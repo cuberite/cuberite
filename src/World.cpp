@@ -120,7 +120,11 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
+cWorld::cWorld(
+	const AString & a_WorldName, const AString & a_DataPath,
+	cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
+	eDimension a_Dimension, const AString & a_LinkedOverworldName
+):
 	m_WorldName(a_WorldName),
 	m_DataPath(a_DataPath),
 	m_LinkedOverworldName(a_LinkedOverworldName),
@@ -135,7 +139,7 @@ cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimensi
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_SpawnX(0),
-	m_SpawnY(0),
+	m_SpawnY(cChunkDef::Height),
 	m_SpawnZ(0),
 	m_BroadcastDeathMessages(true),
 	m_BroadcastAchievementMessages(true),
@@ -146,7 +150,7 @@ cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimensi
 	m_LastChunkCheck(0),
 	m_LastSave(0),
 	m_SkyDarkness(0),
-	m_GameMode(gmNotSet),
+	m_GameMode(gmSurvival),
 	m_bEnabledPVP(false),
 	m_IsDeepSnowEnabled(false),
 	m_ShouldLavaSpawnFire(true),
@@ -201,6 +205,221 @@ cWorld::cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimensi
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
 	Serializer.Load();
+
+	// Track the CSs used by this world in the deadlock detector:
+	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
+
+	// Load world settings from the ini file
+	cIniFile IniFile;
+	if (!IniFile.ReadFile(m_IniFileName))
+	{
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+
+		// TODO: More descriptions for each key
+		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
+		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
+	}
+
+	// The presence of a configuration value overrides everything
+	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
+	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
+	int UnusedDirtyChunksCap = IniFile.GetValueSetI("General", "UnusedChunkCap", 1000);
+	if (UnusedDirtyChunksCap < 0)
+	{
+		UnusedDirtyChunksCap *= -1;
+		IniFile.SetValueI("General", "UnusedChunkCap", UnusedDirtyChunksCap);
+	}
+	m_UnusedDirtyChunksCap = static_cast<size_t>(UnusedDirtyChunksCap);
+
+	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
+	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
+
+	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 12));
+
+	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
+	int KeyNum = IniFile.FindKey("SpawnPosition");
+	m_IsSpawnExplicitlySet =
+	(
+		(KeyNum >= 0) &&
+		(
+			(IniFile.FindValue(KeyNum, "X") >= 0) &&
+			(IniFile.FindValue(KeyNum, "Y") >= 0) &&
+			(IniFile.FindValue(KeyNum, "Z") >= 0)
+		)
+	);
+
+	if (m_IsSpawnExplicitlySet)
+	{
+		LOGD("Spawnpoint explicitly set!");
+		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
+		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
+		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
+	}
+
+	m_StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                      m_StorageSchema);
+	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
+	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
+	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
+	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
+	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
+	m_IsCropsBonemealable         = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",         true);
+	m_IsGrassBonemealable         = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",         true);
+	m_IsMelonStemBonemealable     = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",     true);
+	m_IsMelonBonemealable         = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",         false);
+	m_IsPotatoesBonemealable      = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",      true);
+	m_IsPumpkinStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable",   true);
+	m_IsPumpkinBonemealable       = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",       false);
+	m_IsSaplingBonemealable       = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",       true);
+	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
+	m_IsBigFlowerBonemealable     = IniFile.GetValueSetB("Plants",        "IsBigFlowerBonemealable",     true);
+	m_IsTallGrassBonemealable     = IniFile.GetValueSetB("Plants",        "IsTallGrassBonemealable",     true);
+	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
+	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
+	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
+	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
+	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
+	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
+	m_MinNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalWidth",        2);
+	m_MaxNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalWidth",        21);
+	m_MinNetherPortalHeight       = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalHeight",       3);
+	m_MaxNetherPortalHeight       = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalHeight",       21);
+	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
+	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
+	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
+	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
+
+	m_WorldAge = std::chrono::milliseconds(IniFile.GetValueSetI("General", "WorldAgeMS", 0LL));
+
+	// Load the weather frequency data:
+	if (m_Dimension == dimOverworld)
+	{
+		m_MaxSunnyTicks        = IniFile.GetValueSetI("Weather", "MaxSunnyTicks",        m_MaxSunnyTicks);
+		m_MinSunnyTicks        = IniFile.GetValueSetI("Weather", "MinSunnyTicks",        m_MinSunnyTicks);
+		m_MaxRainTicks         = IniFile.GetValueSetI("Weather", "MaxRainTicks",         m_MaxRainTicks);
+		m_MinRainTicks         = IniFile.GetValueSetI("Weather", "MinRainTicks",         m_MinRainTicks);
+		m_MaxThunderStormTicks = IniFile.GetValueSetI("Weather", "MaxThunderStormTicks", m_MaxThunderStormTicks);
+		m_MinThunderStormTicks = IniFile.GetValueSetI("Weather", "MinThunderStormTicks", m_MinThunderStormTicks);
+		if (m_MaxSunnyTicks < m_MinSunnyTicks)
+		{
+			std::swap(m_MaxSunnyTicks, m_MinSunnyTicks);
+		}
+		if (m_MaxRainTicks < m_MinRainTicks)
+		{
+			std::swap(m_MaxRainTicks, m_MinRainTicks);
+		}
+		if (m_MaxThunderStormTicks < m_MinThunderStormTicks)
+		{
+			std::swap(m_MaxThunderStormTicks, m_MinThunderStormTicks);
+		}
+	}
+
+	auto WorldExists = [&](const AString & a_CheckWorldName)
+	{
+		return (std::find(a_WorldNames.begin(), a_WorldNames.end(), a_CheckWorldName) != a_WorldNames.end());
+	};
+
+	if (a_Dimension == dimOverworld)
+	{
+		AString MyNetherName = GetName() + "_nether";
+		AString MyEndName = GetName() + "_the_end";
+		if (!WorldExists(MyNetherName))
+		{
+			MyNetherName.clear();
+		}
+		if (!WorldExists(MyEndName))
+		{
+			MyEndName = GetName() + "_end";
+			if (!WorldExists(MyEndName))
+			{
+				MyEndName.clear();
+			}
+		}
+
+		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", MyNetherName);
+		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    MyEndName);
+	}
+	else
+	{
+		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
+	}
+
+	// If we are linked to one or more worlds that do not exist, unlink them
+	if (a_Dimension == dimOverworld)
+	{
+		if (!m_LinkedNetherWorldName.empty() && !WorldExists(m_LinkedNetherWorldName))
+		{
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", "");
+			LOG("%s Is linked to a nonexisting nether world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedNetherWorldName.c_str(), GetName().c_str());
+			m_LinkedNetherWorldName.clear();
+		}
+		if (!m_LinkedEndWorldName.empty() && !WorldExists(m_LinkedEndWorldName))
+		{
+			IniFile.SetValue("LinkedWorlds", "EndWorldName", "");
+			LOG("%s Is linked to a nonexisting end world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedEndWorldName.c_str(), GetName().c_str());
+			m_LinkedEndWorldName.clear();
+		}
+	}
+	else
+	{
+		if (!m_LinkedOverworldName.empty() && !WorldExists(m_LinkedOverworldName))
+		{
+			IniFile.SetValue("LinkedWorlds", "OverworldName", "");
+			LOG("%s Is linked to a nonexisting overworld called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
+				GetName().c_str(), m_LinkedOverworldName.c_str(), GetName().c_str());
+			m_LinkedOverworldName.clear();
+		}
+	}
+
+
+
+	// Adjust the enum-backed variables into their respective bounds:
+	m_GameMode         = static_cast<eGameMode>     (Clamp<int>(GameMode,         gmSurvival, gmSpectator));
+	m_TNTShrapnelLevel = static_cast<eShrapnelLevel>(Clamp<int>(TNTShrapnelLevel, slNone,     slAll));
+	m_Weather          = static_cast<eWeather>      (Clamp<int>(Weather,          wSunny,     wStorm));
+
+	InitialiseGeneratorDefaults(IniFile);
+	InitialiseAndLoadMobSpawningValues(IniFile);
+	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
+
+	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
+
+	// preallocate some memory for ticking blocks so we don't need to allocate that often
+	m_BlockTickQueue.reserve(1000);
+	m_BlockTickQueueCopy.reserve(1000);
+
+	// Simulators:
+	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
+	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
+
+	// Water, Lava and Redstone simulators get registered in their initialize function.
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator.get(), 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator.get(), 1);
+
+	m_Generator.Initialize(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
+
+	m_MapManager.LoadMapData();
+
+	// Save any changes that the defaults may have done to the ini file:
+	if (!IniFile.WriteFile(m_IniFileName))
+	{
+		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
+	}
+
+	// Init of the spawn monster time (as they are supposed to have different spawn rate)
+	m_LastSpawnMonster.emplace(cMonster::mfHostile, cTickTimeLong(0));
+	m_LastSpawnMonster.emplace(cMonster::mfPassive, cTickTimeLong(0));
+	m_LastSpawnMonster.emplace(cMonster::mfAmbient, cTickTimeLong(0));
+	m_LastSpawnMonster.emplace(cMonster::mfWater,   cTickTimeLong(0));
 }
 
 
@@ -386,226 +605,13 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::Start(cDeadlockDetect & a_DeadlockDetect)
+void cWorld::Start()
 {
-	// Track the CSs used by this world in the deadlock detector:
-	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
-	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
-	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
-
-	m_SpawnX = 0;
-	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = 0;
-	m_GameMode = eGameMode_Survival;
-
-	cIniFile IniFile;
-	if (!IniFile.ReadFile(m_IniFileName))
-	{
-		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
-
-		// TODO: More descriptions for each key
-		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
-		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
-	}
-
-	// The presence of a configuration value overrides everything
-	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
-	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
-	int UnusedDirtyChunksCap = IniFile.GetValueSetI("General", "UnusedChunkCap", 1000);
-	if (UnusedDirtyChunksCap < 0)
-	{
-		UnusedDirtyChunksCap *= -1;
-		IniFile.SetValueI("General", "UnusedChunkCap", UnusedDirtyChunksCap);
-	}
-	m_UnusedDirtyChunksCap = static_cast<size_t>(UnusedDirtyChunksCap);
-
-	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
-	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
-
-	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 12));
-
-	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
-	int KeyNum = IniFile.FindKey("SpawnPosition");
-	m_IsSpawnExplicitlySet =
-	(
-		(KeyNum >= 0) &&
-		(
-			(IniFile.FindValue(KeyNum, "X") >= 0) &&
-			(IniFile.FindValue(KeyNum, "Y") >= 0) &&
-			(IniFile.FindValue(KeyNum, "Z") >= 0)
-		)
-	);
-
-	if (m_IsSpawnExplicitlySet)
-	{
-		LOGD("Spawnpoint explicitly set!");
-		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
-		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
-		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
-	}
-
-	m_StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                      m_StorageSchema);
-	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
-	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
-	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
-	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
-	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
-	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
-	m_IsCropsBonemealable         = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",         true);
-	m_IsGrassBonemealable         = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",         true);
-	m_IsMelonStemBonemealable     = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",     true);
-	m_IsMelonBonemealable         = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",         false);
-	m_IsPotatoesBonemealable      = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",      true);
-	m_IsPumpkinStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable",   true);
-	m_IsPumpkinBonemealable       = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",       false);
-	m_IsSaplingBonemealable       = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",       true);
-	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
-	m_IsBigFlowerBonemealable     = IniFile.GetValueSetB("Plants",        "IsBigFlowerBonemealable",     true);
-	m_IsTallGrassBonemealable     = IniFile.GetValueSetB("Plants",        "IsTallGrassBonemealable",     true);
-	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
-	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
-	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
-	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
-	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
-	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
-	m_MinNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalWidth",        2);
-	m_MaxNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalWidth",        21);
-	m_MinNetherPortalHeight       = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalHeight",       3);
-	m_MaxNetherPortalHeight       = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalHeight",       21);
-	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
-	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
-	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    static_cast<int>(m_GameMode));
-	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     static_cast<int>(m_Weather));
-
-	m_WorldAge = std::chrono::milliseconds(IniFile.GetValueSetI("General", "WorldAgeMS", 0LL));
-
-	// Load the weather frequency data:
-	if (m_Dimension == dimOverworld)
-	{
-		m_MaxSunnyTicks        = IniFile.GetValueSetI("Weather", "MaxSunnyTicks",        m_MaxSunnyTicks);
-		m_MinSunnyTicks        = IniFile.GetValueSetI("Weather", "MinSunnyTicks",        m_MinSunnyTicks);
-		m_MaxRainTicks         = IniFile.GetValueSetI("Weather", "MaxRainTicks",         m_MaxRainTicks);
-		m_MinRainTicks         = IniFile.GetValueSetI("Weather", "MinRainTicks",         m_MinRainTicks);
-		m_MaxThunderStormTicks = IniFile.GetValueSetI("Weather", "MaxThunderStormTicks", m_MaxThunderStormTicks);
-		m_MinThunderStormTicks = IniFile.GetValueSetI("Weather", "MinThunderStormTicks", m_MinThunderStormTicks);
-		if (m_MaxSunnyTicks < m_MinSunnyTicks)
-		{
-			std::swap(m_MaxSunnyTicks, m_MinSunnyTicks);
-		}
-		if (m_MaxRainTicks < m_MinRainTicks)
-		{
-			std::swap(m_MaxRainTicks, m_MinRainTicks);
-		}
-		if (m_MaxThunderStormTicks < m_MinThunderStormTicks)
-		{
-			std::swap(m_MaxThunderStormTicks, m_MinThunderStormTicks);
-		}
-	}
-
-	if (GetDimension() == dimOverworld)
-	{
-		AString MyNetherName = GetName() + "_nether";
-		AString MyEndName = GetName() + "_the_end";
-		if (cRoot::Get()->GetWorld(MyNetherName) == nullptr)
-		{
-			MyNetherName = "";
-		}
-		if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
-		{
-			MyEndName = GetName() + "_end";
-			if (cRoot::Get()->GetWorld(MyEndName) == nullptr)
-			{
-				MyEndName = "";
-			}
-		}
-
-		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", MyNetherName);
-		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    MyEndName);
-	}
-	else
-	{
-		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
-	}
-
-	// If we are linked to one or more worlds that do not exist, unlink them
-	cRoot * Root = cRoot::Get();
-	if (GetDimension() == dimOverworld)
-	{
-		if ((!m_LinkedNetherWorldName.empty()) && (Root->GetWorld(m_LinkedNetherWorldName) == nullptr))
-		{
-			IniFile.SetValue("LinkedWorlds", "NetherWorldName", "");
-			LOG("%s Is linked to a nonexisting nether world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
-				GetName().c_str(), m_LinkedNetherWorldName.c_str(), GetName().c_str());
-			m_LinkedNetherWorldName = "";
-		}
-		if ((!m_LinkedEndWorldName.empty()) && (Root->GetWorld(m_LinkedEndWorldName) == nullptr))
-		{
-			IniFile.SetValue("LinkedWorlds", "EndWorldName", "");
-			LOG("%s Is linked to a nonexisting end world called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
-				GetName().c_str(), m_LinkedEndWorldName.c_str(), GetName().c_str());
-			m_LinkedEndWorldName = "";
-		}
-	}
-	else
-	{
-		if ((!m_LinkedOverworldName.empty()) && (Root->GetWorld(m_LinkedOverworldName) == nullptr))
-		{
-			IniFile.SetValue("LinkedWorlds", "OverworldName", "");
-			LOG("%s Is linked to a nonexisting overworld called \"%s\". The server has modified \"%s/world.ini\" and removed this invalid link.",
-				GetName().c_str(), m_LinkedOverworldName.c_str(), GetName().c_str());
-			m_LinkedOverworldName = "";
-		}
-	}
-
-
-
-	// Adjust the enum-backed variables into their respective bounds:
-	m_GameMode         = static_cast<eGameMode>     (Clamp<int>(GameMode,         gmSurvival, gmSpectator));
-	m_TNTShrapnelLevel = static_cast<eShrapnelLevel>(Clamp<int>(TNTShrapnelLevel, slNone,     slAll));
-	m_Weather          = static_cast<eWeather>      (Clamp<int>(Weather,          wSunny,     wStorm));
-
-	InitialiseGeneratorDefaults(IniFile);
-	InitialiseAndLoadMobSpawningValues(IniFile);
-	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
-
-	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
-	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
-
-	// preallocate some memory for ticking blocks so we don't need to allocate that often
-	m_BlockTickQueue.reserve(1000);
-	m_BlockTickQueueCopy.reserve(1000);
-
-	// Simulators:
-	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
-	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
-	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
-
-	// Water, Lava and Redstone simulators get registered in their initialize function.
-	m_SimulatorManager->RegisterSimulator(m_SandSimulator.get(), 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator.get(), 1);
-
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
-	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
+	m_Generator.Start();
 	m_ChunkSender.Start();
 	m_TickThread.Start();
-
-	// Init of the spawn monster time (as they are supposed to have different spawn rate)
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfHostile, cTickTimeLong(0)));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfPassive, cTickTimeLong(0)));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfAmbient, cTickTimeLong(0)));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfWater, cTickTimeLong(0)));
-
-	m_MapManager.LoadMapData();
-
-	// Save any changes that the defaults may have done to the ini file:
-	if (!IniFile.WriteFile(m_IniFileName))
-	{
-		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
-	}
 }
 
 

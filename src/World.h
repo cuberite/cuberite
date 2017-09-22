@@ -731,9 +731,8 @@ public:
 
 	void InitializeSpawn(void);
 
-	/** Starts threads that belong to this world.
-	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
-	void Start(cDeadlockDetect & a_DeadlockDetect);
+	/** Starts threads that belong to this world. */
+	void Start();
 
 	/** Stops threads that belong to this world (part of deinit).
 	a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock. */
@@ -1066,8 +1065,15 @@ private:
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
-
-	cWorld(const AString & a_WorldName, const AString & a_DataPath, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
+	/** Construct the world and read settings from its ini file.
+	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
+	@param a_WorldNames is a list of all world names, used to validate linked worlds
+	*/
+	cWorld(
+		const AString & a_WorldName, const AString & a_DataPath,
+		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
+		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
+	);
 	virtual ~cWorld() override;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
