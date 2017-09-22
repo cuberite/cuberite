@@ -1037,7 +1037,7 @@ the most popular tracing reasons - line of sight and solid hits.
 						{ Name = "EndX",   Type = "number" },
 						{ Name = "EndY",   Type = "number" },
 						{ Name = "EndZ",   Type = "number" },
-						{ Name = "Sight",  Type = "number" },
+						{ Name = "Sight",  Type = "number", IsOptional = true },
 					},
 					Returns =
 					{
@@ -1052,7 +1052,7 @@ the most popular tracing reasons - line of sight and solid hits.
 						{ Name = "World", Type = "cWorld" },
 						{ Name = "Start", Type = "Vector3d" },
 						{ Name = "End",   Type = "Vector3d" },
-						{ Name = "Sight", Type = "number" },
+						{ Name = "Sight", Type = "number", IsOptional = true },
 					},
 					Returns =
 					{

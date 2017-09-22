@@ -1999,6 +1999,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						Name = "IsByBonemeal",
 						Type = "boolean",
+						IsOptional = true,
 					},
 				},
 				Returns =
@@ -2651,6 +2652,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						Name = "IsAlwaysTicked",
 						Type = "boolean",
+						IsOptional = true,
 					},
 				},
 				Notes = "Sets the chunk to always be ticked and loaded even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'."
@@ -3351,10 +3353,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						{
 							Name = "FuseTicks",
 							Type = "number",
+							IsOptional = true,
 						},
 						{
 							Name = "InitialVelocityCoeff",
 							Type = "number",
+							IsOptional = true,
 						},
 					},
 					Returns =
@@ -3384,10 +3388,12 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						{
 							Name = "FuseTicks",
 							Type = "number",
+							IsOptional = true,
 						},
 						{
 							Name = "InitialVelocityCoeff",
 							Type = "number",
+							IsOptional = true,
 						},
 					},
 					Returns =

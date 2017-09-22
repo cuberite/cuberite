@@ -6929,6 +6929,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						{
 							Name = "FromBook",
 							Type = "boolean",
+							IsOptional = true,
 						},
 					},
 					Returns =
@@ -11093,6 +11094,7 @@ a_Player:OpenWindow(Window);
 							{
 								Name = "MessageType",
 								Type = "eMessageType",
+								IsOptional = true,
 							},
 						},
 						Notes = "Broadcasts a message to all players, with its message type set to MessageType (default: mtCustom).",

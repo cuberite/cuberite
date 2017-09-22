@@ -834,7 +834,11 @@ local function CreateFunctionParamsDescription(a_FnParams, a_ClassName, a_API)
 		res[idx] = "<tr><td>"
 		res[idx + 1] = param.Name or ""
 		res[idx + 2] = "</td><td><i>"
-		res[idx + 3] = LinkifyType(param.Type, a_API)
+		if param.IsOptional then
+			res[idx + 3] = "optional " .. LinkifyType(param.Type, a_API)
+		else
+			res[idx + 3] = LinkifyType(param.Type, a_API)
+		end
 		res[idx + 4] = "</i></td></tr>"
 		idx = idx + 5
 	end
