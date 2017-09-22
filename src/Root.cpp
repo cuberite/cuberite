@@ -213,7 +213,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_BrewingRecipes.reset(new cBrewingRecipes());
 
 	LOGD("Loading worlds...");
-	LoadWorlds(*settingsRepo, IsNewIniFile);
+	LoadWorlds(dd, *settingsRepo, IsNewIniFile);
 
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager(dd);
@@ -397,7 +397,7 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile)
+void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile)
 {
 	if (a_IsNewIniFile)
 	{
@@ -407,19 +407,28 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 		a_Settings.AddValue("WorldPaths", "world", "world");
 		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
 		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
-		m_pDefaultWorld = new cWorld("world", "world");
+
+		AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
+		m_pDefaultWorld = new cWorld("world", "world", a_dd, WorldNames);
 		m_WorldsByName["world"] = m_pDefaultWorld;
-		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", dimNether, "world");
-		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", dimEnd, "world");
+		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 
-	// First get the default world
+	// Build a list of all world names
+	auto Worlds = a_Settings.GetValues("Worlds");
+	AStringVector WorldNames(Worlds.size());
+	for (const auto & World : Worlds)
+	{
+		WorldNames.push_back(World.second);
+	}
+
+	// Get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str());
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str(), a_dd, WorldNames);
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
-	auto Worlds = a_Settings.GetValues("Worlds");
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -516,7 +525,7 @@ void cRoot::LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIn
 			}
 			Dimension = dimEnd;
 		}
-		NewWorld = new cWorld(WorldName.c_str(), WorldPath.c_str(), Dimension, LinkTo);
+		NewWorld = new cWorld(WorldName.c_str(), WorldPath.c_str(), a_dd, WorldNames, Dimension, LinkTo);
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 
@@ -538,7 +547,7 @@ void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->Start(a_DeadlockDetect);
+		itr->second->Start();
 		itr->second->InitializeSpawn();
 		m_PluginManager->CallHookWorldStarted(*itr->second);
 	}

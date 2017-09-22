@@ -228,7 +228,7 @@ private:
 	void LoadGlobalSettings();
 
 	/** Loads the worlds from settings.ini, creates the worldmap */
-	void LoadWorlds(cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
+	void LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
 
 	/** Starts each world's life */
 	void StartWorlds(cDeadlockDetect & a_DeadlockDetect);

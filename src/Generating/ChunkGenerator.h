@@ -33,7 +33,7 @@ class cChunkDesc;
 
 
 class cChunkGenerator :
-	cIsThread
+	public cIsThread
 {
 	typedef cIsThread super;
 
@@ -110,7 +110,9 @@ public:
 	cChunkGenerator (void);
 	virtual ~cChunkGenerator() override;
 
-	bool Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
+	/** Read settings from the ini file and initialize in preperation for being started. */
+	bool Initialize(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
+
 	void Stop(void);
 
 	/** Queues the chunk for generation

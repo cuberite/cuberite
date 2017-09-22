@@ -47,7 +47,7 @@ cChunkGenerator::~cChunkGenerator()
 
 
 
-bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
+bool cChunkGenerator::Initialize(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
 {
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
@@ -86,8 +86,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 	}
 
 	m_Generator->Initialize(a_IniFile);
-
-	return super::Start();
+	return true;
 }
 
 
