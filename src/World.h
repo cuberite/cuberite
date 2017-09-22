@@ -962,7 +962,7 @@ private:
 	cCriticalSection m_CSPlayers;
 	cPlayerList      m_Players;
 
-	cWorldStorage     m_Storage;
+	cWorldStorage    m_Storage;
 
 	unsigned int m_MaxPlayers;
 

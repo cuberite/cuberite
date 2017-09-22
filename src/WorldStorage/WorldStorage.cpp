@@ -60,13 +60,11 @@ cWorldStorage::~cWorldStorage()
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor)
+void cWorldStorage::Initialize(cWorld & a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor)
 {
-	m_World = a_World;
+	m_World = &a_World;
 	m_StorageSchemaName = a_StorageSchemaName;
 	InitSchemas(a_StorageCompressionFactor);
-
-	return super::Start();
 }
 
 

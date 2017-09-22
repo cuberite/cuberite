@@ -196,6 +196,7 @@ cWorld::cWorld(
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
 	m_ChunkSender(*this),
+	m_Lighting(*this),
 	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
@@ -405,6 +406,7 @@ cWorld::cWorld(
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator.get(), 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator.get(), 1);
 
+	m_Storage.Initialize(*this, m_StorageSchema, m_StorageCompressionFactor);
 	m_Generator.Initialize(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 
 	m_MapManager.LoadMapData();
@@ -607,8 +609,8 @@ void cWorld::InitializeSpawn(void)
 
 void cWorld::Start()
 {
-	m_Lighting.Start(this);
-	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
+	m_Lighting.Start();
+	m_Storage.Start();
 	m_Generator.Start();
 	m_ChunkSender.Start();
 	m_TickThread.Start();

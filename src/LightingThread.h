@@ -52,10 +52,8 @@ class cLightingThread :
 
 public:
 
-	cLightingThread(void);
+	cLightingThread(cWorld & a_World);
 	virtual ~cLightingThread() override;
-
-	bool Start(cWorld * a_World);
 
 	void Stop(void);
 
@@ -94,7 +92,7 @@ protected:
 	typedef std::list<cChunkStay *> cChunkStays;
 
 
-	cWorld * m_World;
+	cWorld & m_World;
 
 	/** The mutex to protect m_Queue and m_PendingQueue */
 	cCriticalSection m_CS;
