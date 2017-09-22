@@ -2351,7 +2351,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location has any damp precipitation (rain or storm) (takes biomes into account, deserts and snowy areas are never wet).",
+				Notes = "Returns true if it is raining or storming at the specified location. This takes into account biomes, as dry or cold biomes do not experience wet weather.",
 			},
 			IsWeatherWetAtBlock =
 			{
@@ -2368,7 +2368,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location has any precipitation (rain or storm), taking into account biomes and any blocks above the specified position that would block the precipitation.",
+				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false. This assumes that the given y coordinate is valid.",
 			},
 			PrepareChunk =
 			{

@@ -793,20 +793,22 @@ public:
 		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather has any precipitation - rain, storm or snow */
+	/** Returns true if the world currently has any precipitation - rain, storm or snow */
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 
-	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
+	/** Returns true if it is raining or storming at the specified location.
+	This takes into account biomes, as dry or cold biomes do not experience wet
+	weather. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
 	{
 		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);
 		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
 	}
 
-	/** Returns true if the specified location has any precipitation (rain or
-	storm), taking into account biomes and any blocks above the specified
-	position that would block the precipitation. This assumes that the given
-	y coordinate is valid. */
+	/** Returns true if the specified location has wet weather (rain or storm),
+	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
+	above the specified position will block the precipitation and this function
+	will return false. This assumes that the given y coordinate is valid. */
 	virtual bool IsWeatherWetAtBlock(Vector3i a_Pos);
 
 	/** Returns the seed of the world. */
