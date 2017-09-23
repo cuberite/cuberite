@@ -835,7 +835,14 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 	// If the area contains block entities, remove those not matching and replace with whatever block entity block was filled
 	if (HasBlockEntities() && ((a_DataTypes & baTypes) != 0))
 	{
-		RescanBlockEntities();
+		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
+		{
+			RescanBlockEntities();
+		}
+		else
+		{
+			ClearBlockEntities(*m_BlockEntities);
+		}
 	}
 }
 
@@ -888,7 +895,14 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 	// If the area contains block entities, remove those in the affected cuboid and replace with whatever block entity block was filled:
 	if (HasBlockEntities() && ((a_DataTypes & baTypes) != 0))
 	{
-		RescanBlockEntities();
+		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
+		{
+			RescanBlockEntities();
+		}
+		else
+		{
+			ClearBlockEntities(*m_BlockEntities);
+		}
 	}
 }
 
