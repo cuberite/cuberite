@@ -5,6 +5,7 @@
 
 #include "Player.h"
 #include "Mobs/Wolf.h"
+#include "Mobs/Horse.h"
 #include "../BoundingBox.h"
 #include "../ChatColor.h"
 #include "../Server.h"
@@ -2196,6 +2197,35 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	);
 
 	return true;
+}
+
+
+
+
+
+void cPlayer::OpenHorseInventory()
+{
+	if (
+		(m_AttachedTo == nullptr) ||
+		!m_AttachedTo->IsMob()
+	)
+	{
+		return;
+	}
+
+	auto & Mob = static_cast<cMonster&>(*m_AttachedTo);
+
+	if (Mob.GetMobType() != mtHorse)
+	{
+		return;
+	}
+
+	auto & Horse = static_cast<cHorse&>(Mob);
+	// The client sends requests for untame horses as well but shouldn't actually open
+	if (Horse.IsTame())
+	{
+		Horse.PlayerOpenWindow(*this);
+	}
 }
 
 

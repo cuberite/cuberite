@@ -338,6 +338,9 @@ public:  // tolua_export
 	the NPC UI. */
 	void HandleNPCTrade(int a_SlotNum);
 
+	/** Handles a player opening their inventory while riding a horse. */
+	void HandleOpenHorseInventory(UInt32 a_EntityID);
+
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);

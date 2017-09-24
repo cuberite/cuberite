@@ -48,6 +48,7 @@ Implements the 1.9 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+#include "../UI/HorseWindow.h"
 
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -1723,7 +1724,7 @@ void cProtocol_1_9_0::SendWindowOpen(const cWindow & a_Window)
 
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
-		Pkt.WriteBEInt32(0);  // TODO: The animal's EntityID
+		Pkt.WriteBEInt32(static_cast<const cHorseWindow&>(a_Window).GetHorseID());
 	}
 }
 
@@ -2517,6 +2518,7 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
 		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
 		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
+		case 7: m_Client->HandleOpenHorseInventory(PlayerID);     break;  // Open horse inventory
 	}
 }
 

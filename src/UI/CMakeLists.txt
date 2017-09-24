@@ -15,6 +15,7 @@ SET (SRCS
 	EnderChestWindow.cpp
 	FurnaceWindow.cpp
 	HopperWindow.cpp
+	HorseWindow.cpp
 	InventoryWindow.cpp)
 
 SET (HDRS
@@ -30,6 +31,7 @@ SET (HDRS
 	EnderChestWindow.h
 	FurnaceWindow.h
 	HopperWindow.h
+	HorseWindow.h
 	InventoryWindow.h
 	MinecartWithChestWindow.h
 	WindowOwner.h)
