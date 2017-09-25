@@ -27,8 +27,8 @@ public:
 	{
 		UNUSED(a_Meta);
 
-		unsigned int NumberOfEntities;
-		bool FoundPlayer;
+		unsigned int NumberOfEntities = 0;
+		bool FoundPlayer = false;
 		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & a_Entity)
 			{
 				if (a_Entity.IsPlayer())
