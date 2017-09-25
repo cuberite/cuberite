@@ -1257,7 +1257,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_BlockDigAnimY = a_BlockY;
 	m_BlockDigAnimZ = a_BlockZ;
 	m_BlockDigAnimStage = 0;
-	m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
+	m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), {m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ}, 0, this);
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1371,7 +1371,7 @@ void cClientHandle::FinishDigAnimation()
 		// End dig animation
 		m_BlockDigAnimStage = -1;
 		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ, 10, this);
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), {m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ}, 10, this);
 	}
 
 	m_BlockDigAnimX = -1;
@@ -2160,7 +2160,7 @@ void cClientHandle::Tick(float a_Dt)
 		}
 		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
 		{
-			m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, static_cast<char>(m_BlockDigAnimStage / 1000), this);
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), {m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ}, static_cast<char>(m_BlockDigAnimStage / 1000), this);
 		}
 	}
 

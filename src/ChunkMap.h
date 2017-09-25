@@ -72,8 +72,8 @@ public:
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
+	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude);
 	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle);

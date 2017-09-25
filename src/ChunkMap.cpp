@@ -325,36 +325,33 @@ void cChunkMap::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 
 
 
-void cChunkMap::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	cChunkCoords ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkPos);
 	if (Chunk == nullptr)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
+	Chunk->BroadcastBlockBreakAnimation(a_EntityID, a_BlockPos, a_Stage, a_Exclude);
 }
 
 
 
 
 
-void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	cChunkCoords ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkPos);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
 	}
-	Chunk->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+	Chunk->BroadcastBlockEntity(a_BlockPos, a_Exclude);
 }
 
 
