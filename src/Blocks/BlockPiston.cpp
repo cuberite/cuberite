@@ -29,7 +29,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 {
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos.x, blockPos.y, blockPos.z);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos);
 	// If the piston is extended, destroy the extension as well
 	if (IsExtended(OldMeta))
 	{
@@ -322,7 +322,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
 
 	// Get the base of the piston
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos.x, blockPos.y, blockPos.z);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos);
 	blockPos -= cBlockPistonHandler::MetadataToOffset(OldMeta);
 
 	BLOCKTYPE Block = a_ChunkInterface.GetBlock(blockPos);

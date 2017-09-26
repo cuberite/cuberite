@@ -55,14 +55,14 @@ public:
 	Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding */
 	int FindObsidianCeiling(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, int MaxY = 0)
 	{
-		if (a_ChunkInterface.GetBlock(X, Y, Z) != E_BLOCK_OBSIDIAN)
+		if (a_ChunkInterface.GetBlock({X, Y, Z}) != E_BLOCK_OBSIDIAN)
 		{
 			return 0;
 		}
 
 		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
 		{
-			BLOCKTYPE Block = a_ChunkInterface.GetBlock(X, newY, Z);
+			BLOCKTYPE Block = a_ChunkInterface.GetBlock({X, newY, Z});
 			if ((Block == E_BLOCK_AIR) || (Block == E_BLOCK_FIRE))
 			{
 				continue;
@@ -92,7 +92,7 @@ public:
 	{
 		for (int checkBorder = FoundObsidianY + 1; checkBorder <= MaxY - 1; checkBorder++)  // FoundObsidianY + 1: FoundObsidianY has already been checked in FindObsidianCeiling; MaxY - 1: portal doesn't need corners
 		{
-			if (a_ChunkInterface.GetBlock(X, checkBorder, Z) != E_BLOCK_OBSIDIAN)
+			if (a_ChunkInterface.GetBlock({X, checkBorder, Z}) != E_BLOCK_OBSIDIAN)
 			{
 				// Base obsidian, base + 1 obsidian, base + x NOT obsidian -> not complete portal
 				return false;
@@ -159,7 +159,7 @@ public:
 	{
 		Dir = 1;  // Set assumed direction (will change if portal turns out to be facing the other direction)
 		bool FoundFrameXP = false, FoundFrameXM = false;
-		for (; ((a_ChunkInterface.GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++)  // Check XP for obsidian blocks, exempting corners
+		for (; ((a_ChunkInterface.GetBlock({X1, Y, Z}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X1, Y + 1, Z}) == E_BLOCK_OBSIDIAN)); X1++)  // Check XP for obsidian blocks, exempting corners
 		{
 			int Value = FindObsidianCeiling(X1, Y, Z, a_ChunkInterface, MaxY);
 			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, a_ChunkInterface, MaxY);  // For corners without obsidian
@@ -174,7 +174,7 @@ public:
 			}
 		}
 		XZP = X1 - 1;  // Set boundary of frame interior
-		for (; ((a_ChunkInterface.GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--)  // Go the other direction (XM)
+		for (; ((a_ChunkInterface.GetBlock({X2, Y, Z}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X2, Y + 1, Z}) == E_BLOCK_OBSIDIAN)); X2--)  // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, a_ChunkInterface, MaxY);
 			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, a_ChunkInterface, MaxY);
@@ -198,7 +198,7 @@ public:
 	{
 		Dir = 2;
 		bool FoundFrameZP = false, FoundFrameZM = false;
-		for (; ((a_ChunkInterface.GetBlock(X, Y, Z1) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X, Y + 1, Z1) == E_BLOCK_OBSIDIAN)); Z1++)
+		for (; ((a_ChunkInterface.GetBlock({X, Y, Z1}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X, Y + 1, Z1}) == E_BLOCK_OBSIDIAN)); Z1++)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z1, a_ChunkInterface, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z1, a_ChunkInterface, MaxY);
@@ -213,7 +213,7 @@ public:
 			}
 		}
 		XZP = Z1 - 1;
-		for (; ((a_ChunkInterface.GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
+		for (; ((a_ChunkInterface.GetBlock({X, Y, Z2}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X, Y + 1, Z2}) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z2, a_ChunkInterface, MaxY);
 			int ValueTwo = FindObsidianCeiling(X, Y + 1, Z2, a_ChunkInterface, MaxY);

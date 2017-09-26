@@ -40,8 +40,8 @@ public:
 		}
 
 		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))
+			!CanReplaceBlock(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})) ||
+			!CanReplaceBlock(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ}))
 		)
 		{
 			return false;
@@ -233,14 +233,14 @@ public:
 	Fails gracefully for (invalid) doors on the world's top and bottom. */
 	static NIBBLETYPE GetCompleteDoorMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 
 		if ((Meta & 0x08) != 0)
 		{
 			// The coords are pointing at the top part of the door
 			if (a_BlockY > 0)
 			{
-				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY - 1, a_BlockZ});
 				return static_cast<NIBBLETYPE>((DownMeta & 0x07) | 0x08 | (Meta << 4));
 			}
 			// This is the top part of the door at the bottommost layer of the world, there's no bottom:
@@ -251,7 +251,7 @@ public:
 			// The coords are pointing at the bottom part of the door
 			if (a_BlockY < cChunkDef::Height - 1)
 			{
-				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
+				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY + 1, a_BlockZ});
 				return static_cast<NIBBLETYPE>(Meta | (UpMeta << 4));
 			}
 			// This is the bottom part of the door at the topmost layer of the world, there's no top:
@@ -262,7 +262,7 @@ public:
 	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
-		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE Block = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
 		if (!IsDoorBlockType(Block))
 		{
 			return;

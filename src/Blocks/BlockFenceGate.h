@@ -36,7 +36,7 @@ public:
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 		NIBBLETYPE NewMetaData = PlayerYawToMetaData(a_Player.GetYaw());
 		OldMetaData ^= 4;  // Toggle the gate
 

@@ -441,7 +441,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_Ne
 {
 	if ((a_NeighborY >= 0) && (a_NeighborY < cChunkDef::Height))
 	{
-		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_NeighborX, a_NeighborY, a_NeighborZ))->OnNeighborChanged(a_ChunkInterface, a_NeighborX, a_NeighborY, a_NeighborZ, a_WhichNeighbor);
+		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock({a_NeighborX, a_NeighborY, a_NeighborZ}))->OnNeighborChanged(a_ChunkInterface, a_NeighborX, a_NeighborY, a_NeighborZ, a_WhichNeighbor);
 	}
 }
 
@@ -462,7 +462,7 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop)
 {
 	cItems Pickups;
-	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 
 	if (a_CanDrop)
 	{
@@ -621,7 +621,7 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 /* default functionality: only test for height, since we assume full voxels with varying height */
-bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
 	return a_Position.y < cBlockInfo::GetBlockHeight(a_BlockType);
 }
