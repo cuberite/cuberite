@@ -19,6 +19,7 @@
 #include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
 #include "DeadlockDetect.h"
+#include "BlockEntities/BlockEntity.h"
 
 #ifndef _WIN32
 	#include <cstdlib>  // abs
@@ -1761,6 +1762,18 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 								{
 									m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 								}
+							}
+
+							// Destroy any block entities
+							if (cBlockEntity::IsBlockEntityBlockType(Block))
+							{
+								Vector3i BlockPos(bx + x, by + y, bz + z);
+								DoWithBlockEntityAt(BlockPos.x, BlockPos.y, BlockPos.z, [](cBlockEntity & a_BE)
+									{
+										a_BE.Destroy();
+										return true;
+									}
+								);
 							}
 
 							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
