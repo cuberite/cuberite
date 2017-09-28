@@ -1679,7 +1679,8 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
-		Pkt.WriteBEInt32(static_cast<const cHorseWindow&>(a_Window).GetHorseID());
+		UInt32 HorseID = static_cast<const cHorseWindow&>(a_Window).GetHorseID();
+		Pkt.WriteBEInt32(static_cast<Int32>(HorseID));
 	}
 }
 
