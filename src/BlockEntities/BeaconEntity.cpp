@@ -231,11 +231,7 @@ void cBeaconEntity::GiveEffects(void)
 		EffectLevel = 1;
 	}
 
-	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
-	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0))
-	{
-		SecondaryEffect = m_SecondaryEffect;
-	}
+	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
 	Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
 	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
@@ -251,7 +247,7 @@ void cBeaconEntity::GiveEffects(void)
 			{
 				a_Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
 
-				if (m_SecondaryEffect != cEntityEffect::effNoEffect)
+				if (HasSecondaryEffect)
 				{
 					a_Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
 				}
