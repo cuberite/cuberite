@@ -189,7 +189,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					}
 				}
 			}
-			return EntitiesSpawned;
+			return HaveSpawnedEntity;
 		}
 	);
 
