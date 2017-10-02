@@ -338,7 +338,8 @@ public:  // tolua_export
 	the NPC UI. */
 	void HandleNPCTrade(int a_SlotNum);
 
-	/** Handles a player opening their inventory while riding a horse. */
+	/** Handles a player opening their inventory while riding a horse.
+	@param a_EntityID ID of the player that is to open the inventory. Should be the same as GetPlayer()->GetUniqueID().  */
 	void HandleOpenHorseInventory(UInt32 a_EntityID);
 
 	void HandlePing             (void);

@@ -2213,14 +2213,14 @@ void cPlayer::OpenHorseInventory()
 		return;
 	}
 
-	auto & Mob = static_cast<cMonster&>(*m_AttachedTo);
+	auto & Mob = static_cast<cMonster &>(*m_AttachedTo);
 
 	if (Mob.GetMobType() != mtHorse)
 	{
 		return;
 	}
 
-	auto & Horse = static_cast<cHorse&>(Mob);
+	auto & Horse = static_cast<cHorse &>(Mob);
 	// The client sends requests for untame horses as well but shouldn't actually open
 	if (Horse.IsTame())
 	{
