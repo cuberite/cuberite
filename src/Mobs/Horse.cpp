@@ -169,6 +169,11 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
+	if (IsBaby())
+	{
+		return;  // Babies don't drop items
+	}
+
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{

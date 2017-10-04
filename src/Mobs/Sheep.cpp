@@ -35,6 +35,11 @@ cSheep::cSheep(int a_Color) :
 
 void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
+	if (IsBaby())
+	{
+		return;  // Babies don't drop items
+	}
+
 	if (!m_IsSheared)
 	{
 		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, static_cast<short>(m_WoolColor)));
