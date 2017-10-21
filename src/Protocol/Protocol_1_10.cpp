@@ -916,7 +916,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 			a_Pkt.WriteBEUInt8(VILLAGER_PROFESSION);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(cVillager::VillagerCareerToProfession(Villager.GetCareer())));
 			break;
 		}  // case mtVillager
 

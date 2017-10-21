@@ -32,6 +32,7 @@ SET (HDRS
 	HopperWindow.h
 	InventoryWindow.h
 	MinecartWithChestWindow.h
+	VillagerTradeWindow.h
 	WindowOwner.h)
 
 if(NOT MSVC)

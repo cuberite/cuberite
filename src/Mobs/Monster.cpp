@@ -1139,14 +1139,14 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		}
 		case mtVillager:
 		{
-			int VillagerType = Random.RandInt(6);
-			if (VillagerType == 6)
+			int VillagerType = Random.RandInt(13);
+			if (VillagerType == 13)
 			{
 				// Give farmers a better chance of spawning
 				VillagerType = 0;
 			}
 
-			return cpp14::make_unique<cVillager>(static_cast<cVillager::eVillagerType>(VillagerType));
+			return cpp14::make_unique<cVillager>(static_cast<cVillager::VillagerCareer>(VillagerType), 1U);
 		}
 		case mtHorse:
 		{

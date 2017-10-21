@@ -1642,6 +1642,40 @@ void cProtocol_1_9_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 
 
+void cProtocol_1_9_0::SendVillagerTradeList(const cWindow & TradeWindow, const std::vector<VillagerTradeOffer> & TradeOffers)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x18);  // Plugin message
+	Pkt.WriteString("MC|TrList");
+	Pkt.WriteBEInt32(static_cast<Int32>(TradeWindow.GetWindowID()));
+	Pkt.WriteBEUInt8(static_cast<UInt8>(TradeOffers.size()));
+
+	for (const auto & Trade : TradeOffers)
+	{
+		WriteItem(Pkt, Trade.PrimaryDesire);
+		WriteItem(Pkt, Trade.Recompense);
+
+		if (Trade.SecondaryDesire.IsEmpty())
+		{
+			Pkt.WriteBool(false);
+		}
+		else
+		{
+			Pkt.WriteBool(true);
+			WriteItem(Pkt, Trade.SecondaryDesire);
+		}
+
+		Pkt.WriteBool(Trade.IsTradeExhausted());
+		Pkt.WriteBEInt32(static_cast<Int32>(Trade.Transactions));
+		Pkt.WriteBEInt32(static_cast<Int32>(Trade.MaximumTransactions));
+	}
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -4045,7 +4079,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(cVillager::VillagerCareerToProfession(Villager.GetCareer())));
 			break;
 		}  // case mtVillager
 

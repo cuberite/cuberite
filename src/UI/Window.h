@@ -62,7 +62,7 @@ public:
 		wtDropSpenser = 3,  // Dropper or Dispenser
 		wtEnchantment = 4,
 		wtBrewery     = 5,
-		wtNPCTrade    = 6,
+		wtVillagerTrade = 6,
 		wtBeacon      = 7,
 		wtAnvil       = 8,
 		wtHopper      = 9,

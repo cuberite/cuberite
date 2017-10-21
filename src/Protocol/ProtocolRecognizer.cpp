@@ -957,6 +957,16 @@ void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int
 
 
 
+void cProtocolRecognizer::SendVillagerTradeList(const cWindow & TradeWindow, const std::vector<VillagerTradeOffer> & TradeOffers)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendVillagerTradeList(TradeWindow, TradeOffers);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_Protocol != nullptr);

@@ -71,7 +71,7 @@ const AString cWindow::GetWindowTypeName(void) const
 		case wtDropSpenser: return "minecraft:dispenser";
 		case wtEnchantment: return "minecraft:enchanting_table";
 		case wtBrewery:     return "minecraft:brewing_stand";
-		case wtNPCTrade:    return "minecraft:villager";
+		case wtVillagerTrade: return "minecraft:villager";
 		case wtBeacon:      return "minecraft:beacon";
 		case wtAnvil:       return "minecraft:anvil";
 		case wtHopper:      return "minecraft:hopper";

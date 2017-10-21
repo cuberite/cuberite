@@ -693,8 +693,9 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtVillager:
 			{
 				const cVillager *Villager = reinterpret_cast<const cVillager *>(a_Monster);
-				m_Writer.AddInt("Profession", Villager->GetVilType());
-				m_Writer.AddInt("Age",        Villager->GetAge());
+				m_Writer.AddInt("Profession", static_cast<Int32>(cVillager::VillagerCareerToProfession(Villager->GetCareer())));
+				m_Writer.AddInt("Career", static_cast<Int32>(Villager->GetCareer()));
+				m_Writer.AddInt("Age", Villager->GetAge());
 				break;
 			}
 			case mtWither:
