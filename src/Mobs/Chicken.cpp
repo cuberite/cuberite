@@ -10,7 +10,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.3, 0.4),
+	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.4, 0.7),
 	m_EggDropTimer(0)
 {
 	SetGravity(-2.0f);
@@ -34,14 +34,10 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;  // Babies don't lay eggs
 	}
 
-	if ((m_EggDropTimer == 6000) && GetRandomProvider().RandBool())
-	{
-		cItems Drops;
-		m_EggDropTimer = 0;
-		Drops.push_back(cItem(E_ITEM_EGG, 1));
-		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-	}
-	else if (m_EggDropTimer == 12000)
+	if (
+		((m_EggDropTimer == 6000) && GetRandomProvider().RandBool()) ||
+		m_EggDropTimer == 12000
+	)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
@@ -60,6 +56,11 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
+	if (IsBaby())
+	{
+		return;  // Babies don't drop items
+	}
+
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
