@@ -238,12 +238,12 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 				if (GetSpeedZ() > 0)
 				{
 					// Going SOUTH, slow down
-					AddSpeedZ(-0.1);
+					ApplyAcceleration({ 0.0, 0.0, 1.0 }, -0.1);
 				}
 				else
 				{
 					// Going NORTH, slow down
-					AddSpeedZ(0.1);
+					ApplyAcceleration({ 0.0, 0.0, -1.0 }, -0.1);
 				}
 			}
 			break;
@@ -265,11 +265,11 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			{
 				if (GetSpeedX() > 0)
 				{
-					AddSpeedX(-0.1);
+					ApplyAcceleration({ 1.0, 0.0, 0.0 }, -0.1);
 				}
 				else
 				{
-					AddSpeedX(0.1);
+					ApplyAcceleration({ -1.0, 0.0, 0.0 }, -0.1);
 				}
 			}
 			break;
@@ -405,16 +405,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 
 void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 {
-	// Initialise to 'slow down' values
-	int AccelDecelSpeed = -2;
-	int AccelDecelNegSpeed = 2;
-
-	if ((a_RailMeta & 0x8) == 0x8)
-	{
-		// Rail powered - set variables to 'speed up' values
-		AccelDecelSpeed = 1;
-		AccelDecelNegSpeed = -1;
-	}
+	// If the rail is powered set to speed up else slow down.
+	const bool IsRailPowered = ((a_RailMeta & 0x8) == 0x8);
+	const double Acceleration = IsRailPowered ? 1.0 : -2.0;
 
 	switch (a_RailMeta & 0x07)
 	{
@@ -435,26 +428,26 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 				if (GetSpeedZ() > NO_SPEED)
 				{
-					AddSpeedZ(AccelDecelSpeed);
+					ApplyAcceleration({ 0.0, 0.0, 1.0 }, Acceleration);
 				}
 				else
 				{
-					AddSpeedZ(AccelDecelNegSpeed);
+					ApplyAcceleration({ 0.0, 0.0, -1.0 }, Acceleration);
 				}
 			}
 			// If rail is powered check for nearby blocks that could kick-start the minecart
-			else if ((a_RailMeta & 0x8) == 0x8)
+			else if (IsRailPowered)
 			{
 				bool IsBlockZP = IsSolidBlockAtOffset(0, 0, 1);
 				bool IsBlockZM = IsSolidBlockAtOffset(0, 0, -1);
 				// Only kick-start the minecart if a block is on one side, but not both
 				if (IsBlockZM && !IsBlockZP)
 				{
-					AddSpeedZ(AccelDecelSpeed);
+					ApplyAcceleration({ 0.0, 0.0, 1.0 }, Acceleration);
 				}
 				else if (!IsBlockZM && IsBlockZP)
 				{
-					AddSpeedZ(AccelDecelNegSpeed);
+					ApplyAcceleration({ 0.0, 0.0, -1.0 }, Acceleration);
 				}
 			}
 			break;
@@ -476,26 +469,26 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 				if (GetSpeedX() > NO_SPEED)
 				{
-					AddSpeedX(AccelDecelSpeed);
+					ApplyAcceleration({ 1.0, 0.0, 0.0 }, Acceleration);
 				}
 				else
 				{
-					AddSpeedX(AccelDecelNegSpeed);
+					ApplyAcceleration({ -1.0, 0.0, 0.0 }, Acceleration);
 				}
 			}
 			// If rail is powered check for nearby blocks that could kick-start the minecart
-			else if ((a_RailMeta & 0x8) == 0x8)
+			else if (IsRailPowered)
 			{
 				bool IsBlockXP = IsSolidBlockAtOffset(1, 0, 0);
 				bool IsBlockXM = IsSolidBlockAtOffset(-1, 0, 0);
 				// Only kick-start the minecart if a block is on one side, but not both
 				if (IsBlockXM && !IsBlockXP)
 				{
-					AddSpeedX(AccelDecelSpeed);
+					ApplyAcceleration({ 1.0, 0.0, 0.0 }, Acceleration);
 				}
 				else if (!IsBlockXM && IsBlockXP)
 				{
-					AddSpeedX(AccelDecelNegSpeed);
+					ApplyAcceleration({ -1.0, 0.0, 0.0 }, Acceleration);
 				}
 			}
 			break;
@@ -507,12 +500,12 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedX() >= NO_SPEED)
 			{
-				AddSpeedX(AccelDecelSpeed);
+				ApplyAcceleration({ 1.0, 0.0, 0.0 }, Acceleration);
 				SetSpeedY(-GetSpeedX());
 			}
 			else
 			{
-				AddSpeedX(AccelDecelNegSpeed);
+				ApplyAcceleration({ -1.0, 0.0, 0.0 }, Acceleration);
 				SetSpeedY(-GetSpeedX());
 			}
 			break;
@@ -524,12 +517,12 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedX() > NO_SPEED)
 			{
-				AddSpeedX(AccelDecelSpeed);
+				ApplyAcceleration({ 1.0, 0.0, 0.0 }, Acceleration);
 				SetSpeedY(GetSpeedX());
 			}
 			else
 			{
-				AddSpeedX(AccelDecelNegSpeed);
+				ApplyAcceleration({ -1.0, 0.0, 0.0 }, Acceleration);
 				SetSpeedY(GetSpeedX());
 			}
 			break;
@@ -541,12 +534,12 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedZ() >= NO_SPEED)
 			{
-				AddSpeedZ(AccelDecelSpeed);
+				ApplyAcceleration({ 0.0, 0.0, 1.0 }, Acceleration);
 				SetSpeedY(-GetSpeedZ());
 			}
 			else
 			{
-				AddSpeedZ(AccelDecelNegSpeed);
+				ApplyAcceleration({ 0.0, 0.0, -1.0 }, Acceleration);
 				SetSpeedY(-GetSpeedZ());
 			}
 			break;
@@ -558,12 +551,12 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 			if (GetSpeedZ() > NO_SPEED)
 			{
-				AddSpeedZ(AccelDecelSpeed);
+				ApplyAcceleration({ 0.0, 0.0, 1.0 }, Acceleration);
 				SetSpeedY(GetSpeedZ());
 			}
 			else
 			{
-				AddSpeedZ(AccelDecelNegSpeed);
+				ApplyAcceleration({ 0.0, 0.0, -1.0 }, Acceleration);
 				SetSpeedY(GetSpeedZ());
 			}
 			break;
@@ -1092,6 +1085,26 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 	return true;
+}
+
+
+
+
+
+void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration)
+{
+	double CurSpeed = GetSpeed().Dot(a_ForwardDirection);
+	double NewSpeed = CurSpeed + a_Acceleration;
+
+	if (NewSpeed < 0.0)
+	{
+		// Prevent deceleration from turning the minecart around.
+		NewSpeed = 0.0;
+	}
+
+	auto Acceleration = a_ForwardDirection * (NewSpeed - CurSpeed);
+
+	AddSpeed(Acceleration);
 }
 
 
