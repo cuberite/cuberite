@@ -18,7 +18,7 @@ template<typename Datatype>
 class cSimplexNoise
 {
 public:
-	cSimplexNoise(int a_Seed)
+	cSimplexNoise(unsigned a_Seed)
 	{
 		// Based on the seed, initialize the permutation table, using a simple LCG and swapping
 
@@ -29,7 +29,7 @@ public:
 		}
 
 		// Use swaps to randomize:
-		std::linear_congruential_engine<unsigned, 48271, 0, 2147483647> lcg(a_Seed);
+		std::minstd_rand lcg(a_Seed);
 		for (size_t i = 0; i < 2000; i++)
 		{
 			std::swap(m_Perm[lcg() % (ARRAYCOUNT(m_Perm) / 2)], m_Perm[lcg() % (ARRAYCOUNT(m_Perm) / 2)]);
@@ -77,11 +77,12 @@ public:
 	Datatype GetValueAt3D(const Datatype a_X, const Datatype a_Y, const Datatype a_Z)
 	{
 		// The gradients are the midpoints of the vertices of a cube.
-		static const Datatype grad3[12][3] = {
+		static const Datatype grad3[12][3] =
+		{
 			{1, 1, 0}, {-1,  1, 0}, {1, -1,  0}, {-1, -1,  0},
 			{1, 0, 1}, {-1,  0, 1}, {1,  0, -1}, {-1,  0, -1},
 			{0, 1, 1}, { 0, -1, 1}, {0,  1, -1}, { 0, -1, -1}
-		}; 
+		};
 
 		// Skew factors:
 		static const Datatype F3 = static_cast<Datatype>(1.0 / 3.0);
@@ -149,13 +150,13 @@ public:
 		// A step of (1, 0, 0) in IJK means a step of (1 - c,    -c,    -c) in XYZ,
 		// a step of (0, 1, 0) in IJK means a step of (-c,    1 - c,    -c) in XYZ, and
 		// a step of (0, 0, 1) in IJK means a step of (-c,       -c, 1 - c) in XYZ, where c = G3 = 1 / 6.
-		Datatype x1 = x0 - i1 + G3; // Offsets for second corner in XYZ coords
+		Datatype x1 = x0 - i1 + G3;  // Offsets for second corner in XYZ coords
 		Datatype y1 = y0 - j1 + G3;
 		Datatype z1 = z0 - k1 + G3;
-		Datatype x2 = x0 - i2 + static_cast<Datatype>(2) * G3; // Offsets for third corner in XYZ coords
+		Datatype x2 = x0 - i2 + static_cast<Datatype>(2) * G3;  // Offsets for third corner in XYZ coords
 		Datatype y2 = y0 - j2 + static_cast<Datatype>(2) * G3;
 		Datatype z2 = z0 - k2 + static_cast<Datatype>(2) * G3;
-		Datatype x3 = x0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3; // Offsets for last corner in XYZ coords
+		Datatype x3 = x0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;  // Offsets for last corner in XYZ coords
 		Datatype y3 = y0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;
 		Datatype z3 = z0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;
 

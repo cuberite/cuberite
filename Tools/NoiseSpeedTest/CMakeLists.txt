@@ -48,6 +48,7 @@ set(SOURCES
 set(HEADERS
 	NoiseSpeedTest.h
 	Globals.h
+	SimplexNoise.h
 )
 
 source_group("" FILES ${SOURCES} ${HEADERS})
