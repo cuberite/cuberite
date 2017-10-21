@@ -1,9 +1,18 @@
 language: cpp
 sudo: false
 
+os:
+- linux
+- osx
+
 compiler:
 - clang
 - gcc
+
+matrix:
+  exclude:
+  - os: osx
+    compiler: gcc
 
 addons:
   apt:
@@ -12,6 +21,13 @@ addons:
     packages:
     - g++-4.8
     - gdb
+
+
+before_script:
+- if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+    brew update;
+    brew install gdb;
+  fi
 
 script: ./CIbuild.sh
 

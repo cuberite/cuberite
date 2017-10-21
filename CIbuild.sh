@@ -14,17 +14,25 @@ fi
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1;
 
 echo "Building..."
-make -j 2;
-make -j 2 test ARGS="-V";
+cmake --build . -- -j 2;
+ctest -j 2 -V;
 
 # Create .gdbinit in home directory. Switches off the confirmation on quit
 echo -e "define hook-quit\n\tset confirm off\nend\n" > ~/.gdbinit
 
 echo "Testing..."
+
+# OSX builds need sudo because gdb isn't signed
+if [ "$TRAVIS_OS_NAME" = osx ]; then
+	GDB_COMMAND="sudo gdb"
+else
+	GDB_COMMAND="gdb"
+fi
+
 cd Server/;
 touch apiCheckFailed.flag
 if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
-	gdb -return-child-result -ex run -ex "bt" -ex "info threads" -ex "thread apply all bt" -ex "quit" --args $CUBERITE_PATH << EOF
+	${GDB_COMMAND} -return-child-result -ex run -ex "bt" -ex "info threads" -ex "thread apply all bt" -ex "quit" --args $CUBERITE_PATH << EOF
 load APIDump
 apicheck
 restart
