@@ -5,6 +5,7 @@
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "Broadcaster.h"
+#include "UI/HorseWindow.h"
 
 
 
@@ -12,21 +13,33 @@
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", 1.4, 1.6),
+	cEntityWindowOwner(this),
 	m_bHasChest(false),
 	m_bIsEating(false),
 	m_bIsRearing(false),
 	m_bIsMouthOpen(false),
 	m_bIsTame(false),
-	m_bIsSaddled(false),
 	m_Type(Type),
 	m_Color(Color),
 	m_Style(Style),
-	m_Armour(0),
 	m_TimesToTame(TameTimes),
 	m_TameAttemptTimes(0),
 	m_RearTickCount(0),
 	m_MaxSpeed(14.0)
 {
+}
+
+
+
+
+
+cHorse::~cHorse()
+{
+	auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -108,22 +121,24 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 	if (m_bIsTame)
 	{
-		if (!m_bIsSaddled)
+		if (a_Player.IsCrouched())
 		{
-			if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
-			{
-				// Saddle the horse:
-				if (!a_Player.IsGameModeCreative())
-				{
-					a_Player.GetInventory().RemoveOneEquippedItem();
-				}
-				m_bIsSaddled = true;
-				m_World->BroadcastEntityMetadata(*this);
-			}
-			else
-			{
-				a_Player.AttachTo(this);
-			}
+			PlayerOpenWindow(a_Player);
+			return;
+		}
+
+		auto EquipedItemType = a_Player.GetEquippedItem().m_ItemType;
+
+		if (
+			!IsSaddled() &&
+			(
+				(EquipedItemType == E_ITEM_SADDLE) ||
+				ItemCategory::IsHorseArmor(EquipedItemType)
+			)
+		)
+		{
+			// Player is holding a horse inventory item, open the window:
+			PlayerOpenWindow(a_Player);
 		}
 		else
 		{
@@ -167,6 +182,65 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 
 
+void cHorse::SetHorseSaddle(cItem a_Saddle)
+{
+	if (a_Saddle.m_ItemType == E_ITEM_SADDLE)
+	{
+		m_World->BroadcastSoundEffect("entity.horse.saddle", GetPosition(), 1.0f, 0.8f);
+	}
+	else if (!a_Saddle.IsEmpty())
+	{
+		return;  // Invalid item
+	}
+
+	m_Saddle = std::move(a_Saddle);
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cHorse::SetHorseArmor(cItem a_Armor)
+{
+	if (ItemCategory::IsHorseArmor(a_Armor.m_ItemType))
+	{
+		m_World->BroadcastSoundEffect("entity.horse.armor", GetPosition(), 1.0f, 0.8f);
+	}
+	else if (!a_Armor.IsEmpty())
+	{
+		return;  // Invalid item
+	}
+
+	m_Armor = std::move(a_Armor);
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+int cHorse::GetHorseArmour(void) const
+{
+	switch (m_Armor.m_ItemType)
+	{
+		case E_ITEM_EMPTY:               return 0;
+		case E_ITEM_IRON_HORSE_ARMOR:    return 1;
+		case E_ITEM_GOLD_HORSE_ARMOR:    return 2;
+		case E_ITEM_DIAMOND_HORSE_ARMOR: return 3;
+
+		default:
+		{
+			LOGWARN("cHorse::GetHorseArmour: Invalid armour item (%d)", m_Armor.m_ItemType);
+			return 0;
+		}
+	}
+}
+
+
+
+
+
 void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	if (IsBaby())
@@ -180,9 +254,13 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
-	if (m_bIsSaddled)
+	if (IsSaddled())
 	{
-		a_Drops.push_back(cItem(E_ITEM_SADDLE, 1));
+		a_Drops.push_back(m_Saddle);
+	}
+	if (!m_Armor.IsEmpty())
+	{
+		a_Drops.push_back(m_Armor);
 	}
 }
 
@@ -205,8 +283,24 @@ void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
-	if ((m_bIsTame) && (m_bIsSaddled))
+	if ((m_bIsTame) && IsSaddled())
 	{
 		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
+}
+
+
+
+
+
+void cHorse::PlayerOpenWindow(cPlayer & a_Player)
+{
+	auto Window = GetWindow();
+	if (Window == nullptr)
+	{
+		Window = new cHorseWindow(*this);
+		OpenWindow(Window);
+	}
+
+	a_Player.OpenWindow(*Window);
 }

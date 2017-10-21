@@ -16977,6 +16977,24 @@ end
 					},
 					Notes = "Returns true if the specified item type is any kind of a hoe.",
 				},
+				IsHorseArmor=
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a horse armor.",
+				},
 				IsLeggings =
 				{
 					IsStatic = true,

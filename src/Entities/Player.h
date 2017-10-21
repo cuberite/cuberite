@@ -409,6 +409,10 @@ public:
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
+	/** Opens the inventory of any tame horse the player is riding.
+	If the player is not riding a horse or if the horse is untamed, does nothing. */
+	void OpenHorseInventory();
+
 	void UseEquippedItem(int a_Amount = 1);
 
 	void SendHealth(void);

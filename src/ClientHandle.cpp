@@ -678,6 +678,18 @@ void cClientHandle::HandleNPCTrade(int a_SlotNum)
 
 
 
+void cClientHandle::HandleOpenHorseInventory(UInt32 a_EntityID)
+{
+	if (m_Player->GetUniqueID() == a_EntityID)
+	{
+		m_Player->OpenHorseInventory();
+	}
+}
+
+
+
+
+
 void cClientHandle::HandlePing(void)
 {
 	/* TODO: unused function, handles Legacy Server List Ping

@@ -14,6 +14,7 @@
 
 
 
+class cHorse;
 class cWindow;
 class cPlayer;
 class cBeaconEntity;
@@ -515,6 +516,30 @@ public:
 
 protected:
 	cMinecartWithChest * m_Chest;
+};
+
+
+
+
+
+/** Slot area holding horse saddle and armor. */
+class cSlotAreaHorse:
+	public cSlotArea
+{
+public:
+	enum
+	{
+		SaddleSlot,
+		ArmorSlot
+	};
+
+	cSlotAreaHorse(cHorse & a_Horse, cWindow & a_ParentWindow);
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+private:
+	cHorse & m_Horse;
 };
 
 

@@ -1175,6 +1175,25 @@ namespace ItemCategory
 			IsBoots(a_ItemType)
 		);
 	}
+
+
+
+	inline bool IsHorseArmor(short a_ItemType)
+	{
+		switch (a_ItemType)
+		{
+			case E_ITEM_IRON_HORSE_ARMOR:
+			case E_ITEM_GOLD_HORSE_ARMOR:
+			case E_ITEM_DIAMOND_HORSE_ARMOR:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
+	}
 }
 
 // tolua_end
