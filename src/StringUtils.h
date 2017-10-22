@@ -94,8 +94,7 @@ extern AString UnicodeCharToUtf8(unsigned a_UnicodeChar);
 /** Converts a UTF-8 string into a UTF-16 BE string. */
 extern std::u16string UTF8ToRawBEUTF16(const AString & a_String);
 
-/** Creates a nicely formatted HEX dump of the given memory block.
-Max a_BytesPerLine is 120. */
+/** Creates a nicely formatted HEX dump of the given memory block. */
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
 /** Returns a copy of a_Message with all quotes and backslashes escaped by a backslash. */
