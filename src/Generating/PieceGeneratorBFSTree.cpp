@@ -294,14 +294,14 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 // DEBUG:
 void cPieceGeneratorBFSTree::DebugConnectorPool(const cPieceGeneratorBFSTree::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
 {
-	printf("  Connector pool: " SIZE_T_FMT " items\n", a_ConnectorPool.size() - a_NumProcessed);
+	fmt::print("  Connector pool: {} items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
 
 	typedef cPieceGeneratorBFSTree::cFreeConnectors::difference_type difType;
 
 	for (auto itr = a_ConnectorPool.cbegin() + static_cast<difType>(a_NumProcessed), end = a_ConnectorPool.cend(); itr != end; ++itr, ++idx)
 	{
-		printf("    " SIZE_T_FMT ": {%d, %d, %d}, type %d, direction %s, depth %d\n",
+		fmt::print("    {}: {{{}, {}, {}}}, type {}, direction {}, depth {}\n",
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,

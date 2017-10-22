@@ -7,11 +7,6 @@
 
 
 
-// TODO: Remove these
-#define SIZE_T_FMT "%zu"
-#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-#define SIZE_T_FMT_HEX "%zx"
-
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)

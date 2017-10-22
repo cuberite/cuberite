@@ -22,11 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	// MSVC has its own custom version of zu format
-	#define SIZE_T_FMT "%Iu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
-	#define SIZE_T_FMT_HEX "%Ix"
-
 	#define NORETURN      __declspec(noreturn)
 
 #elif defined(__GNUC__)
@@ -41,10 +36,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define SIZE_T_FMT "%zu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-	#define SIZE_T_FMT_HEX "%zx"
 
 	#define NORETURN      __attribute((__noreturn__))
 #else
