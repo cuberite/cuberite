@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 project (NoiseSpeedTest)
 
 include(../../SetFlags.cmake)
@@ -59,6 +60,9 @@ add_executable(NoiseSpeedTest
 	${SHARED_SRC}
 	${SHARED_HDR}
 )
+
+target_include_directories(NoiseSpeedTest SYSTEM PRIVATE ../../lib/fmt)
+target_link_libraries(NoiseSpeedTest fmt)
 
 set_target_properties(
 	NoiseSpeedTest

@@ -22,21 +22,24 @@ typedef std::map<AString, AString> AStringMap;
 
 
 
-/** Add the formated string to the existing data in the string.
-Returns a_Dst. */
-extern AString & AppendVPrintf(AString & a_Dst, const char * format, va_list args) FORMATSTRING(2, 0);
-
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf       (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
+extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
+FMT_VARIADIC(AString &, Printf, AString &, const char *);
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, ...) FORMATSTRING(1, 2);
+extern AString Printf(const char * format, fmt::ArgList args);
+FMT_VARIADIC(AString, Printf, const char *);
 
-/** Add the formatted string to the existing data in the string.
-Returns a_Dst */
-extern AString & AppendPrintf (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
+/** Add the formated string to the existing data in the string.
+Returns a_Dst. */
+template <typename... Args>
+extern AString & AppendPrintf(AString & a_Dst, const char * format, const Args & ... args)
+{
+	a_Dst += Printf(format, args...);
+	return a_Dst;
+}
 
 /** Split the string at any of the listed delimiters.
 Return the splitted strings as a stringvector. */

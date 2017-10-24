@@ -2016,7 +2016,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(const char * a_MsgFormat, ...)
+int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -2024,23 +2024,8 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, ...)
 	VERIFY(lua_getinfo(m_LuaState, "n", &entry));
 
 	// Compose the error message:
-	va_list argp;
-	va_start(argp, a_MsgFormat);
-	AString msg;
-
-	#ifdef __clang__
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wformat-nonliteral"
-	#endif
-
-	AppendVPrintf(msg, a_MsgFormat, argp);
-
-	#ifdef __clang__
-		#pragma clang diagnostic pop
-	#endif
-
-	va_end(argp);
-	AString errorMsg = Printf("%s: %s", (entry.name != nullptr) ? entry.name : "<unknown function>", msg.c_str());
+	AString msg = Printf(a_MsgFormat, argp);
+	AString errorMsg = fmt::format("{}: {}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
 
 	// Log everything into the console:
 	LOGWARNING("%s", errorMsg.c_str());

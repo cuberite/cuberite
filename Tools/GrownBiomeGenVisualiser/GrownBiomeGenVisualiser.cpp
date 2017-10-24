@@ -10,6 +10,7 @@
 #define PROT_INT_BUFFER_SIZE (130 * 130)
 #include "Generating/ProtIntGen.h"
 
+#include "fmt/printf.h"
 
 
 
@@ -20,7 +21,6 @@ typedef int Color[3];  // Color is an array of 3 ints
 
 
 // Forward declarations, needed for GCC and Clang:
-void log(const char * a_Fmt, ...) FORMATSTRING(1, 2);
 void outputBitmapFile(
 	const AString & a_FileName,
 	unsigned a_ImageSizeX, unsigned a_ImageSizeY,
@@ -155,14 +155,12 @@ biomeColorMap[] =
 
 
 
-void log(const char * a_Fmt, ...)
+template <typename ... Args>
+void log(const char * a_Fmt, const Args & ... a_Args)
 {
-	AString buf;
-	va_list args;
-	va_start(args, a_Fmt);
-	AppendVPrintf(buf, a_Fmt, args);
-	va_end(args);
-	std::cout << buf << std::endl << std::flush;
+	fmt::printf(a_Fmt, a_Args...);
+	putchar('\n');
+	fflush(stdout);
 }
 
 

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "MCADefrag.h"
 #include "Logger.h"
+#include "LoggerSimple.h"
 #include "LoggerListeners.h"
 #include "zlib/zlib.h"
 

@@ -447,7 +447,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 	}
 	catch (const TCLAP::ArgException & exc)
 	{
-		printf("Error reading command line %s for arg %s", exc.error().c_str(), exc.argId().c_str());
+		fmt::print("Error reading command line {} for arg {}", exc.error(), exc.argId());
 		return cpp14::make_unique<cMemorySettingsRepository>();
 	}
 }

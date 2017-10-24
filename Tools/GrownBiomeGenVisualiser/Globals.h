@@ -22,8 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
@@ -48,8 +46,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 	#if defined(_WIN32)
 		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
@@ -91,8 +87,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 #endif
 
@@ -213,6 +207,7 @@ typedef unsigned char Byte;
 
 
 // Common headers (without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 
 

@@ -103,4 +103,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})
+	target_link_libraries(Blocks fmt)
 endif()

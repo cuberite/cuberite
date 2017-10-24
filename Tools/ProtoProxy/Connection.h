@@ -57,8 +57,12 @@ public:
 	
 	void Run(void);
 	
-	void Log(const char * a_Format, ...);
-	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, ...);
+	void Log(const char * a_Format, fmt::ArgList);
+	FMT_VARIADIC(void, Log, const char *)
+
+	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList);
+	FMT_VARIADIC(void, DataLog, const void *, size_t, const char *)
+
 	void LogFlush(void);
 	
 protected:

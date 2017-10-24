@@ -63,11 +63,9 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 
 
-void cLogger::Log(const char * a_Format, eLogLevel a_LogLevel, va_list a_ArgList)
+void cLogger::Log(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
 {
-	AString Message;
-	AppendVPrintf(Message, a_Format, a_ArgList);
-	LogSimple(Message, a_LogLevel);
+	LogSimple(Printf(a_Format, a_ArgList), a_LogLevel);
 }
 
 
@@ -110,48 +108,36 @@ void cLogger::DetachListener(cListener * a_Listener)
 ////////////////////////////////////////////////////////////////////////////////
 // Global functions
 
-void LOG(const char * a_Format, ...)
+void LOG(const char * a_Format, fmt::ArgList a_ArgList)
 {
-	va_list argList;
-	va_start(argList, a_Format);
-	cLogger::GetInstance().Log(a_Format, cLogger::llRegular, argList);
-	va_end(argList);
+	cLogger::GetInstance().Log(a_Format, cLogger::llRegular, a_ArgList);
 }
 
 
 
 
 
-void LOGINFO(const char * a_Format, ...)
+void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
 {
-	va_list argList;
-	va_start(argList, a_Format);
-	cLogger::GetInstance().Log( a_Format, cLogger::llInfo, argList);
-	va_end(argList);
+	cLogger::GetInstance().Log( a_Format, cLogger::llInfo, a_ArgList);
 }
 
 
 
 
 
-void LOGWARNING(const char * a_Format, ...)
+void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
 {
-	va_list argList;
-	va_start(argList, a_Format);
-	cLogger::GetInstance().Log( a_Format, cLogger::llWarning, argList);
-	va_end(argList);
+	cLogger::GetInstance().Log( a_Format, cLogger::llWarning, a_ArgList);
 }
 
 
 
 
 
-void LOGERROR(const char * a_Format, ...)
+void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
 {
-	va_list argList;
-	va_start(argList, a_Format);
-	cLogger::GetInstance().Log( a_Format, cLogger::llError, argList);
-	va_end(argList);
+	cLogger::GetInstance().Log( a_Format, cLogger::llError, a_ArgList);
 }
 
 
