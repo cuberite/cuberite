@@ -58,7 +58,12 @@ public:
 		cAttachment(cListener * a_listener) : m_listener(a_listener) {}
 	};
 
-	void Log  (const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
+	/** Log a message formatted with a printf style formatting string. */
+	void LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
+	FMT_VARIADIC(void, Log, const char *, eLogLevel);
+
+	/** Log a message formatted with a python style formatting string. */
+	void LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
 	FMT_VARIADIC(void, Log, const char *, eLogLevel);
 
 	/** Logs the simple text message at the specified log level. */
