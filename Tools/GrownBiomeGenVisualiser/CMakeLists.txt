@@ -90,7 +90,6 @@ add_executable(GrownBiomeGenVisualiser
 	${SHARED_OSS_HDR}
 )
 
-target_include_directories(GrownBiomeGenVisualiser SYSTEM PRIVATE ../../lib/fmt)
-target_link_libraries(GrownBiomeGenVisualiser fmt)
+target_link_libraries(GrownBiomeGenVisualiser fmt::fmt)
 
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)

@@ -55,7 +55,7 @@ add_library(Network
 	${Network_HDRS}
 )
 
-target_link_libraries(Network event_core event_extra mbedtls)
+target_link_libraries(Network event_core event_extra fmt::fmt mbedtls)
 if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()
@@ -68,20 +68,20 @@ endif()
 
 # Google: download the google.com frontpage using http client socket:
 add_executable(Google-exe Google.cpp)
-target_link_libraries(Google-exe Network fmt)
+target_link_libraries(Google-exe Network)
 add_test(NAME Google-test COMMAND Google-exe)
 
 # EchoServer: Listen on port 9876, echo everything back:
 add_executable(EchoServer EchoServer.cpp)
-target_link_libraries(EchoServer Network fmt)
+target_link_libraries(EchoServer Network)
 
 # NameLookup: Lookup hostname-to-IP and IP-to-hostname:
 add_executable(NameLookup NameLookup.cpp)
-target_link_libraries(NameLookup Network fmt)
+target_link_libraries(NameLookup Network)
 
 # EnumInterfaces: List all network interfaces:
 add_executable(EnumInterfaces-exe EnumInterfaces.cpp)
-target_link_libraries(EnumInterfaces-exe Network fmt)
+target_link_libraries(EnumInterfaces-exe Network)
 add_test(NAME EnumInterfaces-test COMMAND EnumInterfaces-exe)
 
 

@@ -29,7 +29,7 @@ endif()
 
 # StressEvent: Stress-test the cEvent implementation:
 add_executable(StressEvent-exe StressEvent.cpp)
-target_link_libraries(StressEvent-exe OSSupport fmt)
+target_link_libraries(StressEvent-exe OSSupport fmt::fmt)
 add_test(NAME StressEvent-test COMMAND StressEvent-exe)
 
 

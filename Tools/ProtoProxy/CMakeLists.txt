@@ -101,6 +101,5 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_include_directories(ProtoProxy SYSTEM PRIVATE ../../lib/fmt)
-target_link_libraries(ProtoProxy zlib mbedtls fmt)
+target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt)
 

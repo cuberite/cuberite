@@ -26,7 +26,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(FastRandom-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(FastRandom-exe fmt)
+target_link_libraries(FastRandom-exe fmt::fmt)
 if (WIN32)
 	target_link_libraries(FastRandom-exe ws2_32)
 endif()

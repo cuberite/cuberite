@@ -7,7 +7,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/)
 add_definitions(-DTEST_GLOBALS=1)
 add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
 
-target_link_libraries(ChunkBuffer PUBLIC fmt)
+target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
 
 add_executable(creatable-exe creatable.cpp)
 target_link_libraries(creatable-exe ChunkBuffer)

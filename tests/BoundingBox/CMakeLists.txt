@@ -26,7 +26,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(BoundingBox-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(BoundingBox-exe fmt)
+target_link_libraries(BoundingBox-exe fmt::fmt)
 add_test(NAME BoundingBox-test COMMAND BoundingBox-exe)
 
 

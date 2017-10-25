@@ -48,5 +48,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(BlockEntities ${SRCS} ${HDRS})
-	target_link_libraries(BlockEntities fmt)
+	target_link_libraries(BlockEntities fmt::fmt)
 endif()

@@ -93,5 +93,4 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-target_include_directories(MCADefrag SYSTEM PRIVATE ../../lib/fmt)
-target_link_libraries(MCADefrag zlib fmt)
+target_link_libraries(MCADefrag zlib fmt::fmt)

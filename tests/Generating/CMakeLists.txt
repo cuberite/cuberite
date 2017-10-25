@@ -84,7 +84,7 @@ endif()
 
 
 add_library(GeneratorTestingSupport STATIC ${SHARED_SRCS} ${SHARED_HDRS} ${STUBS})
-target_link_libraries(GeneratorTestingSupport tolualib zlib fmt)
+target_link_libraries(GeneratorTestingSupport tolualib zlib fmt::fmt)
 source_group("Stubs" FILES ${STUBS})
 
 

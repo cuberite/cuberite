@@ -48,5 +48,5 @@ endif()
 
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
-	target_link_libraries(OSSupport fmt)
+	target_link_libraries(OSSupport fmt::fmt)
 endif()

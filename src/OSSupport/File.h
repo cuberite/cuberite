@@ -39,12 +39,14 @@ class cFile
 public:
 
 	// tolua_end
-
-	#ifdef _WIN32
-	static const char PathSeparator = '\\';
-	#else
-	static const char PathSeparator = '/';
-	#endif
+	inline static char PathSeparator()
+	{
+		#ifdef _WIN32
+			return '\\';
+		#else
+			return '/';
+		#endif
+	}
 
 	/** The mode in which to open the file */
 	enum eMode

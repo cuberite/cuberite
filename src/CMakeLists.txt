@@ -360,7 +360,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")

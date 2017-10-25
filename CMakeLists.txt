@@ -261,7 +261,6 @@ add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/libevent/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/fmt)
 
-include_directories(SYSTEM lib/fmt)
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:
 get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)

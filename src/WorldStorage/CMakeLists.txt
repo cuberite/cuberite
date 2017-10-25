@@ -30,5 +30,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(WorldStorage ${SRCS} ${HDRS})
-	target_link_libraries(WorldStorage fmt OSSupport)
+	target_link_libraries(WorldStorage fmt::fmt OSSupport)
 endif()

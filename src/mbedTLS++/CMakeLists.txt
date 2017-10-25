@@ -37,5 +37,5 @@ set(HDRS
 
 if(NOT MSVC)
 	add_library(mbedTLS++ ${SRCS} ${HDRS})
-	target_link_libraries(mbedTLS++ fmt mbedtls)
+	target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
 endif()

@@ -61,8 +61,7 @@ add_executable(NoiseSpeedTest
 	${SHARED_HDR}
 )
 
-target_include_directories(NoiseSpeedTest SYSTEM PRIVATE ../../lib/fmt)
-target_link_libraries(NoiseSpeedTest fmt)
+target_link_libraries(NoiseSpeedTest fmt::fmt)
 
 set_target_properties(
 	NoiseSpeedTest
