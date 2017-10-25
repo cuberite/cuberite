@@ -162,7 +162,7 @@ public:
 	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
 
 	int Printf(const char * a_Fmt, fmt::ArgList);
-	FMT_VARIADIC(int, Printf, const char *);
+	FMT_VARIADIC(int, Printf, const char *)
 
 	/** Flushes all the bufferef output into the file (only when writing) */
 	void Flush(void);

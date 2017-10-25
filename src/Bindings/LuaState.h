@@ -824,7 +824,7 @@ public:
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
 	int ApiParamError(const char * a_MsgFormat, fmt::ArgList);
-	FMT_VARIADIC(int, ApiParamError, const char *);
+	FMT_VARIADIC(int, ApiParamError, const char *)
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);

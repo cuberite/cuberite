@@ -60,11 +60,11 @@ public:
 
 	/** Log a message formatted with a printf style formatting string. */
 	void LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(void, Log, const char *, eLogLevel);
+	FMT_VARIADIC(void, LogPrintf, const char *, eLogLevel)
 
 	/** Log a message formatted with a python style formatting string. */
 	void LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(void, Log, const char *, eLogLevel);
+	FMT_VARIADIC(void, LogFormat, const char *, eLogLevel)
 
 	/** Logs the simple text message at the specified log level. */
 	void LogSimple(AString a_Message, eLogLevel a_LogLevel = llRegular);

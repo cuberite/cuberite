@@ -17,7 +17,7 @@ public:
 
 	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	void Out(const char * a_Fmt, fmt::ArgList);
-	FMT_VARIADIC(void, Out, const char *);
+	FMT_VARIADIC(void, Out, const char *)
 
 	/** Called when the command wants to output anything; may be called multiple times */
 	virtual void Out(const AString & a_Text) = 0;

@@ -25,12 +25,12 @@ typedef std::map<AString, AString> AStringMap;
 /** Output the formatted text into the string.
 Returns a_Dst. */
 extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString &, Printf, AString &, const char *);
+FMT_VARIADIC(AString &, Printf, AString &, const char *)
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
 extern AString Printf(const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString, Printf, const char *);
+FMT_VARIADIC(AString, Printf, const char *)
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */

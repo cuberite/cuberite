@@ -5,30 +5,30 @@
 // python style format specified logging
 
 extern void FLOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOG, const char *);
+FMT_VARIADIC(void, FLOG, const char *)
 
 extern void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGINFO, const char *);
+FMT_VARIADIC(void, FLOGINFO, const char *)
 
 extern void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGWARNING, const char *);
+FMT_VARIADIC(void, FLOGWARNING, const char *)
 
 extern void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGERROR, const char *);
+FMT_VARIADIC(void, FLOGERROR, const char *)
 
 // printf style format specified logging (DEPRECATED)
 
 extern void LOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOG, const char *);
+FMT_VARIADIC(void, LOG, const char *)
 
 extern void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGINFO, const char *);
+FMT_VARIADIC(void, LOGINFO, const char *)
 
 extern void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGWARNING, const char *);
+FMT_VARIADIC(void, LOGWARNING, const char *)
 
 extern void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGERROR, const char *);
+FMT_VARIADIC(void, LOGERROR, const char *)
 
 
 // Macro variants
