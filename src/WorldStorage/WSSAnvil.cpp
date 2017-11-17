@@ -3156,7 +3156,22 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 	// Load health:
 	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	a_Entity.SetHealth(Health > 0 ? a_NBT.GetShort(Health) : a_Entity.GetMaxHealth());
+
+	if (Health > 0)
+	{
+		if (a_NBT.GetType(Health) == TAG_Short)
+		{
+			a_Entity.SetHealth(a_NBT.GetShort(Health));
+		}
+		else
+		{
+			a_Entity.SetHealth(a_NBT.GetFloat(Health));
+		}
+	}
+	else
+	{
+		a_Entity.SetHealth(a_Entity.GetMaxHealth());
+	}
 
 	return true;
 }
