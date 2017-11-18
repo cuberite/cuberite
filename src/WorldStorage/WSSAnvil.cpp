@@ -3165,7 +3165,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		}
 		else
 		{
-			a_Entity.SetHealth(a_NBT.GetFloat(Health));
+			a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(Health)));
 		}
 	}
 	else
