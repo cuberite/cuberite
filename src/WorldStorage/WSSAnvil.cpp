@@ -3159,6 +3159,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 	if (Health > 0)
 	{
+		/* Newer versions of Minecraft save Health as a float */
 		if (a_NBT.GetType(Health) == TAG_Short)
 		{
 			a_Entity.SetHealth(a_NBT.GetShort(Health));
