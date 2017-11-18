@@ -3154,20 +3154,23 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll(Rotation[1]);
 
-	// Load health:
+	// Depending on the Minecraft version, the entity's health is
+	// stored either as a float Health tag (HealF prior to 1.9) or
+	// as a short Health tag. The float tags should be preferred.
 	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	int HealF  = a_NBT.FindChildByName(a_TagIdx, "HealF");
 
-	if (Health > 0)
+	if (Health > 0 && a_NBT.GetType(Health) == TAG_Float)
 	{
-		/* Newer versions of Minecraft save Health as a float */
-		if (a_NBT.GetType(Health) == TAG_Short)
-		{
-			a_Entity.SetHealth(a_NBT.GetShort(Health));
-		}
-		else
-		{
-			a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(Health)));
-		}
+		a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(Health)));
+	}
+	else if (HealF > 0)
+	{
+		a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(HealF)));
+	}
+	else if (Health > 0)
+	{
+		a_Entity.SetHealth(a_NBT.GetShort(Health));
 	}
 	else
 	{
