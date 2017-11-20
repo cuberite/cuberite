@@ -3162,15 +3162,15 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 	if (Health > 0 && a_NBT.GetType(Health) == TAG_Float)
 	{
-		a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(Health)));
+		a_Entity.SetHealth(a_NBT.GetFloat(Health));
 	}
 	else if (HealF > 0)
 	{
-		a_Entity.SetHealth(static_cast<short>(a_NBT.GetFloat(HealF)));
+		a_Entity.SetHealth(a_NBT.GetFloat(HealF));
 	}
 	else if (Health > 0)
 	{
-		a_Entity.SetHealth(a_NBT.GetShort(Health));
+		a_Entity.SetHealth(static_cast<float>(a_NBT.GetShort(Health)));
 	}
 	else
 	{
