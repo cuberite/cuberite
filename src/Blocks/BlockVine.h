@@ -25,7 +25,7 @@ public:
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockType, BlockMeta);
 		if (BlockType == m_BlockType)
 		{
 			a_BlockMeta = BlockMeta | DirectionToMetaData(a_BlockFace);
@@ -109,16 +109,16 @@ public:
 			{ 1,  0, 8},  // east,  XP
 		} ;
 		NIBBLETYPE res = 0;
-		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+		for (auto & Coord : Coords)
 		{
 			BLOCKTYPE  BlockType;
 			NIBBLETYPE BlockMeta;
 			if (
-				a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) &&
+				a_Chunk.UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta) &&
 				IsBlockAttachable(BlockType)
 			)
 			{
-				res |= Coords[i].Bit;
+				res |= Coord.Bit;
 			}
 		}
 		return res;

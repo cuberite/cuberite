@@ -27,7 +27,7 @@ public:
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, Block, Meta);
 
 		if (!CanBePlacedOn(Block, Meta, a_BlockFace))  // Try to preserve original direction
 		{
@@ -152,7 +152,7 @@ public:
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, true);
 			BLOCKTYPE BlockInQuestion;
 			NIBBLETYPE BlockInQuestionMeta;
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockInQuestion, BlockInQuestionMeta);
+			a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockInQuestion, BlockInQuestionMeta);
 
 			if (CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face))
 			{

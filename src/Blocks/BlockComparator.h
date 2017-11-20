@@ -20,7 +20,7 @@ public:
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 		Meta ^= 0x04;  // Toggle 3rd (addition / subtraction) bit with XOR
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 		return true;
@@ -70,17 +70,16 @@ public:
 		return ((a_Meta & 0x8) == 0x8);
 	}
 
-	inline static Vector3i GetSideCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
+	inline static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
 	{
-		auto Position = a_Position;
 		if (!a_bInverse)
 		{
 			switch (a_Meta)
 			{
-				case 0x0: Position.x++; break;
-				case 0x1: Position.z--; break;
-				case 0x2: Position.x--; break;
-				case 0x3: Position.z++; break;
+				case 0x0: a_Position.x++; break;
+				case 0x1: a_Position.z--; break;
+				case 0x2: a_Position.x--; break;
+				case 0x3: a_Position.z++; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -93,10 +92,10 @@ public:
 		{
 			switch (a_Meta)
 			{
-				case 0x0: Position.x--; break;
-				case 0x1: Position.z++; break;
-				case 0x2: Position.x++; break;
-				case 0x3: Position.z--; break;
+				case 0x0: a_Position.x--; break;
+				case 0x1: a_Position.z++; break;
+				case 0x2: a_Position.x++; break;
+				case 0x3: a_Position.z--; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -106,18 +105,17 @@ public:
 			}
 		}
 
-		return Position;
+		return a_Position;
 	}
 
-	inline static Vector3i GetRearCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetRearCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
-		auto Position = a_Position;
 		switch (a_Meta)
 		{
-			case 0x0: Position.z++; break;
-			case 0x1: Position.x--; break;
-			case 0x2: Position.z--; break;
-			case 0x3: Position.x++; break;
+			case 0x0: a_Position.z++; break;
+			case 0x1: a_Position.x--; break;
+			case 0x2: a_Position.z--; break;
+			case 0x3: a_Position.x++; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -126,18 +124,17 @@ public:
 			}
 		}
 
-		return Position;
+		return a_Position;
 	}
 
-	inline static Vector3i GetFrontCoordinate(const Vector3i & a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
-		auto Position = a_Position;
 		switch (a_Meta)
 		{
-			case 0x0: Position.z--; break;
-			case 0x1: Position.x++; break;
-			case 0x2: Position.z++; break;
-			case 0x3: Position.x--; break;
+			case 0x0: a_Position.z--; break;
+			case 0x1: a_Position.x++; break;
+			case 0x2: a_Position.z++; break;
+			case 0x3: a_Position.x--; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -146,7 +143,7 @@ public:
 			}
 		}
 
-		return Position;
+		return a_Position;
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

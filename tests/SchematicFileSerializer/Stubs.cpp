@@ -199,7 +199,7 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
 
 
 
-bool cBlockHandler::IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
 	return true;
 }

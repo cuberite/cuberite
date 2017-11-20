@@ -32,7 +32,7 @@ public:
 
 		BLOCKTYPE BlockBeforePlacement;
 		NIBBLETYPE MetaBeforePlacement;
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockBeforePlacement, MetaBeforePlacement);
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockBeforePlacement, MetaBeforePlacement);
 
 		if ((BlockBeforePlacement == E_BLOCK_SNOW) && (MetaBeforePlacement < FullBlockMeta))
 		{
@@ -50,7 +50,7 @@ public:
 		NIBBLETYPE MetaBelow;
 		return (
 			(a_BlockY > 0) &&
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockBelow, MetaBelow) &&
+			a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY - 1, a_BlockZ}, BlockBelow, MetaBelow) &&
 			CanBeOn(BlockBelow, MetaBelow)
 		);
 	}
@@ -99,7 +99,7 @@ public:
 		return 14;
 	}
 
-	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
 	{
 		return a_Position.y < (cBlockInfo::GetBlockHeight(a_BlockType) * (a_BlockMeta & 0x07));
 	}

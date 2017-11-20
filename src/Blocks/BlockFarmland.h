@@ -82,7 +82,7 @@ public:
 		}
 
 		// Check whether we should revert to dirt:
-		BLOCKTYPE UpperBlock = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+		BLOCKTYPE UpperBlock = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ});
 		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
 		{
 			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);

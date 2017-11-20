@@ -25,7 +25,7 @@ public:
 			BLOCKTYPE BottomType;
 			if (
 				(a_Pos.y < 1) ||
-				!a_ChunkInterface.GetBlockTypeMeta(a_Pos.x, a_Pos.y - 1, a_Pos.z, BottomType, a_Meta) ||
+				!a_ChunkInterface.GetBlockTypeMeta(a_Pos - Vector3i(0, 1, 0), BottomType, a_Meta) ||
 				(BottomType != E_BLOCK_BIG_FLOWER)
 			)
 			{
@@ -43,7 +43,8 @@ public:
 
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		Vector3i Pos(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Pos);
 		int AlternateY  = a_BlockY;
 		int BottomY     = a_BlockY;
 
@@ -57,7 +58,7 @@ public:
 			++AlternateY;
 		}
 		// also destroy the other block if it has a valid height and is a big flower
-		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock(a_BlockX, AlternateY, a_BlockZ) == E_BLOCK_BIG_FLOWER)
+		if (cChunkDef::IsValidHeight(AlternateY) && a_ChunkInterface.GetBlock({Pos.x, AlternateY, Pos.z}) == E_BLOCK_BIG_FLOWER)
 		{
 			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, BottomY, a_BlockZ, a_CanDrop);
 			a_ChunkInterface.FastSetBlock(a_BlockX, AlternateY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -87,10 +88,11 @@ public:
 
 	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		Vector3i BlockPos(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(BlockPos);
 		if (Meta & 0x8)
 		{
-			Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+			Meta = a_ChunkInterface.GetBlockMeta(BlockPos - Vector3i(0, 1, 0));
 		}
 
 		NIBBLETYPE FlowerMeta = Meta & 0x7;
@@ -115,7 +117,7 @@ public:
 					{
 						Pickups.Add(E_BLOCK_TALL_GRASS, 2, 2);
 					}
-					a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
+					a_WorldInterface.SpawnItemPickups(Pickups, BlockPos.x, BlockPos.y, BlockPos.z);
 				}
 				a_Player.UseEquippedItem();
 			}
@@ -129,7 +131,7 @@ public:
 			)
 		)
 		{
-			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, 0, 0);
+			a_ChunkInterface.SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, 0, 0);
 		}
 	}
 
@@ -153,22 +155,25 @@ public:
 
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		Vector3i BlockPos(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(BlockPos);
 
 		if (OldMeta & 0x8)
 		{
 			// Was upper part of flower
-			if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == m_BlockType)
+			Vector3i LowerPart = BlockPos - Vector3i(0, 1, 0);
+			if (a_ChunkInterface.GetBlock(LowerPart) == m_BlockType)
 			{
-				a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+				a_ChunkInterface.FastSetBlock(LowerPart, E_BLOCK_AIR, 0);
 			}
 		}
 		else
 		{
 			// Was lower part
-			if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ) == m_BlockType)
+			Vector3i UpperPart = BlockPos + Vector3i(0, 1, 0);
+			if (a_ChunkInterface.GetBlock(UpperPart) == m_BlockType)
 			{
-				a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);
+				a_ChunkInterface.FastSetBlock(UpperPart, E_BLOCK_AIR, 0);
 			}
 		}
 	}

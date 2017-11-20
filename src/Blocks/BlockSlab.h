@@ -75,7 +75,7 @@ public:
 
 		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
 		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
-		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
+		if (IsAnySlabType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})))
 		{
 			a_BlockType = GetDoubleSlabType(m_BlockType);
 			a_BlockMeta = a_BlockMeta & 0x7;
@@ -184,7 +184,7 @@ public:
 		}
 	}
 
-	virtual bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_BlockMeta & 0x8)  // top half
 		{

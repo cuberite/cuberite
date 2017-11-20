@@ -18,12 +18,12 @@ cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType)
 
 void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 
 	if (OldMeta & 8)
 	{
 		// Was upper part of door
-		if (IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (IsDoorBlockType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY - 1, a_BlockZ})))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -31,7 +31,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 	else
 	{
 		// Was lower part
-		if (IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
+		if (IsDoorBlockType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ})))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -50,7 +50,7 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 	UNUSED(a_CursorY);
 	UNUSED(a_CursorZ);
 
-	switch (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))
+	switch (a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}))
 	{
 		default:
 		{
@@ -87,7 +87,7 @@ void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, c
 	UNUSED(a_ChunkInterface);
 
 	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 
 	if (Meta & 0x8)
 	{

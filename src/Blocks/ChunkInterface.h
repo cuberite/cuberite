@@ -16,11 +16,10 @@ public:
 
 	cChunkInterface(cChunkMap * a_ChunkMap) : m_ChunkMap(a_ChunkMap) {}
 
-	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
-	BLOCKTYPE GetBlock(const Vector3i & a_Pos);
-	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ);
+	BLOCKTYPE GetBlock(Vector3i a_Pos);
+	NIBBLETYPE GetBlockMeta(Vector3i a_Pos);
 
-	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	bool GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed.

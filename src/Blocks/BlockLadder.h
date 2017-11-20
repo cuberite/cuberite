@@ -101,7 +101,7 @@ public:
 
 		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ));
+		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}));
 	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override

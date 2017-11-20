@@ -17,9 +17,8 @@
 
 void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-
 	Vector3i ThisPos(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(ThisPos);
 	Vector3i Direction = MetaDataToDirection(OldMeta & 0x3);
 	if (OldMeta & 0x8)
 	{
@@ -55,9 +54,9 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 
 bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
+	Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
-		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
 	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
@@ -66,7 +65,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 	}
 	else
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Coords);
 		if ((Meta & 0x4) == 0x4)
 		{
 			a_Player.SendMessageFailure("This bed is occupied");
@@ -100,13 +99,13 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					VERIFY((Meta & 0x4) != 0x4);  // Occupied flag should never be set, else our compilator (intended) is broken
 
 					PillowDirection = MetaDataToDirection(Meta & 0x3);
-					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED)  // Must always use pillow location for sleeping
+					if (a_ChunkInterface.GetBlock(Coords + PillowDirection) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
 						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);
 					}
 				}
 
-				a_Player.SetBedPos(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+				a_Player.SetBedPos(Coords);
 				SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 				a_Player.SetIsInBed(true);
 				a_Player.SendMessageSuccess("Home position set successfully");
