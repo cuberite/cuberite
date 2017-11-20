@@ -368,10 +368,10 @@ public:
 	virtual void Heal(int a_HitPoints);
 
 	/** Returns the health of this entity */
-	int GetHealth(void) const { return m_Health; }
+	float GetHealth(void) const { return m_Health; }
 
 	/** Sets the health of this entity; doesn't broadcast any hurt animation */
-	void SetHealth(int a_Health);
+	void SetHealth(float a_Health);
 
 	// tolua_end
 
@@ -403,9 +403,9 @@ public:
 	// tolua_begin
 
 	/** Sets the maximum value for the health */
-	void SetMaxHealth(int a_MaxHealth);
+	void SetMaxHealth(float a_MaxHealth);
 
-	int GetMaxHealth(void) const { return m_MaxHealth; }
+	float GetMaxHealth(void) const { return m_MaxHealth; }
 
 	/** Sets whether the entity is fireproof */
 	void SetIsFireproof(bool a_IsFireproof);
@@ -556,8 +556,8 @@ protected:
 	Note that the UniqueID is not persisted through storage. */
 	UInt32 m_UniqueID;
 
-	int m_Health;
-	int m_MaxHealth;
+	float m_Health;
+	float m_MaxHealth;
 
 	/** The entity to which this entity is attached (vehicle), nullptr if none */
 	cEntity * m_AttachedTo;

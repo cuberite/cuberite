@@ -3310,7 +3310,7 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			Health: 1 | 3 - (1 - 3) = 5
 			*/
 			auto & Minecart = reinterpret_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteBEInt32((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4);
+			a_Pkt.WriteBEInt32(static_cast<Int32>((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4));
 			a_Pkt.WriteBEUInt8(0x52);
 			a_Pkt.WriteBEInt32(1);  // Shaking direction, doesn't seem to affect anything
 			a_Pkt.WriteBEUInt8(0x73);
