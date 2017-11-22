@@ -235,6 +235,10 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
 	}
+	catch (fmt::FormatError & f)
+	{
+		FLOGERROR("Formatting exception: {0}", f.what());
+	}
 	catch (std::exception & e)
 	{
 		LOGERROR("Standard exception: %s", e.what());
@@ -447,7 +451,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 	}
 	catch (const TCLAP::ArgException & exc)
 	{
-		fmt::print("Error reading command line {} for arg {}", exc.error(), exc.argId());
+		fmt::print("Error reading command line {0} for arg {1}", exc.error(), exc.argId());
 		return cpp14::make_unique<cMemorySettingsRepository>();
 	}
 }

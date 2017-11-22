@@ -644,7 +644,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		}  // for j
 
 		// Write Hex with a dynamic fixed width
-		Output.write("{:08x}: {:{}}   {}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
 		Hex.clear();
 		Chars.clear();
 	}  // for i

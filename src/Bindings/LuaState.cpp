@@ -2025,7 +2025,7 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
 
 	// Compose the error message:
 	AString msg = Printf(a_MsgFormat, argp);
-	AString errorMsg = fmt::format("{}: {}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
+	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
 
 	// Log everything into the console:
 	LOGWARNING("%s", errorMsg.c_str());
