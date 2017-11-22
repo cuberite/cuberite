@@ -431,7 +431,7 @@ void cNBTChunkSerializer::AddBasicEntity(cEntity * a_Entity, const AString & a_C
 		m_Writer.AddDouble("", a_Entity->GetYaw());
 		m_Writer.AddDouble("", a_Entity->GetPitch());
 	m_Writer.EndList();
-	m_Writer.AddShort("Health", static_cast<Int16>(a_Entity->GetHealth()));
+	m_Writer.AddFloat("Health", a_Entity->GetHealth());
 }
 
 

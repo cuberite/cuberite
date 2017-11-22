@@ -528,9 +528,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
 	}
 
-	m_Health -= static_cast<short>(a_TDI.FinalDamage);
+	m_Health -= static_cast<float>(a_TDI.FinalDamage);
 
-	m_Health = std::max(m_Health, 0);
+	m_Health = std::max(m_Health, 0.0f);
 
 	// Add knockback:
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
@@ -810,9 +810,9 @@ void cEntity::Heal(int a_HitPoints)
 
 
 
-void cEntity::SetHealth(int a_Health)
+void cEntity::SetHealth(float a_Health)
 {
-	m_Health = Clamp(a_Health, 0, m_MaxHealth);
+	m_Health = Clamp(a_Health, 0.0f, m_MaxHealth);
 }
 
 
@@ -1782,7 +1782,7 @@ void cEntity::OnFinishedBurning(void)
 
 
 
-void cEntity::SetMaxHealth(int a_MaxHealth)
+void cEntity::SetMaxHealth(float a_MaxHealth)
 {
 	m_MaxHealth = a_MaxHealth;
 
