@@ -611,17 +611,15 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		// Load the proper BlockEntity type based on the block type:
 		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, relPos);
 		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, relPos);
-		std::unique_ptr<cBlockEntity> be(LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta));
-		if (be.get() == nullptr)
+		OwnedBlockEntity be(LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta));
+		if (be == nullptr)
 		{
 			continue;
 		}
 
 		// Add the BlockEntity to the loaded data:
 		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
-		a_BlockEntities.insert({ Idx, be.get() });
-		// Release after inserting in case it throws.
-		be.release();
+		a_BlockEntities.insert({ Idx, std::move(be) });
 	}  // for Child - tag children
 }
 

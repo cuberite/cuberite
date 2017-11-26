@@ -27,6 +27,7 @@ SET (SRCS
 	ChatColor.cpp
 	Chunk.cpp
 	ChunkData.cpp
+	ChunkDef.cpp
 	ChunkGeneratorThread.cpp
 	ChunkMap.cpp
 	ChunkSender.cpp

@@ -569,7 +569,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 	}
 	if (HasBlockEntities())
 	{
-		ClearBlockEntities(*(a_Into.m_BlockEntities));
+		a_Into.m_BlockEntities->clear();
 		for (const auto & keyPair: *m_BlockEntities)
 		{
 			const auto & pos = keyPair.second->GetPos();
@@ -663,36 +663,22 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 	}
 	if (HasBlockEntities())
 	{
-		auto maxX = m_Size.x - a_SubMaxX;
-		auto maxY = m_Size.y - a_SubMaxY;
-		auto maxZ = m_Size.z - a_SubMaxZ;
+		const Vector3i AddMin{ a_AddMinX, a_AddMinY, a_AddMinZ };
+		const cCuboid CropBox{ AddMin, m_Size - Vector3i{a_SubMaxX, a_SubMaxY, a_SubMaxZ} };
 
 		// Move and crop block Entities:
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
-			auto posX = be->GetPosX();
-			auto posY = be->GetPosY();
-			auto posZ = be->GetPosZ();
-			if (
-				(posX < a_AddMinX) || (posX >= maxX) ||
-				(posY < a_AddMinY) || (posY >= maxY) ||
-				(posZ < a_AddMinZ) || (posZ >= maxZ)
-			)
-			{
-				// The block entity is out of new coord range, remove it:
-				delete be;
-			}
-			else
+			auto Pos = be->GetPos();
+			if (CropBox.IsInside(Pos))
 			{
 				// The block entity is within the new coords, recalculate its coords to match the new area:
-				posX -= a_AddMinX;
-				posY -= a_AddMinY;
-				posZ -= a_AddMinZ;
-				be->SetPos({posX, posY, posZ});
-				m_BlockEntities->insert({MakeIndex(posX, posY, posZ), std::move(be)});
+				Pos -= AddMin;
+				be->SetPos({Pos.x, Pos.y, Pos.z});
+				m_BlockEntities->insert({MakeIndex(Pos.x, Pos.y, Pos.z), std::move(be)});
 			}
 		}
 	}
@@ -730,7 +716,7 @@ void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMa
 		// Move block entities:
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto posX = be->GetPosX() + a_SubMinX;
@@ -831,7 +817,7 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 		}
 		else
 		{
-			ClearBlockEntities(*m_BlockEntities);
+			m_BlockEntities->clear();
 		}
 	}
 }
@@ -891,7 +877,7 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 		}
 		else
 		{
-			ClearBlockEntities(*m_BlockEntities);
+			m_BlockEntities->clear();
 		}
 	}
 }
@@ -1091,7 +1077,7 @@ void cBlockArea::RotateCCW(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosZ();
@@ -1151,7 +1137,7 @@ void cBlockArea::RotateCW(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = m_Size.z - be->GetPosZ() - 1;
@@ -1210,7 +1196,7 @@ void cBlockArea::MirrorXY(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1267,7 +1253,7 @@ void cBlockArea::MirrorXZ(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1324,7 +1310,7 @@ void cBlockArea::MirrorYZ(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = MaxX - be->GetPosX();
@@ -1383,7 +1369,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosZ();
@@ -1444,7 +1430,7 @@ void cBlockArea::RotateCWNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = m_Size.z - be->GetPosZ() - 1;
@@ -1500,7 +1486,7 @@ void cBlockArea::MirrorXYNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1554,7 +1540,7 @@ void cBlockArea::MirrorXZNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1608,7 +1594,7 @@ void cBlockArea::MirrorYZNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (const auto & keyPair: oldBE)
+		for (auto & keyPair: oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = MaxX - be->GetPosX();
@@ -2598,19 +2584,6 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 
 
 
-void cBlockArea::ClearBlockEntities(cBlockEntities & a_BlockEntities)
-{
-	for (auto & keyPair: a_BlockEntities)
-	{
-		delete keyPair.second;
-	}
-	a_BlockEntities.clear();
-}
-
-
-
-
-
 void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cBlockArea & a_Src)
 {
 	// Only supported with both BlockEntities and BlockTypes (caller should check):
@@ -2713,11 +2686,7 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 		auto type = m_BlockTypes[static_cast<size_t>(keyPair.first)];
 		if (type == keyPair.second->GetBlockType())
 		{
-			m_BlockEntities->insert({keyPair.first, std::move(keyPair.second)});
-		}
-		else
-		{
-			delete keyPair.second;
+			m_BlockEntities->insert(std::move(keyPair));
 		}
 	}
 }
@@ -2734,22 +2703,6 @@ cBlockEntity * cBlockArea::GetBlockEntityRel(Vector3i a_RelPos)
 	}
 	auto itr = m_BlockEntities->find(MakeIndex(a_RelPos));
 	return (itr == m_BlockEntities->end()) ? nullptr : itr->second;
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cBlockArea::sBlockEntityDeleter:
-
-void cBlockArea::sBlockEntitiesDeleter::operator () (cBlockEntities * a_BlockEntities)
-{
-	if (a_BlockEntities != nullptr)
-	{
-		ClearBlockEntities(*a_BlockEntities);
-		delete a_BlockEntities;
-	}
 }
 
 

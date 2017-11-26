@@ -653,10 +653,10 @@ private:
 	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
-	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
+	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
 
 	/** Add a block entity to the chunk without marking the chunk dirty */
-	void AddBlockEntityClean(cBlockEntity * a_BlockEntity);
+	void AddBlockEntityClean(OwnedBlockEntity a_BlockEntity);
 
 	/** Creates a block entity for each block that needs a block entity and doesn't have one already */
 	void CreateBlockEntities(void);

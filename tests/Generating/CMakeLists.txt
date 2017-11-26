@@ -14,6 +14,7 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BlockID.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
+	${CMAKE_SOURCE_DIR}/src/ChunkDef.cpp
 	${CMAKE_SOURCE_DIR}/src/Enchantments.cpp
 	${CMAKE_SOURCE_DIR}/src/FastRandom.cpp
 	${CMAKE_SOURCE_DIR}/src/IniFile.cpp

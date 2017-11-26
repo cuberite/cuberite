@@ -110,10 +110,6 @@ cChunk::~cChunk()
 
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 
-	for (auto & KeyPair : m_BlockEntities)
-	{
-		delete KeyPair.second;
-	}
 	m_BlockEntities.clear();
 
 	// Remove and destroy all entities that are not players:
@@ -305,7 +301,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 	for (auto & KeyPair : m_BlockEntities)
 	{
-		a_Callback.BlockEntity(KeyPair.second);
+		a_Callback.BlockEntity(KeyPair.second.get());
 	}
 }
 
@@ -325,17 +321,13 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	m_IsLightValid = a_SetChunkData.IsLightValid();
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
-	for (auto & KeyPair : m_BlockEntities)
-	{
-		delete KeyPair.second;
-	}
-	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
+	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities())
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
 		for (auto & KeyPair : m_BlockEntities)
 		{
-			cBlockEntity * Block = KeyPair.second;
+			cBlockEntity * Block = KeyPair.second.get();
 			BLOCKTYPE EntityBlockType = Block->GetBlockType();
 			BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
 			ASSERT(WorldBlockType == EntityBlockType);
@@ -448,7 +440,6 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	{
 		if (affectedArea.IsInside(itr->second->GetPos()))
 		{
-			delete itr->second;
 			itr = m_BlockEntities.erase(itr);
 		}
 		else
@@ -482,7 +473,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			}
 			auto clone = be->Clone({posX, posY, posZ});
 			clone->SetWorld(m_World);
-			AddBlockEntityClean(clone);
+			AddBlockEntityClean(std::move(clone));
 			m_World->BroadcastBlockEntity({posX, posY, posZ});
 		}
 	}
@@ -1346,8 +1337,6 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	{
 		BlockEntity->Destroy();
 		RemoveBlockEntity(BlockEntity);
-		delete BlockEntity;
-		BlockEntity = nullptr;
 	}
 
 	// If the new block is a block entity, create the entity object:
@@ -1527,20 +1516,20 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 
 
-void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
+void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 {
 	MarkDirty();
-	AddBlockEntityClean(a_BlockEntity);
+	AddBlockEntityClean(std::move(a_BlockEntity));
 }
 
 
 
 
 
-void cChunk::AddBlockEntityClean(cBlockEntity * a_BlockEntity)
+void cChunk::AddBlockEntityClean(OwnedBlockEntity a_BlockEntity)
 {
 	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
-	auto Result = m_BlockEntities.insert({ Idx, a_BlockEntity });
+	auto Result = m_BlockEntities.insert({ Idx, std::move(a_BlockEntity) });
 	UNUSED(Result);
 	ASSERT(Result.second);  // No block entity already at this position
 }
@@ -1560,7 +1549,7 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 	}
 
 	auto itr = m_BlockEntities.find(static_cast<size_t>(MakeIndexNoCheck(relPos)));
-	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
+	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
 
@@ -1571,7 +1560,7 @@ cBlockEntity * cChunk::GetBlockEntityRel(Vector3i a_RelPos)
 {
 	ASSERT(IsValidRelPos(a_RelPos));
 	auto itr = m_BlockEntities.find(static_cast<size_t>(MakeIndexNoCheck(a_RelPos)));
-	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
+	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
 
@@ -1958,7 +1947,7 @@ bool cChunk::GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback
 	// The blockentity list is locked by the parent chunkmap's CS
 	for (auto & KeyPair : m_BlockEntities)
 	{
-		cBlockEntity * Block = KeyPair.second;
+		cBlockEntity * Block = KeyPair.second.get();
 		if (
 			(sizeof...(tBlocktype) == 0) ||  // Let empty list mean all block entities
 			(IsOneOf<tBlocktype...>(Block->GetBlockType()))

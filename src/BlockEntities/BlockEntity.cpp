@@ -73,36 +73,35 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 
 
 
-cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
+OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
 {
 	switch (a_BlockType)
 	{
-		case E_BLOCK_BEACON:        return new cBeaconEntity      (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BED:           return new cBedEntity         (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BREWING_STAND: return new cBrewingstandEntity(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_CHEST:         return new cChestEntity       (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_COMMAND_BLOCK: return new cCommandBlockEntity(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DISPENSER:     return new cDispenserEntity   (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DROPPER:       return new cDropperEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_ENDER_CHEST:   return new cEnderChestEntity  (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FLOWER_POT:    return new cFlowerPotEntity   (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FURNACE:       return new cFurnaceEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HEAD:          return new cMobHeadEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HOPPER:        return new cHopperEntity      (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_JUKEBOX:       return new cJukeboxEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_LIT_FURNACE:   return new cFurnaceEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_MOB_SPAWNER:   return new cMobSpawnerEntity  (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_NOTE_BLOCK:    return new cNoteEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_SIGN_POST:     return new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_TRAPPED_CHEST: return new cChestEntity       (a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_WALLSIGN:      return new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_BED:           return OwnedBlockEntity{new cBedEntity         (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_BREWING_STAND: return OwnedBlockEntity{new cBrewingstandEntity(a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_CHEST:         return OwnedBlockEntity{new cChestEntity       (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_COMMAND_BLOCK: return OwnedBlockEntity{new cCommandBlockEntity(a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_DISPENSER:     return OwnedBlockEntity{new cDispenserEntity   (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_DROPPER:       return OwnedBlockEntity{new cDropperEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_ENDER_CHEST:   return OwnedBlockEntity{new cEnderChestEntity  (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_FLOWER_POT:    return OwnedBlockEntity{new cFlowerPotEntity   (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_FURNACE:       return OwnedBlockEntity{new cFurnaceEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_HEAD:          return OwnedBlockEntity{new cMobHeadEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_HOPPER:        return OwnedBlockEntity{new cHopperEntity      (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_JUKEBOX:       return OwnedBlockEntity{new cJukeboxEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_LIT_FURNACE:   return OwnedBlockEntity{new cFurnaceEntity     (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_MOB_SPAWNER:   return OwnedBlockEntity{new cMobSpawnerEntity  (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_NOTE_BLOCK:    return OwnedBlockEntity{new cNoteEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_SIGN_POST:     return OwnedBlockEntity{new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_TRAPPED_CHEST: return OwnedBlockEntity{new cChestEntity       (a_BlockType, a_BlockMeta, a_Pos, a_World)};
+		case E_BLOCK_WALLSIGN:      return OwnedBlockEntity{new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World)};
 		default:
 		{
 			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",
 				__FUNCTION__, a_BlockType, ItemTypeToString(a_BlockType).c_str()
 			);
 			ASSERT(!"Requesting creation of an unknown block entity");
-			return nullptr;
+			return {};
 		}
 	}
 }
@@ -111,11 +110,11 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 
 
 
-cBlockEntity * cBlockEntity::Clone(Vector3i a_Pos)
+OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 {
-	auto res = std::unique_ptr<cBlockEntity>(CreateByBlockType(m_BlockType, m_BlockMeta, a_Pos, nullptr));
+	auto res = CreateByBlockType(m_BlockType, m_BlockMeta, a_Pos, nullptr);
 	res->CopyFrom(*this);
-	return res.release();
+	return res;
 }
 
 
