@@ -601,7 +601,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 		// No block entity for this block type
 		return nullptr;
 	}
-	auto res = m_BlockEntities.insert({ Idx, std::move(be) });
+	auto res = m_BlockEntities.emplace(Idx, std::move(be));
 	return res.first->second.get();
 }
 

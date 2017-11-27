@@ -619,7 +619,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 		// Add the BlockEntity to the loaded data:
 		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
-		a_BlockEntities.insert({ Idx, std::move(be) });
+		a_BlockEntities.emplace(Idx, std::move(be));
 	}  // for Child - tag children
 }
 

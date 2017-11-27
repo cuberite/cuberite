@@ -1529,7 +1529,7 @@ void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 void cChunk::AddBlockEntityClean(OwnedBlockEntity a_BlockEntity)
 {
 	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
-	auto Result = m_BlockEntities.insert({ Idx, std::move(a_BlockEntity) });
+	auto Result = m_BlockEntities.emplace(Idx, std::move(a_BlockEntity));
 	UNUSED(Result);
 	ASSERT(Result.second);  // No block entity already at this position
 }
