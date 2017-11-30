@@ -168,7 +168,7 @@ set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(Bindings.cpp PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS} "-Wno-old-style-cast -Wno-missing-prototypes")
+	set_source_files_properties(Bindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast -Wno-missing-prototypes -Wno-zero-as-null-pointer-constant")
 endif()
 
 if(NOT MSVC)

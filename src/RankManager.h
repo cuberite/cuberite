@@ -8,8 +8,19 @@
 
 #pragma once
 
+// Because SQLiteCpp uses NULL instead of nullptr, we need to disable the Clang warning here
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Transaction.h"
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
+
 
 
 

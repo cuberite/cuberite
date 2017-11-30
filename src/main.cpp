@@ -72,6 +72,12 @@ bool cRoot::m_RunAsService = false;
 
 
 #ifndef _DEBUG
+// Because SQLiteCpp uses NULL instead of nullptr, we need to disable the Clang warning for std::signal here
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif
+
 static void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
@@ -115,6 +121,10 @@ static void NonCtrlHandler(int a_Signal)
 		default: break;
 	}
 }
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
 #endif  // _DEBUG
 
 
