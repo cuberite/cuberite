@@ -2384,7 +2384,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand);
 }
 
 
@@ -2787,7 +2787,7 @@ void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
 
 	// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
-	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, static_cast<int>(Hand));
 }
 
 

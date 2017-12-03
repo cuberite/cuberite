@@ -2329,13 +2329,13 @@ void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
 
-	cItem Item;
+	cItem Item; // Ignored
 	ReadItem(a_ByteBuffer, Item, 3);
 
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, eHand::hMain);
 }
 
 
