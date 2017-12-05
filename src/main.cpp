@@ -72,7 +72,7 @@ bool cRoot::m_RunAsService = false;
 
 
 #ifndef _DEBUG
-// Because SQLiteCpp uses NULL instead of nullptr, we need to disable the Clang warning for std::signal here
+// Because SIG_DFL or SIG_IGN could be NULL instead of nullptr, we need to disable the Clang warning here
 #ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
