@@ -1400,11 +1400,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// This function handles three actions:
 	// (1) Place a block
 	// (2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace
-	// (3) Use the held item: eating, drinking, charging a bow, using buckets
+	// (3) Use the held item targeting a block: e.g. farming
+	// (4) Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
 	//
 	// As for 1.12.2, This function has two use cases:
-	// * Calling with parameters -1, 255, -1, BLOCK_FACE_NONE(-1), 0, 0, 0, Hand. --(3)
-	// * Calling with valid parameters.                                           --(1) or (2)
+	// * Calling with parameters -1, 255, -1, BLOCK_FACE_NONE(-1), 0, 0, 0, Hand. --(4)
+	// * Calling with valid parameters.                                           --(1) (2) or (3)
 	//   Sneaking player will prioritize placement over using block, otherwise the other way round.
 	//
 	// In version 1.8.x, these two cases shareing the same packet id. In version >= 1.9, there is a new packet id "Use Item".
@@ -1417,6 +1418,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	//
 	// Actions rejected by plugin will not lead to other attempts.
 	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
+	//
+	// I delibrately seperate the code for (3) and (4) so that we are able to seperate these two cases in the future.
 
 	// TODO: Move use item into a dedicated function.
 
