@@ -14,7 +14,7 @@
 #include "../Root.h"
 
 // Because SQLiteCpp uses NULL instead of nullptr, we need to disable the Clang warning here
-#ifdef __clang__
+#if __clang_major__ >= 5
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
@@ -22,7 +22,7 @@
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Statement.h"
 
-#ifdef __clang__
+#if __clang_major__ >= 5
 	#pragma clang diagnostic pop
 #endif
 
