@@ -1397,10 +1397,35 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, int a_Hand)
 {
-	// TODO: We are still consuming the items in main hand.
-	// TODO: Rewrite this function
-	const cItem& heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	// This function handles three actions:
+	// (1) Place a block
+	// (2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace
+	// (3) Use the held item: eating, drinking, charging a bow, using buckets
+	//
+	// As for 1.12.2, This function has two use cases:
+	// * Calling with parameters -1, 255, -1, BLOCK_FACE_NONE(-1), 0, 0, 0, Hand. --(3)
+	// * Calling with valid parameters.                                           --(1) or (2)
+	//   Sneaking player will prioritize placement over using block, otherwise the other way round.
+	//
+	// In version 1.8.x, these two cases shareing the same packet id. In version >= 1.9, there is a new packet id "Use Item".
+	// But we still call this function in its handler for backward compatibility.
+    //
+	// Frozen player can do nothing.
+	// In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
+	//
+	// If the action failed, we need to send an update of the placed block or inventory to the client.
+	//
+	// Actions rejected by plugin will not lead to other attempts.
+	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
 
+	// TODO: Move use item into a dedicated function.
+
+	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
+	a_Hand = eHand::hMain;
+	const cItem& heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
+
+	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
 	// Distance from the block's center to the player's eye height
 	double dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, Hand: %d, HeldItem: %s; dist: %.02f",
@@ -1410,148 +1435,122 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// Check the reach distance:
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
 	double maxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
-	bool AreRealCoords = (dist <= maxDist);
+	bool isWithinReach = (dist <= maxDist);
 
 	cWorld * World = m_Player->GetWorld();
-
-	if (
-		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
-		IsValidBlock(heldItem.m_ItemType) &&
-		!AreRealCoords
-	)
-	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
-		{
-			if (cChunkDef::IsValidHeight(a_BlockY))
-			{
-				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
-			}
-			if (cChunkDef::IsValidHeight(a_BlockY + 1))
-			{
-				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *m_Player);  // 2 block high things
-			}
-			if (cChunkDef::IsValidHeight(a_BlockY - 1))
-			{
-				World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, *m_Player);  // 2 block high things
-			}
-		}
-		m_Player->GetInventory().SendEquippedSlot();
-		return;
-	}
-
-	if (!AreRealCoords)
-	{
-		a_BlockFace = BLOCK_FACE_NONE;
-	}
-
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	if (a_BlockFace == BLOCK_FACE_NONE)
 	{
-		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		if (AreRealCoords)
-		{
-			cChunkInterface ChunkInterface(World->GetChunkMap());
-			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-			BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		// Use item in main/off hand
+		// TODO: do we need to sync the current inventory with client if it fails?
+		if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator()) return;
 
-			if (a_BlockFace != BLOCK_FACE_NONE)
+		if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(heldItem.m_ItemDamage)))
+		{
+			if (
+				ItemHandler->IsFood() &&
+				(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
+				(heldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
+			)
 			{
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				if (cChunkDef::IsValidHeight(a_BlockY))
-				{
-					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
-				}
-				if (cChunkDef::IsValidHeight(a_BlockY + 1))
-				{
-					World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *m_Player);  // 2 block high things
-				}
-				if (cChunkDef::IsValidHeight(a_BlockY - 1))
-				{
-					World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, *m_Player);  // 2 block high things
-				}
-				m_Player->GetInventory().SendEquippedSlot();
+				// The player is satiated or in creative, and trying to eat
+				return;
+			}
+			if (!PlgMgr->CallHookPlayerEating(*m_Player))
+			{
+				m_Player->StartEating();
 			}
 		}
-		return;
-	}
-
-	m_NumBlockChangeInteractionsThisTick++;
-
-	if (!CheckBlockInteractionsRate())
-	{
-		Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
-		return;
-	}
-
-	if (AreRealCoords)
-	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-
-		if (BlockHandler->IsUseable() && !m_Player->IsCrouched() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType)))
+		else
 		{
-			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+			// Use an item in hand without a target block
+			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 			{
-				cChunkInterface ChunkInterface(World->GetChunkMap());
-				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-				{
-					// block use was successful, we're done
-					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-					return;
-				}
+				// All plugins agree with using the item
+				cBlockInServerPluginInterface PluginInterface(*World);
+				ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 			}
-		}
-	}
-
-	// Players, who spectate cannot use their items
-	if (m_Player->IsGameModeSpectator())
-	{
-		return;
-	}
-
-	short EquippedDamage = heldItem.m_ItemDamage;
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
-
-	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
-	{
-		if (!ItemHandler->OnPlayerPlace(*World, *m_Player, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-		{
-			// Placement failed, bail out
-			return;
-		}
-	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
-	{
-		if (
-			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only creative or hungry players can eat
-			ItemHandler->IsFood() &&
-			(heldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
-		)
-		{
-			// The player is satiated or in creative, and trying to eat
-			return;
-		}
-		m_Player->StartEating();
-		if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerEating(*m_Player))
-		{
-			// A plugin won't let us eat, abort (send the proper packets to the client, too):
-			m_Player->AbortEating();
 		}
 	}
 	else
 	{
-		if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		// Place a block or use a block
+		bool success = false;
+		if (isWithinReach && !m_Player->IsFrozen())
 		{
-			// A plugin doesn't agree with using the item, abort
-			return;
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			NIBBLETYPE BlockMeta;
+			World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+
+			bool placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
+			bool usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+
+			if (usable && !(placeable && m_Player->IsCrouched()))
+			{
+				// use a block
+				if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+				{
+					cChunkInterface ChunkInterface(World->GetChunkMap());
+					if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+					{
+						// block use was successful, we're done
+						PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+						success = true;
+					}
+				}
+				else
+				{
+					// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
+					// A plugin doesn't agree with the action, replace the block on the client and quit:
+					BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				}
+			}
+			else if (placeable)
+			{
+				// TODO: Double check that we don't need this for using item and for packet out of range
+				m_NumBlockChangeInteractionsThisTick++;
+				if (!CheckBlockInteractionsRate())
+				{
+					Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
+					return;
+				}
+				if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+				{
+					// place a block
+					success = ItemHandler->OnPlayerPlace(*World, *m_Player, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				}
+			}
+			else
+			{
+				// Use an item in hand with a target block
+				if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+				{
+					// All plugins agree with using the item
+					cBlockInServerPluginInterface PluginInterface(*World);
+					ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+					PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+					success = true;
+				}
+			}
 		}
-		cBlockInServerPluginInterface PluginInterface(*World);
-		ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+
+		if (!success)
+		{
+			// Update the target block including the block above and below for 2 block hight things
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			for (int i = -1; i <= 1; i++)
+			{
+				if (cChunkDef::IsValidHeight(a_BlockY + i))
+				{
+					World->SendBlockTo(a_BlockX, a_BlockY + i, a_BlockZ, *m_Player);
+				}
+			}
+			// TODO: Send corresponding slot based on hand
+			m_Player->GetInventory().SendEquippedSlot();
+		}
 	}
 }
 
