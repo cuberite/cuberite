@@ -2784,7 +2784,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
 	m_Client->HandleUseItem(Hand);
 }
