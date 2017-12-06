@@ -1395,22 +1395,64 @@ void cClientHandle::FinishDigAnimation()
 
 
 
+void cClientHandle::HandleUseItem(int a_Hand) {
+	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
+	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
+	// In version >= 1.9, there is a new packet id for "Use Item".
+
+	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
+	a_Hand = eHand::hMain;
+	const cItem& heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
+	cWorld * World = m_Player->GetWorld();
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+
+	// Use item in main/off hand
+	// TODO: do we need to sync the current inventory with client if it fails?
+	if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator()) return;
+
+	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(heldItem.m_ItemDamage))
+	{
+		if (
+			ItemHandler->IsFood() &&
+			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
+			(heldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
+		)
+		{
+			// The player is satiated or in creative, and trying to eat
+			return;
+		}
+		if (!PlgMgr->CallHookPlayerEating(*m_Player))
+		{
+			m_Player->StartEating();
+		}
+	}
+	else
+	{
+		// Use an item in hand without a target block
+		if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
+		{
+			// All plugins agree with using the item
+			cBlockInServerPluginInterface PluginInterface(*World);
+			ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, -1, 255, -1, BLOCK_FACE_NONE);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0);
+		}
+	}
+}
+
+
+
+
+
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, int a_Hand)
 {
 	// This function handles three actions:
 	// (1) Place a block
 	// (2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace
 	// (3) Use the held item targeting a block: e.g. farming
-	// (4) Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
 	//
-	// As for 1.12.2, This function has two use cases:
-	// * Calling with parameters -1, 255, -1, BLOCK_FACE_NONE(-1), 0, 0, 0, Hand. --(4)
-	// * Calling with valid parameters.                                           --(1) (2) or (3)
-	//   Sneaking player will prioritize placement over using block, otherwise the other way round.
+	// Sneaking player will prioritize placement over using block, otherwise the other way round.
 	//
-	// In version 1.8.x, these two cases shareing the same packet id. In version >= 1.9, there is a new packet id "Use Item".
-	// But we still call this function in its handler for backward compatibility.
-    //
 	// Frozen player can do nothing.
 	// In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
 	//
@@ -1418,8 +1460,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	//
 	// Actions rejected by plugin will not lead to other attempts.
 	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
-	//
-	// I delibrately seperate the code for (3) and (4) so that we are able to seperate these two cases in the future.
 
 	// TODO: Move use item into a dedicated function.
 
@@ -1439,116 +1479,77 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
 	double maxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
 	bool isWithinReach = (dist <= maxDist);
-
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (a_BlockFace == BLOCK_FACE_NONE)
-	{
-		// Use item in main/off hand
-		// TODO: do we need to sync the current inventory with client if it fails?
-		if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator()) return;
 
-		if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(heldItem.m_ItemDamage)))
+	bool success = false;
+	if (isWithinReach && !m_Player->IsFrozen())
+	{
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE BlockMeta;
+		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+
+		bool placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
+		bool usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+
+		if (usable && !(placeable && m_Player->IsCrouched()))
 		{
-			if (
-				ItemHandler->IsFood() &&
-				(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
-				(heldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
-			)
+			// use a block
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
-				// The player is satiated or in creative, and trying to eat
+				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+				{
+					// block use was successful, we're done
+					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+					success = true;
+				}
+			}
+			else
+			{
+				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
+				// A plugin doesn't agree with the action, replace the block on the client and quit:
+				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			}
+		}
+		else if (placeable)
+		{
+			// TODO: Double check that we don't need this for using item and for packet out of range
+			m_NumBlockChangeInteractionsThisTick++;
+			if (!CheckBlockInteractionsRate())
+			{
+				Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 				return;
 			}
-			if (!PlgMgr->CallHookPlayerEating(*m_Player))
+			if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 			{
-				m_Player->StartEating();
+				// place a block
+				success = ItemHandler->OnPlayerPlace(*World, *m_Player, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 			}
 		}
 		else
 		{
-			// Use an item in hand without a target block
+			// Use an item in hand with a target block
 			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 			{
 				// All plugins agree with using the item
 				cBlockInServerPluginInterface PluginInterface(*World);
 				ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-			}
-		}
-	}
-	else
-	{
-		// Place a block or use a block
-		bool success = false;
-		if (isWithinReach && !m_Player->IsFrozen())
-		{
-			cChunkInterface ChunkInterface(World->GetChunkMap());
-			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-			NIBBLETYPE BlockMeta;
-			World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-
-			bool placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
-			bool usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
-
-			if (usable && !(placeable && m_Player->IsCrouched()))
-			{
-				// use a block
-				if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
-				{
-					cChunkInterface ChunkInterface(World->GetChunkMap());
-					if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-					{
-						// block use was successful, we're done
-						PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-						success = true;
-					}
-				}
-				else
-				{
-					// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
-					// A plugin doesn't agree with the action, replace the block on the client and quit:
-					BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				}
-			}
-			else if (placeable)
-			{
-				// TODO: Double check that we don't need this for using item and for packet out of range
-				m_NumBlockChangeInteractionsThisTick++;
-				if (!CheckBlockInteractionsRate())
-				{
-					Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
-					return;
-				}
-				if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-				{
-					// place a block
-					success = ItemHandler->OnPlayerPlace(*World, *m_Player, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-				}
-			}
-			else
-			{
-				// Use an item in hand with a target block
-				if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-				{
-					// All plugins agree with using the item
-					cBlockInServerPluginInterface PluginInterface(*World);
-					ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-					PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-					success = true;
-				}
+				success = true;
 			}
 		}
 
 		if (!success)
 		{
-			// Update the target block including the block above and below for 2 block hight things
+			// Update the target block including the block above and below for 2 block high things
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			for (int i = -1; i <= 1; i++)
+			for (int y = a_BlockY - 1; y <= a_BlockY + 1; y++)
 			{
-				if (cChunkDef::IsValidHeight(a_BlockY + i))
+				if (cChunkDef::IsValidHeight(y))
 				{
-					World->SendBlockTo(a_BlockX, a_BlockY + i, a_BlockZ, *m_Player);
+					World->SendBlockTo(a_BlockX, y, a_BlockZ, *m_Player);
 				}
 			}
 			// TODO: Send corresponding slot based on hand

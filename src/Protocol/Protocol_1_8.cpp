@@ -2335,7 +2335,15 @@ void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, eHand::hMain);
+	eBlockFace blockFace = FaceIntToBlockFace(Face);
+	if (blockFace == eBlockFace::BLOCK_FACE_NONE)
+	{
+		m_Client->HandleUseItem(eHand::hMain);
+	}
+	else
+	{
+		m_Client->HandleRightClick(BlockX, BlockY, BlockZ, blockFace, CursorX, CursorY, CursorZ, eHand::hMain);
+	}
 }
 
 
