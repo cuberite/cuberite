@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Item.h"
+#include "LazyArray.h"
 
 
 
@@ -36,7 +37,7 @@ public:
 	// tolua_begin
 	int GetWidth   (void) const { return m_Width; }
 	int GetHeight  (void) const { return m_Height; }
-	int GetNumSlots(void) const { return m_NumSlots; }
+	int GetNumSlots(void) const { return static_cast<int>(m_Slots.size()); }
 
 	/** Converts XY coords into slot number; returns -1 on invalid coords */
 	int GetSlotNum(int a_X, int a_Y) const;
@@ -47,7 +48,6 @@ public:
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
 
 	/** Copies all items from a_Src to this grid.
-	Both grids must be the same size (asserts).
 	Doesn't copy the listeners. */
 	void CopyFrom(const cItemGrid & a_Src);
 
@@ -183,25 +183,11 @@ public:
 protected:
 	int     m_Width;
 	int     m_Height;
-	int     m_NumSlots;  // m_Width * m_Height, for easier validity checking in the access functions
-	mutable std::unique_ptr<cItem[]> m_Slots;  // x + m_Width * y, DO NOT USE DIRECTLY -- MAY BE NULLPTR
+	cLazyArray<cItem> m_Slots;
 
 	cListeners       m_Listeners;    ///< Listeners which should be notified on slot changes; the pointers are not owned by this object
 	cCriticalSection m_CSListeners;  ///< CS that guards the m_Listeners against multi-thread access
 	bool             m_IsInTriggerListeners;  ///< Set to true while TriggerListeners is running, to detect attempts to manipulate listener list while triggerring
-
-
-	/** Access to the slots. Always use this instead of m_Slots directly.
-	Will cause allocation if IsCompletelyEmpty() was true before the call. */
-	cItem * GetSlots();
-	const cItem * GetSlots() const;
-
-	/** Returns true if no storage has been allocated yet. */
-	bool IsCompletelyEmpty() const;
-
-	/** Retrieve slot by slot number.
-	Never causes the grid to be allocated. */
-	const cItem & UncheckedGetSlot(int a_SlotNum) const;
 
 	/** Calls all m_Listeners for the specified slot number */
 	void TriggerListeners(int a_SlotNum);

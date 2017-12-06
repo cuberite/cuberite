@@ -12,11 +12,10 @@
 
 
 
-cItemGrid::cItemGrid(int a_Width, int a_Height) :
+cItemGrid::cItemGrid(int a_Width, int a_Height):
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_NumSlots(a_Width * a_Height),
-	m_Slots(),
+	m_Slots(a_Width * a_Height),
 	m_IsInTriggerListeners(false)
 {
 }
@@ -27,7 +26,7 @@ cItemGrid::cItemGrid(int a_Width, int a_Height) :
 
 bool cItemGrid::IsValidSlotNum(int a_SlotNum) const
 {
-	return ((a_SlotNum >= 0) && (a_SlotNum < m_NumSlots));
+	return ((a_SlotNum >= 0) && (a_SlotNum < m_Slots.size()));
 }
 
 
@@ -67,7 +66,7 @@ void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: SlotNum out of range: %d in grid of range %d",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		a_X = -1;
 		a_Y = -1;
@@ -83,21 +82,9 @@ void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 
 void cItemGrid::CopyFrom(const cItemGrid & a_Src)
 {
-	ASSERT(m_Width == a_Src.m_Width);
-	ASSERT(m_Height == a_Src.m_Height);
-
-	if (a_Src.IsCompletelyEmpty())
-	{
-		Clear();
-		return;
-	}
-
-	auto * SrcSlots = a_Src.GetSlots();
-	auto * DestSlots = GetSlots();
-	for (int i = m_NumSlots - 1; i >= 0; --i)
-	{
-		DestSlots[i] = SrcSlots[i];
-	}
+	m_Width = a_Src.m_Width;
+	m_Height = a_Src.m_Height;
+	m_Slots = a_Src.m_Slots;
 
 	// The listeners are not copied
 }
@@ -120,11 +107,11 @@ const cItem & cItemGrid::GetSlot(int a_SlotNum) const
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
-		return UncheckedGetSlot(0);
+		a_SlotNum = 0;
 	}
-	return UncheckedGetSlot(a_SlotNum);
+	return m_Slots.GetAt(a_SlotNum);
 }
 
 
@@ -154,14 +141,14 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		return;
 	}
 
-	if (!a_Item.IsEmpty() || !IsCompletelyEmpty())
+	if (!a_Item.IsEmpty() || m_Slots.IsStorageAllocated())
 	{
-		GetSlots()[a_SlotNum] = a_Item;
+		m_Slots[a_SlotNum] = a_Item;
 	}
 	TriggerListeners(a_SlotNum);
 }
@@ -193,19 +180,19 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		return;
 	}
 
 	// Check if already empty:
-	if (UncheckedGetSlot(a_SlotNum).IsEmpty())
+	if (m_Slots.GetAt(a_SlotNum).IsEmpty())
 	{
 		return;
 	}
 
 	// Empty and notify
-	GetSlots()[a_SlotNum].Empty();
+	m_Slots[a_SlotNum].Empty();
 	TriggerListeners(a_SlotNum);
 }
 
@@ -218,11 +205,11 @@ bool cItemGrid::IsSlotEmpty(int a_SlotNum) const
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		return true;
 	}
-	return UncheckedGetSlot(a_SlotNum).IsEmpty();
+	return m_Slots.GetAt(a_SlotNum).IsEmpty();
 }
 
 
@@ -240,13 +227,13 @@ bool cItemGrid::IsSlotEmpty(int a_X, int a_Y) const
 
 void cItemGrid::Clear(void)
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return;  // Already clear
 	}
 
-	auto Slots = GetSlots();
-	for (int i = 0; i < m_NumSlots; i++)
+	auto Slots = m_Slots.data();
+	for (int i = 0; i < m_Slots.size(); i++)
 	{
 		Slots[i].Empty();
 		TriggerListeners(i);
@@ -262,33 +249,31 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
 
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		// Grid is empty, all slots are available
-		return a_AllowNewStacks ? std::min(NumLeft, m_NumSlots * MaxStack) : 0;
+		return a_AllowNewStacks ? std::min(NumLeft, m_Slots.size() * MaxStack) : 0;
 	}
 
-	auto * Slots = GetSlots();
-
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	for (const auto & Slot : m_Slots)
 	{
-		if (Slots[i].IsEmpty())
+		if (Slot.IsEmpty())
 		{
 			if (a_AllowNewStacks)
 			{
 				NumLeft -= MaxStack;
 			}
 		}
-		else if (Slots[i].IsEqual(a_ItemStack))
+		else if (Slot.IsEqual(a_ItemStack))
 		{
-			NumLeft -= MaxStack - Slots[i].m_ItemCount;
+			NumLeft -= MaxStack - Slot.m_ItemCount;
 		}
 		if (NumLeft <= 0)
 		{
 			// All items fit
 			return a_ItemStack.m_ItemCount;
 		}
-	}  // for i - Slots[]
+	}  // for Slot - m_Slots[]
 	return a_ItemStack.m_ItemCount - NumLeft;
 }
 
@@ -301,12 +286,12 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 	if (!IsValidSlotNum(a_Slot))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_Slot, m_NumSlots
+			__FUNCTION__, a_Slot, m_Slots.size()
 		);
 		return 0;
 	}
 
-	auto Slots = GetSlots();
+	auto Slots = m_Slots.data();
 	int PrevCount = 0;
 	if (Slots[a_Slot].IsEmpty())
 	{
@@ -329,14 +314,14 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 
 int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritarySlot)
 {
-	auto Slots = GetSlots();
+	auto Slots = m_Slots.data();
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = a_ItemStack.GetMaxStackSize();
 
 	if ((a_PrioritarySlot != -1) && !IsValidSlotNum(a_PrioritarySlot))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_PrioritarySlot, m_NumSlots
+			__FUNCTION__, a_PrioritarySlot, m_Slots.size()
 		);
 		a_PrioritarySlot = -1;
 	}
@@ -354,7 +339,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 	}
 
 	// Scan existing stacks:
-	for (int i = 0; i < m_NumSlots; i++)
+	for (int i = 0; i < m_Slots.size(); i++)
 	{
 		if (Slots[i].IsEqual(a_ItemStack))
 		{
@@ -372,7 +357,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 		return (a_ItemStack.m_ItemCount - NumLeft);
 	}
 
-	for (int i = 0; i < m_NumSlots; i++)
+	for (int i = 0; i < m_Slots.size(); i++)
 	{
 		if (Slots[i].IsEmpty())
 		{
@@ -417,10 +402,10 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 
 int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 {
-	auto Slots = GetSlots();
+	auto Slots = m_Slots.data();
 	int NumLeft = a_ItemStack.m_ItemCount;
 
-	for (int i = 0; i < m_NumSlots; i++)
+	for (int i = 0; i < m_Slots.size(); i++)
 	{
 		if (NumLeft <= 0)
 		{
@@ -454,18 +439,18 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning -1",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		return -1;
 	}
 
-	if (UncheckedGetSlot(a_SlotNum).IsEmpty())
+	if (m_Slots.GetAt(a_SlotNum).IsEmpty())
 	{
 		// The item is empty, it's not gonna change
 		return 0;
 	}
 
-	auto Slots = GetSlots();
+	auto Slots = m_Slots.data();
 
 	if (Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
 	{
@@ -505,18 +490,18 @@ cItem cItemGrid::RemoveOneItem(int a_SlotNum)
 	if (!IsValidSlotNum(a_SlotNum))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
-			__FUNCTION__, a_SlotNum, m_NumSlots
+			__FUNCTION__, a_SlotNum, m_Slots.size()
 		);
 		return cItem();
 	}
 
 	// If the slot is empty, return an empty item
-	if (UncheckedGetSlot(a_SlotNum).IsEmpty())
+	if (m_Slots.GetAt(a_SlotNum).IsEmpty())
 	{
 		return cItem();
 	}
 
-	auto Slots = GetSlots();
+	auto Slots = m_Slots.data();
 
 	// Make a copy of the item in slot, set count to 1 and remove one from the slot
 	cItem res = Slots[a_SlotNum];
@@ -551,18 +536,17 @@ cItem cItemGrid::RemoveOneItem(int a_X, int a_Y)
 
 int cItemGrid::HowManyItems(const cItem & a_Item)
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return 0;
 	}
 
 	int res = 0;
-	auto Slots = GetSlots();
-	for (int i = 0; i < m_NumSlots; i++)
+	for (auto & Slot : m_Slots)
 	{
-		if (Slots[i].IsEqual(a_Item))
+		if (Slot.IsEqual(a_Item))
 		{
-			res += Slots[i].m_ItemCount;
+			res += Slot.m_ItemCount;
 		}
 	}
 	return res;
@@ -574,7 +558,7 @@ int cItemGrid::HowManyItems(const cItem & a_Item)
 
 bool cItemGrid::HasItems(const cItem & a_ItemStack)
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return 0;
 	}
@@ -607,13 +591,13 @@ int cItemGrid::GetFirstUsedSlot(void) const
 
 int cItemGrid::GetLastEmptySlot(void) const
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
-		return m_NumSlots - 1;
+		return m_Slots.size() - 1;
 	}
 
-	auto Slots = GetSlots();
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	auto Slots = m_Slots.data();
+	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
 		if (Slots[i].IsEmpty())
 		{
@@ -629,13 +613,13 @@ int cItemGrid::GetLastEmptySlot(void) const
 
 int cItemGrid::GetLastUsedSlot(void) const
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return -1;
 	}
 
-	auto Slots = GetSlots();
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	auto Slots = m_Slots.data();
+	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
 		if (!Slots[i].IsEmpty())
 		{
@@ -654,18 +638,18 @@ int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 	if ((a_StartFrom != -1) && !IsValidSlotNum(a_StartFrom))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_StartFrom, m_NumSlots
+			__FUNCTION__, a_StartFrom, m_Slots.size()
 		);
 		a_StartFrom = -1;
 	}
 
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return std::max(0, a_StartFrom);
 	}
 
-	auto Slots = GetSlots();
-	for (int i = a_StartFrom + 1; i < m_NumSlots; i++)
+	auto Slots = m_Slots.data();
+	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
 		if (Slots[i].IsEmpty())
 		{
@@ -684,18 +668,18 @@ int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
 	if ((a_StartFrom != -1) && !IsValidSlotNum(a_StartFrom))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_StartFrom, m_NumSlots
+			__FUNCTION__, a_StartFrom, m_Slots.size()
 		);
 		a_StartFrom = -1;
 	}
 
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return -1;
 	}
 
-	auto Slots = GetSlots();
-	for (int i = a_StartFrom + 1; i < m_NumSlots; i++)
+	auto Slots = m_Slots.data();
+	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
 		if (!Slots[i].IsEmpty())
 		{
@@ -711,17 +695,16 @@ int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
 
 void cItemGrid::CopyToItems(cItems & a_Items) const
 {
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return;
 	}
 
-	auto Slots = GetSlots();
-	for (int i = 0; i < m_NumSlots; i++)
+	for (const auto & Slot : m_Slots)
 	{
-		if (!Slots[i].IsEmpty())
+		if (!Slot.IsEmpty())
 		{
-			a_Items.push_back(Slots[i]);
+			a_Items.push_back(Slot);
 		}
 	}  // for i - Slots[]
 }
@@ -734,16 +717,16 @@ bool cItemGrid::DamageItem(int a_SlotNum, short a_Amount)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: invalid slot number %d out of %d slots, ignoring.", __FUNCTION__, a_SlotNum, m_NumSlots);
+		LOGWARNING("%s: invalid slot number %d out of %d slots, ignoring.", __FUNCTION__, a_SlotNum, m_Slots.size());
 		return false;
 	}
 
-	if (IsCompletelyEmpty())
+	if (!m_Slots.IsStorageAllocated())
 	{
 		return false;
 	}
 
-	return GetSlots()[a_SlotNum].DamageItem(a_Amount);
+	return m_Slots[a_SlotNum].DamageItem(a_Amount);
 }
 
 
@@ -808,7 +791,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 				break;
 			}
 		}  // for j - a_LootProbabs[]
-		SetSlot(Rnd % m_NumSlots, CurrentLoot);
+		SetSlot(Rnd % m_Slots.size(), CurrentLoot);
 	}  // for i - NumSlots
 }
 
@@ -858,59 +841,6 @@ void cItemGrid::TriggerListeners(int a_SlotNum)
 		(*itr)->OnSlotChanged(this, a_SlotNum);
 	}  // for itr - m_Listeners[]
 	m_IsInTriggerListeners = false;
-}
-
-
-
-
-
-bool cItemGrid::IsCompletelyEmpty() const
-{
-	return (m_Slots == nullptr);
-}
-
-
-
-
-
-const cItem & cItemGrid::UncheckedGetSlot(int a_SlotNum) const
-{
-	if (m_Slots == nullptr)
-	{
-		// An unallocated grid must be empty
-		static const cItem EmptyItem;
-		return EmptyItem;
-	}
-	else
-	{
-		return m_Slots[static_cast<size_t>(a_SlotNum)];
-	}
-}
-
-
-
-
-
-cItem * cItemGrid::GetSlots()
-{
-	if (m_Slots == nullptr)
-	{
-		m_Slots.reset(new cItem[m_NumSlots]);
-	}
-	return m_Slots.get();
-}
-
-
-
-
-
-const cItem * cItemGrid::GetSlots() const
-{
-	if (m_Slots == nullptr)
-	{
-		m_Slots.reset(new cItem[m_NumSlots]);
-	}
-	return m_Slots.get();
 }
 
 
