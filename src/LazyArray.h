@@ -7,7 +7,7 @@ It is therefore important that default constructed values are indistinguishable 
 template <typename T>
 class cLazyArray
 {
-	static_assert(!(std::is_reference<T>::value || std::is_array<T>::value),
+	static_assert((!std::is_reference<T>::value && !std::is_array<T>::value),
 		"cLazyArray<T>: T must be a value type");
 	static_assert(std::is_default_constructible<T>::value,
 		"cLazyArray<T>: T must be default constructible");
@@ -20,7 +20,7 @@ public:
 	using size_type = int;
 	using iterator = pointer;
 	using const_iterator = const_pointer;
-	
+
 	cLazyArray(size_type a_Size) NOEXCEPT:
 		m_Size{ a_Size }
 	{
@@ -32,6 +32,7 @@ public:
 	{
 		if (a_Other.IsStorageAllocated())
 		{
+			// Note that begin() will allocate the array to copy into
 			std::copy(a_Other.begin(), a_Other.end(), begin());
 		}
 	}
@@ -68,16 +69,16 @@ public:
 
 	// STL style interface
 
-	const T * cbegin() const { return data(); }
-	T *        begin()       { return data(); }
-	const T *  begin() const { return cbegin(); }
+	const_iterator cbegin() const { return data(); }
+	iterator        begin()       { return data(); }
+	const_iterator  begin() const { return cbegin(); }
 
-	const T * cend() const { return data() + m_Size; }
-	T *        end()       { return data() + m_Size; }
-	const T *  end() const { return cend(); }
+	const_iterator cend() const { return data() + m_Size; }
+	iterator        end()       { return data() + m_Size; }
+	const_iterator  end() const { return cend(); }
 
 	size_type size() const NOEXCEPT { return m_Size; }
-	
+
 	const T * data() const
 	{
 		if (m_Array == nullptr)
@@ -89,7 +90,7 @@ public:
 
 	T * data()
 	{
-		auto const_this = const_cast<const cLazyArray *>(this);
+		const cLazyArray * const_this = this;
 		return const_cast<T *>(const_this->data());
 	}
 
@@ -100,7 +101,7 @@ public:
 	}
 
 	// Extra functions to help avoid allocation
-	
+
 	/** A const view of an element of the array. Never causes the array to allocate. */
 	const T & GetAt(size_type a_Idx) const
 	{
