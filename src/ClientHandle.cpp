@@ -1465,35 +1465,35 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_Hand = eHand::hMain;
-	const cItem& heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
+	const cItem& HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
 
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
 	// Distance from the block's center to the player's eye height
-	double dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
-	LOGD("HandleRightClick: {%d, %d, %d}, face %d, Hand: %d, HeldItem: %s; dist: %.02f",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Hand, ItemToFullString(heldItem).c_str(), dist
+	double Dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
+	LOGD("HandleRightClick: {%d, %d, %d}, face %d, Hand: %d, HeldItem: %s; Dist: %.02f",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Hand, ItemToFullString(HeldItem).c_str(), Dist
 	);
 
 	// Check the reach distance:
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
-	double maxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
-	bool isWithinReach = (dist <= maxDist);
+	double MaxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
+	bool IsWithinReach = (Dist <= MaxDist);
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	bool success = false;
-	if (isWithinReach && !m_Player->IsFrozen())
+	bool Success = false;
+	if (IsWithinReach && !m_Player->IsFrozen())
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
-		bool placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
-		bool usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
+		bool Usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
-		if (usable && !(placeable && m_Player->IsCrouched()))
+		if (Usable && !(Placeable && m_Player->IsCrouched()))
 		{
 			// use a block
 			cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1503,7 +1503,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				{
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-					success = true;
+					Success = true;
 				}
 			}
 			else
@@ -1513,7 +1513,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			}
 		}
-		else if (placeable)
+		else if (Placeable)
 		{
 			// TODO: Double check that we don't need this for using item and for packet out of range
 			m_NumBlockChangeInteractionsThisTick++;
@@ -1525,7 +1525,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 			{
 				// place a block
-				success = ItemHandler->OnPlayerPlace(*World, *m_Player, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 			}
 		}
 		else
@@ -1535,13 +1535,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				// All plugins agree with using the item
 				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-				success = true;
+				Success = true;
 			}
 		}
 	}
-	if (!success)
+	if (!Success)
 	{
 		// Update the target block including the block above and below for 2 block high things
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
