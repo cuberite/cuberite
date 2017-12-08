@@ -2384,7 +2384,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand);
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
 }
 
 
@@ -2786,7 +2786,7 @@ void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleUseItem(Hand);
+	m_Client->HandleUseItem(HandIntToEnum(Hand));
 }
 
 
@@ -3259,6 +3259,23 @@ eBlockFace cProtocol_1_9_0::FaceIntToBlockFace(Int32 a_BlockFace)
 		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
 		default: return BLOCK_FACE_NONE;
+	}
+}
+
+
+
+
+
+eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
+{
+	// Convert hand parameter into eHand enum
+	switch (a_Hand)
+	{
+	case 0: return eHand::hMain;
+	case 1: return eHand::hOff;
+	default:
+		ASSERT(!"Unknown hand value");
+		return eHand::hMain;
 	}
 }
 

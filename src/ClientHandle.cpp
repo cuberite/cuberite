@@ -1395,7 +1395,7 @@ void cClientHandle::FinishDigAnimation()
 
 
 
-void cClientHandle::HandleUseItem(int a_Hand) {
+void cClientHandle::HandleUseItem(eHand a_Hand) {
 	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
 	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
 	// In version >= 1.9, there is a new packet id for "Use Item".
@@ -1444,7 +1444,7 @@ void cClientHandle::HandleUseItem(int a_Hand) {
 
 
 
-void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, int a_Hand)
+void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand)
 {
 	// This function handles three actions:
 	// (1) Place a block
@@ -1485,7 +1485,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	bool success = false;
 	if (isWithinReach && !m_Player->IsFrozen())
 	{
-		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
@@ -1540,21 +1540,20 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				success = true;
 			}
 		}
-
-		if (!success)
+	}
+	if (!success)
+	{
+		// Update the target block including the block above and below for 2 block high things
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		for (int y = a_BlockY - 1; y <= a_BlockY + 1; y++)
 		{
-			// Update the target block including the block above and below for 2 block high things
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			for (int y = a_BlockY - 1; y <= a_BlockY + 1; y++)
+			if (cChunkDef::IsValidHeight(y))
 			{
-				if (cChunkDef::IsValidHeight(y))
-				{
-					World->SendBlockTo(a_BlockX, y, a_BlockZ, *m_Player);
-				}
+				World->SendBlockTo(a_BlockX, y, a_BlockZ, *m_Player);
 			}
-			// TODO: Send corresponding slot based on hand
-			m_Player->GetInventory().SendEquippedSlot();
 		}
+		// TODO: Send corresponding slot based on hand
+		m_Player->GetInventory().SendEquippedSlot();
 	}
 }
 
