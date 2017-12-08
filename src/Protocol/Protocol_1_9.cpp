@@ -66,6 +66,7 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 /** Value for main hand in Hand parameter for Protocol 1.9. */
 static const UInt32 MAIN_HAND = 0;
+static const UInt32 OFF_HAND = 1;
 
 
 
@@ -3271,8 +3272,8 @@ eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 	// Convert hand parameter into eHand enum
 	switch (a_Hand)
 	{
-	case 0: return eHand::hMain;
-	case 1: return eHand::hOff;
+	case MAIN_HAND: return eHand::hMain;
+	case OFF_HAND: return eHand::hOff;
 	default:
 		ASSERT(!"Unknown hand value");
 		return eHand::hMain;
