@@ -100,6 +100,11 @@ public:
 		std::swap(m_Size, a_Other.m_Size);
 	}
 
+	friend void swap(cLazyArray & a_Lhs, cLazyArray & a_Rhs) NOEXCEPT
+	{
+		a_Lhs.swap(a_Rhs);
+	}
+
 	// Extra functions to help avoid allocation
 
 	/** A const view of an element of the array. Never causes the array to allocate. */
@@ -118,7 +123,7 @@ public:
 	}
 
 	/** Returns true if the array has already been allocated. */
-	bool IsStorageAllocated() const { return (m_Array != nullptr); }
+	bool IsStorageAllocated() const NOEXCEPT { return (m_Array != nullptr); }
 
 private:
 	// Mutable so const data() can allocate the array
