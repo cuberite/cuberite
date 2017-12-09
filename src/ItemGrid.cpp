@@ -232,10 +232,9 @@ void cItemGrid::Clear(void)
 		return;  // Already clear
 	}
 
-	auto Slots = m_Slots.data();
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
-		Slots[i].Empty();
+		m_Slots[i].Empty();
 		TriggerListeners(i);
 	}
 }
@@ -291,19 +290,18 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 		return 0;
 	}
 
-	auto Slots = m_Slots.data();
 	int PrevCount = 0;
-	if (Slots[a_Slot].IsEmpty())
+	if (m_Slots[a_Slot].IsEmpty())
 	{
-		Slots[a_Slot] = a_ItemStack;
+		m_Slots[a_Slot] = a_ItemStack;
 		PrevCount = 0;
 	}
 	else
 	{
-		PrevCount = Slots[a_Slot].m_ItemCount;
+		PrevCount = m_Slots[a_Slot].m_ItemCount;
 	}
-	Slots[a_Slot].m_ItemCount = static_cast<char>(std::min(a_MaxStack, PrevCount + a_Num));
-	int toReturn = Slots[a_Slot].m_ItemCount - PrevCount;
+	m_Slots[a_Slot].m_ItemCount = static_cast<char>(std::min(a_MaxStack, PrevCount + a_Num));
+	int toReturn = m_Slots[a_Slot].m_ItemCount - PrevCount;
 	TriggerListeners(a_Slot);
 	return toReturn;
 }
@@ -314,7 +312,6 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 
 int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritarySlot)
 {
-	auto Slots = m_Slots.data();
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = a_ItemStack.GetMaxStackSize();
 
@@ -330,8 +327,8 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 	if (
 		(a_PrioritarySlot != -1) &&
 		(
-			Slots[a_PrioritarySlot].IsEmpty() ||
-			Slots[a_PrioritarySlot].IsEqual(a_ItemStack)
+			m_Slots[a_PrioritarySlot].IsEmpty() ||
+			m_Slots[a_PrioritarySlot].IsEqual(a_ItemStack)
 		)
 	)
 	{
@@ -341,7 +338,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 	// Scan existing stacks:
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
-		if (Slots[i].IsEqual(a_ItemStack))
+		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
 			NumLeft -= AddItemToSlot(a_ItemStack, i, NumLeft, MaxStack);
 		}
@@ -359,7 +356,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
-		if (Slots[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			NumLeft -= AddItemToSlot(a_ItemStack, i, NumLeft, MaxStack);
 		}
@@ -402,7 +399,6 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 
 int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 {
-	auto Slots = m_Slots.data();
 	int NumLeft = a_ItemStack.m_ItemCount;
 
 	for (int i = 0; i < m_Slots.size(); i++)
@@ -412,15 +408,15 @@ int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 			break;
 		}
 
-		if (Slots[i].IsEqual(a_ItemStack))
+		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
-			int NumToRemove = std::min(NumLeft, static_cast<int>(Slots[i].m_ItemCount));
+			int NumToRemove = std::min(NumLeft, static_cast<int>(m_Slots[i].m_ItemCount));
 			NumLeft -= NumToRemove;
-			Slots[i].m_ItemCount -= NumToRemove;
+			m_Slots[i].m_ItemCount -= NumToRemove;
 
-			if (Slots[i].m_ItemCount <= 0)
+			if (m_Slots[i].m_ItemCount <= 0)
 			{
-				Slots[i].Empty();
+				m_Slots[i].Empty();
 			}
 
 			TriggerListeners(i);
@@ -450,26 +446,24 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 		return 0;
 	}
 
-	auto Slots = m_Slots.data();
-
-	if (Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
+	if (m_Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
 	{
 		// Trying to remove more items than there already are, make the item empty
-		Slots[a_SlotNum].Empty();
+		m_Slots[a_SlotNum].Empty();
 		TriggerListeners(a_SlotNum);
 		return 0;
 	}
 
-	Slots[a_SlotNum].m_ItemCount += a_AddToCount;
+	m_Slots[a_SlotNum].m_ItemCount += a_AddToCount;
 
-	cItemHandler * Handler = cItemHandler::GetItemHandler(Slots[a_SlotNum].m_ItemType);
-	if (Slots[a_SlotNum].m_ItemCount > Handler->GetMaxStackSize())
+	cItemHandler * Handler = cItemHandler::GetItemHandler(m_Slots[a_SlotNum].m_ItemType);
+	if (m_Slots[a_SlotNum].m_ItemCount > Handler->GetMaxStackSize())
 	{
-		Slots[a_SlotNum].m_ItemCount = Handler->GetMaxStackSize();
+		m_Slots[a_SlotNum].m_ItemCount = Handler->GetMaxStackSize();
 	}
 
 	TriggerListeners(a_SlotNum);
-	return Slots[a_SlotNum].m_ItemCount;
+	return m_Slots[a_SlotNum].m_ItemCount;
 }
 
 
@@ -501,17 +495,15 @@ cItem cItemGrid::RemoveOneItem(int a_SlotNum)
 		return cItem();
 	}
 
-	auto Slots = m_Slots.data();
-
 	// Make a copy of the item in slot, set count to 1 and remove one from the slot
-	cItem res = Slots[a_SlotNum];
+	cItem res = m_Slots[a_SlotNum];
 	res.m_ItemCount = 1;
-	Slots[a_SlotNum].m_ItemCount -= 1;
+	m_Slots[a_SlotNum].m_ItemCount -= 1;
 
 	// Emptying the slot correctly if appropriate
-	if (Slots[a_SlotNum].m_ItemCount == 0)
+	if (m_Slots[a_SlotNum].m_ItemCount == 0)
 	{
-		Slots[a_SlotNum].Empty();
+		m_Slots[a_SlotNum].Empty();
 	}
 
 	// Notify everyone of the change
@@ -596,10 +588,9 @@ int cItemGrid::GetLastEmptySlot(void) const
 		return m_Slots.size() - 1;
 	}
 
-	auto Slots = m_Slots.data();
 	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
-		if (Slots[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
@@ -618,10 +609,9 @@ int cItemGrid::GetLastUsedSlot(void) const
 		return -1;
 	}
 
-	auto Slots = m_Slots.data();
 	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
-		if (!Slots[i].IsEmpty())
+		if (!m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
@@ -648,10 +638,9 @@ int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 		return std::max(0, a_StartFrom);
 	}
 
-	auto Slots = m_Slots.data();
 	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
-		if (Slots[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
@@ -678,10 +667,9 @@ int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
 		return -1;
 	}
 
-	auto Slots = m_Slots.data();
 	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
-		if (!Slots[i].IsEmpty())
+		if (!m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
