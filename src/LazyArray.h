@@ -90,6 +90,7 @@ public:
 
 	T * data()
 	{
+		static_assert(!std::is_const<typename decltype(m_Array)::element_type>::value, "");
 		const cLazyArray * const_this = this;
 		return const_cast<T *>(const_this->data());
 	}
