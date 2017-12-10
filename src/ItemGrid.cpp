@@ -323,6 +323,11 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 		a_PrioritarySlot = -1;
 	}
 
+	if (!a_AllowNewStacks && !m_Slots.IsStorageAllocated())
+	{
+		return 0;  // No existing stacks to add to
+	}
+
 	// Try prioritarySlot first:
 	if (
 		(a_PrioritarySlot != -1) &&
@@ -400,6 +405,11 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
+
+	if (!m_Slots.IsStorageAllocated())
+	{
+		return 0;  // No items to remove
+	}
 
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
@@ -550,11 +560,6 @@ int cItemGrid::HowManyItems(const cItem & a_Item)
 
 bool cItemGrid::HasItems(const cItem & a_ItemStack)
 {
-	if (!m_Slots.IsStorageAllocated())
-	{
-		return 0;
-	}
-
 	int CurrentlyHave = HowManyItems(a_ItemStack);
 	return (CurrentlyHave >= a_ItemStack.m_ItemCount);
 }
@@ -583,14 +588,9 @@ int cItemGrid::GetFirstUsedSlot(void) const
 
 int cItemGrid::GetLastEmptySlot(void) const
 {
-	if (!m_Slots.IsStorageAllocated())
-	{
-		return m_Slots.size() - 1;
-	}
-
 	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
-		if (m_Slots[i].IsEmpty())
+		if (m_Slots.GetAt(i).IsEmpty())
 		{
 			return i;
 		}
@@ -606,12 +606,12 @@ int cItemGrid::GetLastUsedSlot(void) const
 {
 	if (!m_Slots.IsStorageAllocated())
 	{
-		return -1;
+		return -1;  // No slots are used
 	}
 
 	for (int i = m_Slots.size() - 1; i >= 0; i--)
 	{
-		if (!m_Slots[i].IsEmpty())
+		if (!m_Slots.GetAt(i).IsEmpty())
 		{
 			return i;
 		}
@@ -633,14 +633,9 @@ int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 		a_StartFrom = -1;
 	}
 
-	if (!m_Slots.IsStorageAllocated())
-	{
-		return std::max(0, a_StartFrom);
-	}
-
 	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
-		if (m_Slots[i].IsEmpty())
+		if (m_Slots.GetAt(i).IsEmpty())
 		{
 			return i;
 		}
@@ -664,12 +659,12 @@ int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
 
 	if (!m_Slots.IsStorageAllocated())
 	{
-		return -1;
+		return -1;  // No slots are used
 	}
 
 	for (int i = a_StartFrom + 1; i < m_Slots.size(); i++)
 	{
-		if (!m_Slots[i].IsEmpty())
+		if (!m_Slots.GetAt(i).IsEmpty())
 		{
 			return i;
 		}
@@ -685,7 +680,7 @@ void cItemGrid::CopyToItems(cItems & a_Items) const
 {
 	if (!m_Slots.IsStorageAllocated())
 	{
-		return;
+		return;  // Nothing to copy
 	}
 
 	for (const auto & Slot : m_Slots)
@@ -694,7 +689,7 @@ void cItemGrid::CopyToItems(cItems & a_Items) const
 		{
 			a_Items.push_back(Slot);
 		}
-	}  // for i - Slots[]
+	}  // for Slot - Slots[]
 }
 
 
@@ -711,7 +706,7 @@ bool cItemGrid::DamageItem(int a_SlotNum, short a_Amount)
 
 	if (!m_Slots.IsStorageAllocated())
 	{
-		return false;
+		return false;  // Nothing to damage
 	}
 
 	return m_Slots[a_SlotNum].DamageItem(a_Amount);
