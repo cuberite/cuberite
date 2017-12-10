@@ -59,27 +59,6 @@ cBoundingBox::cBoundingBox(Vector3d a_Pos, double a_CubeLength) :
 
 
 
-cBoundingBox::cBoundingBox(const cBoundingBox & a_Orig) :
-	m_Min(a_Orig.m_Min),
-	m_Max(a_Orig.m_Max)
-{
-}
-
-
-
-
-
-cBoundingBox & cBoundingBox::operator=(const cBoundingBox & a_Other)
-{
-	m_Min = a_Other.m_Min;
-	m_Max = a_Other.m_Max;
-	return *this;
-}
-
-
-
-
-
 void cBoundingBox::Move(double a_OffX, double a_OffY, double a_OffZ)
 {
 	m_Min.x += a_OffX;
