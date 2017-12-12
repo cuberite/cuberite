@@ -5,6 +5,8 @@
 
 #include "Globals.h"
 #include "MojangAPI.h"
+#include "SQLiteCpp/Database.h"
+#include "SQLiteCpp/Statement.h"
 #include "../IniFile.h"
 #include "json/json.h"
 #include "mbedTLS++/BlockingSslClientSocket.h"
@@ -12,19 +14,6 @@
 #include "../RankManager.h"
 #include "../OSSupport/IsThread.h"
 #include "../Root.h"
-
-// Because SQLiteCpp uses NULL instead of nullptr, we need to disable the Clang warning here
-#if __clang_major__ >= 5
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#endif
-
-#include "SQLiteCpp/Database.h"
-#include "SQLiteCpp/Statement.h"
-
-#if __clang_major__ >= 5
-	#pragma clang diagnostic pop
-#endif
 
 
 
