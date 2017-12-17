@@ -151,8 +151,8 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		SetWorld(World);  // Use default world
 		SetCapabilities();
 
-		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
-			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
+		FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}",
+			a_PlayerName, GetPosition()
 		);
 	}
 
@@ -2257,8 +2257,8 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
 	StatSerializer.Load();
 
-	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), a_World->GetName().c_str()
+	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
+		GetName(), a_FileName, GetPosition(), a_World->GetName()
 	);
 
 	return true;
