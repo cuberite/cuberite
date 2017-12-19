@@ -44,6 +44,10 @@ protected:
 	Returns whether the block was changed or not. */
 	bool HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
 
+	/** Checks if neighboring blocks are soakable, if so, converts them to soaked version.
+	a_Rel, a_BlockType are the location and block type of the fluid block which will soak its neighbors. */
+	void SoakNeighbors(cChunk * a_Chunk, Vector3i a_Rel, BLOCKTYPE a_BlockType);
+
 	/** Spread fluid to XZ neighbors.
 	The coords are of the block currently being processed; a_NewMeta is the new meta for the new fluid block.
 	Descendants may overridde to provide more sophisticated algorithms. */
