@@ -1144,3 +1144,15 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 	}
 	return res;
 }
+
+bool StringToFloat(const AString & a_String, float & a_Num)
+{
+	char *err;
+	a_Num = strtod(a_String.c_str(), &err);
+	if (*err != 0)
+	{
+		return false;
+	}
+	return true;
+}
+

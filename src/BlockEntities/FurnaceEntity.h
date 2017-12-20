@@ -84,6 +84,9 @@ public:
 	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
+	/** Calculates and returns the experience reward for the current recipe */
+	int GetReward(void);
+
 	// tolua_end
 
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)

@@ -169,6 +169,25 @@ bool cFurnaceEntity::ContinueCooking(void)
 	return m_IsCooking;
 }
 
+int cFurnaceEntity::GetReward(void)
+{
+	float RawReward = m_CurrentRecipe->Reward;
+	float Multiplier = GetOutputSlot().m_ItemCount;
+	if (RawReward && Multiplier)
+	{
+		RawReward *= Multiplier;
+		int Reward = int(RawReward);
+		float Remainder = RawReward - Reward;
+		// Remainder is used as the percentage chance of getting an extra exp point
+		if (Remainder && GetRandomProvider().RandBool(Remainder))
+		{
+			Reward++;
+		}
+		return Reward;
+	}
+	return 0;
+}
+
 
 
 

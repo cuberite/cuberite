@@ -1932,83 +1932,12 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
 {
-	float RawReward = a_Result.m_ItemCount;  // Player's fractional reward
-	float Multiplier = 0;
-
-	switch (a_Result.m_ItemType)
+	int Reward = m_Furnace->GetReward();
+	if (Reward)
 	{
-		case E_ITEM_GOLD:
-		case E_ITEM_DIAMOND:
-		case E_ITEM_EMERALD:
-			Multiplier = 1.0f;
-			break;
-		case E_ITEM_IRON:
-		case E_ITEM_REDSTONE_DUST:
-			Multiplier = 0.7f;
-			break;
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_STEAK:
-		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_COOKED_FISH:
-		case E_ITEM_BAKED_POTATO:
-		case E_ITEM_COOKED_MUTTON:
-		case E_ITEM_COOKED_RABBIT:
-		case E_BLOCK_HARDENED_CLAY:
-			Multiplier = 0.35f;
-			break;
-		case E_ITEM_CLAY_BRICK:
-			Multiplier = 0.3f;
-			break;
-		case E_ITEM_DYE:
-		case E_ITEM_NETHER_QUARTZ:
-			Multiplier = 0.2f;
-			break;
-		case E_BLOCK_GLASS:
-		case E_BLOCK_STONE:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
-		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
-		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
-		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
-		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
-		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
-		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
-		case E_BLOCK_RED_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
-		case E_ITEM_COAL:
-		case E_ITEM_IRON_NUGGET:
-		case E_ITEM_GOLD_NUGGET:
-		case E_META_STONE_BRICK_CRACKED:
-			Multiplier = 0.1f;
-			break;
-		default:
-			Multiplier = 0;
+		a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
 	}
 
-	RawReward *= Multiplier;
-
-	// If player has earned a reward; convert this into the actual amount of XP earned
-	if (RawReward)
-	{
-		int Reward = int(RawReward);
-		float Remainder = RawReward - Reward;
-		// Remainder is used as the percentage chance of getting an extra exp point
-		if (Remainder && (GetRandomProvider().RandBool(Remainder)))
-		{
-			Reward++;
-		}
-		if (Reward)
-		{
-			a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
-		}
-	}
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
