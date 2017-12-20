@@ -796,6 +796,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	else if (a_ItemGrid = &m_ShieldSlots)
 	{
 		Base = invShieldOffset;
+
 	}
 	else
 	{
