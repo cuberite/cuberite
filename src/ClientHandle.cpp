@@ -1395,21 +1395,25 @@ void cClientHandle::FinishDigAnimation()
 
 
 
-void cClientHandle::HandleUseItem(eHand a_Hand) {
+void cClientHandle::HandleUseItem(eHand a_Hand)
+{
 	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
 	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
 	// In version >= 1.9, there is a new packet id for "Use Item".
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_Hand = eHand::hMain;
-	const cItem& heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	const cItem & heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	// Use item in main/off hand
+	// Use item in main / off hand
 	// TODO: do we need to sync the current inventory with client if it fails?
-	if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator()) return;
+	if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator())
+	{
+		return;
+	}
 
 	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(heldItem.m_ItemDamage))
 	{
@@ -1465,7 +1469,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_Hand = eHand::hMain;
-	const cItem& HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	const cItem & HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
 
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
