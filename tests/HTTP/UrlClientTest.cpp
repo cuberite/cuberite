@@ -19,7 +19,7 @@ public:
 	}
 
 
-	~cCallbacks()
+	virtual ~cCallbacks() override
 	{
 		LOGD("Deleting the cCallbacks instance at %p", reinterpret_cast<void *>(this));
 	}

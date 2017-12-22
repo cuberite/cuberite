@@ -190,7 +190,7 @@ struct sChunkMeta
 
 cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_ItemIdx(0),
-	m_LogFile(NULL),
+	m_LogFile(nullptr),
 	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
@@ -252,7 +252,7 @@ void cConnection::Run(void)
 		FD_SET(m_ServerSocket, &ReadFDs);
 		FD_SET(m_ClientSocket, &ReadFDs);
 		SOCKET MaxSocket = std::max(m_ServerSocket, m_ClientSocket);
-		int res = select(MaxSocket + 1, &ReadFDs, NULL, NULL, NULL);
+		int res = select(MaxSocket + 1, &ReadFDs, nullptr, nullptr, nullptr);
 		if (res <= 0)
 		{
 			printf("select() failed: %d; aborting client", SocketError);
@@ -2571,7 +2571,7 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	AString fnam;
 	Printf(fnam, "%s_tile_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
-	if (f != NULL)
+	if (f != nullptr)
 	{
 		fwrite(Data.data(), 1, Data.size(), f);
 		fclose(f);
@@ -2730,7 +2730,7 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	AString fnam;
 	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
-	if (f != NULL)
+	if (f != nullptr)
 	{
 		fwrite(Metadata.data(), 1, Metadata.size(), f);
 		fclose(f);
