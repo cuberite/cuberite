@@ -72,7 +72,7 @@ cRoot::cRoot(void) :
 
 cRoot::~cRoot()
 {
-	s_Root = 0;
+	s_Root = nullptr;
 }
 
 

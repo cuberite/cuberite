@@ -272,7 +272,7 @@ void cFurnaceRecipe::ClearRecipes(void)
 
 const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_Ingredient) const
 {
-	const cRecipe * BestRecipe = 0;
+	const cRecipe * BestRecipe = nullptr;
 	for (RecipeList::const_iterator itr = m_pState->Recipes.begin(); itr != m_pState->Recipes.end(); ++itr)
 	{
 		const cRecipe & Recipe = *itr;

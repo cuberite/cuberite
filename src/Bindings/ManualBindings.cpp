@@ -43,6 +43,14 @@
 
 
 
+// Hotpatching the Macro to prevent a Clang Warning (0 for pointer used)
+#undef  lua_tostring
+#define lua_tostring(L, i) lua_tolstring(L, (i), nullptr)
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // LuaCommandHandler:
 
