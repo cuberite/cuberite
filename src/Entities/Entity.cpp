@@ -1650,7 +1650,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		}  // for z
 	}  // for x
 
-	// Check if the player's head is in water.
+	// Check if the entity's head is in water.
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
