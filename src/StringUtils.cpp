@@ -1148,7 +1148,7 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 bool StringToFloat(const AString & a_String, float & a_Num)
 {
 	char *err;
-	a_Num = strtod(a_String.c_str(), &err);
+	a_Num = strtof(a_String.c_str(), &err);
 	if (*err != 0)
 	{
 		return false;
