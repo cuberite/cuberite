@@ -1194,60 +1194,13 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksLeftBurning--;
 	}
 
-	// Update the burning times, based on surroundings:
-	int MinRelX = FloorC(GetPosX() - m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int MaxRelX = FloorC(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int MinRelZ = FloorC(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	int MaxRelZ = FloorC(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
-	bool HasWater = false;
-	bool HasLava = false;
-	bool HasFire = false;
-
-	for (int x = MinRelX; x <= MaxRelX; x++)
-	{
-		for (int z = MinRelZ; z <= MaxRelZ; z++)
-		{
-			int RelX = x;
-			int RelZ = z;
-
-			for (int y = MinY; y <= MaxY; y++)
-			{
-				BLOCKTYPE Block;
-				a_Chunk.UnboundedRelGetBlockType(RelX, y, RelZ, Block);
-
-				switch (Block)
-				{
-					case E_BLOCK_FIRE:
-					{
-						HasFire = true;
-						break;
-					}
-					case E_BLOCK_LAVA:
-					case E_BLOCK_STATIONARY_LAVA:
-					{
-						HasLava = true;
-						break;
-					}
-					case E_BLOCK_STATIONARY_WATER:
-					case E_BLOCK_WATER:
-					{
-						HasWater = true;
-						break;
-					}
-				}  // switch (BlockType)
-			}  // for y
-		}  // for z
-	}  // for x
-
-	if (HasWater)
+	if (IsInWater())
 	{
 		// Extinguish the fire
 		m_TicksLeftBurning = 0;
 	}
 
-	if (HasLava)
+	if (IsInLava())
 	{
 		// Burn:
 		m_TicksLeftBurning = BURN_TICKS;
@@ -1268,7 +1221,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastLavaDamage = 0;
 	}
 
-	if (HasFire)
+	if (IsInFire())
 	{
 		// Burn:
 		m_TicksLeftBurning = BURN_TICKS;
