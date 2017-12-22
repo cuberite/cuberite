@@ -3969,11 +3969,11 @@ static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 	}
 
 
-	// API function no longer available:
-	LOGWARNING("cEntity:IsSubmerged() is deprecated. Use cEntity:IsUnderWater() instead.");
+	// API function deprecated:
+	LOGWARNING("cEntity:IsSubmerged() is deprecated. Use cEntity:IsHeadInWater() instead.");
 	cLuaState::LogStackTrace(tolua_S);
 
-	L.Push(Mtolua_new((bool)(self->IsUnderWater())));
+	L.Push(Mtolua_new((bool)(self->IsHeadInWater())));
 	return 1;
 }
 
@@ -3994,7 +3994,7 @@ static int tolua_cEntity_IsSwimming(lua_State * tolua_S)
 	}
 
 
-	// API function no longer available:
+	// API function deprecated
 	LOGWARNING("cEntity:IsSwimming() is deprecated. Use cEntity:IsInWater() instead.");
 	cLuaState::LogStackTrace(tolua_S);
 

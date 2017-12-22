@@ -481,11 +481,17 @@ public:
 	virtual bool IsRclking  (void) const {return false; }
 	virtual bool IsInvisible(void) const { return false; }
 
-	/** Returns whether the entity is swimming or not */
-	virtual bool IsInWater(void) const{ return m_IsInWater; }
+	/** Returns true if any part of the entity is in a fire block */
+	virtual bool IsInFire(void) const { return m_IsInFire; }
 
-	/** Return whether the entity is under water or not */
-	virtual bool IsUnderWater(void) const{ return m_IsUnderWater; }
+	/** Returns true if any part of the entity is in a lava block */
+	virtual bool IsInLava(void) const { return m_IsInLava; }
+
+	/** Returns true if any part of the entity is in a water block */
+	virtual bool IsInWater(void) const { return m_IsInWater; }
+
+	/** Returns true if any part of the entity is in a water block */
+	virtual bool IsHeadInWater(void) const { return m_IsHeadInWater; }
 
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
@@ -619,11 +625,17 @@ protected:
 	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 
-	/** If the bottom of an entity is currently in a water block */
+	/** If any part of the entity is in a fire block */
+	bool m_IsInFire;
+
+	/** If any part of the entity is in a lava block */
+	bool m_IsInLava;
+
+	/** If any part of the entity is in a water block */
 	bool m_IsInWater;
 
-	/** If the top of an entity is currently in a water block */
-	bool m_IsUnderWater;
+	/** If the entity's head is in a water block */
+	bool m_IsHeadInWater;
 
 	/** Air level of a mobile */
 	int m_AirLevel;
@@ -650,7 +662,8 @@ protected:
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);
 
-	/** Called once per tick to set IsInWater and IsUnderWater */
+	/** Called once per tick to set m_IsInFire, m_IsInLava, m_IsInWater and
+	m_IsHeadInWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
 private:

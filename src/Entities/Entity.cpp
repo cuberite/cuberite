@@ -54,8 +54,10 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_TicksSinceLastFireDamage(0),
 	m_TicksLeftBurning(0),
 	m_TicksSinceLastVoidDamage(0),
+	m_IsInFire(false),
+	m_IsInLava(false),
 	m_IsInWater(false),
-	m_IsUnderWater(false),
+	m_IsHeadInWater(false),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -477,11 +479,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
-			if (!IsMob() && !IsUnderWater() && !IsInWater())
+			if (!IsMob() && !IsInWater())
 			{
 				StartBurning(BurnTicks * 20);
 			}
-			else if (IsMob() && !IsUnderWater() && !IsInWater())
+			else if (IsMob() && !IsInWater())
 			{
 				cMonster * Monster = reinterpret_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
@@ -1644,37 +1646,70 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 
 void cEntity::SetSwimState(cChunk & a_Chunk)
 {
+	m_IsInFire = false;
+	m_IsInLava = false;
+	m_IsInWater = false;
+	m_IsHeadInWater = false;
+
 	int RelY = FloorC(GetPosY() + 0.1);
 	int HeadRelY = CeilC(GetPosY() + GetHeight()) - 1;
 	ASSERT(RelY <= HeadRelY);
 	if ((RelY < 0) || (HeadRelY >= cChunkDef::Height))
 	{
-		m_IsInWater = false;
-		m_IsUnderWater = false;
 		return;
 	}
 
-	BLOCKTYPE BlockIn;
+	int MinRelX = FloorC(GetPosX() - m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int MaxRelX = FloorC(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int MinRelZ = FloorC(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int MaxRelZ = FloorC(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+
+	for (int x = MinRelX; x <= MaxRelX; x++)
+	{
+		for (int z = MinRelZ; z <= MaxRelZ; z++)
+		{
+			for (int y = MinY; y <= MaxY; y++)
+			{
+				BLOCKTYPE Block;
+				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
+				{
+					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
+						x, y, z, GetPosX(), GetPosZ()
+					);
+					return;
+				}
+
+				if (Block == E_BLOCK_FIRE)
+				{
+					m_IsInFire = true;
+				}
+				else if (IsBlockLava(Block))
+				{
+					m_IsInLava = true;
+				}
+				else if (IsBlockWater(Block))
+				{
+					m_IsInWater = true;
+				}
+			}  // for y
+		}  // for z
+	}  // for x
+
+	// Check if the player's head is in water.
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-
-	// Check if the player is swimming:
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn))
+	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
+	BLOCKTYPE BlockIn;
+	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
-		// This sometimes happens on Linux machines
-		// Ref.: https://forum.cuberite.org/thread-1244.html
-		LOGD("SetSwimState failure: RelX = %d, RelZ = %d, Pos = %.02f, %.02f}",
-			RelX, RelY, GetPosX(), GetPosZ()
+		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
+			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
-		m_IsInWater = false;
-		m_IsUnderWater = false;
 		return;
 	}
-	m_IsInWater = IsBlockWater(BlockIn);
-
-	// Check if the player is submerged:
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, HeadRelY, RelZ, BlockIn));
-	m_IsSubmerged = IsBlockWater(BlockIn);
+	m_IsHeadInWater = IsBlockWater(BlockIn);
 }
 
 
@@ -1710,7 +1745,7 @@ void cEntity::HandleAir(void)
 
 	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
 
-	if (IsUnderWater())
+	if (IsHeadInWater())
 	{
 		if (!IsPlayer())  // Players control themselves
 		{

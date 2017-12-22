@@ -3724,6 +3724,26 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is invisible",
 				},
+				IsInFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a fire block",
+				},
+				IsInLava =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a lava block",
+				},
 				IsInWater =
 				{
 					Returns =
@@ -3732,7 +3752,17 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the bottom of the entity is in water",
+					Notes = "Returns true if any part of the entity is in a water block",
+				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
 				},
 				IsItemFrame =
 				{
@@ -3882,7 +3912,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is submerged in water (head is in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsUnderWater()</b>",
+					Notes = "Returns true if the entity's head is in a water block <b>Currently deprecated in favour of IsHeadInWater()</b>",
 				},
 				IsSwimming =
 				{
@@ -3892,7 +3922,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
+					Notes = "Returns true if any part of the entity is in a water block. Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
 				},
 				IsTicking =
 				{

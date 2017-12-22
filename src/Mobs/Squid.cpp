@@ -47,7 +47,7 @@ void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (!IsUnderWater())
+	if (!IsHeadInWater())
 	{
 		if (m_AirLevel <= 0)
 		{

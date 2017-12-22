@@ -123,7 +123,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	double KnockbackAmount = 11 + 10 * PunchLevel;
 	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
 
-	if (IsOnFire() && !a_EntityHit.IsUnderWater() && !a_EntityHit.IsInWater())
+	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
 		a_EntityHit.StartBurning(100);
 	}
