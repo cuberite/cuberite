@@ -173,13 +173,13 @@ int cFurnaceEntity::GetReward(void)
 {
 	float RawReward = m_CurrentRecipe->Reward;
 	float Multiplier = GetOutputSlot().m_ItemCount;
-	if (RawReward && Multiplier)
+	if ((RawReward != 0.0) && (Multiplier != 0.0))
 	{
 		RawReward *= Multiplier;
 		int Reward = int(RawReward);
 		float Remainder = RawReward - Reward;
 		// Remainder is used as the percentage chance of getting an extra exp point
-		if (Remainder && GetRandomProvider().RandBool(Remainder))
+		if ((Remainder != 0.0) && (GetRandomProvider().RandBool(Remainder)))
 		{
 			Reward++;
 		}
