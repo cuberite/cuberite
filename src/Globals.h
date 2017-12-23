@@ -251,39 +251,32 @@ template class SizeChecker<UInt8,  1>;
 
 	// Logging functions
 	template <typename ... Args>
-	void inline LOGERROR(const char * a_Format, const Args & ... a_Args)
+	void LOG(const char * a_Format, const Args & ... a_Args)
 	{
 		fmt::printf(a_Format, a_Args...);
 		putchar('\n');
 		fflush(stdout);
 	}
+
+	#define LOGERROR   LOG
+	#define LOGWARNING LOG
+	#define LOGD       LOG
+	#define LOGINFO    LOG
+	#define LOGWARN    LOG
 
 	template <typename ... Args>
-	void inline LOGWARNING(const char * a_Format, const Args & ... a_Args)
+	void FLOG(const char * a_Format, const Args & ... a_Args)
 	{
-		fmt::printf(a_Format, a_Args...);
+		fmt::print(a_Format, a_Args...);
 		putchar('\n');
 		fflush(stdout);
 	}
 
-	template <typename ... Args>
-	void inline LOGD(const char * a_Format, const Args & ... a_Args)
-	{
-		fmt::printf(a_Format, a_Args...);
-		putchar('\n');
-		fflush(stdout);
-	}
-
-	template <typename ... Args>
-	void inline LOG(const char * a_Format, const Args & ... a_Args)
-	{
-		fmt::printf(a_Format, a_Args...);
-		putchar('\n');
-		fflush(stdout);
-	}
-
-	#define LOGINFO LOG
-	#define LOGWARN LOGWARNING
+	#define FLOGERROR   FLOG
+	#define FLOGWARNING FLOG
+	#define FLOGD       FLOG
+	#define FLOGINFO    FLOG
+	#define FLOGWARN    FLOG
 
 #endif
 
