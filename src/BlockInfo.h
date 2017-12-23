@@ -82,10 +82,7 @@ public:
 	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
-	inline static bool IsRainBlocker              (BLOCKTYPE a_Type)
-	{
-		return ((Get(a_Type).m_IsRainBlocker) || Get(a_Type).m_IsSolid);
-	}
+	inline static bool IsRainBlocker              (BLOCKTYPE a_Type) { return Get(a_Type).m_IsRainBlocker;       }
 	inline static bool IsSkylightDispersant       (BLOCKTYPE a_Type)
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
