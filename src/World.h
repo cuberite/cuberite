@@ -766,7 +766,7 @@ public:
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
 	eWeather GetWeather(void) const { return m_Weather; }
 
-	/** Returns true if the current weather is sun */
+	/** Returns true if the current weather is sunny. */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
@@ -775,7 +775,7 @@ public:
 		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather is rain */
+	/** Returns true if the current weather is rainy. */
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
@@ -784,7 +784,7 @@ public:
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather is stormy */
+	/** Returns true if the current weather is stormy. */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 
 	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
@@ -793,12 +793,11 @@ public:
 		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the world currently has any precipitation - rain, storm or snow */
+	/** Returns true if the world currently has any precipitation - rain, storm or snow. */
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 
 	/** Returns true if it is raining or storming at the specified location.
-	This takes into account biomes, as dry or cold biomes do not experience wet
-	weather. */
+	This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
 	{
 		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);

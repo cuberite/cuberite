@@ -2237,7 +2237,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the current world is raining (no thunderstorm).",
+				Notes = "Returns true if the current weather is rainy.",
 			},
 			IsWeatherRainAt =
 			{
@@ -2258,7 +2258,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location is raining (takes biomes into account - it never rains in a desert).",
+				Notes = "Returns true if it is rainy at the specified location. This takes into account biomes.",
 			},
 			IsWeatherStorm =
 			{
@@ -2268,7 +2268,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the current world is stormy.",
+				Notes = "Returns true if the current weather is stormy.",
 			},
 			IsWeatherStormAt =
 			{
@@ -2289,7 +2289,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location is stormy (takes biomes into account - no storm in a desert).",
+				Notes = "Returns true if it is stormy at the specified location. This takes into account biomes.",
 			},
 			IsWeatherSunny =
 			{
@@ -2320,7 +2320,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the current weather is sunny at the specified location (takes into account biomes).",
+				Notes = "Returns true if it is sunny at the specified location. This takes into account biomes.",
 			},
 			IsWeatherWet =
 			{
@@ -2330,7 +2330,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the current world has any precipitation (rain or storm).",
+				Notes = "Returns true if the world currently has any precipitation - rain, storm or snow.",
 			},
 			IsWeatherWetAt =
 			{
@@ -2351,7 +2351,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if it is raining or storming at the specified location. This takes into account biomes, as dry or cold biomes do not experience wet weather.",
+				Notes = "Returns true if it is raining or storming at the specified location. This takes into account biomes.",
 			},
 			IsWeatherWetAtBlock =
 			{
