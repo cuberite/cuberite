@@ -1465,8 +1465,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// Actions rejected by plugin will not lead to other attempts.
 	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
 
-	// TODO: Move use item into a dedicated function.
-
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_Hand = eHand::hMain;
 	const cItem & HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
@@ -1497,7 +1495,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
 		bool Usable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
-		if (Usable && !(Placeable && m_Player->IsCrouched()))
+		if (Usable && !m_Player->IsCrouched())
 		{
 			// use a block
 			cChunkInterface ChunkInterface(World->GetChunkMap());

@@ -3272,11 +3272,11 @@ eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 	// Convert hand parameter into eHand enum
 	switch (a_Hand)
 	{
-	case MAIN_HAND: return eHand::hMain;
-	case OFF_HAND: return eHand::hOff;
-	default:
-		ASSERT(!"Unknown hand value");
-		return eHand::hMain;
+		case MAIN_HAND: return eHand::hMain;
+		case OFF_HAND: return eHand::hOff;
+		default:
+			ASSERT(!"Unknown hand value");
+			return eHand::hMain;
 	}
 }
 
