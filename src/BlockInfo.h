@@ -43,9 +43,6 @@ public:
 	/** Does this block disperse sky light? (only relevant for transparent blocks) */
 	bool m_IsSkylightDispersant;
 
-	/** Can this block hold snow atop? */
-	bool m_IsSnowable;
-
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
@@ -87,7 +84,14 @@ public:
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
 	}
-	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
+	inline static bool IsSnowable                 (BLOCKTYPE a_Type)
+	{
+		return (
+			(a_Type == E_BLOCK_ICE)
+			|| (a_Type == E_BLOCK_LEAVES)
+			|| (!Get(a_Type).m_Transparent && (a_Type != E_BLOCK_PACKED_ICE))
+		);
+	}
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool IsUseableBySpectator       (BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
@@ -108,7 +112,6 @@ public:
 		, m_PistonBreakable(false)
 		, m_IsRainBlocker(false)
 		, m_IsSkylightDispersant(false)
-		, m_IsSnowable(false)
 		, m_IsSolid(true)
 		, m_UseableBySpectator(false)
 		, m_FullyOccupiesVoxel(false)

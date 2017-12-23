@@ -347,6 +347,41 @@ static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
 
 
 
+static int tolua_get_cBlockInfo_m_IsSnowable(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cBlockInfo"))
+	{
+		return 0;
+	}
+
+	L.Push("");
+	LOGWARNING("cBlockInfo.m_IsSnowable is deprecated");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cBlockInfo_m_IsSnowable(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cBlockInfo"))
+	{
+		return 0;
+	}
+
+	LOGWARNING("cBlockInfo.m_IsSnowable is deprecated in favour of cBlockInfo::IsSnowable()");
+	L.LogStackTrace(0);
+	return 0;
+}
+
+
+
+
+
 static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 {
 	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
@@ -550,6 +585,7 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_beginmodule(tolua_S, "cBlockInfo");
 		tolua_function(tolua_S, "GetPlaceSound", tolua_cBlockInfo_GetPlaceSound);
 		tolua_variable(tolua_S, "m_PlaceSound", tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+		tolua_variable(tolua_S, "m_IsSnowable", tolua_get_cBlockInfo_m_IsSnowable, tolua_set_cBlockInfo_m_IsSnowable);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cItem");
