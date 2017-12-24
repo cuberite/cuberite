@@ -464,7 +464,10 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_PistonBreakable = true;
 
 
-	// Blocks that block rain or snow's passage:
+	/* Blocks that block rain or snow's passage:
+	*  All solid blocks are also rain blockers, and they are set automatically
+	*  at the end of this function.
+	*/
 	Info[E_BLOCK_SIGN_POST                    ].m_IsRainBlocker = true;
 	Info[E_BLOCK_WALLSIGN                     ].m_IsRainBlocker = true;
 	Info[E_BLOCK_WALL_BANNER                  ].m_IsRainBlocker = true;
