@@ -310,17 +310,17 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 
 
 
-int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritarySlot)
+int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritySlot)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = a_ItemStack.GetMaxStackSize();
 
-	if ((a_PrioritarySlot != -1) && !IsValidSlotNum(a_PrioritarySlot))
+	if ((a_PrioritySlot != -1) && !IsValidSlotNum(a_PrioritySlot))
 	{
 		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_PrioritarySlot, m_Slots.size()
+			__FUNCTION__, a_PrioritySlot, m_Slots.size()
 		);
-		a_PrioritarySlot = -1;
+		a_PrioritySlot = -1;
 	}
 
 	if (!a_AllowNewStacks && !m_Slots.IsStorageAllocated())
@@ -328,16 +328,16 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 		return 0;  // No existing stacks to add to
 	}
 
-	// Try prioritarySlot first:
+	// Try prioritySlot first:
 	if (
-		(a_PrioritarySlot != -1) &&
+		(a_PrioritySlot != -1) &&
 		(
-			m_Slots[a_PrioritarySlot].IsEmpty() ||
-			m_Slots[a_PrioritarySlot].IsEqual(a_ItemStack)
+			m_Slots[a_PrioritySlot].IsEmpty() ||
+			m_Slots[a_PrioritySlot].IsEqual(a_ItemStack)
 		)
 	)
 	{
-		NumLeft -= AddItemToSlot(a_ItemStack, a_PrioritarySlot, NumLeft, MaxStack);
+		NumLeft -= AddItemToSlot(a_ItemStack, a_PrioritySlot, NumLeft, MaxStack);
 	}
 
 	// Scan existing stacks:
@@ -378,12 +378,12 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 
 
 
-int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_PrioritarySlot)
+int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_PrioritySlot)
 {
 	int TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks, a_PrioritarySlot);
+		int NumAdded = AddItem(*itr, a_AllowNewStacks, a_PrioritySlot);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
