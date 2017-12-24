@@ -352,7 +352,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 			// All items fit
 			return a_ItemStack.m_ItemCount;
 		}
-	}  // for i - Slots[]
+	}  // for i - m_Slots[]
 
 	if (!a_AllowNewStacks)
 	{
@@ -370,7 +370,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 			// All items fit
 			return a_ItemStack.m_ItemCount;
 		}
-	}  // for i - Slots[]
+	}  // for i - m_Slots[]
 	return (a_ItemStack.m_ItemCount - NumLeft);
 }
 
@@ -689,7 +689,7 @@ void cItemGrid::CopyToItems(cItems & a_Items) const
 		{
 			a_Items.push_back(Slot);
 		}
-	}  // for Slot - Slots[]
+	}  // for Slot - m_Slots[]
 }
 
 

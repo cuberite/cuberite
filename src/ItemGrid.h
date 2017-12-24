@@ -37,7 +37,7 @@ public:
 	// tolua_begin
 	int GetWidth   (void) const { return m_Width; }
 	int GetHeight  (void) const { return m_Height; }
-	int GetNumSlots(void) const { return static_cast<int>(m_Slots.size()); }
+	int GetNumSlots(void) const { return m_Slots.size(); }
 
 	/** Converts XY coords into slot number; returns -1 on invalid coords */
 	int GetSlotNum(int a_X, int a_Y) const;
