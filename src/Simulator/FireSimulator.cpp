@@ -118,7 +118,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		auto BurnsForever = ((y <= 0) || DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
+		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
 		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
@@ -129,7 +129,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		);
 
 		// Randomly burn out the fire if it is raining:
-		if ((!BurnsForever || (y <= 0)) && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
+		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
 			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
 			itr = Data.erase(itr);
@@ -165,7 +165,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		}
 
 		// Burn out the fire one step by increasing the meta:
-		if (!BurnsForever || (y <= 0))
+		if (!BurnsForever)
 		{
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
