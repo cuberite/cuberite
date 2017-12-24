@@ -20,6 +20,7 @@
 #include "BlockCocoaPod.h"
 #include "BlockCommandBlock.h"
 #include "BlockComparator.h"
+#include "BlockConcretePowder.h"
 #include "BlockCrops.h"
 #include "BlockDeadBush.h"
 #include "BlockDirt.h"
@@ -210,6 +211,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COCOA_POD:                     return new cBlockCocoaPodHandler        (a_BlockType);
 		case E_BLOCK_COMMAND_BLOCK:                 return new cBlockCommandBlockHandler    (a_BlockType);
 		case E_BLOCK_ACTIVE_COMPARATOR:             return new cBlockComparatorHandler      (a_BlockType);
+		case E_BLOCK_CONCRETE_POWDER:               return new cBlockConcretePowderHandler  (a_BlockType);
 		case E_BLOCK_COBBLESTONE:                   return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_COBBLESTONE_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                        return new cBlockCobWebHandler          (a_BlockType);
