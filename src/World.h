@@ -807,7 +807,7 @@ public:
 	/** Returns true if the specified location has wet weather (rain or storm),
 	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
 	above the specified position will block the precipitation and this function
-	will return false. This assumes that the given y coordinate is valid. */
+	will return false. */
 	virtual bool IsWeatherWetAtBlock(Vector3i a_Pos);
 
 	/** Returns the seed of the world. */

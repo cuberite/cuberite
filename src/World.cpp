@@ -544,13 +544,17 @@ void cWorld::ChangeWeather(void)
 
 bool cWorld::IsWeatherWetAtBlock(Vector3i a_Pos)
 {
-	ASSERT(cChunkDef::IsValidHeight(a_Pos.y));
 	if (!IsWeatherWetAt(a_Pos.x, a_Pos.z))
 	{
 		return false;
 	}
 
-	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
+	if (a_Pos.y >= cChunkDef::Height)
+	{
+		return true;
+	}
+
+	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= std::max(0, a_Pos.y); y--)
 	{
 		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
 		if (cBlockInfo::IsRainBlocker(BlockType))

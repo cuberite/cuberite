@@ -2368,7 +2368,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false. This assumes that the given y coordinate is valid.",
+				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false.",
 			},
 			PrepareChunk =
 			{
