@@ -542,7 +542,7 @@ void cWorld::ChangeWeather(void)
 
 
 
-bool cWorld::IsWeatherWetAtBlock(Vector3i a_Pos)
+bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 {
 	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
 	{

@@ -124,7 +124,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
 			[this, AbsPos](Vector3i cc)
 			{
-				return (m_World.IsWeatherWetAtBlock(AbsPos + cc));
+				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
 			}
 		);
 

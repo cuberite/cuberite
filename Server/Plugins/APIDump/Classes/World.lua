@@ -2353,7 +2353,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns true if it is raining or storming at the specified location. This takes into account biomes.",
 			},
-			IsWeatherWetAtBlock =
+			IsWeatherWetAtXYZ =
 			{
 				Params =
 				{

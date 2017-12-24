@@ -808,7 +808,7 @@ public:
 	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
 	above the specified position will block the precipitation and this function
 	will return false. */
-	virtual bool IsWeatherWetAtBlock(Vector3i a_Pos);
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos);
 
 	/** Returns the seed of the world. */
 	int GetSeed(void) { return m_Generator.GetSeed(); }
