@@ -112,7 +112,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		auto BurnsForever = DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z));
+		auto BurnsForever = ((y < 0) || DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
 		auto Raining = false;
@@ -162,7 +162,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		}
 
 		// Burn out the fire one step by increasing the meta:
-		if (!BurnsForever && (y > 0))
+		if (!BurnsForever)
 		{
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
