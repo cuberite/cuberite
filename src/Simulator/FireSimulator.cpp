@@ -123,7 +123,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		);
 
 		// Randomly burn out the fire if it is raining:
-		if (!BurnsForever && Raining && !GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
+		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
 			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
 			itr = Data.erase(itr);
