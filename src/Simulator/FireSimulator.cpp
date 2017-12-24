@@ -115,15 +115,12 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((y < 0) || DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
-		auto Raining = false;
-		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
-		{
-			if (m_World.IsWeatherWetAtBlock(AbsPos + gCrossCoords[i]))
+		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
+			[this, AbsPos](Vector3i cc)
 			{
-				Raining = true;
-				break;
+				return (m_World.IsWeatherWetAtBlock(AbsPos + cc));
 			}
-		}
+		);
 
 		// Randomly burn out the fire if it is raining:
 		if (!BurnsForever && Raining && !GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
