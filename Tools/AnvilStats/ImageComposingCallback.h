@@ -59,7 +59,7 @@ public:
 	/** Erases the entire image with the specified color */
 	void EraseImage(int a_Color);
 
-	/** Erases the specified chunk's portion of the image with the specified color. Note that chunk coords are */ relative to the current region
+	/** Erases the specified chunk's portion of the image with the specified color. Note that chunk coords are relative to the current region */
 	void EraseChunk(int a_Color, int a_RelChunkX, int a_RelChunkZ);
 
 	/** Returns the current region X coord */
@@ -74,7 +74,7 @@ public:
 	/** Returns the color of the pixel at the specified UV coords; -1 if outside */
 	int GetPixel(int a_RelU, int a_RelV);
 
-	/** Sets a row of pixels. a_Pixels is expected to be a_CountU pixels wide. a_RelUStart + a_CountU is assumed less */ than image width
+	/** Sets a row of pixels. a_Pixels is expected to be a_CountU pixels wide. a_RelUStart + a_CountU is assumed less than image width */
 	void SetPixelURow(int a_RelUStart, int a_RelV, int a_CountU, int * a_Pixels);
 
 	/** "Shades" the given color based on the shade amount given

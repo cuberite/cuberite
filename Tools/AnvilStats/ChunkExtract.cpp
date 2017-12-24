@@ -53,7 +53,7 @@ bool cChunkExtract::OnCompressedDataSizePos(int a_CompressedDataSize, int a_Data
 
 	// Copy data from mAnvilFile to ChunkFile:
 	mAnvilFile.Seek(a_DataOffset);
-	for (int BytesToCopy = a_CompressedDataSize; BytesToCopy > 0)
+	for (int BytesToCopy = a_CompressedDataSize; BytesToCopy > 0;)
 	{
 		char Buffer[64000];
 		int NumBytes = std::min(BytesToCopy, (int)sizeof(Buffer));
