@@ -46,21 +46,18 @@ h1 {
 }
 
 .row2 {
-    margin: 0 auto;
+    margin: 25px auto;
     text-align: center;
     vertical-align: middle;
-    margin-top: 25px;
-	margin-bottom: 25px;
 }
 
 .contention {
     color: #000;
     text-align: left;
     line-height: 1.4;
-    margin: 0;
+    margin: 0 0 75px 0;
     font-family: Tahoma,Verdana,Arial,Sans-Serif;
     font-size: 13px;
-	margin-bottom:75px;
 }
 
 .push25 {
