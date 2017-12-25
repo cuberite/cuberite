@@ -18,7 +18,7 @@ bool g_IsVerbose = false;
 
 
 
-/// This class can read and write RCON packets to / from a connected socket
+/** This class can read and write RCON packets to / from a connected socket */
 class cRCONPacketizer
 {
 public:
@@ -27,29 +27,29 @@ public:
 		ptCommand = 2,
 		ptLogin = 3,
 	} ;
-	
+
 	cRCONPacketizer(cSocket & a_Socket);
-	
-	/// Sends the packet to the socket and waits until the response is received.
-	/// Returns true if response successfully received, false if the client disconnected or protocol error.
-	/// Dumps the reply payload to stdout.
+
+	/** Sends the packet to the socket and waits until the response is received.
+	Returns true if response successfully received, false if the client disconnected or protocol error.
+	Dumps the reply payload to stdout. */
 	bool SendPacket(int a_PacketType, const AString & a_PacketPayload);
-	
+
 protected:
-	/// The socket to use for reading incoming data and writing outgoing data:
+	/** The socket to use for reading incoming data and writing outgoing data: */
 	cSocket & m_Socket;
-	
-	/// The RequestID of the packet that is being sent. Incremented when the reply is received
+
+	/** The RequestID of the packet that is being sent. Incremented when the reply is received */
 	int m_RequestID;
 
-	/// Receives the full response and dumps its payload to stdout.
-	/// Returns true if successful, false if the client disconnected or protocol error.
+	/** Receives the full response and dumps its payload to stdout.
+	Returns true if successful, false if the client disconnected or protocol error. */
 	bool ReceiveResponse(void);
-	
-	/// Parses the received response packet and dumps its payload to stdout.
-	/// Returns true if successful, false on protocol error
-	/// Assumes that the packet length has already been read from the packet
-	/// If the packet is successfully parsed, increments m_RequestID
+
+	/** Parses the received response packet and dumps its payload to stdout.
+	Returns true if successful, false on protocol error
+	Assumes that the packet length has already been read from the packet
+	If the packet is successfully parsed, increments m_RequestID */
 	bool ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength);
 } ;
 
@@ -92,7 +92,7 @@ bool cRCONPacketizer::SendPacket(int a_PacketType, const AString & a_PacketPaylo
 		);
 		return false;
 	}
-	
+
 	return ReceiveResponse();
 }
 
@@ -101,7 +101,7 @@ bool cRCONPacketizer::SendPacket(int a_PacketType, const AString & a_PacketPaylo
 
 
 bool cRCONPacketizer::ReceiveResponse(void)
-{	
+{
 	// Receive the response:
 	cByteBuffer Buffer(64 KiB);
 	while (true)
@@ -122,7 +122,7 @@ bool cRCONPacketizer::ReceiveResponse(void)
 		}
 		Buffer.Write(buf, NumReceived);
 		Buffer.ResetRead();
-		
+
 		// Check if the buffer contains the full packet:
 		if (!Buffer.CanReadBytes(14))
 		{
@@ -136,7 +136,7 @@ bool cRCONPacketizer::ReceiveResponse(void)
 			// The packet is not complete yet
 			continue;
 		}
-		
+
 		// Parse the packet
 		return ParsePacket(Buffer, PacketSize);
 	}
@@ -166,7 +166,7 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 			return false;
 		}
 	}
-	
+
 	// Check the packet type:
 	int PacketType = 0;
 	VERIFY(a_Buffer.ReadLEInt(PacketType));
@@ -176,7 +176,7 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 		IsValid = false;
 		// Continue, so that the payload is printed before the program aborts.
 	}
-	
+
 	AString Payload;
 	VERIFY(a_Buffer.ReadString(Payload, a_PacketLength - 10));
 
@@ -195,7 +195,7 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // main:
 
 int RealMain(int argc, char * argv[])
@@ -255,14 +255,14 @@ int RealMain(int argc, char * argv[])
 		fprintf(stderr, "Unknown parameter: \"%s\". Aborting.", argv[i]);
 		return 1;
 	}  // for i - argv[]
-	
+
 	if (ServerAddress.empty() || (ServerPort < 0))
 	{
 		fprintf(stderr, "Server address or port not set. Use the --server and --port parameters to set them. Aborting.");
 		return 1;
 	}
 
-	// Connect:	
+	// Connect:
 	if (cSocket::WSAStartup() != 0)
 	{
 		fprintf(stderr, "Cannot initialize network stack. Aborting\n");
@@ -279,7 +279,7 @@ int RealMain(int argc, char * argv[])
 		return 3;
 	}
 	cRCONPacketizer Packetizer(s);
-	
+
 	// Authenticate using the provided password:
 	if (!Password.empty())
 	{
@@ -300,7 +300,7 @@ int RealMain(int argc, char * argv[])
 			fprintf(stderr, "No password provided, not sending a login packet.\n");
 		}
 	}
-	
+
 	// Send each command:
 	for (AStringVector::const_iterator itr = Commands.begin(), end = Commands.end(); itr != end; ++itr)
 	{
@@ -313,7 +313,7 @@ int RealMain(int argc, char * argv[])
 			return 5;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -327,7 +327,3 @@ int main(int argc, char * argv[])
 	int res = RealMain(argc, argv);
 	return res;
 }
-
-
-
-
