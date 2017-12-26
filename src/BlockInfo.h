@@ -37,7 +37,10 @@ public:
 	/** Can a piston break this block? */
 	bool m_PistonBreakable;
 
-	/** Does a block disperse sky light? (only relevant for transparent blocks) */
+	/** Does this block block the passage of rain? */
+	bool m_IsRainBlocker;
+
+	/** Does this block disperse sky light? (only relevant for transparent blocks) */
 	bool m_IsSkylightDispersant;
 
 	/** Can this block hold snow atop? */
@@ -79,6 +82,7 @@ public:
 	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
+	inline static bool IsRainBlocker              (BLOCKTYPE a_Type) { return Get(a_Type).m_IsRainBlocker;       }
 	inline static bool IsSkylightDispersant       (BLOCKTYPE a_Type)
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
@@ -102,6 +106,7 @@ public:
 		, m_Transparent(false)
 		, m_OneHitDig(false)
 		, m_PistonBreakable(false)
+		, m_IsRainBlocker(false)
 		, m_IsSkylightDispersant(false)
 		, m_IsSnowable(false)
 		, m_IsSolid(true)
@@ -149,7 +154,3 @@ inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
 {
 	return cBlockInfo::Get(a_BlockType).m_Handler.get();
 }
-
-
-
-
