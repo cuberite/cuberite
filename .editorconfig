@@ -6,5 +6,4 @@ charset = utf-8
 end_of_line = lf
 indent_style = tab
 insert_final_newline = true
-spaces_around_operators = true
 trim_trailing_whitespace = true
