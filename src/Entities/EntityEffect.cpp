@@ -126,8 +126,9 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
 {
 	// Drinkable potion if 13th lowest bit is set
+	// Water bottles are also drinkable potions
 	// Ref.: https://minecraft.gamepedia.com/Potions#Data_value_table
-	return ((a_ItemDamage & 0x2000) != 0);
+	return (a_ItemDamage == 0) || ((a_ItemDamage & 0x2000) != 0);
 }
 
 
@@ -512,7 +513,3 @@ void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
-
-
-
-
