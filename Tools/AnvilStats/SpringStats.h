@@ -22,31 +22,32 @@ public:
 	class cStats
 	{
 	public:
-		/// Per-height, per-biome frequencies of springs
+		/** Per-height, per-biome frequencies of springs */
 		typedef UInt64 SpringStats[256][256];
-		
+
 		SpringStats m_LavaSprings;
 		SpringStats m_WaterSprings;
-		
-		UInt64 m_TotalChunks;  ///< Total number of chunks that are fully processed through this callback(OnSectionsFinished())
-		
+
+		/** Total number of chunks that are fully processed through this callback(OnSectionsFinished()) */
+		UInt64 m_TotalChunks;
+
 		cStats(void);
 		void Add(const cStats & a_Other);
 	} ;
-	
+
 	cSpringStats(void);
-	
+
 	const cStats & GetStats(void) const { return m_Stats; }
-	
+
 protected:
 
 	BLOCKTYPE  m_BlockTypes[16 * 16 * 256];
 	NIBBLETYPE m_BlockMetas[16 * 16 * 256 / 2];
 	char       m_Biomes[16 * 16];
 	bool       m_AreBiomesValid;
-	
+
 	cStats m_Stats;
-	
+
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnHeader(int a_FileOffset, unsigned char a_NumSectors, int a_Timestamp) override { return false; }
@@ -67,7 +68,7 @@ protected:
 	) override;
 	virtual bool OnSectionsFinished(void) override;
 
-	/// Tests the specified block, if it appears to be a spring, it is added to a_Stats
+	/** Tests the specified block, if it appears to be a spring, it is added to a_Stats */
 	void TestSpring(int a_RelX, int a_RelY, int a_RelZ, cStats::SpringStats & a_Stats);
 } ;
 
@@ -80,23 +81,19 @@ class cSpringStatsFactory :
 {
 public:
 	virtual ~cSpringStatsFactory();
-	
+
 	virtual cCallback * CreateNewCallback(void) override
 	{
 		return new cSpringStats;
 	}
 
 	cSpringStats::cStats m_CombinedStats;
-	
+
 	void JoinResults(void);
-	
-	/// Saves total per-height data (summed through biomes) for both spring types to the file
+
+	/** Saves total per-height data (summed through biomes) for both spring types to the file */
 	void SaveTotals(const AString & a_FileName);
-	
-	/// Saves complete per-height, per-biome statistics for the springs to the file
+
+	/** Saves complete per-height, per-biome statistics for the springs to the file */
 	void SaveStatistics(const cSpringStats::cStats::SpringStats & a_Stats, const AString & a_FileName);
 } ;
-
-
-
-

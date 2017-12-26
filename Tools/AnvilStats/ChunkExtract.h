@@ -20,7 +20,7 @@ class cChunkExtract :
 {
 public:
 	cChunkExtract(const AString & iWorldFolder);
-	
+
 protected:
 	AString mWorldFolder;
 	cFile   mAnvilFile;
@@ -28,10 +28,10 @@ protected:
 	int     mCurAnvilZ;  // Z-coord of mAnvilFile, -"-
 	int     mCurChunkX;  // X-coord of the chunk being processed
 	int     mCurChunkZ;  // Z-coord of the chunk being processed
-	
-	/// Opens new anvil file into mAnvilFile, sets mCurAnvilX and mCurAnvilZ
+
+	/** Opens new anvil file into mAnvilFile, sets mCurAnvilX and mCurAnvilZ */
 	void OpenAnvilFile(int a_AnvilX, int a_AnvilZ);
-	
+
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnHeader(int a_FileOffset, unsigned char a_NumSectors, int a_Timestamp) override { return false; }
@@ -51,7 +51,7 @@ public:
 		mWorldFolder(iWorldFolder)
 	{
 	}
-	
+
 	virtual cCallback * CreateNewCallback(void) override
 	{
 		return new cChunkExtract(mWorldFolder);
@@ -60,7 +60,3 @@ public:
 protected:
 	AString mWorldFolder;
 } ;
-
-
-
-
