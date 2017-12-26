@@ -238,7 +238,7 @@ const char * GetBlockTypeString(unsigned char a_BlockType)
 		"Wooden Button",
 		"Head",
 	} ;
-	
+
 	return (a_BlockType < ARRAYCOUNT(BlockTypeNames)) ? BlockTypeNames[a_BlockType] : "";
 }
 
@@ -287,7 +287,3 @@ int GetNumCores(void)
 	}  // while (Affinity > 0)
 	return NumCores;
 }
-
-
-
-
