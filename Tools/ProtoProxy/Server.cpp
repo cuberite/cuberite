@@ -23,7 +23,7 @@ cServer::cServer(void)
 int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 {
 	m_ConnectPort = a_ConnectPort;
-	
+
 	#ifdef _WIN32
 		WSAData wsa;
 		int res = WSAStartup(0x0202, &wsa);
@@ -33,7 +33,7 @@ int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 			return res;
 		}
 	#endif  // _WIN32
-	
+
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (m_ListenSocket < 0)
 	{
@@ -71,7 +71,7 @@ int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 		return err;
 	}
 	LOGINFO("Listening for client connections on port %d, connecting to server at localhost:%d", a_ListenPort, a_ConnectPort);
-	
+
 	LOGINFO("Generating protocol encryption keypair...");
 	m_PrivateKey.Generate();
 	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
@@ -103,7 +103,3 @@ void cServer::Run(void)
 		LOGINFO("Client disconnected. Ready for another connection.");
 	}
 }
-
-
-
-

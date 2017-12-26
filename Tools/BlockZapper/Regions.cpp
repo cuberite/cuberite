@@ -11,7 +11,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cRegion:
 
 cRegion::cRegion(void) :
@@ -66,7 +66,7 @@ bool cRegion::TouchesChunk(int a_ChunkX, int a_ChunkZ) const
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cRegions:
 
 void cRegions::Read(std::istream & a_Stream)
@@ -75,7 +75,7 @@ void cRegions::Read(std::istream & a_Stream)
 	{
 		AString Line;
 		std::getline(a_Stream, Line);
-		
+
 		// Process the line
 		AStringVector Split = StringSplit(Line, " \t");
 		AStringVector NonEmpty;
@@ -110,7 +110,7 @@ void cRegions::Read(std::istream & a_Stream)
 void cRegions::AddRegion(const AStringVector & a_Split)
 {
 	ASSERT((a_Split.size() == 6) || (a_Split.size() == 7));
-	
+
 	int Coords[6];
 	for (int i = 0; i < 6; i++)
 	{
@@ -121,10 +121,10 @@ void cRegions::AddRegion(const AStringVector & a_Split)
 			return;
 		}
 	}  // for i - a_Split[]
-	
+
 	bool ShouldZapBlocks = true;
 	bool ShouldZapEntities = false;
-	
+
 	if (a_Split.size() == 7)
 	{
 		AString Upper = a_Split[6];
@@ -148,7 +148,7 @@ void cRegions::AddRegion(const AStringVector & a_Split)
 			return;
 		}
 	}
-	
+
 	// Swap coords, if needed:
 	for (int i = 0; i < 3; i++)
 	{
@@ -157,11 +157,7 @@ void cRegions::AddRegion(const AStringVector & a_Split)
 			std::swap(Coords[2 * i], Coords[2 * i + 1]);
 		}
 	}
-	
+
 	// Store the region
 	m_Regions.push_back(cRegion(Coords[0], Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], ShouldZapBlocks, ShouldZapEntities));
 }
-
-
-
-
