@@ -125,10 +125,10 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 
 bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
 {
-	// Drinkable potion if 13th lowest bit is set
-	// Water bottles are also drinkable potions
-	// Ref.: https://minecraft.gamepedia.com/Java_Edition_data_values#Potions
-	return (a_ItemDamage == 0) || ((a_ItemDamage & 0x2000) != 0);
+	// Potions are drinkable if they are not splash potions.
+	// i.e. potions are drinkable if the 14th lowest bit is not set
+	// Ref.: https://minecraft.gamepedia.com/Java_Edition_data_values#.22Splash_potion.22_bit
+	return ((a_ItemDamage & 0x4000) == 0);
 }
 
 
