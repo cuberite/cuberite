@@ -93,9 +93,15 @@ public:
 			}
 			else if (FloaterInfo.CanPickup())
 			{
+				UInt32 LotSLevel = std::min(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
+
+				// Chances for getting an item from the category for each level of Luck of the Sea (0 - 3)
+				const int TreasureChances[] = {50, 71, 92, 113};  // 5% | 7.1% | 9.2% | 11.3%
+				const int JunkChances[] = {100, 81, 61, 42};  // 10% | 8.1% | 6.1% | 4.2%
+
 				cItems Drops;
-				int ItemCategory = Random.RandInt(99);
-				if (ItemCategory <= 4)  // Treasures 5%
+				int ItemCategory = Random.RandInt(999);
+				if (ItemCategory < TreasureChances[LotSLevel])
 				{
 					switch (Random.RandInt(5))  // Each piece of treasure has an equal chance of 1 / 6
 					{
@@ -139,7 +145,7 @@ public:
 
 					a_Player->GetStatManager().AddValue(statTreasureFished, 1);
 				}
-				else if (ItemCategory <= 14)  // Junk 10%
+				else if (ItemCategory < JunkChances[LotSLevel])
 				{
 					int Junk = Random.RandInt(82);
 					if (Junk < 10)  // 10 / 83 chance of spawning a bowl
@@ -191,7 +197,7 @@ public:
 
 					a_Player->GetStatManager().AddValue(statJunkFished, 1);
 				}
-				else  // Fish 85%
+				else
 				{
 					int FishType = Random.RandInt(99);
 					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
