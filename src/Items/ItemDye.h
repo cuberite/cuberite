@@ -21,29 +21,36 @@ public:
 
 
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
+
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
 		// Handle growing the plants:
-		if ((a_Item.m_ItemDamage == E_META_DYE_WHITE) && (a_BlockFace != BLOCK_FACE_NONE))
+		if (a_EquippedItem.m_ItemDamage == E_META_DYE_WHITE)
 		{
-			if (a_World->GrowRipePlant(a_BlockX, a_BlockY, a_BlockZ, true))
+			if (a_World.GrowRipePlant(a_BlockX, a_BlockY, a_BlockZ, true))
 			{
 				// Particle effects are in GrowRipePlant
-				if (!a_Player->IsGameModeCreative())
+				if (!a_Player.IsGameModeCreative())
 				{
-					a_Player->GetInventory().RemoveOneEquippedItem();
+					a_Player.GetInventory().RemoveOneEquippedItem();
 					return true;
 				}
 			}
 		}
-		else if ((a_Item.m_ItemDamage == E_META_DYE_BROWN) && (a_BlockFace >= BLOCK_FACE_ZM) && (a_BlockFace <= BLOCK_FACE_XP))
+		else if ((a_EquippedItem.m_ItemDamage == E_META_DYE_BROWN) && (a_BlockFace >= BLOCK_FACE_ZM) && (a_BlockFace <= BLOCK_FACE_XP))
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 
 			// Check if the block that the player clicked is a jungle log.
 			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x3) != E_META_LOG_JUNGLE))
@@ -55,17 +62,17 @@ public:
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 			BlockMeta = cBlockCocoaPodHandler::BlockFaceToMeta(a_BlockFace);
 
-			if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_AIR)
+			if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_AIR)
 			{
 				return false;
 			}
 
 			// Place the cocoa pod:
-			if (a_Player->PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta))
+			if (a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta))
 			{
-				if (a_Player->IsGameModeSurvival())
+				if (a_Player.IsGameModeSurvival())
 				{
-					a_Player->GetInventory().RemoveOneEquippedItem();
+					a_Player.GetInventory().RemoveOneEquippedItem();
 				}
 				return true;
 			}

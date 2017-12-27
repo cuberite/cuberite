@@ -21,8 +21,8 @@ public:
 
 	/** Move the armor to the armor slot of the player's inventory */
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
 		int SlotNum;
@@ -61,7 +61,14 @@ public:
 		{
 			Item.Empty();
 		}
-		a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), Item);
+		if (a_Hand == hMain)
+		{
+			a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), Item);
+		}
+		else
+		{
+			a_Player->GetInventory().SetShieldSlot(Item);
+		}
 		return true;
 	}
 

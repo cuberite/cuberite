@@ -20,9 +20,16 @@ public:
 
 
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
+
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
 		if (a_BlockFace < 0)
@@ -30,18 +37,18 @@ public:
 			return false;
 		}
 
-		if (!a_Player->IsGameModeCreative())
+		if (!a_Player.IsGameModeCreative())
 		{
 			switch (m_ItemType)
 			{
 				case E_ITEM_FLINT_AND_STEEL:
 				{
-					a_Player->UseEquippedItem();
+					a_Player.UseEquippedItem();
 					break;
 				}
 				case E_ITEM_FIRE_CHARGE:
 				{
-					a_Player->GetInventory().RemoveOneEquippedItem();
+					a_Player.GetInventory().RemoveOneEquippedItem();
 					break;
 				}
 				default:
@@ -51,14 +58,14 @@ public:
 			}
 		}
 
-		switch (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
+		switch (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ))
 		{
 			case E_BLOCK_TNT:
 			{
 				// Activate the TNT:
-				a_World->BroadcastSoundEffect("entity.tnt.primed", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 1.0f);
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-				a_World->SpawnPrimedTNT({a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5});  // 80 ticks to boom
+				a_World.BroadcastSoundEffect("entity.tnt.primed", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 1.0f);
+				a_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+				a_World.SpawnPrimedTNT({a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5});  // 80 ticks to boom
 				break;
 			}
 			default:
@@ -69,10 +76,10 @@ public:
 				{
 					break;
 				}
-				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+				if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
 				{
-					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
-					a_World->BroadcastSoundEffect("item.flintandsteel.use", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0F, 1.04F);
+					a_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
+					a_World.BroadcastSoundEffect("item.flintandsteel.use", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0F, 1.04F);
 					break;
 				}
 			}

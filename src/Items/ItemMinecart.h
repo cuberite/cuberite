@@ -25,20 +25,20 @@ public:
 	{
 	}
 
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
 
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
-		if (a_BlockFace < 0)
-		{
-			return false;
-		}
-
 		// Check that there's rail in there:
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE Block = a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		switch (Block)
 		{
 			case E_BLOCK_MINECART_TRACKS:
@@ -60,20 +60,16 @@ public:
 		double y = static_cast<double>(a_BlockY) + 0.5;
 		double z = static_cast<double>(a_BlockZ) + 0.5;
 
-		if (a_World->SpawnMinecart(x, y, z, m_ItemType) == cEntity::INVALID_ID)
+		if (a_World.SpawnMinecart(x, y, z, m_ItemType) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
 
-		if (!a_Player->IsGameModeCreative())
+		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
 		return true;
 	}
 
 } ;
-
-
-
-

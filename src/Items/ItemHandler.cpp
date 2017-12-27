@@ -443,18 +443,15 @@ bool cItemHandler::GetBlocksToPlace(
 
 
 bool cItemHandler::OnItemUse(
-	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+	const cItem & a_Item, eHand a_Hand
 )
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_PluginInterface);
 	UNUSED(a_Item);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_BlockFace);
+	UNUSED(a_Hand);
 
 	return false;
 }
@@ -828,11 +825,11 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 
 
-bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
+bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item, eHand a_Hand)
 {
 	if (!a_Player->IsGameModeCreative())
 	{
-		a_Player->GetInventory().RemoveOneEquippedItem();
+		a_Player->GetInventory().RemoveOneEquippedItem(a_Hand);
 	}
 
 	FoodInfo Info = GetFoodInfo(a_Item);

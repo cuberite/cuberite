@@ -29,8 +29,8 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
 		ASSERT(a_Player != nullptr);
@@ -41,7 +41,7 @@ public:
 			return false;
 		}
 
-		a_Player->StartChargingBow();
+		a_Player->StartChargingBow(a_Hand);
 		return true;
 	}
 
@@ -92,7 +92,7 @@ public:
 				ArrowPtr->SetPickupState(cArrowEntity::psNoPickup);
 			}
 
-			a_Player->UseEquippedItem();
+			a_Player->UseEquippedItem(1, a_Player->GetChargingBowHand());
 		}
 
 		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)

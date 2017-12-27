@@ -18,9 +18,9 @@ public:
 	}
 
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item, eHand a_Hand) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
+		if (!super::EatItem(a_Player, a_Item, a_Hand))
 		{
 			return false;
 		}

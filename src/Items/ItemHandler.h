@@ -73,8 +73,8 @@ public:
 	/** Called when the player tries to use the item (right mouse button).
 	Return false to abort the usage. DEFAULT: False */
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	);
 
 
@@ -129,7 +129,7 @@ public:
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item);
 
 	/** Lets the player eat a selected item. Returns true if the player ate the item */
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item);
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item, eHand a_Hand);
 
 	/** Indicates if this item is a tool */
 	virtual bool IsTool(void);

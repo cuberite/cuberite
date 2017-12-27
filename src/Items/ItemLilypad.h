@@ -21,26 +21,20 @@ public:
 	}
 
 
-	virtual bool IsPlaceable(void) override
-	{
-		return false;  // Set as not placeable so OnItemUse is called
-	}
-
-
-
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
 		if (a_BlockFace > BLOCK_FACE_NONE)
 		{
 			// Clicked on the side of a submerged block; vanilla allows placement, so should we
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LILY_PAD, 0);
-			if (!a_Player->IsGameModeCreative())
+			a_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LILY_PAD, 0);
+			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
+				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			return true;
 		}
@@ -85,18 +79,18 @@ public:
 		};
 
 		cCallbacks Callbacks;
-		cLineBlockTracer Tracer(*a_Player->GetWorld(), Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+		cLineBlockTracer Tracer(*a_Player.GetWorld(), Callbacks);
+		Vector3d Start(a_Player.GetEyePosition() + a_Player.GetLookVector());
+		Vector3d End(a_Player.GetEyePosition() + a_Player.GetLookVector() * 5);
 
 		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
 
 		if (Callbacks.m_HasHitFluid)
 		{
-			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
-			if (!a_Player->IsGameModeCreative())
+			a_World.SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
+			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
+				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			return true;
 		}
@@ -104,7 +98,3 @@ public:
 		return false;
 	}
 };
-
-
-
-

@@ -202,15 +202,28 @@ int cInventory::RemoveItem(const cItem & a_ItemStack)
 
 
 
-bool cInventory::RemoveOneEquippedItem(void)
+bool cInventory::RemoveOneEquippedItem(eHand a_Hand)
 {
-	if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
+	if (a_Hand == hMain)
 	{
-		return false;
-	}
+		if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
+		{
+			return false;
+		}
 
-	m_HotbarSlots.ChangeSlotCount(m_EquippedSlotNum, -1);
-	return true;
+		m_HotbarSlots.ChangeSlotCount(m_EquippedSlotNum, -1);
+		return true;
+	}
+	else
+	{
+		if (m_ShieldSlots.GetSlot(0).IsEmpty())
+		{
+			return false;
+		}
+
+		m_ShieldSlots.ChangeSlotCount(0, -1);
+		return true;
+	}
 }
 
 
@@ -407,9 +420,16 @@ void cInventory::SetEquippedSlotNum(int a_SlotNum)
 
 
 
-bool cInventory::DamageEquippedItem(short a_Amount)
+bool cInventory::DamageEquippedItem(short a_Amount, eHand a_Hand)
 {
-	return DamageItem(invHotbarOffset + m_EquippedSlotNum, a_Amount);
+	if (a_Hand == hOff)
+	{
+		return DamageItem(invShieldOffset, a_Amount);
+	}
+	else
+	{
+		return DamageItem(invHotbarOffset + m_EquippedSlotNum, a_Amount);
+	}
 }
 
 

@@ -87,8 +87,9 @@ public:
 	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 
+	// TODO(9caihezi): remove the default value
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
-	bool RemoveOneEquippedItem(void);
+	bool RemoveOneEquippedItem(eHand a_Hand = hMain);
 
 	/** Returns the number of items of type a_Item that are stored */
 	int HowManyItems(const cItem & a_Item);
@@ -158,7 +159,7 @@ public:
 	bool DamageItem(int a_SlotNum, short a_Amount);
 
 	/** Adds the specified damage to the currently held item; deletes the item and returns true if the item broke. */
-	bool DamageEquippedItem(short a_Amount = 1);
+	bool DamageEquippedItem(short a_Amount = 1, eHand a_Hand = hMain);
 
 	const cItem & GetEquippedHelmet    (void) const { return m_ArmorSlots.GetSlot(0); }
 	const cItem & GetEquippedChestplate(void) const { return m_ArmorSlots.GetSlot(1); }

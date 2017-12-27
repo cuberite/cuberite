@@ -25,15 +25,18 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
+		// TODO: It's better to have separate handler for bucket and lava_bucket/water_bucket.
+		// The bucket should handle "OnItemUse" and lava_bucket/water_bucket should handle OnPlayerPlace.
+		// Now it behaves a bit different from vanilla server that the lava_bucket can be placed on the surface of water if there's no solid block ahead.
 		switch (m_ItemType)
 		{
-			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_LAVA);
-			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_WATER);
+			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_Hand);
+			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, E_BLOCK_LAVA, a_Hand);
+			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, E_BLOCK_WATER, a_Hand);
 			default:
 			{
 				ASSERT(!"Unhandled ItemType");
@@ -44,13 +47,8 @@ public:
 
 
 
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, eHand a_Hand)
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			return false;
-		}
-
 		Vector3i BlockPos;
 		if (!GetBlockFromTrace(a_World, a_Player, BlockPos))
 		{
@@ -96,7 +94,7 @@ public:
 		if (!a_Player->IsGameModeCreative())
 		{
 			// Remove the bucket from the inventory
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
+			if (!a_Player->GetInventory().RemoveOneEquippedItem(a_Hand))
 			{
 				LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
 				ASSERT(!"Inventory bucket mismatch");
@@ -116,14 +114,9 @@ public:
 
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
+		BLOCKTYPE a_FluidBlock, eHand a_Hand
 	)
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			return false;
-		}
-
 		BLOCKTYPE CurrentBlockType;
 		NIBBLETYPE CurrentBlockMeta;
 		eBlockFace EntryFace;
@@ -143,7 +136,7 @@ public:
 		if (a_Player->GetGameMode() != gmCreative)
 		{
 			// Remove fluid bucket, add empty bucket:
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
+			if (!a_Player->GetInventory().RemoveOneEquippedItem(a_Hand))
 			{
 				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");
 				ASSERT(!"Inventory bucket mismatch");

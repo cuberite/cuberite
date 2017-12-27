@@ -29,14 +29,11 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
 		UNUSED(a_Item);
-		UNUSED(a_BlockX);
-		UNUSED(a_BlockZ);
-		UNUSED(a_BlockFace);
 
 		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you right-click it.
 
@@ -48,7 +45,7 @@ public:
 		cMap * NewMap = a_World->GetMapManager().CreateMap(CenterX, CenterZ, DEFAULT_SCALE);
 
 		// Remove empty map from inventory
-		if (!a_Player->GetInventory().RemoveOneEquippedItem())
+		if (!a_Player->GetInventory().RemoveOneEquippedItem(a_Hand))
 		{
 			ASSERT(!"Inventory mismatch");
 			return true;
