@@ -1414,7 +1414,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// TODO: Move use item into a dedicated function.
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
-	eHand a_HandReal = a_Hand; // TODO: remove this
+	eHand a_HandReal = a_Hand;  // TODO: remove this
 	a_Hand = eHand::hMain;
 	const cItem & HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);

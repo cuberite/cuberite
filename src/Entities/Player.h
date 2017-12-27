@@ -123,7 +123,7 @@ public:
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
-	/** Returns a eHand enum indicating which hand is used for charging bow **/
+	/** Returns an eHand enum indicating which hand is used for charging bow */
 	eHand GetChargingBowHand() const { return m_ChargingBowHand; }
 
 	void SetTouchGround(bool a_bTouchGround);

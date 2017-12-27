@@ -656,7 +656,7 @@ void cPlayer::StartEating(eHand h_Hand)
 
 	// Send the packets:
 	// TODO(9caihezi): The animation varies from version to version. Add a related function in Protocol class
-	//m_World->BroadcastEntityAnimation(*this, 3);
+	// m_World->BroadcastEntityAnimation(*this, 3);
 	m_World->BroadcastEntityMetadata(*this);
 }
 

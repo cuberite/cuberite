@@ -422,7 +422,8 @@ void cInventory::SetEquippedSlotNum(int a_SlotNum)
 
 bool cInventory::DamageEquippedItem(short a_Amount, eHand a_Hand)
 {
-	if (a_Hand == hOff) {
+	if (a_Hand == hOff)
+	{
 		return DamageItem(invShieldOffset, a_Amount);
 	}
 	else
