@@ -1,12 +1,4 @@
 
-// ItemFishingRod.h
-
-// Declares the various fishing rod ItemHandlers
-
-
-
-
-
 #pragma once
 
 #include "../Entities/Floater.h"
@@ -66,6 +58,21 @@ public:
 	cItemFishingRodHandler(int a_ItemType) :
 		super(a_ItemType)
 	{
+	}
+
+
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaFishingNothing:  return 0;
+			case dlaFishingFish:     return 1;
+			case dlaFishingBlock:    return 2;
+			case dlaFishingItem:     return 3;
+			case dlaFishingMob:      return 5;
+			default:                 return 0;
+		}
 	}
 
 
@@ -240,7 +247,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-

@@ -148,7 +148,7 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player.UseEquippedItem();
+			a_Player.UseEquippedItem(cItemHandler::dlaLightFire);
 		}
 		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosition(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
@@ -156,4 +156,3 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		m_BurnedWithFlintAndSteel = true;
 	}
 }
-

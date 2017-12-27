@@ -63,7 +63,13 @@ public:
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
-		return 1;
+		switch (a_Action)
+		{
+			case dlaBreakBlockInstant:  return 1;
+			case dlaShearBlock:         return 1;
+			case dlaShearSheep:         return 1;
+			default:                    return 0;
+		}
 	}
 
 
@@ -95,7 +101,3 @@ public:
 	}
 
 } ;
-
-
-
-

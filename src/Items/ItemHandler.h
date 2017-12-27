@@ -21,10 +21,24 @@ class cItemHandler
 {
 public:
 
-	enum eDurabilityLostAction
+	enum eDurabilityLostAction : int
 	{
 		dlaBreakBlock,
+		dlaBreakBlockInstant,
 		dlaAttackEntity,
+		dlaCarrotOnStickBoost,
+		dlaElytraFly,
+		dlaFishingBlock,
+		dlaFishingFish,
+		dlaFishingItem,
+		dlaFishingMob,
+		dlaFishingNothing,
+		dlaLightFire,
+		dlaShearBlock,
+		dlaShearSheep,
+		dlaShieldBlock,
+		dlaShootArrow,
+		dlaTilling,
 	};
 
 	cItemHandler(int a_ItemType);

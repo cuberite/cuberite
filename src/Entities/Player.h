@@ -5,6 +5,7 @@
 #include "../Inventory.h"
 #include "../Defines.h"
 #include "../World.h"
+#include "../Items/ItemHandler.h"
 
 #include "../Statistics.h"
 
@@ -413,7 +414,7 @@ public:
 	If the player is not riding a horse or if the horse is untamed, does nothing. */
 	void OpenHorseInventory();
 
-	void UseEquippedItem(int a_Amount = 1);
+	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
 
 	void SendHealth(void);
 

@@ -66,7 +66,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player.UseEquippedItem();
+				a_Player.UseEquippedItem(cItemHandler::dlaShearSheep);
 			}
 
 			cItems Drops;
@@ -77,4 +77,3 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 		} break;
 	}
 }
-

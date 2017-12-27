@@ -1,15 +1,8 @@
 
-// ItemBow.h
-
-// Declares the cItemBowHandler class representing the itemhandler for bows
-
-
-
-
-
 #pragma once
 
 #include "../Entities/ArrowEntity.h"
+#include "ItemHandler.h"
 
 
 
@@ -24,6 +17,17 @@ public:
 	cItemBowHandler(void) :
 		super(E_ITEM_BOW)
 	{
+	}
+
+
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaShootArrow: return 1;
+			default:            return 0;
+		}
 	}
 
 
@@ -92,7 +96,7 @@ public:
 				ArrowPtr->SetPickupState(cArrowEntity::psNoPickup);
 			}
 
-			a_Player->UseEquippedItem();
+			a_Player->UseEquippedItem(cItemHandler::dlaShootArrow);
 		}
 
 		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
@@ -101,8 +105,3 @@ public:
 		}
 	}
 } ;
-
-
-
-
-

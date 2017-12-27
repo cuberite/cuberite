@@ -17,12 +17,14 @@
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
 #include "ItemCake.h"
+#include "ItemCarrotOnStick.h"
 #include "ItemCauldron.h"
 #include "ItemChest.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
+#include "ItemElytra.h"
 #include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
@@ -125,10 +127,12 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BOW:                 return new cItemBowHandler();
 		case E_ITEM_BREWING_STAND:       return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAKE:                return new cItemCakeHandler(a_ItemType);
+		case E_ITEM_CARROT_ON_STICK:     return new cItemCarrotOnStickHandler(a_ItemType);
 		case E_ITEM_CAULDRON:            return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:                 return new cItemEggHandler();
+		case E_ITEM_ELYTRA:              return new cItemElytraHandler(a_ItemType);
 		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
 		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
@@ -494,10 +498,8 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
 	}
 
-	if (!cBlockInfo::IsOneHitDig(Block))
-	{
-		a_Player->UseEquippedItem(GetDurabilityLossByAction(dlaBreakBlock));
-	}
+	auto Action = (cBlockInfo::IsOneHitDig(Block) ? dlaBreakBlockInstant : dlaBreakBlock);
+	a_Player->UseEquippedItem(Action);
 }
 
 
@@ -507,7 +509,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 void cItemHandler::OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity)
 {
 	UNUSED(a_AttackedEntity);
-	a_Attacker->UseEquippedItem(GetDurabilityLossByAction(dlaAttackEntity));
+	a_Attacker->UseEquippedItem(dlaAttackEntity);
 }
 
 
@@ -527,15 +529,9 @@ void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_I
 
 short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
 {
-	switch (a_Action)
-	{
-		case dlaAttackEntity: return 2;
-		case dlaBreakBlock:   return 1;
-	}
+	UNUSED(a_Action);
 
-	#ifndef __clang__
 	return 0;
-	#endif
 }
 
 
@@ -865,4 +861,3 @@ float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block)
 {
 	return 1.0f;
 }
-

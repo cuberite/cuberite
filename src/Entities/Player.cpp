@@ -2330,35 +2330,30 @@ bool cPlayer::SaveToDisk()
 
 
 
-void cPlayer::UseEquippedItem(int a_Amount)
+void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 {
-	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
+	// No durability loss in creative or spectator modes:
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}
 
-	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	// Get item being used:
 	cItem Item = GetEquippedItem();
-	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
-	if (UnbreakingLevel > 0)
-	{
-		double chance = 0.0;
-		if (ItemCategory::IsArmor(Item.m_ItemType))
-		{
-			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
-		}
-		else
-		{
-			chance = 1.0 / (UnbreakingLevel + 1);
-		}
 
-		if (GetRandomProvider().RandBool(chance))
-		{
-			return;
-		}
+	// Get base damage for action type:
+	Int16 Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
+
+	// If the item has an unbreaking enchantment, give it a chance of escaping damage:
+	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
+	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
+	double chance = 1 - (1.0 / (UnbreakingLevel + 1));
+	if (GetRandomProvider().RandBool(chance))
+	{
+		return;
 	}
 
-	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
+	if (GetInventory().DamageEquippedItem(Dmg))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}

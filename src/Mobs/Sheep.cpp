@@ -66,7 +66,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
-		a_Player.UseEquippedItem();
+		a_Player.UseEquippedItem(cItemHandler::dlaShearSheep);
 
 		cItems Drops;
 		char NumDrops = GetRandomProvider().RandInt<char>(1, 3);
@@ -208,4 +208,3 @@ NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 		return E_META_WOOL_PINK;
 	}
 }
-

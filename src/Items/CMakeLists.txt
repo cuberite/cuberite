@@ -16,12 +16,14 @@ SET (HDRS
 	ItemBrewingStand.h
 	ItemBucket.h
 	ItemCake.h
+	ItemCarrotOnStick.h
 	ItemCauldron.h
 	ItemChest.h
 	ItemCloth.h
 	ItemComparator.h
 	ItemDoor.h
 	ItemDye.h
+	ItemElytra.h
 	ItemEmptyMap.h
 	ItemFishingRod.h
 	ItemFlowerPot.h

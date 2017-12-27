@@ -59,7 +59,7 @@ public:
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
 			a_World->BroadcastSoundEffect("item.hoe.till", {a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5}, 1.0f, 0.8f);
-			a_Player->UseEquippedItem();
+			a_Player->UseEquippedItem(cItemHandler::dlaTilling);
 			return true;
 		}
 
@@ -69,9 +69,11 @@ public:
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
-		return 0;
+		switch (a_Action)
+		{
+			case dlaAttackEntity:  return 1;
+			case dlaTilling:       return 1;
+			default:               return 0;
+		}
 	}
 } ;
-
-
-
