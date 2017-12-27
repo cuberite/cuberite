@@ -11,8 +11,8 @@ class cBlockConcretePowderHandler :
 	public cBlockHandler
 {
 public:
-	cBlockConcretePowderHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockConcretePowderHandler(BLOCKTYPE a_BlockType):
+		cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -22,15 +22,20 @@ public:
 
 	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
-		GetSoaked(Vector3i(a_RelX, a_RelY, a_RelZ), a_Chunk);
+		if (GetSoaked(Vector3i(a_RelX, a_RelY, a_RelZ), a_Chunk))
+		{
+			return;
+		}
+		cBlockHandler::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
 	}
 
 
 
 
 
-	/** Check blocks above and around to see if they are water. If one is, convert this into concrete block */
-	void GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
+	/** Check blocks above and around to see if they are water. If one is, convert this into concrete block.
+		Returns TRUE if the block was changed. */
+	bool GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		bool ShouldSoak = false;
 
@@ -42,22 +47,28 @@ public:
 			Vector3i( 0, 0, -1),
 			Vector3i( 0, 1,  0),
 		};
+		BLOCKTYPE NeighborType;
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
-			if (IsBlockWater(a_Chunk.GetBlock({a_Rel.x + Coords[i].x, a_Rel.y + Coords[i].y, a_Rel.z + Coords[i].z})))
+			if (!a_Chunk.UnboundedRelGetBlockType(a_Rel.x + Coords[i].x, a_Rel.y + Coords[i].y, a_Rel.z + Coords[i].z, NeighborType))
+			{
+				continue;
+			}
+			if (IsBlockWater(NeighborType))
 			{
 				ShouldSoak = true;
-				continue;
+				break;
 			}
 		}  // for i - Coords[]
 
 		if (ShouldSoak)
 		{
-			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			a_Chunk.GetBlockTypeMeta(a_Rel.x, a_Rel.y, a_Rel.z, BlockType, BlockMeta);
+			BlockMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
 			a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_CONCRETE, BlockMeta);
+			return true;
 		}
+		return false;
 	}
 
 
