@@ -72,8 +72,6 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		return;
 	}
 
-	SoakNeighbors(a_Chunk, Vector3i(a_RelX, a_RelY, a_RelZ), MyBlock);
-
 	if (MyMeta != 0)
 	{
 		// Source blocks aren't checked for tributaries, others are.
@@ -429,39 +427,5 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 	return false;
 }
 
-void cFloodyFluidSimulator::SoakNeighbors(cChunk * a_Chunk, Vector3i a_Rel, BLOCKTYPE a_BlockType)
-{
-	// Only water blocks can soak neighboring blocks
-	if (!IsBlockWater(a_BlockType))
-	{
-		return;
-	}
-
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	// The blocks adjacent and below this water can be soaked
-	static const Vector3i Coords[] =
-	{
-		Vector3i( 1,  0,  0),
-		Vector3i(-1,  0,  0),
-		Vector3i( 0,  0,  1),
-		Vector3i( 0,  0, -1),
-		Vector3i( 0, -1,  0),
-	};
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
-	{
-		if (!a_Chunk->UnboundedRelGetBlock(a_Rel.x + Coords[i].x, a_Rel.y + Coords[i].y, a_Rel.z + Coords[i].z, BlockType, BlockMeta))
-		{
-			continue;
-		}
-		// Only concrete powder can be soaked
-		if (BlockType == E_BLOCK_CONCRETE_POWDER)
-		{
-			a_Chunk->SetBlock(a_Rel.x + Coords[i].x, a_Rel.y + Coords[i].y, a_Rel.z + Coords[i].z, E_BLOCK_CONCRETE, BlockMeta);
-		}
-	}  // for i - Coords[]
-
-	return;
-}
 
 
