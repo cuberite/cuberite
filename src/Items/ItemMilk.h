@@ -17,14 +17,14 @@ public:
 		return true;
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item, eHand a_Hand) override
 	{
 		UNUSED(a_Item);
 		a_Player->ClearEntityEffects();
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player->GetInventory().RemoveOneEquippedItem(a_Hand);
 			a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
 		}
 		return true;

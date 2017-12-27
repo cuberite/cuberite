@@ -68,22 +68,17 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 		) override
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			return false;
-		}
-
 		Vector3i BlockPos;
 		if (!GetBlockFromTrace(a_World, a_Player, BlockPos))
 		{
 			return false;  // Nothing in range.
 		}
 
-		a_Player->GetInventory().RemoveOneEquippedItem();
+		a_Player->GetInventory().RemoveOneEquippedItem(a_Hand);
 		cItem NewItem(E_ITEM_POTION, 1, 0);
 		a_Player->GetInventory().AddItem(NewItem);
 		return true;

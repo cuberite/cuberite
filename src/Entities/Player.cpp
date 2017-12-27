@@ -507,10 +507,11 @@ int cPlayer::DeltaExperience(int a_Xp_delta)
 
 
 
-void cPlayer::StartChargingBow(void)
+void cPlayer::StartChargingBow(eHand a_Hand)
 {
 	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
+	m_ChargingBowHand = a_Hand;
 	m_BowCharge = 0;
 	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
@@ -647,13 +648,15 @@ void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 
 
 
-void cPlayer::StartEating(void)
+void cPlayer::StartEating(eHand h_Hand)
 {
 	// Set the timer:
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
+	m_EatingWithHand = h_Hand;
 
 	// Send the packets:
-	m_World->BroadcastEntityAnimation(*this, 3);
+	// TODO(9caihezi): The animation varies from version to version. Add a related function in Protocol class
+	//m_World->BroadcastEntityAnimation(*this, 3);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -671,10 +674,10 @@ void cPlayer::FinishEating(void)
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
-	cItem Item(GetEquippedItem());
+	cItem Item(GetEquippedItem(m_EatingWithHand));
 	Item.m_ItemCount = 1;
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Item.m_ItemType);
-	if (!ItemHandler->EatItem(this, &Item))
+	if (!ItemHandler->EatItem(this, &Item, m_EatingWithHand))
 	{
 		return;
 	}
@@ -2330,7 +2333,7 @@ bool cPlayer::SaveToDisk()
 
 
 
-void cPlayer::UseEquippedItem(int a_Amount)
+void cPlayer::UseEquippedItem(int a_Amount, eHand a_Hand)
 {
 	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
 	{
@@ -2338,7 +2341,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	}
 
 	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
-	cItem Item = GetEquippedItem();
+	cItem Item = GetEquippedItem(a_Hand);
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
 	if (UnbreakingLevel > 0)
 	{
@@ -2358,7 +2361,8 @@ void cPlayer::UseEquippedItem(int a_Amount)
 		}
 	}
 
-	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
+	bool successful = GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount), a_Hand);
+	if (successful)
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}

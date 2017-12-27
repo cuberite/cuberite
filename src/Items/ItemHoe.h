@@ -20,20 +20,27 @@ public:
 
 
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
+
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
-		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_BlockY >= cChunkDef::Height))
+		if (a_BlockY >= cChunkDef::Height)
 		{
 			return false;
 		}
-		BLOCKTYPE UpperBlock = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+		BLOCKTYPE UpperBlock = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
 
 		BLOCKTYPE Block;
 		NIBBLETYPE BlockMeta;
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
+		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
 
 		if (((Block == E_BLOCK_DIRT) || (Block == E_BLOCK_GRASS)) && (UpperBlock == E_BLOCK_AIR))
 		{
@@ -57,9 +64,9 @@ public:
 				}
 			}
 
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
-			a_World->BroadcastSoundEffect("item.hoe.till", {a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5}, 1.0f, 0.8f);
-			a_Player->UseEquippedItem();
+			a_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
+			a_World.BroadcastSoundEffect("item.hoe.till", {a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5}, 1.0f, 0.8f);
+			a_Player.UseEquippedItem();
 			return true;
 		}
 

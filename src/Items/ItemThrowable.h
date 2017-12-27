@@ -28,8 +28,8 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
 		Vector3d Pos = a_Player->GetThrowStartPos();
@@ -38,14 +38,14 @@ public:
 		// Play sound
 		a_World->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0), 0.5f, 0.4f / GetRandomProvider().RandReal(0.8f, 1.2f));
 
-		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
+		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem(a_Hand), &Speed) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player->GetInventory().RemoveOneEquippedItem(a_Hand);
 		}
 
 		return true;
@@ -132,25 +132,31 @@ public:
 	}
 
 
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
-		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
+		if (a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
 		{
 			return false;
 		}
 
-		if (a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem()) == 0)
+		if (a_World.CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, &a_Player, &a_Player.GetEquippedItem()) == 0)
 		{
 			return false;
 		}
 
-		if (!a_Player->IsGameModeCreative())
+		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player.GetInventory().RemoveOneEquippedItem();
 		}
 
 		return true;

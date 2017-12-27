@@ -19,10 +19,16 @@ public:
 	}
 
 
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
 
-	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
 		if (a_BlockFace < 0)
@@ -37,15 +43,15 @@ public:
 			a_BlockY--;
 		}
 
-		eMonsterType MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
+		eMonsterType MonsterType = ItemDamageToMonsterType(a_EquippedItem.m_ItemDamage);
 		if (
 			(MonsterType != mtInvalidType) &&  // Valid monster type
-			(a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
+			(a_World.SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
 		{
-			if (!a_Player->IsGameModeCreative())
+			if (!a_Player.IsGameModeCreative())
 			{
 				// The mob was spawned, "use" the item:
-				a_Player->GetInventory().RemoveOneEquippedItem();
+				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			return true;
 		}

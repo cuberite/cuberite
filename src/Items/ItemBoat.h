@@ -26,18 +26,11 @@ public:
 	{
 	}
 
-
-
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_Item, eHand a_Hand
 	) override
 	{
-		if ((a_BlockFace != BLOCK_FACE_YM) && (a_BlockFace != BLOCK_FACE_NONE))
-		{
-			return false;
-		}
-
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
 		{
@@ -103,7 +96,7 @@ public:
 		// Remove boat from players hand
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player->GetInventory().RemoveOneEquippedItem(a_Hand);
 		}
 
 		return true;

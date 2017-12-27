@@ -1394,60 +1394,6 @@ void cClientHandle::FinishDigAnimation()
 
 
 
-
-void cClientHandle::HandleUseItem(eHand a_Hand)
-{
-	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
-	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
-	// In version >= 1.9, there is a new packet id for "Use Item".
-
-	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
-	a_Hand = eHand::hMain;
-	const cItem & heldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(heldItem.m_ItemType);
-	cWorld * World = m_Player->GetWorld();
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-
-	// Use item in main / off hand
-	// TODO: do we need to sync the current inventory with client if it fails?
-	if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator())
-	{
-		return;
-	}
-
-	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(heldItem.m_ItemDamage))
-	{
-		if (
-			ItemHandler->IsFood() &&
-			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
-			(heldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
-		)
-		{
-			// The player is satiated or in creative, and trying to eat
-			return;
-		}
-		if (!PlgMgr->CallHookPlayerEating(*m_Player))
-		{
-			m_Player->StartEating();
-		}
-	}
-	else
-	{
-		// Use an item in hand without a target block
-		if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
-		{
-			// All plugins agree with using the item
-			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler->OnItemUse(World, m_Player, PluginInterface, heldItem, -1, 255, -1, BLOCK_FACE_NONE);
-			PlgMgr->CallHookPlayerUsedItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0);
-		}
-	}
-}
-
-
-
-
-
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand)
 {
 	// This function handles three actions:
@@ -1468,6 +1414,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// TODO: Move use item into a dedicated function.
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
+	eHand a_HandReal = a_Hand; // TODO: remove this
 	a_Hand = eHand::hMain;
 	const cItem & HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
@@ -1539,7 +1486,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				// All plugins agree with using the item
 				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_HandReal);
 				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 				Success = true;
 			}
@@ -1788,6 +1735,60 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 		}
 	);
 }
+
+
+
+
+
+void cClientHandle::HandleUseItem(eHand a_Hand)
+{
+	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
+	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
+	// In version >= 1.9, there is a new packet id for "Use Item".
+
+	const cItem & HeldItem = a_Hand == eHand::hOff ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
+	cWorld * World = m_Player->GetWorld();
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+
+	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_Hand, ItemToFullString(HeldItem).c_str());
+
+	// Use item in main / off hand
+	// TODO: do we need to sync the current inventory with client if it fails?
+	if (m_Player->IsFrozen() || m_Player->IsGameModeSpectator())
+	{
+		return;
+	}
+
+	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(HeldItem.m_ItemDamage))
+	{
+		if (
+			ItemHandler->IsFood() &&
+			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
+			(HeldItem.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
+		)
+		{
+			// The player is satiated or in creative, and trying to eat
+			return;
+		}
+		if (!PlgMgr->CallHookPlayerEating(*m_Player))
+		{
+			m_Player->StartEating(a_Hand);
+		}
+	}
+	else
+	{
+		// Use an item in hand without a target block
+		if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
+		{
+			// All plugins agree with using the item
+			cBlockInServerPluginInterface PluginInterface(*World);
+			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_Hand);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0);
+		}
+	}
+}
+
 
 
 
