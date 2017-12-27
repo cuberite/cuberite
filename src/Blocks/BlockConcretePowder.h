@@ -20,9 +20,9 @@ public:
 
 
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
-		GetSoaked(Vector3i(a_BlockX, a_BlockY, a_BlockZ), a_BlockMeta, a_ChunkInterface);
+		GetSoaked(Vector3i(a_RelX, a_RelY, a_RelZ), a_Chunk);
 	}
 
 
@@ -30,7 +30,7 @@ public:
 
 
 	/** Check blocks above and around to see if they are water. If one is, convert this into concrete block */
-	void GetSoaked(Vector3i a_Rel, NIBBLETYPE a_BlockMeta, cChunkInterface & a_Chunk)
+	void GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		bool ShouldSoak = false;
 
@@ -53,7 +53,10 @@ public:
 
 		if (ShouldSoak)
 		{
-			a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_CONCRETE, a_BlockMeta);
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			a_Chunk.GetBlockTypeMeta(a_Rel.x, a_Rel.y, a_Rel.z, BlockType, BlockMeta);
+			a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_CONCRETE, BlockMeta);
 		}
 	}
 
