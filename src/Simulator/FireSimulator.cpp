@@ -147,16 +147,11 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		/*
-		FLOG("FS: Fire at {%d, %d, %d} is stepping",
-			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
-		);
-		*/
 		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
 			FLOG("FS: Fire at {%d, %d, %d} burnt out, removing the fire block",
-				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+				AbsPos.x, AbsPos.y, AbsPos.z
 			);
 			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
 			RemoveFuelNeighbors(a_Chunk, x, y, z);
@@ -350,22 +345,15 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 				}
 
 				// Start the fire in the neighbor {x, y, z}
-				/*
-				FLOG("FS: Trying to start fire at {%d, %d, %d}.",
-					x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
-				);
-				*/
 				if (CanStartFireInBlock(a_Chunk, x, y, z))
 				{
-					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
-					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
-
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
+					auto AbsPos = cChunkDef::RelativeToAbsolute({x, y, z}, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos.x, AbsPos.y, AbsPos.z, ssFireSpread))
 					{
 						return;
 					}
 
-					FLOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
+					FLOG("FS: Starting new fire at {%d, %d, %d}.", AbsPos.x, AbsPos.y, AbsPos.z);
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
 			}  // for y
