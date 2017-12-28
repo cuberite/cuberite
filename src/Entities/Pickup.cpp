@@ -155,7 +155,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
 				if (m_Timer > std::chrono::milliseconds(500))
 				{
-					Destroy(true);
+					Destroy();
 					return;
 				}
 			}
@@ -179,14 +179,14 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_Timer > std::chrono::milliseconds(500))  // 0.5 second
 		{
-			Destroy(true);
+			Destroy();
 			return;
 		}
 	}
 
 	if (m_Timer > m_Lifetime)
 	{
-		Destroy(true);
+		Destroy();
 		return;
 	}
 }
@@ -199,7 +199,7 @@ bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtCactusContact)
 	{
-		Destroy(true);
+		Destroy();
 		return true;
 	}
 

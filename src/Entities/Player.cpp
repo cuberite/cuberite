@@ -156,9 +156,6 @@ bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
-	// Spawn the entity on the clients:
-	GetWorld()->BroadcastSpawnEntity(*this);
-
 	return true;
 }
 
@@ -206,6 +203,9 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
+
+	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
+
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
 	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
@@ -1977,12 +1977,6 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	if (m_World != a_WorldChangeInfo.m_NewWorld)
-	{
-		// Tell others we are gone
-		GetWorld()->BroadcastDestroyEntity(*this);
-	}
-
 	#ifdef _DEBUG
 		// Take note of old chunk coords
 		auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
@@ -2028,9 +2022,6 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 			ch->SendWeather(a_WorldChangeInfo.m_NewWorld->GetWeather());
 		}
 	}
-
-	// Broadcast the player into the new world.
-	a_WorldChangeInfo.m_NewWorld->BroadcastSpawnEntity(*this);
 
 	LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 		this->GetName().c_str(),
@@ -2432,7 +2423,7 @@ void cPlayer::HandleFloater()
 	}
 	m_World->DoWithEntityByID(m_FloaterID, [](cEntity & a_Entity)
 		{
-			a_Entity.Destroy(true);
+			a_Entity.Destroy();
 			return true;
 		}
 	);

@@ -157,19 +157,28 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
-	// Spawn the entity on the clients:
-	a_EntityWorld.BroadcastSpawnEntity(*this);
-
-	// If has any mob leashed broadcast every leashed entity to this
-	if (HasAnyMobLeashed())
-	{
-		for (auto LeashedMob : m_LeashedMobs)
-		{
-			m_World->BroadcastLeashEntity(*LeashedMob, *this);
-		}
-	}
-
 	return true;
+}
+
+
+
+
+
+void cEntity::OnAddToWorld(cWorld & a_World)
+{
+	// Spawn the entity on the clients:
+	a_World.BroadcastSpawnEntity(*this);
+	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnRemoveFromWorld(cWorld & a_World)
+{
+	RemoveAllLeashedMobs();
+	a_World.BroadcastDestroyEntity(*this);
 }
 
 
@@ -222,7 +231,7 @@ cChunk * cEntity::GetParentChunk()
 
 
 
-void cEntity::Destroy(bool a_ShouldBroadcast)
+void cEntity::Destroy()
 {
 	SetIsTicking(false);
 
@@ -230,11 +239,6 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	while (!m_LeashedMobs.empty())
 	{
 		m_LeashedMobs.front()->Unleash(true, true);
-	}
-
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
 	}
 
 	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
@@ -1497,12 +1501,6 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
 	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
-	if (m_World != a_WorldChangeInfo.m_NewWorld)
-	{
-		// Tell others we are gone
-		m_World->BroadcastDestroyEntity(*this);
-	}
-
 	#ifdef _DEBUG
 		// Take note of old chunk coords
 		auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
@@ -1525,8 +1523,6 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
-
-	a_WorldChangeInfo.m_NewWorld->BroadcastSpawnEntity(*this);
 
 	// Add to new world and removal from the old one
 	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
@@ -2228,4 +2224,32 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
 
 	m_LeashedMobs.remove(a_Monster);
+}
+
+
+
+
+
+void cEntity::RemoveAllLeashedMobs()
+{
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(false, true);
+	}
+}
+
+
+
+
+
+void cEntity::BroadcastLeashedMobs()
+{
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
 }

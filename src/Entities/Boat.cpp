@@ -59,7 +59,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 				m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 0, 0, 0, true);
 			}
 		}
-		Destroy(true);
+		Destroy();
 	}
 	return true;
 }

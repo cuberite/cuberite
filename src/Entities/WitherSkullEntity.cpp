@@ -43,7 +43,7 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	// TODO: Explode
 	// TODO: Apply wither effect to entity and others nearby
 
-	Destroy(true);
+	Destroy();
 }
 
 

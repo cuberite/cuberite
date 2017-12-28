@@ -28,7 +28,7 @@ public:
 		m_Pos = Floater.GetPosition();
 		m_BitePos = Floater.GetBitePos();
 		m_AttachedMobID = Floater.GetAttachedMobID();
-		Floater.Destroy(true);
+		Floater.Destroy();
 		return true;
 	}
 

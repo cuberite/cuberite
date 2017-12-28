@@ -43,7 +43,7 @@ public:
 
 	virtual ~cMonster() override;
 
-	virtual void Destroy(bool a_ShouldBroadcast = true) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	virtual void Destroyed() override;
 

@@ -172,6 +172,16 @@ public:
 	Adds the entity to the world. */
 	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
+	/** Called when the entity is added to a world.
+	e.g after first spawning or after successfuly moving between worlds.
+	\param a_World The world being added to. */
+	virtual void OnAddToWorld(cWorld & a_World);
+
+	/** Called when the entity is removed from a world.
+	e.g. When the entity is destroyed or moved to a different world.
+	\param a_World The world being removed from. */
+	virtual void OnRemoveFromWorld(cWorld & a_World);
+
 	// tolua_begin
 
 	eEntityType GetEntityType(void) const { return m_EntityType; }
@@ -277,8 +287,14 @@ public:
 	If this returns false, you must stop using the cEntity pointer you have. */
 	bool IsTicking(void) const;
 
-	/** Destroys the entity and schedules it for memory freeing; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
-	virtual void Destroy(bool a_ShouldBroadcast = true);
+	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
+	virtual void Destroy();
+
+	OBSOLETE void Destroy(bool a_ShouldBroadcast)
+	{
+		LOGWARNING("cEntity:Destory(bool) is deprecated, use cEntity:Destroy() instead.");
+		Destroy();
+	}
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
@@ -444,7 +460,7 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false)
+	OBSOLETE void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false)
 	{
 		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
 		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
@@ -557,13 +573,16 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
-	/** Adds a mob to the leashed list of mobs */
+	/** Adds a mob to the leashed list of mobs. */
 	void AddLeashedMob(cMonster * a_Monster);
 
-	/** Removes a mob from the leashed list of mobs */
+	/** Removes a mob from the leashed list of mobs. */
 	void RemoveLeashedMob(cMonster * a_Monster);
 
-	/** Returs whether the entity has any mob leashed to */
+	/** Removes all mobs from the leashed list of mobs. */
+	void RemoveAllLeashedMobs();
+
+	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
 protected:
@@ -689,6 +708,9 @@ protected:
 	/** Called once per tick to set m_IsInFire, m_IsInLava, m_IsInWater and
 	m_IsHeadInWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
+
+	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
+	void BroadcastLeashedMobs();
 
 private:
 

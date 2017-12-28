@@ -165,14 +165,20 @@ endif ()
 
 set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
 
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
+if (NOT MSVC)
+	set(BINDING_COMPILE_FLAGS "-Wno-error -Wno-deprecated")
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	if(NOT APPLE AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5) # Workaround for VERSION_GREATER_EQUAL, which is only supported on CMake 3.7+
-		set(ADDITIONAL_FLAGS "-Wno-zero-as-null-pointer-constant")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(BINDING_COMPILE_FLAGS "${BINDING_COMPILE_FLAGS} -Wno-old-style-cast -Wno-missing-prototypes")
+		if(NOT APPLE AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5) # Workaround for VERSION_GREATER_EQUAL, which is only supported on CMake 3.7+
+			set(BINDING_COMPILE_FLAGS "${BINDING_COMPILE_FLAGS} -Wno-zero-as-null-pointer-constant")
+		endif()
 	endif()
-	set_source_files_properties(Bindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast -Wno-missing-prototypes ${ADDITIONAL_FLAGS}")
+else()
+	set(BINDING_COMPILE_FLAGS "/Wd4996")  # Disable deprecation warnings
 endif()
+
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "${BINDING_COMPILE_FLAGS}")
 
 if(NOT MSVC)
 	add_library(Bindings ${SRCS} ${HDRS})
