@@ -430,6 +430,8 @@ public:
 		else
 		{
 			m_ParentRequest.GetCallbacks().OnBodyFinished();
+			// Finished recieving data, shutdown the link
+			m_Link->Shutdown();
 		}
 	}
 
