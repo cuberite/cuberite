@@ -1909,7 +1909,15 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	UNUSED(a_Player);
+	//UNUSED(a_Player);
+	if (a_SlotNum == 1) // Input slot
+	{
+		if (m_Furnace->GetLastSmelter() != & a_Player) // If another player has modified the input slot, reset reward counter
+		{
+			m_Furnace->GetReward(); // Reset reward counter
+		}
+	}
+	m_Furnace->SetLastSmelter(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
@@ -1932,11 +1940,17 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
 {
-	int Reward = m_Furnace->GetReward();
-	if (Reward)
+	if (& a_Player == m_Furnace->GetLastSmelter())
 	{
-		a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+		int Reward = m_Furnace->GetReward();
+		LOG("Reward %d\n", Reward);
+		if (Reward)
+		{
+			
+			a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+		}
 	}
+	
 
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)

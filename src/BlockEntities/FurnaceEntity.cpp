@@ -23,7 +23,7 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsDestroyed(false),
@@ -32,7 +32,8 @@ cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
 	m_TimeBurned(0),
-	m_IsLoading(false)
+	m_IsLoading(false),
+	m_LastSmelter(nullptr)
 {
 	m_Contents.AddListener(*this);
 }
@@ -169,23 +170,18 @@ bool cFurnaceEntity::ContinueCooking(void)
 	return m_IsCooking;
 }
 
+
+
+
+
 int cFurnaceEntity::GetReward(void)
 {
-	float RawReward = m_CurrentRecipe->Reward;
-	float Multiplier = GetOutputSlot().m_ItemCount;
-	if ((RawReward != 0.0) && (Multiplier != 0.0))
+	if (GetRandomProvider().RandBool(Remainder))
 	{
-		RawReward *= Multiplier;
-		int Reward = int(RawReward);
-		float Remainder = RawReward - Reward;
-		// Remainder is used as the percentage chance of getting an extra exp point
-		if ((Remainder != 0.0) && (GetRandomProvider().RandBool(Remainder)))
-		{
-			Reward++;
-		}
-		return Reward;
+		Reward++;
 	}
-	return 0;
+	m_RewardCounter = 0.0;
+	return Reward;
 }
 
 
@@ -208,6 +204,7 @@ void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
 void cFurnaceEntity::FinishOne()
 {
 	m_TimeCooked = 0;
+	m_RewardCounter += m_CurrentRecipe->Reward;
 
 	if (m_Contents.GetSlot(fsOutput).IsEmpty())
 	{
