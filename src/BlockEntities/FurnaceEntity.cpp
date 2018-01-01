@@ -176,6 +176,9 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 int cFurnaceEntity::GetReward(void)
 {
+	int Reward = FloorC(m_RewardCounter);
+	float Remainder = m_RewardCounter - (float)Reward;
+	// Remainder is used as the percentage chance of getting an extra xp point
 	if (GetRandomProvider().RandBool(Remainder))
 	{
 		Reward++;
