@@ -1,7 +1,7 @@
 
 // HeightMap.cpp
 
-// Implements the cHeightMap class representing a cCallback descendant that draws a B&W map of heights for the world
+// Implements the cHeightMap class representing a cCallback descendant that draws a B & W map of heights for the world
 
 #include "Globals.h"
 #include "HeightMap.h"
@@ -253,7 +253,7 @@ bool cHeightMap::IsGround(BLOCKTYPE a_BlockType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeightMapFactory:
 
 cHeightMapFactory::~cHeightMapFactory()
@@ -265,7 +265,3 @@ cHeightMapFactory::~cHeightMapFactory()
 	}
 	// TODO: Join all the files into one giant image file
 }
-
-
-
-

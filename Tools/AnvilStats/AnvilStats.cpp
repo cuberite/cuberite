@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
 		LOG("\nNo method number present, aborting.");
 		return -1;
 	}
-	
+
 	AString WorldFolder;
 	if (argc > 2)
 	{
@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
 	{
 		WorldFolder = "." + cFile::PathSeparator;
 	}
-	
+
 	cCallbackFactory * Factory = NULL;
 	switch (atol(argv[1]))
 	{
@@ -59,14 +59,10 @@ int main(int argc, char * argv[])
 	}
 	cProcessor Processor;
 	Processor.ProcessWorld(WorldFolder, *Factory);
-	
+
 	LOG("Processing finished");
-	
+
 	delete Factory;
-	
+
 	LOG("Done");
 }
-
-
-
-

@@ -50,7 +50,7 @@ void ShowHelp(const char * a_ProgramFullName)
 int main(int argc, char * argv[])
 {
 	new cMCLogger;  // Create a new logger, it will assign itself as the main logger instance
-	
+
 	AString MCAFolder = ".";
 	for (int i = 1; i < argc; i++)
 	{
@@ -74,24 +74,20 @@ int main(int argc, char * argv[])
 			return 0;
 		}
 	}
-	
+
 	cRegions Regions;
-	
+
 	/*
 	// DEBUG: Read input from a file instead of stdin:
 	std::fstream fs("test_in.txt");
 	Regions.Read(fs);
 	//*/
-	
+
 	Regions.Read(std::cin);
-	
+
 	cZapper Zapper(MCAFolder);
 	Zapper.ZapRegions(Regions.GetAll());
-	
+
 	LOGINFO("Done");
 	return 0;
 } ;
-
-
-
-

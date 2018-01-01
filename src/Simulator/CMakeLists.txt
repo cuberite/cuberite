@@ -29,7 +29,6 @@ SET (HDRS
 	VaporizeFluidSimulator.h
 )
 
-
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
 endif()
