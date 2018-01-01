@@ -35,8 +35,8 @@ public:
 		NIBBLETYPE UnderMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, UnderType, UnderMeta);
 		return (
-			((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) &&  // Water is below...
-			(UnderMeta == 0)                                                              // ... and it's a source
+			(((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) && (UnderMeta == 0)) ||  // A water source is below
+			(UnderType == E_BLOCK_ICE) || (UnderType == E_BLOCK_FROSTED_ICE)                                    // Or (frosted) ice
 		);
 	}
 };

@@ -3128,11 +3128,11 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 					}
 					else if (PotionEffect.find("thick") != AString::npos)
 					{
-						a_Item.m_ItemDamage = 20;
+						a_Item.m_ItemDamage = 32;
 					}
 					else if (PotionEffect.find("awkward") != AString::npos)
 					{
-						a_Item.m_ItemDamage = 10;
+						a_Item.m_ItemDamage = 16;
 					}
 					else if (PotionEffect.find("regeneration") != AString::npos)
 					{
