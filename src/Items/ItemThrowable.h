@@ -1,7 +1,7 @@
 
 // ItemThrowable.h
 
-// Declares the itemhandlers for throwable items: eggs, snowballs and ender pearls
+// Declares the itemhandlers for throwable items: eggs, snowballs, ender pearls, and eyes of ender.
 
 
 
