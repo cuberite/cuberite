@@ -854,7 +854,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Position changed -> super::Tick() called:
 		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT)
 
-		// Set swim states (water, lava, and fire);
+		// Set swim states (water, lava, and fire):
 		SetSwimState(*NextChunk);
 
 		// Handle catching on fire and burning:
@@ -882,7 +882,6 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Handle drowning:
 		if (IsMob() || IsPlayer())
 		{
-
 			HandleAir();
 		}
 

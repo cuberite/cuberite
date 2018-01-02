@@ -154,10 +154,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 			BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
 
-			if (
-				IsBlockLava(BlockBelow) || (BlockBelow == E_BLOCK_FIRE) ||
-				IsBlockLava(BlockIn) || (BlockIn == E_BLOCK_FIRE)
-			)
+			if (IsOnFire())
 			{
 				m_bCollected = true;
 				m_Timer = std::chrono::milliseconds(0);  // We have to reset the timer.
@@ -261,7 +258,3 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
 	return false;
 }
-
-
-
-
