@@ -833,6 +833,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_InvulnerableTicks--;
 	}
 
+	// Non-players are destroyed as soon as they fall out of the world:
 	if ((GetPosY() < 0) && (!IsPlayer()))
 	{
 		Destroy();
@@ -850,11 +851,16 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			return;
 		}
 
-		// Position changed -> super::Tick() called
+		// Position changed -> super::Tick() called:
 		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT)
 
+		// Set swim states (water, lava, and fire);
+		SetSwimState(*NextChunk);
+
+		// Handle catching on fire and burning:
 		TickBurning(*NextChunk);
 
+		// Damage players if they are in the void
 		if (GetPosY() < VOID_BOUNDARY)
 		{
 			TickInVoid(*NextChunk);
@@ -864,6 +870,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_TicksSinceLastVoidDamage = 0;
 		}
 
+		// Handle cactus damage or destruction:
 		if (
 			IsMob() || IsPickup() || IsExpOrb() ||
 			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
@@ -871,12 +878,11 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			DetectCacti();
 		}
+
+		// Handle drowning:
 		if (IsMob() || IsPlayer())
 		{
-			// Set swimming state
-			SetSwimState(*NextChunk);
 
-			// Handle drowning
 			HandleAir();
 		}
 
