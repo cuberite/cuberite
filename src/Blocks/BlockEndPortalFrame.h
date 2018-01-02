@@ -8,11 +8,21 @@
 
 
 class cBlockEndPortalFrameHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+	public cMetaRotator<cBlockHandler, 0x03,
+	E_META_END_PORTAL_FRAME_ZM,
+	E_META_END_PORTAL_FRAME_XP,
+	E_META_END_PORTAL_FRAME_ZP,
+	E_META_END_PORTAL_FRAME_XM
+	>
 {
 public:
 	cBlockEndPortalFrameHandler(BLOCKTYPE a_BlockType):
-		cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
+		cMetaRotator<cBlockHandler, 0x03,
+		E_META_END_PORTAL_FRAME_ZM,
+		E_META_END_PORTAL_FRAME_XP,
+		E_META_END_PORTAL_FRAME_ZP,
+		E_META_END_PORTAL_FRAME_XM
+		>(a_BlockType)
 	{
 	}
 
@@ -28,7 +38,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = EndPortalRotationToMetaData(a_Player.GetYaw());
+		a_BlockMeta = YawToMetaData(a_Player.GetYaw());
 		return true;
 	}
 
@@ -36,7 +46,7 @@ public:
 
 
 
-	inline static NIBBLETYPE EndPortalRotationToMetaData(double a_Rotation)
+	inline static NIBBLETYPE YawToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
 		if (a_Rotation > 360)
@@ -46,19 +56,19 @@ public:
 
 		if ((a_Rotation >= 0) && (a_Rotation < 90))
 		{
-			return 0x1;
+			return E_META_END_PORTAL_FRAME_XM;
 		}
 		else if ((a_Rotation >= 180) && (a_Rotation < 270))
 		{
-			return 0x3;
+			return E_META_END_PORTAL_FRAME_XP;
 		}
 		else if ((a_Rotation >= 90) && (a_Rotation < 180))
 		{
-			return 0x2;
+			return E_META_END_PORTAL_FRAME_ZM;
 		}
 		else
 		{
-			return 0x0;
+			return E_META_END_PORTAL_FRAME_ZP;
 		}
 	}
 
@@ -68,9 +78,9 @@ public:
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		// 0x4 is the bit which signifies the eye of ender is in it.
+		// E_META_END_PORTAL_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);
-		if ((a_BlockMeta & 4) == 4)
+		if ((a_BlockMeta & E_META_END_PORTAL_EYE) == E_META_END_PORTAL_EYE)
 		{
 			// LOG("Location is %d %d %d", a_BlockX, a_BlockY, a_BlockZ);
 			// Direction is the first two bits, masked by 0x3
@@ -102,14 +112,18 @@ public:
 		- Check diagonally (clockwise) for another portal block
 			- if exists, and has eye, Continue. Abort if any are facing the wrong direction.
 			- if doesn't exist, check horizontally (the block to the left of this block). Abort if there is no horizontal block.
-		- After a corner has been met, circle around each wall, ensuring valid portal frames connect the rectangle.
+		- After a corner has been met, traverse the portal clockwise, ensuring valid portal frames connect the rectangle.
 		- Track the NorthWest Corner, and the dimensions.
 		- If dimensions are valid, create the portal.
 		*/
 
+		// Make sure this is going clockwise.
+		ASSERT(E_META_END_PORTAL_FRAME_ZP - E_META_END_PORTAL_FRAME_XP == 1);
+
 		const int MIN_PORTAL_WIDTH = 3;
 		const int MAX_PORTAL_WIDTH = 4;
 
+		// Directions to use for the clockwise traversal.
 		static const Vector3i Left[] =
 		{
 			{ 1, 0,  0},  // 0, South, left block is East  / XP
@@ -134,27 +148,41 @@ public:
 
 		while (Turns <= 4)
 		{
+			Vector3i Target;
+			BLOCKTYPE TargetBlockType;
+			NIBBLETYPE TargetBlockMeta;
+
 			// Since we start on the first wall, get the corner, then cover each wall, we're effectively scanning 5 walls.
 			if (Proper > (MAX_PORTAL_WIDTH * 5))
 			{
 				return false;
 			}
 
-			int CornerValid = IsValidFrame(Former + LeftForward[(a_Direction + Turns) % 4], (a_Direction + Turns + 1) % 4, a_ChunkInterface);
-			if (CornerValid == E_VALID_PORTAL_FRAME)
+			// (a_Direction + Turns) % 4 is the direction the former block is facing.
+			Target = Former + LeftForward[(a_Direction + Turns) % 4];
+			if (!a_ChunkInterface.GetBlockTypeMeta(Target, TargetBlockType, TargetBlockMeta))
 			{
-				Former = Former + LeftForward[(a_Direction + Turns) % 4];
-				if ((a_Direction + Turns) % 4 == 3)
+				// If the block couldn't be read, fail.
+				return false;
+			}
+
+			// (a_Direction + Turns + 1) % 4 is the direction the corner block should face.
+			if (IsValidFrame(TargetBlockType, TargetBlockMeta, (a_Direction + Turns + 1) % 4))
+			{
+
+				// When the former portal frame faces positive X, this corner will be XM, ZM.
+				if ((a_Direction + Turns) % 4 == E_META_END_PORTAL_FRAME_XP)
 				{
 					// Remember the NW (XM, ZM) Corner
-					// Relative to the previous frame, the portal should appear to the right of the new portal frame.
-					Corner = Former - Left[(a_Direction + Turns) % 4];
+					// Relative to the previous frame, the portal should appear to the right of this portal frame.
+					Corner = Target - Left[(a_Direction + Turns) % 4];
 				}
+				Former = Target;
 				Turns++;
 				Proper++;
 				continue;
 			}
-			else if (CornerValid == E_INVALID_PORTAL_FRAME)
+			else if (IsPortalFrame(TargetBlockType))
 			{
 				// The Portal Frame existed, but was either missing the eye, or was facing the wrong direction.
 				return false;
@@ -162,12 +190,22 @@ public:
 			else
 			{
 
-				// Corner is not a portal block, try edge.
-				int EdgeValid = IsValidFrame(Former + Left[(a_Direction + Turns) % 4], (a_Direction + Turns) % 4, a_ChunkInterface);
-				if (EdgeValid == E_VALID_PORTAL_FRAME)
+				// Corner is not a portal block, check the left edge.
+				Target = Former + Left[(a_Direction + Turns) % 4];
+				if (!a_ChunkInterface.GetBlockTypeMeta(Target, TargetBlockType, TargetBlockMeta))
 				{
+					// If the block couldn't be read, fail.
+					return false;
+				}
+
+				// The edge should face the same direction, (a_Direction + Turns) % 4.
+				if (IsValidFrame(TargetBlockType, TargetBlockMeta, (a_Direction + Turns) % 4))
+				{
+
+					// After the first turn, start tracking length of frame edges (width of portal).
 					if (Turns >= 1)
 					{
+						// X width stored at 0 and 2, Z width at 1 and 3.
 						Width[(a_Direction + Turns) % 4]++;
 
 						if (Width[(a_Direction + Turns) % 4] > MAX_PORTAL_WIDTH)
@@ -176,7 +214,7 @@ public:
 							return false;
 						}
 					}
-					Former = Former + Left[(a_Direction + Turns) % 4];
+					Former = Target;
 					Proper++;
 					continue;
 				}
@@ -216,25 +254,21 @@ public:
 
 
 
-	/** Check a specific block to see if it is a valid portal frame. */
-	EndPortalReturns IsValidFrame(Vector3i a_Pos, NIBBLETYPE a_ShouldFace, cChunkInterface & a_ChunkInterface)
+	/** Return true if this block is a portal frame, has an eye, and is facing the correct direction. */
+	bool IsValidFrame(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_ShouldFace)
 	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (! a_ChunkInterface.GetBlockTypeMeta(a_Pos, BlockType, BlockMeta))
-		{
-			// If we couldn't read the block, pretend it didn't exist.
-			return E_NOT_PORTAL_FRAME;
-		}
-		if (BlockType != E_BLOCK_END_PORTAL_FRAME)
-		{
-			return E_NOT_PORTAL_FRAME;
-		}
-		else if (BlockMeta != (a_ShouldFace | 4))
-		{
-			return E_INVALID_PORTAL_FRAME;
-		}
-		return E_VALID_PORTAL_FRAME;
+		return ((a_BlockType == E_BLOCK_END_PORTAL_FRAME)
+			&& (a_BlockMeta == (a_ShouldFace | E_META_END_PORTAL_EYE))
+		);
+	}
+
+
+
+
+	/** Return true if this block is a portal frame. */
+	bool IsPortalFrame(BLOCKTYPE BlockType)
+	{
+		return (BlockType == E_BLOCK_END_PORTAL_FRAME);
 	}
 
 
