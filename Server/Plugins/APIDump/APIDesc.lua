@@ -3944,16 +3944,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity represents a {{cTNTEntity|TNT entity}}",
 				},
-				IsUnderWater =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the top of the entity is in water",
-				},
 				Killed =
 				{
 					Params =
