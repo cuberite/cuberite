@@ -52,12 +52,8 @@ int main(int argc, char ** argv)
 		LOGERROR("Server initialization failed: %d", res);
 		return res;
 	}
-	
+
 	Server.Run();
-	
+
 	return 0;
 }
-
-
-
-

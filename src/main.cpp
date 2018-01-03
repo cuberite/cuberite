@@ -72,6 +72,14 @@ bool cRoot::m_RunAsService = false;
 
 
 #ifndef _DEBUG
+// Because SIG_DFL or SIG_IGN could be NULL instead of nullptr, we need to disable the Clang warning here
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wunknown-warning-option"
+	#pragma clang diagnostic ignored "-Wunknown-pragmas"
+	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif  // __clang__
+
 static void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
@@ -115,6 +123,10 @@ static void NonCtrlHandler(int a_Signal)
 		default: break;
 	}
 }
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif  // __clang__
 #endif  // _DEBUG
 
 

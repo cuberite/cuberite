@@ -10,7 +10,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSpringStats::cStats
 
 cSpringStats::cStats::cStats(void) :
@@ -41,7 +41,7 @@ void cSpringStats::cStats::Add(const cSpringStats::cStats & a_Other)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSpringStats:
 
 cSpringStats::cSpringStats(void) :
@@ -99,7 +99,7 @@ bool cSpringStats::OnSectionsFinished(void)
 	{
 		return true;
 	}
-	
+
 	// Calc the spring stats:
 	for (int y = 1; y < 255; y++)
 	{
@@ -173,14 +173,14 @@ void cSpringStats::TestSpring(int a_RelX, int a_RelY, int a_RelZ, cSpringStats::
 			}
 		}  // switch (BlockType)
 	}  // for i - Coords[]
-	
+
 	if (!HasFluidNextToIt)
 	{
 		// Surrounded by solids on all sides, this is probably not a spring,
 		// but rather a bedrocked lake or something similar. Dont want.
 		return;
 	}
-	
+
 	// No source blocks next to the specified block, so it is a spring. Add it to stats:
 	a_Stats[a_RelY][((unsigned char *)m_Biomes)[a_RelX + 16 * a_RelZ]] += 1;
 }
@@ -189,7 +189,7 @@ void cSpringStats::TestSpring(int a_RelX, int a_RelY, int a_RelZ, cSpringStats::
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSpringStatsFactory:
 
 cSpringStatsFactory::~cSpringStatsFactory()
@@ -273,7 +273,3 @@ void cSpringStatsFactory::SaveStatistics(const cSpringStats::cStats::SpringStats
 		f.Write(Line.c_str(), Line.size());
 	}
 }
-
-
-
-

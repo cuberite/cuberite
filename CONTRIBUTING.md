@@ -76,6 +76,15 @@ src/CheckBasicStyle.lua 1>&2 -g
 
 Note that the check script is not smart enough to catch everything, so not having any warnings does not necessarily imply that you followed the conventions fully. The other humans working on this will perform more checks before merging.
 
+Github-related conventions
+--------------------------
+The following rules are not strictly enforced, but if you follow them, you will make it easier for us to review your changes.
+ - Use good short title for your PRs. `Store Health as float` is good, `Fix #4024` is not good.
+ - If a PR fixes an issue, mention it in the PR description, but **not** in the commits themselves. Typically, we add the line `Fixes #007` to the bottom of the PR description, this makes Github link the PR to the issue, auto-close the issue when the PR is merged, and also is included in the merge message.
+ - Focus on one thing only. Each PR should avoid making unrelated changes - those makes the history more difficult to understand later on, and they make the review a headache.
+ - Feel free to rebase, amend or otherwise manipulate the commits in the PR (of course, as long as you're the only one working on the PR). We mostly squash-merge PRs, so your internal commit structure will not be important in the end.
+ - If the PR is about one change, but it makes sense to keep the change broken into several commits, make sure each such commit is compilable, encapsulated, and possibly add a note to the PR description so that we consider this.
+	
 Copyright
 ---------
 

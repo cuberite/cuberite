@@ -17,7 +17,7 @@ static const int DELTA_STEP = 120;  // The normal per-notch wheel delta
 /** Map for converting biome values to colors. Initialized from biomeColors[]. */
 static uchar biomeToColor[256 * 4];
 
-/** Map for converting biome values to colors. Used to initialize biomeToColor[].*/
+/** Map for converting biome values to colors. Used to initialize biomeToColor[]. */
 static struct
 {
 	EMCSBiome m_Biome;
@@ -49,22 +49,22 @@ static struct
 	{ biJungleHills,          { 0x2c, 0x42, 0x05 }, },
 
 	{ biJungleEdge,           { 0x62, 0x8b, 0x17 }, },
-	{ biDeepOcean,            { 0x00, 0x00, 0x30 },	},
-	{ biStoneBeach,           { 0xa2, 0xa2, 0x84 },	},
-	{ biColdBeach,            { 0xfa, 0xf0, 0xc0 },	},
-	{ biBirchForest,          { 0x30, 0x74, 0x44 },	},
-	{ biBirchForestHills,     { 0x1f, 0x5f, 0x32 },	},
-	{ biRoofedForest,         { 0x40, 0x51, 0x1a },	},
-	{ biColdTaiga,            { 0x31, 0x55, 0x4a },	},
-	{ biColdTaigaHills,       { 0x59, 0x7d, 0x72 },	},
-	{ biMegaTaiga,            { 0x59, 0x66, 0x51 },	},
-	{ biMegaTaigaHills,       { 0x59, 0x66, 0x59 },	},
-	{ biExtremeHillsPlus,     { 0x50, 0x70, 0x50 },	},
-	{ biSavanna,              { 0xbd, 0xb2, 0x5f },	},
-	{ biSavannaPlateau,       { 0xa7, 0x9d, 0x64 },	},
-	{ biMesa,                 { 0xd9, 0x45, 0x15 },	},
-	{ biMesaPlateauF,         { 0xb0, 0x97, 0x65 },	},
-	{ biMesaPlateau,          { 0xca, 0x8c, 0x65 },	},
+	{ biDeepOcean,            { 0x00, 0x00, 0x30 }, },
+	{ biStoneBeach,           { 0xa2, 0xa2, 0x84 }, },
+	{ biColdBeach,            { 0xfa, 0xf0, 0xc0 }, },
+	{ biBirchForest,          { 0x30, 0x74, 0x44 }, },
+	{ biBirchForestHills,     { 0x1f, 0x5f, 0x32 }, },
+	{ biRoofedForest,         { 0x40, 0x51, 0x1a }, },
+	{ biColdTaiga,            { 0x31, 0x55, 0x4a }, },
+	{ biColdTaigaHills,       { 0x59, 0x7d, 0x72 }, },
+	{ biMegaTaiga,            { 0x59, 0x66, 0x51 }, },
+	{ biMegaTaigaHills,       { 0x59, 0x66, 0x59 }, },
+	{ biExtremeHillsPlus,     { 0x50, 0x70, 0x50 }, },
+	{ biSavanna,              { 0xbd, 0xb2, 0x5f }, },
+	{ biSavannaPlateau,       { 0xa7, 0x9d, 0x64 }, },
+	{ biMesa,                 { 0xd9, 0x45, 0x15 }, },
+	{ biMesaPlateauF,         { 0xb0, 0x97, 0x65 }, },
+	{ biMesaPlateau,          { 0xca, 0x8c, 0x65 }, },
 
 	// M variants:
 	{ biSunflowerPlains,      { 0xb5, 0xdb, 0x88 }, },
@@ -307,8 +307,8 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 	// which need to be shifted to account for panning inside that chunk
 	centerx -= (m_X - centerchunkx * 16) * m_Zoom;
 	centery -= (m_Z - centerchunkz * 16) * m_Zoom;
-	// centerx,y now points to the top left corner of the center chunk
-	// so now calculate our x,y in relation
+	// centerx, centery now points to the top left corner of the center chunk
+	// so now calculate our x, y in relation
 	double chunksize = 16 * m_Zoom;
 	centerx += (a_ChunkX - centerchunkx) * chunksize;
 	centery += (a_ChunkZ - centerchunkz) * chunksize;
@@ -550,7 +550,3 @@ void BiomeView::keyPressEvent(QKeyEvent * a_Event)
 		}
 	}
 }
-
-
-
-

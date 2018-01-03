@@ -26,14 +26,14 @@ public:
 		m_IsInComment(false)
 	{
 	}
-	
-	
+
+
 	bool IsGood(void) const
 	{
 		return !m_Out.fail();
 	}
-	
-	
+
+
 	void ProcessFile(const AString & a_FileIn)
 	{
 		std::ifstream In(a_FileIn.c_str());
@@ -49,14 +49,14 @@ public:
 			PushLine(Line);
 		}
 	}
-	
+
 protected:
 	std::ofstream m_Out;
 	bool          m_IsInToLua;    ///< Set to true if inside a tolua_begin .. tolua_end block
 	bool          m_IsInComment;  ///< Set to true if previous line has started a multiline comment; only outside tolua blocks
 	AString       m_LastComment;  ///< Accumulator for a multiline comment preceding a tolua block
-	
-	
+
+
 	void PushLine(const AString & a_Line)
 	{
 		if (m_IsInToLua)
@@ -71,7 +71,7 @@ protected:
 			m_Out << a_Line << std::endl;
 			return;
 		}
-		
+
 		if (m_IsInComment)
 		{
 			// Inside a multiline comment block, outside of a tolua block; accumulate m_LastComment
@@ -79,9 +79,9 @@ protected:
 			m_IsInComment = (a_Line.find("*/") == AString::npos);
 			return;
 		}
-		
+
 		AString Trimmed(TrimString(a_Line));
-		
+
 		if (Trimmed == "// tolua_begin")
 		{
 			// Beginning of a tolua block
@@ -93,19 +93,19 @@ protected:
 			}
 			return;
 		}
-		
+
 		size_t CommentBegin = a_Line.find("/*");
 		if (CommentBegin != AString::npos)
 		{
 			m_IsInComment = (a_Line.find("*/", CommentBegin) == AString::npos);
 			m_LastComment = a_Line;
 		}
-		
+
 		size_t ExportIdx = a_Line.find("// tolua_export");
 		if (ExportIdx != AString::npos)
 		{
 			// Single-line tolua block
-			
+
 			// Strip the export comment and right-trim the line:
 			AString Stripped(a_Line.substr(0, ExportIdx));
 			int End = Stripped.length() - 1;
@@ -114,7 +114,7 @@ protected:
 				End--;
 			}
 			Stripped.erase(End + 1);
-			
+
 			if (!m_LastComment.empty())
 			{
 				m_Out << m_LastComment << std::endl;
@@ -123,7 +123,7 @@ protected:
 			m_Out << Stripped << std::endl;
 			return;
 		}
-		
+
 		if (!m_IsInComment)
 		{
 			m_LastComment.clear();
@@ -147,7 +147,7 @@ bool ParsePackageFile(const AString & a_FileName, AStrings & a_CFiles, AStrings 
 		std::cerr << "Cannot open the package file " << a_FileName << "." << std::endl;
 		return false;
 	}
-	
+
 	while (!PkgFile.eof())
 	{
 		AString Line;
@@ -169,7 +169,7 @@ bool ParsePackageFile(const AString & a_FileName, AStrings & a_CFiles, AStrings 
 
 
 
-/// Processes the specified input header file into the output file
+/** Processes the specified input header file into the output file */
 void ProcessCFile(const AString & a_CFileIn, const AString & a_CFileOut)
 {
 	cProcessor p(a_CFileOut);
@@ -189,14 +189,14 @@ int main(int argc, char * argv[])
 {
 	AString BaseDir = (argc > 1) ? argv[1] : ".";
 	AString OutDir  = (argc > 2) ? argv[2] : "Out";
-	
+
 	// Create the output directory:
 	#ifdef _WIN32
 	CreateDirectory(OutDir.c_str(), NULL);
 	#else
 	mkdir(OutDir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 	#endif
-	
+
 	// Parse the package file
 	AStrings CFiles;
 	AStrings DirectLines;
@@ -204,7 +204,7 @@ int main(int argc, char * argv[])
 	{
 		return 1;
 	}
-	
+
 	// Process header files:
 	for (AStrings::const_iterator itr = CFiles.begin(), end = CFiles.end(); itr != end; ++itr)
 	{
@@ -213,10 +213,6 @@ int main(int argc, char * argv[])
 		AString Out = Printf("%s/%04x.h", OutDir.c_str(), cnt++);
 		ProcessCFile(In, Out);
 	}  // for itr - CFiles[]
-	
+
 	return 0;
 }
-
-
-
-

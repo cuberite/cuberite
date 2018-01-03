@@ -20,7 +20,7 @@ not much variance in the coords. The exact sizes and coord ranges were adapted f
 
 
 
-/// The sizes of the interpolated noise that are calculated:
+/** The sizes of the interpolated noise that are calculated: */
 static const int SIZE_X = 33;
 static const int SIZE_Y = 5;
 static const int SIZE_Z = 5;
@@ -115,7 +115,3 @@ int main(int argc, char ** argv)
 
 	return 0;
 }
-
-
-
-

@@ -35,11 +35,11 @@ bool cImageComposingCallback::OnNewRegion(int a_RegionX, int a_RegionZ)
 {
 	ASSERT(m_CurrentRegionX == INVALID_REGION_COORD);
 	ASSERT(m_CurrentRegionZ == INVALID_REGION_COORD);  // Has any previous region been finished properly?
-	
+
 	m_CurrentRegionX = a_RegionX;
 	m_CurrentRegionZ = a_RegionZ;
 	OnEraseImage();
-	
+
 	return CALLBACK_CONTINUE;
 }
 
@@ -53,7 +53,7 @@ void cImageComposingCallback::OnRegionFinished(int a_RegionX, int a_RegionZ)
 	ASSERT(m_CurrentRegionZ != INVALID_REGION_COORD);  // Has a region been started properly?
 	ASSERT(m_CurrentRegionX == a_RegionX);
 	ASSERT(m_CurrentRegionZ == a_RegionZ);  // Is it the same region that has been started?
-	
+
 	AString FileName = GetFileName(a_RegionX, a_RegionZ);
 	if (!FileName.empty())
 	{
@@ -61,7 +61,7 @@ void cImageComposingCallback::OnRegionFinished(int a_RegionX, int a_RegionZ)
 		SaveImage(FileName);
 		OnAfterImageSaved(a_RegionX, a_RegionZ, FileName);
 	}
-	
+
 	m_CurrentRegionX = INVALID_REGION_COORD;
 	m_CurrentRegionZ = INVALID_REGION_COORD;
 }
@@ -122,7 +122,7 @@ void cImageComposingCallback::SetPixel(int a_RelU, int a_RelV, int a_Color)
 {
 	ASSERT((a_RelU >= 0) && (a_RelU < IMAGE_WIDTH));
 	ASSERT((a_RelV >= 0) && (a_RelV < IMAGE_HEIGHT));
-	
+
 	m_ImageData[a_RelU + IMAGE_WIDTH * a_RelV] = a_Color;
 }
 
@@ -137,7 +137,7 @@ int cImageComposingCallback::GetPixel(int a_RelU, int a_RelV)
 		// Outside the image data
 		return -1;
 	}
-	
+
 	return m_ImageData[a_RelU + IMAGE_WIDTH * a_RelV];
 }
 
@@ -213,7 +213,3 @@ void cImageComposingCallback::SaveImage(const AString & a_FileName)
 	f.Write(BMPHeader, sizeof(BMPHeader));
 	f.Write(m_ImageData, PIXEL_COUNT * 4);
 }
-
-
-
-

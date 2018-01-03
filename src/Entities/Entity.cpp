@@ -243,6 +243,7 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 			this->GetUniqueID(), this->GetClass(),
 			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
 		);
+		UNUSED(ParentChunkCoords);  // Non Debug mode only
 
 		// Make sure that RemoveEntity returned a valid smart pointer
 		// Also, not storing the returned pointer means automatic destruction
@@ -1171,12 +1172,9 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	}
 
 	// Fire is extinguished by rain
-	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
+	if (GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()))
 	{
-		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
-		{
-			m_TicksLeftBurning = 0;
-		}
+		m_TicksLeftBurning = 0;
 	}
 
 	// Do the burning damage:
@@ -1599,6 +1597,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
 		);
+		UNUSED(OldChunkCoords);  // Non Debug mode only
 		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
 	});

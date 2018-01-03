@@ -19,23 +19,26 @@ class cHeightBiomeMap :
 	public cImageComposingCallback
 {
 	typedef cImageComposingCallback super;
-	
+
 public:
 	// Minima and maxima for the regions processed through this callback
 	int m_MinRegionX, m_MaxRegionX;
 	int m_MinRegionZ, m_MaxRegionZ;
-	
+
 	cHeightBiomeMap(void);
-	
+
 protected:
 	int m_CurrentChunkX;  // Absolute chunk coords
 	int m_CurrentChunkZ;
 	int m_CurrentChunkRelX;  // Chunk offset from the start of the region
 	int m_CurrentChunkRelZ;
-	
-	char      m_ChunkBiomes[16 * 16];        ///< Biome-map  for the current chunk
-	int       m_ChunkHeight[16 * 16];        ///< Height-map for the current chunk
-	BLOCKTYPE m_BlockTypes [16 * 16 * 256];  ///< Block data for the current chunk (between OnSection() and OnSectionsFinished() )
+
+	/** Biome-map  for the current chunk */
+	char      m_ChunkBiomes[16 * 16];
+	/** Height-map for the current chunk */
+	int       m_ChunkHeight[16 * 16];
+	/** Block data for the current chunk (between OnSection() and OnSectionsFinished()) */
+	BLOCKTYPE m_BlockTypes [16 * 16 * 256];
 
 	// cCallback overrides:
 	virtual bool OnNewRegion(int a_RegionX, int a_RegionZ) override;
@@ -57,7 +60,7 @@ protected:
 		const NIBBLETYPE * a_BlockSkyLight
 	) override;
 	virtual bool OnSectionsFinished(void) override;
-	
+
 } ;
 
 
@@ -69,13 +72,9 @@ class cHeightBiomeMapFactory :
 {
 public:
 	virtual ~cHeightBiomeMapFactory();
-	
+
 	virtual cCallback * CreateNewCallback(void) override
 	{
 		return new cHeightBiomeMap;
 	}
 } ;
-
-
-
-

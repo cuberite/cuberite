@@ -28,6 +28,7 @@ cInventory::cInventory(cPlayer & a_Owner) :
 	m_ArmorSlots.AddListener(*this);
 	m_InventorySlots.AddListener(*this);
 	m_HotbarSlots.AddListener(*this);
+	m_ShieldSlots.AddListener(*this);
 
 	SetEquippedSlotNum(0);
 }
@@ -791,6 +792,10 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	else if (a_ItemGrid == &m_HotbarSlots)
 	{
 		Base = invHotbarOffset;
+	}
+	else if (a_ItemGrid == &m_ShieldSlots)
+	{
+		Base = invShieldOffset;
 	}
 	else
 	{
