@@ -20,10 +20,7 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
-		{
-			return false;
-		}
+		super::EatItem(a_Player, a_Item);
 
 		// Add the effects:
 		a_Player->AddEntityEffect(cEntityEffect::effAbsorption, 2400, 0);
@@ -48,7 +45,3 @@ public:
 	}
 
 };
-
-
-
-
