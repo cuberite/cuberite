@@ -86,6 +86,13 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 		return;
 	}
+	else if ((m_BlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockBelow))
+	{
+		// Concrete powder falling into water solidifies on the first water it touches
+		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, E_BLOCK_CONCRETE, m_BlockMeta);
+		Destroy(true);
+		return;
+	}
 
 	float MilliDt = a_Dt.count() * 0.001f;
 	AddSpeedY(MilliDt * -9.8f);

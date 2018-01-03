@@ -26,6 +26,7 @@ SET (HDRS
 	BlockCocoaPod.h
 	BlockCommandBlock.h
 	BlockComparator.h
+	BlockConcretePowder.h
 	BlockCrops.h
 	BlockDeadBush.h
 	BlockDirt.h

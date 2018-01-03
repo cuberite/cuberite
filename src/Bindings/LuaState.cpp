@@ -960,54 +960,42 @@ void cLuaState::Push(cEntity * a_Entity)
 	}
 	else
 	{
-		switch (a_Entity->GetEntityType())
-		{
-			case cEntity::etMonster:
+		const char * ClassName = [&]
 			{
-				// Don't push specific mob types, as those are not exported in the API:
-				tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
-				break;
-			}
-			case cEntity::etPlayer:
-			{
-				tolua_pushusertype(m_LuaState, a_Entity, "cPlayer");
-				break;
-			}
-			case cEntity::etPickup:
-			{
-				tolua_pushusertype(m_LuaState, a_Entity, "cPickup");
-				break;
-			}
-			case cEntity::etTNT:
-			{
-				tolua_pushusertype(m_LuaState, a_Entity, "cTNTEntity");
-				break;
-			}
-			case cEntity::etProjectile:
-			{
-				tolua_pushusertype(m_LuaState, a_Entity, a_Entity->GetClass());
-				break;
-			}
-			case cEntity::etFloater:
-			{
-				tolua_pushusertype(m_LuaState, a_Entity, "cFloater");
-				break;
-			}
+				switch (a_Entity->GetEntityType())
+				{
+					case cEntity::etBoat:         return "cBoat";
+					case cEntity::etExpOrb:       return "cExpOrb";
+					case cEntity::etFallingBlock: return "cFallingBlock";
+					case cEntity::etFloater:      return "cFloater";
+					case cEntity::etItemFrame:    return "cItemFrame";
+					case cEntity::etLeashKnot:    return "cLeashKnot";
+					case cEntity::etPainting:     return "cPainting";
+					case cEntity::etPickup:       return "cPickup";
+					case cEntity::etPlayer:       return "cPlayer";
+					case cEntity::etTNT:          return "cTNTEntity";
 
-			case cEntity::etEntity:
-			case cEntity::etEnderCrystal:
-			case cEntity::etFallingBlock:
-			case cEntity::etMinecart:
-			case cEntity::etBoat:
-			case cEntity::etExpOrb:
-			case cEntity::etItemFrame:
-			case cEntity::etPainting:
-			case cEntity::etLeashKnot:
-			{
-				// Push the generic entity class type:
-				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
-			}
-		}  // switch (EntityType)
+					case cEntity::etMonster:
+					{
+						// Don't push specific mob types, as those are not exported in the API:
+						return "cMonster";
+					}
+					case cEntity::etProjectile:
+					{
+						// Push the specific projectile type:
+						return a_Entity->GetClass();
+					}
+
+					case cEntity::etEntity:
+					case cEntity::etEnderCrystal:
+					case cEntity::etMinecart:
+					{
+						// Push the generic entity class type:
+						return "cEntity";
+					}
+				}  // switch (EntityType)
+			}();
+		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
 	}
 }
 
