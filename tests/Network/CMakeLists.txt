@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
@@ -54,7 +55,7 @@ add_library(Network
 	${Network_HDRS}
 )
 
-target_link_libraries(Network event_core event_extra mbedtls)
+target_link_libraries(Network event_core event_extra fmt::fmt mbedtls)
 if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()

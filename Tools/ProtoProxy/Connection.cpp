@@ -10,6 +10,8 @@
 #include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
+#include "fmt/printf.h"
+
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
 #endif
@@ -282,15 +284,12 @@ void cConnection::Run(void)
 
 
 
-void cConnection::Log(const char * a_Format, ...)
+void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
 {
-	va_list args;
-	va_start(args, a_Format);
-	AString msg;
-	AppendVPrintf(msg, a_Format, args);
-	va_end(args);
-	AString FullMsg;
-	Printf(FullMsg, "[%5.3f] %s\n", GetRelativeTime(), msg.c_str());
+	fmt::MemoryWriter FullMsg;
+	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
+	fmt::printf(FullMsg, a_Format, a_Args);
+	fmt::printf(FullMsg, "\n");
 
 	// Log to file:
 	cCSLock Lock(m_CSLog);
@@ -307,16 +306,13 @@ void cConnection::Log(const char * a_Format, ...)
 
 
 
-void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, ...)
+void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList a_Args)
 {
-	va_list args;
-	va_start(args, a_Format);
-	AString msg;
-	AppendVPrintf(msg, a_Format, args);
-	va_end(args);
-	AString FullMsg;
+	fmt::MemoryWriter FullMsg;
+	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
+	fmt::printf(FullMsg, a_Format, a_Args);
 	AString Hex;
-	Printf(FullMsg, "[%5.3f] %s\n%s\n", GetRelativeTime(), msg.c_str(), CreateHexDump(Hex, a_Data, a_Size, 16).c_str());
+	fmt::printf(FullMsg, "\n%s\n", CreateHexDump(Hex, a_Data, a_Size, 16));
 
 	// Log to file:
 	cCSLock Lock(m_CSLog);
