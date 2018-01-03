@@ -39,27 +39,30 @@ public:
 	{
 		bool ShouldSoak = false;
 
-		static const Vector3i Coords[] =
+		static const std::array<Vector3i, 5> WaterCheck
 		{
-			Vector3i( 1, 0,  0),
-			Vector3i(-1, 0,  0),
-			Vector3i( 0, 0,  1),
-			Vector3i( 0, 0, -1),
-			Vector3i( 0, 1,  0),
-		};
-		BLOCKTYPE NeighborType;
-		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
-		{
-			if (!a_Chunk.UnboundedRelGetBlockType(a_Rel.x + Coords[i].x, a_Rel.y + Coords[i].y, a_Rel.z + Coords[i].z, NeighborType))
 			{
-				continue;
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+				{ 0, 1,  0},
+			}
+		};
+
+		ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
+		{
+			BLOCKTYPE NeighborType;
+			if (!a_Chunk.UnboundedRelGetBlockType(a_Rel.x + a_Offset.x, a_Rel.y + a_Offset.y, a_Rel.z + a_Offset.z, NeighborType))
+			{
+				return false;
 			}
 			if (IsBlockWater(NeighborType))
 			{
-				ShouldSoak = true;
-				break;
+				return true;
 			}
-		}  // for i - Coords[]
+			return false;
+		});
 
 		if (ShouldSoak)
 		{
