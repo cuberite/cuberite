@@ -37,8 +37,6 @@ public:
 		Returns TRUE if the block was changed. */
 	bool GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
-		bool ShouldSoak = false;
-
 		static const std::array<Vector3i, 5> WaterCheck
 		{
 			{
@@ -50,7 +48,7 @@ public:
 			}
 		};
 
-		ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
+		bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
 		{
 			BLOCKTYPE NeighborType;
 			if (!a_Chunk.UnboundedRelGetBlockType(a_Rel.x + a_Offset.x, a_Rel.y + a_Offset.y, a_Rel.z + a_Offset.z, NeighborType))
