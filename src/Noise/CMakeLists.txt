@@ -15,5 +15,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Noise ${SRCS} ${HDRS})
-	target_link_libraries(Noise OSSupport)
+	target_link_libraries(Noise fmt::fmt OSSupport)
 endif()

@@ -352,7 +352,7 @@ void cCraftingRecipes::LoadRecipes(void)
 		}
 		AddRecipeLine(LineNum, Recipe);
 	}  // for itr - Split[]
-	LOG("Loaded " SIZE_T_FMT " crafting recipes", m_Recipes.size());
+	LOG("Loaded %zu crafting recipes", m_Recipes.size());
 }
 
 
@@ -380,7 +380,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	AStringVector Sides = StringSplit(RecipeLine, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
+		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %zu", a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}

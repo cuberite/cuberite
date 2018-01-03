@@ -22,13 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
-	// MSVC has its own custom version of zu format
-	#define SIZE_T_FMT "%Iu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
-	#define SIZE_T_FMT_HEX "%Ix"
-
 	#define NORETURN      __declspec(noreturn)
 
 #elif defined(__GNUC__)
@@ -43,12 +36,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
-	#define SIZE_T_FMT "%zu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-	#define SIZE_T_FMT_HEX "%zx"
 
 	#define NORETURN      __attribute((__noreturn__))
 #else
@@ -68,8 +55,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 #endif
 
@@ -191,6 +176,7 @@ typedef unsigned char Byte;
 
 
 // Common headers (without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"

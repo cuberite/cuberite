@@ -5,6 +5,8 @@
 
 #include "Globals.h"
 
+#include "fmt/printf.h"
+
 #ifdef _MSC_VER
 	// Under MSVC, link to WinSock2 (needed by RawBEToUTF8's byteswapping)
 	#pragma comment(lib, "ws2_32.lib")
@@ -50,60 +52,10 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & AppendVPrintf(AString & str, const char * format, va_list args)
+AString & Printf(AString & str, const char * format, fmt::ArgList args)
 {
 	ASSERT(format != nullptr);
-
-	char buffer[2048];
-	int len;
-	#ifdef va_copy
-	va_list argsCopy;
-	va_copy(argsCopy, args);
-	#else
-	#define argsCopy args
-	#endif
-	#ifdef _MSC_VER
-	// MS CRT provides secure printf that doesn't behave like in the C99 standard
-	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, argsCopy)) != -1)
-	#else  // _MSC_VER
-	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, argsCopy)) < static_cast<int>(ARRAYCOUNT(buffer)))
-	#endif  // else _MSC_VER
-	{
-		// The result did fit into the static buffer
-		#ifdef va_copy
-		va_end(argsCopy);
-		#endif
-		str.append(buffer, static_cast<size_t>(len));
-		return str;
-	}
-	#ifdef va_copy
-	va_end(argsCopy);
-	#endif
-
-	// The result did not fit into the static buffer, use a dynamic buffer:
-	#ifdef _MSC_VER
-	// for MS CRT, we need to calculate the result length
-	len = _vscprintf(format, args);
-	if (len == -1)
-	{
-		return str;
-	}
-	#endif  // _MSC_VER
-
-	// Allocate a buffer and printf into it:
-	#ifdef va_copy
-	va_copy(argsCopy, args);
-	#endif
-	std::vector<char> Buffer(static_cast<size_t>(len) + 1);
-	#ifdef _MSC_VER
-	vsprintf_s(&(Buffer.front()), Buffer.size(), format, argsCopy);
-	#else  // _MSC_VER
-	vsnprintf(&(Buffer.front()), Buffer.size(), format, argsCopy);
-	#endif  // else _MSC_VER
-	str.append(&(Buffer.front()), Buffer.size() - 1);
-	#ifdef va_copy
-	va_end(argsCopy);
-	#endif
+	str = fmt::sprintf(format, args);
 	return str;
 }
 
@@ -111,41 +63,10 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 
 
 
-AString & Printf(AString & str, const char * format, ...)
+AString Printf(const char * format, fmt::ArgList args)
 {
-	str.clear();
-	va_list args;
-	va_start(args, format);
-	std::string & retval = AppendVPrintf(str, format, args);
-	va_end(args);
-	return retval;
-}
-
-
-
-
-
-AString Printf(const char * format, ...)
-{
-	AString res;
-	va_list args;
-	va_start(args, format);
-	AppendVPrintf(res, format, args);
-	va_end(args);
-	return res;
-}
-
-
-
-
-
-AString & AppendPrintf(AString & dst, const char * format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	std::string & retval = AppendVPrintf(dst, format, args);
-	va_end(args);
-	return retval;
+	ASSERT(format != nullptr);
+	return fmt::sprintf(format, args);
 }
 
 
@@ -690,7 +611,7 @@ are equivalent to the following loop:
 
 
 
-#define HEX(x) ((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
+#define HEX(x) static_cast<char>((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
 
 /**
 format binary data this way:
@@ -698,50 +619,36 @@ format binary data this way:
 */
 AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	ASSERT(a_BytesPerLine <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
-	char line[512];
-	char * p;
-	char * q;
+	fmt::MemoryWriter Output;
+	/* If formatting the data from the comment above:
+		Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
+		Chars holds: "1234567890abcdef" */
+	fmt::MemoryWriter Hex, Chars;
 
-	a_Out.reserve(a_Size / a_BytesPerLine * (18 + 6 * a_BytesPerLine));
+	if (a_Size > 0)
+	{
+		// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
+		const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
+		const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
+		Output.buffer().reserve(NumLines * CharsPerLine);
+	}
+
 	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
 	{
-		size_t k = a_Size - i;
-		if (k > a_BytesPerLine)
-		{
-			k = a_BytesPerLine;
-		}
-		#ifdef _MSC_VER
-		// MSVC provides a "secure" version of sprintf()
-		int Count = sprintf_s(line, sizeof(line), "%08x:", static_cast<unsigned>(i));
-		#else
-		int Count = sprintf(line, "%08x:", static_cast<unsigned>(i));
-		#endif
-		// Remove the terminating nullptr / leftover garbage in line, after the sprintf-ed value
-		memset(line + Count, 32, sizeof(line) - static_cast<size_t>(Count));
-		p = line + 10;
-		q = p + 2 + a_BytesPerLine * 3 + 1;
+		size_t k = std::min(a_Size - i, a_BytesPerLine);
 		for (size_t j = 0; j < k; j++)
 		{
 			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
-			p[0] = HEX(c >> 4);
-			p[1] = HEX(c & 0xf);
-			p[2] = ' ';
-			if (c >= ' ')
-			{
-				q[0] = static_cast<char>(c);
-			}
-			else
-			{
-				q[0] = '.';
-			}
-			p += 3;
-			q ++;
+			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
+			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
-		q[0] = '\n';
-		q[1] = 0;
-		a_Out.append(line);
+
+		// Write Hex with a dynamic fixed width
+		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+		Hex.clear();
+		Chars.clear();
 	}  // for i
+	a_Out.append(Output.data(), Output.size());
 	return a_Out;
 }
 
