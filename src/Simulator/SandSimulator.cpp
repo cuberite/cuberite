@@ -319,6 +319,11 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 		{
 			BlockY = y + 1;
 		}
+		else if ((FallingBlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockType))
+		{
+			FallingBlockType = E_BLOCK_CONCRETE;
+			BlockY = y;
+		}
 		else
 		{
 			// Can fall further down

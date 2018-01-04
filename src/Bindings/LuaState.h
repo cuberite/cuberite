@@ -823,7 +823,8 @@ public:
 	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	int ApiParamError(const char * a_MsgFormat, ...);
+	int ApiParamError(const char * a_MsgFormat, fmt::ArgList);
+	FMT_VARIADIC(int, ApiParamError, const char *)
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);
