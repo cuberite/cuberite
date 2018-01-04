@@ -21,24 +21,14 @@ class cItemHandler
 {
 public:
 
-	enum eDurabilityLostAction : int
+	/** Actions that may cause durability of an item may be lost, where the
+	magnitude of the loss depends on the specific item used to perform the
+	action */
+	enum eDurabilityLostAction
 	{
+		dlaAttackEntity,
 		dlaBreakBlock,
 		dlaBreakBlockInstant,
-		dlaAttackEntity,
-		dlaCarrotOnStickBoost,
-		dlaElytraFly,
-		dlaFishingBlock,
-		dlaFishingFish,
-		dlaFishingItem,
-		dlaFishingMob,
-		dlaFishingNothing,
-		dlaLightFire,
-		dlaShearBlock,
-		dlaShearSheep,
-		dlaShieldBlock,
-		dlaShootArrow,
-		dlaTilling,
 	};
 
 	cItemHandler(int a_ItemType);
@@ -121,7 +111,9 @@ public:
 	/** Called after the player has eaten this item. */
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
 
-	/** Get the durability lost which the item will get, when a specified action was performed. */
+	/** Get the durability lost which the item will get, when a specified action
+	was performed. This is only relevant for uses where the damage taken may
+	depend on the item used. */
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action);
 
 	/** Returns the maximum stack size for a given item */

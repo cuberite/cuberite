@@ -27,9 +27,9 @@ public:
 	{
 		switch (a_Action)
 		{
-			case dlaAttackEntity: return 2;
-			case dlaBreakBlock:   return 1;
-			default:              return 0;
+			case dlaAttackEntity:      return 2;
+			case dlaBreakBlock:        return 1;
+			case dlaBreakBlockInstant: return 0;
 		}
 	}
 
@@ -45,7 +45,7 @@ public:
 			BlockHandler(Block)->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			a_Player->UseEquippedItem(dlaBreakBlock);
+			a_Player->UseEquippedItem(cItemHandler::dlaBreakBlock);
 			return true;
 		}
 		return false;

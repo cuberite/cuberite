@@ -120,7 +120,7 @@ public:
 					}
 					a_WorldInterface.SpawnItemPickups(Pickups, BlockPos.x, BlockPos.y, BlockPos.z);
 				}
-				a_Player.UseEquippedItem(cItemHandler::dlaShearBlock);
+				a_Player.UseEquippedItem();
 			}
 		}
 

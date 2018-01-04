@@ -62,21 +62,6 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
-	{
-		switch (a_Action)
-		{
-			case dlaFishingNothing:  return 0;
-			case dlaFishingFish:     return 1;
-			case dlaFishingBlock:    return 2;
-			case dlaFishingItem:     return 3;
-			case dlaFishingMob:      return 5;
-			default:                 return 0;
-		}
-	}
-
-
-
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace

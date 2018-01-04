@@ -48,7 +48,7 @@ public:
 		{
 			case dlaAttackEntity:       return 1;
 			case dlaBreakBlock:         return 2;
-			default:                    return 0;
+			case dlaBreakBlockInstant:  return 0;
 		}
 	}
 

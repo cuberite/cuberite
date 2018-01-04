@@ -23,9 +23,9 @@ public:
 	{
 		switch (a_Action)
 		{
-			case dlaAttackEntity: return 2;
-			case dlaBreakBlock:   return 1;
-			default:              return 0;
+			case dlaAttackEntity:       return 2;
+			case dlaBreakBlock:         return 1;
+			case dlaBreakBlockInstant:  return 0;
 		}
 	}
 

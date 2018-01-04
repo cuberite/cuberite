@@ -17,14 +17,12 @@
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
 #include "ItemCake.h"
-#include "ItemCarrotOnStick.h"
 #include "ItemCauldron.h"
 #include "ItemChest.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
-#include "ItemElytra.h"
 #include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
@@ -127,12 +125,10 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BOW:                 return new cItemBowHandler();
 		case E_ITEM_BREWING_STAND:       return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAKE:                return new cItemCakeHandler(a_ItemType);
-		case E_ITEM_CARROT_ON_STICK:     return new cItemCarrotOnStickHandler(a_ItemType);
 		case E_ITEM_CAULDRON:            return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:                 return new cItemEggHandler();
-		case E_ITEM_ELYTRA:              return new cItemElytraHandler(a_ItemType);
 		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
 		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);

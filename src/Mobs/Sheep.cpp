@@ -66,7 +66,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
-		a_Player.UseEquippedItem(cItemHandler::dlaShearSheep);
+		a_Player.UseEquippedItem();
 
 		cItems Drops;
 		char NumDrops = GetRandomProvider().RandInt<char>(1, 3);

@@ -20,17 +20,6 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
-	{
-		switch (a_Action)
-		{
-			case dlaLightFire:     return 1;
-			default:               return 0;
-		}
-	}
-
-
-
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
@@ -47,7 +36,7 @@ public:
 			{
 				case E_ITEM_FLINT_AND_STEEL:
 				{
-					a_Player->UseEquippedItem(dlaLightFire);
+					a_Player->UseEquippedItem();
 					break;
 				}
 				case E_ITEM_FIRE_CHARGE:

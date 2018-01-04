@@ -65,10 +65,9 @@ public:
 	{
 		switch (a_Action)
 		{
+			case dlaAttackEntity:       return 0;
+			case dlaBreakBlock:         return 0;
 			case dlaBreakBlockInstant:  return 1;
-			case dlaShearBlock:         return 1;
-			case dlaShearSheep:         return 1;
-			default:                    return 0;
 		}
 	}
 

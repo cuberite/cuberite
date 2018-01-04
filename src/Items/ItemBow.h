@@ -21,17 +21,6 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
-	{
-		switch (a_Action)
-		{
-			case dlaShootArrow: return 1;
-			default:            return 0;
-		}
-	}
-
-
-
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
@@ -96,7 +85,7 @@ public:
 				ArrowPtr->SetPickupState(cArrowEntity::psNoPickup);
 			}
 
-			a_Player->UseEquippedItem(cItemHandler::dlaShootArrow);
+			a_Player->UseEquippedItem();
 		}
 
 		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
