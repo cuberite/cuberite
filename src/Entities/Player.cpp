@@ -2358,15 +2358,6 @@ void cPlayer::UseEquippedItem(short a_Damage)
 
 
 
-void cPlayer::UseEquippedItem(void)
-{
-	UseEquippedItem(1);
-}
-
-
-
-
-
 void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 {
 	// Get item being used:
