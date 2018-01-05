@@ -330,8 +330,8 @@ public:
 	// cHTTPResponseParser::cCallbacks overrides:
 	virtual void OnError(const AString & a_ErrorDescription) override
 	{
-		m_ParentRequest.CallErrorCallback(a_ErrorDescription);
 		m_Link = nullptr;
+		m_ParentRequest.CallErrorCallback(a_ErrorDescription);
 	}
 
 
