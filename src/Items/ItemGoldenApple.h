@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "ItemFood.h"
@@ -48,7 +49,3 @@ public:
 	}
 
 };
-
-
-
-
