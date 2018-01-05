@@ -1,12 +1,4 @@
 
-// ItemFishingRod.h
-
-// Declares the various fishing rod ItemHandlers
-
-
-
-
-
 #pragma once
 
 #include "../Entities/Floater.h"
@@ -240,7 +232,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-
