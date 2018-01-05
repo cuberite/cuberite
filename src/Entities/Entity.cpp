@@ -862,7 +862,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		if (
-			IsMob() || IsPickup() || IsExpOrb() ||
+			IsMob() || IsPickup() ||
 			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
 		)
 		{

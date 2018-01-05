@@ -23,6 +23,9 @@ public:
 
 	// Override functions
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	virtual void DetectCacti(void) override;
+
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	// tolua_begin

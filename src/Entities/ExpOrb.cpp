@@ -46,6 +46,8 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	DetectCacti();
+
 	// Check player proximity no more than twice per second
 	if ((m_TicksAlive % 10) == 0)
 	{
@@ -75,6 +77,20 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_Timer += a_Dt;
 	if (m_Timer >= std::chrono::minutes(5))
+	{
+		Destroy(true);
+	}
+}
+
+
+
+
+
+void cExpOrb::DetectCacti(void)
+{
+	auto HealthBefore = m_Health;
+	super::DetectCacti();
+	if (m_Health < HealthBefore)
 	{
 		Destroy(true);
 	}
