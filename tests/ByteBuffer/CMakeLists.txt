@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -25,6 +26,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(ByteBuffer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+target_link_libraries(ByteBuffer-exe fmt::fmt)
 if (WIN32)
 	target_link_libraries(ByteBuffer-exe ws2_32)
 endif()

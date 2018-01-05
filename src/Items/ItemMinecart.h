@@ -1,10 +1,3 @@
-// ItemMinecart.h
-
-// Declares the various minecart ItemHandlers
-
-
-
-
 
 #pragma once
 
@@ -73,7 +66,3 @@ public:
 	}
 
 } ;
-
-
-
-

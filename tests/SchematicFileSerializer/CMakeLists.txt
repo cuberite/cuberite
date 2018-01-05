@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
@@ -73,7 +74,7 @@ endif()
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(SchematicFileSerializer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(SchematicFileSerializer-exe zlib)
+target_link_libraries(SchematicFileSerializer-exe zlib fmt::fmt)
 add_test(NAME SchematicFileSerializer-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializer-exe)
 
 

@@ -83,4 +83,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
+	target_link_libraries(Mobs fmt::fmt)
 endif()
