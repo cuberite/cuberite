@@ -204,6 +204,20 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+void cPickup::DetectCacti(void)
+{
+	auto HealthBefore = m_Health;
+	super::DetectCacti();
+	if (m_Health < HealthBefore)
+	{
+		Destroy(true);
+	}
+}
+
+
+
+
+
 bool cPickup::CollectedBy(cPlayer & a_Dest)
 {
 	if (m_bCollected)
@@ -261,7 +275,3 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
 	return false;
 }
-
-
-
-
