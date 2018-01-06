@@ -822,17 +822,8 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
-	if (!a_Player->IsGameModeCreative())
-	{
-		a_Player->GetInventory().RemoveOneEquippedItem();
-	}
-
-	FoodInfo Info = GetFoodInfo(a_Item);
-	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
-	{
-		return a_Player->Feed(Info.FoodLevel, Info.Saturation);
-	}
-	return false;
+	auto FoodInfo = GetFoodInfo(a_Item);
+	return a_Player->Feed(FoodInfo.FoodLevel, FoodInfo.Saturation);
 }
 
 

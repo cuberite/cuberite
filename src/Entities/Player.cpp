@@ -678,6 +678,10 @@ void cPlayer::FinishEating(void)
 	{
 		return;
 	}
+	if (!IsGameModeCreative())
+	{
+		GetInventory().RemoveOneEquippedItem();
+	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
 
