@@ -5,6 +5,7 @@
 #include "../Inventory.h"
 #include "../Defines.h"
 #include "../World.h"
+#include "../Items/ItemHandler.h"
 
 #include "../Statistics.h"
 
@@ -413,7 +414,13 @@ public:
 	If the player is not riding a horse or if the horse is untamed, does nothing. */
 	void OpenHorseInventory();
 
-	void UseEquippedItem(int a_Amount = 1);
+	/** Damage the player's equipped item by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseEquippedItem(short a_Damage = 1);
+
+	/** Damage the player's equipped item by the amount of damage such an item
+	is damaged by when used for a_Action */
+	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
 
 	void SendHealth(void);
 

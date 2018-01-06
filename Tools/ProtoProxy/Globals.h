@@ -22,8 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -36,8 +34,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 #else
 
@@ -56,8 +52,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 
 #endif
@@ -186,10 +180,11 @@ typedef unsigned char Byte;
 
 
 // Common headers (part 1, without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 
-
+#include "LoggerSimple.h"
 
 
 

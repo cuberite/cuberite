@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 project (GrownBiomeGenVisualiser)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
@@ -88,5 +89,7 @@ add_executable(GrownBiomeGenVisualiser
 	${SHARED_OSS_SRC}
 	${SHARED_OSS_HDR}
 )
+
+target_link_libraries(GrownBiomeGenVisualiser fmt::fmt)
 
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)

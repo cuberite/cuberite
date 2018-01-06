@@ -1,12 +1,4 @@
 
-// ItemBigFlower.h
-
-// Declares the cItemBigFlower class representing the cItemHandler for big flowers
-
-
-
-
-
 #pragma once
 
 #include "ItemHandler.h"
@@ -61,7 +53,3 @@ public:
 		return true;
 	}
 };
-
-
-
-

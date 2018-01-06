@@ -74,7 +74,7 @@ void cHTTPServerConnection::Send(const void * a_Data, size_t a_Size)
 {
 	ASSERT(m_CurrentRequest != nullptr);
 	// We're sending in Chunked transfer encoding
-	SendData(Printf(SIZE_T_FMT_HEX "\r\n", a_Size));
+	SendData(fmt::format("{0:x}\r\n", a_Size));
 	SendData(a_Data, a_Size);
 	SendData("\r\n");
 }

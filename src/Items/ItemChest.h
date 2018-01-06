@@ -1,12 +1,4 @@
 
-// ItemChest.h
-
-// Declares the cItemChestHandler class representing the cItemHandler descendant responsible for chests
-
-
-
-
-
 #pragma once
 
 #include "ItemHandler.h"
@@ -164,7 +156,3 @@ public:
 private:
 	cItemChestHandler(const cItemChestHandler &) = delete;
 };
-
-
-
-
