@@ -260,11 +260,12 @@ class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
 public:
-	cFinishGenSprinkleFoliage(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
+ cFinishGenSprinkleFoliage(int a_Seed, int a_MaxCactusHeight) : m_Noise(a_Seed), m_Seed(a_Seed), m_MaxCactusHeight(a_MaxCactusHeight) {}
 
 protected:
 	cNoise m_Noise;
 	int    m_Seed;
+    int    m_MaxCactusHeight;
 
 	/** Tries to place sugarcane at the coords specified, returns true if successful */
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);

@@ -14,6 +14,7 @@
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"
 #include "../IniFile.h"
+#include "../BlockEntities/BlockEntity.h"
 
 
 
@@ -801,6 +802,10 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
+
+                        for(int i = 0; i < (x % m_MaxCactusHeight); i++) {
+                            a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
+                        }
 					}
 					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
