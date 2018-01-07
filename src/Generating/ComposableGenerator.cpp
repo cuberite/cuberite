@@ -525,7 +525,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(finisher, "SprinkleFoliage") == 0)
 		{
-            int MaxCactusHeight = a_IniFile.GetValueI("Plants", "MaxCactusHeight", 3);
+			int MaxCactusHeight = a_IniFile.GetValueI("Plants", "MaxCactusHeight", 3);
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSprinkleFoliage(Seed, MaxCactusHeight)));
 		}
 		else if (NoCaseCompare(finisher, "TallGrass") == 0)
