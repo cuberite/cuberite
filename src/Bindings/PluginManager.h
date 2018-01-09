@@ -448,8 +448,8 @@ private:
 	/** Calls a_HookFunction on each plugin registered to the hook HookName.
 	Returns false if the action is to continue or true if the plugin wants to abort.
 	Accessible only from within PluginManager.cpp */
-	template <cPluginManager::PluginHook HookName, class ... PmfArgs, class ... RealArgs>
-	bool GenericCallHook(bool (cPlugin::*a_HookFunction)(PmfArgs...), RealArgs & ... a_Args);
+	template <class HookFunction>
+	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
 } ;  // tolua_export
 
 
