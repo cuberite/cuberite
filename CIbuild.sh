@@ -12,8 +12,15 @@ echo "Building..."
 cmake --build . -- -j 2;
 ctest -j 2 -V;
 
-# Create .gdbinit in home directory. Switches off the confirmation on quit
-echo -e "define hook-quit\n\tset confirm off\nend\n" > ~/.gdbinit
+# Create .gdbinit in home directory.
+# * Switches off the confirmation on quit
+# * Stops gdb from disabling address space layout randomization.
+cat << EOF > ~/.gdbinit
+define hook-quit
+	set confirm off
+end
+set disable-randomization off
+EOF
 
 echo "Testing..."
 
