@@ -392,7 +392,7 @@ public:
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
+		return m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	}
 
 	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
@@ -400,31 +400,31 @@ public:
 	such as leaf decay flags. */
 	inline void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
 	{
-			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
-			if (hasChanged)
+		bool hasChanged = m_ChunkData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
+		if (hasChanged)
+		{
+			if (a_ShouldMarkDirty)
 			{
-				if (a_ShouldMarkDirty)
-				{
-					MarkDirty();
-				}
-				if (a_ShouldInformClients)
-				{
-					m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
-				}
+				MarkDirty();
 			}
+			if (a_ShouldInformClients)
+			{
+				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+			}
+		}
 	}
 
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered  (int a_RelX, int a_RelY, int a_RelZ) const {return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ)); }
+	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetTimeAlteredLight(m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ })); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
