@@ -1,6 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "EntityEffect.h"
+#include "Broadcaster.h"
 #include "Player.h"
 #include "../Chunk.h"
 #include "../Mobs/Monster.h"
@@ -414,10 +415,10 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 
 void cEntityEffectInvisibility::BroadcastMetadata(cPawn & a_Target)
 {
-	auto ParentChunk = a_Target.GetParentChunk();
-	if (ParentChunk != nullptr)
+	auto World = a_Target.GetWorld();
+	if (World != nullptr)
 	{
-		ParentChunk->BroadcastEntityMetadata(a_Target);
+		World->GetBroadcaster().BroadcastEntityMetadata(a_Target);
 	}
 }
 

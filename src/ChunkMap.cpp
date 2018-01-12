@@ -987,44 +987,28 @@ void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2,
 
 void cChunkMap::CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback)
 {
-	cClientHandleList Clients1(a_Chunk1->GetAllClients());
-	cClientHandleList Clients2(a_Chunk2->GetAllClients());
+	auto Clients1 = a_Chunk1->GetAllClients();
+	auto Clients2 = a_Chunk2->GetAllClients();
 
 	// Find "removed" clients:
-	for (cClientHandleList::iterator itr1 = Clients1.begin(); itr1 != Clients1.end(); ++itr1)
+	for (auto * Client : Clients1)
 	{
-		bool Found = false;
-		for (cClientHandleList::iterator itr2 = Clients2.begin(); itr2 != Clients2.end(); ++itr2)
-		{
-			if (*itr1 == *itr2)
-			{
-				Found = true;
-				break;
-			}
-		}  // for itr2 - Clients2[]
+		bool Found = (std::find(Clients2.begin(), Clients2.end(), Client) != Clients2.end());
 		if (!Found)
 		{
-			a_Callback.Removed(*itr1);
+			a_Callback.Removed(Client);
 		}
-	}  // for itr1 - Clients1[]
+	}  // for Client - Clients1[]
 
 	// Find "added" clients:
-	for (cClientHandleList::iterator itr2 = Clients2.begin(); itr2 != Clients2.end(); ++itr2)
+	for (auto * Client : Clients2)
 	{
-		bool Found = false;
-		for (cClientHandleList::iterator itr1 = Clients1.begin(); itr1 != Clients1.end(); ++itr1)
-		{
-			if (*itr1 == *itr2)
-			{
-				Found = true;
-				break;
-			}
-		}  // for itr1 - Clients1[]
+		bool Found = (std::find(Clients1.begin(), Clients1.end(), Client) != Clients1.end());
 		if (!Found)
 		{
-			a_Callback.Added(*itr2);
+			a_Callback.Added(Client);
 		}
-	}  // for itr2 - Clients2[]
+	}  // for Client - Clients2[]
 }
 
 

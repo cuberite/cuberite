@@ -7,6 +7,7 @@
 #include "Globals.h"
 
 #include "FloodyFluidSimulator.h"
+#include "Broadcaster.h"
 #include "../World.h"
 #include "../Chunk.h"
 #include "../BlockArea.h"
@@ -258,7 +259,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect(
+			m_World.GetBroadcaster().BroadcastSoundEffect(
 				"block.lava.extinguish",
 				Vector3d(BlockX, a_RelY, BlockZ),
 				0.5f,
@@ -278,7 +279,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect(
+			m_World.GetBroadcaster().BroadcastSoundEffect(
 				"block.lava.extinguish",
 				Vector3d(BlockX, a_RelY, BlockZ),
 				0.5f,

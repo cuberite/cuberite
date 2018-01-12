@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "VaporizeFluidSimulator.h"
+#include "Broadcaster.h"
 #include "../Chunk.h"
 
 
@@ -35,13 +36,9 @@ void cVaporizeFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	)
 	{
 		a_Chunk->SetBlock(RelX, a_Block.y, RelZ, E_BLOCK_AIR, 0);
-		a_Chunk->BroadcastSoundEffect(
+		cBroadcaster(m_World).BroadcastSoundEffect(
 			"block.fire.extinguish",
-			{
-				static_cast<double>(a_Block.x),
-				static_cast<double>(a_Block.y),
-				static_cast<double>(a_Block.z)
-			},
+			Vector3d(a_Block),
 			1.0f,
 			0.6f
 		);

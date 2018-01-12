@@ -4,25 +4,27 @@
 #include "Defines.h"
 #include "Scoreboard.h"
 
-//fwd:
+// fwd:
 class cClientHandle;
 class cCompositeChat;
 class cPlayer;
 class cWorld;
 enum class EffectID : Int32;
 
+
+
 class cBroadcaster
 {
 public:
 
-	cBroadcaster(cWorld * a_World);
+	cBroadcaster(cWorld & a_World): m_World(&a_World) {}
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
-	void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);  // tolua_export
+	void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockBreakAnimation        (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockEntity                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
+	void BroadcastBlockEntity                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastChat                       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom);
 	void BroadcastChatInfo                   (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtInformation); }
 	void BroadcastChatFailure                (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
@@ -45,8 +47,8 @@ public:
 	void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityAnimation            (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
-	void BroadcastParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = nullptr);
-	void BroadcastParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, cClientHandle * a_Exclude = nullptr);
+	void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);

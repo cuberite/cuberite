@@ -62,13 +62,13 @@ typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 
 
-// tolua_begin
-class cWorld :
+class cWorld  // tolua_export
+	final:
 	public cForEachChunkProvider,
 	public cWorldInterface
+// tolua_begin
 {
 public:
-
 	// tolua_end
 
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */

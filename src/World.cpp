@@ -4135,5 +4135,5 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 
 cBroadcaster cWorld::GetBroadcaster()
 {
-	return cBroadcaster(this);
+	return cBroadcaster(*this);
 }

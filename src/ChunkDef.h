@@ -71,6 +71,33 @@ public:
 
 
 
+/** Non-owning view of a chunk's client handles. */
+class cChunkClientHandles
+{
+public:
+	using const_iterator = std::vector<cClientHandle *>::const_iterator;
+	using iterator = const_iterator;
+
+	explicit cChunkClientHandles(const std::vector<cClientHandle *> & a_Container):
+		m_Begin(a_Container.cbegin()),
+		m_End(a_Container.cend())
+	{
+	}
+
+	const_iterator begin()  const { return m_Begin; }
+	const_iterator cbegin() const { return m_Begin; }
+
+	const_iterator end()  const { return m_End; }
+	const_iterator cend() const { return m_End; }
+
+private:
+	const_iterator m_Begin, m_End;
+};
+
+
+
+
+
 /** Constants used throughout the code, useful typedefs and utility functions */
 class cChunkDef
 {

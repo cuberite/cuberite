@@ -212,7 +212,7 @@ void cEntity::SetParentChunk(cChunk * a_Chunk)
 
 
 
-cChunk * cEntity::GetParentChunk()
+cChunk * cEntity::GetParentChunk() const
 {
 	return m_ParentChunk;
 }
