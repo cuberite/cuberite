@@ -2471,32 +2471,22 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
-BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
+void cChunk::GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ });
+	a_BlockType = GetBlock(a_RelPos);
+	a_BlockMeta = GetMeta(a_RelPos);
 }
 
 
 
 
 
-void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+void cChunk::GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_BlockMeta = m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
-}
-
-
-
-
-
-void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-{
-	Vector3i RelPos{ a_RelX, a_RelY, a_RelZ };
-	a_BlockType  = GetBlock(RelPos);
-	a_Meta       = m_ChunkData.GetMeta(RelPos);
-	a_SkyLight   = m_ChunkData.GetSkyLight(RelPos);
-	a_BlockLight = m_ChunkData.GetBlockLight(RelPos);
+	a_BlockType  = GetBlock(a_RelPos);
+	a_Meta       = m_ChunkData.GetMeta(a_RelPos);
+	a_SkyLight   = m_ChunkData.GetSkyLight(a_RelPos);
+	a_BlockLight = m_ChunkData.GetBlockLight(a_RelPos);
 }
 
 
