@@ -50,9 +50,9 @@
 	#include <stdlib.h>
 #endif
 
-#include "Broadcaster.h"
 #include "SpawnPrepare.h"
 #include "FastRandom.h"
+#include "OpaqueWorld.h"
 
 
 
@@ -61,6 +61,23 @@ const int TIME_NIGHT_START   = 13187;
 const int TIME_NIGHT_END     = 22812;
 const int TIME_SUNRISE       = 23999;
 const int TIME_SPAWN_DIVISOR =   148;
+
+
+
+
+
+namespace World
+{
+	// Implement conversion functions from OpaqueWorld.h
+	cBroadcastInterface * GetBroadcastInterface(cWorld * a_World) { return a_World; }
+	cForEachChunkProvider * GetFECProvider     (cWorld * a_World) { return a_World; }
+	cWorldInterface * GetWorldInterface        (cWorld * a_World) { return a_World; }
+
+	cChunkInterface GetChunkInterface(cWorld & a_World)
+	{
+		return { a_World.GetChunkMap() };
+	}
+}
 
 
 
@@ -2428,368 +2445,6 @@ bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 
 
 
-void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
-{
-	GetBroadcaster().BroadcastAttachEntity(a_Entity, a_Vehicle);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastBlockAction(a_BlockPos, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	LOG("BroadcastBlockAction with integer position is deprecated, use vector-parametered version instead.");
-	GetBroadcaster().BroadcastBlockAction({a_BlockX, a_BlockY, a_BlockZ}, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastBlockBreakAnimation(a_EntityID, a_BlockPos, a_Stage, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastBlockEntity(a_BlockPos, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
-{
-	GetBroadcaster().BroadcastChat(a_Message, a_Exclude, a_ChatPrefix);
-}
-
-
-
-
-
-void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastChat(a_Message, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastCollectEntity(a_Entity, a_Player, a_Count, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastDestroyEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
-{
-	GetBroadcaster().BroadcastDetachEntity(a_Entity, a_PreviousVehicle);
-}
-
-
-
-
-
-void cWorld::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
-{
-	GetBroadcaster().BroadcastLeashEntity(a_Entity, a_EntityLeashedTo);
-}
-
-
-
-
-
-void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
-{
-	GetBroadcaster().BroadcastUnleashEntity(a_Entity);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityHeadLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityMetadata(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityRelMove(a_Entity, { a_RelX, a_RelY, a_RelZ }, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityRelMoveLook(a_Entity, { a_RelX, a_RelY, a_RelZ }, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityVelocity(a_Entity, a_Exclude);
-}
-
-
-
-
-void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
-}
-
-
-
-
-
-
-void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastPlayerListAddPlayer(a_Player, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastPlayerListRemovePlayer(a_Player, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastPlayerListUpdateGameMode(a_Player, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastPlayerListUpdatePing(a_Player, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastPlayerListUpdateDisplayName(a_Player, a_CustomName, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
-{
-	GetBroadcaster().BroadcastScoreboardObjective(a_Name, a_DisplayName, a_Mode);
-}
-
-
-
-
-
-void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
-{
-	GetBroadcaster().BroadcastScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
-}
-
-
-
-
-
-void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
-{
-	GetBroadcaster().BroadcastDisplayObjective(a_Objective, a_Display);
-}
-
-
-
-
-
-void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
-{
-	LOG("BroadcastSoundEffect with double position arguments is deprecated, use vector-parametered version instead.");
-	GetBroadcaster().BroadcastSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastSoundParticleEffect(a_EffectID, { a_SrcX, a_SrcY, a_SrcZ }, a_Data, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastSpawnEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastTeleportEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastThunderbolt(a_BlockPos, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastTimeUpdate(a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	GetBroadcaster().BroadcastUseBed(a_Entity, { a_BlockX, a_BlockY, a_BlockZ });
-}
-
-
-
-
-
-void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
-{
-	GetBroadcaster().BroadcastWeather(a_Weather, a_Exclude);
-}
-
-
-
-
-
 void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
 {
 	m_ChunkMap->SendBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Client);
@@ -4129,11 +3784,4 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 	cPluginManager::Get()->CallHookChunkGenerated(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
-}
-
-
-
-cBroadcaster cWorld::GetBroadcaster()
-{
-	return cBroadcaster(*this);
 }

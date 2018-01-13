@@ -1888,23 +1888,21 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		if (!m_bHasSentNoSpeed || IsPlayer())
 		{
 			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
-			int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
-			int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
+			Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
 
-			if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
+			if (Diff.HasNonZeroLength())  // Have we moved?
 			{
-				if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+				if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
 				{
 					// Difference within Byte limitations, use a relative move packet
 					if (m_bDirtyOrientation)
 					{
-						m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_World->BroadcastEntityRelMoveLook(*this, Vector3<char>(Diff), a_Exclude);
 						m_bDirtyOrientation = false;
 					}
 					else
 					{
-						m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_World->BroadcastEntityRelMove(*this, Vector3<char>(Diff), a_Exclude);
 					}
 					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
 					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position

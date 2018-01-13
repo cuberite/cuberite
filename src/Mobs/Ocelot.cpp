@@ -5,7 +5,6 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
-#include "Broadcaster.h"
 #include "../BoundingBox.h"
 
 
@@ -159,13 +158,13 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					SetOwner(a_Player.GetName(), a_Player.GetUUID());
 					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
 					m_World->BroadcastEntityStatus(*this, esWolfTamed);
-					m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 				}
 				else
 				{
 					// Taming failed
 					m_World->BroadcastEntityStatus(*this, esWolfTaming);
-					m_World->GetBroadcaster().BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 				}
 			}
 		}

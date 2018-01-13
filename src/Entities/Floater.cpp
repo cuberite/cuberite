@@ -6,7 +6,6 @@
 #include "Floater.h"
 #include "Player.h"
 #include "../ClientHandle.h"
-#include "Broadcaster.h"
 
 
 
@@ -123,12 +122,12 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
 				m_ParticlePos.Set(GetPosX() + Random.RandInt(-4, 4), GetPosY(), GetPosZ() + Random.RandInt(-4, 4));
-				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
 			else if (m_CountDownTime < 20)
 			{
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
-				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
 
 			m_CountDownTime--;

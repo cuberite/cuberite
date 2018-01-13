@@ -60,10 +60,8 @@ public:
 			if (Item.m_ItemCount <= 0)
 			{
 				/* Experimental: show animation pickups getting together */
-				int DiffX = FloorC(m_Pickup->GetPosX() * 32.0) - FloorC(EntityPos.x * 32.0);
-				int DiffY = FloorC(m_Pickup->GetPosY() * 32.0) - FloorC(EntityPos.y * 32.0);
-				int DiffZ = FloorC(m_Pickup->GetPosZ() * 32.0) - FloorC(EntityPos.z * 32.0);
-				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ));
+				auto Diff = (m_Pickup->GetPosition() * 32.0).Floor() - (EntityPos * 32.0).Floor();
+				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, Vector3<char>(Diff));
 				/* End of experimental animation */
 				a_Entity.Destroy();
 

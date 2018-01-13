@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "tolua++/include/tolua++.h"
 #include "../World.h"
-#include "../Broadcaster.h"
 #include "../UUID.h"
 #include "ManualBindings.h"
 #include "LuaState.h"
@@ -54,7 +53,7 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 		L.GetStackValue(11 + i, data[static_cast<size_t>(i)]);
 	}
 
-	World->GetBroadcaster().BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmount, ExcludeClient);
+	World->BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmount, ExcludeClient);
 
 	return 0;
 }

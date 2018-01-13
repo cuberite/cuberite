@@ -7,7 +7,6 @@
 
 
 #include "Chunk.h"
-#include "Broadcaster.h"
 #include "World.h"
 #include "ClientHandle.h"
 #include "Server.h"
@@ -496,7 +495,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			auto clone = be->Clone(posX, posY, posZ);
 			clone->SetWorld(m_World);
 			AddBlockEntityClean(clone);
-			m_World->GetBroadcaster().BroadcastBlockEntity({posX, posY, posZ});
+			m_World->BroadcastBlockEntity({posX, posY, posZ});
 		}
 	}
 }

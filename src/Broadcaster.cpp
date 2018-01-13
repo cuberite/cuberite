@@ -1,9 +1,8 @@
 // Broadcaster.cpp
 
-// Implements the broadcasting interface for cWorld
+// Implements the broadcasting functions for cWorld
 
 #include "Globals.h"
-#include "Broadcaster.h"
 #include "World.h"
 #include "Chunk.h"
 #include "ClientHandle.h"
@@ -88,9 +87,9 @@ namespace
 
 
 
-void cBroadcaster::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
+void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendAttachEntity(a_Entity, a_Vehicle);
 		}
@@ -101,9 +100,9 @@ void cBroadcaster::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity
 
 
 
-void cBroadcaster::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_BlockPos, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType);
 		}
@@ -114,9 +113,9 @@ void cBroadcaster::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte 
 
 
 
-void cBroadcaster::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_BlockPos, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendBlockBreakAnim(a_EntityID, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Stage);
 		}
@@ -127,9 +126,9 @@ void cBroadcaster::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_Bl
 
 
 
-void cBroadcaster::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
-	m_World->DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
+	DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
 		{
 			cBlockEntity * Entity = a_Chunk.GetBlockEntity(a_BlockPos);
 			if (Entity == nullptr)
@@ -153,9 +152,9 @@ void cBroadcaster::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle
 
 
 
-void cBroadcaster::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
+void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendChat(a_Message, a_ChatPrefix);
 		}
@@ -166,9 +165,9 @@ void cBroadcaster::BroadcastChat(const AString & a_Message, const cClientHandle 
 
 
 
-void cBroadcaster::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
+void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendChat(a_Message);
 		}
@@ -179,9 +178,9 @@ void cBroadcaster::BroadcastChat(const cCompositeChat & a_Message, const cClient
 
 
 
-void cBroadcaster::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
+void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendCollectEntity(a_Entity, a_Player, a_Count);
 		}
@@ -192,9 +191,9 @@ void cBroadcaster::BroadcastCollectEntity(const cEntity & a_Entity, const cPlaye
 
 
 
-void cBroadcaster::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendDestroyEntity(a_Entity);
 		}
@@ -205,9 +204,9 @@ void cBroadcaster::BroadcastDestroyEntity(const cEntity & a_Entity, const cClien
 
 
 
-void cBroadcaster::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
+void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendDetachEntity(a_Entity, a_PreviousVehicle);
 		}
@@ -218,9 +217,9 @@ void cBroadcaster::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity
 
 
 
-void cBroadcaster::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
+void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
-	ForClientsInWorld(*m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendDisplayObjective(a_Objective, a_Display);
 		}
@@ -231,9 +230,9 @@ void cBroadcaster::BroadcastDisplayObjective(const AString & a_Objective, cScore
 
 
 
-void cBroadcaster::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
 		}
@@ -244,9 +243,9 @@ void cBroadcaster::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cBroadcaster::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
 		}
@@ -257,9 +256,9 @@ void cBroadcaster::BroadcastEntityEquipment(const cEntity & a_Entity, short a_Sl
 
 
 
-void cBroadcaster::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityHeadLook(a_Entity);
 		}
@@ -270,9 +269,9 @@ void cBroadcaster::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClie
 
 
 
-void cBroadcaster::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityLook(a_Entity);
 		}
@@ -283,9 +282,9 @@ void cBroadcaster::BroadcastEntityLook(const cEntity & a_Entity, const cClientHa
 
 
 
-void cBroadcaster::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityMetadata(a_Entity);
 		}
@@ -296,9 +295,9 @@ void cBroadcaster::BroadcastEntityMetadata(const cEntity & a_Entity, const cClie
 
 
 
-void cBroadcaster::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityRelMove(a_Entity, a_RelMove.x, a_RelMove.y, a_RelMove.z);
 		}
@@ -309,9 +308,9 @@ void cBroadcaster::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<char
 
 
 
-void cBroadcaster::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityRelMoveLook(a_Entity, a_RelMove.x, a_RelMove.y, a_RelMove.z);
 		}
@@ -322,9 +321,9 @@ void cBroadcaster::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<
 
 
 
-void cBroadcaster::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityStatus(a_Entity, a_Status);
 		}
@@ -335,9 +334,9 @@ void cBroadcaster::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status
 
 
 
-void cBroadcaster::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityVelocity(a_Entity);
 		}
@@ -347,9 +346,9 @@ void cBroadcaster::BroadcastEntityVelocity(const cEntity & a_Entity, const cClie
 
 
 
-void cBroadcaster::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityAnimation(a_Entity, a_Animation);
 		}
@@ -360,9 +359,9 @@ void cBroadcaster::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Ani
 
 
 
-void cBroadcaster::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
+void cWorld::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendLeashEntity(a_Entity, a_EntityLeashedTo);
 		}
@@ -373,9 +372,9 @@ void cBroadcaster::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity 
 
 
 
-void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude)
+void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_Src, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_Src, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
 		}
@@ -386,9 +385,9 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 
 
 
-void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude)
+void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_Src, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_Src, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
 		}
@@ -400,9 +399,9 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 
 
 
-void cBroadcaster::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListAddPlayer(a_Player);
 		}
@@ -413,9 +412,9 @@ void cBroadcaster::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const 
 
 
 
-void cBroadcaster::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListRemovePlayer(a_Player);
 		}
@@ -426,9 +425,9 @@ void cBroadcaster::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, con
 
 
 
-void cBroadcaster::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListUpdateGameMode(a_Player);
 		}
@@ -439,9 +438,9 @@ void cBroadcaster::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, c
 
 
 
-void cBroadcaster::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListUpdatePing(a_Player);
 		}
@@ -452,9 +451,9 @@ void cBroadcaster::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const
 
 
 
-void cBroadcaster::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 		}
@@ -465,9 +464,9 @@ void cBroadcaster::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player
 
 
 
-void cBroadcaster::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
+void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendRemoveEntityEffect(a_Entity, a_EffectID);
 		}
@@ -478,9 +477,9 @@ void cBroadcaster::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_E
 
 
 
-void cBroadcaster::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	ForClientsInWorld(*m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 		}
@@ -491,9 +490,9 @@ void cBroadcaster::BroadcastScoreboardObjective(const AString & a_Name, const AS
 
 
 
-void cBroadcaster::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_PlayerName, cObjective::Score a_Score, Byte a_Mode)
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_PlayerName, cObjective::Score a_Score, Byte a_Mode)
 {
-	ForClientsInWorld(*m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendScoreUpdate(a_Objective, a_PlayerName, a_Score, a_Mode);
 		}
@@ -504,9 +503,9 @@ void cBroadcaster::BroadcastScoreUpdate(const AString & a_Objective, const AStri
 
 
 
-void cBroadcaster::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_Position, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_Position, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
 		}
@@ -517,9 +516,9 @@ void cBroadcaster::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_
 
 
 
-void cBroadcaster::BroadcastSoundParticleEffect(const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSoundParticleEffect(const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_SrcPos, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_SrcPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendSoundParticleEffect(a_EffectID, a_SrcPos.x, a_SrcPos.y, a_SrcPos.z, a_Data);
 		}
@@ -530,9 +529,9 @@ void cBroadcaster::BroadcastSoundParticleEffect(const EffectID a_EffectID, Vecto
 
 
 
-void cBroadcaster::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Entity.SpawnOn(a_Client);
 		}
@@ -543,9 +542,9 @@ void cBroadcaster::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle 
 
 
 
-void cBroadcaster::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendTeleportEntity(a_Entity);
 		}
@@ -556,9 +555,9 @@ void cBroadcaster::BroadcastTeleportEntity(const cEntity & a_Entity, const cClie
 
 
 
-void cBroadcaster::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
+void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
 {
-	ForClientsLoadingPos(a_BlockPos, *m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendThunderbolt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 		}
@@ -569,11 +568,11 @@ void cBroadcaster::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle
 
 
 
-void cBroadcaster::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
+void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendTimeUpdate(m_World->GetWorldAge(), m_World->GetTimeOfDay(), m_World->IsDaylightCycleEnabled());
+			a_Client.SendTimeUpdate(GetWorldAge(), GetTimeOfDay(), IsDaylightCycleEnabled());
 		}
 	);
 }
@@ -582,9 +581,9 @@ void cBroadcaster::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 
 
 
-void cBroadcaster::BroadcastUnleashEntity(const cEntity & a_Entity)
+void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
 {
-	ForClientsLoadingEntity(a_Entity, *m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsLoadingEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendUnleashEntity(a_Entity);
 		}
@@ -595,9 +594,9 @@ void cBroadcaster::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 
 
-void cBroadcaster::BroadcastUseBed(const cEntity & a_Entity, Vector3i a_BedPos)
+void cWorld::BroadcastUseBed(const cEntity & a_Entity, Vector3i a_BedPos)
 {
-	ForClientsLoadingPos(a_BedPos, *m_World, nullptr, [&](cClientHandle & a_Client)
+	ForClientsLoadingPos(a_BedPos, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendUseBed(a_Entity, a_BedPos.x, a_BedPos.y, a_BedPos.z);
 		}
@@ -608,9 +607,9 @@ void cBroadcaster::BroadcastUseBed(const cEntity & a_Entity, Vector3i a_BedPos)
 
 
 
-void cBroadcaster::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
+void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*m_World, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendWeather(a_Weather);
 		}

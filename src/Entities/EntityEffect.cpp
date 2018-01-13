@@ -1,7 +1,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "EntityEffect.h"
-#include "Broadcaster.h"
 #include "Player.h"
 #include "../Chunk.h"
 #include "../Mobs/Monster.h"
@@ -418,7 +417,7 @@ void cEntityEffectInvisibility::BroadcastMetadata(cPawn & a_Target)
 	auto World = a_Target.GetWorld();
 	if (World != nullptr)
 	{
-		World->GetBroadcaster().BroadcastEntityMetadata(a_Target);
+		World->BroadcastEntityMetadata(a_Target);
 	}
 }
 

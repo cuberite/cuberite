@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "MobSpawnerEntity.h"
-#include "Broadcaster.h"
 
 #include "../World.h"
 #include "../FastRandom.h"
@@ -179,7 +178,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
-						m_World->GetBroadcaster().BroadcastSoundParticleEffect(
+						m_World->BroadcastSoundParticleEffect(
 							EffectID::PARTICLE_MOBSPAWN,
 							Vector3d(PosX, RelY, PosZ).Floor(),
 							0
