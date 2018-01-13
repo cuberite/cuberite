@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Broadcaster.h"
 #include "Chunk.h"
 #include "MetaRotator.h"
 
@@ -35,7 +34,7 @@ public:
 
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta, false);
 		a_WorldInterface.WakeUpSimulators(Pos);
-		a_WorldInterface.GetBroadcaster().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
 		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Broadcaster.h"
 #include "../Chunk.h"
 #include "MetaRotator.h"
 #include "BlockSlab.h"
@@ -26,7 +25,7 @@ public:
 
 		a_ChunkInterface.SetBlockMeta(Coords.x, Coords.y, Coords.z, Meta);
 		a_WorldInterface.WakeUpSimulators(Coords);
-		a_WorldInterface.GetBroadcaster().BroadcastSoundEffect("block.lever.click", Vector3d(Coords), 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", Vector3d(Coords), 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
 

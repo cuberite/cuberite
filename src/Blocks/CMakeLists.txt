@@ -94,6 +94,7 @@ SET (HDRS
 	BlockVine.h
 	BlockWallSign.h
 	BlockWorkbench.h
+	BroadcastInterface.h
 	ChunkInterface.h
 	ClearMetaOnDrop.h
 	GetHandlerCompileTimeTemplate.h

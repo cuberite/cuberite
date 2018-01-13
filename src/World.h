@@ -21,6 +21,7 @@
 #include "Scoreboard.h"
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
+#include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
 
 
@@ -65,8 +66,8 @@ typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 class cWorld  // tolua_export
 	final:
 	public cForEachChunkProvider,
-	public cWorldInterface
-// tolua_begin
+	public cWorldInterface,
+	public cBroadcastInterface
 {
 public:
 	// tolua_end
@@ -187,7 +188,7 @@ public:
 	void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityStatus               (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityAnimation            (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr);  // tolua_export
+	virtual void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
 	void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
@@ -198,18 +199,21 @@ public:
 	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);  // tolua_export
+	void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	void BroadcastSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr);  // tolua_export
+	virtual void BroadcastSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr);
 	void BroadcastUnleashEntity              (const cEntity & a_Entity);
-	void BroadcastUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr);
 
-	virtual cBroadcaster GetBroadcaster() override;
+	virtual cBroadcastInterface & GetBroadcastManager(void) override
+	{
+		return *this;
+	}
 
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -848,6 +852,8 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
+
+	cBroadcaster GetBroadcaster();
 
 private:
 
