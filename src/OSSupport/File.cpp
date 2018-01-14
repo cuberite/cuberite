@@ -690,13 +690,9 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::Printf(const char * a_Fmt, ...)
+int cFile::Printf(const char * a_Fmt, fmt::ArgList a_ArgList)
 {
-	AString buf;
-	va_list args;
-	va_start(args, a_Fmt);
-	AppendVPrintf(buf, a_Fmt, args);
-	va_end(args);
+	AString buf = ::Printf(a_Fmt, a_ArgList);
 	return Write(buf.c_str(), buf.length());
 }
 

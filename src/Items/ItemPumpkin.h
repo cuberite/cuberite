@@ -1,12 +1,4 @@
 
-// ItemPumpkin.h
-
-// Declares the cItemPumpkinHandler class representing the pumpkin block in its item form
-
-
-
-
-
 #pragma once
 
 #include "ItemHandler.h"
@@ -150,7 +142,3 @@ public:
 		return false;
 	}
 };
-
-
-
-

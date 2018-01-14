@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 project (ProtoProxy)
 
 include(../../SetFlags.cmake)
@@ -100,5 +101,5 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(ProtoProxy zlib mbedtls)
+target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt)
 
