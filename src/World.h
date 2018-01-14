@@ -766,7 +766,7 @@ public:
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
 	eWeather GetWeather(void) const { return m_Weather; }
 
-	/** Returns true if the current weather is sun */
+	/** Returns true if the current weather is sunny. */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
@@ -775,7 +775,7 @@ public:
 		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather is rain */
+	/** Returns true if the current weather is rainy. */
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
@@ -784,7 +784,7 @@ public:
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather is stormy */
+	/** Returns true if the current weather is stormy. */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 
 	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
@@ -793,14 +793,22 @@ public:
 		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 
-	/** Returns true if the current weather has any precipitation - rain, storm or snow */
+	/** Returns true if the world currently has any precipitation - rain, storm or snow. */
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 
-	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	/** Returns true if it is raining or storming at the specified location.
+	This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
 	{
-		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);
+		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
 	}
+
+	/** Returns true if the specified location has wet weather (rain or storm),
+	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
+	above the specified position will block the precipitation and this function
+	will return false. */
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos);
 
 	/** Returns the seed of the world. */
 	int GetSeed(void) { return m_Generator.GetSeed(); }
@@ -1129,7 +1137,3 @@ private:
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
 };  // tolua_export
-
-
-
-

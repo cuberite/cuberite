@@ -77,4 +77,3 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 		} break;
 	}
 }
-

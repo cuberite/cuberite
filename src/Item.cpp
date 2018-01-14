@@ -55,6 +55,7 @@ short cItem::GetMaxDamage(void) const
 		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
 		case E_ITEM_DIAMOND_SWORD:   return 1561;
 		case E_ITEM_FLINT_AND_STEEL: return 64;
+		case E_ITEM_FISHING_ROD:     return 65;
 		case E_ITEM_GOLD_AXE:        return 32;
 		case E_ITEM_GOLD_BOOTS:      return 92;
 		case E_ITEM_GOLD_CHESTPLATE: return 113;
@@ -88,8 +89,9 @@ short cItem::GetMaxDamage(void) const
 		case E_ITEM_WOODEN_PICKAXE:  return 59;
 		case E_ITEM_WOODEN_SHOVEL:   return 59;
 		case E_ITEM_WOODEN_SWORD:    return 59;
+
+		default: return 0;
 	}
-	return 0;
 }
 
 
@@ -628,7 +630,7 @@ cItem * cItems::Get(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently " SIZE_T_FMT " items. Returning a nil.", a_Idx, size());
+		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently %zu items. Returning a nil.", a_Idx, size());
 		return nullptr;
 	}
 	return &at(static_cast<size_t>(a_Idx));
@@ -642,7 +644,7 @@ void cItems::Set(int a_Idx, const cItem & a_Item)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Not setting.", a_Idx, size());
+		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
 		return;
 	}
 	at(static_cast<size_t>(a_Idx)) = a_Item;
@@ -656,7 +658,7 @@ void cItems::Delete(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Ignoring.", a_Idx, size());
+		LOGWARNING("cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently %zu items. Ignoring.", a_Idx, size());
 		return;
 	}
 	erase(begin() + a_Idx);
@@ -670,7 +672,7 @@ void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDama
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently " SIZE_T_FMT " items. Not setting.", a_Idx, size());
+		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
 		return;
 	}
 	at(static_cast<size_t>(a_Idx)) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);

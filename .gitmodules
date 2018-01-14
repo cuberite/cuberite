@@ -59,3 +59,7 @@
 	path = lib/zlib
 	url = https://github.com/cuberite/zlib.git
 	ignore = dirty
+[submodule "lib/fmt"]
+	path = lib/fmt
+	url = https://github.com/fmtlib/fmt.git
+	ignore = dirty

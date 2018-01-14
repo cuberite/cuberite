@@ -646,7 +646,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 {
 	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
-		LOGWARNING("%s: Distributing less items (%d) than slots (" SIZE_T_FMT  ")", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
+		LOGWARNING("%s: Distributing less items (%d) than slots (%zu)", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
 		return 0;
 	}

@@ -19,9 +19,9 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 	m_Map(a_Map)
 {
 	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
+	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
 
-	Printf(m_Path, "%s%cmap_%i.dat", DataPath.c_str(), cFile::PathSeparator, a_Map->GetID());
+	Printf(m_Path, "%s%cmap_%i.dat", DataPath.c_str(), cFile::PathSeparator(), a_Map->GetID());
 
 	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
 }
@@ -203,9 +203,9 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount(0)
 {
 	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
+	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
 
-	Printf(m_Path, "%s%cidcounts.dat", DataPath.c_str(), cFile::PathSeparator);
+	Printf(m_Path, "%s%cidcounts.dat", DataPath.c_str(), cFile::PathSeparator());
 
 	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
 }

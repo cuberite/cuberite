@@ -12,22 +12,12 @@ echo "Building..."
 cmake --build . -- -j 2;
 ctest -j 2 -V;
 
-# Create .gdbinit in home directory. Switches off the confirmation on quit
-echo -e "define hook-quit\n\tset confirm off\nend\n" > ~/.gdbinit
-
 echo "Testing..."
-
-# OSX builds don't have gdb
-if [ "$TRAVIS_OS_NAME" = osx ]; then
-	GDB_COMMAND=""
-else
-	GDB_COMMAND="gdb -return-child-result -ex run -ex \"bt\" -ex \"info threads\" -ex \"thread apply all bt\" -ex \"quit\" --args"
-fi
 
 cd Server/;
 touch apiCheckFailed.flag
 if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
-	${GDB_COMMAND} ${CUBERITE_PATH} <<- EOF
+	${CUBERITE_PATH} <<- EOF
 		load APIDump
 		apicheck
 		restart

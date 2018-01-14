@@ -92,6 +92,7 @@ src/AllFiles.lst
 *.VC.opendb
 *.VC.db
 *.idb
+.vs/
 
 # cmake output folders and files
 ZERO_CHECK.dir/

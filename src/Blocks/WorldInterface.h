@@ -65,7 +65,7 @@ public:
 
 	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 
-	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Returns or sets the minumim or maximum netherportal width */

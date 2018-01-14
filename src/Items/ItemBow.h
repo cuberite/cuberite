@@ -1,15 +1,8 @@
 
-// ItemBow.h
-
-// Declares the cItemBowHandler class representing the itemhandler for bows
-
-
-
-
-
 #pragma once
 
 #include "../Entities/ArrowEntity.h"
+#include "ItemHandler.h"
 
 
 
@@ -101,8 +94,3 @@ public:
 		}
 	}
 } ;
-
-
-
-
-

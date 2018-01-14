@@ -50,7 +50,7 @@ DarkOakPlanks, 4 = DarkOakLog, *
 EnderChest       = EyeOfEnder,  2:2 | Obsidian, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 Furnace          = Cobblestone, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 JunglePlanks, 4  = JungleLog, *
-OakPlanks, 4     = OakLog, * 
+OakPlanks, 4     = OakLog, *
 SprucePlanks, 4  = SpruceLog, *
 Stick, 4         = Planks^-1, 2:2, 2:3
 Torch, 4         = Stick, 1:2 | Coal^-1, 1:1
@@ -345,7 +345,6 @@ Bowl, 4              = Planks^-1, 1:1, 2:2, 3:1
 Bread                = Wheat, 1:1, 2:1, 3:1
 Cake                 = MilkBucket, 1:1, 2:1, 3:1 | Sugar, 1:2, 3:2 | Egg, 2:2 | Wheat, 1:3, 2:3, 3:3
 Cookie, 8            = Wheat, *, * | CocoaBeans, *
-EnchantedGoldenApple = RedApple, 2:2 | GoldBlock, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 GoldenApple          = RedApple, 2:2 | GoldIngot, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 MelonBlock           = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 MelonSeeds           = MelonSlice, *
@@ -858,7 +857,7 @@ GoldNugget, 9      = GoldIngot, *
 MagmaCream         = SlimeBall, * | BlazePowder, *
 
 #******************************************************#
-# Dyed Armor 
+# Dyed Armor
 # Do not modify
 LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, *
 LeatherHelmet = LeatherHelmet^-1, * | Dye^-1, * | Dye^-1, *

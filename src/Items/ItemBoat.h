@@ -1,10 +1,3 @@
-// ItemBoat.h
-
-// Declares the various boat ItemHandlers
-
-
-
-
 
 #pragma once
 
@@ -109,7 +102,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-

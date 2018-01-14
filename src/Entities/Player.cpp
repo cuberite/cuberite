@@ -678,6 +678,10 @@ void cPlayer::FinishEating(void)
 	{
 		return;
 	}
+	if (!IsGameModeCreative())
+	{
+		GetInventory().RemoveOneEquippedItem();
+	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
 
@@ -2330,38 +2334,43 @@ bool cPlayer::SaveToDisk()
 
 
 
-void cPlayer::UseEquippedItem(int a_Amount)
+void cPlayer::UseEquippedItem(short a_Damage)
 {
-	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
+	// No durability loss in creative or spectator modes:
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}
 
-	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	// If the item has an unbreaking enchantment, give it a chance of escaping damage:
+	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
 	cItem Item = GetEquippedItem();
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
-	if (UnbreakingLevel > 0)
+	double chance = 1 - (1.0 / (UnbreakingLevel + 1));
+	if (GetRandomProvider().RandBool(chance))
 	{
-		double chance = 0.0;
-		if (ItemCategory::IsArmor(Item.m_ItemType))
-		{
-			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
-		}
-		else
-		{
-			chance = 1.0 / (UnbreakingLevel + 1);
-		}
-
-		if (GetRandomProvider().RandBool(chance))
-		{
-			return;
-		}
+		return;
 	}
 
-	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
+	if (GetInventory().DamageEquippedItem(a_Damage))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
+}
+
+
+
+
+
+void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
+{
+	// Get item being used:
+	cItem Item = GetEquippedItem();
+
+	// Get base damage for action type:
+	short Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
+
+	UseEquippedItem(Dmg);
 }
 
 

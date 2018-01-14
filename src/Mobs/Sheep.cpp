@@ -208,4 +208,3 @@ NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
 		return E_META_WOOL_PINK;
 	}
 }
-
