@@ -22,10 +22,6 @@
 
 
 
-// Ticks to wait to do leash calculations
-#define LEASH_ACTIONS_TICK_STEP 10
-
-
 
 /** Map for eType <-> string
 Needs to be alpha-sorted by the strings, because binary search is used in StringToMobType()
@@ -400,10 +396,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}  // switch (m_EMState)
 
 	// Leash calculations
-	if ((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
-	{
-		CalcLeashActions();
-	}
+	CalcLeashActions(a_Dt);
 
 	BroadcastMovementUpdate();
 
@@ -422,7 +415,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cMonster::CalcLeashActions()
+void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 {
 	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
 	// This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't be loaded yet.
@@ -435,19 +428,41 @@ void cMonster::CalcLeashActions()
 			SetLeashToPos(nullptr);
 		}
 	}
-	else if (IsLeashed())  // Mob is already leashed to an entity: follow it.
-	{
-		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
-		MoveToPosition(m_LeashedTo->GetPosition());
 
-		// If distance to target > 10 break leash
-		Vector3f a_Distance(m_LeashedTo->GetPosition() - GetPosition());
-		double Distance(a_Distance.Length());
-		if (Distance > 10.0)
+	if (!IsLeashed())
+	{
+		return;
+	}
+
+	static const double LeashNaturalLength = 5.0;   // Length at equilibrium
+	static const double LeashMaximumLength = 10.0;  // Length where the leash breaks
+	static const double LeashSpringConstant = 20.0;  // How elastic the leash is
+
+	// If distance to target > Maximum, break leash
+	auto Displacement = m_LeashedTo->GetPosition() - GetPosition();
+	double Distance = Displacement.Length();
+	if (Distance > LeashMaximumLength)
+	{
+		LOGD("Leash broken (distance)");
+		Unleash(false);
+	}
+	else if (Distance > LeashNaturalLength)
+	{
+		// Accelerate monster towards the leashed to entity:
+		auto Extension = Distance - LeashNaturalLength;
+		auto Direction = Displacement / Distance;
+
+		auto Acceleration = Direction * (Extension * LeashSpringConstant);
+
+		// Stop mobs from floating up when on the ground
+		if (IsOnGround() && (Acceleration.y < std::abs(GetGravity())))
 		{
-			LOGD("Leash broken (distance)");
-			Unleash(false);
+			Acceleration.y = 0.0;
 		}
+
+		// Apply the acceleration
+		using namespace std::chrono;
+		AddSpeed(Acceleration * duration_cast<duration<double>>(a_Dt).count());
 	}
 }
 
