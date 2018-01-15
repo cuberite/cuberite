@@ -169,7 +169,7 @@ public:
 	If a_BackFill is true, the areas will be filled from the back (right side). (Example: Empty Hotbar -> Item get in slot 8, not slot 0) */
 	void DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
 
-	/** Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
+	/** Called on DblClicking to collect all stackable items from all areas into hand.
 	The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
 	If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
 	Returns true if full stack has been collected, false if there's space remaining to fill. */
