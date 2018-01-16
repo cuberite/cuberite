@@ -532,7 +532,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	m_Health -= static_cast<float>(a_TDI.FinalDamage);
-
 	m_Health = std::max(m_Health, 0.0f);
 
 	// Add knockback:
@@ -872,7 +871,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Handle cactus damage or destruction:
 		if (
-			IsMob() || IsPickup() || IsExpOrb() ||
+			IsMob() || IsPickup() ||
 			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
 		)
 		{
@@ -1281,20 +1280,27 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 
 void cEntity::DetectCacti(void)
 {
-	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	double w = m_Width / 2;
-	if (
-		((Y > 0) && (Y < cChunkDef::Height)) &&
-		((((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
-		((GetPosX() - X < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
-		(((Z + 1) - GetPosZ() < w) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS)) ||
-		((GetPosZ() - Z < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
-		(((Y + 1) - GetPosY() < w) && (GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_CACTUS)) ||
-		((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y - 1, Z) == E_BLOCK_CACTUS)))
-		)
+	int MinX = FloorC(GetPosX() - m_Width / 2);
+	int MaxX = FloorC(GetPosX() + m_Width / 2);
+	int MinZ = FloorC(GetPosZ() - m_Width / 2);
+	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
+	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+
+	for (int x = MinX; x <= MaxX; x++)
 	{
-		TakeDamage(dtCactusContact, nullptr, 1, 0);
-	}
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int y = MinY; y <= MaxY; y++)
+			{
+				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_CACTUS)
+				{
+					TakeDamage(dtCactusContact, nullptr, 1, 0);
+					return;
+				}
+			}  // for y
+		}  // for z
+	}  // for x
 }
 
 
