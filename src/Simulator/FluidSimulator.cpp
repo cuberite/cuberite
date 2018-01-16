@@ -124,49 +124,55 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 	return (a_Meta1 < a_Meta2);
 }
 
+#define D_DN lp[dn]
+#define D_UP lp[up]
+#define D_RT lp[rt]
+#define D_LT lp[lt]
 
 
 
-
-// TODO Not working very well yet :s
-Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
+Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool a_Over)
 {
+	Vector3f vDirection = { 0.0, 0.0, 0.0 };
+
 	if (!cChunkDef::IsValidHeight(a_Y))
 	{
-		return NONE;
+		return vDirection;
 	}
 	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
 	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
 	{
-		return NONE;
+		return vDirection;
 	}
-
-	/*
-	Disabled because of causing problems and being useless atm
-	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);  // If there is nothing or fluid below it -> dominating flow is down :D
-	if ((BlockBelow == E_BLOCK_AIR) || IsAllowedBlock(BlockBelow))
-	{
-		return Y_MINUS;
-	}
-	*/
 
 	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
-	int X = 0, Z = 0;  // Lowest Pos will be stored here
+
+    if(LowestPoint == 8)
+        LowestPoint = 0;
 
 	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
 	{
-		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
+		return GetFlowingDirectionVec(a_X, a_Y + 1, a_Z, false);
 	}
 
 	std::vector< Vector3i * > Points;
 
 	Points.reserve(4);  // Already allocate 4 places :D
 
-	// add blocks around the checking pos
-	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
+						// add blocks around the checking pos
+
 	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
+	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
+
+	int lp[4];
+	int i = 0;
+	int ct = LowestPoint;
+	int dir = -1;
+	int dir_ = -1;
+	int up, dn, lt, rt;
+	float lrp = 0;
 
 	for (auto itr = Points.cbegin(), end = Points.cend(); itr != end; ++itr)
 	{
@@ -174,54 +180,216 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 		auto PosBlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
 		if (IsAllowedBlock(PosBlockID))
 		{
-			NIBBLETYPE Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			lp[i] = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			if(lp[i] == 8)
+                lp[i] = 0;
 
-			if (Meta > LowestPoint)
-			{
-				LowestPoint = Meta;
-				X = Pos->x;
-				Z = Pos->z;
-			}
 		}
 		else if (PosBlockID == E_BLOCK_AIR)
 		{
-			LowestPoint = 9;  // This always dominates
-			X = Pos->x;
-			Z = Pos->z;
-
+			if(LowestPoint == 7)
+				lp[i] = 8;
+			else
+				lp[i] = -1;
 		}
+		else
+		{
+			lp[i] = -2;
+		}
+		if (ct < lp[i])
+        {
+            ct = lp[i];
+			dir_ = i;
+        }
 		delete Pos;
 		Pos = nullptr;
+		i++;
 	}
 
-	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
+	if (dir_ == -1 && LowestPoint == 0)
+		return vDirection;
+
+    ct = LowestPoint;
+
+	if ((lp[0] == lp[1] && lp[1] == lp[2] && lp[2] == lp[3]) || (lp[0] == lp[2] && lp[1] == lp[3]))
+		return vDirection;
+
+	if (lp[0] == lp[2] || (lp[0] < 0 && lp[2] < 0))
 	{
-		return NONE;
+		if (lp[1] > lp[3] && lp[1] > ct)
+			dir = DIR_SOUTH;
+		else if (lp[3] > lp[1] && lp[3] > ct)
+			dir = DIR_NORTH;
+		else
+			return vDirection;
 	}
-
-	if (a_X - X > 0)
+	else if (lp[1] == lp[3] || (lp[1] < 0 && lp[3] < 0))
 	{
-		return X_MINUS;
+		if (lp[0] > lp[2] && lp[0] > ct)
+			dir = DIR_EAST;
+		else if (lp[2] > lp[0] && lp[2] > ct)
+			dir = DIR_WEST;
+		else
+			return vDirection;
 	}
 
-	if (a_X - X < 0)
+	if (dir == -1)
 	{
-		return X_PLUS;
+		LOG("dir_ = %d", dir_);
+		switch (dir_)
+		{
+			case DIR_EAST:
+			{
+				up = 0;
+				rt = 1;
+				dn = 2;
+				lt = 3;
+				break;
+			}
+			case DIR_SOUTH:
+			{
+				up = 1;
+				rt = 2;
+				dn = 3;
+				lt = 0;
+				break;
+			}
+			case DIR_WEST:
+			{
+				up = 2;
+				rt = 3;
+				dn = 0;
+				lt = 1;
+				break;
+			}
+			case DIR_NORTH:
+			{
+				up = 3;
+				rt = 0;
+				dn = 1;
+				lt = 2;
+				break;
+			}
+		}
+
+		if (D_UP == D_RT)
+		{
+			if (D_LT >= 0)
+			{
+				dir = rt;
+				if (D_DN >= 0)
+					lrp = -1.0;
+				else
+					lrp = -0.5;
+			}
+			else if (D_DN >= 0)
+			{
+				dir = up;
+				if (D_LT >= 0)
+					lrp = 1.0;
+				else
+					lrp = 0.5;
+			}
+			else
+			{
+				dir = up;
+				lrp = 1.0;
+			}
+
+		}
+		else if (D_UP == D_LT)
+		{
+			if (D_RT >= 0)
+			{
+				dir = lt;
+				if (D_DN >= 0)
+					lrp = 1.0;
+				else
+					lrp = 0.5;
+			}
+			else if (D_DN >= 0)
+			{
+				dir = up;
+				if (D_RT >= 0)
+					lrp = -1.0;
+				else
+					lrp = -0.5;
+			}
+			else
+			{
+				dir = up;
+				lrp = -1.0;
+			}
+		}
+		else if (D_LT < 0)
+		{
+			dir = up;
+			if (D_LT == D_DN)
+				lrp = 1.0;
+			else
+				lrp = 0.25;
+		}
+		else if (D_RT < 0)
+		{
+			dir = up;
+			if (D_RT == D_DN)
+				lrp = -1.0;
+			else
+				lrp = -0.25;
+		}
+		else if (D_DN < 0 && D_RT != 0 && D_LT != 0)
+		{
+			dir = up;
+			if (D_RT > D_LT)
+			{
+				lrp = 1.0;
+			}
+			else if (D_LT > D_RT)
+			{
+				lrp = -1.0;
+			}
+		}
+		else
+			dir = up;
 	}
 
-	if (a_Z - Z > 0)
-	{
-		return Z_MINUS;
-	}
-
-	if (a_Z - Z < 0)
-	{
-		return Z_PLUS;
-	}
-
-	return NONE;
+    switch (dir)
+    {
+        case DIR_EAST:
+        {
+			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_EAST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+            vDirection.x = 1.0;
+            vDirection.z = lrp;
+            break;
+        }
+        case DIR_SOUTH:
+        {
+			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_SOUTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+            vDirection.x = -lrp;
+			vDirection.z = 1.0;
+            break;
+        }
+        case DIR_WEST:
+        {
+			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_WEST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+            vDirection.x = -1.0;
+            vDirection.z = -lrp;
+            break;
+        }
+        case DIR_NORTH:
+        {
+			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_NORTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+            vDirection.x = lrp;
+			vDirection.z = -1.0;
+            break;
+        }
+		default:
+		{
+			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n", ct, lp[0], lp[1], lp[2], lp[3]);
+		}
+    }
+	//vDirection = { 0.0, 0.0, 0.0 };
+	return vDirection;
 }
-
-
 
 
