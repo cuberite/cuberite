@@ -128,7 +128,7 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 #define D_UP lp[up]
 #define D_RT lp[rt]
 #define D_LT lp[lt]
-
+//#define DEBUG_PICKUP_WATERMOVE
 
 
 Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool a_Over)
@@ -220,8 +220,6 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 			dir = DIR_SOUTH;
 		else if (lp[3] > lp[1] && lp[3] > ct)
 			dir = DIR_NORTH;
-		else
-			return vDirection;
 	}
 	else if (lp[1] == lp[3] || (lp[1] < 0 && lp[3] < 0))
 	{
@@ -229,13 +227,14 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 			dir = DIR_EAST;
 		else if (lp[2] > lp[0] && lp[2] > ct)
 			dir = DIR_WEST;
-		else
-			return vDirection;
 	}
 
 	if (dir == -1)
 	{
+        #ifdef DEBUG_PICKUP_WATERMOVE
 		LOG("dir_ = %d", dir_);
+		#endif
+
 		switch (dir_)
 		{
 			case DIR_EAST:
@@ -357,38 +356,49 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
     {
         case DIR_EAST:
         {
+        #ifdef DEBUG_PICKUP_WATERMOVE
 			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_EAST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+         #endif
             vDirection.x = 1.0;
             vDirection.z = lrp;
             break;
         }
         case DIR_SOUTH:
         {
+        #ifdef DEBUG_PICKUP_WATERMOVE
 			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_SOUTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+         #endif
             vDirection.x = -lrp;
 			vDirection.z = 1.0;
             break;
         }
         case DIR_WEST:
         {
+        #ifdef DEBUG_PICKUP_WATERMOVE
 			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_WEST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+        #endif
             vDirection.x = -1.0;
             vDirection.z = -lrp;
             break;
         }
         case DIR_NORTH:
         {
+        #ifdef DEBUG_PICKUP_WATERMOVE
 			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_NORTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
+         #endif
             vDirection.x = lrp;
 			vDirection.z = -1.0;
             break;
         }
+        #ifdef DEBUG_PICKUP_WATERMOVE
 		default:
 		{
 			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n", ct, lp[0], lp[1], lp[2], lp[3]);
 		}
+		#endif
     }
-	//vDirection = { 0.0, 0.0, 0.0 };
+
+	//vDirection = { 0.0, 0.0, 0.0 }; //For Debug
 	return vDirection;
 }
 

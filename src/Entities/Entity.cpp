@@ -911,6 +911,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 
+
+	/* //For debug Pickups watermove
+    if(!IsPickup())
+            return;
+    */
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
@@ -929,7 +934,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (!cBlockInfo::IsSolid(BlockBelow))  // Check if block below is air or water.
 			{
-                LOG("-----------------------------------------");
 				m_bOnGround = false;
 			}
 		}
@@ -1114,6 +1118,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
+	//For debug Pickups watermove
+	//m_bHasSentNoSpeed = false;
 }
 
 
