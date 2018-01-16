@@ -46,6 +46,8 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	DetectCacti();
+
 	// Check player proximity no more than twice per second
 	if ((m_TicksAlive % 10) == 0)
 	{
@@ -78,4 +80,15 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		Destroy(true);
 	}
+}
+
+bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtCactusContact)
+	{
+		Destroy(true);
+		return true;
+	}
+
+	return super::DoTakeDamage(a_TDI);
 }
