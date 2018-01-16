@@ -235,23 +235,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		AddSpeedX(Distance.x);
 		AddSpeedZ(Distance.z);
 	}
-
-	// Speed up leashed mobs getting far from player
-	if (IsLeashed() && GetLeashedTo()->IsPlayer())
-	{
-		Distance = GetLeashedTo()->GetPosition() - GetPosition();
-		Distance.Normalize();
-		AddSpeedX(Distance.x);
-		AddSpeedZ(Distance.z);
-	}
-
 }
-
-
-
-
-
-
 
 
 
@@ -434,24 +418,29 @@ void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 		return;
 	}
 
-	static const double LeashNaturalLength = 5.0;   // Length at equilibrium
-	static const double LeashMaximumLength = 10.0;  // Length where the leash breaks
-	static const double LeashSpringConstant = 20.0;  // How elastic the leash is
+	static const double CloseFollowDistance = 1.8;   // The closest the mob will path towards the leashed to entity
+	static const double LeashNaturalLength  = 5.0;   // The closest the mob is actively pulled towards the entity
+	static const double LeashMaximumLength  = 10.0;  // Length where the leash breaks
+	static const double LeashSpringConstant = 20.0;  // How stiff the leash is
 
-	// If distance to target > Maximum, break leash
-	auto Displacement = m_LeashedTo->GetPosition() - GetPosition();
-	double Distance = Displacement.Length();
+	const auto LeashedToPos = m_LeashedTo->GetPosition();
+	const auto Displacement = LeashedToPos - GetPosition();
+	const auto Distance = Displacement.Length();
+	const auto Direction = Displacement.NormalizeCopy();
+
+	// If the leash is over-extended, break the leash:
 	if (Distance > LeashMaximumLength)
 	{
 		LOGD("Leash broken (distance)");
 		Unleash(false);
+		return;
 	}
-	else if (Distance > LeashNaturalLength)
+
+	// If the mob isn't following close enough, pull the mob towards the leashed to entity:
+	if (Distance > LeashNaturalLength)
 	{
 		// Accelerate monster towards the leashed to entity:
-		auto Extension = Distance - LeashNaturalLength;
-		auto Direction = Displacement / Distance;
-
+		const auto Extension = Distance - LeashNaturalLength;
 		auto Acceleration = Direction * (Extension * LeashSpringConstant);
 
 		// Stop mobs from floating up when on the ground
@@ -463,6 +452,14 @@ void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 		// Apply the acceleration
 		using namespace std::chrono;
 		AddSpeed(Acceleration * duration_cast<duration<double>>(a_Dt).count());
+	}
+
+	// Passively follow the leashed to entity:
+	if (Distance > CloseFollowDistance)
+	{
+		const Vector3d TargetBlock((LeashedToPos - Direction * CloseFollowDistance).Floor());
+		// Move to centre of target block face
+		MoveToPosition(TargetBlock + Vector3d{ 0.5, 0.0, 0.5 });
 	}
 }
 
