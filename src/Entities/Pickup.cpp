@@ -204,14 +204,15 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cPickup::DetectCacti(void)
+bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	auto HealthBefore = m_Health;
-	super::DetectCacti();
-	if (m_Health < HealthBefore)
+	if (a_TDI.DamageType == dtCactusContact)
 	{
 		Destroy(true);
+		return true;
 	}
+
+	return super::DoTakeDamage(a_TDI);
 }
 
 

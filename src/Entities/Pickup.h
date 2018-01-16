@@ -36,7 +36,7 @@ public:
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	virtual void DetectCacti(void) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	virtual bool DoesPreventBlockPlacement(void) const override { return false; }
 
