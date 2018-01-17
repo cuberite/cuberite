@@ -1037,11 +1037,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (WaterDirVec.x > 0.0)
 	{
-        m_WaterSpeed.x = 0.2f * WaterDirVec.x;
+		m_WaterSpeed.x = 0.2f * WaterDirVec.x;
 	}
 	if (WaterDirVec.z > 0.0)
 	{
-        m_WaterSpeed.z = 0.2f * WaterDirVec.z;
+		m_WaterSpeed.z = 0.2f * WaterDirVec.z;
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)

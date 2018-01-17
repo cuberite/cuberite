@@ -145,7 +145,9 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
 
 	if (CentralPoint == 8)
+	{
 		CentralPoint = 0;
+	}
 
 	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
 	{
@@ -174,14 +176,20 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 		{
 			LevelPoint[i] = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
 			if (LevelPoint[i] == 8)
-                LevelPoint[i] = CentralPoint;
+			{
+				LevelPoint[i] = CentralPoint;
+			}
 		}
 		else if (PosBlockID == E_BLOCK_AIR)
 		{
 			if (CentralPoint == 7)
+			{
 				LevelPoint[i] = 8;
+			}
 			else
-                LevelPoint[i] = CentralPoint;
+			{
+				LevelPoint[i] = CentralPoint;
+			}
 		}
 		else
 		{
@@ -192,7 +200,7 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 		i++;
 	}
 
-    // Calculate the flow direction
+	// Calculate the flow direction
 
 	vDirection.x = 1.0f * (LevelPoint[0] - CentralPoint) + -1.0f * (LevelPoint[2] - CentralPoint);
 	vDirection.z = 1.0f * (LevelPoint[1] - CentralPoint) + -1.0f * (LevelPoint[3] - CentralPoint);
