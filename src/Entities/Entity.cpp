@@ -414,8 +414,19 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
-		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+
+		// IsOnGround() only is false if the player is moving downwards
+		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
+		if (!Player->IsOnGround())
+		{
+			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
+			{
+				a_TDI.FinalDamage *= 1.5;  // 150% damage
+				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+			}
+		}
+
 		const cEnchantments & Enchantments = Player->GetEquippedItem().m_Enchantments;
 
 		int SharpnessLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSharpness));
@@ -456,7 +467,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
-						a_TDI.RawDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
+						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
@@ -516,15 +527,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if (Random.RandBool(Chance / 100.0))
 			{
 				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
-			}
-		}
-
-		if (!Player->IsOnGround())
-		{
-			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
-			{
-				a_TDI.FinalDamage += 2;
-				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
 			}
 		}
 
