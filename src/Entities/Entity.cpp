@@ -1032,40 +1032,18 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDirVec = m_World->GetWaterSimulator()->GetFlowingDirectionVec(BlockX, BlockY, BlockZ, false);
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
-	switch (WaterDir)
+	if (WaterDirVec.x != 0.0f)
 	{
-		case X_PLUS:
-		{
-			m_WaterSpeed.x = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case X_MINUS:
-		{
-			m_WaterSpeed.x = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_PLUS:
-		{
-			m_WaterSpeed.z = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_MINUS:
-		{
-			m_WaterSpeed.z = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		default:
-		{
-			break;
-		}
+		m_WaterSpeed.x = 0.3f * WaterDirVec.x;
+	}
+
+	if (WaterDirVec.z != 0.0f)
+	{
+		m_WaterSpeed.z = 0.3f * WaterDirVec.z;
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
@@ -1092,6 +1070,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// Set our position to where the block was hit, minus a bit:
 			// TODO: The real entity's m_Width should be taken into account here
 			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
+
 			if (HitBlockFace == BLOCK_FACE_YP)
 			{
 				// We hit the ground, adjust the position to the top of the block:
