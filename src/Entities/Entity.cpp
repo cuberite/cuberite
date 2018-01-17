@@ -1035,13 +1035,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
-	if (WaterDirVec.x > 0.0)
+	if (WaterDirVec.x != 0.0f)
 	{
-		m_WaterSpeed.x = 0.2f * WaterDirVec.x;
+        m_WaterSpeed.x = 0.3f * WaterDirVec.x;
 	}
-	if (WaterDirVec.z > 0.0)
+
+	if (WaterDirVec.z != 0.0f)
 	{
-		m_WaterSpeed.z = 0.2f * WaterDirVec.z;
+        m_WaterSpeed.z = 0.3f * WaterDirVec.z;
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
@@ -1112,6 +1113,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
+	m_bHasSentNoSpeed = false;
 }
 
 
