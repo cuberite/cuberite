@@ -1113,7 +1113,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
-	m_bHasSentNoSpeed = false;
 }
 
 
