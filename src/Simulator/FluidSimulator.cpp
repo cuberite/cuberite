@@ -192,9 +192,13 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 		i++;
 	}
 
+    // Calculate the flow direction
+
 	vDirection.x = 1.0 * (LevelPoint[0] - CentralPoint) + -1.0 * (LevelPoint[2] - CentralPoint);
 	vDirection.z = 1.0 * (LevelPoint[1] - CentralPoint) + -1.0 * (LevelPoint[3] - CentralPoint);
+
 	vDirection.Normalize();
+
 	return vDirection;
 }
 

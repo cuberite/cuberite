@@ -1073,6 +1073,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// Set our position to where the block was hit, minus a bit:
 			// TODO: The real entity's m_Width should be taken into account here
 			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
+
 			if (HitBlockFace == BLOCK_FACE_YP)
 			{
 				// We hit the ground, adjust the position to the top of the block:
