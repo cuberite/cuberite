@@ -195,6 +195,21 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtCactusContact)
+	{
+		Destroy(true);
+		return true;
+	}
+
+	return super::DoTakeDamage(a_TDI);
+}
+
+
+
+
+
 bool cPickup::CollectedBy(cPlayer & a_Dest)
 {
 	if (m_bCollected)
