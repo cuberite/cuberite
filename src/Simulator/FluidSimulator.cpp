@@ -158,7 +158,7 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 
 	Points.reserve(4);  // Already allocate 4 places :D
 
-						// add blocks around the checking pos
+	// add blocks around the checking pos
 
 	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
