@@ -97,6 +97,7 @@ public:
 		if (
 			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
 			(
+				!cBlockInfo::IsSolid(LeftNeighborBlock) &&               // Prioritize hinge on the left side
 				cBlockInfo::IsSolid(RightNeighborBlock) &&               // The block to the right is solid...
 				!cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
 			)
