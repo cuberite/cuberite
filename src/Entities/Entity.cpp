@@ -912,10 +912,10 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 
 
-	/* //For debug Pickups watermove
+	 //For debug Pickups watermove
     if(!IsPickup())
             return;
-    */
+
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
@@ -1042,13 +1042,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (WaterDirVec.x != 0)
 	{
-        m_WaterSpeed.x = 0.4f * WaterDirVec.x;
-       // m_bOnGround = false;
+        m_WaterSpeed.x = 0.2f * WaterDirVec.x;
 	}
 	if (WaterDirVec.z != 0)
 	{
-        m_WaterSpeed.z = 0.4f * WaterDirVec.z;
-       // m_bOnGround = false;
+        m_WaterSpeed.z = 0.2f * WaterDirVec.z;
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
@@ -1118,8 +1116,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
-	//For debug Pickups watermove
-	//m_bHasSentNoSpeed = false;
 }
 
 

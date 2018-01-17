@@ -124,11 +124,8 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 	return (a_Meta1 < a_Meta2);
 }
 
-#define D_DN lp[dn]
-#define D_UP lp[up]
-#define D_RT lp[rt]
-#define D_LT lp[lt]
-//#define DEBUG_PICKUP_WATERMOVE
+
+
 
 
 Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool a_Over)
@@ -145,10 +142,10 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 		return vDirection;
 	}
 
-	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
+	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
 
-    if(LowestPoint == 8)
-        LowestPoint = 0;
+    if(CentralPoint == 8)
+        CentralPoint = 0;
 
 	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
 	{
@@ -166,13 +163,8 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
 
-	int lp[4];
+	int LevelPoint[4];
 	int i = 0;
-	int ct = LowestPoint;
-	int dir = -1;
-	int dir_ = -1;
-	int up, dn, lt, rt;
-	float lrp = 0;
 
 	for (auto itr = Points.cbegin(), end = Points.cend(); itr != end; ++itr)
 	{
@@ -180,225 +172,29 @@ Vector3f cFluidSimulator::GetFlowingDirectionVec(int a_X, int a_Y, int a_Z, bool
 		auto PosBlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
 		if (IsAllowedBlock(PosBlockID))
 		{
-			lp[i] = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
-			if(lp[i] == 8)
-                lp[i] = 0;
-
+			LevelPoint[i] = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			if(LevelPoint[i] == 8)
+                LevelPoint[i] = CentralPoint;
 		}
 		else if (PosBlockID == E_BLOCK_AIR)
 		{
-			if(LowestPoint == 7)
-				lp[i] = 8;
+			if(CentralPoint == 7)
+				LevelPoint[i] = 8;
 			else
-				lp[i] = -1;
+                LevelPoint[i] = CentralPoint;
 		}
 		else
 		{
-			lp[i] = -2;
+			LevelPoint[i] = CentralPoint;
 		}
-		if (ct < lp[i])
-        {
-            ct = lp[i];
-			dir_ = i;
-        }
 		delete Pos;
 		Pos = nullptr;
 		i++;
 	}
 
-	if (dir_ == -1 && LowestPoint == 0)
-		return vDirection;
-
-    ct = LowestPoint;
-
-	if ((lp[0] == lp[1] && lp[1] == lp[2] && lp[2] == lp[3]) || (lp[0] == lp[2] && lp[1] == lp[3]))
-		return vDirection;
-
-	if (lp[0] == lp[2] || (lp[0] < 0 && lp[2] < 0))
-	{
-		if (lp[1] > lp[3] && lp[1] > ct)
-			dir = DIR_SOUTH;
-		else if (lp[3] > lp[1] && lp[3] > ct)
-			dir = DIR_NORTH;
-	}
-	else if (lp[1] == lp[3] || (lp[1] < 0 && lp[3] < 0))
-	{
-		if (lp[0] > lp[2] && lp[0] > ct)
-			dir = DIR_EAST;
-		else if (lp[2] > lp[0] && lp[2] > ct)
-			dir = DIR_WEST;
-	}
-
-	if (dir == -1)
-	{
-        #ifdef DEBUG_PICKUP_WATERMOVE
-		LOG("dir_ = %d", dir_);
-		#endif
-
-		switch (dir_)
-		{
-			case DIR_EAST:
-			{
-				up = 0;
-				rt = 1;
-				dn = 2;
-				lt = 3;
-				break;
-			}
-			case DIR_SOUTH:
-			{
-				up = 1;
-				rt = 2;
-				dn = 3;
-				lt = 0;
-				break;
-			}
-			case DIR_WEST:
-			{
-				up = 2;
-				rt = 3;
-				dn = 0;
-				lt = 1;
-				break;
-			}
-			case DIR_NORTH:
-			{
-				up = 3;
-				rt = 0;
-				dn = 1;
-				lt = 2;
-				break;
-			}
-		}
-
-		if (D_UP == D_RT)
-		{
-			if (D_LT >= 0)
-			{
-				dir = rt;
-				if (D_DN >= 0)
-					lrp = -1.0;
-				else
-					lrp = -0.5;
-			}
-			else if (D_DN >= 0)
-			{
-				dir = up;
-				if (D_LT >= 0)
-					lrp = 1.0;
-				else
-					lrp = 0.5;
-			}
-			else
-			{
-				dir = up;
-				lrp = 1.0;
-			}
-
-		}
-		else if (D_UP == D_LT)
-		{
-			if (D_RT >= 0)
-			{
-				dir = lt;
-				if (D_DN >= 0)
-					lrp = 1.0;
-				else
-					lrp = 0.5;
-			}
-			else if (D_DN >= 0)
-			{
-				dir = up;
-				if (D_RT >= 0)
-					lrp = -1.0;
-				else
-					lrp = -0.5;
-			}
-			else
-			{
-				dir = up;
-				lrp = -1.0;
-			}
-		}
-		else if (D_LT < 0)
-		{
-			dir = up;
-			if (D_LT == D_DN)
-				lrp = 1.0;
-			else
-				lrp = 0.25;
-		}
-		else if (D_RT < 0)
-		{
-			dir = up;
-			if (D_RT == D_DN)
-				lrp = -1.0;
-			else
-				lrp = -0.25;
-		}
-		else if (D_DN < 0 && D_RT != 0 && D_LT != 0)
-		{
-			dir = up;
-			if (D_RT > D_LT)
-			{
-				lrp = 1.0;
-			}
-			else if (D_LT > D_RT)
-			{
-				lrp = -1.0;
-			}
-		}
-		else
-			dir = up;
-	}
-
-    switch (dir)
-    {
-        case DIR_EAST:
-        {
-        #ifdef DEBUG_PICKUP_WATERMOVE
-			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_EAST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
-         #endif
-            vDirection.x = 1.0;
-            vDirection.z = lrp;
-            break;
-        }
-        case DIR_SOUTH:
-        {
-        #ifdef DEBUG_PICKUP_WATERMOVE
-			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_SOUTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
-         #endif
-            vDirection.x = -lrp;
-			vDirection.z = 1.0;
-            break;
-        }
-        case DIR_WEST:
-        {
-        #ifdef DEBUG_PICKUP_WATERMOVE
-			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_WEST\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
-        #endif
-            vDirection.x = -1.0;
-            vDirection.z = -lrp;
-            break;
-        }
-        case DIR_NORTH:
-        {
-        #ifdef DEBUG_PICKUP_WATERMOVE
-			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n lrp = %1.1f\n DIR_NORTH\n", ct, lp[0], lp[1], lp[2], lp[3], lrp);
-         #endif
-            vDirection.x = lrp;
-			vDirection.z = -1.0;
-            break;
-        }
-        #ifdef DEBUG_PICKUP_WATERMOVE
-		default:
-		{
-			LOG("***************\n ct = %d\n lp[0] = %d\n lp[1] = %d\n lp[2] = %d\n lp[3] = %d\n", ct, lp[0], lp[1], lp[2], lp[3]);
-		}
-		#endif
-    }
-
-	//vDirection = { 0.0, 0.0, 0.0 }; //For Debug
+	vDirection.x = 1.0 * (LevelPoint[0] - CentralPoint) + -1.0 * (LevelPoint[2] - CentralPoint);
+	vDirection.z = 1.0 * (LevelPoint[1] - CentralPoint) + -1.0 * (LevelPoint[3] - CentralPoint);
+	vDirection.Normalize();
 	return vDirection;
 }
 

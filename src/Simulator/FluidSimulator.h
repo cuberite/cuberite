@@ -3,7 +3,6 @@
 
 #include "Simulator.h"
 
-
 class cWorld;
 
 
@@ -19,13 +18,6 @@ enum Direction
 };
 
 
-enum WorldDirection
-{
-	DIR_EAST,
-	DIR_SOUTH,
-	DIR_WEST,
-	DIR_NORTH
-};
 
 
 
