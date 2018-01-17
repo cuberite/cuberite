@@ -85,11 +85,11 @@ bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
 bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
 {
 	return (
-				(a_BlockType == E_BLOCK_AIR) ||
-				(a_BlockType == E_BLOCK_FIRE) ||
-				IsAllowedBlock(a_BlockType) ||
-				CanWashAway(a_BlockType)
-				);
+		(a_BlockType == E_BLOCK_AIR) ||
+		(a_BlockType == E_BLOCK_FIRE) ||
+		IsAllowedBlock(a_BlockType) ||
+		CanWashAway(a_BlockType)
+		);
 }
 
 
