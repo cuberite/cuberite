@@ -1032,18 +1032,40 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ, false);
+	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
-	if (WaterDir.x != 0.0f)
+	switch (WaterDir)
 	{
-		m_WaterSpeed.x = 0.3f * WaterDir.x;
-	}
-
-	if (WaterDir.z != 0.0f)
-	{
-		m_WaterSpeed.z = 0.3f * WaterDir.z;
+		case X_PLUS:
+		{
+			m_WaterSpeed.x = 0.2f;
+			m_bOnGround = false;
+			break;
+		}
+		case X_MINUS:
+		{
+			m_WaterSpeed.x = -0.2f;
+			m_bOnGround = false;
+			break;
+		}
+		case Z_PLUS:
+		{
+			m_WaterSpeed.z = 0.2f;
+			m_bOnGround = false;
+			break;
+		}
+		case Z_MINUS:
+		{
+			m_WaterSpeed.z = -0.2f;
+			m_bOnGround = false;
+			break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	if (fabs(m_WaterSpeed.x) < 0.05)
