@@ -158,7 +158,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 	Points[2] = { a_X - 1, a_Y, a_Z };
 	Points[3] = { a_X, a_Y, a_Z - 1 };
 
-	for (int i = 0; i < ARRAYCOUNT(LevelPoint); i++)
+	for (unsigned long i = 0; i < ARRAYCOUNT(LevelPoint); i++)
 	{
 		BlockID = m_World.GetBlock(Points[i].x, Points[i].y, Points[i].z);
 
