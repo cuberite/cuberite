@@ -130,18 +130,16 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 
 Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 {
-	Vector3f vDirection;
-
 	if (!cChunkDef::IsValidHeight(a_Y))
 	{
-		return vDirection;
+		return {};
 	}
 
 	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
 
 	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
 	{
-		return vDirection;
+		return {};
 	}
 
 	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);
@@ -201,21 +199,23 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		}
 	}
 
+	Vector3f Direction;
+
 	// Calculate the flow direction
 
-	vDirection.x = LevelPoint[0] - LevelPoint[2];
-	vDirection.z = LevelPoint[1] - LevelPoint[3];
+	Direction.x = LevelPoint[0] - LevelPoint[2];
+	Direction.z = LevelPoint[1] - LevelPoint[3];
 
-	float Length = static_cast<float>(sqrt(vDirection.x * vDirection.x + vDirection.z * vDirection.z));
+	float Length = static_cast<float>(sqrt(Direction.x * Direction.x + Direction.z * Direction.z));
 
 	if (Length != 0.0f)
 	{
 		float Len = 1.0f / Length;
 
-		vDirection.x *= Len;
-		vDirection.z *= Len;
+		Direction.x *= Len;
+		Direction.z *= Len;
 	}
 
-	return vDirection;
+	return Direction;
 }
 
