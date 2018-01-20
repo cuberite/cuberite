@@ -206,7 +206,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 	vDirection.x = LevelPoint[0] - LevelPoint[2];
 	vDirection.z = LevelPoint[1] - LevelPoint[3];
 
-	double Length = sqrt(vDirection.x * vDirection.x + vDirection.z * vDirection.z);
+	float Length = static_cast<float>sqrt(vDirection.x * vDirection.x + vDirection.z * vDirection.z);
 
 	if (Length != 0.0f)
 	{
