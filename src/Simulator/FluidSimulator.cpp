@@ -152,11 +152,9 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 	}
 
 	int LevelPoint[4];
-	Vector3i Points[4];  // blocks around the checking pos
-	Points[0] = { a_X + 1, a_Y, a_Z };
-	Points[1] = { a_X, a_Y, a_Z + 1 };
-	Points[2] = { a_X - 1, a_Y, a_Z };
-	Points[3] = { a_X, a_Y, a_Z - 1 };
+
+	// blocks around the checking pos
+	Vector3i Points[4] = { { a_X + 1, a_Y, a_Z }, { a_X, a_Y, a_Z + 1 }, { a_X - 1, a_Y, a_Z },	{ a_X, a_Y, a_Z - 1 } };
 
 	for (unsigned long i = 0; i < ARRAYCOUNT(LevelPoint); i++)
 	{
