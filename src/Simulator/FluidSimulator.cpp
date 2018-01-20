@@ -128,100 +128,94 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 
 
 
-// TODO Not working very well yet :s
-Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
+Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 {
+	Vector3f vDirection;
+	Vector3i Points[4];
+	int LevelPoint[4];
+
 	if (!cChunkDef::IsValidHeight(a_Y))
 	{
-		return NONE;
+		return vDirection;
 	}
+
 	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
+
 	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
 	{
-		return NONE;
+		return vDirection;
 	}
 
-	/*
-	Disabled because of causing problems and being useless atm
-	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);  // If there is nothing or fluid below it -> dominating flow is down :D
-	if ((BlockBelow == E_BLOCK_AIR) || IsAllowedBlock(BlockBelow))
-	{
-		return Y_MINUS;
-	}
-	*/
+	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);
 
-	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
-	int X = 0, Z = 0;  // Lowest Pos will be stored here
-
-	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
+	if (CentralPoint > 7)
 	{
-		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
+		CentralPoint -= 8;
 	}
 
-	std::vector< Vector3i * > Points;
+	// blocks around the checking pos
 
-	Points.reserve(4);  // Already allocate 4 places :D
+	Points[0] = { a_X + 1, a_Y, a_Z };
+	Points[1] = { a_X, a_Y, a_Z + 1 };
+	Points[2] = { a_X - 1, a_Y, a_Z };
+	Points[3] = { a_X, a_Y, a_Z - 1 };
 
-	// add blocks around the checking pos
-	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
-	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
-	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
-	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
-
-	for (auto itr = Points.cbegin(), end = Points.cend(); itr != end; ++itr)
+	for (int i = 0; i < 4; i++)
 	{
-		Vector3i * Pos = (*itr);
-		auto PosBlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
-		if (IsAllowedBlock(PosBlockID))
+		BlockID = m_World.GetBlock(Points[i].x, Points[i].y, Points[i].z);
+
+		if (IsAllowedBlock(BlockID))
 		{
-			NIBBLETYPE Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			LevelPoint[i] = m_World.GetBlockMeta(Points[i].x, Points[i].y, Points[i].z);
 
-			if (Meta > LowestPoint)
+			if (LevelPoint[i] > 7)
 			{
-				LowestPoint = Meta;
-				X = Pos->x;
-				Z = Pos->z;
+				LevelPoint[i] -= 8;
+			}
+			else if (LevelPoint[i] == 0)
+			{
+				BlockID = m_World.GetBlock(Points[i].x, Points[i].y - 1, Points[i].z);
+
+				if (IsAllowedBlock(BlockID))
+				{
+					LevelPoint[i] = CentralPoint + 1;
+				}
 			}
 		}
-		else if (PosBlockID == E_BLOCK_AIR)
+		else if (BlockID == E_BLOCK_AIR)
 		{
-			LowestPoint = 9;  // This always dominates
-			X = Pos->x;
-			Z = Pos->z;
+			BlockID = m_World.GetBlock(Points[i].x, Points[i].y - 1, Points[i].z);
 
+			if (IsAllowedBlock(BlockID))
+			{
+				LevelPoint[i] = CentralPoint + 1;
+			}
+			else
+			{
+				LevelPoint[i] = CentralPoint;
+			}
 		}
-		delete Pos;
-		Pos = nullptr;
+		else
+		{
+			LevelPoint[i] = CentralPoint;
+		}
 	}
 
-	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
+	// Calculate the flow direction
+
+	vDirection.x = LevelPoint[0] - LevelPoint[2];
+	vDirection.z = LevelPoint[1] - LevelPoint[3];
+
+	double Length = sqrt(vDirection.x * vDirection.x + vDirection.z * vDirection.z);
+
+	if (Length != 0.0f)
 	{
-		return NONE;
+		float Len = 1.0f / Length;
+
+		vDirection.x *= Len;
+		vDirection.z *= Len;
 	}
 
-	if (a_X - X > 0)
-	{
-		return X_MINUS;
-	}
-
-	if (a_X - X < 0)
-	{
-		return X_PLUS;
-	}
-
-	if (a_Z - Z > 0)
-	{
-		return Z_MINUS;
-	}
-
-	if (a_Z - Z < 0)
-	{
-		return Z_PLUS;
-	}
-
-	return NONE;
+	return vDirection;
 }
-
-
-
 

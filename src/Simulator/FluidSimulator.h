@@ -28,7 +28,7 @@ class cFluidSimulatorData
 {
 public:
 	virtual ~cFluidSimulatorData() {}
-} ;
+};
 
 
 
@@ -46,7 +46,7 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 
 	/** Gets the flowing direction. If a_Over is true also the block over the current block affects the direction (standard) */
-	virtual Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);
+	virtual Vector3f GetFlowingDirection(int a_X, int a_Y, int a_Z);
 
 	/** Creates a ChunkData object for the simulator to use. The simulator returns the correct object type. */
 	virtual cFluidSimulatorData * CreateChunkData(void) { return nullptr; }
@@ -66,7 +66,7 @@ public:
 protected:
 	BLOCKTYPE m_FluidBlock;            // The fluid block type that needs simulating
 	BLOCKTYPE m_StationaryFluidBlock;  // The fluid block type that indicates no simulation is needed
-} ;
+};
 
 
 
