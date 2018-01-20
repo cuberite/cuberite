@@ -54,8 +54,7 @@ public:
 		m_Callbacks->OnError(a_ErrorMessage);
 
 		// Terminate the request's TCP link:
-		auto link = m_Link.lock();
-		if (link != nullptr)
+		if (auto link = m_Link.lock())
 		{
 			link->Close();
 		}
@@ -497,7 +496,11 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	auto Self = m_Self.lock();
 
 	// Do the actual redirect:
-	m_Link.lock()->Close();
+	if (auto Link = m_Link.lock())
+	{
+		Link->Close();
+	}
+
 	m_Url = a_RedirectUrl;
 	m_NumRemainingRedirects = m_NumRemainingRedirects - 1;
 	auto res = DoRequest(Self);
