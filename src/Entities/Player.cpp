@@ -1081,14 +1081,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			case dtAdmin: DamageText = "was administrator'd"; break;
 			case dtExplosion: DamageText = "blew up"; break;
 			case dtAttack: DamageText = "was attacked by thin air"; break;
-			#ifndef __clang__
-			default:
-			{
-				ASSERT(!"Unknown damage type");
-				DamageText = "died, somehow; we've no idea how though";
-				break;
-			}
-			#endif  // __clang__
+			COVERED_SWITCH;
 		}
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);

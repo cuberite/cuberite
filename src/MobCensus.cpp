@@ -47,11 +47,8 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 			ASSERT(!"Unhandled mob family");
 			return -1;
 		}
+		COVERED_SWITCH;
 	}
-	#if !defined(__clang__)
-		ASSERT(!"Unknown mob family");
-		return -1;
-	#endif
 }
 
 

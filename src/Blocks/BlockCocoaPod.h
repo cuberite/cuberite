@@ -81,11 +81,8 @@ public:
 				ASSERT(!"Unknown face");
 				return 0;
 			}
+			COVERED_SWITCH;
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

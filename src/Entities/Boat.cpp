@@ -206,11 +206,8 @@ AString cBoat::MaterialToString(eMaterial a_Material)
 		case bmJungle:  return "jungle";
 		case bmAcacia:  return "acacia";
 		case bmDarkOak: return "dark_oak";
+		COVERED_SWITCH;
 	}
-	ASSERT(!"Unhandled boat material");
-	#ifndef __clang__
-		return "oak";
-	#endif
 }
 
 
@@ -263,10 +260,8 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 		case bmJungle:  return cItem(E_ITEM_JUNGLE_BOAT);
 		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
 		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
+		COVERED_SWITCH;
 	}
-	#ifndef __clang__
-		return cItem(E_ITEM_BOAT);
-	#endif
 }
 
 

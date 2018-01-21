@@ -74,6 +74,7 @@ public:
 			case dlaAttackEntity:       return 1;
 			case dlaBreakBlock:         return 0;
 			case dlaBreakBlockInstant:  return 0;
+			COVERED_SWITCH;
 		}
 	}
 } ;

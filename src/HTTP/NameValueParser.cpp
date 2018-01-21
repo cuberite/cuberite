@@ -403,11 +403,8 @@ bool cNameValueParser::Finish(void)
 			m_State = psFinished;
 			return true;
 		}
+		COVERED_SWITCH;
 	}
-	ASSERT(!"Unhandled parser state!");
-	#ifndef __clang__
-		return false;
-	#endif
 }
 
 

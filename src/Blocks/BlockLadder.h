@@ -59,11 +59,8 @@ public:
 			{
 				return 0x2;
 			}
+			COVERED_SWITCH;
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
 	}
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)

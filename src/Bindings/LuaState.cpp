@@ -993,6 +993,8 @@ void cLuaState::Push(cEntity * a_Entity)
 						// Push the generic entity class type:
 						return "cEntity";
 					}
+
+					COVERED_SWITCH;
 				}  // switch (EntityType)
 			}();
 		tolua_pushusertype(m_LuaState, a_Entity, ClassName);

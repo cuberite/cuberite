@@ -355,11 +355,8 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
+		COVERED_SWITCH;
 	}
-	ASSERT(!"Unhandled projectile entity kind!");
-	#ifndef __clang__
-		return "";
-	#endif
 }
 
 

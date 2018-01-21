@@ -44,11 +44,8 @@ public:
 				ASSERT(!"Unhandled tripwire hook direction!");
 				return 0x0;
 			}
+			COVERED_SWITCH;
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
 	}
 
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)

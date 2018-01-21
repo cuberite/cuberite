@@ -105,13 +105,7 @@ protected:
 				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
 				break;
 			}
-			#if !defined(__clang__)
-			default:
-			{
-				ASSERT(!"Unknown BLOCK_FACE");
-				return 0;
-			}
-			#endif
+			COVERED_SWITCH;
 		}
 
 		return Dir;

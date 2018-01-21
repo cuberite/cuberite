@@ -30,11 +30,7 @@ AString cObjective::TypeToString(eType a_Type)
 		case otStatBlockMine:      return "stat.mineBlock";
 		case otStatEntityKill:     return "stat.killEntity";
 		case otStatEntityKilledBy: return "stat.entityKilledBy";
-
-		// clang optimisises this line away then warns that it has done so.
-		#if !defined(__clang__)
-		default: return "";
-		#endif
+		COVERED_SWITCH;
 	}
 
 }

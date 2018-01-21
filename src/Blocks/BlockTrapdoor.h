@@ -82,11 +82,8 @@ public:
 				ASSERT(!"Unhandled block face!");
 				return 0;
 			}
+			COVERED_SWITCH;
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
 	}
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)

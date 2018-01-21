@@ -30,6 +30,8 @@ static const int MAX_LIST_ITEMS = 10000;
 	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while (false)
 #endif
 
+#define AS_INT(x) static_cast<int>(x)
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,77 +39,68 @@ static const int MAX_LIST_ITEMS = 10000;
 
 AString cNBTParseErrorCategory::message(int a_Condition) const
 {
-	switch (static_cast<eNBTParseError>(a_Condition))
+	switch (a_Condition)
 	{
-		case eNBTParseError::npSuccess:
+		case AS_INT(eNBTParseError::npSuccess):
 		{
 			return "Parsing succeded";
 		}
-		case eNBTParseError::npNeedBytes:
+		case AS_INT(eNBTParseError::npNeedBytes):
 		{
 			return "Expected more data";
 		}
-		case eNBTParseError::npNoTopLevelCompound:
+		case AS_INT(eNBTParseError::npNoTopLevelCompound):
 		{
 			return "No top level compound tag";
 		}
-		case eNBTParseError::npStringMissingLength:
+		case AS_INT(eNBTParseError::npStringMissingLength):
 		{
 			return "Expected a string length but had insufficient data";
 		}
-		case eNBTParseError::npStringInvalidLength:
+		case AS_INT(eNBTParseError::npStringInvalidLength):
 		{
 			return "String length invalid";
 		}
-		case eNBTParseError::npCompoundImbalancedTag:
+		case AS_INT(eNBTParseError::npCompoundImbalancedTag):
 		{
 			return "Compound tag was unmatched at end of file";
 		}
-		case eNBTParseError::npListMissingType:
+		case AS_INT(eNBTParseError::npListMissingType):
 		{
 			return "Expected a list type but had insuffiecient data";
 		}
-		case eNBTParseError::npListMissingLength:
+		case AS_INT(eNBTParseError::npListMissingLength):
 		{
 			return "Expected a list length but had insufficient data";
 		}
-		case eNBTParseError::npListInvalidLength:
+		case AS_INT(eNBTParseError::npListInvalidLength):
 		{
 			return "List length invalid";
 		}
-		case eNBTParseError::npSimpleMissing:
+		case AS_INT(eNBTParseError::npSimpleMissing):
 		{
 			return "Expected a numeric type but had insufficient data";
 		}
-		case eNBTParseError::npArrayMissingLength:
+		case AS_INT(eNBTParseError::npArrayMissingLength):
 		{
 			return "Expected an array length but had insufficient data";
 		}
-		case eNBTParseError::npArrayInvalidLength:
+		case AS_INT(eNBTParseError::npArrayInvalidLength):
 		{
 			return "Array length invalid";
 		}
-		case eNBTParseError::npUnknownTag:
+		case AS_INT(eNBTParseError::npUnknownTag):
 		{
 			return "Unknown tag";
 		}
-
-		#ifdef __clang__
-			#pragma clang diagnostic push
-			#pragma clang diagnostic ignored "-Wcovered-switch-default"
-			#pragma clang diagnostic ignored "-Wunreachable-code"
-		#endif
-
 		default:
 		{
 			return "<unrecognized error>";
 		}
-
-		#ifdef __clang__
-			#pragma clang diagnostic pop
-		#endif
 	}
 }
+
+#undef AS_INT
 
 
 
@@ -337,13 +330,12 @@ eNBTParseError cParsedNBT::ReadTag(void)
 			return eNBTParseError::npSuccess;
 		}
 
-		#if !defined(__clang__)
-		default:
-		#endif
 		case TAG_Min:
 		{
 			return eNBTParseError::npUnknownTag;
 		}
+
+		COVERED_SWITCH;
 	}  // switch (iType)
 }
 

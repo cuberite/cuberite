@@ -62,11 +62,9 @@ public:
 				ASSERT(!"Unhandled block face!");
 				return a_QuartzMeta;  // No idea, give a special meta (all sides the same)
 			}
+
+			COVERED_SWITCH;
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

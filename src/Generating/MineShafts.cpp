@@ -786,13 +786,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 			Meta = E_META_CHEST_FACING_XP;
 			break;
 		}
-		#if !defined(__clang__)
-		default:
-		{
-			ASSERT(!"Unknown direction");
-			return;
-		}
-		#endif
+		COVERED_SWITCH;
 	}  // switch (Dir)
 
 	if (
