@@ -166,38 +166,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 
 		if (IsAllowedBlock(BlockID))
 		{
-			LevelPoint[i] = m_World.GetBlockMeta(Points[i].x, Points[i].y, Points[i].z);
-
-			if (LevelPoint[i] > 7)
-			{
-				LevelPoint[i] -= 8;
-			}
-			else if (LevelPoint[i] == 0)
-			{
-				BlockID = m_World.GetBlock(Points[i].x, Points[i].y - 1, Points[i].z);
-
-				if (BlockID == m_FluidBlock)
-				{
-					LevelPoint[i] = CentralPoint + 1;
-				}
-				else if (BlockID == m_StationaryFluidBlock)
-				{
-					LevelPoint[i] = CentralPoint;
-				}
-			}
-		}
-		else if (BlockID == E_BLOCK_AIR)
-		{
-			BlockID = m_World.GetBlock(Points[i].x, Points[i].y - 1, Points[i].z);
-
-			if (IsAllowedBlock(BlockID))
-			{
-				LevelPoint[i] = CentralPoint + 1;
-			}
-			else
-			{
-				LevelPoint[i] = CentralPoint;
-			}
+			LevelPoint[i] = 0x07 & m_World.GetBlockMeta(Points[i].x, Points[i].y, Points[i].z);
 		}
 		else
 		{
