@@ -39,12 +39,14 @@ class cFile
 public:
 
 	// tolua_end
-
-	#ifdef _WIN32
-	static const char PathSeparator = '\\';
-	#else
-	static const char PathSeparator = '/';
-	#endif
+	inline static char PathSeparator()
+	{
+		#ifdef _WIN32
+			return '\\';
+		#else
+			return '/';
+		#endif
+	}
 
 	/** The mode in which to open the file */
 	enum eMode
@@ -161,7 +163,8 @@ public:
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */
 	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
 
-	int Printf(const char * a_Fmt, ...) FORMATSTRING(2, 3);
+	int Printf(const char * a_Fmt, fmt::ArgList);
+	FMT_VARIADIC(int, Printf, const char *)
 
 	/** Flushes all the bufferef output into the file (only when writing) */
 	void Flush(void);

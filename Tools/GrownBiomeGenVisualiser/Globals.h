@@ -22,13 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
-	// MSVC has its own custom version of zu format
-	#define SIZE_T_FMT "%Iu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
-	#define SIZE_T_FMT_HEX "%Ix"
-
 	#define NORETURN      __declspec(noreturn)
 
 #elif defined(__GNUC__)
@@ -48,27 +41,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
-
-	#if defined(_WIN32)
-		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
-		// We need direct size formats:
-		#if defined(_WIN64)
-			#define SIZE_T_FMT "%I64u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "I64u"
-			#define SIZE_T_FMT_HEX "%I64x"
-		#else
-			#define SIZE_T_FMT "%u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "u"
-			#define SIZE_T_FMT_HEX "%x"
-		#endif
-	#else
-		// We're compiling on Linux, so we can use libc's size_t printf format:
-		#define SIZE_T_FMT "%zu"
-		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-		#define SIZE_T_FMT_HEX "%zx"
-	#endif
 
 	#define NORETURN      __attribute((__noreturn__))
 #else
@@ -91,8 +63,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 #endif
 
@@ -213,6 +183,7 @@ typedef unsigned char Byte;
 
 
 // Common headers (without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 
 

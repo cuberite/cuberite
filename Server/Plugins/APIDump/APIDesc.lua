@@ -238,7 +238,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether the specified block type will be destroyed after a single hit.",
+					Notes = "Returns true if the specified block type will be destroyed after a single hit.",
 				},
 				IsPistonBreakable =
 				{
@@ -256,7 +256,43 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether a piston can break the specified block type.",
+					Notes = "Returns true if a piston can break the specified block type.",
+				},
+				IsRainBlocker =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block type blocks rain from passing through.",
+				},
+				IsSkylightDispersant =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsSnowable =
 				{
@@ -293,24 +329,6 @@ return
 						},
 					},
 					Notes = "Returns whether the specified block type is solid.",
-				},
-				IsSkylightDispersant =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsTransparent =
 				{
@@ -3706,6 +3724,46 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is invisible",
 				},
+				IsInFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a fire block",
+				},
+				IsInLava =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a lava block",
+				},
+				IsInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a water block",
+				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
+				},
 				IsItemFrame =
 				{
 					Returns =
@@ -3854,7 +3912,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity's head is in a water block <b>Currently deprecated in favour of IsHeadInWater()</b>",
 				},
 				IsSwimming =
 				{
@@ -3864,7 +3922,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if any part of the entity is in a water block. Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
 				},
 				IsTicking =
 				{

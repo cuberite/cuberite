@@ -14,9 +14,9 @@
 
 // Easy switch for turning on debugging logging:
 #if 0
-	#define FLOG LOGD
+	#define FIRE_LOG LOGD
 #else
-	#define FLOG(...)
+	#define FIRE_LOG(...)
 #endif
 
 
@@ -25,15 +25,22 @@
 
 #define MAX_CHANCE_REPLACE_FUEL 100000
 #define MAX_CHANCE_FLAMMABILITY 100000
+// The base chance that in a tick, rain will extinguish a fire block.
+#define CHANCE_BASE_RAIN_EXTINGUISH 0.2
+// The additional chance, multiplied by the meta of the fire block, that rain
+// will extinguish a fire block in a tick.
+#define CHANCE_AGE_M_RAIN_EXTINGUISH 0.03
 
 
 
 
 
-static const struct
-{
-	int x, y, z;
-} gCrossCoords[] =
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
+static const Vector3i gCrossCoords[] =
 {
 	{ 1, 0,  0},
 	{-1, 0,  0},
@@ -45,10 +52,7 @@ static const struct
 
 
 
-static const struct
-{
-	int x, y, z;
-} gNeighborCoords[] =
+static const Vector3i gNeighborCoords[] =
 {
 	{ 1,  0,  0},
 	{-1,  0,  0},
@@ -57,6 +61,10 @@ static const struct
 	{ 0,  0,  1},
 	{ 0,  0, -1},
 } ;
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
 
 
 
@@ -97,20 +105,39 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		int x = itr->x;
 		int y = itr->y;
 		int z = itr->z;
+		auto AbsPos = cChunkDef::RelativeToAbsolute({x, y, z}, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
 		BLOCKTYPE BlockType = a_Chunk->GetBlock(x, y, z);
 
 		if (!IsAllowedBlock(BlockType))
 		{
 			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
-			FLOG("FS: Removing block {%d, %d, %d}",
-				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+			FIRE_LOG("FS: Removing block {%d, %d, %d}",
+				AbsPos.x, AbsPos.y, AbsPos.z
 			);
 			itr = Data.erase(itr);
 			continue;
 		}
 
+		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
+		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
+
+		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
+			[this, AbsPos](Vector3i cc)
+			{
+				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
+			}
+		);
+
+		// Randomly burn out the fire if it is raining:
+		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
+		{
+			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
+			itr = Data.erase(itr);
+			continue;
+		}
+
 		// Try to spread the fire:
-		TrySpreadFire(a_Chunk, itr->x, itr->y, itr->z);
+		TrySpreadFire(a_Chunk, x, y, z);
 
 		itr->Data -= NumMSecs;
 		if (itr->Data >= 0)
@@ -120,30 +147,31 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		// Burn out the fire one step by increasing the meta:
 		/*
-		FLOG("FS: Fire at {%d, %d, %d} is stepping",
+		FIRE_LOG("FS: Fire at {%d, %d, %d} is stepping",
 			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
 		);
 		*/
-		NIBBLETYPE BlockMeta = a_Chunk->GetMeta(x, y, z);
+		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
 			// The fire burnt out completely
-			FLOG("FS: Fire at {%d, %d, %d} burnt out, removing the fire block",
+			FIRE_LOG("FS: Fire at {%d, %d, %d} burnt out, removing the fire block",
 				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
 			);
-			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
-			RemoveFuelNeighbors(a_Chunk, itr->x, itr->y, itr->z);
+			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
+			RemoveFuelNeighbors(a_Chunk, x, y, z);
 			itr = Data.erase(itr);
 			continue;
 		}
 
-		if ((itr->y > 0) && (!DoesBurnForever(a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z))))
+		// Burn out the fire one step by increasing the meta:
+		if (!BurnsForever)
 		{
 			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
 		}
-		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+
+		itr->Data = GetBurnStepTime(a_Chunk, x, y, z);  // TODO: Add some randomness into this
 		++itr;
 	}  // for itr - Data[]
 }
@@ -244,7 +272,7 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 		}
 	}  // for itr - ChunkData[]
 
-	FLOG("FS: Adding block {%d, %d, %d}", a_Block.x, a_Block.y, a_Block.z);
+	FIRE_LOG("FS: Adding block {%d, %d, %d}", a_Block.x, a_Block.y, a_Block.z);
 	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ, 100));
 }
 
@@ -283,7 +311,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		}
 	}  // for i - gCrossCoords[]
 
-	if (!IsBlockBelowSolid && (a_RelY >= 0))
+	if (!IsBlockBelowSolid)
 	{
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
@@ -324,7 +352,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 				// Start the fire in the neighbor {x, y, z}
 				/*
-				FLOG("FS: Trying to start fire at {%d, %d, %d}.",
+				FIRE_LOG("FS: Trying to start fire at {%d, %d, %d}.",
 					x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
 				);
 				*/
@@ -338,7 +366,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 						return;
 					}
 
-					FLOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
+					FIRE_LOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
 			}  // for y
@@ -427,7 +455,3 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 	}  // for i - Coords[]
 	return false;
 }
-
-
-
-

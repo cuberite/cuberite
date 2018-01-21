@@ -193,38 +193,14 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	// Take damage when touching water, drowning damage seems to be most appropriate
-	if (CheckRain() || IsSwimming())
+	// Take damage when wet, drowning damage seems to be most appropriate
+	if (
+		cChunkDef::IsValidHeight(POSY_TOINT) &&
+		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
+	)
 	{
 		EventLosePlayer();
 		TakeDamage(dtDrowning, nullptr, 1, 0);
 		// TODO teleport to a safe location
 	}
 }
-
-
-
-
-
-bool cEnderman::CheckRain(void)
-{
-	if (!GetWorld()->IsWeatherRain())
-	{
-		return false;
-	}
-
-	Vector3d coords = GetPosition();
-	for (int Y = static_cast<int>(coords.y); Y < cChunkDef::Height; ++Y)
-	{
-		BLOCKTYPE Block = m_World->GetBlock(static_cast<int>(coords.x), Y, static_cast<int>(coords.z));
-		if (Block != E_BLOCK_AIR)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-
-
-

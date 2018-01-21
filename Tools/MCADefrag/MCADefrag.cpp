@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "MCADefrag.h"
 #include "Logger.h"
+#include "LoggerSimple.h"
 #include "LoggerListeners.h"
 #include "zlib/zlib.h"
 
@@ -31,17 +32,17 @@ int main(int argc, char ** argv)
 		return EXIT_FAILURE;
 	}
 	auto fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
-	
+
 	cLogger::InitiateMultithreading();
-	
+
 	cMCADefrag Defrag;
 	if (!Defrag.Init(argc, argv))
 	{
 		return EXIT_FAILURE;
 	}
-	
+
 	Defrag.Run();
-	
+
 	return 0;
 }
 
@@ -49,7 +50,7 @@ int main(int argc, char ** argv)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cMCADefrag:
 
 cMCADefrag::cMCADefrag(void) :
@@ -82,7 +83,7 @@ void cMCADefrag::Run(void)
 	{
 		StartThread();
 	}
-	
+
 	// Wait for all the threads to finish:
 	while (!m_Threads.empty())
 	{
@@ -122,7 +123,7 @@ AString cMCADefrag::GetNextFileName(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cMCADefrag::cThread:
 
 cMCADefrag::cThread::cThread(cMCADefrag & a_Parent) :
@@ -161,7 +162,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 		return;
 	}
 	LOGINFO("%s", a_FileName.c_str());
-	
+
 	// Open input and output files:
 	AString OutFileName = a_FileName + ".new";
 	cFile In, Out;
@@ -175,7 +176,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 		LOGWARNING("Cannot open file %s for writing, skipping file.", OutFileName.c_str());
 		return;
 	}
-	
+
 	// Read the Locations and Timestamps from the input file:
 	Byte Locations[4096];
 	UInt32 Timestamps[1024];
@@ -189,7 +190,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 		LOGWARNING("Cannot read Timestamps in file %s, skipping file.", a_FileName.c_str());
 		return;
 	}
-	
+
 	// Write dummy Locations to the Out file (will be overwritten once the correct ones are known)
 	if (Out.Write(Locations, sizeof(Locations)) != sizeof(Locations))
 	{
@@ -197,14 +198,14 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 		return;
 	}
 	m_CurrentSectorOut = 2;
-	
+
 	// Write a copy of the Timestamps into the Out file:
 	if (Out.Write(Timestamps, sizeof(Timestamps)) != sizeof(Timestamps))
 	{
 		LOGWARNING("Cannot write Timestamps to file %s, skipping file.", OutFileName.c_str());
 		return;
 	}
-	
+
 	// Process each chunk:
 	for (size_t i = 0; i < 1024; i++)
 	{
@@ -231,7 +232,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 			return;
 		}
 	}
-	
+
 	// Write the new Locations into the MCA header:
 	Out.Seek(0);
 	if (Out.Write(Locations, sizeof(Locations)) != sizeof(Locations))
@@ -239,7 +240,7 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 		LOGWARNING("Cannot write updated Locations to file %s, skipping file.", OutFileName.c_str());
 		return;
 	}
-	
+
 	// Close the files, delete orig, rename new:
 	In.Close();
 	Out.Close();
@@ -263,7 +264,7 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 		);
 		return false;
 	}
-	
+
 	// Read the exact size:
 	Byte Buf[4];
 	if (a_File.Read(Buf, 4) != 4)
@@ -277,14 +278,14 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 		LOGWARNING("Invalid chunk data - SizeInSectors (%d) smaller that RealSize (%d)", SizeInSectors, m_CompressedChunkDataSize);
 		return false;
 	}
-	
+
 	// Read the data:
 	if (a_File.Read(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) != m_CompressedChunkDataSize)
 	{
 		LOGWARNING("Failed to read chunk data!");
 		return false;
 	}
-	
+
 	// Uncompress the data if recompression is active
 	if (m_Parent.m_ShouldRecompress)
 	{
@@ -294,7 +295,7 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 			LOGINFO("Chunk failed to uncompress, will be copied verbatim instead.");
 		}
 	}
-	
+
 	return true;
 }
 
@@ -312,14 +313,14 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 			LOGINFO("Chunk failed to recompress, will be coped verbatim instead.");
 		}
 	}
-	
+
 	// Update the Location:
 	a_LocationRaw[0] = static_cast<Byte>(m_CurrentSectorOut >> 16);
 	a_LocationRaw[1] = (m_CurrentSectorOut >> 8) & 0xff;
 	a_LocationRaw[2] = m_CurrentSectorOut & 0xff;
 	a_LocationRaw[3] = static_cast<Byte>((m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB));  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
 	m_CurrentSectorOut += a_LocationRaw[3];
-	
+
 	// Write the data length:
 	Byte Buf[4];
 	Buf[0] = static_cast<Byte>(m_CompressedChunkDataSize >> 24);
@@ -331,14 +332,14 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 		LOGWARNING("Failed to write chunk length!");
 		return false;
 	}
-	
+
 	// Write the data:
 	if (a_File.Write(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) != m_CompressedChunkDataSize)
 	{
 		LOGWARNING("Failed to write chunk data!");
 		return false;
 	}
-	
+
 	// Pad onto the next sector:
 	int NumPadding = a_LocationRaw[3] * 4096 - (m_CompressedChunkDataSize + 4);
 	ASSERT(NumPadding >= 0);
@@ -347,7 +348,7 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 		LOGWARNING("Failed to write padding");
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -419,7 +420,7 @@ bool cMCADefrag::cThread::CompressChunk(void)
 		LOGINFO("Too much data for the internal compression buffer!");
 		return false;
 	}
-	
+
 	// Compress the data using the highest compression factor:
 	int errorcode = compress2(m_CompressedChunkData + 1, &CompressedSize, m_RawChunkData, static_cast<uLong>(m_RawChunkDataSize), Z_BEST_COMPRESSION);
 	if (errorcode != Z_OK)
@@ -432,7 +433,3 @@ bool cMCADefrag::cThread::CompressChunk(void)
 	m_CompressedChunkDataSize = static_cast<int>(CompressedSize + 1);
 	return true;
 }
-
-
-
-

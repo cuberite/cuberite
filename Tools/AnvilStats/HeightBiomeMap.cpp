@@ -55,12 +55,12 @@ bool cHeightBiomeMap::OnNewChunk(int a_ChunkX, int a_ChunkZ)
 	m_CurrentChunkZ = a_ChunkZ;
 	m_CurrentChunkRelX = m_CurrentChunkX - m_CurrentRegionX * 32;
 	m_CurrentChunkRelZ = m_CurrentChunkZ - m_CurrentRegionZ * 32;
-	
+
 	ASSERT((m_CurrentChunkRelX >= 0) && (m_CurrentChunkRelX < 32));
 	ASSERT((m_CurrentChunkRelZ >= 0) && (m_CurrentChunkRelZ < 32));
-	
+
 	memset(m_BlockTypes, 0, sizeof(m_BlockTypes));
-	
+
 	return CALLBACK_CONTINUE;
 }
 
@@ -72,7 +72,7 @@ bool cHeightBiomeMap::OnNewChunk(int a_ChunkX, int a_ChunkZ)
 bool cHeightBiomeMap::OnBiomes(const unsigned char * a_BiomeData)
 {
 	memcpy(m_ChunkBiomes, a_BiomeData, sizeof(m_ChunkBiomes));
-	
+
 	return CALLBACK_CONTINUE;
 }
 
@@ -86,7 +86,7 @@ bool cHeightBiomeMap::OnHeightMap(const int * a_HeightMapBE)
 	{
 		m_ChunkHeight[i] = ntohl(a_HeightMapBE[i]);
 	}  // for i - m_ChunkHeight
-	
+
 	return CALLBACK_CONTINUE;
 }
 
@@ -157,12 +157,12 @@ bool cHeightBiomeMap::OnSectionsFinished(void)
 					break;  // for y
 				}
 			}  // for y
-			
+
 			// Set the color based on the biome and height:
 			char Biome = m_ChunkBiomes[16 * z + x];
 			PixelLine[x] = ShadeColor(BiomePalette[Biome], Height);
 		}  // for x
-		
+
 		// Set the pixelline into the image:
 		SetPixelURow(m_CurrentChunkRelX * 16, m_CurrentChunkRelZ * 16 + z, 16, PixelLine);
 	}  // for z
@@ -173,7 +173,7 @@ bool cHeightBiomeMap::OnSectionsFinished(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeightBiomeMapFactory:
 
 cHeightBiomeMapFactory::~cHeightBiomeMapFactory()
@@ -203,7 +203,7 @@ cHeightBiomeMapFactory::~cHeightBiomeMapFactory()
 			MaxRegionZ = cb->m_MaxRegionZ;
 		}
 	}
-	
+
 	// If the size is small enough, write an HTML file referencing all the images in a table:
 	if ((MaxRegionX >= MinRegionX) && (MaxRegionZ >= MinRegionZ) && (MaxRegionX - MinRegionX < 100) && (MaxRegionZ - MinRegionZ < 100))
 	{
@@ -224,7 +224,3 @@ cHeightBiomeMapFactory::~cHeightBiomeMapFactory()
 		}
 	}
 }
-
-
-
-

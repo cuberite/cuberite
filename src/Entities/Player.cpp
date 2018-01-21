@@ -92,9 +92,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
 
-	m_IsSwimming = false;
-	m_IsSubmerged = false;
-
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
@@ -677,6 +674,10 @@ void cPlayer::FinishEating(void)
 	if (!ItemHandler->EatItem(this, &Item))
 	{
 		return;
+	}
+	if (!IsGameModeCreative())
+	{
+		GetInventory().RemoveOneEquippedItem();
 	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
@@ -2330,38 +2331,43 @@ bool cPlayer::SaveToDisk()
 
 
 
-void cPlayer::UseEquippedItem(int a_Amount)
+void cPlayer::UseEquippedItem(short a_Damage)
 {
-	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
+	// No durability loss in creative or spectator modes:
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}
 
-	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	// If the item has an unbreaking enchantment, give it a chance of escaping damage:
+	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
 	cItem Item = GetEquippedItem();
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
-	if (UnbreakingLevel > 0)
+	double chance = 1 - (1.0 / (UnbreakingLevel + 1));
+	if (GetRandomProvider().RandBool(chance))
 	{
-		double chance = 0.0;
-		if (ItemCategory::IsArmor(Item.m_ItemType))
-		{
-			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
-		}
-		else
-		{
-			chance = 1.0 / (UnbreakingLevel + 1);
-		}
-
-		if (GetRandomProvider().RandBool(chance))
-		{
-			return;
-		}
+		return;
 	}
 
-	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
+	if (GetInventory().DamageEquippedItem(a_Damage))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
+}
+
+
+
+
+
+void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
+{
+	// Get item being used:
+	cItem Item = GetEquippedItem();
+
+	// Get base damage for action type:
+	short Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
+
+	UseEquippedItem(Dmg);
 }
 
 
@@ -2494,12 +2500,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
-		else if (IsSubmerged())
-		{
-			m_Stats.AddValue(statDistDove, Value);
-			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
-		}
-		else if (IsSwimming())
+		else if (IsInWater())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));

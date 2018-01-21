@@ -542,6 +542,34 @@ void cWorld::ChangeWeather(void)
 
 
 
+bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
+{
+	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
+	{
+		return false;
+	}
+
+	if (a_Pos.y >= cChunkDef::Height)
+	{
+		return true;
+	}
+
+	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
+	{
+		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
+		if (cBlockInfo::IsRainBlocker(BlockType))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+
+
 void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
@@ -654,7 +682,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	{
 		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
 
-		LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+		LOGINFO("World \"%s\": Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 		return;
 	}
 
@@ -688,14 +716,14 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+				LOGINFO("World \"%s\":Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 				return;
 			}
 		}
 	}
 
 	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	LOGWARNING("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+	LOGWARNING("World \"%s\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 }
 
 

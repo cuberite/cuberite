@@ -11,7 +11,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStatistics::cStats:
 
 cStatistics::cStats::cStats(void) :
@@ -97,7 +97,7 @@ void cStatistics::cStats::UpdateCoordsRange(int a_ChunkX, int a_ChunkZ)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStatistics:
 
 cStatistics::cStatistics(void)
@@ -153,7 +153,7 @@ bool cStatistics::OnSection
 		// The current biome data is not valid, we don't have the means for sorting the BlockTypes into per-biome arrays
 		return true;
 	}
-	
+
 	for (int y = 0; y < 16; y++)
 	{
 		int Height = (int)a_Y * 16 + y;
@@ -168,10 +168,10 @@ bool cStatistics::OnSection
 			}
 		}
 	}
-	
+
 	m_Stats.m_BlockNumChunks += m_IsFirstSectionInChunk ? 1 : 0;
 	m_IsFirstSectionInChunk = false;
-	
+
 	return false;
 }
 
@@ -187,7 +187,7 @@ bool cStatistics::OnEmptySection(unsigned char a_Y)
 		return true;
 	}
 
-	// Add air to all columns:	
+	// Add air to all columns:
 	for (int z = 0; z < 16; z++)
 	{
 		for (int x = 0; x < 16; x++)
@@ -196,10 +196,10 @@ bool cStatistics::OnEmptySection(unsigned char a_Y)
 			m_Stats.m_BlockCounts[Biome][0] += 16;  // 16 blocks in a column, all air
 		}
 	}
-	
+
 	m_Stats.m_BlockNumChunks += m_IsFirstSectionInChunk ? 1 : 0;
 	m_IsFirstSectionInChunk = false;
-		
+
 	return false;
 }
 
@@ -221,9 +221,9 @@ bool cStatistics::OnEntity(
 )
 {
 	m_Stats.m_NumEntities += 1;
-	
+
 	// TODO
-	
+
 	return false;
 }
 
@@ -239,12 +239,12 @@ bool cStatistics::OnTileEntity(
 )
 {
 	m_Stats.m_NumTileEntities += 1;
-	
+
 	if (a_EntityType == "MobSpawner")
 	{
 		OnSpawner(a_NBT, a_NBTTag);
 	}
-	
+
 	return false;
 }
 
@@ -280,7 +280,7 @@ void cStatistics::OnSpawner(cParsedNBT & a_NBT, int a_TileEntityTag)
 		return;
 	}
 	m_Stats.m_SpawnerEntity[Ent] += 1;
-	
+
 	// Get the spawner pos:
 	int PosYTag = a_NBT.FindChildByName(a_TileEntityTag, "y");
 	if ((PosYTag < 0) || (a_NBT.GetType(PosYTag) != TAG_Int))
@@ -295,7 +295,7 @@ void cStatistics::OnSpawner(cParsedNBT & a_NBT, int a_TileEntityTag)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStatisticsFactory:
 
 cStatisticsFactory::cStatisticsFactory(void) :
@@ -315,7 +315,7 @@ cStatisticsFactory::~cStatisticsFactory()
 	JoinResults();
 	LOG("  Total %llu chunks went through", m_CombinedStats.m_TotalChunks);
 	LOG("  Biomes processed for %llu chunks", m_CombinedStats.m_BiomeNumChunks);
-	
+
 	// Check the number of blocks processed
 	UInt64 TotalBlocks = 0;
 	for (int i = 0; i <= 255; i++)
@@ -327,7 +327,7 @@ cStatisticsFactory::~cStatisticsFactory()
 	}
 	UInt64 ExpTotalBlocks = m_CombinedStats.m_BlockNumChunks * 16LL * 16LL * 256LL;
 	LOG("  BlockIDs processed for %llu chunks, %llu blocks (exp %llu; %s)", m_CombinedStats.m_BlockNumChunks, TotalBlocks, ExpTotalBlocks, (TotalBlocks == ExpTotalBlocks) ? "match" : "failed");
-	
+
 	// Save statistics:
 	LOG("  Saving statistics into files:");
 	LOG("    Statistics.txt");
@@ -429,7 +429,7 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 		LOG("Cannot write to file PerHeightBlockTypes.xls. Statistics not written.");
 		return;
 	}
-	
+
 	// Write header:
 	f.Printf("Blocks 0 - 127:\nHeight");
 	for (int i = 0; i < 128; i++)
@@ -437,7 +437,7 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
 	}
 	f.Printf("\n");
-	
+
 	// Write first half:
 	for (int y = 0; y < 256; y++)
 	{
@@ -457,7 +457,7 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
 	}
 	f.Printf("\n");
-	
+
 	// Write second half:
 	for (int y = 0; y < 256; y++)
 	{
@@ -483,10 +483,10 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 		LOG("Cannot write to file BiomeBlockTypes.xls. Statistics not written.");
 		return;
 	}
-	
+
 	AString FileHeader("Biomes 0-127:\n");
 	f.Write(FileHeader.c_str(), FileHeader.length());
-	
+
 	AString Header("BlockType\tBlockType");
 	for (int Biome = 0; Biome <= 127; Biome++)
 	{
@@ -502,7 +502,7 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 	}
 	Header.append("\n");
 	f.Write(Header.c_str(), Header.length());
-	
+
 	for (int BlockType = 0; BlockType <= 255; BlockType++)
 	{
 		AString Line;
@@ -530,7 +530,7 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 	}
 	Header.append("\n");
 	f.Write(Header.c_str(), Header.length());
-	
+
 	for (int BlockType = 0; BlockType <= 255; BlockType++)
 	{
 		AString Line;
@@ -557,7 +557,7 @@ void cStatisticsFactory::SaveStatistics(void)
 		LOG("Cannot write to file Statistics.txt. Statistics not written.");
 		return;
 	}
-	
+
 	int Elapsed = (clock() - m_BeginTick) / CLOCKS_PER_SEC;
 	f.Printf("Time elapsed: %d seconds (%d hours, %d minutes and %d seconds)\n", Elapsed, Elapsed / 3600, (Elapsed / 60) % 60, Elapsed % 60);
 	f.Printf("Total chunks processed: %llu\n", m_CombinedStats.m_TotalChunks);
@@ -589,7 +589,7 @@ void cStatisticsFactory::SaveSpawners(void)
 		LOG("Cannot write to file Spawners.xls. Statistics not written.");
 		return;
 	}
-	
+
 	f.Printf("Entity type\tTotal count\tCount per chunk\n");
 	for (int i = 0; i < entMax; i++)
 	{
@@ -609,7 +609,7 @@ void cStatisticsFactory::SavePerHeightSpawners(void)
 		LOG("Cannot write to file PerHeightSpawners.xls. Statistics not written.");
 		return;
 	}
-	
+
 	// Write header:
 	f.Printf("Height\tTotal");
 	for (int i = 0; i < entMax; i++)
@@ -634,7 +634,3 @@ void cStatisticsFactory::SavePerHeightSpawners(void)
 		f.Printf("\n");
 	}
 }
-
-
-
-

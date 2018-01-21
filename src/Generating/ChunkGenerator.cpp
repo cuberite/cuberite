@@ -118,7 +118,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 		// Add to queue, issue a warning if too many:
 		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
 		{
-			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
+			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%zu)", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
 		m_Queue.push_back(cQueueItem{a_ChunkX, a_ChunkZ, a_ForceGenerate, a_Callback});
 	}

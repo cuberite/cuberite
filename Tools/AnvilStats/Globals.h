@@ -12,35 +12,35 @@
 #if defined(_MSC_VER)
 	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
 	#pragma warning(disable:4481)
-	
+
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)
-	
+
 	#define _CRT_SECURE_NO_WARNINGS
 
 	#define OBSOLETE __declspec(deprecated)
-	
+
 	// No alignment needed in MSVC
 	#define ALIGN_8
 	#define ALIGN_16
-	
+
 	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 	// MSVC has its own custom version of zu format
 	#define SIZE_T_FMT "%Iu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
 	#define SIZE_T_FMT_HEX "%Ix"
-	
+
 	#define NORETURN      __declspec(noreturn)
 
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
-	
+
 	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
 	#define override
-	
+
 	#define OBSOLETE __attribute__((deprecated))
 
 	#define ALIGN_8 __attribute__((aligned(8)))
@@ -54,19 +54,19 @@
 	#define SIZE_T_FMT "%zu"
 	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
 	#define SIZE_T_FMT_HEX "%zx"
-	
+
 	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
-	
+
 	/*
 	// Copy and uncomment this into another #elif section based on your compiler identification
-	
+
 	// Explicitly mark classes as abstract (no instances can be created)
 	#define abstract
-	
+
 	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
 	#define override
 
@@ -114,11 +114,11 @@ typedef unsigned short     UInt16;
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 	#include <winsock2.h>
-	
+
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min
 	#undef max
-	
+
 	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
 	#ifdef GetFreeSpace
 		#undef GetFreeSpace
@@ -193,35 +193,35 @@ typedef unsigned short     UInt16;
 
 // Common definitions:
 
-#define LOG(x,...) printf(x "\n", __VA_ARGS__)
+#define LOG(x, ...) printf(x "\n", __VA_ARGS__)
 #define LOGERROR LOG
 #define LOGWARNING LOG
 #define LOGINFO LOG
 #define LOGWARN LOG
 
-/// Evaluates to the number of elements in an array (compile-time!)
+/** Evaluates to the number of elements in an array (compile-time!) */
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
+/** Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)") */
 #define KiB * 1024
 
-/// Allows arithmetic expressions like "32 MiB" (but consider using parenthesis around it, "(32 MiB)" )
+/** Allows arithmetic expressions like "32 MiB" (but consider using parenthesis around it, "(32 MiB)") */
 #define MiB * 1024 * 1024
 
-/// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
+/** Faster than (int)floorf((float)x / (float)div) */
+#define FAST_FLOOR_DIV(x, div) ((x) < 0 ? (((int)x / div) - 1) : ((int)x / div))
 
 #define TOLUA_TEMPLATE_BIND(...)
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef  _DEBUG
-	#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+	#define ASSERT(x) (!!(x) || (LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), assert(0), 0))
 #else
 	#define ASSERT(x) ((void)0)
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+#define VERIFY(x) (!!(x) || (LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
 typedef unsigned char Byte;
 
@@ -229,11 +229,11 @@ typedef unsigned char Byte;
 
 
 
-/// A generic interface used mainly in ForEach() functions
+/** A generic interface used mainly in ForEach() functions */
 template <typename Type> class cItemCallback
 {
 public:
-	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
+	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;
 
@@ -255,8 +255,3 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 // Common headers (part 2, with macros):
 #include "../../src/ChunkDef.h"
 #include "../../src/BlockID.h"
-
-
-
-
-

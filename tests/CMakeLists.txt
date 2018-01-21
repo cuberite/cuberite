@@ -4,6 +4,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
 	setup_target_for_coverage("${PROJECT_NAME}_coverage" "ctest" coverage)
 endif()
 
+add_definitions(-DTEST_GLOBALS=1)
+
 add_subdirectory(BoundingBox)
 add_subdirectory(ByteBuffer)
 add_subdirectory(ChunkData)

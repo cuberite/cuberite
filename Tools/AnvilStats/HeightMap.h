@@ -1,7 +1,7 @@
 
 // HeightMap.h
 
-// Declares the cHeightMap class representing a cCallback descendant that draws a B&W map of heights for the world
+// Declares the cHeightMap class representing a cCallback descendant that draws a B & W map of heights for the world
 
 
 
@@ -20,9 +20,9 @@ class cHeightMap :
 {
 public:
 	cHeightMap(void);
-	
+
 	void Finish(void);
-	
+
 	static bool IsGround(BLOCKTYPE a_BlockType);
 
 protected:
@@ -33,9 +33,11 @@ protected:
 	int m_CurrentRegionX;
 	int m_CurrentRegionZ;
 	bool m_IsCurrentRegionValid;
-	int  m_Height[16 * 32 * 16 * 32];  ///< Height-map of the entire current region [x + 16 * 32 * z]
-	BLOCKTYPE m_BlockTypes[16 * 16 * 256];  ///< Block data of the currently processed chunk (between OnSection() and OnSectionsFinished() )
-	
+	/** Height-map of the entire current region [x + 16 * 32 * z] */
+	int  m_Height[16 * 32 * 16 * 32];
+	/** Block data of the currently processed chunk (between OnSection() and OnSectionsFinished()) */
+	BLOCKTYPE m_BlockTypes[16 * 16 * 256];
+
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnHeader(int a_FileOffset, unsigned char a_NumSectors, int a_Timestamp) override { return false; }
@@ -68,14 +70,10 @@ class cHeightMapFactory :
 {
 public:
 	virtual ~cHeightMapFactory();
-	
+
 	virtual cCallback * CreateNewCallback(void) override
 	{
 		return new cHeightMap;
 	}
 
 } ;
-
-
-
-

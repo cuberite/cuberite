@@ -58,7 +58,13 @@ public:
 		cAttachment(cListener * a_listener) : m_listener(a_listener) {}
 	};
 
-	void Log  (const char * a_Format, eLogLevel a_LogLevel, va_list a_ArgList) FORMATSTRING(2, 0);
+	/** Log a message formatted with a printf style formatting string. */
+	void LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
+	FMT_VARIADIC(void, LogPrintf, const char *, eLogLevel)
+
+	/** Log a message formatted with a python style formatting string. */
+	void LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
+	FMT_VARIADIC(void, LogFormat, const char *, eLogLevel)
 
 	/** Logs the simple text message at the specified log level. */
 	void LogSimple(AString a_Message, eLogLevel a_LogLevel = llRegular);
@@ -76,15 +82,6 @@ private:
 	void DetachListener(cListener * a_Listener);
 
 };
-
-
-
-
-// These declarations are duplicated in globals.h
-extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
-extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
 
 
 

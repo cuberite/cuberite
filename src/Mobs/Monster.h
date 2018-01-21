@@ -326,6 +326,6 @@ private:
 	cPawn * m_Target;
 
 	/** Leash calculations inside Tick function */
-	void CalcLeashActions();
+	void CalcLeashActions(std::chrono::milliseconds a_Dt);
 
 } ;  // tolua_export
