@@ -149,7 +149,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		CentralPoint -= 8;
 	}
 
-	int LevelPoint[4];
+	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
 	Vector3i Points[]
