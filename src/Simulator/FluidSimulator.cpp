@@ -142,13 +142,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		return {};
 	}
 
-	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);
-
-	if (CentralPoint > 7)
-	{
-		CentralPoint -= 8;
-	}
-
+	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z) & 0x07;
 	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
