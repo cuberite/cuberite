@@ -217,6 +217,6 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		Direction.Normalize();
 	}
 
-	return {};
+	return Direction;
 }
 
