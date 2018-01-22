@@ -1080,57 +1080,106 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	NextSpeed += m_WaterSpeed;
 
-	if (NextSpeed.SqrLength() > 0.0f)
+	if (NextSpeed.HasNonZeroLength())
 	{
-		Vector3d HitCoords;
-		Vector3i HitBlockCoords;
-		eBlockFace HitBlockFace;
-		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
-		if (isHit)
+		Vector3d SizeLimit[]
 		{
-			// Set our position to where the block was hit, minus a bit:
-			// TODO: The real entity's m_Width should be taken into account here
-			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
-			if (HitBlockFace == BLOCK_FACE_YP)
+			{ m_Width, 0, 0 },
+			{ 0, m_Height, 0 },
+			{ 0, 0, m_Width },
+		};
+
+		for (unsigned long i = 0; i < ARRAYCOUNT(SizeLimit); i++)
+		{
+			switch (i)
 			{
-				// We hit the ground, adjust the position to the top of the block:
-				m_bOnGround = true;
-				NextPos.y = HitBlockCoords.y + 1;
+				case 0:
+				{
+					if (NextSpeed.x == 0)
+					{
+						continue;
+					}
+					else if (NextSpeed.x < 0)
+					{
+						SizeLimit[i].x *= -1;
+					}
+					break;
+				}
+				case 1:
+				{
+					if (NextSpeed.y == 0)
+					{
+						continue;
+					}
+					else if (NextSpeed.y < 0)
+					{
+						SizeLimit[i].y = 0;
+					}
+					break;
+				}
+				case 2:
+				{
+					if (NextSpeed.z == 0)
+					{
+						continue;
+					}
+					else if (NextSpeed.z < 0)
+					{
+						SizeLimit[i].z *= -1;
+					}
+					break;
+				}
 			}
 
-			// Avoid movement in the direction of the blockface that has been hit:
-			switch (HitBlockFace)
+			Vector3d HitCoords;
+			Vector3i HitBlockCoords;
+			eBlockFace HitBlockFace;
+
+			Vector3d wantNextPos = NextPos + SizeLimit[i] + NextSpeed * DtSec.count();
+
+			auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+
+			if (isHit)
 			{
-				case BLOCK_FACE_XM:
-				case BLOCK_FACE_XP:
+				switch (i)
 				{
-					NextSpeed.x = 0;
-					break;
-				}
-				case BLOCK_FACE_YM:
-				case BLOCK_FACE_YP:
-				{
-					NextSpeed.y = 0;
-					break;
-				}
-				case BLOCK_FACE_ZM:
-				case BLOCK_FACE_ZP:
-				{
-					NextSpeed.z = 0;
-					break;
-				}
-				default:
-				{
-					break;
+					case 0:
+					{
+						if ((HitBlockFace == BLOCK_FACE_XM) || (HitBlockFace == BLOCK_FACE_XP))
+						{
+							NextSpeed.x = 0;
+							NextPos.x = HitCoords.x - SizeLimit[i].x;
+							break;
+						}
+					}
+					case 1:
+					{
+						if (HitBlockFace == BLOCK_FACE_YM)
+						{
+							NextSpeed.y = 0;
+							NextPos.y = HitCoords.y - SizeLimit[i].y;
+						}
+						else if (HitBlockFace == BLOCK_FACE_YP)
+						{
+							NextSpeed.y = 0;
+							NextPos.y = HitCoords.y;
+							m_bOnGround = true;
+						}
+						break;
+					}
+					case 2:
+					{
+						if ((HitBlockFace == BLOCK_FACE_ZM) || (HitBlockFace == BLOCK_FACE_ZP))
+						{
+							NextSpeed.z = 0;
+							NextPos.z = HitCoords.z - SizeLimit[i].z;
+							break;
+						}
+					}
 				}
 			}
 		}
-		else
-		{
-			// We didn't hit anything, so move:
-			NextPos += (NextSpeed * DtSec.count());
-		}
+		NextPos += (NextSpeed * DtSec.count());
 	}
 
 	SetPosition(NextPos);
