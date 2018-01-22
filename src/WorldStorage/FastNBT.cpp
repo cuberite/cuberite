@@ -55,7 +55,7 @@ public:
 	/** Returns the canonical error category instance. */
 	static const cNBTParseErrorCategory & Get() NOEXCEPT
 	{
-		static const cNBTParseErrorCategory Category;
+		static cNBTParseErrorCategory Category;
 		return Category;
 	}
 };
