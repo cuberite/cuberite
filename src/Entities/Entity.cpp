@@ -1095,11 +1095,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				case 0:
 				{
-					if (NextSpeed.x == 0)
+					if (NextSpeed.x == 0.0)
 					{
 						continue;
 					}
-					else if (NextSpeed.x < 0)
+					else if (NextSpeed.x < 0.0)
 					{
 						SizeLimit[i].x *= -1;
 					}
@@ -1107,11 +1107,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 				case 1:
 				{
-					if (NextSpeed.y == 0)
+					if (NextSpeed.y == 0.0)
 					{
 						continue;
 					}
-					else if (NextSpeed.y < 0)
+					else if (NextSpeed.y < 0.0)
 					{
 						SizeLimit[i].y = 0;
 					}
@@ -1119,11 +1119,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 				case 2:
 				{
-					if (NextSpeed.z == 0)
+					if (NextSpeed.z == 0.0)
 					{
 						continue;
 					}
-					else if (NextSpeed.z < 0)
+					else if (NextSpeed.z < 0.0)
 					{
 						SizeLimit[i].z *= -1;
 					}
