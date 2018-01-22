@@ -30,77 +30,110 @@ static const int MAX_LIST_ITEMS = 10000;
 	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while (false)
 #endif
 
-#define AS_INT(x) static_cast<int>(x)
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // cNBTParseErrorCategory:
 
+namespace
+{
+
+class cNBTParseErrorCategory final :
+	public std::error_category
+{
+	cNBTParseErrorCategory() = default;
+public:
+	/** Category name */
+	virtual const char * name() const NOEXCEPT override
+	{
+		return "NBT parse error";
+	}
+
+	/** Maps a parse error code to an error message */
+	virtual AString message(int a_Condition) const override;
+
+	/** Returns the canonical error category instance. */
+	static const cNBTParseErrorCategory & Get() NOEXCEPT
+	{
+		static const cNBTParseErrorCategory Category;
+		return Category;
+	}
+};
+
+
+
+
+
 AString cNBTParseErrorCategory::message(int a_Condition) const
 {
-	switch (a_Condition)
+	switch (static_cast<eNBTParseError>(a_Condition))
 	{
-		case AS_INT(eNBTParseError::npSuccess):
+		case eNBTParseError::npSuccess:
 		{
 			return "Parsing succeded";
 		}
-		case AS_INT(eNBTParseError::npNeedBytes):
+		case eNBTParseError::npNeedBytes:
 		{
 			return "Expected more data";
 		}
-		case AS_INT(eNBTParseError::npNoTopLevelCompound):
+		case eNBTParseError::npNoTopLevelCompound:
 		{
 			return "No top level compound tag";
 		}
-		case AS_INT(eNBTParseError::npStringMissingLength):
+		case eNBTParseError::npStringMissingLength:
 		{
 			return "Expected a string length but had insufficient data";
 		}
-		case AS_INT(eNBTParseError::npStringInvalidLength):
+		case eNBTParseError::npStringInvalidLength:
 		{
 			return "String length invalid";
 		}
-		case AS_INT(eNBTParseError::npCompoundImbalancedTag):
+		case eNBTParseError::npCompoundImbalancedTag:
 		{
 			return "Compound tag was unmatched at end of file";
 		}
-		case AS_INT(eNBTParseError::npListMissingType):
+		case eNBTParseError::npListMissingType:
 		{
 			return "Expected a list type but had insuffiecient data";
 		}
-		case AS_INT(eNBTParseError::npListMissingLength):
+		case eNBTParseError::npListMissingLength:
 		{
 			return "Expected a list length but had insufficient data";
 		}
-		case AS_INT(eNBTParseError::npListInvalidLength):
+		case eNBTParseError::npListInvalidLength:
 		{
 			return "List length invalid";
 		}
-		case AS_INT(eNBTParseError::npSimpleMissing):
+		case eNBTParseError::npSimpleMissing:
 		{
 			return "Expected a numeric type but had insufficient data";
 		}
-		case AS_INT(eNBTParseError::npArrayMissingLength):
+		case eNBTParseError::npArrayMissingLength:
 		{
 			return "Expected an array length but had insufficient data";
 		}
-		case AS_INT(eNBTParseError::npArrayInvalidLength):
+		case eNBTParseError::npArrayInvalidLength:
 		{
 			return "Array length invalid";
 		}
-		case AS_INT(eNBTParseError::npUnknownTag):
+		case eNBTParseError::npUnknownTag:
 		{
 			return "Unknown tag";
 		}
-		default:
-		{
-			return "<unrecognized error>";
-		}
+		COVERED_SWITCH;
 	}
 }
 
-#undef AS_INT
+}  // namespace (anonymous)
+
+
+
+
+
+std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
+{
+	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
+}
 
 
 
