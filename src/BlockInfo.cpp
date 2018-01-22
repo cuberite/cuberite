@@ -560,9 +560,11 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 	// Nonsolid blocks:
 	Info[E_BLOCK_ACTIVATOR_RAIL               ].m_IsSolid = false;
+	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_IsSolid = false;
 	Info[E_BLOCK_AIR                          ].m_IsSolid = false;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_IsSolid = false;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_IsSolid = false;
+	Info[E_BLOCK_CARPET                       ].m_IsSolid = false;
 	Info[E_BLOCK_CARROTS                      ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_FLOWER                ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
@@ -577,6 +579,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_FIRE                         ].m_IsSolid = false;
 	Info[E_BLOCK_FLOWER                       ].m_IsSolid = false;
 	Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
+	Info[E_BLOCK_INACTIVE_COMPARATOR          ].m_IsSolid = false;
+	Info[E_BLOCK_LADDER                       ].m_IsSolid = false;
 	Info[E_BLOCK_LAVA                         ].m_IsSolid = false;
 	Info[E_BLOCK_LEVER                        ].m_IsSolid = false;
 	Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
@@ -586,6 +590,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POWERED_RAIL                 ].m_IsSolid = false;
 	Info[E_BLOCK_RAIL                         ].m_IsSolid = false;
 	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
+	Info[E_BLOCK_REDSTONE_REPEATER_OFF        ].m_IsSolid = false;
+	Info[E_BLOCK_REDSTONE_REPEATER_ON         ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_OFF           ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_ON            ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_IsSolid = false;
@@ -601,6 +607,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_TALL_GRASS                   ].m_IsSolid = false;
 	Info[E_BLOCK_TORCH                        ].m_IsSolid = false;
 	Info[E_BLOCK_TRIPWIRE                     ].m_IsSolid = false;
+	Info[E_BLOCK_TRIPWIRE_HOOK                ].m_IsSolid = false;
 	Info[E_BLOCK_VINES                        ].m_IsSolid = false;
 	Info[E_BLOCK_WALL_BANNER                  ].m_IsSolid = false;
 	Info[E_BLOCK_WALLSIGN                     ].m_IsSolid = false;
