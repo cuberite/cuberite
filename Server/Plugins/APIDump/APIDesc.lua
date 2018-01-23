@@ -3724,6 +3724,46 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is invisible",
 				},
+				IsInFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a fire block",
+				},
+				IsInLava =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a lava block",
+				},
+				IsInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a water block",
+				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
+				},
 				IsItemFrame =
 				{
 					Returns =
@@ -3872,7 +3912,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity's head is in a water block <b>Currently deprecated in favour of IsHeadInWater()</b>",
 				},
 				IsSwimming =
 				{
@@ -3882,7 +3922,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if any part of the entity is in a water block. Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
 				},
 				IsTicking =
 				{
@@ -7173,7 +7213,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							IsOptional = true,
 						},
 						{
-							Name = "PrioritarySlot",
+							Name = "PrioritySlot",
 							Type = "number",
 							IsOptional = true,
 						},
@@ -7184,7 +7224,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							Type = "number",
 						},
 					},
-					Notes = "Adds as many items out of ItemStack as can fit. If AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true (default), empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the number of items that fit.",
+					Notes = "Adds as many items out of ItemStack as can fit. If AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true (default), empty slots can be used for the rest. If PrioritySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritySlot is set to -1 (default), regular order applies. Returns the number of items that fit.",
 				},
 				AddItems =
 				{
@@ -7200,7 +7240,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							IsOptional = true,
 						},
 						{
-							Name = "PrioritarySlot",
+							Name = "PrioritySlot",
 							Type = "number",
 							IsOptional = true,
 						},
@@ -7211,7 +7251,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							Type = "number",
 						},
 					},
-					Notes = "Same as AddItem, but works on an entire list of item stacks. The a_ItemStackList is modified to reflect the leftover items. If a_AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true, empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the total number of items that fit.",
+					Notes = "Same as AddItem, but works on an entire list of item stacks. The a_ItemStackList is modified to reflect the leftover items. If a_AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true, empty slots can be used for the rest. If PrioritySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritySlot is set to -1 (default), regular order applies. Returns the total number of items that fit.",
 				},
 				ChangeSlotCount =
 				{

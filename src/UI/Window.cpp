@@ -421,43 +421,15 @@ void cWindow::DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cS
 
 bool cWindow::CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks)
 {
-	// First ask the slot areas from a_Area till the end of list:
-	bool ShouldCollect = false;
-	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	// Ask to collect items from each slot area in order:
+	for (auto Area : m_SlotAreas)
 	{
-		if (&a_Area == *itr)
+		if (Area->CollectItemsToHand(a_Dragging, a_Player, a_CollectFullStacks))
 		{
-			ShouldCollect = true;
-		}
-		if (!ShouldCollect)
-		{
-			continue;
-		}
-		if ((*itr)->CollectItemsToHand(a_Dragging, a_Player, a_CollectFullStacks))
-		{
-			// a_Dragging is full
-			return true;
+			return true;  // a_Dragging is full
 		}
 	}
-
-	// a_Dragging still not full, ask slot areas before a_Area in the list:
-	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
-	{
-		if (*itr == &a_Area)
-		{
-			// All areas processed
-			return false;
-		}
-		if ((*itr)->CollectItemsToHand(a_Dragging, a_Player, a_CollectFullStacks))
-		{
-			// a_Dragging is full
-			return true;
-		}
-	}
-	// Shouldn't reach here
-	// a_Area is expected to be part of m_SlotAreas[], so the "return false" in the loop above should have returned already
-	ASSERT(!"This branch should not be reached");
-	return false;
+	return false;  // All areas processed
 }
 
 

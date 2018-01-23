@@ -156,7 +156,7 @@ bool cPawn::IsInvisible() const
 
 void cPawn::HandleAir(void)
 {
-	if (IsSubmerged() && HasEntityEffect(cEntityEffect::effWaterBreathing))
+	if (IsHeadInWater() && HasEntityEffect(cEntityEffect::effWaterBreathing))
 	{
 		// Prevent the oxygen from decreasing
 		return;
@@ -486,6 +486,3 @@ cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 	auto itr = m_EntityEffects.find(a_EffectType);
 	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;
 }
-
-
-
