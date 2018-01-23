@@ -1096,17 +1096,10 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				case 0:
 					{
-						if (NextSpeed.x < 0.0)
-						{
-							SizeLimit[i].x *= -1;
-						}
-						if (NextSpeed.y <= 0.0)
+						SizeLimit[i] *= NextSpeed.NormalizeCopy();
+						if (NextSpeed.y < 0.0)
 						{
 							SizeLimit[i].y *= 0;
-						}
-						if (NextSpeed.z <0.0)
-						{
-							SizeLimit[i].z *= -1;
 						}
 					}
 				case 1:
