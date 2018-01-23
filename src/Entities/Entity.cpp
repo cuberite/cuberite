@@ -1084,6 +1084,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		Vector3d SizeLimit[]
 		{
+			{ m_Width, m_Height, m_Width },
 			{ m_Width, 0, 0 },
 			{ 0, m_Height, 0 },
 			{ 0, 0, m_Width },
@@ -1094,6 +1095,21 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			switch (i)
 			{
 				case 0:
+					{
+						if (NextSpeed.x < 0.0)
+						{
+							SizeLimit[i].x *= -1;
+						}
+						if (NextSpeed.y <= 0.0)
+						{
+							SizeLimit[i].y *= 0;
+						}
+						if (NextSpeed.z <0.0)
+						{
+							SizeLimit[i].z *= -1;
+						}
+					}
+				case 1:
 				{
 					if (NextSpeed.x == 0.0)
 					{
@@ -1105,7 +1121,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					}
 					break;
 				}
-				case 1:
+				case 2:
 				{
 					if (NextSpeed.y == 0.0)
 					{
@@ -1117,7 +1133,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					}
 					break;
 				}
-				case 2:
+				case 3:
 				{
 					if (NextSpeed.z == 0.0)
 					{
@@ -1139,6 +1155,17 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 			auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
 
+			if (i == 0)
+			{
+				if (isHit)
+				{
+					continue;
+				}
+				else
+				{
+					break;
+				}
+			}
 			if (isHit)
 			{
 				switch (i)
