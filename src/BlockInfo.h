@@ -72,6 +72,9 @@ public:
 	/** Associated block handler. */
 	std::unique_ptr<cBlockHandler, sHandlerDeleter> m_Handler;
 
+	/** The block type associated with this cBlockInfo. Needed for DeprecatedBindings.cpp */
+	BLOCKTYPE m_BlockType;
+
 	// tolua_begin
 
 	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
@@ -119,6 +122,7 @@ public:
 		, m_BlockHeight(1.0)
 		, m_Hardness(0.0f)
 		, m_Handler()
+		, m_BlockType(E_BLOCK_AIR)
 	{}
 
 private:

@@ -355,7 +355,10 @@ static int tolua_get_cBlockInfo_m_IsSnowable(lua_State * tolua_S)
 		return 0;
 	}
 
-	L.Push("");
+	const cBlockInfo * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	L.Push(cBlockInfo::IsSnowable(Self->m_BlockType));
 	LOGWARNING("cBlockInfo.m_IsSnowable is deprecated");
 	L.LogStackTrace(0);
 	return 1;

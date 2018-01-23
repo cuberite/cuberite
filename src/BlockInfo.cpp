@@ -17,7 +17,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
-		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(static_cast<BLOCKTYPE>(i)));
+		Info[i].m_BlockType = static_cast<BLOCKTYPE>(i);
+		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(Info[i].m_BlockType));
 	}
 
 	// Emissive blocks
