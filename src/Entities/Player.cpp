@@ -1977,28 +1977,29 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	#ifdef _DEBUG
-		// Take note of old chunk coords
-		auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
-	#endif
+	if (m_World == a_WorldChangeInfo.m_NewWorld)
+	{
+		// Moving to same world, don't need to remove from world
+		SetPosition(a_WorldChangeInfo.m_NewPosition);
+		return;
+	}
 
-	// Set position to the new position
-	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
+	LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetName(), GetWorld()->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(), GetChunkZ()
+	);
 
 	// Stop all mobs from targeting this player
 	StopEveryoneFromTargetingMe();
 
-	if (m_World == a_WorldChangeInfo.m_NewWorld)
-	{
-		// Moving to same world, don't need to remove from world
-		return;
-	}
-
 	// Prevent further ticking in this world
 	SetIsTicking(false);
 
-	// Queue add to new world and removal from the old one
+	// Remove from the old world
 	auto & OldWorld = *GetWorld();
+	auto Self = OldWorld.RemovePlayer(*this);
+
+	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
 	SetWorld(a_WorldChangeInfo.m_NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	cClientHandle * ch = GetClientHandle();
@@ -2023,15 +2024,8 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 		}
 	}
 
-	LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-		this->GetName().c_str(),
-		OldWorld.GetName().c_str(), a_WorldChangeInfo.m_NewWorld->GetName().c_str(),
-		OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
-	);
-
 	// New world will take over and announce client at its next tick
-	auto PlayerPtr = static_cast<cPlayer *>(OldWorld.RemovePlayer(*this).release());
-	a_WorldChangeInfo.m_NewWorld->AddPlayer(std::unique_ptr<cPlayer>(PlayerPtr), &OldWorld);
+	a_WorldChangeInfo.m_NewWorld->AddPlayer(std::move(Self), &OldWorld);
 }
 
 

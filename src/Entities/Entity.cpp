@@ -1501,14 +1501,6 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
 	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
-	#ifdef _DEBUG
-		// Take note of old chunk coords
-		auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
-	#endif
-
-	// Set position to the new position
-	SetPosition(a_WorldChangeInfo.m_NewPosition);
-
 	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
 		m_PortalCooldownData.m_TicksDelayed = 0;
@@ -1518,20 +1510,30 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 	if (GetWorld() == a_WorldChangeInfo.m_NewWorld)
 	{
 		// Moving to same world, don't need to remove from world
+		SetPosition(a_WorldChangeInfo.m_NewPosition);
 		return;
 	}
+
+	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetUniqueID(), GetClass(),
+		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(), GetChunkZ()
+	);
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
 
-	// Add to new world and removal from the old one
-	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-		this->GetUniqueID(), this->GetClass(),
-		m_World->GetName().c_str(), a_WorldChangeInfo.m_NewWorld->GetName().c_str(),
-		OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
-	);
-	a_WorldChangeInfo.m_NewWorld->AddEntity(m_World->RemoveEntity(*this));
+	// Remove from the old world
+	auto Self = m_World->RemoveEntity(*this);
+
+	// Update entity before calling hook
+	SetPosition(a_WorldChangeInfo.m_NewPosition);
+	SetWorld(a_WorldChangeInfo.m_NewWorld);
+
 	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *m_World);
+
+	// Don't do anything after adding as the old world's CS no longer protects us
+	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self));
 }
 
 
