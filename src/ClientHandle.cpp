@@ -1431,7 +1431,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	bool Success = false;
-	if (IsWithinReach && !m_Player->IsFrozen())
+	if (
+		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
+		IsWithinReach && !m_Player->IsFrozen()
+	)
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
@@ -1470,11 +1473,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 				return;
 			}
-			if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-			{
-				// place a block
-				Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-			}
+			// place a block
+			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		}
 		else
 		{
@@ -1751,6 +1751,11 @@ void cClientHandle::HandleUseItem(eHand a_Hand)
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_Hand, ItemToFullString(HeldItem).c_str());
+
+	if (PlgMgr->CallHookPlayerRightClick(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
+	{
+		return;  // Plugin denied click action
+	}
 
 	// Use item in main / off hand
 	// TODO: do we need to sync the current inventory with client if it fails?
