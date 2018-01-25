@@ -16,7 +16,11 @@ class cFunctionRef<Ret(Args...)>
 {
 public:
 	/** Construct from a function object. */
-	template <class FunctionObject>
+	template <class FunctionObject,
+		typename std::enable_if<  // Don't disable the default copy constructor
+			!std::is_same<typename std::decay<FunctionObject>::type, cFunctionRef>::value,
+		int>::type = 0
+	>
 	cFunctionRef(FunctionObject && a_FunctionObject)
 	{
 		// Store an opaque reference to the object.
