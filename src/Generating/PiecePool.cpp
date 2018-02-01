@@ -200,7 +200,7 @@ Vector3i cPiece::cConnector::AddDirection(const Vector3i & a_Pos, eDirection a_D
 		case dirYP_XP_ZM: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
 		case dirYP_XP_ZP: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
 	}
-	UNREACHABLE("Unsupported piece direction");
+	UNREACHABLE("Unsupported connector direction");
 }
 
 
@@ -226,7 +226,7 @@ const char * cPiece::cConnector::DirectionToString(eDirection a_Direction)
 		case dirYP_XP_ZM: return "y+x+z-";
 		case dirYP_XP_ZP: return "y+x+z+";
 	}
-	UNREACHABLE("Unsupported piece direction");
+	UNREACHABLE("Unsupported connector direction");
 }
 
 
@@ -282,7 +282,7 @@ cPiece::cConnector::eDirection cPiece::cConnector::RotateDirection(eDirection a_
 		case dirYP_XP_ZM: return dirYP_XM_ZP;
 		case dirYP_XP_ZP: return dirYP_XM_ZM;
 	}
-	UNREACHABLE("Unsupported piece direction");
+	UNREACHABLE("Unsupported connector direction");
 }
 
 
@@ -309,7 +309,7 @@ cPiece::cConnector::eDirection cPiece::cConnector::RotateDirectionCCW(eDirection
 		case dirYP_XP_ZM: return dirYP_XM_ZM;
 		case dirYP_XP_ZP: return dirYP_XP_ZM;
 	}
-	UNREACHABLE("Unsupported piece direction");
+	UNREACHABLE("Unsupported connector direction");
 }
 
 
@@ -336,7 +336,7 @@ cPiece::cConnector::eDirection cPiece::cConnector::RotateDirectionCW(eDirection 
 		case dirYP_XP_ZM: return dirYP_XP_ZP;
 		case dirYP_XP_ZP: return dirYP_XM_ZP;
 	}
-	UNREACHABLE("Unsupported piece direction");
+	UNREACHABLE("Unsupported connector direction");
 }
 
 

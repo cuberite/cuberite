@@ -767,32 +767,30 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int x, z;
 	NIBBLETYPE Meta = 0;
-	std::tie(x, z, Meta) = [&]
+	[&]
+	{
+		switch (m_Direction)
 		{
-			switch (m_Direction)
+			case dirXM:
+			case dirXP:
 			{
-				case dirXM:
-				case dirXP:
-				{
-					return std::tuple<int, int, NIBBLETYPE>(
-						m_BoundingBox.p1.x + m_ChestPosition - BlockX,
-						m_BoundingBox.p1.z - BlockZ,
-						E_META_CHEST_FACING_ZP
-					);
-				}
+				x = m_BoundingBox.p1.x + m_ChestPosition - BlockX;
+				z = m_BoundingBox.p1.z - BlockZ;
+				Meta = E_META_CHEST_FACING_ZP;
+				return;
+			}
 
-				case dirZM:
-				case dirZP:
-				{
-					return std::tuple<int, int, NIBBLETYPE>(
-						m_BoundingBox.p1.x - BlockX,
-						m_BoundingBox.p1.z + m_ChestPosition - BlockZ,
-						E_META_CHEST_FACING_XP
-					);
-				}
-			}  // switch (Dir)
-			UNREACHABLE("Unsupported corridor direction");
-		}();
+			case dirZM:
+			case dirZP:
+			{
+				x = m_BoundingBox.p1.x - BlockX;
+				z = m_BoundingBox.p1.z + m_ChestPosition - BlockZ;
+				Meta = E_META_CHEST_FACING_XP;
+				return;
+			}
+		}  // switch (Dir)
+		UNREACHABLE("Unsupported corridor direction");
+	}();
 
 	if (
 		(x >= 0) && (x < cChunkDef::Width) &&
