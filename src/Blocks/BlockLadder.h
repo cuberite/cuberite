@@ -59,8 +59,8 @@ public:
 			{
 				return 0x2;
 			}
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported block face");
 	}
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)

@@ -152,8 +152,8 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 				return ePathFinderStatus::PATH_FOUND;
 			}
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported path finder status");
 }
 
 

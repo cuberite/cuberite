@@ -491,8 +491,8 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 		{
 			return Random.RandInt(m_MinThunderStormTicks, m_MaxThunderStormTicks);
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported weather");
 }
 
 
@@ -856,8 +856,8 @@ eWeather cWorld::ChooseNewWeather()
 			// 1 / 8 chance of turning into a thunderstorm
 			return GetRandomProvider().RandBool(0.125) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported weather");
 }
 
 

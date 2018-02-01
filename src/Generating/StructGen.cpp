@@ -273,8 +273,8 @@ int cStructGenTrees::GetNumTrees(
 				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
 				return 0;
 			}
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported biome");
 	};
 
 	int NumTrees = 0;

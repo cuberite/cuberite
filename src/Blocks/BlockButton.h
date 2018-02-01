@@ -91,8 +91,8 @@ public:
 				ASSERT(!"Unhandled block face!");
 				return 0x0;
 			}
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported block face");
 	}
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)

@@ -387,8 +387,8 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtStarving:        return "dtStarving";
 		case dtSuffocating:     return "dtSuffocation";
 		case dtExplosion:       return "dtExplosion";
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported damage type");
 }
 
 

@@ -120,8 +120,8 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 		{
 			return "Unknown tag";
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported nbt parse error");
 }
 
 }  // namespace (anonymous)
@@ -367,9 +367,8 @@ eNBTParseError cParsedNBT::ReadTag(void)
 		{
 			return eNBTParseError::npUnknownTag;
 		}
-
-		COVERED_SWITCH;
 	}  // switch (iType)
+	UNREACHABLE("Unsupported nbt tag type");
 }
 
 #undef CASE_SIMPLE_TAG

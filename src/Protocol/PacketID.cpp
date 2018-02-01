@@ -78,8 +78,8 @@ UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 		case sendWindowItems:           return 0x14;
 		case sendWindowOpen:            return 0x13;
 		case sendWindowProperty:        return 0x15;
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported outgoing packet type");
 }
 
 

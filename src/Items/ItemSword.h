@@ -49,8 +49,8 @@ public:
 			case dlaAttackEntity:       return 1;
 			case dlaBreakBlock:         return 2;
 			case dlaBreakBlockInstant:  return 0;
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported durability loss action");
 	}
 
 

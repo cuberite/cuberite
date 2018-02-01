@@ -145,8 +145,8 @@ void cSslConfig::SetAuthMode(const eSslAuthMode a_AuthMode)
 			case eSslAuthMode::Optional: return MBEDTLS_SSL_VERIFY_OPTIONAL;
 			case eSslAuthMode::Required: return MBEDTLS_SSL_VERIFY_REQUIRED;
 			case eSslAuthMode::Unset:    return MBEDTLS_SSL_VERIFY_UNSET;
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported durability loss action");
 	}();
 
 	mbedtls_ssl_conf_authmode(&m_Config, Mode);

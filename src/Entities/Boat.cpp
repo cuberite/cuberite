@@ -206,8 +206,8 @@ AString cBoat::MaterialToString(eMaterial a_Material)
 		case bmJungle:  return "jungle";
 		case bmAcacia:  return "acacia";
 		case bmDarkOak: return "dark_oak";
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported boat material");
 }
 
 
@@ -260,8 +260,8 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 		case bmJungle:  return cItem(E_ITEM_JUNGLE_BOAT);
 		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
 		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported boat material");
 }
 
 

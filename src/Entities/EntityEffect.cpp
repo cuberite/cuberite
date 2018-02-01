@@ -216,8 +216,8 @@ std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(cEntityEffect::
 		case cEntityEffect::effWaterBreathing: return cpp14::make_unique<cEntityEffectWaterBreathing>(a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWeakness:       return cpp14::make_unique<cEntityEffectWeakness      >(a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWither:         return cpp14::make_unique<cEntityEffectWither        >(a_Duration, a_Intensity, a_DistanceModifier);
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported entity effect");
 }
 
 

@@ -355,14 +355,6 @@ template class SizeChecker<UInt8,  1>;
 /** Use to mark code that should be impossible to reach. */
 #define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)
 
-/** Use to mark switches over enums which cover all enum values.
-The behavior is undefined if the switch receieves a value without a corresponding case. */
-#ifdef __clang__
-	#define COVERED_SWITCH
-#else
-	#define COVERED_SWITCH default: UNREACHABLE("Covered switch should never hit default")
-#endif
-
 
 
 

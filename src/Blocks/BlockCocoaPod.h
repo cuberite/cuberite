@@ -81,8 +81,8 @@ public:
 				ASSERT(!"Unknown face");
 				return 0;
 			}
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported block face");
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

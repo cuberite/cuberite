@@ -64,8 +64,8 @@ public:
 			case BLOCK_FACE_ZM:   return 0x4;
 			case BLOCK_FACE_YM:   return 0x0;
 			case BLOCK_FACE_NONE: return 0x6;
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported block face");
 	}
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)

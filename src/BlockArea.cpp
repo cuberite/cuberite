@@ -2571,8 +2571,6 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			break;
 		}  // case msMask
-
-		COVERED_SWITCH;
 	}  // switch (a_Strategy)
 
 	if (HasBlockEntities())

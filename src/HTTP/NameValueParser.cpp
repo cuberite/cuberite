@@ -403,8 +403,8 @@ bool cNameValueParser::Finish(void)
 			m_State = psFinished;
 			return true;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported name value parser state");
 }
 
 

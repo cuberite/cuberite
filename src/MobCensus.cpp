@@ -47,8 +47,8 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 			ASSERT(!"Unhandled mob family");
 			return -1;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported mob family");
 }
 
 

@@ -1060,29 +1060,31 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
-		AString DamageText;
-		switch (a_TDI.DamageType)
-		{
-			case dtRangedAttack: DamageText = "was shot"; break;
-			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
-			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
-			case dtStarving: DamageText = "forgot the importance of food"; break;
-			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
-			case dtLavaContact: DamageText = "was melted by lava"; break;
-			case dtPoisoning: DamageText = "died from septicaemia"; break;
-			case dtWithering: DamageText = "is a husk of their former selves"; break;
-			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
-			case dtFireContact: DamageText = "burnt themselves to death"; break;
-			case dtInVoid: DamageText = "somehow fell out of the world"; break;
-			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
-			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
-			case dtAdmin: DamageText = "was administrator'd"; break;
-			case dtExplosion: DamageText = "blew up"; break;
-			case dtAttack: DamageText = "was attacked by thin air"; break;
-			COVERED_SWITCH;
-		}
+		const AString DamageText = [&]
+			{
+				switch (a_TDI.DamageType)
+				{
+					case dtRangedAttack:    return "was shot";
+					case dtLightning:       return "was plasmified by lightining";
+					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+					case dtDrowning:        return "drowned";
+					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+					case dtStarving:        return "forgot the importance of food";
+					case dtCactusContact:   return "was impaled on a cactus";
+					case dtLavaContact:     return "was melted by lava";
+					case dtPoisoning:       return "died from septicaemia";
+					case dtWithering:       return "is a husk of their former selves";
+					case dtOnFire:          return "forgot to stop, drop, and roll";
+					case dtFireContact:     return "burnt themselves to death";
+					case dtInVoid:          return "somehow fell out of the world";
+					case dtPotionOfHarming: return "was magicked to death";
+					case dtEnderPearl:      return "misused an ender pearl";
+					case dtAdmin:           return "was administrator'd";
+					case dtExplosion:       return "blew up";
+					case dtAttack:          return "was attacked by thin air";
+				}
+				UNREACHABLE("Unsupported damage type");
+			}();
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))

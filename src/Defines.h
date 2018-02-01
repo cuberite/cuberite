@@ -277,8 +277,7 @@ inline const char * ClickActionToString(int a_ClickAction)
 
 		case caUnknown:                      return "caUnknown";
 	}
-	ASSERT(!"Unknown click action");
-	return "caUnknown";
+	UNREACHABLE("Unknown click action");
 }
 
 
@@ -300,8 +299,8 @@ inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 		{
 			return a_BlockFace;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported block face");
 }
 
 
@@ -323,8 +322,8 @@ inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 		{
 			return a_BlockFace;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported block face");
 }
 
 
@@ -345,8 +344,8 @@ inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
 		{
 			return a_BlockFace;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported block face");
 }
 
 
@@ -364,8 +363,8 @@ inline eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
 		case BLOCK_FACE_XM:   return BLOCK_FACE_XP;
 		case BLOCK_FACE_ZM:   return BLOCK_FACE_ZP;
 		case BLOCK_FACE_NONE: return a_BlockFace;
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported block face");
 }
 
 
@@ -384,8 +383,8 @@ inline AString BlockFaceToString(eBlockFace a_BlockFace)
 		case BLOCK_FACE_ZM: return "BLOCK_FACE_ZM";
 		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported block face");
 }
 
 

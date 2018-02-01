@@ -44,8 +44,8 @@ public:
 				ASSERT(!"Unhandled tripwire hook direction!");
 				return 0x0;
 			}
-			COVERED_SWITCH;
 		}
+		UNREACHABLE("Unsupported block face");
 	}
 
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)

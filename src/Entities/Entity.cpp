@@ -639,8 +639,8 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		{
 			return true;
 		}
-		COVERED_SWITCH;
 	}
+	UNREACHABLE("Unsupported damage type");
 }
 
 
