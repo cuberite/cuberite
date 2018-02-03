@@ -45,57 +45,61 @@ namespace TreeNBT
 
 void cTag::uPayload::Construct(const AString & a_String)
 {
-	new(&String) AString(a_String);
+	new(&m_Storage) AString(a_String);
 }
 void cTag::uPayload::Construct(const cCompound & a_Compound)
 {
-	Compound = new cCompound(a_Compound);
+	auto Compound = new cCompound(a_Compound);
+	new(&m_Storage) (cCompound*)(Compound);
 }
 void cTag::uPayload::Construct(const cList & a_List)
 {
-	List = new cList(a_List);
+	auto List = new cList(a_List);
+	new(&m_Storage) (cList*)(List);
 }
 void cTag::uPayload::Construct(const cArray<Int8> & a_ByteArray)
 {
-	new(&ByteArray) cArray<Int8>(a_ByteArray);
+	new(&m_Storage) cArray<Int8>(a_ByteArray);
 }
 void cTag::uPayload::Construct(const cArray<Int32> & a_IntArray)
 {
-	new(&IntArray) cArray<Int32>(a_IntArray);
+	new(&m_Storage) cArray<Int32>(a_IntArray);
 }
 
 void cTag::uPayload::Construct(AString && a_String)
 {
-	new(&String) AString(std::move(a_String));
+	new(&m_Storage) AString(std::move(a_String));
 }
 void cTag::uPayload::Construct(cCompound && a_Compound)
 {
-	Compound = new cCompound(std::move(a_Compound));
+	auto Compound = new cCompound(std::move(a_Compound));
+	new(&m_Storage) (cCompound *)(Compound);
 }
 void cTag::uPayload::Construct(cList && a_List)
 {
-	List = new cList(std::move(a_List));
+	auto List = new cList(std::move(a_List));
+	new(&m_Storage) (cList *)(List);
 }
 void cTag::uPayload::Construct(cArray<Int8> && a_ByteArray)
 {
-	new(&ByteArray) cArray<Int8>(std::move(a_ByteArray));
+	new(&m_Storage) cArray<Int8>(std::move(a_ByteArray));
 }
 void cTag::uPayload::Construct(cArray<Int32> && a_IntArray)
 {
-	new(&IntArray) cArray<Int32>(std::move(a_IntArray));
+	new(&m_Storage) cArray<Int32>(std::move(a_IntArray));
 }
 
-void cTag::uPayload::Assign(AString && a_String)         { String = std::move(a_String); }
-void cTag::uPayload::Assign(cCompound && a_Compound)     { *Compound = std::move(a_Compound); }
-void cTag::uPayload::Assign(cList && a_List)             { *List = std::move(a_List); }
-void cTag::uPayload::Assign(cArray<Int8> && a_ByteArray) { ByteArray = std::move(a_ByteArray); }
-void cTag::uPayload::Assign(cArray<Int32> && a_IntArray) { IntArray = std::move(a_IntArray); }
+void cTag::uPayload::Assign(AString && a_String)         { As<AString>()       = std::move(a_String);    }
+void cTag::uPayload::Assign(cCompound && a_Compound)     { *As<cCompound *>()  = std::move(a_Compound);  }
+void cTag::uPayload::Assign(cList && a_List)             { *As<cList *>()      = std::move(a_List);      }
+void cTag::uPayload::Assign(cArray<Int8> && a_ByteArray) { As<cArray<Int8>>()  = std::move(a_ByteArray); }
+void cTag::uPayload::Assign(cArray<Int32> && a_IntArray) { As<cArray<Int32>>() = std::move(a_IntArray);  }
 
-void cTag::uPayload::Assign(const AString & a_String)         { String = a_String;}
-void cTag::uPayload::Assign(const cCompound & a_Compound)     { *Compound = a_Compound; }
-void cTag::uPayload::Assign(const cList & a_List)             { *List = a_List; }
-void cTag::uPayload::Assign(const cArray<Int8> & a_ByteArray) { ByteArray = a_ByteArray; }
-void cTag::uPayload::Assign(const cArray<Int32> & a_IntArray) { IntArray = a_IntArray; }
+void cTag::uPayload::Assign(const AString & a_String)         { As<AString>()       = a_String;    }
+void cTag::uPayload::Assign(const cCompound & a_Compound)     { *As<cCompound *>()  = a_Compound;  }
+void cTag::uPayload::Assign(const cList & a_List)             { *As<cList *>()      = a_List;      }
+void cTag::uPayload::Assign(const cArray<Int8> & a_ByteArray) { As<cArray<Int8>>()  = a_ByteArray; }
+void cTag::uPayload::Assign(const cArray<Int32> & a_IntArray) { As<cArray<Int32>>() = a_IntArray;  }
 
 #pragma pop_macro("new")
 

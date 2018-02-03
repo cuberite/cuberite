@@ -17,6 +17,9 @@
 	#define LVALUE_REF_QUALIFIER
 #endif
 
+#pragma push_macro("new")
+#undef new
+
 namespace TreeNBT
 {
 
@@ -44,9 +47,6 @@ template <> struct TypeFromTagId<TAG_List>      { using type = cList; };
 template <> struct TypeFromTagId<TAG_Compound>  { using type = cCompound; };
 template <> struct TypeFromTagId<TAG_ByteArray> { using type = cArray<Int8>; };
 template <> struct TypeFromTagId<TAG_IntArray>  { using type = cArray<Int32>; };
-
-template <typename T>
-typename std::add_const<T>::type & AsConst(T & a_Value) { return a_Value; }
 
 template <bool Value, typename T>
 using enable_if_t = typename std::enable_if<Value, T>::type;
@@ -112,63 +112,63 @@ public:
 		{
 			case TAG_Byte:
 			{
-				a_Visitor(m_Payload.Byte);
+				a_Visitor(m_Payload.As<Int8>());
 				return;
 			}
 			case TAG_Short:
 			{
-				a_Visitor(m_Payload.Short);
+				a_Visitor(m_Payload.As<Int16>());
 				return;
 			}
 			case TAG_Int:
 			{
-				a_Visitor(m_Payload.Int);
+				a_Visitor(m_Payload.As<Int32>());
 				return;
 			}
 			case TAG_Long:
 			{
-				a_Visitor(m_Payload.Long);
+				a_Visitor(m_Payload.As<Int64>());
 				return;
 			}
 			case TAG_Float:
 			{
-				a_Visitor(m_Payload.Float);
+				a_Visitor(m_Payload.As<float>());
 				return;
 			}
 			case TAG_Double:
 			{
-				a_Visitor(m_Payload.Double);
+				a_Visitor(m_Payload.As<double>());
 				return;
 			}
 			case TAG_ByteArray:
 			{
-				a_Visitor(m_Payload.ByteArray);
+				a_Visitor(m_Payload.As<cArray<Int8>>());
 				return;
 			}
 			case TAG_String:
 			{
-				a_Visitor(m_Payload.String);
+				a_Visitor(m_Payload.As<AString>());
 				return;
 			}
 			case TAG_List:
 			{
-				a_Visitor(Detail::AsConst(*m_Payload.List));
+				a_Visitor(*m_Payload.As<const cList *>());
 				return;
 			}
 			case TAG_Compound:
 			{
-				a_Visitor(Detail::AsConst(*m_Payload.Compound));
+				a_Visitor(*m_Payload.As<const cCompound *>());
 				return;
 			}
 			case TAG_IntArray:
 			{
-				a_Visitor(m_Payload.IntArray);
+				a_Visitor(m_Payload.As<cArray<Int32>>());
 				return;
 			}
 			case TAG_End:
 			{
-				cEmptyTag Empty{};
-				a_Visitor(Detail::AsConst(Empty));
+				const cEmptyTag Empty{};
+				a_Visitor(Empty);
 				return;
 			}
 		}
@@ -181,57 +181,57 @@ public:
 		{
 			case TAG_Byte:
 			{
-				a_Visitor(m_Payload.Byte);
+				a_Visitor(m_Payload.As<Int8>());
 				return;
 			}
 			case TAG_Short:
 			{
-				a_Visitor(m_Payload.Short);
+				a_Visitor(m_Payload.As<Int16>());
 				return;
 			}
 			case TAG_Int:
 			{
-				a_Visitor(m_Payload.Int);
+				a_Visitor(m_Payload.As<Int32>());
 				return;
 			}
 			case TAG_Long:
 			{
-				a_Visitor(m_Payload.Long);
+				a_Visitor(m_Payload.As<Int64>());
 				return;
 			}
 			case TAG_Float:
 			{
-				a_Visitor(m_Payload.Float);
+				a_Visitor(m_Payload.As<float>());
 				return;
 			}
 			case TAG_Double:
 			{
-				a_Visitor(m_Payload.Double);
+				a_Visitor(m_Payload.As<double>());
 				return;
 			}
 			case TAG_ByteArray:
 			{
-				a_Visitor(m_Payload.ByteArray);
+				a_Visitor(m_Payload.As<cArray<Int8>>());
 				return;
 			}
 			case TAG_String:
 			{
-				a_Visitor(m_Payload.String);
+				a_Visitor(m_Payload.As<AString>());
 				return;
 			}
 			case TAG_List:
 			{
-				a_Visitor(*m_Payload.List);
+				a_Visitor(*m_Payload.As<cList *>());
 				return;
 			}
 			case TAG_Compound:
 			{
-				a_Visitor(*m_Payload.Compound);
+				a_Visitor(*m_Payload.As<cCompound *>());
 				return;
 			}
 			case TAG_IntArray:
 			{
-				a_Visitor(m_Payload.IntArray);
+				a_Visitor(m_Payload.As<cArray<Int32>>());
 				return;
 			}
 			case TAG_End:
@@ -251,57 +251,57 @@ public:
 			{
 				case TAG_Byte:
 				{
-					a_Visitor(std::move(m_Payload.Byte));
+					a_Visitor(std::move(m_Payload.As<Int8>()));
 					return;
 				}
 				case TAG_Short:
 				{
-					a_Visitor(std::move(m_Payload.Short));
+					a_Visitor(std::move(m_Payload.As<Int16>()));
 					return;
 				}
 				case TAG_Int:
 				{
-					a_Visitor(std::move(m_Payload.Int));
+					a_Visitor(std::move(m_Payload.As<Int32>()));
 					return;
 				}
 				case TAG_Long:
 				{
-					a_Visitor(std::move(m_Payload.Long));
+					a_Visitor(std::move(m_Payload.As<Int64>()));
 					return;
 				}
 				case TAG_Float:
 				{
-					a_Visitor(std::move(m_Payload.Float));
+					a_Visitor(std::move(m_Payload.As<float>()));
 					return;
 				}
 				case TAG_Double:
 				{
-					a_Visitor(std::move(m_Payload.Double));
+					a_Visitor(std::move(m_Payload.As<double>()));
 					return;
 				}
 				case TAG_ByteArray:
 				{
-					a_Visitor(std::move(m_Payload.ByteArray));
+					a_Visitor(std::move(m_Payload.As<cArray<Int8>>()));
 					return;
 				}
 				case TAG_String:
 				{
-					a_Visitor(std::move(m_Payload.String));
+					a_Visitor(std::move(m_Payload.As<AString>()));
 					return;
 				}
 				case TAG_List:
 				{
-					a_Visitor(std::move(*m_Payload.List));
+					a_Visitor(std::move(*m_Payload.As<cList *>()));
 					return;
 				}
 				case TAG_Compound:
 				{
-					a_Visitor(std::move(*m_Payload.Compound));
+					a_Visitor(std::move(*m_Payload.As<cCompound *>()));
 					return;
 				}
 				case TAG_IntArray:
 				{
-					a_Visitor(std::move(m_Payload.IntArray));
+					a_Visitor(std::move(m_Payload.As<cArray<Int32>>()));
 					return;
 				}
 				case TAG_End:
@@ -351,17 +351,43 @@ private:
 	/** Union that holds the actual tag value. */
 	union uPayload
 	{
-		Int8          Byte;
-		Int16         Short;
-		Int32         Int;
-		Int64         Long;
-		float         Float;
-		double        Double;
-		AString       String;
-		cCompound *   Compound;
-		cList *       List;
-		cArray<Int8>  ByteArray;
-		cArray<Int32> IntArray;
+		using Storage = std::aligned_union<1,
+			Int8,          // TAG_Byte
+			Int16,         // TAG_Short
+			Int32,         // TAG_Int
+			Int64,         // TAG_Long
+			float,         // TAG_Float
+			double,        // TAG_Double
+			AString,       // TAG_String
+			cCompound *,   // TAG_Compound
+			cList *,       // TAG_List
+			cArray<Int8>,  // TAG_ByteArray
+			cArray<Int32>  // TAG_IntArray
+		>::type;
+
+		Storage m_Storage;
+
+		template <typename T>
+		T & As() LVALUE_REF_QUALIFIER
+		{
+			return reinterpret_cast<T &>(m_Storage);
+		}
+
+		template <typename T>
+		const T & As() const LVALUE_REF_QUALIFIER
+		{
+			return reinterpret_cast<const T &>(m_Storage);
+		}
+
+		#if HAS_REFERENCE_QUALIFIERS
+			template <typename T>
+			T && As() &&
+			{
+				using RValue = T && ;
+				return reinterpret_cast<RValue>(m_Storage);
+			}
+		#endif  // HAS_REFERENCE_QUALIFIERS
+
 
 		template <typename T>
 		uPayload(T && a_Value)
@@ -373,12 +399,13 @@ private:
 		// that templates can rely on overloading.
 
 		void Construct(cEmptyTag) {}
-		void Construct(Int8   a_Byte)   { Byte   = a_Byte;   }
-		void Construct(Int16  a_Short)  { Short  = a_Short;  }
-		void Construct(Int32  a_Int)    { Int    = a_Int;    }
-		void Construct(Int64  a_Long)   { Long   = a_Long;   }
-		void Construct(float  a_Float)  { Float  = a_Float;  }
-		void Construct(double a_Double) { Double = a_Double; }
+
+		void Construct(Int8   a_Byte)   { new(&m_Storage) Int8{a_Byte};     }
+		void Construct(Int16  a_Short)  { new(&m_Storage) Int16{a_Short};   }
+		void Construct(Int32  a_Int)    { new(&m_Storage) Int32{a_Int};     }
+		void Construct(Int64  a_Long)   { new(&m_Storage) Int64{a_Long};    }
+		void Construct(float  a_Float)  { new(&m_Storage) float{a_Float};   }
+		void Construct(double a_Double) { new(&m_Storage) double{a_Double}; }
 
 		void Construct(const AString & a_String);
 		void Construct(const cCompound & a_Compound);
@@ -393,12 +420,12 @@ private:
 		void Construct(cArray<Int32> && a_IntArray);
 
 		void Assign(cEmptyTag) {}
-		void Assign(Int8   a_Byte)   { Byte   = a_Byte;   }
-		void Assign(Int16  a_Short)  { Short  = a_Short;  }
-		void Assign(Int32  a_Int)    { Int    = a_Int;    }
-		void Assign(Int64  a_Long)   { Long   = a_Long;   }
-		void Assign(float  a_Float)  { Float  = a_Float;  }
-		void Assign(double a_Double) { Double = a_Double; }
+		void Assign(Int8   a_Byte)   { As<Int8>()   = a_Byte;   }
+		void Assign(Int16  a_Short)  { As<Int16>()  = a_Short;  }
+		void Assign(Int32  a_Int)    { As<Int32>()  = a_Int;    }
+		void Assign(Int64  a_Long)   { As<Int64>()  = a_Long;   }
+		void Assign(float  a_Float)  { As<float>()  = a_Float;  }
+		void Assign(double a_Double) { As<double>() = a_Double; }
 
 		void Assign(AString && a_String);
 		void Assign(cCompound && a_Compound);
@@ -699,3 +726,5 @@ inline cTag::cTag(cList a_Value):     m_TagId{TAG_List},     m_Payload(std::move
 
 
 }  // namespace TreeNBT
+
+#pragma pop_macro("new")
