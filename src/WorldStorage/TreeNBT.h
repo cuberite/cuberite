@@ -60,7 +60,7 @@ class cArray:
 
 
 #pragma push_macro("STYLE_CHECK_HACK")
-#define STYLE_CHECK_HACK /* CheckBasicStyle.lua doesn't like const & qualified member functions. */
+#define STYLE_CHECK_HACK /* CheckBasicStyle.lua doesn't like const-ref qualified member functions. */
 
 
 /** Type used when visiting an empty tag. */
@@ -84,7 +84,7 @@ public:
 	cTag(AString a_Value):       m_TagId{TAG_String},    m_Payload(std::move(a_Value)) {}
 	cTag(cArray<Int8> a_Value):  m_TagId{TAG_ByteArray}, m_Payload(std::move(a_Value)) {}
 	cTag(cArray<Int32> a_Value): m_TagId{TAG_IntArray},  m_Payload(std::move(a_Value)) {}
-	
+
 	cTag(const char * a_String): cTag(AString(a_String)) {}
 	cTag(cCompound a_Value);
 	cTag(cList a_Value);
@@ -450,8 +450,6 @@ private:
 	void Destroy();
 };
 
-#pragma pop_macro("STYLE_CHECK_HACK")
-
 
 /** cList represents NBT's TAG_List.
 A list tag is a dynamic array of tags that are all of the same type.
@@ -496,7 +494,7 @@ public:
 			return {a_Pos, false};
 		}
 	}
-	
+
 	/** Try to insert a new tag at the end of the list.
 	Returns false if the tag is of the wrong type and cannot be inserted. */
 	template <typename Tag, typename = IsTag<Tag>>
@@ -512,7 +510,7 @@ public:
 			return false;
 		}
 	}
-	
+
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
 	void Visit(iterator a_Pos, Func a_Visitor) &
@@ -520,7 +518,7 @@ public:
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
 	}
-	
+
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
 	void Visit(iterator a_Pos, Func a_Visitor) &&
@@ -528,15 +526,15 @@ public:
 		auto Idx = std::distance(begin(), a_Pos);
 		std::move(m_Tags[Idx]).Visit(std::move(a_Visitor));
 	}
-	
+
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) const &
+	void Visit(iterator a_Pos, Func a_Visitor) const STYLE_CHECK_HACK &
 	{
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
 	}
-	
+
 	/** Clear the list and rebind to store a new tag type. */
 	void Reset(eTagType a_NewListType)
 	{
@@ -586,6 +584,8 @@ private:
 	eTagType m_TypeId;
 	std::vector<cTag> m_Tags;
 };
+
+#pragma pop_macro("STYLE_CHECK_HACK")
 
 
 
@@ -641,7 +641,7 @@ public:
 	{
 		return m_Tags.insert(a_Value);
 	}
-	
+
 	size_type erase(const AString & a_Name) { return m_Tags.erase(a_Name); }
 	iterator erase(const_iterator a_Pos) { return m_Tags.erase(a_Pos); }
 	iterator erase(const_iterator a_First, const_iterator a_Last)
