@@ -5,6 +5,18 @@
 
 #include <unordered_map>
 
+#if (!defined(_MSC_VER) || (_MSC_VER >= 1900))
+	#define HAS_REFERENCE_QUALIFIERS 1
+#else
+	#define HAS_REFERENCE_QUALIFIERS 0
+#endif
+
+#if HAS_REFERENCE_QUALIFIERS
+	#define LVALUE_REF_QUALIFIER &
+#else
+	#define LVALUE_REF_QUALIFIER
+#endif
+
 namespace TreeNBT
 {
 
@@ -59,8 +71,7 @@ class cArray:
 };
 
 
-#pragma push_macro("STYLE_CHECK_HACK")
-#define STYLE_CHECK_HACK /* CheckBasicStyle.lua doesn't like const-ref qualified member functions. */
+
 
 
 /** Type used when visiting an empty tag. */
@@ -95,7 +106,7 @@ public:
 	cTag & operator = (cTag && a_Move);
 
 	template <typename F>
-	void Visit(F && a_Visitor) const STYLE_CHECK_HACK &
+	void Visit(F && a_Visitor) const LVALUE_REF_QUALIFIER
 	{
 		switch (m_TagId)
 		{
@@ -164,7 +175,7 @@ public:
 	}
 
 	template <typename F>
-	void Visit(F && a_Visitor) &
+	void Visit(F && a_Visitor) LVALUE_REF_QUALIFIER
 	{
 		switch (m_TagId)
 		{
@@ -232,73 +243,75 @@ public:
 		}
 	}
 
-	template <typename F>
-	void Visit(F && a_Visitor) &&
-	{
-		switch (m_TagId)
+	#if HAS_REFERENCE_QUALIFIERS
+		template <typename F>
+		void Visit(F && a_Visitor) &&
 		{
-			case TAG_Byte:
+			switch (m_TagId)
 			{
-				a_Visitor(std::move(m_Payload.Byte));
-				return;
-			}
-			case TAG_Short:
-			{
-				a_Visitor(std::move(m_Payload.Short));
-				return;
-			}
-			case TAG_Int:
-			{
-				a_Visitor(std::move(m_Payload.Int));
-				return;
-			}
-			case TAG_Long:
-			{
-				a_Visitor(std::move(m_Payload.Long));
-				return;
-			}
-			case TAG_Float:
-			{
-				a_Visitor(std::move(m_Payload.Float));
-				return;
-			}
-			case TAG_Double:
-			{
-				a_Visitor(std::move(m_Payload.Double));
-				return;
-			}
-			case TAG_ByteArray:
-			{
-				a_Visitor(std::move(m_Payload.ByteArray));
-				return;
-			}
-			case TAG_String:
-			{
-				a_Visitor(std::move(m_Payload.String));
-				return;
-			}
-			case TAG_List:
-			{
-				a_Visitor(std::move(*m_Payload.List));
-				return;
-			}
-			case TAG_Compound:
-			{
-				a_Visitor(std::move(*m_Payload.Compound));
-				return;
-			}
-			case TAG_IntArray:
-			{
-				a_Visitor(std::move(m_Payload.IntArray));
-				return;
-			}
-			case TAG_End:
-			{
-				a_Visitor(cEmptyTag{});
-				return;
+				case TAG_Byte:
+				{
+					a_Visitor(std::move(m_Payload.Byte));
+					return;
+				}
+				case TAG_Short:
+				{
+					a_Visitor(std::move(m_Payload.Short));
+					return;
+				}
+				case TAG_Int:
+				{
+					a_Visitor(std::move(m_Payload.Int));
+					return;
+				}
+				case TAG_Long:
+				{
+					a_Visitor(std::move(m_Payload.Long));
+					return;
+				}
+				case TAG_Float:
+				{
+					a_Visitor(std::move(m_Payload.Float));
+					return;
+				}
+				case TAG_Double:
+				{
+					a_Visitor(std::move(m_Payload.Double));
+					return;
+				}
+				case TAG_ByteArray:
+				{
+					a_Visitor(std::move(m_Payload.ByteArray));
+					return;
+				}
+				case TAG_String:
+				{
+					a_Visitor(std::move(m_Payload.String));
+					return;
+				}
+				case TAG_List:
+				{
+					a_Visitor(std::move(*m_Payload.List));
+					return;
+				}
+				case TAG_Compound:
+				{
+					a_Visitor(std::move(*m_Payload.Compound));
+					return;
+				}
+				case TAG_IntArray:
+				{
+					a_Visitor(std::move(m_Payload.IntArray));
+					return;
+				}
+				case TAG_End:
+				{
+					a_Visitor(cEmptyTag{});
+					return;
+				}
 			}
 		}
-	}
+	#endif  // HAS_REFERENCE_QUALIFIERS
 
 	eTagType TypeId() const
 	{
@@ -513,23 +526,25 @@ public:
 
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) &
+	void Visit(iterator a_Pos, Func a_Visitor) LVALUE_REF_QUALIFIER
 	{
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
 	}
 
-	/** Visit the element of the list at the given position. */
-	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) &&
-	{
-		auto Idx = std::distance(begin(), a_Pos);
-		std::move(m_Tags[Idx]).Visit(std::move(a_Visitor));
-	}
+	#if HAS_REFERENCE_QUALIFIERS
+		/** Visit the element of the list at the given position. */
+		template <typename Func>
+		void Visit(iterator a_Pos, Func a_Visitor) &&
+		{
+			auto Idx = std::distance(begin(), a_Pos);
+			std::move(m_Tags[Idx]).Visit(std::move(a_Visitor));
+		}
+	#endif
 
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) const STYLE_CHECK_HACK &
+	void Visit(iterator a_Pos, Func a_Visitor) const LVALUE_REF_QUALIFIER
 	{
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
@@ -593,7 +608,7 @@ private:
 	std::vector<cTag> m_Tags;
 };
 
-#pragma pop_macro("STYLE_CHECK_HACK")
+
 
 
 
