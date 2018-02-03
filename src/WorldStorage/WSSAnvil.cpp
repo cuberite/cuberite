@@ -1568,6 +1568,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
 		{ "PigZombie",                     &cWSSAnvil::LoadPigZombieFromNBT },
 		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
+		{ "ZombieVillager",                &cWSSAnvil::LoadZombieVillagerFromNBT },
+		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
 	};
 
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
@@ -2968,15 +2970,7 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int IsVillagerIdx = a_NBT.FindChildByName(a_TagIdx, "IsVillager");
-	if (IsVillagerIdx < 0)
-	{
-		return;
-	}
-
-	bool IsVillagerZombie = ((a_NBT.GetByte(IsVillagerIdx) == 1) ? true : false);
-
-	std::unique_ptr<cZombie> Monster = cpp14::make_unique<cZombie>(IsVillagerZombie);
+	std::unique_ptr<cZombie> Monster = cpp14::make_unique<cZombie>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2994,7 +2988,7 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		switch (a_NBT.GetType(AgeableIdx))
 		{
 			case TAG_Byte: Age = static_cast<int>(a_NBT.GetByte(AgeableIdx)); break;
-			case TAG_Int:  Age = a_NBT.GetInt (AgeableIdx); break;
+			case TAG_Int:  Age = a_NBT.GetInt(AgeableIdx); break;
 			default: Age = 0; break;
 		}
 		Monster->SetAge(Age);
@@ -3029,6 +3023,49 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 			case TAG_Byte: Age = static_cast<int>(a_NBT.GetByte(AgeableIdx)); break;
 			case TAG_Int:  Age = a_NBT.GetInt (AgeableIdx); break;
 			default: Age = 0; break;
+		}
+		Monster->SetAge(Age);
+	}
+
+	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadZombieVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	int ProfessionIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
+	if (ProfessionIdx < 0)
+	{
+		return;
+	}
+
+	cVillager::eVillagerType Profession = static_cast<cVillager::eVillagerType>(a_NBT.GetInt(ProfessionIdx));
+
+	std::unique_ptr<cZombieVillager> Monster = cpp14::make_unique<cZombieVillager>(Profession);
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	// TODO: Conversion time
+
+	int AgeableIdx  = a_NBT.FindChildByName(a_TagIdx, "Age");
+	if (AgeableIdx > 0)
+	{
+		int Age;
+		switch (a_NBT.GetType(AgeableIdx))
+		{
+			case TAG_Byte: Age = static_cast<int>(a_NBT.GetByte(AgeableIdx)); break;
+			case TAG_Int:  Age = a_NBT.GetInt (AgeableIdx); break;
+			default:       Age = 0; break;
 		}
 		Monster->SetAge(Age);
 	}

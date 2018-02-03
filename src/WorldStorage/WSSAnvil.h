@@ -232,6 +232,7 @@ protected:
 	void LoadWolfFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZombieVillagerFromNBT  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads the owner name and UUID from the entity at the specified NBT tag.
 	Returns a pair of {name, uuid}. If the entity is not owned, name is an empty string and uuid is nil. */

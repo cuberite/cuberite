@@ -4329,11 +4329,11 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);  // TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
+			a_Pkt.WriteVarInt32(0);
 
 			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Zombie.IsConverting());
+			a_Pkt.WriteBool(false);
 			break;
 		}  // case mtZombie
 
@@ -4345,6 +4345,23 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(ZombieVillager.GetProfession());
+
+			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.ConversionTime() != -1);
+			break;
+		}  // case mtZombieVillager
 
 		default: break;
 	}  // switch (a_Mob.GetType())

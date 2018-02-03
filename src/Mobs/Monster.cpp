@@ -69,6 +69,7 @@ static const struct
 	{mtWolf,           "wolf",           "Wolf",           "wolf"},
 	{mtZombie,         "zombie",         "Zombie",         "zombie"},
 	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
+	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
 } ;
 
 
@@ -662,6 +663,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtWitherSkeleton:
 		case mtZombie:
 		case mtZombiePigman:
+		case mtZombieVillager:
 		case mtSlime:
 		case mtMagmaCube:
 		{
@@ -1078,6 +1080,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtWolf:           return mfPassive;
 		case mtZombie:         return mfHostile;
 		case mtZombiePigman:   return mfHostile;
+		case mtZombieVillager: return mfHostile;
 
 		default:
 		{
@@ -1176,17 +1179,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		{
 			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtVillager:
-		{
-			int VillagerType = Random.RandInt(6);
-			if (VillagerType == 6)
-			{
-				// Give farmers a better chance of spawning
-				VillagerType = 0;
-			}
-
-			return cpp14::make_unique<cVillager>(static_cast<cVillager::eVillagerType>(VillagerType));
-		}
+		case mtVillager: return cpp14::make_unique<cVillager>(cVillager::GetRandomProfession());
 		case mtHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
@@ -1203,7 +1196,10 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 			return cpp14::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
-
+		case mtZombieVillager:
+		{
+			return cpp14::make_unique<cZombieVillager>(cVillager::GetRandomProfession());
+		}
 		case mtBat:            return cpp14::make_unique<cBat>();
 		case mtBlaze:          return cpp14::make_unique<cBlaze>();
 		case mtCaveSpider:     return cpp14::make_unique<cCaveSpider>();

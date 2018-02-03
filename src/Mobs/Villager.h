@@ -29,9 +29,13 @@ public:
 
 	CLASS_PROTODEF(cVillager)
 
+	/** Returns a random Profession. */
+	static eVillagerType GetRandomProfession();
+
 	// cEntity overrides
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick        (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void KilledBy    (TakeDamageInfo & a_TDI) override;
 
 	// cVillager functions
 	/** return true if the given blocktype are: crops, potatoes or carrots. */

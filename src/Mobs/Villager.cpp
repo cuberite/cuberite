@@ -107,6 +107,26 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+
+void cVillager::KilledBy(TakeDamageInfo & a_TDI)
+{
+	super::KilledBy(a_TDI);
+
+	// TODO: 0% chance on Easy, 50% chance on Normal and 100% chance on Hard
+	if (GetRandomProvider().RandBool(0.5) && (a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsMob()))
+	{
+		eMonsterType MonsterType = (static_cast<cMonster *>(a_TDI.Attacker)->GetMobType());
+		if ((MonsterType == mtZombie) || (MonsterType == mtZombieVillager))
+		{
+			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombieVillager, false);
+		}
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Farmer functions:
 
@@ -203,7 +223,17 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 		{
 			return true;
 		}
+		default: return false;
 	}
-	return false;
 }
 
+
+
+
+
+cVillager::eVillagerType cVillager::GetRandomProfession()
+{
+	int Profession = GetRandomProvider().RandInt(cVillager::eVillagerType::vtMax - 1);
+
+	return static_cast<cVillager::eVillagerType>(Profession);
+}

@@ -456,9 +456,10 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				switch (Monster->GetMobType())
 				{
 					case mtSkeleton:
-					case mtZombie:
 					case mtWither:
+					case mtZombie:
 					case mtZombiePigman:
+					case mtZombieVillager:
 					{
 						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;

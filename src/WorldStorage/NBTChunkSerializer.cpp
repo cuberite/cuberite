@@ -738,10 +738,17 @@ public:
 			case mtVillager:       EntityClass = "Villager";       break;
 			case mtWitch:          EntityClass = "Witch";          break;
 			case mtWither:         EntityClass = "WitherBoss";     break;
+<<<<<<< HEAD
 			case mtWitherSkeleton: EntityClass = "WitherSkeleton"; break;
 			case mtWolf:           EntityClass = "Wolf";           break;
 			case mtZombie:         EntityClass = "Zombie";         break;
 			case mtZombiePigman:   EntityClass = "PigZombie";      break;
+=======
+			case mtWolf:           EntityClass = "Wolf";           break;
+			case mtZombie:         EntityClass = "Zombie";         break;
+			case mtZombiePigman:   EntityClass = "PigZombie";      break;
+			case mtZombieVillager: EntityClass = "ZombieVillager"; break;
+>>>>>>> Add Zombie Villagers
 			default:
 			{
 				ASSERT(!"Unhandled monster type");
@@ -901,16 +908,20 @@ public:
 				}
 				case mtZombie:
 				{
-					const cZombie *Zombie = static_cast<const cZombie *>(a_Monster);
-					mWriter.AddByte("IsVillager",   Zombie->IsVillagerZombie() ? 1 : 0);
-					mWriter.AddByte("IsConverting", Zombie->IsConverting() ? 1 : 0);
-					mWriter.AddInt ("Age",          Zombie->GetAge());
+					mWriter.AddInt("Age", static_cast<const cZombie *>(a_Monster)->GetAge());
 					break;
 				}
 				case mtZombiePigman:
 				{
 					mWriter.AddInt("Age", static_cast<const cZombiePigman *>(a_Monster)->GetAge());
 					break;
+				}
+				case mtZombieVillager:
+				{
+					const cZombieVillager *ZombieVillager = reinterpret_cast<const cZombieVillager *>(a_Monster);
+					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
+					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
+					mWriter.AddInt("Age",            ZombieVillager->GetAge());
 				}
 				case mtBlaze:
 				case mtCaveSpider:

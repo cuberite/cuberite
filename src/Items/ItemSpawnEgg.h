@@ -87,11 +87,8 @@ public:
 			case E_META_SPAWN_EGG_WOLF:            return mtWolf;
 			case E_META_SPAWN_EGG_ZOMBIE:          return mtZombie;
 			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN:   return mtZombiePigman;
+			case E_META_SPAWN_EGG_ZOMBIE_VILLAGER: return mtZombieVillager;
+			default: return mtInvalidType;
 		}
-		return mtInvalidType;
 	}
 } ;
-
-
-
-
