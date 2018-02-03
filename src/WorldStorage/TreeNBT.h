@@ -557,10 +557,18 @@ public:
 	iterator end() const { return m_Tags.cend(); }
 
 
-	iterator erase(iterator a_Pos) { return m_Tags.erase(a_Pos); }
+	iterator erase(iterator a_Pos)
+	{
+		auto Idx = std::distance(m_Tags.cbegin(), a_Pos);
+		return m_Tags.erase(m_Tags.begin() + Idx);
+	}
 	iterator erase(iterator a_First, iterator a_Last)
 	{
-		return m_Tags.erase(a_First, a_Last);
+		auto Begin = m_Tags.begin();
+		auto CBegin = m_Tags.cbegin();
+		auto FirstIdx = std::distance(CBegin, a_First);
+		auto LastIdx = std::distance(CBegin, a_Last);
+		return m_Tags.erase(Begin + FirstIdx, Begin + LastIdx);
 	}
 
 	size_type size() const { return m_Tags.size(); }
@@ -643,8 +651,8 @@ public:
 	}
 
 	size_type erase(const AString & a_Name) { return m_Tags.erase(a_Name); }
-	iterator erase(const_iterator a_Pos) { return m_Tags.erase(a_Pos); }
-	iterator erase(const_iterator a_First, const_iterator a_Last)
+	iterator erase(iterator a_Pos) { return m_Tags.erase(a_Pos); }
+	iterator erase(iterator a_First, iterator a_Last)
 	{
 		return m_Tags.erase(a_First, a_Last);
 	}
