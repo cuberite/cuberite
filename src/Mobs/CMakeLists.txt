@@ -35,7 +35,8 @@ SET (SRCS
 	Wither.cpp
 	Wolf.cpp
 	Zombie.cpp
-	ZombiePigman.cpp)
+	ZombiePigman.cpp
+	ZombieVillager.cpp)
 
 SET (HDRS
 	AggressiveMonster.h
@@ -76,7 +77,8 @@ SET (HDRS
 	Wither.h
 	Wolf.h
 	Zombie.h
-	ZombiePigman.h)
+	ZombiePigman.h
+	ZombieVillager.h)
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})

@@ -3748,9 +3748,9 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEUInt8(0x0c);
 			a_Pkt.WriteBEInt8(Zombie.IsBaby() ? 1 : -1);
 			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(Zombie.IsVillagerZombie() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(0);
 			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8(Zombie.IsConverting() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(0);
 			break;
 		}  // case mtZombie
 
@@ -3761,6 +3761,18 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
 			break;
 		}  // case mtZombiePigman
+
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(0x0c);
+			a_Pkt.WriteBEInt8(ZombieVillager.IsBaby() ? 1 : -1);
+			a_Pkt.WriteBEUInt8(0x0d);
+			a_Pkt.WriteBEUInt8(1);
+			a_Pkt.WriteBEUInt8(0x0e);
+			a_Pkt.WriteBEUInt8((ZombieVillager.ConversionTime() == -1) ? 0 : 1);
+			break;
+		}  // case mtZombieVillager
 
 		default: break;
 	}  // switch (a_Mob.GetType())

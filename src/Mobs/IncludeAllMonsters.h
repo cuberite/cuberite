@@ -29,3 +29,4 @@
 #include "Wolf.h"
 #include "Zombie.h"
 #include "ZombiePigman.h"
+#include "ZombieVillager.h"

@@ -60,37 +60,35 @@ public:
 	{
 		switch (a_ItemDamage)
 		{
-			case E_META_SPAWN_EGG_BAT:           return mtBat;
-			case E_META_SPAWN_EGG_BLAZE:         return mtBlaze;
-			case E_META_SPAWN_EGG_CAVE_SPIDER:   return mtCaveSpider;
-			case E_META_SPAWN_EGG_CHICKEN:       return mtChicken;
-			case E_META_SPAWN_EGG_COW:           return mtCow;
-			case E_META_SPAWN_EGG_CREEPER:       return mtCreeper;
-			case E_META_SPAWN_EGG_ENDERMAN:      return mtEnderman;
-			case E_META_SPAWN_EGG_GHAST:         return mtGhast;
-			case E_META_SPAWN_EGG_GUARDIAN:      return mtGuardian;
-			case E_META_SPAWN_EGG_HORSE:         return mtHorse;
-			case E_META_SPAWN_EGG_MAGMA_CUBE:    return mtMagmaCube;
-			case E_META_SPAWN_EGG_MOOSHROOM:     return mtMooshroom;
-			case E_META_SPAWN_EGG_OCELOT:        return mtOcelot;
-			case E_META_SPAWN_EGG_PIG:           return mtPig;
-			case E_META_SPAWN_EGG_RABBIT:        return mtRabbit;
-			case E_META_SPAWN_EGG_SHEEP:         return mtSheep;
-			case E_META_SPAWN_EGG_SILVERFISH:    return mtSilverfish;
-			case E_META_SPAWN_EGG_SKELETON:      return mtSkeleton;
-			case E_META_SPAWN_EGG_SLIME:         return mtSlime;
-			case E_META_SPAWN_EGG_SPIDER:        return mtSpider;
-			case E_META_SPAWN_EGG_SQUID:         return mtSquid;
-			case E_META_SPAWN_EGG_VILLAGER:      return mtVillager;
-			case E_META_SPAWN_EGG_WITCH:         return mtWitch;
-			case E_META_SPAWN_EGG_WOLF:          return mtWolf;
-			case E_META_SPAWN_EGG_ZOMBIE:        return mtZombie;
-			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN: return mtZombiePigman;
+			case E_META_SPAWN_EGG_BAT:             return mtBat;
+			case E_META_SPAWN_EGG_BLAZE:           return mtBlaze;
+			case E_META_SPAWN_EGG_CAVE_SPIDER:     return mtCaveSpider;
+			case E_META_SPAWN_EGG_CHICKEN:         return mtChicken;
+			case E_META_SPAWN_EGG_COW:             return mtCow;
+			case E_META_SPAWN_EGG_CREEPER:         return mtCreeper;
+			case E_META_SPAWN_EGG_ENDERMAN:        return mtEnderman;
+			case E_META_SPAWN_EGG_GHAST:           return mtGhast;
+			case E_META_SPAWN_EGG_GUARDIAN:        return mtGuardian;
+			case E_META_SPAWN_EGG_HORSE:           return mtHorse;
+			case E_META_SPAWN_EGG_MAGMA_CUBE:      return mtMagmaCube;
+			case E_META_SPAWN_EGG_MOOSHROOM:       return mtMooshroom;
+			case E_META_SPAWN_EGG_OCELOT:          return mtOcelot;
+			case E_META_SPAWN_EGG_PIG:             return mtPig;
+			case E_META_SPAWN_EGG_RABBIT:          return mtRabbit;
+			case E_META_SPAWN_EGG_SHEEP:           return mtSheep;
+			case E_META_SPAWN_EGG_SILVERFISH:      return mtSilverfish;
+			case E_META_SPAWN_EGG_SKELETON:        return mtSkeleton;
+			case E_META_SPAWN_EGG_SLIME:           return mtSlime;
+			case E_META_SPAWN_EGG_SPIDER:          return mtSpider;
+			case E_META_SPAWN_EGG_SQUID:           return mtSquid;
+			case E_META_SPAWN_EGG_VILLAGER:        return mtVillager;
+			case E_META_SPAWN_EGG_WITCH:           return mtWitch;
+			case E_META_SPAWN_EGG_WOLF:            return mtWolf;
+			case E_META_SPAWN_EGG_ZOMBIE:          return mtZombie;
+			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN:   return mtZombiePigman;
+			case E_META_SPAWN_EGG_ZOMBIE_VILLAGER: return mtZombieVillager;
+
+			default: return mtInvalidType;
 		}
-		return mtInvalidType;
 	}
 } ;
-
-
-
-

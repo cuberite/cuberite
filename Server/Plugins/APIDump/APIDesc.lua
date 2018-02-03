@@ -9269,6 +9269,10 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "",
 				},
+				mtZombieVillager =
+				{
+					Notes = "",
+				},
 			},
 			ConstantGroups =
 			{
@@ -16997,6 +17001,7 @@ end
 						"mtWolf",
 						"mtZombie",
 						"mtZombiePigman",
+						"mtZombieVillager",
 						"mtMax",
 					},
 					TextBefore = [[

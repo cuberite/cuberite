@@ -919,9 +919,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			// a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);
 
-			// a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			// a_Pkt.WriteBool(Zombie.IsConverting());
 			break;
 		}  // case mtZombie
 
@@ -933,6 +930,23 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_CONVERTING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.ConversionTime()));
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_PROFESSION);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.GetProfession()));
+			break;
+		}  // case mtZombieVillager
 
 		case mtBlaze:
 		case mtEnderDragon:
