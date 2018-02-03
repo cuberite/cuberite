@@ -54,6 +54,33 @@ using enable_if_t = typename std::enable_if<Value, T>::type;
 template <typename T>
 using decay_t = typename std::decay<T>::type;
 
+// Reimplementation of std::aligned_union
+
+template <size_t... Values> struct Maximum;
+
+template <size_t N1, size_t N2, size_t... Tail>
+struct Maximum<N1, N2, Tail...>:
+	std::integral_constant<size_t,
+		(N1 > N2) ? Maximum<N1, Tail...>::value : Maximum<N2, Tail...>::value
+	>
+{
+};
+
+template <size_t N>
+struct Maximum<N>:
+	std::integral_constant<size_t, N>
+{
+};
+
+template<size_t MinLength, class... Ts>
+struct aligned_union:
+	std::aligned_storage<
+		Maximum<MinLength, sizeof(Ts)...>::value,
+		Maximum<std::alignment_of<Ts>::value...>::value
+	>
+{
+};
+
 }  // namespace Detail
 
 
@@ -351,7 +378,7 @@ private:
 	/** Union that holds the actual tag value. */
 	union uPayload
 	{
-		using Storage = std::aligned_union<1,
+		using Storage = Detail::aligned_union<1,
 			Int8,          // TAG_Byte
 			Int16,         // TAG_Short
 			Int32,         // TAG_Int
