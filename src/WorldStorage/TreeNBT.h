@@ -46,8 +46,7 @@ using decay_t = typename std::decay<T>::type;
 
 
 
-/** cArray represents NBT's TAG_ByteArray and TAG_IntArray.
-As such only cArray<Int8> and cArray<*/
+/** cArray represents NBT's TAG_ByteArray and TAG_IntArray. */
 template <typename T>
 class cArray:
 	public std::vector<T>
@@ -312,7 +311,7 @@ public:
 	{
 		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		ValueGetter<const ValueType> Getter;
+		sValueGetter<const ValueType> Getter;
 		Visit(Getter);
 		return Getter.m_Result;
 	}
@@ -323,7 +322,7 @@ public:
 	{
 		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		ValueGetter<ValueType> Getter;
+		sValueGetter<ValueType> Getter;
 		Visit(Getter);
 		return Getter.m_Result;
 	}
@@ -429,7 +428,7 @@ private:
 
 	/** Implementation of GetAs. */
 	template <typename ValueType>
-	struct ValueGetter
+	struct sValueGetter
 	{
 		ValueType * m_Result = nullptr;
 
