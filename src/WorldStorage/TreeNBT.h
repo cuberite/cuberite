@@ -86,6 +86,7 @@ public:
 	cTag(cArray<Int8> a_Value):  m_TagId{TAG_ByteArray}, m_Payload(std::move(a_Value)) {}
 	cTag(cArray<Int32> a_Value): m_TagId{TAG_IntArray},  m_Payload(std::move(a_Value)) {}
 	
+	cTag(const char * a_String): cTag(AString(a_String)) {}
 	cTag(cCompound a_Value);
 	cTag(cList a_Value);
 
