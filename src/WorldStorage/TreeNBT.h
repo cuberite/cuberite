@@ -33,6 +33,9 @@ template <> struct TypeFromTagId<TAG_Compound>  { using type = cCompound; };
 template <> struct TypeFromTagId<TAG_ByteArray> { using type = cArray<Int8>; };
 template <> struct TypeFromTagId<TAG_IntArray>  { using type = cArray<Int32>; };
 
+template <typename T>
+typename std::add_const<T>::type & AsConst(T & a_Value) { return a_Value; }
+
 template <bool Value, typename T>
 using enable_if_t = typename std::enable_if<Value, T>::type;
 
@@ -138,6 +141,75 @@ public:
 			}
 			case TAG_List:
 			{
+				a_Visitor(Detail::AsConst(*m_Payload.List));
+				return;
+			}
+			case TAG_Compound:
+			{
+				a_Visitor(Detail::AsConst(*m_Payload.Compound));
+				return;
+			}
+			case TAG_IntArray:
+			{
+				a_Visitor(m_Payload.IntArray);
+				return;
+			}
+			case TAG_End:
+			{
+				cEmptyTag Empty{};
+				a_Visitor(Detail::AsConst(Empty));
+				return;
+			}
+		}
+	}
+
+	template <typename F>
+	void Visit(F && a_Visitor) &
+	{
+		switch (m_TagId)
+		{
+			case TAG_Byte:
+			{
+				a_Visitor(m_Payload.Byte);
+				return;
+			}
+			case TAG_Short:
+			{
+				a_Visitor(m_Payload.Short);
+				return;
+			}
+			case TAG_Int:
+			{
+				a_Visitor(m_Payload.Int);
+				return;
+			}
+			case TAG_Long:
+			{
+				a_Visitor(m_Payload.Long);
+				return;
+			}
+			case TAG_Float:
+			{
+				a_Visitor(m_Payload.Float);
+				return;
+			}
+			case TAG_Double:
+			{
+				a_Visitor(m_Payload.Double);
+				return;
+			}
+			case TAG_ByteArray:
+			{
+				a_Visitor(m_Payload.ByteArray);
+				return;
+			}
+			case TAG_String:
+			{
+				a_Visitor(m_Payload.String);
+				return;
+			}
+			case TAG_List:
+			{
 				a_Visitor(*m_Payload.List);
 				return;
 			}
@@ -153,24 +225,79 @@ public:
 			}
 			case TAG_End:
 			{
-				a_Visitor(cEmptyTag{});
+				cEmptyTag Empty{};
+				a_Visitor(Empty);
 				return;
 			}
 		}
 	}
 
 	template <typename F>
-	void Visit(F && a_Visitor) &
-	{
-		const auto * CThis = this;
-		CThis->Visit(LValueVisitWrapper<F>{std::forward<F>(a_Visitor)});
-	}
-
-	template <typename F>
 	void Visit(F && a_Visitor) &&
 	{
-		const auto * CThis = this;
-		CThis->Visit(RValueVisitWrapper<F>{std::forward<F>(a_Visitor)});
+		switch (m_TagId)
+		{
+			case TAG_Byte:
+			{
+				a_Visitor(std::move(m_Payload.Byte));
+				return;
+			}
+			case TAG_Short:
+			{
+				a_Visitor(std::move(m_Payload.Short));
+				return;
+			}
+			case TAG_Int:
+			{
+				a_Visitor(std::move(m_Payload.Int));
+				return;
+			}
+			case TAG_Long:
+			{
+				a_Visitor(std::move(m_Payload.Long));
+				return;
+			}
+			case TAG_Float:
+			{
+				a_Visitor(std::move(m_Payload.Float));
+				return;
+			}
+			case TAG_Double:
+			{
+				a_Visitor(std::move(m_Payload.Double));
+				return;
+			}
+			case TAG_ByteArray:
+			{
+				a_Visitor(std::move(m_Payload.ByteArray));
+				return;
+			}
+			case TAG_String:
+			{
+				a_Visitor(std::move(m_Payload.String));
+				return;
+			}
+			case TAG_List:
+			{
+				a_Visitor(std::move(*m_Payload.List));
+				return;
+			}
+			case TAG_Compound:
+			{
+				a_Visitor(std::move(*m_Payload.Compound));
+				return;
+			}
+			case TAG_IntArray:
+			{
+				a_Visitor(std::move(m_Payload.IntArray));
+				return;
+			}
+			case TAG_End:
+			{
+				a_Visitor(cEmptyTag{});
+				return;
+			}
+		}
 	}
 
 	eTagType TypeId() const
@@ -184,7 +311,7 @@ public:
 	{
 		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		ValueGetter<ValueType> Getter;
+		ValueGetter<const ValueType> Getter;
 		Visit(Getter);
 		return Getter.m_Result;
 	}
@@ -193,9 +320,11 @@ public:
 	auto GetAs()
 		-> typename Detail::TypeFromTagId<TagId>::type *
 	{
+		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		const auto * CThis = this;
-		return const_cast<ValueType *>(CThis->GetAs<TagId>());
+		ValueGetter<ValueType> Getter;
+		Visit(Getter);
+		return Getter.m_Result;
 	}
 
 	bool IsEmpty() const
@@ -297,43 +426,14 @@ private:
 		}
 	};
 
-
-	/** Visitor wrapper used to implement Visit() &. */
-	template <typename F>
-	struct LValueVisitWrapper
-	{
-		F && Visitor;
-		template <typename T>
-		void operator () (T & a_Value)
-		{
-			using NCT = typename std::remove_const<T>::type;
-			auto && NCRef = const_cast<NCT &>(a_Value);
-			Visitor(NCRef);
-		}
-	};
-	
-	/** Visitor wrapper used to implement Visit() &&. */
-	template <typename F>
-	struct RValueVisitWrapper
-	{
-		F && Visitor;
-		template <typename T>
-		void operator () (T & a_Value)
-		{
-			using NCT = typename std::remove_const<T>::type;
-			auto && NCRef = const_cast<NCT &&>(a_Value);
-			Visitor(NCRef);
-		}
-	};
-
 	/** Implementation of GetAs. */
 	template <typename ValueType>
 	struct ValueGetter
 	{
-		const ValueType * m_Result = nullptr;
+		ValueType * m_Result = nullptr;
 
 		// Called for values matching the tag id
-		void operator () (const ValueType & a_Value)
+		void operator () (ValueType & a_Value)
 		{
 			m_Result = &a_Value;
 		}
