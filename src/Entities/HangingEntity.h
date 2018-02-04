@@ -60,40 +60,34 @@ protected:
 	/** Converts protocol hanging item facing to eBlockFace values */
 	inline static eBlockFace ProtocolFaceToBlockFace(Byte a_ProtocolFace)
 	{
-		eBlockFace Dir;
-
 		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 		switch (a_ProtocolFace)
 		{
-			case 0: Dir = BLOCK_FACE_ZP; break;
-			case 2: Dir = BLOCK_FACE_ZM; break;
-			case 1: Dir = BLOCK_FACE_XM; break;
-			case 3: Dir = BLOCK_FACE_XP; break;
+			case 0: return BLOCK_FACE_ZP;
+			case 2: return BLOCK_FACE_ZM;
+			case 1: return BLOCK_FACE_XM;
+			case 3: return BLOCK_FACE_XP;
 			default:
 			{
 				LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_ProtocolFace);
 				ASSERT(!"Tried to convert a bad facing!");
 
-				Dir = cHangingEntity::ProtocolFaceToBlockFace(3);
+				return cHangingEntity::ProtocolFaceToBlockFace(3);
 			}
 		}
-
-		return Dir;
 	}
 
 
 	/** Converts eBlockFace values to protocol hanging item faces */
 	inline static Byte BlockFaceToProtocolFace(eBlockFace a_BlockFace)
 	{
-		Byte Dir;
-
 		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_ZP: Dir = 0; break;
-			case BLOCK_FACE_ZM: Dir = 2; break;
-			case BLOCK_FACE_XM: Dir = 1; break;
-			case BLOCK_FACE_XP: Dir = 3; break;
+			case BLOCK_FACE_ZP: return 0;
+			case BLOCK_FACE_ZM: return 2;
+			case BLOCK_FACE_XM: return 1;
+			case BLOCK_FACE_XP: return 3;
 			case BLOCK_FACE_YP:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_NONE:
@@ -102,19 +96,10 @@ protected:
 				// LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);
 				// ASSERT(!"Tried to convert a bad facing!");
 
-				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
-				break;
+				return cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
 			}
-			#if !defined(__clang__)
-			default:
-			{
-				ASSERT(!"Unknown BLOCK_FACE");
-				return 0;
-			}
-			#endif
 		}
-
-		return Dir;
+		UNREACHABLE("Unsupported block face");
 	}
 };  // tolua_export
 
