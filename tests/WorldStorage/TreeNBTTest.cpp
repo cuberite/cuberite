@@ -41,12 +41,13 @@ struct sVisitExpect
 {
 	void operator () (Expected) {}
 
-	template <typename Unexpected>
-	void operator () (Unexpected &&)
+	template <typename Arg>
+	void operator () (Arg &&)
 	{
+		using Unexpected = Arg &&;
 		FLOGERROR("Expected {0}{1}{2}, got {3}{4}{5}",
 			StrConst<Expected>(),   typeid(Expected).name(),   StrRefQual<Expected>(),
-			StrConst<Unexpected>(), typeid(Unexpected).name(), StrRefQual<Unexpected &&>()
+			StrConst<Unexpected>(), typeid(Unexpected).name(), StrRefQual<Unexpected>()
 		);
 		assert_test(!"Visit called with unexpected type");
 	}
@@ -56,17 +57,17 @@ struct sVisitExpect
 void GetAsExpect(TreeNBT::cTag & a_Tag, eTagType Expected)
 {
 	// GetAs returns non-null pointer if and only if the tag type is expected
-	assert_test((a_Tag.GetAs<TAG_Byte     >() != nullptr) == (Expected == TAG_Byte     ));
-	assert_test((a_Tag.GetAs<TAG_Short    >() != nullptr) == (Expected == TAG_Short    ));
-	assert_test((a_Tag.GetAs<TAG_Int      >() != nullptr) == (Expected == TAG_Int      ));
-	assert_test((a_Tag.GetAs<TAG_Long     >() != nullptr) == (Expected == TAG_Long     ));
-	assert_test((a_Tag.GetAs<TAG_Float    >() != nullptr) == (Expected == TAG_Float    ));
-	assert_test((a_Tag.GetAs<TAG_Double   >() != nullptr) == (Expected == TAG_Double   ));
+	assert_test((a_Tag.GetAs<TAG_Byte     >() != nullptr) == (Expected == TAG_Byte));
+	assert_test((a_Tag.GetAs<TAG_Short    >() != nullptr) == (Expected == TAG_Short));
+	assert_test((a_Tag.GetAs<TAG_Int      >() != nullptr) == (Expected == TAG_Int));
+	assert_test((a_Tag.GetAs<TAG_Long     >() != nullptr) == (Expected == TAG_Long));
+	assert_test((a_Tag.GetAs<TAG_Float    >() != nullptr) == (Expected == TAG_Float));
+	assert_test((a_Tag.GetAs<TAG_Double   >() != nullptr) == (Expected == TAG_Double));
 	assert_test((a_Tag.GetAs<TAG_ByteArray>() != nullptr) == (Expected == TAG_ByteArray));
-	assert_test((a_Tag.GetAs<TAG_String   >() != nullptr) == (Expected == TAG_String   ));
-	assert_test((a_Tag.GetAs<TAG_List     >() != nullptr) == (Expected == TAG_List     ));
-	assert_test((a_Tag.GetAs<TAG_Compound >() != nullptr) == (Expected == TAG_Compound ));
-	assert_test((a_Tag.GetAs<TAG_IntArray >() != nullptr) == (Expected == TAG_IntArray ));
+	assert_test((a_Tag.GetAs<TAG_String   >() != nullptr) == (Expected == TAG_String));
+	assert_test((a_Tag.GetAs<TAG_List     >() != nullptr) == (Expected == TAG_List));
+	assert_test((a_Tag.GetAs<TAG_Compound >() != nullptr) == (Expected == TAG_Compound));
+	assert_test((a_Tag.GetAs<TAG_IntArray >() != nullptr) == (Expected == TAG_IntArray));
 }
 
 
@@ -77,7 +78,8 @@ void AssertHoldsType(TreeNBT::cTag & a_Tag)
 	assert_test(a_Tag.TypeId() == ExpectedTypeId);
 	GetAsExpect(a_Tag, ExpectedTypeId);
 	a_Tag.Visit(sVisitExpect<ExpectedVisitType &>{});
-	std::move(a_Tag).Visit(sVisitExpect<ExpectedVisitType &&>{});
+	using RVal = ExpectedVisitType &&;
+	std::move(a_Tag).Visit(sVisitExpect<RVal>{});
 
 	const auto & ConstTag = a_Tag;
 	ConstTag.Visit(sVisitExpect<const ExpectedVisitType &>{});
@@ -128,7 +130,7 @@ void TestTagCreation()
 		AssertHoldsType<TAG_String, AString>(StringTag2);
 	}
 	{
-		TreeNBT::cTag ListTag = TreeNBT::cList(TAG_Byte);
+		TreeNBT::cTag ListTag = TreeNBT::cList{};
 		AssertHoldsType<TAG_List, TreeNBT::cList>(ListTag);
 	}
 	{
@@ -162,7 +164,7 @@ void TestTagAssignment()
 		assert_test(*CopyTag.GetAs<TAG_String>() == TestString);
 	}
 
-	// Copy assign different type 
+	// Copy assign different type
 	{
 		TreeNBT::cTag CopyTag;
 		TreeNBT::cTag StringTag = TestString;

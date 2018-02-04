@@ -202,49 +202,4 @@ cTag & cTag::operator = (cTag && a_MoveFrom)
 	return *this;
 }
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// TreeNBT::cTag:
-
-void cList::resize(size_type a_NewSize)
-{
-	auto OldSize = size();
-
-	if (OldSize >= a_NewSize)
-	{
-		// Resize without any new elements
-		m_Tags.resize(a_NewSize);
-	}
-	else
-	{
-		// Resize with new elements
-		auto DefaultValue = [&]
-			{
-				switch (m_TypeId)
-				{
-					case TAG_Byte:      return cTag(Int8{});
-					case TAG_Short:     return cTag(Int16{});
-					case TAG_Int:       return cTag(Int32{});
-					case TAG_Long:      return cTag(Int64{});
-					case TAG_Float:     return cTag(float{});
-					case TAG_Double:    return cTag(double{});
-					case TAG_ByteArray: return cTag(cArray<Int8>{});
-					case TAG_String:    return cTag(AString{});
-					case TAG_List:      return cTag(cList{TAG_Byte});
-					case TAG_Compound:  return cTag(cCompound{});
-					case TAG_IntArray:  return cTag(cArray<Int32>{});
-					case TAG_End:
-					{
-						ASSERT(!"Bad array type id");
-						return cTag();
-					}
-				}
-			}();
-		m_Tags.resize(a_NewSize, DefaultValue);
-	}
-}
-
 }  // namespace TreeNBT

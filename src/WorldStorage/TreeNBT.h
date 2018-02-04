@@ -48,12 +48,6 @@ template <> struct TypeFromTagId<TAG_Compound>  { using type = cCompound; };
 template <> struct TypeFromTagId<TAG_ByteArray> { using type = cArray<Int8>; };
 template <> struct TypeFromTagId<TAG_IntArray>  { using type = cArray<Int32>; };
 
-template <bool Value, typename T>
-using enable_if_t = typename std::enable_if<Value, T>::type;
-
-template <typename T>
-using decay_t = typename std::decay<T>::type;
-
 // Reimplementation of std::aligned_union
 
 template <size_t... Values> struct Maximum;
@@ -524,9 +518,6 @@ To maintain this property, the individual elements can't be modified directly.
 Instead, elements must be modified via the `Visit` function. */
 class cList
 {
-	template <typename Tag, typename Result = void>
-	using IsTag = Detail::enable_if_t<
-		std::is_same<Detail::decay_t<Tag>, cTag>::value, Result>;
 public:
 	using value_type             = std::vector<cTag>::value_type;
 	using size_type              = std::vector<cTag>::size_type;
@@ -541,41 +532,54 @@ public:
 	using iterator               = std::vector<cTag>::const_iterator;
 	using const_iterator         = std::vector<cTag>::const_iterator;
 
-	cList(eTagType a_ListType):
-		m_TypeId(a_ListType)
+	/** Try to insert a new tag at the given position.
+	Returns false if the tag is of the wrong type and cannot be inserted. */
+	std::pair<iterator, bool> TryInsert(iterator a_Pos, const cTag & a_Tag)
 	{
-		VERIFY(a_ListType != TAG_End);
+		if (!IsTagCompatible(a_Tag.TypeId()))
+		{
+			return {a_Pos, false};
+		}
+
+		return {m_Tags.insert(MutableIterator(a_Pos), std::move(a_Tag)), true};
 	}
 
 	/** Try to insert a new tag at the given position.
 	Returns false if the tag is of the wrong type and cannot be inserted. */
-	template <typename Tag, typename = IsTag<Tag>>
-	std::pair<iterator, bool> TryInsert(iterator a_Pos, Tag && a_Tag)
+	std::pair<iterator, bool> TryInsert(iterator a_Pos, cTag && a_Tag)
 	{
-		if (a_Tag.TypeId() == m_TypeId)
-		{
-			return {m_Tags.insert(std::forward<Tag>(a_Tag)), true};
-		}
-		else
+		if (!IsTagCompatible(a_Tag.TypeId()))
 		{
 			return {a_Pos, false};
 		}
+
+		return {m_Tags.insert(MutableIterator(a_Pos), std::move(a_Tag)), true};
 	}
 
 	/** Try to insert a new tag at the end of the list.
 	Returns false if the tag is of the wrong type and cannot be inserted. */
-	template <typename Tag, typename = IsTag<Tag>>
-	bool TryPushBack(Tag && a_Tag)
+	bool TryPushBack(const cTag & a_Tag)
 	{
-		if (a_Tag.TypeId() == m_TypeId)
-		{
-			m_Tags.push_back(std::forward<Tag>(a_Tag));
-			return true;
-		}
-		else
+		if (!IsTagCompatible(a_Tag.TypeId()))
 		{
 			return false;
 		}
+
+		m_Tags.push_back(a_Tag);
+		return true;
+	}
+
+	/** Try to insert a new tag at the end of the list.
+	Returns false if the tag is of the wrong type and cannot be inserted. */
+	bool TryPushBack(cTag && a_Tag)
+	{
+		if (!IsTagCompatible(a_Tag.TypeId()))
+		{
+			return false;
+		}
+
+		m_Tags.push_back(std::move(a_Tag));
+		return true;
 	}
 
 	/** Visit the element of the list at the given position. */
@@ -604,12 +608,17 @@ public:
 		m_Tags[Idx].Visit(std::move(a_Visitor));
 	}
 
-	/** Clear the list and rebind to store a new tag type. */
-	void Reset(eTagType a_NewListType)
+	/** Type of the current elements or TAG_End if empty. */
+	eTagType TypeId() const
 	{
-		clear();
-		m_TypeId = a_NewListType;
-		VERIFY(a_NewListType != TAG_End);
+		if (m_Tags.empty())
+		{
+			return TAG_End;
+		}
+		else
+		{
+			return m_Tags[0].TypeId();
+		}
 	}
 
 	// Standard STL style interface
@@ -628,28 +637,25 @@ public:
 
 	iterator erase(iterator a_Pos)
 	{
-		auto Idx = std::distance(m_Tags.cbegin(), a_Pos);
-		return m_Tags.erase(m_Tags.begin() + Idx);
+		return m_Tags.erase(MutableIterator(a_Pos));
 	}
+
 	iterator erase(iterator a_First, iterator a_Last)
 	{
-		auto Begin = m_Tags.begin();
-		auto CBegin = m_Tags.cbegin();
-		auto FirstIdx = std::distance(CBegin, a_First);
-		auto LastIdx = std::distance(CBegin, a_Last);
-		return m_Tags.erase(Begin + FirstIdx, Begin + LastIdx);
+		return m_Tags.erase(MutableIterator(a_First), MutableIterator(a_Last));
 	}
 
-	size_type size() const { return m_Tags.size(); }
 
-	void resize(size_type a_NewSize);
+	size_type size() const { return m_Tags.size(); }
+	bool empty() const { return m_Tags.empty(); }
+
+	void reserve(size_type a_ReserveSize) { m_Tags.reserve(a_ReserveSize); }
 
 	void clear() { m_Tags.clear(); }
 
 	void swap(cList & a_Other) NOEXCEPT
 	{
-		std::swap(m_TypeId, a_Other.m_TypeId);
-		std::swap(m_Tags, a_Other.m_Tags);
+		m_Tags.swap(a_Other.m_Tags);
 	}
 
 	friend void swap(cList & a_Lhs, cList & a_Rhs) NOEXCEPT
@@ -658,8 +664,25 @@ public:
 	}
 
 private:
-	eTagType m_TypeId;
 	std::vector<cTag> m_Tags;
+
+	/** Can the given tag type be added to the list? */
+	bool IsTagCompatible(eTagType a_Type) const
+	{
+		return (
+			// If there are elements already, they must be of the same type
+			(m_Tags.empty() || (m_Tags[0].TypeId() == a_Type)) &&
+			(a_Type != TAG_End)  // TAG_End isn't a valid element
+		);
+	}
+
+	/** Get a mutable iterator from a const_iterator.
+	Needed to workaround missing const_iterator overloads for insert and erase. */
+	std::vector<cTag>::iterator MutableIterator(const_iterator a_Itr)
+	{
+		auto Idx = std::distance(cbegin(), a_Itr);
+		return m_Tags.begin() + Idx;
+	}
 };
 
 
