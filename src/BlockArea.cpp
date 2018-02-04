@@ -2890,7 +2890,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2911,7 +2911,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2932,7 +2932,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2953,7 +2953,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y

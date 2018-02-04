@@ -10,18 +10,41 @@
 
 
 
-/** Returns true if all a_Array's elements between [0] and [a_NumElements - 1] are equal to a_Value. */
-template <typename T> inline bool IsAllValue(const T * a_Array, size_t a_NumElements, T a_Value)
+namespace
 {
-	for (size_t i = 0; i < a_NumElements; i++)
+	/** Returns true if all a_Array's elements between [0] and [a_NumElements - 1] are equal to a_Value. */
+	template <typename T>
+	bool IsAllValue(const T * a_Array, size_t a_NumElements, T a_Value)
 	{
-		if (a_Array[i] != a_Value)
+		for (size_t i = 0; i < a_NumElements; i++)
 		{
-			return false;
+			if (a_Array[i] != a_Value)
+			{
+				return false;
+			}
 		}
+		return true;
 	}
-	return true;
-}
+
+
+
+
+
+	struct sSectionIndices
+	{
+		int Section = 0;  // Index into m_Sections
+		int Index = 0;    // Index into a single sChunkSection
+	};
+
+	sSectionIndices IndicesFromRelPos(Vector3i a_RelPos)
+	{
+		ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
+		sSectionIndices Ret;
+		Ret.Section = a_RelPos.y / cChunkData::SectionHeight;
+		Ret.Index = cChunkDef::MakeIndexNoCheck(a_RelPos.x, a_RelPos.y % cChunkData::SectionHeight, a_RelPos.z);
+		return Ret;
+	}
+}  // namespace (anonymous)
 
 
 
@@ -110,21 +133,16 @@ void cChunkData::Assign(cChunkData && a_Other)
 
 
 
-BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
+BLOCKTYPE cChunkData::GetBlock(Vector3i a_RelPos) const
 {
-	if (
-		(a_X < 0) || (a_X >= cChunkDef::Width) ||
-		(a_Y < 0) || (a_Y >= cChunkDef::Height) ||
-		(a_Z < 0) || (a_Z >= cChunkDef::Width)
-	)
+	if (!cChunkDef::IsValidRelPos(a_RelPos))
 	{
 		return E_BLOCK_AIR;  // Coordinates are outside outside the world, so this must be an air block
 	}
-	int Section = a_Y / SectionHeight;
-	if (m_Sections[Section] != nullptr)
+	auto Idxs = IndicesFromRelPos(a_RelPos);
+	if (m_Sections[Idxs.Section] != nullptr)
 	{
-		int Index = cChunkDef::MakeIndexNoCheck(a_X, static_cast<int>(static_cast<UInt32>(a_Y) - (static_cast<UInt32>(Section) * SectionHeight)), a_Z);
-		return m_Sections[Section]->m_BlockTypes[Index];
+		return m_Sections[Idxs.Section]->m_BlockTypes[Idxs.Index];
 	}
 	else
 	{
@@ -136,53 +154,44 @@ BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 
 
 
-void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
+void cChunkData::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_Block)
 {
-	if (
-		(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
-		(a_RelY >= cChunkDef::Height) || (a_RelY < 0) ||
-		(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
-	)
+	if (!cChunkDef::IsValidRelPos(a_RelPos))
 	{
 		ASSERT(!"cChunkData::SetMeta(): index out of range!");
 		return;
 	}
 
-	int Section = static_cast<int>(static_cast<UInt32>(a_RelY) / SectionHeight);
-	if (m_Sections[Section] == nullptr)
+	auto Idxs = IndicesFromRelPos(a_RelPos);
+	if (m_Sections[Idxs.Section] == nullptr)
 	{
 		if (a_Block == 0x00)
 		{
 			return;
 		}
-		m_Sections[Section] = Allocate();
-		if (m_Sections[Section] == nullptr)
+		m_Sections[Idxs.Section] = Allocate();
+		if (m_Sections[Idxs.Section] == nullptr)
 		{
 			ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 			return;
 		}
-		ZeroSection(m_Sections[Section]);
+		ZeroSection(m_Sections[Idxs.Section]);
 	}
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, static_cast<int>(static_cast<UInt32>(a_RelY) - (static_cast<UInt32>(Section) * SectionHeight)), a_RelZ);
-	m_Sections[Section]->m_BlockTypes[Index] = a_Block;
+	m_Sections[Idxs.Section]->m_BlockTypes[Idxs.Index] = a_Block;
 }
 
 
 
 
 
-NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
+NIBBLETYPE cChunkData::GetMeta(Vector3i a_RelPos) const
 {
-	if (
-		(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
-		(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
-		(a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+	if (cChunkDef::IsValidRelPos(a_RelPos))
 	{
-		int Section = static_cast<int>(static_cast<UInt32>(a_RelY) / SectionHeight);
-		if (m_Sections[Section] != nullptr)
+		auto Idxs = IndicesFromRelPos(a_RelPos);
+		if (m_Sections[Idxs.Section] != nullptr)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(a_RelX, static_cast<int>(static_cast<UInt32>(a_RelY) - (static_cast<UInt32>(Section) * SectionHeight)), a_RelZ);
-			return (m_Sections[Section]->m_BlockMetas[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
+			return (m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4)) & 0x0f;
 		}
 		else
 		{
@@ -197,38 +206,33 @@ NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
+bool cChunkData::SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Nibble)
 {
-	if (
-		(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
-		(a_RelY >= cChunkDef::Height) || (a_RelY < 0) ||
-		(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
-	)
+	if (!cChunkDef::IsValidRelPos(a_RelPos))
 	{
 		ASSERT(!"cChunkData::SetMeta(): index out of range!");
 		return false;
 	}
 
-	int Section = static_cast<int>(static_cast<UInt32>(a_RelY) / SectionHeight);
-	if (m_Sections[Section] == nullptr)
+	auto Idxs = IndicesFromRelPos(a_RelPos);
+	if (m_Sections[Idxs.Section] == nullptr)
 	{
 		if ((a_Nibble & 0xf) == 0x00)
 		{
 			return false;
 		}
-		m_Sections[Section] = Allocate();
-		if (m_Sections[Section] == nullptr)
+		m_Sections[Idxs.Section] = Allocate();
+		if (m_Sections[Idxs.Section] == nullptr)
 		{
 			ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 			return false;
 		}
-		ZeroSection(m_Sections[Section]);
+		ZeroSection(m_Sections[Idxs.Section]);
 	}
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, static_cast<int>(static_cast<UInt32>(a_RelY) - (static_cast<UInt32>(Section) * SectionHeight)), a_RelZ);
-	NIBBLETYPE oldval = m_Sections[Section]->m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0xf;
-	m_Sections[Section]->m_BlockMetas[Index / 2] = static_cast<NIBBLETYPE>(
-		(m_Sections[Section]->m_BlockMetas[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
-		((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
+	NIBBLETYPE oldval = m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4) & 0xf;
+	m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] = static_cast<NIBBLETYPE>(
+		(m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] & (0xf0 >> ((Idxs.Index & 1) * 4))) |  // The untouched nibble
+		((a_Nibble & 0x0f) << ((Idxs.Index & 1) * 4))  // The nibble being set
 	);
 	return oldval != a_Nibble;
 }
@@ -237,19 +241,14 @@ bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble
 
 
 
-NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
+NIBBLETYPE cChunkData::GetBlockLight(Vector3i a_RelPos) const
 {
-	if (
-		(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
-		(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
-		(a_RelZ < cChunkDef::Width) && (a_RelZ > -1)
-	)
+	if (cChunkDef::IsValidRelPos(a_RelPos))
 	{
-		int Section = static_cast<int>(static_cast<UInt32>(a_RelY) / SectionHeight);
-		if (m_Sections[Section] != nullptr)
+		auto Idxs = IndicesFromRelPos(a_RelPos);
+		if (m_Sections[Idxs.Section] != nullptr)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(a_RelX, static_cast<int>(static_cast<UInt32>(a_RelY) - (static_cast<UInt32>(Section) * SectionHeight)), a_RelZ);
-			return (m_Sections[Section]->m_BlockLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
+			return (m_Sections[Idxs.Section]->m_BlockLight[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4)) & 0x0f;
 		}
 		else
 		{
@@ -264,15 +263,14 @@ NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
+NIBBLETYPE cChunkData::GetSkyLight(Vector3i a_RelPos) const
 {
-	if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+	if (cChunkDef::IsValidRelPos(a_RelPos))
 	{
-		int Section = static_cast<int>(static_cast<UInt32>(a_RelY) / SectionHeight);
-		if (m_Sections[Section] != nullptr)
+		auto Idxs = IndicesFromRelPos(a_RelPos);
+		if (m_Sections[Idxs.Section] != nullptr)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(a_RelX, static_cast<int>(static_cast<UInt32>(a_RelY) - (static_cast<UInt32>(Section) * SectionHeight)), a_RelZ);
-			return (m_Sections[Section]->m_BlockSkyLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
+			return (m_Sections[Idxs.Section]->m_BlockSkyLight[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4)) & 0x0f;
 		}
 		else
 		{
