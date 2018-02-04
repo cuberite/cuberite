@@ -162,7 +162,7 @@ void cZapper::LoadChunkData(cFile & a_InFile, int a_ChunkHeaderValue, AString & 
 	a_InFile.Read(ChunkHeader, sizeof(ChunkHeader));
 	if (ChunkHeader[4] != 2)
 	{
-		fprintf(stderr, "Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping", a_ChunkX, a_ChunkZ, ChunkHeader[5]);
+		fprintf(stderr, "Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping", a_ChunkX, a_ChunkZ, ChunkHeader[4]);
 		return;
 	}
 	int ActualSize = (ChunkHeader[0] << 24) |  (ChunkHeader[1] << 16) | (ChunkHeader[2] << 8) | ChunkHeader[3];
