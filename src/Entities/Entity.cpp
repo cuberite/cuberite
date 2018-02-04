@@ -640,10 +640,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 			return true;
 		}
 	}
-	ASSERT(!"Invalid damage type!");
-	#ifndef __clang__
-		return false;
-	#endif
+	UNREACHABLE("Unsupported damage type");
 }
 
 

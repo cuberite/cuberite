@@ -352,6 +352,9 @@ template class SizeChecker<UInt8,  1>;
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
+/** Use to mark code that should be impossible to reach. */
+#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)
+
 
 
 
