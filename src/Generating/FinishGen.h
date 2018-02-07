@@ -268,8 +268,11 @@ protected:
 	int    m_MaxCactusHeight;
 	int    m_MaxSugarcaneHeight;
 
-	/** Tries to place sugarcane at the coords specified, returns true if successful */
-	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
+	/** Tries to place sugarcane at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY) */
+	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int & a_RelY, int a_RelZ);
+
+	/** Tries to place cactus at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY)*/
+	bool TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, int & a_RelY, int a_RelZ);
 
 	// Returns true is the specified biome is a desert or its variant
 	static bool IsDesertVariant(EMCSBiome a_biome);
