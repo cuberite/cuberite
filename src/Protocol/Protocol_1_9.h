@@ -255,6 +255,10 @@ protected:
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
 	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
+	/** Converts the hand parameter received by the protocol into eHand constants.
+	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
+	eHand HandIntToEnum(Int32 a_Hand);
+
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 

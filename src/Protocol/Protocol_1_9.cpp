@@ -66,6 +66,7 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 /** Value for main hand in Hand parameter for Protocol 1.9. */
 static const UInt32 MAIN_HAND = 0;
+static const UInt32 OFF_HAND = 1;
 
 
 
@@ -2384,7 +2385,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
 }
 
 
@@ -2784,10 +2785,9 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
-	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleUseItem(HandIntToEnum(Hand));
 }
 
 
@@ -3260,6 +3260,25 @@ eBlockFace cProtocol_1_9_0::FaceIntToBlockFace(Int32 a_BlockFace)
 		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
 		default: return BLOCK_FACE_NONE;
+	}
+}
+
+
+
+
+
+eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
+{
+	// Convert hand parameter into eHand enum
+	switch (a_Hand)
+	{
+		case MAIN_HAND: return eHand::hMain;
+		case OFF_HAND: return eHand::hOff;
+		default:
+		{
+			ASSERT(!"Unknown hand value");
+			return eHand::hMain;
+		}
 	}
 }
 

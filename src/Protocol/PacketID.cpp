@@ -79,11 +79,7 @@ UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 		case sendWindowOpen:            return 0x13;
 		case sendWindowProperty:        return 0x15;
 	}
-	ASSERT(!"Retrieving packet ID for unknown packet type");
-	#ifndef __clang__
-		LOGWARNING("Retrieving packet ID for unknown packet type %d!", a_Packet);
-		return 0;
-	#endif
+	UNREACHABLE("Unsupported outgoing packet type");
 }
 
 

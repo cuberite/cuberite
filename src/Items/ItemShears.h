@@ -69,6 +69,7 @@ public:
 			case dlaBreakBlock:         return 0;
 			case dlaBreakBlockInstant:  return 1;
 		}
+		UNREACHABLE("Unsupported durability loss action");
 	}
 
 
