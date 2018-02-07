@@ -670,8 +670,8 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc &a_ChunkDesc, int a_RelX, int & a_RelY, int a_RelZ)
 {
-	//TODO add for loop, with noise parameter, to generate multiple height cactus
-	for(int i = 1; i < (a_RelX % m_MaxCactusHeight); i++)
+	// TODO add for loop, with noise parameter, to generate multiple height cactus
+	for (int i = 1; i < (a_RelX % m_MaxCactusHeight); i++)
 	{
 		if (
 			(a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) ||
@@ -682,14 +682,14 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc &a_ChunkDesc, int a_RelX
 			return false;
 		}
 
-		switch(a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ))
+		switch (a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ))
 		{
-		    case E_BLOCK_SAND :
-		    case E_BLOCK_CACTUS :
+			case E_BLOCK_SAND :
+			case E_BLOCK_CACTUS :
 			{
 				break;
 			}
-		    default :
+			default :
 			{
 				return false;
 			}
@@ -707,7 +707,7 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc &a_ChunkDesc, int a_RelX
 			return false;
 		}
 
-		//All conditions are met, we can place a cactus here
+		// All conditions are met, we can place a cactus here
 		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_CACTUS);
 	}
 
@@ -836,7 +836,8 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				case E_BLOCK_SAND:
 				{
-					if (val1 + val2 > 0.5f) {
+					if (val1 + val2 > 0.5f)
+					{
 						TryAddCactus(a_ChunkDesc, x, Top, z);
 					}
 					else
