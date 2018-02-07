@@ -672,9 +672,9 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc &a_ChunkDesc, int a_RelX
 {
 	if (!IsDesertVariant(a_ChunkDesc.GetBiome(a_RelX, a_RelZ))
 	{
-		return false; 
+		return false;
 	}
-		
+
 	for (int i = 1; i < (m_Noise.IntNoise2D(a_RelX, a_RelZ) % m_MaxCactusHeight); i++)
 	{
 		if (
