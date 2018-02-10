@@ -20,7 +20,6 @@ class cReader :
 	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
 		BLOCKTYPE * OutputRows = m_BlockTypes;
-		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
 		for (size_t i = 0; i != cChunkData::NumSections; ++i)
 		{
