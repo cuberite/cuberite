@@ -404,10 +404,7 @@ bool cNameValueParser::Finish(void)
 			return true;
 		}
 	}
-	ASSERT(!"Unhandled parser state!");
-	#ifndef __clang__
-		return false;
-	#endif
+	UNREACHABLE("Unsupported name value parser state");
 }
 
 

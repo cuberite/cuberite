@@ -217,11 +217,7 @@ std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(cEntityEffect::
 		case cEntityEffect::effWeakness:       return cpp14::make_unique<cEntityEffectWeakness      >(a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWither:         return cpp14::make_unique<cEntityEffectWither        >(a_Duration, a_Intensity, a_DistanceModifier);
 	}
-
-	ASSERT(!"Unhandled entity effect type!");
-	#ifndef __clang__
-		return {};
-	#endif
+	UNREACHABLE("Unsupported entity effect");
 }
 
 
