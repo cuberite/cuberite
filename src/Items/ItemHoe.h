@@ -69,9 +69,12 @@ public:
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
-		return 0;
+		switch (a_Action)
+		{
+			case dlaAttackEntity:       return 1;
+			case dlaBreakBlock:         return 0;
+			case dlaBreakBlockInstant:  return 0;
+		}
+		UNREACHABLE("Unsupported durability loss action");
 	}
 } ;
-
-
-

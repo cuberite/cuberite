@@ -50,7 +50,8 @@ public:
 	// Helper functions:
 	static cPluginLua * GetLuaPlugin(lua_State * L);
 	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
-	static int lua_do_error(lua_State * L, const char * a_pFormat, ...);
+	static int lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList);
+	FMT_VARIADIC(static int, lua_do_error, lua_State *, const char *)
 
 
 	/** Binds the DoWith(ItemName) functions of regular classes. */

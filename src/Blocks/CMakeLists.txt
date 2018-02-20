@@ -26,6 +26,7 @@ SET (HDRS
 	BlockCocoaPod.h
 	BlockCommandBlock.h
 	BlockComparator.h
+	BlockConcretePowder.h
 	BlockCrops.h
 	BlockDeadBush.h
 	BlockDirt.h
@@ -103,4 +104,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Blocks ${SRCS} ${HDRS})
+	target_link_libraries(Blocks fmt::fmt)
 endif()

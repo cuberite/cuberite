@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "ItemHandler.h"
@@ -104,7 +105,3 @@ public:
 		return false;
 	}
 };
-
-
-
-

@@ -92,9 +92,6 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 {
 	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
 
-	m_IsSwimming = false;
-	m_IsSubmerged = false;
-
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
@@ -678,6 +675,10 @@ void cPlayer::FinishEating(void)
 	{
 		return;
 	}
+	if (!IsGameModeCreative())
+	{
+		GetInventory().RemoveOneEquippedItem();
+	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
 
@@ -1059,36 +1060,31 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
-		AString DamageText;
-		switch (a_TDI.DamageType)
-		{
-			case dtRangedAttack: DamageText = "was shot"; break;
-			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
-			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
-			case dtStarving: DamageText = "forgot the importance of food"; break;
-			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
-			case dtLavaContact: DamageText = "was melted by lava"; break;
-			case dtPoisoning: DamageText = "died from septicaemia"; break;
-			case dtWithering: DamageText = "is a husk of their former selves"; break;
-			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
-			case dtFireContact: DamageText = "burnt themselves to death"; break;
-			case dtInVoid: DamageText = "somehow fell out of the world"; break;
-			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
-			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
-			case dtAdmin: DamageText = "was administrator'd"; break;
-			case dtExplosion: DamageText = "blew up"; break;
-			case dtAttack: DamageText = "was attacked by thin air"; break;
-			#ifndef __clang__
-			default:
+		const AString DamageText = [&]
 			{
-				ASSERT(!"Unknown damage type");
-				DamageText = "died, somehow; we've no idea how though";
-				break;
-			}
-			#endif  // __clang__
-		}
+				switch (a_TDI.DamageType)
+				{
+					case dtRangedAttack:    return "was shot";
+					case dtLightning:       return "was plasmified by lightining";
+					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+					case dtDrowning:        return "drowned";
+					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+					case dtStarving:        return "forgot the importance of food";
+					case dtCactusContact:   return "was impaled on a cactus";
+					case dtLavaContact:     return "was melted by lava";
+					case dtPoisoning:       return "died from septicaemia";
+					case dtWithering:       return "is a husk of their former selves";
+					case dtOnFire:          return "forgot to stop, drop, and roll";
+					case dtFireContact:     return "burnt themselves to death";
+					case dtInVoid:          return "somehow fell out of the world";
+					case dtPotionOfHarming: return "was magicked to death";
+					case dtEnderPearl:      return "misused an ender pearl";
+					case dtAdmin:           return "was administrator'd";
+					case dtExplosion:       return "blew up";
+					case dtAttack:          return "was attacked by thin air";
+				}
+				UNREACHABLE("Unsupported damage type");
+			}();
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
@@ -2330,38 +2326,43 @@ bool cPlayer::SaveToDisk()
 
 
 
-void cPlayer::UseEquippedItem(int a_Amount)
+void cPlayer::UseEquippedItem(short a_Damage)
 {
-	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
+	// No durability loss in creative or spectator modes:
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}
 
-	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	// If the item has an unbreaking enchantment, give it a chance of escaping damage:
+	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
 	cItem Item = GetEquippedItem();
 	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
-	if (UnbreakingLevel > 0)
+	double chance = 1 - (1.0 / (UnbreakingLevel + 1));
+	if (GetRandomProvider().RandBool(chance))
 	{
-		double chance = 0.0;
-		if (ItemCategory::IsArmor(Item.m_ItemType))
-		{
-			chance = 0.6 + (0.4 / (UnbreakingLevel + 1));
-		}
-		else
-		{
-			chance = 1.0 / (UnbreakingLevel + 1);
-		}
-
-		if (GetRandomProvider().RandBool(chance))
-		{
-			return;
-		}
+		return;
 	}
 
-	if (GetInventory().DamageEquippedItem(static_cast<Int16>(a_Amount)))
+	if (GetInventory().DamageEquippedItem(a_Damage))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
+}
+
+
+
+
+
+void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
+{
+	// Get item being used:
+	cItem Item = GetEquippedItem();
+
+	// Get base damage for action type:
+	short Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
+
+	UseEquippedItem(Dmg);
 }
 
 
@@ -2494,12 +2495,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
-		else if (IsSubmerged())
-		{
-			m_Stats.AddValue(statDistDove, Value);
-			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
-		}
-		else if (IsSwimming())
+		else if (IsInWater())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));

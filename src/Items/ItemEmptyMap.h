@@ -1,10 +1,4 @@
 
-// ItemEmptyMap.h
-
-
-
-
-
 #pragma once
 
 #include "../Item.h"
@@ -64,7 +58,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-

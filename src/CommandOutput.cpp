@@ -13,13 +13,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCommandOutputCallback:
 
-void cCommandOutputCallback::Out(const char * a_Fmt, ...)
+void cCommandOutputCallback::Out(const char * a_Fmt, fmt::ArgList args)
 {
-	AString Output;
-	va_list args;
-	va_start(args, a_Fmt);
-	AppendVPrintf(Output, a_Fmt, args);
-	va_end(args);
+	AString Output = Printf(a_Fmt, args);
 	Output.append("\n");
 	Out(Output);
 }

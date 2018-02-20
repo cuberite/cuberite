@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
@@ -22,13 +23,14 @@ if (WIN32)
 		${OSSupport_SRCS}
 		${OSSupport_HDRS}
 	)
+	target_link_libraries(OSSupport PUBLIC fmt::fmt)
 endif()
 
 # Define individual tests:
 
 # StressEvent: Stress-test the cEvent implementation:
 add_executable(StressEvent-exe StressEvent.cpp)
-target_link_libraries(StressEvent-exe OSSupport)
+target_link_libraries(StressEvent-exe OSSupport fmt::fmt)
 add_test(NAME StressEvent-test COMMAND StressEvent-exe)
 
 
