@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "NetworkSingleton.h"
+#include "OSSupport/Network.h"
 #include <event2/thread.h>
 #include <event2/bufferevent.h>
 #include <event2/listener.h>
@@ -102,11 +103,25 @@ void cNetworkSingleton::Terminate(void)
 	event_base_loopbreak(m_EventBase);
 	m_EventLoopThread.join();
 
-	// Remove all objects:
+	// Close all open connections:
 	{
 		cCSLock Lock(m_CS);
-		m_Connections.clear();
-		m_Servers.clear();
+		// Must take copies because Close will modify lists
+		auto Conns = m_Connections;
+		for (auto & Conn : Conns)
+		{
+			Conn->Close();
+		}
+
+		auto Servers = m_Servers;
+		for (auto & Server : Servers)
+		{
+			Server->Close();
+		}
+
+		// Closed handles should have removed themself
+		ASSERT(m_Connections.empty());
+		ASSERT(m_Servers.empty());
 	}
 
 	// Free the underlying LibEvent objects:
@@ -167,7 +182,7 @@ void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Event
 
 
 
-void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
+void cNetworkSingleton::AddLink(cTCPLinkPtr a_Link)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
@@ -178,7 +193,7 @@ void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
 
 
 
-void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
+void cNetworkSingleton::RemoveLink(const cTCPLink * a_Link)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
@@ -196,7 +211,7 @@ void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
 
 
 
-void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
+void cNetworkSingleton::AddServer(cServerHandlePtr a_Server)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
@@ -207,7 +222,7 @@ void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
 
 
 
-void cNetworkSingleton::RemoveServer(const cServerHandleImpl * a_Server)
+void cNetworkSingleton::RemoveServer(const cServerHandle * a_Server)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
