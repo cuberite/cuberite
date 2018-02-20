@@ -74,7 +74,7 @@ return
 		cBlockInfo =
 		{
 			Desc = [[
-				This class is used to query and register block properties.
+				This class is used to query block properties.
 			]],
 			Functions =
 			{
@@ -130,7 +130,7 @@ return
 							Type = "cBlockInfo",
 						},
 					},
-					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
+					Notes = "Returns the {{cBlockInfo}} structure for the specified block type. <b>OBSOLETE</b>, use static functions instead",
 				},
 				GetHardness =
 				{
@@ -372,57 +372,57 @@ return
 				m_BlockHeight =
 				{
 					Type = "number",
-					Notes = "The height of the block, a value between 0.0 and 1.0",
+					Notes = "The height of the block, a value between 0.0 and 1.0. <b>OBSOLETE</b>, use cBlockInfo:GetBlockHeight() instead.",
 				},
 				m_CanBeTerraformed =
 				{
 					Type = "bool",
-					Notes = "Is this block suited to be terraformed?",
+					Notes = "Is this block suited to be terraformed? <b>OBSOLETE</b>, use cBlockInfo:CanBeTerraformed() instead.",
 				},
 				m_FullyOccupiesVoxel =
 				{
 					Type = "bool",
-					Notes = "Does this block fully occupy its voxel - is it a 'full' block?",
+					Notes = "Does this block fully occupy its voxel - is it a 'full' block? <b>OBSOLETE</b>, use cBlockInfo:FullyOccupiesVoxel() instead.",
 				},
 				m_Hardness =
 				{
 					Type = "number",
-					Notes = "The greater the value the longer the player needs to break the block.",
+					Notes = "The greater the value the longer the player needs to break the block. <b>OBSOLETE</b>, use cBlockInfo:GetHardness() instead.",
 				},
 				m_IsSnowable =
 				{
 					Type = "bool",
-					Notes = "Can this block hold snow atop?",
+					Notes = "Can this block hold snow atop? <b>OBSOLETE</b>, use cBlockInfo:IsSnowable() instead",
 				},
 				m_IsSolid =
 				{
 					Type = "bool",
-					Notes = "Is this block solid (player cannot walk through)?",
+					Notes = "Is this block solid (player cannot walk through)? <b>OBSOLETE</b>, use cBlockInfo:IsSolid() instead.",
 				},
 				m_LightValue =
 				{
 					Type = "number",
-					Notes = "How much light do the blocks emit on their own?",
+					Notes = "How much light do the blocks emit on their own? <b>OBSOLETE</b>, use cBlockInfo:GetLightValue() instead.",
 				},
 				m_OneHitDig =
 				{
 					Type = "bool",
-					Notes = "Is a block destroyed after a single hit?",
+					Notes = "Is a block destroyed after a single hit? <b>OBSOLETE</b>, use cBlockInfo:IsOneHitDig() instead.",
 				},
 				m_PistonBreakable =
 				{
 					Type = "bool",
-					Notes = "Can a piston break this block?",
+					Notes = "Can a piston break this block? <b>OBSOLETE</b>, use cBlockInfo:IsPistonBreakable instead.",
 				},
 				m_SpreadLightFalloff =
 				{
 					Type = "number",
-					Notes = "How much light do the blocks consume?",
+					Notes = "How much light do the blocks consume? <b>OBSOLETE</b>, use cBlockInfo:GetSpreadLightFalloff() instead.",
 				},
 				m_Transparent =
 				{
 					Type = "bool",
-					Notes = "Is a block completely transparent? (light doesn't get decreased(?))",
+					Notes = "Is a block completely transparent? (light doesn't get decreased(?)). <b>OBSOLETE</b>, use cBlockInfo:IsTransparent() instead.",
 				},
 			},
 		},
