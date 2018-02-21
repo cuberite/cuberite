@@ -52,6 +52,22 @@ cUUID GetOldStyleOfflineUUID(const AString & a_PlayerName)
 	return Ret;
 }
 
+
+
+
+
+/** Returns the folder for the player data based on the UUID given.
+This can be used both for online and offline UUIDs. */
+AString GetUUIDFolderName(const cUUID & a_Uuid)
+{
+	AString UUID = a_Uuid.ToShortString();
+
+	AString res("players/");
+	res.append(UUID, 0, 2);
+	res.push_back('/');
+	return res;
+}
+
 }  // namespace (anonymous)
 
 
@@ -2085,12 +2101,11 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	// Check for old offline UUID filename, if it exists migrate to new filename
 	cUUID OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
 	auto OldFilename = GetUUIDFileName(GetOldStyleOfflineUUID(GetName()));
-	LOG(OldFilename.c_str());
 	auto NewFilename = GetUUIDFileName(m_UUID);
 	// Only move if there isn't already a new file
 	if (!cFile::IsFile(NewFilename) && cFile::IsFile(OldFilename))
 	{
-		cFile::CreateFolder(NewFilename.substr(0, 10));  // Ensure folder exists to move to
+		cFile::CreateFolderRecursive(GetUUIDFolderName(m_UUID));  // Ensure folder exists to move to
 		if (
 			cFile::Rename(OldFilename, NewFilename) &&
 			(m_UUID == OfflineUUID) &&
@@ -2272,8 +2287,7 @@ void cPlayer::OpenHorseInventory()
 
 bool cPlayer::SaveToDisk()
 {
-	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/"));  // Create the "players" folder, if it doesn't exist yet (#1268)
-	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.ToShortString().substr(0, 2));
+	cFile::CreateFolderRecursive(FILE_IO_PREFIX + GetUUIDFolderName(m_UUID));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
