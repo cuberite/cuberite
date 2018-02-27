@@ -11,6 +11,7 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
+#include "../Bindings/PluginManager.h"
 #include "BoundingBox.h"
 
 #include "../Chunk.h"
@@ -283,6 +284,7 @@ void cMonster::StopMovingToPosition()
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -406,6 +408,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	BroadcastMovementUpdate();
+
+	cRoot::Get()->GetPluginManager()->CallHookMonsterMoved(*this, GetPosition());
 
 	if (m_AgingTimer > 0)
 	{

@@ -659,6 +659,15 @@ bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPositi
 
 
 
+bool cPluginLua::OnMonsterMoved(cMonster & a_Monster, const Vector3d & a_NewPosition)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_MONSTER_MOVED, &a_Monster, a_NewPosition);
+}
+
+
+
+
+
 bool cPluginLua::OnEntityTeleport(cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_ENTITY_TELEPORT, &a_Entity, a_OldPosition, a_NewPosition);
@@ -1069,6 +1078,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
 		case cPluginManager::HOOK_LOGIN_FORGE:                  return "OnLoginForge";
+		case cPluginManager::HOOK_MONSTER_MOVED:                return "OnMonsterMoved";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";
