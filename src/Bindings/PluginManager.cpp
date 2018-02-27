@@ -808,14 +808,14 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 
 
-bool cPluginManager::CallHookMonsterMoved(cMonster & a_Monster, const Vector3d & a_NewPosition)
+bool cPluginManager::CallHookMonsterMoved(cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
 	FIND_HOOK(HOOK_MONSTER_MOVED);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnMonsterMoved(a_Monster, a_NewPosition))
+		if ((*itr)->OnMonsterMoved(a_Monster, a_OldPosition, a_NewPosition))
 		{
 			return true;
 		}

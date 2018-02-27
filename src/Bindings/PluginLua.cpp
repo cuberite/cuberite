@@ -659,9 +659,9 @@ bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPositi
 
 
 
-bool cPluginLua::OnMonsterMoved(cMonster & a_Monster, const Vector3d & a_NewPosition)
+bool cPluginLua::OnMonsterMoved(cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_MONSTER_MOVED, &a_Monster, a_NewPosition);
+	return CallSimpleHooks(cPluginManager::HOOK_MONSTER_MOVED, &a_Monster, a_OldPosition, a_NewPosition);
 }
 
 

@@ -263,6 +263,8 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	Vector3d OldPosition = GetPosition();
+
 	super::Tick(a_Dt, a_Chunk);
 
 	if (!IsTicking())
@@ -386,7 +388,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BroadcastMovementUpdate();
 
-	cRoot::Get()->GetPluginManager()->CallHookMonsterMoved(*this, GetPosition());
+	cRoot::Get()->GetPluginManager()->CallHookMonsterMoved(*this, OldPosition, GetPosition());
 
 	if (m_AgingTimer > 0)
 	{
