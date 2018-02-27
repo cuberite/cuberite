@@ -6,6 +6,11 @@
 
 
 
+namespace
+{
+
+/** Track number of cCallbacks instances alive. */
+std::atomic<int> g_ActiveCallbacks{ 0 };
 
 /** Simple callbacks that dump the events to the console and signalize a cEvent when the request is finished. */
 class cCallbacks:
@@ -15,12 +20,14 @@ public:
 	cCallbacks(cEvent & a_Event):
 		m_Event(a_Event)
 	{
+		++g_ActiveCallbacks;
 		LOGD("Created a cCallbacks instance at %p", reinterpret_cast<void *>(this));
 	}
 
 
-	~cCallbacks()
+	virtual ~cCallbacks() override
 	{
+		--g_ActiveCallbacks;
 		LOGD("Deleting the cCallbacks instance at %p", reinterpret_cast<void *>(this));
 	}
 
@@ -102,7 +109,7 @@ protected:
 
 
 
-static int TestRequest1()
+int TestRequest1()
 {
 	LOG("Running test 1");
 	cEvent evtFinished;
@@ -126,7 +133,7 @@ static int TestRequest1()
 
 
 
-static int TestRequest2()
+int TestRequest2()
 {
 	LOG("Running test 2");
 	cEvent evtFinished;
@@ -148,7 +155,7 @@ static int TestRequest2()
 
 
 
-static int TestRequest3()
+int TestRequest3()
 {
 	LOG("Running test 3");
 	cEvent evtFinished;
@@ -172,7 +179,7 @@ static int TestRequest3()
 
 
 
-static int TestRequest4()
+int TestRequest4()
 {
 	LOG("Running test 4");
 	cEvent evtFinished;
@@ -194,7 +201,7 @@ static int TestRequest4()
 
 
 
-static int TestRequests()
+int TestRequests()
 {
 	std::function<int(void)> tests[] =
 	{
@@ -215,6 +222,8 @@ static int TestRequests()
 	return 0;
 }
 
+}  // namespace (anonymous)
+
 
 
 
@@ -231,6 +240,11 @@ int main()
 
 	LOGD("Terminating cNetwork...");
 	cNetworkSingleton::Get().Terminate();
+
+	// No leaked callback instances
+	LOGD("cCallback instances still alive: %d", g_ActiveCallbacks.load());
+	assert_test(g_ActiveCallbacks == 0);
+
 	LOGD("cUrlClient test finished");
 
 	return res;

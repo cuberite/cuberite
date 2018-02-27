@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
@@ -17,7 +18,9 @@ set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CtrDrbgContext.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CryptoKey.cpp
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/EntropyContext.cpp
@@ -38,8 +41,10 @@ set (Network_HDRS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkLookup.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.h
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Queue.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CtrDrbgContext.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/CryptoKey.h
 	${CMAKE_SOURCE_DIR}/src/mbedTLS++/EntropyContext.h
@@ -54,7 +59,7 @@ add_library(Network
 	${Network_HDRS}
 )
 
-target_link_libraries(Network event_core event_extra mbedtls)
+target_link_libraries(Network event_core event_extra fmt::fmt mbedtls)
 if (MSVC)
 	target_link_libraries(Network ws2_32.lib)
 endif()

@@ -10,6 +10,7 @@
 #define PROT_INT_BUFFER_SIZE (130 * 130)
 #include "Generating/ProtIntGen.h"
 
+#include "fmt/printf.h"
 
 
 
@@ -20,7 +21,6 @@ typedef int Color[3];  // Color is an array of 3 ints
 
 
 // Forward declarations, needed for GCC and Clang:
-void log(const char * a_Fmt, ...) FORMATSTRING(1, 2);
 void outputBitmapFile(
 	const AString & a_FileName,
 	unsigned a_ImageSizeX, unsigned a_ImageSizeY,
@@ -59,11 +59,11 @@ static const Color spectrumColors[] =
 /** Color palette used for displaying biome groups. */
 static const Color biomeGroupColors[] =
 {
-	/* bgOcean     */ {0x00, 0x00, 0x70},
-	/* bgDesert    */	{0xfa, 0x94, 0x18},
-	/* bgTemperate */	{0x05, 0x66, 0x21},
-	/* bgMountains */	{0x60, 0x60, 0x60},
-	/* bgIce       */	{0xa0, 0xa0, 0xff},
+	/* bgOcean     */  {0x00, 0x00, 0x70},
+	/* bgDesert    */  {0xfa, 0x94, 0x18},
+	/* bgTemperate */  {0x05, 0x66, 0x21},
+	/* bgMountains */  {0x60, 0x60, 0x60},
+	/* bgIce       */  {0xa0, 0xa0, 0xff},
 };
 
 
@@ -110,22 +110,22 @@ biomeColorMap[] =
 	{ biJungleHills,          { 0x2c, 0x42, 0x05 }, },
 
 	{ biJungleEdge,           { 0x62, 0x8b, 0x17 }, },
-	{ biDeepOcean,            { 0x00, 0x00, 0x30 },	},
-	{ biStoneBeach,           { 0xa2, 0xa2, 0x84 },	},
-	{ biColdBeach,            { 0xfa, 0xf0, 0xc0 },	},
-	{ biBirchForest,          { 0x30, 0x74, 0x44 },	},
-	{ biBirchForestHills,     { 0x1f, 0x5f, 0x32 },	},
-	{ biRoofedForest,         { 0x40, 0x51, 0x1a },	},
-	{ biColdTaiga,            { 0x31, 0x55, 0x4a },	},
-	{ biColdTaigaHills,       { 0x59, 0x7d, 0x72 },	},
-	{ biMegaTaiga,            { 0x59, 0x66, 0x51 },	},
-	{ biMegaTaigaHills,       { 0x59, 0x66, 0x59 },	},
-	{ biExtremeHillsPlus,     { 0x50, 0x70, 0x50 },	},
-	{ biSavanna,              { 0xbd, 0xb2, 0x5f },	},
-	{ biSavannaPlateau,       { 0xa7, 0x9d, 0x64 },	},
-	{ biMesa,                 { 0xd9, 0x45, 0x15 },	},
-	{ biMesaPlateauF,         { 0xb0, 0x97, 0x65 },	},
-	{ biMesaPlateau,          { 0xca, 0x8c, 0x65 },	},
+	{ biDeepOcean,            { 0x00, 0x00, 0x30 }, },
+	{ biStoneBeach,           { 0xa2, 0xa2, 0x84 }, },
+	{ biColdBeach,            { 0xfa, 0xf0, 0xc0 }, },
+	{ biBirchForest,          { 0x30, 0x74, 0x44 }, },
+	{ biBirchForestHills,     { 0x1f, 0x5f, 0x32 }, },
+	{ biRoofedForest,         { 0x40, 0x51, 0x1a }, },
+	{ biColdTaiga,            { 0x31, 0x55, 0x4a }, },
+	{ biColdTaigaHills,       { 0x59, 0x7d, 0x72 }, },
+	{ biMegaTaiga,            { 0x59, 0x66, 0x51 }, },
+	{ biMegaTaigaHills,       { 0x59, 0x66, 0x59 }, },
+	{ biExtremeHillsPlus,     { 0x50, 0x70, 0x50 }, },
+	{ biSavanna,              { 0xbd, 0xb2, 0x5f }, },
+	{ biSavannaPlateau,       { 0xa7, 0x9d, 0x64 }, },
+	{ biMesa,                 { 0xd9, 0x45, 0x15 }, },
+	{ biMesaPlateauF,         { 0xb0, 0x97, 0x65 }, },
+	{ biMesaPlateau,          { 0xca, 0x8c, 0x65 }, },
 
 	// M variants:
 	{ biSunflowerPlains,      { 0xb5, 0xdb, 0x88 }, },
@@ -155,14 +155,12 @@ biomeColorMap[] =
 
 
 
-void log(const char * a_Fmt, ...)
+template <typename ... Args>
+void log(const char * a_Fmt, const Args & ... a_Args)
 {
-	AString buf;
-	va_list args;
-	va_start(args, a_Fmt);
-	AppendVPrintf(buf, a_Fmt, args);
-	va_end(args);
-	std::cout << buf << std::endl << std::flush;
+	fmt::printf(a_Fmt, a_Args...);
+	putchar('\n');
+	fflush(stdout);
 }
 
 
@@ -237,7 +235,7 @@ void initializeBiomeColors(void)
 	}
 
 	// Initialize per-biome:
-	for(size_t i = 0; i < ARRAYCOUNT(biomeColorMap); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(biomeColorMap); i++)
 	{
 		auto & dst = biomeColors[biomeColorMap[i].biome];
 		const auto & src = biomeColorMap[i].color;
@@ -450,7 +448,3 @@ int main(int argc, char ** argv)
 	log("GrownBiomeGenVisualiser finished");
 	return 0;
 }
-
-
-
-

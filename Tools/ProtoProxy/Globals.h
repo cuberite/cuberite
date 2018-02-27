@@ -22,8 +22,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -36,8 +34,6 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
-
-	#define FORMATSTRING(formatIndex, va_argsIndex)
 
 #else
 
@@ -56,8 +52,6 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	*/
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
 
 #endif
@@ -186,23 +180,24 @@ typedef unsigned char Byte;
 
 
 // Common headers (part 1, without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 
-
+#include "LoggerSimple.h"
 
 
 
 // Common definitions:
 
-/// Evaluates to the number of elements in an array (compile-time!)
+/** Evaluates to the number of elements in an array (compile-time!) */
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
+/* Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)") */
 #define KiB * 1024
 
-/// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
+/* Faster than (int)floorf((float)x / (float)div) */
+#define FAST_FLOOR_DIV(x, div) ((x) < 0 ? (((int)x / div) - 1) : ((int)x / div))
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef  NDEBUG
@@ -212,7 +207,7 @@ typedef unsigned char Byte;
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+#define VERIFY(x) (!!(x) || (LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
 // C++11 has std::shared_ptr in <memory>, included earlier
 #define SharedPtr std::shared_ptr
@@ -222,10 +217,10 @@ typedef unsigned char Byte;
 
 
 
-/// A generic interface used mainly in ForEach() functions
+/* A generic interface used mainly in ForEach() functions */
 template <typename Type> class cItemCallback
 {
 public:
-	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
+	/* Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
 	virtual bool Item(Type * a_Type) = 0;
 } ;

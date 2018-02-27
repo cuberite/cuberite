@@ -10,6 +10,8 @@
 #include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
+#include "fmt/printf.h"
+
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
 #endif
@@ -17,7 +19,7 @@
 
 
 
-/// When defined, the following macro causes a sleep after each parsed packet (DEBUG-mode only)
+/** When defined, the following macro causes a sleep after each parsed packet (DEBUG-mode only) */
 // #define SLEEP_AFTER_PACKET
 
 
@@ -121,7 +123,7 @@
 			return true; \
 		} \
 	}
-	
+
 #define HANDLE_SERVER_READ(Proc) \
 	{ \
 		if (!Proc) \
@@ -130,7 +132,7 @@
 			return true; \
 		} \
 	}
-	
+
 
 
 
@@ -162,7 +164,7 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 struct sCoords
 {
 	int x, y, z;
-	
+
 	sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
 } ;
 
@@ -185,12 +187,12 @@ struct sChunkMeta
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cConnection:
 
 cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_ItemIdx(0),
-	m_LogFile(NULL),
+	m_LogFile(nullptr),
 	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
@@ -252,7 +254,7 @@ void cConnection::Run(void)
 		FD_SET(m_ServerSocket, &ReadFDs);
 		FD_SET(m_ClientSocket, &ReadFDs);
 		SOCKET MaxSocket = std::max(m_ServerSocket, m_ClientSocket);
-		int res = select(MaxSocket + 1, &ReadFDs, NULL, NULL, NULL);
+		int res = select(MaxSocket + 1, &ReadFDs, nullptr, nullptr, nullptr);
 		if (res <= 0)
 		{
 			printf("select() failed: %d; aborting client", SocketError);
@@ -282,23 +284,20 @@ void cConnection::Run(void)
 
 
 
-void cConnection::Log(const char * a_Format, ...)
+void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
 {
-	va_list args;
-	va_start(args, a_Format);
-	AString msg;
-	AppendVPrintf(msg, a_Format, args);
-	va_end(args);
-	AString FullMsg;
-	Printf(FullMsg, "[%5.3f] %s\n", GetRelativeTime(), msg.c_str());
-	
+	fmt::MemoryWriter FullMsg;
+	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
+	fmt::printf(FullMsg, a_Format, a_Args);
+	fmt::printf(FullMsg, "\n");
+
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fputs(FullMsg.c_str(), m_LogFile);
 	#ifdef _DEBUG
 		fflush(m_LogFile);
 	#endif  // _DEBUG
-	
+
 	// Log to screen:
 	// std::cout << FullMsg;
 }
@@ -307,21 +306,18 @@ void cConnection::Log(const char * a_Format, ...)
 
 
 
-void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, ...)
+void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList a_Args)
 {
-	va_list args;
-	va_start(args, a_Format);
-	AString msg;
-	AppendVPrintf(msg, a_Format, args);
-	va_end(args);
-	AString FullMsg;
+	fmt::MemoryWriter FullMsg;
+	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
+	fmt::printf(FullMsg, a_Format, a_Args);
 	AString Hex;
-	Printf(FullMsg, "[%5.3f] %s\n%s\n", GetRelativeTime(), msg.c_str(), CreateHexDump(Hex, a_Data, a_Size, 16).c_str());
-	
+	fmt::printf(FullMsg, "\n%s\n", CreateHexDump(Hex, a_Data, a_Size, 16));
+
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fputs(FullMsg.c_str(), m_LogFile);
-	
+
 	/*
 	// Log to screen:
 	std::cout << FullMsg;
@@ -374,9 +370,9 @@ bool cConnection::RelayFromServer(void)
 		Log("Server closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
-	
+
 	DataLog(Buffer, static_cast<size_t>(res), "Received %d bytes from the SERVER", res);
-	
+
 	switch (m_ServerState)
 	{
 		case csUnencrypted:
@@ -414,9 +410,9 @@ bool cConnection::RelayFromClient(void)
 		Log("Client closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
-	
+
 	DataLog(Buffer, static_cast<size_t>(res), "Received %d bytes from the CLIENT", res);
-	
+
 	switch (m_ClientState)
 	{
 		case csUnencrypted:
@@ -456,7 +452,7 @@ double cConnection::GetRelativeTime(void)
 bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, static_cast<unsigned>(a_Size));
-	
+
 	int res = static_cast<int>(send(a_Socket, a_Data, a_Size, 0));  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain. Return type is int on Windows and ssize_t on Linux
 	if (res <= 0)
 	{
@@ -525,7 +521,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 		Log("Too much queued data for the server, aborting connection");
 		return false;
 	}
-	
+
 	while (m_ClientBuffer.CanReadBytes(1))
 	{
 		UInt32 PacketLen;
@@ -556,7 +552,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}  // case -1
-			
+
 			case 1:
 			{
 				// Status query
@@ -568,7 +564,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}
-			
+
 			case 2:
 			{
 				// Login
@@ -580,7 +576,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}
-			
+
 			case 3:
 			{
 				// Game:
@@ -611,7 +607,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}  // case 3 - Game
-			
+
 			default:
 			{
 				Log("Receiving server packets while in an unknown protocol state (%d)!", m_ClientProtocolState);
@@ -635,7 +631,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		Log("Too much queued data for the client, aborting connection");
 		return false;
 	}
-	
+
 	if (
 		(m_ServerState == csEncryptedUnderstood) &&
 		(m_ClientState == csUnencrypted)
@@ -643,7 +639,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	{
 		// Client hasn't finished encryption handshake yet, don't send them any data yet
 	}
-	
+
 	while (true)
 	{
 		UInt32 PacketLen;
@@ -679,7 +675,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
 				break;
 			}
-			
+
 			case 1:
 			{
 				// Status query:
@@ -691,7 +687,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}
-			
+
 			case 2:
 			{
 				// Login:
@@ -704,7 +700,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				}
 				break;
 			}
-			
+
 			case 3:
 			{
 				// Game:
@@ -766,7 +762,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				}  // switch (PacketType)
 				break;
 			}  // case 3 - Game
-			
+
 			// TODO: Move this elsewhere
 			default:
 			{
@@ -775,7 +771,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				break;
 			}
 		}  // switch (m_ProtocolState)
-		
+
 		m_ServerBuffer.CommitRead();
 	}  // while (CanReadBytes(1))
 	return true;
@@ -785,7 +781,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // packet handling, client-side, initial handshake:
 
 bool cConnection::HandleClientHandshake(void)
@@ -796,7 +792,7 @@ bool cConnection::HandleClientHandshake(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  ServerPort);
 	HANDLE_CLIENT_PACKET_READ(ReadVarInt,        UInt32,  NextState);
 	m_ClientBuffer.CommitRead();
-	
+
 	Log("Received an initial handshake packet from the client:");
 	Log("  ProtocolVersion = %u", ProtocolVersion);
 	Log("  ServerHost = \"%s\"", ServerHost.c_str());
@@ -815,10 +811,10 @@ bool cConnection::HandleClientHandshake(void)
 	cByteBuffer ToServer(512);
 	ToServer.WriteVarUTF8String(Pkt);
 	SERVERSEND(ToServer);
-	
+
 	m_ClientProtocolState = static_cast<int>(NextState);
 	m_ServerProtocolState = static_cast<int>(NextState);
-	
+
 	return true;
 }
 
@@ -826,7 +822,7 @@ bool cConnection::HandleClientHandshake(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // packet handling, client-side, login:
 
 bool cConnection::HandleClientLoginEncryptionKeyResponse(void)
@@ -852,7 +848,7 @@ bool cConnection::HandleClientLoginStart(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // packet handling, client-side, game:
 
 bool cConnection::HandleClientAnimation(void)
@@ -934,7 +930,7 @@ bool cConnection::HandleClientClientStatuses(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Statuses);
 	Log("Received a PACKET_CLIENT_STATUSES from the CLIENT:");
 	Log("  Statuses = %u (0x%02x)", Statuses, Statuses);
-	
+
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1087,7 +1083,7 @@ bool cConnection::HandleClientPlayerPosition(void)
 	Log("Received a PACKET_PLAYER_POSITION from the client");
 
 	// TODO: list packet contents
-	
+
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1110,7 +1106,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	Log("  Stance = %.03f", Stance);
 	Log("  Yaw, Pitch = <%.03f, %.03f>", Yaw, Pitch);
 	Log("  IsOnGround = %s", IsOnGround ? "true" : "false");
-	
+
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1279,7 +1275,7 @@ bool cConnection::HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_Packet
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // packet handling, server-side, login:
 
 bool cConnection::HandleServerLoginDisconnect(void)
@@ -1314,10 +1310,10 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	Log("Got PACKET_ENCRYPTION_KEY_REQUEST from the SERVER:");
 	Log("  ServerID = %s", ServerID.c_str());
 	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", static_cast<unsigned>(PublicKey.size()));
-	
+
 	// Reply to the server:
 	SendEncryptionKeyResponse(PublicKey, Nonce);
-	
+
 	// Do not send to client - we want the client connection open
 	return true;
 }
@@ -1333,10 +1329,10 @@ bool cConnection::HandleServerLoginSuccess(void)
 	Log("Received a login success packet from the server:");
 	Log("  UUID = \"%s\"", UUID.c_str());
 	Log("  Username = \"%s\"", Username.c_str());
-	
+
 	Log("Server is now in protocol state Game.");
 	m_ServerProtocolState = 3;
-	
+
 	if (m_IsServerEncrypted)
 	{
 		Log("Server communication is now encrypted");
@@ -1355,7 +1351,7 @@ bool cConnection::HandleServerLoginSuccess(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // packet handling, server-side, game:
 
 bool cConnection::HandleServerAttachEntity(void)
@@ -1585,7 +1581,7 @@ bool cConnection::HandleServerEntityProperties(void)
 	Log("Received a PACKET_ENTITY_PROPERTIES from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Count = %u", Count);
-	
+
 	for (UInt32 i = 0; i < Count; i++)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Key);
@@ -1797,7 +1793,7 @@ bool cConnection::HandleServerKick(void)
 	{
 		Log("  This was a std reply to client's PING");
 		AStringVector Split;
-		
+
 		// Split by NULL chars (StringSplit() won't work here):
 		size_t Last = 0;
 		size_t Len = Reason.size();
@@ -1813,7 +1809,7 @@ bool cConnection::HandleServerKick(void)
 		{
 			Split.push_back(Reason.substr(Last));
 		}
-		
+
 		if (Split.size() == 6)
 		{
 			Log("  Preamble: \"%s\"", Split[0].c_str());
@@ -1822,7 +1818,7 @@ bool cConnection::HandleServerKick(void)
 			Log("  MOTD: \"%s\"", Split[3].c_str());
 			Log("  Cur players: \"%s\"", Split[4].c_str());
 			Log("  Max players: \"%s\"", Split[5].c_str());
-			
+
 			// Modify the MOTD to show that it's being ProtoProxied:
 			Reason.assign(Split[0]);
 			Reason.push_back(0);
@@ -1876,9 +1872,9 @@ bool cConnection::HandleServerMapChunk(void)
 	Log("Received a PACKET_MAP_CHUNK from the server:");
 	Log("  ChunkPos = [%d, %d]", ChunkX, ChunkZ);
 	Log("  Compressed size = %u (0x%x)", CompressedSize, CompressedSize);
-	
+
 	// TODO: Save the compressed data into a file for later analysis
-	
+
 	COPY_TO_CLIENT()
 	return true;
 }
@@ -1897,7 +1893,7 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	{
 		return false;
 	}
-	
+
 	// Read individual chunk metas.
 	// Need to read them first and only then start logging (in case we don't have the full packet yet)
 	typedef std::vector<sChunkMeta> sChunkMetas;
@@ -1911,12 +1907,12 @@ bool cConnection::HandleServerMapChunkBulk(void)
 		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, AddBitmap);
 		ChunkMetas.push_back(sChunkMeta(ChunkX, ChunkZ, PrimaryBitmap, AddBitmap));
 	}
-	
+
 	Log("Received a PACKET_MAP_CHUNK_BULK from the server:");
 	Log("  ChunkCount = %u", ChunkCount);
 	Log("  Compressed size = %u (0x%x)", CompressedSize, CompressedSize);
 	Log("  IsSkyLightSent = %s", IsSkyLightSent ? "true" : "false");
-	
+
 	// Log individual chunk coords:
 	int idx = 0;
 	for (sChunkMetas::iterator itr = ChunkMetas.begin(), end = ChunkMetas.end(); itr != end; ++itr, ++idx)
@@ -1927,7 +1923,7 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	}  // for itr - ChunkMetas[]
 
 	// TODO: Save the compressed data into a file for later analysis
-	
+
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2038,7 +2034,7 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the server");
 
 	// TODO: list packet contents
-	
+
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2304,7 +2300,7 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	}
 	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%u bytes):", static_cast<unsigned>(Buffer.size()));
 	#endif  // _DEBUG
-	
+
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,   UInt32, EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  ObjType);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
@@ -2446,7 +2442,7 @@ bool cConnection::HandleServerStatusResponse(void)
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Response);
 	Log("Received server's status response:");
 	Log("  Response: %s", Response.c_str());
-	
+
 	// Modify the response to show that it's being proto-proxied:
 	const char DescSearch[] = "\"description\":{\"text\":\"";
 	size_t idx = Response.find(DescSearch);
@@ -2555,7 +2551,7 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  BlockY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Action);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, DataLength);	
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, DataLength);
 
 	AString Data;
 	if ((DataLength > 0) && !m_ServerBuffer.ReadString(Data, DataLength))
@@ -2571,7 +2567,7 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	AString fnam;
 	Printf(fnam, "%s_tile_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
-	if (f != NULL)
+	if (f != nullptr)
 	{
 		fwrite(Data.data(), 1, Data.size(), f);
 		fclose(f);
@@ -2730,13 +2726,13 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	AString fnam;
 	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
-	if (f != NULL)
+	if (f != nullptr)
 	{
 		fwrite(Metadata.data(), 1, Metadata.size(), f);
 		fclose(f);
 		AppendPrintf(a_ItemDesc, "\n    (saved to file \"%s\")", fnam.c_str());
 	}
-	
+
 	return true;
 }
 
@@ -2901,7 +2897,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 			}
 			case 6:
 			{
-				Log("%spos[%u] = <%d, %d, %d>", Indent.c_str(), Index, 
+				Log("%spos[%u] = <%d, %d, %d>", Indent.c_str(), Index,
 					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2]  << 16) | (a_Metadata[pos + 3]  << 8) | a_Metadata[pos + 4],
 					(a_Metadata[pos + 5] << 24) | (a_Metadata[pos + 6]  << 16) | (a_Metadata[pos + 7]  << 8) | a_Metadata[pos + 8],
 					(a_Metadata[pos + 9] << 24) | (a_Metadata[pos + 10] << 16) | (a_Metadata[pos + 11] << 8) | a_Metadata[pos + 12]
@@ -2939,7 +2935,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 
 	m_ServerEncryptor.Init(SharedSecret, SharedSecret);
 	m_ServerDecryptor.Init(SharedSecret, SharedSecret);
-	
+
 	// Encrypt the nonce:
 	Byte EncryptedNonce[128];
 	res = PubKey.Encrypt(reinterpret_cast<const Byte *>(a_Nonce.data()), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
@@ -2948,7 +2944,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 		Log("Nonce encryption failed: %d (0x%x)", res, res);
 		return;
 	}
-	
+
 	// Send the packet to the server:
 	Log("Sending PACKET_ENCRYPTION_KEY_RESPONSE to the SERVER");
 	cByteBuffer ToServer(1024);
@@ -2966,7 +2962,3 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	m_ServerState = csEncryptedUnderstood;
 	m_IsServerEncrypted = true;
 }
-
-
-
-

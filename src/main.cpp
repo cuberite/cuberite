@@ -72,6 +72,14 @@ bool cRoot::m_RunAsService = false;
 
 
 #ifndef _DEBUG
+// Because SIG_DFL or SIG_IGN could be NULL instead of nullptr, we need to disable the Clang warning here
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wunknown-warning-option"
+	#pragma clang diagnostic ignored "-Wunknown-pragmas"
+	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif  // __clang__
+
 static void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
@@ -115,6 +123,10 @@ static void NonCtrlHandler(int a_Signal)
 		default: break;
 	}
 }
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif  // __clang__
 #endif  // _DEBUG
 
 
@@ -222,6 +234,10 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 	{
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
+	}
+	catch (fmt::FormatError & f)
+	{
+		FLOGERROR("Formatting exception: {0}", f.what());
 	}
 	catch (std::exception & e)
 	{
@@ -435,7 +451,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 	}
 	catch (const TCLAP::ArgException & exc)
 	{
-		printf("Error reading command line %s for arg %s", exc.error().c_str(), exc.argId().c_str());
+		fmt::print("Error reading command line {0} for arg {1}", exc.error(), exc.argId());
 		return cpp14::make_unique<cMemorySettingsRepository>();
 	}
 }

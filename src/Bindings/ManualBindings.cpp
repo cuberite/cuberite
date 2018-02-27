@@ -43,6 +43,14 @@
 
 
 
+// Hotpatching the Macro to prevent a Clang Warning (0 for pointer used)
+#undef  lua_tostring
+#define lua_tostring(L, i) lua_tolstring(L, (i), nullptr)
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // LuaCommandHandler:
 
@@ -108,7 +116,7 @@ int cManualBindings::tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Er
 
 
 
-int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, ...)
+int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -120,11 +128,9 @@ int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, ...)
 	ReplaceString(msg, "#funcname#", (entry.name != nullptr) ? entry.name : "?");
 
 	// Copied from luaL_error and modified
-	va_list argp;
-	va_start(argp, a_pFormat);
 	luaL_where(L, 1);
-	lua_pushvfstring(L, msg.c_str(), argp);
-	va_end(argp);
+	AString FmtMsg = Printf(msg.c_str(), a_ArgList);
+	lua_pushlstring(L, FmtMsg.data(), FmtMsg.size());
 	lua_concat(L, 2);
 	return lua_error(L);
 }
@@ -3948,6 +3954,56 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cEntity"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cEntity * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// API function deprecated:
+	LOGWARNING("cEntity:IsSubmerged() is deprecated. Use cEntity:IsHeadInWater() instead.");
+	cLuaState::LogStackTrace(tolua_S);
+
+	L.Push(self->IsHeadInWater());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cEntity_IsSwimming(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cEntity"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cEntity * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// API function deprecated
+	LOGWARNING("cEntity:IsSwimming() is deprecated. Use cEntity:IsInWater() instead.");
+	cLuaState::LogStackTrace(tolua_S);
+
+	L.Push(self->IsInWater());
+	return 1;
+}
+
+
+
+
+
 static int tolua_cEntity_GetPosition(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -4067,6 +4123,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cEntity");
 			tolua_constant(tolua_S, "INVALID_ID", cEntity::INVALID_ID);
+			tolua_function(tolua_S, "IsSubmerged", tolua_cEntity_IsSubmerged);
+			tolua_function(tolua_S, "IsSwimming", tolua_cEntity_IsSwimming);
 			tolua_function(tolua_S, "GetPosition", tolua_cEntity_GetPosition);
 			tolua_function(tolua_S, "GetSpeed", tolua_cEntity_GetSpeed);
 		tolua_endmodule(tolua_S);
@@ -4232,7 +4290,3 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

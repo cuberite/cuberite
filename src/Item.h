@@ -270,7 +270,3 @@ public:
 	int   m_MaxAmount;
 	int   m_Weight;
 } ;
-
-
-
-

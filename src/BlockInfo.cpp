@@ -17,7 +17,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
-		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(static_cast<BLOCKTYPE>(i)));
+		Info[i].m_BlockType = static_cast<BLOCKTYPE>(i);
+		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(Info[i].m_BlockType));
 	}
 
 	// Emissive blocks
@@ -313,6 +314,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_SANDSTONE_STAIRS             ].m_Transparent = true;
 	Info[E_BLOCK_SAPLING                      ].m_Transparent = true;
 	Info[E_BLOCK_SIGN_POST                    ].m_Transparent = true;
+	Info[E_BLOCK_SNOW                         ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_DOOR                  ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_FENCE                 ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_FENCE_GATE            ].m_Transparent = true;
@@ -464,89 +466,15 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_PistonBreakable = true;
 
 
-	// Blocks that can be snowed over:
-	Info[E_BLOCK_BEDROCK                      ].m_IsSnowable = true;
-	Info[E_BLOCK_BLOCK_OF_COAL                ].m_IsSnowable = true;
-	Info[E_BLOCK_BLOCK_OF_REDSTONE            ].m_IsSnowable = true;
-	Info[E_BLOCK_BONE_BLOCK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_BOOKCASE                     ].m_IsSnowable = true;
-	Info[E_BLOCK_BRICK                        ].m_IsSnowable = true;
-	Info[E_BLOCK_CHAIN_COMMAND_BLOCK          ].m_IsSnowable = true;
-	Info[E_BLOCK_CLAY                         ].m_IsSnowable = true;
-	Info[E_BLOCK_CRAFTING_TABLE               ].m_IsSnowable = true;
-	Info[E_BLOCK_COAL_ORE                     ].m_IsSnowable = true;
-	Info[E_BLOCK_COMMAND_BLOCK                ].m_IsSnowable = true;
-	Info[E_BLOCK_COBBLESTONE                  ].m_IsSnowable = true;
-	Info[E_BLOCK_DIAMOND_BLOCK                ].m_IsSnowable = true;
-	Info[E_BLOCK_DIAMOND_ORE                  ].m_IsSnowable = true;
-	Info[E_BLOCK_DIRT                         ].m_IsSnowable = true;
-	Info[E_BLOCK_DISPENSER                    ].m_IsSnowable = true;
-	Info[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB    ].m_IsSnowable = true;
-	Info[E_BLOCK_DOUBLE_STONE_SLAB            ].m_IsSnowable = true;
-	Info[E_BLOCK_DOUBLE_WOODEN_SLAB           ].m_IsSnowable = true;
-	Info[E_BLOCK_DROPPER                      ].m_IsSnowable = true;
-	Info[E_BLOCK_EMERALD_BLOCK                ].m_IsSnowable = true;
-	Info[E_BLOCK_EMERALD_ORE                  ].m_IsSnowable = true;
-	Info[E_BLOCK_END_BRICKS                   ].m_IsSnowable = true;
-	Info[E_BLOCK_END_STONE                    ].m_IsSnowable = true;
-	Info[E_BLOCK_FURNACE                      ].m_IsSnowable = true;
-	Info[E_BLOCK_GLOWSTONE                    ].m_IsSnowable = true;
-	Info[E_BLOCK_GOLD_BLOCK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_GOLD_ORE                     ].m_IsSnowable = true;
-	Info[E_BLOCK_GRASS                        ].m_IsSnowable = true;
-	Info[E_BLOCK_GRAVEL                       ].m_IsSnowable = true;
-	Info[E_BLOCK_HARDENED_CLAY                ].m_IsSnowable = true;
-	Info[E_BLOCK_HAY_BALE                     ].m_IsSnowable = true;
-	Info[E_BLOCK_HUGE_BROWN_MUSHROOM          ].m_IsSnowable = true;
-	Info[E_BLOCK_HUGE_RED_MUSHROOM            ].m_IsSnowable = true;
-	Info[E_BLOCK_IRON_BLOCK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_IRON_ORE                     ].m_IsSnowable = true;
-	Info[E_BLOCK_JACK_O_LANTERN               ].m_IsSnowable = true;
-	Info[E_BLOCK_JUKEBOX                      ].m_IsSnowable = true;
-	Info[E_BLOCK_LAPIS_BLOCK                  ].m_IsSnowable = true;
-	Info[E_BLOCK_LAPIS_ORE                    ].m_IsSnowable = true;
-	Info[E_BLOCK_LEAVES                       ].m_IsSnowable = true;
-	Info[E_BLOCK_LIT_FURNACE                  ].m_IsSnowable = true;
-	Info[E_BLOCK_LOG                          ].m_IsSnowable = true;
-	Info[E_BLOCK_MELON                        ].m_IsSnowable = true;
-	Info[E_BLOCK_MOSSY_COBBLESTONE            ].m_IsSnowable = true;
-	Info[E_BLOCK_MYCELIUM                     ].m_IsSnowable = true;
-	Info[E_BLOCK_NETHER_BRICK                 ].m_IsSnowable = true;
-	Info[E_BLOCK_NETHER_QUARTZ_ORE            ].m_IsSnowable = true;
-	Info[E_BLOCK_NETHER_WART_BLOCK            ].m_IsSnowable = true;
-	Info[E_BLOCK_NETHERRACK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_NEW_LEAVES                   ].m_IsSnowable = true;
-	Info[E_BLOCK_NEW_LOG                      ].m_IsSnowable = true;
-	Info[E_BLOCK_NOTE_BLOCK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_OBSERVER                     ].m_IsSnowable = true;
-	Info[E_BLOCK_OBSIDIAN                     ].m_IsSnowable = true;
-	Info[E_BLOCK_PLANKS                       ].m_IsSnowable = true;
-	Info[E_BLOCK_PRISMARINE_BLOCK             ].m_IsSnowable = true;
-	Info[E_BLOCK_PUMPKIN                      ].m_IsSnowable = true;
-	Info[E_BLOCK_PURPUR_BLOCK                 ].m_IsSnowable = true;
-	Info[E_BLOCK_PURPUR_DOUBLE_SLAB           ].m_IsSnowable = true;
-	Info[E_BLOCK_PURPUR_PILLAR                ].m_IsSnowable = true;
-	Info[E_BLOCK_QUARTZ_BLOCK                 ].m_IsSnowable = true;
-	Info[E_BLOCK_RED_NETHER_BRICK             ].m_IsSnowable = true;
-	Info[E_BLOCK_RED_SANDSTONE                ].m_IsSnowable = true;
-	Info[E_BLOCK_REDSTONE_LAMP_OFF            ].m_IsSnowable = true;
-	Info[E_BLOCK_REDSTONE_LAMP_ON             ].m_IsSnowable = true;
-	Info[E_BLOCK_REDSTONE_ORE                 ].m_IsSnowable = true;
-	Info[E_BLOCK_REDSTONE_ORE_GLOWING         ].m_IsSnowable = true;
-	Info[E_BLOCK_REPEATING_COMMAND_BLOCK      ].m_IsSnowable = true;
-	Info[E_BLOCK_SAND                         ].m_IsSnowable = true;
-	Info[E_BLOCK_SANDSTONE                    ].m_IsSnowable = true;
-	Info[E_BLOCK_SEA_LANTERN                  ].m_IsSnowable = true;
-	Info[E_BLOCK_SILVERFISH_EGG               ].m_IsSnowable = true;
-	Info[E_BLOCK_SNOW_BLOCK                   ].m_IsSnowable = true;
-	Info[E_BLOCK_SOULSAND                     ].m_IsSnowable = true;
-	Info[E_BLOCK_SPONGE                       ].m_IsSnowable = true;
-	Info[E_BLOCK_STAINED_CLAY                 ].m_IsSnowable = true;
-	Info[E_BLOCK_STONE                        ].m_IsSnowable = true;
-	Info[E_BLOCK_STONE_BRICKS                 ].m_IsSnowable = true;
-	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_IsSnowable = true;
-	Info[E_BLOCK_TNT                          ].m_IsSnowable = true;
-	Info[E_BLOCK_WOOL                         ].m_IsSnowable = true;
+	/* Blocks that block rain or snow's passage:
+	*  All solid blocks are also rain blockers, and they are set automatically
+	*  at the end of this function.
+	*/
+	Info[E_BLOCK_SIGN_POST                    ].m_IsRainBlocker = true;
+	Info[E_BLOCK_WALLSIGN                     ].m_IsRainBlocker = true;
+	Info[E_BLOCK_WALL_BANNER                  ].m_IsRainBlocker = true;
+	Info[E_BLOCK_STANDING_BANNER              ].m_IsRainBlocker = true;
+
 
 	// Nonsolid blocks:
 	Info[E_BLOCK_ACTIVATOR_RAIL               ].m_IsSolid = false;
@@ -554,8 +482,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BIG_FLOWER                   ].m_IsSolid = false;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_IsSolid = false;
 	Info[E_BLOCK_CARROTS                      ].m_IsSolid = false;
-	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_FLOWER                ].m_IsSolid = false;
+	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
 	Info[E_BLOCK_COBWEB                       ].m_IsSolid = false;
 	Info[E_BLOCK_CROPS                        ].m_IsSolid = false;
 	Info[E_BLOCK_DANDELION                    ].m_IsSolid = false;
@@ -575,17 +503,17 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POTATOES                     ].m_IsSolid = false;
 	Info[E_BLOCK_POWERED_RAIL                 ].m_IsSolid = false;
 	Info[E_BLOCK_RAIL                         ].m_IsSolid = false;
+	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_OFF           ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_ON            ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_IsSolid = false;
-	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
 	Info[E_BLOCK_REEDS                        ].m_IsSolid = false;
 	Info[E_BLOCK_SAPLING                      ].m_IsSolid = false;
 	Info[E_BLOCK_SIGN_POST                    ].m_IsSolid = false;
 	Info[E_BLOCK_SNOW                         ].m_IsSolid = false;
+	Info[E_BLOCK_STANDING_BANNER              ].m_IsSolid = false;
 	Info[E_BLOCK_STATIONARY_LAVA              ].m_IsSolid = false;
 	Info[E_BLOCK_STATIONARY_WATER             ].m_IsSolid = false;
-	Info[E_BLOCK_STANDING_BANNER              ].m_IsSolid = false;
 	Info[E_BLOCK_STONE_BUTTON                 ].m_IsSolid = false;
 	Info[E_BLOCK_STONE_PRESSURE_PLATE         ].m_IsSolid = false;
 	Info[E_BLOCK_TALL_GRASS                   ].m_IsSolid = false;
@@ -974,8 +902,9 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_RED_SHULKER_BOX              ].m_Hardness = 0.2f;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Hardness = 0.2f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
+
+	for (size_t i = 0; i < Info.size(); ++i)
+	{
+		Info[i].m_IsRainBlocker |= Info[i].m_IsSolid;
+	}
 }
-
-
-
-

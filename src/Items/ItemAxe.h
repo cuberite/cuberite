@@ -18,7 +18,21 @@ public:
 	}
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block)
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaAttackEntity:       return 2;
+			case dlaBreakBlock:         return 1;
+			case dlaBreakBlockInstant:  return 0;
+		}
+		UNREACHABLE("Unsupported durability loss action");
+	}
+
+
+
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
 	{
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{
@@ -40,7 +54,3 @@ public:
 	}
 
 } ;
-
-
-
-

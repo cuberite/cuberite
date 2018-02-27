@@ -106,7 +106,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		}  // switch (ParsingLine[0])
 	}  // while (getline(ParsingLine))
 
-	LOG("Loaded " SIZE_T_FMT " furnace recipes and " SIZE_T_FMT " fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
+	LOG("Loaded %zu furnace recipes and %zu fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
 }
 
 
@@ -125,7 +125,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
+		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got %zu", a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
@@ -167,7 +167,7 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
 	{
-		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got " SIZE_T_FMT, a_LineNum, Sides.size() - 1);
+		LOGWARNING("furnace.txt: line %d: A single '=' was expected, got %zu", a_LineNum, Sides.size() - 1);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
@@ -272,7 +272,7 @@ void cFurnaceRecipe::ClearRecipes(void)
 
 const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_Ingredient) const
 {
-	const cRecipe * BestRecipe = 0;
+	const cRecipe * BestRecipe = nullptr;
 	for (RecipeList::const_iterator itr = m_pState->Recipes.begin(); itr != m_pState->Recipes.end(); ++itr)
 	{
 		const cRecipe & Recipe = *itr;

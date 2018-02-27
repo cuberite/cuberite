@@ -1,39 +1,62 @@
 language: cpp
 sudo: false
 
-os:
-- linux
-- osx
-
-compiler:
-- clang
-- gcc
+# Use Linux by default
+os: linux
 
 matrix:
-  exclude:
-  - os: osx
-    compiler: gcc
-
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
-    - gdb
-
-
-before_script:
-- if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-    brew update;
-    brew install gdb;
-  fi
+  include:
+    # AppleClang
+    # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
+    - os: osx
+      compiler: clang
+      env: &Release
+        - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
+    - os: osx
+      compiler: clang
+      env: &Debug
+        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
+    # Default clang
+    - compiler: clang
+      env: *Release
+    - compiler: clang
+      env: *Debug
+    # clang 3.5
+    - compiler: clang
+      addons: &clang35
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.5
+          packages:
+            - clang++-3.5
+            - clang-3.5
+      before_install:
+        - CC=clang-3.5;CXX=clang++-3.5
+      env: *Release
+    - compiler: clang
+      addons: *clang35
+      before_install:
+        - CC=clang-3.5;CXX=clang++-3.5
+      env: *Debug
+    # gcc 4.8
+    - compiler: gcc
+      addons: &gcc48
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.8
+            - gcc-4.8
+      before_install:
+        - CC=gcc-4.8;CXX=g++-4.8
+      env: *Release
+    - compiler: gcc
+      addons: *gcc48
+      before_install:
+        - CC=gcc-4.8;CXX=g++-4.8
+      env: *Debug
 
 script: ./CIbuild.sh
-
-env:
-  - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
-  - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG   CUBERITE_PATH=./Cuberite_debug
 
 notifications:
   email:

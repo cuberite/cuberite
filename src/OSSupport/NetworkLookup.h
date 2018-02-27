@@ -20,7 +20,7 @@ class cNetworkLookup :
 public:
 
 	cNetworkLookup();
-	~cNetworkLookup();
+	virtual ~cNetworkLookup() override;
 
 	/** Schedule a lookup task for execution. */
 	void ScheduleLookup(std::function<void()> a_Lookup);

@@ -20,7 +20,7 @@ const int CHUNK_INFLATE_MAX = 1 MiB;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProcessor::cThread:
 
 cProcessor::cThread::cThread(cCallback & a_Callback, cProcessor & a_ParentProcessor) :
@@ -48,9 +48,9 @@ void cProcessor::cThread::WaitForStart(void)
 void cProcessor::cThread::Execute(void)
 {
 	LOG("Started a new thread: %p, ID %d", this, cIsThread::GetCurrentID());
-	
+
 	m_HasStarted.Set();
-	
+
 	for (;;)
 	{
 		AString FileName = m_ParentProcessor.GetOneFileName();
@@ -61,7 +61,7 @@ void cProcessor::cThread::Execute(void)
 		}
 		ProcessFile(FileName);
 	}  // for-ever
-	
+
 	LOG("Thread %p (ID %d) terminated", this, cIsThread::GetCurrentID());
 }
 
@@ -72,7 +72,7 @@ void cProcessor::cThread::Execute(void)
 void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 {
 	LOG("Processing file \"%s\"", a_FileName.c_str());
-	
+
 	size_t idx = a_FileName.rfind("r.");
 	if (idx == AString::npos)
 	{
@@ -91,14 +91,14 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 		// Callback doesn't want the region file processed
 		return;
 	}
-	
+
 	cFile f;
 	if (!f.Open(a_FileName, cFile::fmRead))
 	{
 		LOG("Cannot open file \"%s\", skipping file.", a_FileName.c_str());
 		return;
 	}
-	
+
 	AString FileContents;
 	f.ReadRestOfFile(FileContents);
 	if (FileContents.size() < sizeof(8 KiB))
@@ -106,9 +106,9 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 		LOG("Cannot read header in file \"%s\", skipping file.", a_FileName.c_str());
 		return;
 	}
-	
+
 	ProcessFileData(FileContents.data(), FileContents.size(), RegionX * 32, RegionZ * 32);
-	
+
 	m_Callback.OnRegionFinished(RegionX, RegionZ);
 }
 
@@ -124,16 +124,16 @@ void cProcessor::cThread::ProcessFileData(const char * a_FileData, size_t a_Size
 	{
 		Header[i] = ntohl(HeaderPtr[i]);
 	}
-	
+
 	for (int i = 0; i < 1024; i++)
 	{
 		unsigned Location = Header[i];
 		unsigned Timestamp = Header[i + 1024];
 		if (
-			((Location == 0) && (Timestamp == 0)) || // Official docs' "not present"
-			(Location >> 8 < 2)                   || // Logical - no chunk can start inside the header
-			((Location & 0xff) == 0)              || // Logical - no chunk can be zero bytes
-			((Location >> 8) * 4096 > a_Size)        // Logical - no chunk can start at beyond the file end
+			((Location == 0) && (Timestamp == 0)) ||  // Official docs' "not present"
+			(Location >> 8 < 2)                   ||  // Logical - no chunk can start inside the header
+			((Location & 0xff) == 0)              ||  // Logical - no chunk can be zero bytes
+			((Location >> 8) * 4096 > a_Size)         // Logical - no chunk can start at beyond the file end
 		)
 		{
 			// Chunk not present in the file
@@ -159,11 +159,11 @@ void cProcessor::cThread::ProcessChunk(const char * a_FileData, int a_ChunkX, in
 	{
 		return;
 	}
-	
+
 	const char * ChunkStart = a_FileData + a_SectorStart * 4096;
 	int ByteSize = ntohl(*(int *)ChunkStart);
 	char CompressionMethod = ChunkStart[4];
-	
+
 	if (m_Callback.OnCompressedDataSizePos(ByteSize, a_SectorStart * 4096 + 5, CompressionMethod))
 	{
 		return;
@@ -195,7 +195,7 @@ void cProcessor::cThread::ProcessCompressedChunkData(int a_ChunkX, int a_ChunkZ,
 		LOG("Decompression failed, skipping chunk [%d, %d]", a_ChunkX, a_ChunkZ);
 		return;
 	}
-	
+
 	if (m_Callback.OnDecompressedData(Decompressed, strm.total_out))
 	{
 		return;
@@ -208,7 +208,7 @@ void cProcessor::cThread::ProcessCompressedChunkData(int a_ChunkX, int a_ChunkZ,
 		LOG("NBT Parsing failed, skipping chunk [%d, %d]", a_ChunkX, a_ChunkZ);
 		return;
 	}
-	
+
 	ProcessParsedChunkData(a_ChunkX, a_ChunkZ, NBT);
 }
 
@@ -235,7 +235,7 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 	{
 		return;
 	}
-	
+
 	int LastUpdateTag = a_NBT.FindChildByName(LevelTag, "LastUpdate");
 	if (LastUpdateTag > 0)
 	{
@@ -244,14 +244,14 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 			return;
 		}
 	}
-	
+
 	int TerrainPopulatedTag = a_NBT.FindChildByName(LevelTag, "TerrainPopulated");
 	bool TerrainPopulated = (TerrainPopulatedTag < 0) ? false : (a_NBT.GetByte(TerrainPopulatedTag) != 0);
 	if (m_Callback.OnTerrainPopulated(TerrainPopulated))
 	{
 		return;
 	}
-	
+
 	int BiomesTag = a_NBT.FindChildByName(LevelTag, "Biomes");
 	if (BiomesTag > 0)
 	{
@@ -260,7 +260,7 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 			return;
 		}
 	}
-	
+
 	int HeightMapTag = a_NBT.FindChildByName(LevelTag, "HeightMap");
 	if (HeightMapTag > 0)
 	{
@@ -269,22 +269,22 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 			return;
 		}
 	}
-	
+
 	if (ProcessChunkSections(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
 	{
 		return;
 	}
-	
+
 	if (ProcessChunkEntities(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
 	{
 		return;
 	}
-	
+
 	if (ProcessChunkTileEntities(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
 	{
 		return;
 	}
-	
+
 	if (ProcessChunkTileTicks(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
 	{
 		return;
@@ -302,7 +302,7 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 	{
 		return false;
 	}
-	
+
 	bool SectionProcessed[16];
 	memset(SectionProcessed, 0, sizeof(SectionProcessed));
 	for (int Tag = a_NBT.GetFirstChild(Sections); Tag > 0; Tag = a_NBT.GetNextSibling(Tag))
@@ -313,12 +313,12 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 		int DataTag       = a_NBT.FindChildByName(Tag, "Data");
 		int BlockLightTag = a_NBT.FindChildByName(Tag, "BlockLightTag");
 		int SkyLightTag   = a_NBT.FindChildByName(Tag, "SkyLight");
-		
+
 		if ((YTag < 0) || (BlocksTag < 0) || (DataTag < 0))
 		{
 			continue;
 		}
-		
+
 		unsigned char SectionY = a_NBT.GetByte(YTag);
 		if (SectionY >= 16)
 		{
@@ -338,7 +338,7 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 		}
 		SectionProcessed[SectionY] = true;
 	}  // for Tag - Sections[]
-	
+
 	// Call the callback for empty sections:
 	for (unsigned char y = 0; y < 16; y++)
 	{
@@ -350,12 +350,12 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 			}
 		}
 	}
-	
+
 	if (m_Callback.OnSectionsFinished())
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -370,7 +370,7 @@ bool cProcessor::cThread::ProcessChunkEntities(int a_ChunkX, int a_ChunkZ, cPars
 	{
 		return false;
 	}
-	
+
 	for (int EntityTag = a_NBT.GetFirstChild(EntitiesTag); EntityTag > 0; EntityTag = a_NBT.GetNextSibling(EntityTag))
 	{
 		int PosTag = a_NBT.FindChildByName(EntityTag, "Pos");
@@ -433,7 +433,7 @@ bool cProcessor::cThread::ProcessChunkTileEntities(int a_ChunkX, int a_ChunkZ, c
 	{
 		return false;
 	}
-	
+
 	for (int TileEntityTag = a_NBT.GetFirstChild(TileEntitiesTag); TileEntityTag > 0; TileEntityTag = a_NBT.GetNextSibling(TileEntityTag))
 	{
 		if (m_Callback.OnTileEntity(
@@ -461,7 +461,7 @@ bool cProcessor::cThread::ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cPar
 	{
 		return false;
 	}
-	
+
 	for (int TileTickTag = a_NBT.GetFirstChild(TileTicksTag); TileTickTag > 0; TileTickTag = a_NBT.GetNextSibling(TileTickTag))
 	{
 		int iTag = a_NBT.FindChildByName(TileTicksTag, "i");
@@ -491,7 +491,7 @@ bool cProcessor::cThread::ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cPar
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProcessor:
 
 cProcessor::cProcessor(void) :
@@ -514,24 +514,24 @@ cProcessor::~cProcessor()
 void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & a_CallbackFactory)
 {
 	PopulateFileQueue(a_WorldFolder);
-	
+
 	if (m_FileQueue.empty())
 	{
 		LOG("No files to process, exitting.");
 		return;
 	}
-	
+
 	// Start as many threads as there are cores, plus one:
 	// (One more thread can be in the file-read IO block while all other threads crunch the numbers)
 	int NumThreads = GetNumCores() + 1;
-	
+
 	/*
 	// Limit the number of threads in DEBUG mode to 1 for easier debugging
 	#ifdef _DEBUG
 	NumThreads = 1;
 	#endif  // _DEBUG
 	//*/
-	
+
 	// Start all the threads:
 	for (int i = 0; i < NumThreads; i++)
 	{
@@ -589,7 +589,3 @@ AString cProcessor::GetOneFileName(void)
 	m_FileQueue.pop_back();
 	return res;
 }
-
-
-
-

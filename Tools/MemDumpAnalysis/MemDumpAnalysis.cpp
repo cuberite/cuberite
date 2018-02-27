@@ -25,7 +25,7 @@ public:
 	int        m_Size;   ///< Sum of memory block sizes allocated by this function or its children
 	int        m_Count;  ///< Total number of memory blocks allocated by this function or its children
 	AStringSet m_ChildrenNames;
-	
+
 	cFunction(void) :
 		m_Size(0),
 		m_Count(0)
@@ -66,7 +66,7 @@ bool IsFnBlackListed(const char * a_FnName)
 		"luaM_realloc_",
 		"",
 	} ;
-	
+
 	for (int i = 0; i < ARRAYCOUNT(BlackList); i++)
 	{
 		if (strcmp(BlackList[i], a_FnName) == 0)
@@ -169,7 +169,7 @@ void WriteSizeStatistics(void)
 {
 	typedef std::vector<std::pair<AString, int> > StringIntPairs;
 	StringIntPairs FnSizes;
-	
+
 	cFile f("memdump_totals.txt", cFile::fmWrite);
 	if (!f.IsOpen())
 	{
@@ -182,7 +182,7 @@ void WriteSizeStatistics(void)
 		FnSizes.push_back(std::pair<AString, int>(itr->first, itr->second.m_Size));
 	}  // for itr - g_FnSizes[]
 	std::sort(FnSizes.begin(), FnSizes.end(), CompareFnInt);
-	
+
 	for (StringIntPairs::const_iterator itr = FnSizes.begin(), end = FnSizes.end(); itr != end; ++itr)
 	{
 		f.Printf("%d\t%s\n", itr->second, itr->first.c_str());
@@ -197,7 +197,7 @@ void WriteCountStatistics(void)
 {
 	typedef std::vector<std::pair<AString, int> > StringIntPairs;
 	StringIntPairs FnCounts;
-	
+
 	cFile f("memdump_counts.txt", cFile::fmWrite);
 	if (!f.IsOpen())
 	{
@@ -210,7 +210,7 @@ void WriteCountStatistics(void)
 		FnCounts.push_back(std::pair<AString, int>(itr->first, itr->second.m_Count));
 	}  // for itr - g_FnSizes[]
 	std::sort(FnCounts.begin(), FnCounts.end(), CompareFnInt);
-	
+
 	for (StringIntPairs::const_iterator itr = FnCounts.begin(), end = FnCounts.end(); itr != end; ++itr)
 	{
 		f.Printf("%d\t%s\n", itr->second, itr->first.c_str());
@@ -254,7 +254,7 @@ void WriteDotGraph(void)
 		LOGERROR("Cannot open memdump.dot");
 		return;
 	}
-	
+
 	f.Printf("digraph {\n\tnode [shape=plaintext]\n\n");
 	for (FunctionMap::const_iterator itrF = g_FnMap.begin(), endF = g_FnMap.end(); itrF != endF; ++itrF)
 	{
@@ -288,11 +288,11 @@ int main(int argc, char * argv[])
 		printf("Cannot open memdump.xml\n");
 		return 1;
 	}
-	
+
 	// Create the XML parser:
 	XML_Parser Parser = XML_ParserCreate(NULL);
 	XML_SetElementHandler(Parser, OnStartElement, OnEndElement);
-	
+
 	// Feed the file through XML parser:
 	char Buffer[512 KiB];
 	while (true)
@@ -307,15 +307,11 @@ int main(int argc, char * argv[])
 	}
 	XML_Parse(Parser, "", 0, true);
 	f.Close();
-	
+
 	// Output the statistics
 	WriteSizeStatistics();
 	WriteCountStatistics();
 	WriteDotGraph();
-	
+
 	return 0;
 }
-
-
-
-

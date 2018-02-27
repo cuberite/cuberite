@@ -270,7 +270,7 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	else
 	#endif
 	{
-		const AString a_MobString = tolua_tocppstring(LuaState, 1, 0);
+		const AString a_MobString = tolua_tocppstring(LuaState, 1, nullptr);
 		eMonsterType MobType = cMonster::StringToMobType(a_MobString);
 		tolua_pushnumber(LuaState, static_cast<lua_Number>(MobType));
 		tolua_pushcppstring(LuaState, a_MobString);
@@ -285,6 +285,32 @@ tolua_lerror:
 	tolua_error(LuaState, "#ferror in function 'StringToMobType'.", &tolua_err);
 	return 0;
 	#endif
+}
+
+
+
+
+
+static int tolua_cBlockInfo_Get(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamStaticSelf("cBlockInfo") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+
+	BLOCKTYPE BlockType{};
+	L.GetStackValue(2, BlockType);
+
+	LOGWARNING("cBlockInfo:Get() is deprecated, use the static querying functions instead");
+	L.LogStackTrace(0);
+
+	cBlockInfo & BlockInfo = const_cast<cBlockInfo &>(cBlockInfo::Get(BlockType));
+	L.Push(&BlockInfo);
+	return 1;
 }
 
 
@@ -347,6 +373,50 @@ static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
 
 
 
+/** cBlockInfo variables: access the corresponding getter function instead of the variable.
+\tparam VariableType The type of the variable being accessed.
+\tparam GetterFunction The function called to get the value returned to lua. */
+template <typename VariableType, VariableType (*GetterFunction)(BLOCKTYPE)>
+static int tolua_get_cBlockInfo(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cBlockInfo"))
+	{
+		return 0;
+	}
+
+	const cBlockInfo * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	L.Push(GetterFunction(Self->m_BlockType));
+	LOGWARNING("cBlockInfo variables are deprecated, use the static functions instead.");
+	L.LogStackTrace(0);
+
+	return 1;
+}
+
+
+
+
+
+/** cBlockInfo variables: Print deprecation message on assignment. */
+static int tolua_set_cBlockInfo(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cBlockInfo"))
+	{
+		return 0;
+	}
+
+	LOGWARNING("cBlockInfo variables are deprecated in favour of the static functions.");
+	L.LogStackTrace(0);
+	return 0;
+}
+
+
+
+
+
 static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 {
 	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
@@ -379,7 +449,7 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 	if (
 		!L.CheckParamSelf("cItem") ||
 		!L.CheckParamString(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -548,8 +618,23 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
 
 	tolua_beginmodule(tolua_S, "cBlockInfo");
-		tolua_function(tolua_S, "GetPlaceSound", tolua_cBlockInfo_GetPlaceSound);
-		tolua_variable(tolua_S, "m_PlaceSound", tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+		tolua_function(tolua_S, "Get",                    tolua_cBlockInfo_Get);
+		tolua_function(tolua_S, "GetPlaceSound",          tolua_cBlockInfo_GetPlaceSound);
+		tolua_variable(tolua_S, "m_PlaceSound",           tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+		tolua_variable(tolua_S, "m_LightValue",           tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetLightValue        >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_SpreadLightFalloff",   tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetSpreadLightFalloff>, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_Transparent",          tolua_get_cBlockInfo<bool,       cBlockInfo::IsTransparent        >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_OneHitDig",            tolua_get_cBlockInfo<bool,       cBlockInfo::IsOneHitDig          >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_PistonBreakable",      tolua_get_cBlockInfo<bool,       cBlockInfo::IsPistonBreakable    >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_IsRainBlocker",        tolua_get_cBlockInfo<bool,       cBlockInfo::IsRainBlocker        >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_IsSkylightDispersant", tolua_get_cBlockInfo<bool,       cBlockInfo::IsSkylightDispersant >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_IsSnowable",           tolua_get_cBlockInfo<bool,       cBlockInfo::IsSnowable           >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_IsSolid",              tolua_get_cBlockInfo<bool,       cBlockInfo::IsSolid              >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_UseableBySpectator",   tolua_get_cBlockInfo<bool,       cBlockInfo::IsUseableBySpectator >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_FullyOccupiesVoxel",   tolua_get_cBlockInfo<bool,       cBlockInfo::FullyOccupiesVoxel   >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_CanBeTerraformed",     tolua_get_cBlockInfo<bool,       cBlockInfo::CanBeTerraformed     >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_BlockHeight",          tolua_get_cBlockInfo<float,      cBlockInfo::GetBlockHeight       >, tolua_set_cBlockInfo);
+		tolua_variable(tolua_S, "m_Hardness",             tolua_get_cBlockInfo<float,      cBlockInfo::GetHardness          >, tolua_set_cBlockInfo);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cItem");

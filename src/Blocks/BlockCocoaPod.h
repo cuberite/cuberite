@@ -82,10 +82,7 @@ public:
 				return 0;
 			}
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
+		UNREACHABLE("Unsupported block face");
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

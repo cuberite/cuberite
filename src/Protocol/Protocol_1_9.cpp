@@ -66,6 +66,7 @@ static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 /** Value for main hand in Hand parameter for Protocol 1.9. */
 static const UInt32 MAIN_HAND = 0;
+static const UInt32 OFF_HAND = 1;
 
 
 
@@ -162,7 +163,7 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 		}
 		else
 		{
-			LOG("Unknown additional data sent in server address (BungeeCord/FML?): " SIZE_T_FMT " parameters", Params.size());
+			LOG("Unknown additional data sent in server address (BungeeCord/FML?): %zu parameters", Params.size());
 			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
 		}
 	}
@@ -1912,7 +1913,7 @@ void cProtocol_1_9_0::AddReceivedData(const char * a_Data, size_t a_Size)
 			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
 			AString Hex;
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") unparsed bytes already present in buffer:\n%s\n",
+			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
 				AllData.size(), AllData.size(), Hex.c_str()
 			);
 		}
@@ -2053,14 +2054,14 @@ void cProtocol_1_9_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.9: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",
+			LOGWARNING("Protocol 1.9: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
 
 			// Put a message in the comm log:
 			if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 			{
-				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got " SIZE_T_FMT " left) ^^^^^^\n\n\n",
+				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
 					1, bb.GetReadableSpace()
 				);
 				m_CommLogFile.Flush();
@@ -2082,7 +2083,7 @@ void cProtocol_1_9_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
 		AString Hex;
 		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("Protocol 1.9: There are " SIZE_T_FMT " (0x" SIZE_T_FMT_HEX ") bytes of non-parse-able data left in the buffer:\n%s",
+		m_CommLogFile.Printf("Protocol 1.9: There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
 			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
 		);
 		m_CommLogFile.Flush();
@@ -2384,7 +2385,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
 }
 
 
@@ -2784,10 +2785,9 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt64, Hand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	// Didn't click a block - emulate old values used with place block of -1, -1, -1 (and BLOCK_FACE_NONE).
-	m_Client->HandleRightClick(-1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleUseItem(HandIntToEnum(Hand));
 }
 
 
@@ -3029,7 +3029,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
-		LOGWARNING("Cannot parse NBT item metadata: %s at (" SIZE_T_FMT " / " SIZE_T_FMT " bytes)\n%s",
+		LOGWARNING("Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
 			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
 		);
 		return;
@@ -3128,11 +3128,11 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 					}
 					else if (PotionEffect.find("thick") != AString::npos)
 					{
-						a_Item.m_ItemDamage = 20;
+						a_Item.m_ItemDamage = 32;
 					}
 					else if (PotionEffect.find("awkward") != AString::npos)
 					{
-						a_Item.m_ItemDamage = 10;
+						a_Item.m_ItemDamage = 16;
 					}
 					else if (PotionEffect.find("regeneration") != AString::npos)
 					{
@@ -3260,6 +3260,25 @@ eBlockFace cProtocol_1_9_0::FaceIntToBlockFace(Int32 a_BlockFace)
 		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
 		default: return BLOCK_FACE_NONE;
+	}
+}
+
+
+
+
+
+eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
+{
+	// Convert hand parameter into eHand enum
+	switch (a_Hand)
+	{
+		case MAIN_HAND: return eHand::hMain;
+		case OFF_HAND: return eHand::hOff;
+		default:
+		{
+			ASSERT(!"Unknown hand value");
+			return eHand::hMain;
+		}
 	}
 }
 

@@ -15,9 +15,9 @@
 	// Useful warnings from warning level 4:
 	#pragma warning(3 : 4127)  // Conditional expression is constant
 	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed/unsigned mismatch
+	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed / unsigned mismatch
 	#pragma warning(3 : 4310)  // Cast truncates constant value
-	#pragma warning(3 : 4389)  // Signed/unsigned mismatch
+	#pragma warning(3 : 4389)  // Signed / unsigned mismatch
 	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
 	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
 	#pragma warning(3 : 4702)  // Unreachable code
@@ -254,9 +254,9 @@ template class SizeChecker<UInt16, 2>;
 	#include "src/Logger.h"
 #else
 	// Logging functions
-void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGERROR(const char* a_Format, ...)
+void inline LOGERROR(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
@@ -271,14 +271,15 @@ void inline LOGERROR(const char* a_Format, ...)
 
 // Common definitions:
 
-/// Evaluates to the number of elements in an array (compile-time!)
+/** Evaluates to the number of elements in an array (compile-time!) */
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)")
+/** Allows arithmetic expressions like "32 KiB" (but consider using parenthesis
+around it, "(32 KiB)") */
 #define KiB * 1024
 #define MiB * 1024 * 1024
 
-/// Faster than (int)floorf((float)x / (float)div)
+/** Faster than (int)floorf((float)x / (float)div) */
 #define FAST_FLOOR_DIV( x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review

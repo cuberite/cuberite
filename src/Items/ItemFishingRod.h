@@ -1,12 +1,4 @@
 
-// ItemFishingRod.h
-
-// Declares the various fishing rod ItemHandlers
-
-
-
-
-
 #pragma once
 
 #include "../Entities/Floater.h"
@@ -97,29 +89,41 @@ public:
 						return true;
 					}
 				);
+				a_Player->UseEquippedItem(5);
 			}
 			else if (FloaterInfo.CanPickup())
 			{
+				UInt32 LotSLevel = std::min(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
+
+				// Chances for getting an item from the category for each level of Luck of the Sea (0 - 3)
+				const int TreasureChances[] = {50, 71, 92, 113};  // 5% | 7.1% | 9.2% | 11.3%
+				const int JunkChances[] = {100, 81, 61, 42};  // 10% | 8.1% | 6.1% | 4.2%
+
 				cItems Drops;
-				int ItemCategory = Random.RandInt(99);
-				if (ItemCategory <= 4)  // Treasures 5%
+				int ItemCategory = Random.RandInt(999);
+				if (ItemCategory < TreasureChances[LotSLevel])
 				{
-					int Treasure = Random.RandInt(5);
-					switch (Treasure)
+					switch (Random.RandInt(5))  // Each piece of treasure has an equal chance of 1 / 6
 					{
 						case 0:
 						{
-							Drops.Add(cItem(E_ITEM_BOW));  // TODO: Enchantments
+							cItem Bow(E_ITEM_BOW, 1, Random.RandInt<short>(50));
+							Bow.EnchantByXPLevels(Random.RandInt(22, 30));
+							Drops.Add(Bow);
 							break;
 						}
 						case 1:
 						{
-							Drops.Add(cItem(E_ITEM_BOOK));  // TODO: Enchanted book
+							cItem Book(E_ITEM_ENCHANTED_BOOK);
+							Book.EnchantByXPLevels(30);
+							Drops.Add(Book);
 							break;
 						}
 						case 2:
 						{
-							Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50)));  // Fishing rod with durability. TODO: Enchantments on it
+							cItem Rod(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50));
+							Rod.EnchantByXPLevels(Random.RandInt(22, 30));
+							Drops.Add(Rod);
 							break;
 						}
 						case 3:
@@ -141,57 +145,59 @@ public:
 
 					a_Player->GetStatManager().AddValue(statTreasureFished, 1);
 				}
-				else if (ItemCategory <= 14)  // Junk 10%
+				else if (ItemCategory < JunkChances[LotSLevel])
 				{
-					int Junk = Random.RandInt(70);
-					if (Junk <= 1)
-					{
-						Drops.Add(cItem(E_ITEM_DYE, 10, 0));
-					}
-					else if (Junk <= 4)
-					{
-						Drops.Add(cItem(E_ITEM_BOW, 1, Random.RandInt<short>(64)));
-					}
-					else if (Junk <= 9)
-					{
-						Drops.Add(cItem(E_ITEM_STICK));
-					}
-					else if (Junk <= 14)
-					{
-						Drops.Add(cItem(E_ITEM_STRING));
-					}
-					else if (Junk <= 22)
+					int Junk = Random.RandInt(82);
+					if (Junk < 10)  // 10 / 83 chance of spawning a bowl
 					{
 						Drops.Add(cItem(E_ITEM_BOWL));
 					}
-					else if (Junk <= 30)
+					else if (Junk < 12)  // 2 / 83 chance of spawning a fishing rod
+					{
+						// Fishing Rods caught from the Junk category will be 10%–100% damaged, and always unenchanted.
+						Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(7, 65)));
+					}
+					else if (Junk < 22)  // 10 / 83 chance of spawning leather
 					{
 						Drops.Add(cItem(E_ITEM_LEATHER));
 					}
-					else if (Junk <= 38)
+					else if (Junk < 32)  // 10 / 83 chance of spawning leather boots
 					{
-						Drops.Add(cItem(E_ITEM_LEATHER_BOOTS));
+						// Leather boots caught from the Junk category will be 10%–100% damaged, and always unenchanted.
+						Drops.Add(cItem(E_ITEM_LEATHER_BOOTS, 1, Random.RandInt<short>(7, 66)));
 					}
-					else if (Junk <= 46)
+					else if (Junk < 42)  // 10 / 83 chance of spawning rotten flesh
 					{
 						Drops.Add(cItem(E_ITEM_ROTTEN_FLESH));
 					}
-					else if (Junk <= 54)
+					else if (Junk < 47)  // 5 / 83 chance of spawning a stick
 					{
-						Drops.Add(cItem(E_ITEM_POTIONS));
+						Drops.Add(cItem(E_ITEM_STICK));
 					}
-					else if (Junk <= 62)
+					else if (Junk < 52)  // 5 / 83 chance of spawning string
+					{
+						Drops.Add(cItem(E_ITEM_STRING));
+					}
+					else if (Junk < 62)  // 10 / 83 chance of spawning a water bottle
+					{
+						Drops.Add(cItem(E_ITEM_POTION));
+					}
+					else if (Junk < 72)  // 10 / 83 chance of spawning a bone
 					{
 						Drops.Add(cItem(E_ITEM_BONE));
 					}
-					else if (Junk <= 70)
+					else if (Junk < 73)  // 1 / 83 chance of spawning an ink sac
+					{
+						Drops.Add(cItem(E_ITEM_DYE));
+					}
+					else  // 10 / 83 chance of spawning a tripwire hook
 					{
 						Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
 					}
 
 					a_Player->GetStatManager().AddValue(statJunkFished, 1);
 				}
-				else  // Fish
+				else
 				{
 					int FishType = Random.RandInt(99);
 					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
@@ -202,11 +208,11 @@ public:
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
 					}
-					else if (FishType <= 24)
+					else if (FishType <= 24)  // Raw salmon has a 25% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_SALMON));
 					}
-					else
+					else  // Raw fish has a 60% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
 					}
@@ -224,7 +230,17 @@ public:
 
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x * FISH_SPEED_MULT, (FlyDirection.y + 1.0f) * FISH_SPEED_MULT, FlyDirection.z * FISH_SPEED_MULT);
+				a_World->SpawnExperienceOrb(a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), Random.RandInt(1, 6));
+				a_Player->UseEquippedItem(1);
 				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
+			}
+			else
+			{
+				BLOCKTYPE Block = a_World->GetBlock(FloaterInfo.GetPos() - Vector3d(0, 0.1, 0));
+				if ((Block != E_BLOCK_AIR) && !IsBlockWater(Block))
+				{
+					a_Player->UseEquippedItem(2);
+				}
 			}
 		}
 		else
@@ -240,7 +256,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-

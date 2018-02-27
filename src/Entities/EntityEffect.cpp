@@ -23,7 +23,7 @@ cEntityEffect::eType cEntityEffect::GetPotionEffectType(short a_ItemDamage)
 {
 	// Lowest four bits
 	// Potion effect bits are different from entity effect values
-	// For reference: https://minecraft.gamepedia.com/Data_values#.22Potion_effect.22_bits
+	// For reference: https://minecraft.gamepedia.com/Java_Edition_data_values#.22Potion_effect.22_bits
 	switch (a_ItemDamage & 0x0f)
 	{
 		case 0x01: return cEntityEffect::effRegeneration;
@@ -112,9 +112,9 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 	SplashCoeff = IsPotionDrinkable(a_ItemDamage) ? 1 : 0.75;
 
 	// Ref.:
-	//   https://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
-	//   https://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
-	//   https://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
+	//   https://minecraft.gamepedia.com/Java_Edition_data_values#.22Tier.22_bit
+	//   https://minecraft.gamepedia.com/Java_Edition_data_values#.22Extended_duration.22_bit
+	//   https://minecraft.gamepedia.com/Java_Edition_data_values#.22Splash_potion.22_bit
 
 	return static_cast<int>(base * TierCoeff * ExtCoeff * SplashCoeff);
 }
@@ -125,9 +125,10 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 
 bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
 {
-	// Drinkable potion if 13th lowest bit is set
-	// Ref.: https://minecraft.gamepedia.com/Potions#Data_value_table
-	return ((a_ItemDamage & 0x2000) != 0);
+	// Potions are drinkable if they are not splash potions.
+	// i.e. potions are drinkable if the 14th lowest bit is not set
+	// Ref.: https://minecraft.gamepedia.com/Java_Edition_data_values#.22Splash_potion.22_bit
+	return ((a_ItemDamage & 0x4000) == 0);
 }
 
 
@@ -216,11 +217,7 @@ std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(cEntityEffect::
 		case cEntityEffect::effWeakness:       return cpp14::make_unique<cEntityEffectWeakness      >(a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWither:         return cpp14::make_unique<cEntityEffectWither        >(a_Duration, a_Intensity, a_DistanceModifier);
 	}
-
-	ASSERT(!"Unhandled entity effect type!");
-	#ifndef __clang__
-		return {};
-	#endif
+	UNREACHABLE("Unsupported entity effect");
 }
 
 
@@ -512,7 +509,3 @@ void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
-
-
-
-

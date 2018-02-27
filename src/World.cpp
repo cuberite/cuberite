@@ -492,11 +492,7 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 			return Random.RandInt(m_MinThunderStormTicks, m_MaxThunderStormTicks);
 		}
 	}
-
-	#ifndef __clang__
-		ASSERT(!"Unknown weather");
-		return -1;
-	#endif
+	UNREACHABLE("Unsupported weather");
 }
 
 
@@ -536,6 +532,34 @@ void cWorld::ChangeWeather(void)
 {
 	// In the next tick the weather will be changed
 	m_WeatherInterval = 0;
+}
+
+
+
+
+
+bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
+{
+	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
+	{
+		return false;
+	}
+
+	if (a_Pos.y >= cChunkDef::Height)
+	{
+		return true;
+	}
+
+	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
+	{
+		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
+		if (cBlockInfo::IsRainBlocker(BlockType))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -654,7 +678,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	{
 		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
 
-		LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+		LOGINFO("World \"%s\": Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 		return;
 	}
 
@@ -688,14 +712,14 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+				LOGINFO("World \"%s\":Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 				return;
 			}
 		}
 	}
 
 	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	LOGWARNING("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+	LOGWARNING("World \"%s\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 }
 
 
@@ -823,19 +847,17 @@ eWeather cWorld::ChooseNewWeather()
 	switch (m_Weather)
 	{
 		case eWeather_Sunny:
-		case eWeather_ThunderStorm: return eWeather_Rain;
-
+		case eWeather_ThunderStorm:
+		{
+			return eWeather_Rain;
+		}
 		case eWeather_Rain:
 		{
 			// 1 / 8 chance of turning into a thunderstorm
 			return GetRandomProvider().RandBool(0.125) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
-
-	#ifndef __clang__
-		ASSERT(!"Unknown weather");
-		return eWeather_Sunny;
-	#endif
+	UNREACHABLE("Unsupported weather");
 }
 
 

@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
@@ -14,6 +15,8 @@ set (HTTP_SRCS
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
@@ -24,6 +27,8 @@ set (HTTP_HDRS
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
 )
 
@@ -57,11 +62,11 @@ source_group("Data Files" FILES ${TEST_DATA_FILES})
 
 # HTTPMessageParser_file: Feed file contents into a cHTTPResponseParser and print the callbacks as they're called:
 add_executable(HTTPMessageParser_file-exe HTTPMessageParser_file.cpp ${TEST_DATA_FILES})
-target_link_libraries(HTTPMessageParser_file-exe HTTP Network OSSupport)
+target_link_libraries(HTTPMessageParser_file-exe HTTP Network OSSupport fmt::fmt)
 
 # UrlClientTest: Tests the UrlClient class by requesting a few things off the internet:
 add_executable(UrlClientTest-exe UrlClientTest.cpp)
-target_link_libraries(UrlClientTest-exe HTTP)
+target_link_libraries(UrlClientTest-exe HTTP fmt::fmt)
 
 
 

@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 set (SHARED_SRCS
@@ -18,7 +19,7 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 
 add_executable(UUIDTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(UUIDTest mbedcrypto)
+target_link_libraries(UUIDTest mbedcrypto fmt::fmt)
 target_compile_definitions(UUIDTest PRIVATE TEST_GLOBALS=1)
 target_include_directories(UUIDTest PRIVATE
 	${CMAKE_SOURCE_DIR}/src/
