@@ -218,7 +218,7 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-template <class HookFunction>
+template <typename HookFunction>
 bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction)
 {
 	auto Plugins = m_Hooks.find(a_HookName);
