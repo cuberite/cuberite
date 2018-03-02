@@ -218,3 +218,13 @@ bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition)
 
 
 
+
+bool cOcelot::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtFalling)
+	{
+		return false;
+	}
+
+	return super::DoTakeDamage(a_TDI);
+}

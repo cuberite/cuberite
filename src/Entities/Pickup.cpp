@@ -147,17 +147,8 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
 			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
 
-			int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
-			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
-
-			// If the pickup is on the bottommost block position, make it think the void is made of air: (#131)
-			BLOCKTYPE BlockBelow = (BlockY > 0) ? CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
-			BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
-
-			if (
-				IsBlockLava(BlockBelow) || (BlockBelow == E_BLOCK_FIRE) ||
-				IsBlockLava(BlockIn) || (BlockIn == E_BLOCK_FIRE)
-			)
+			// Destroy the pickup if it is on fire:
+			if (IsOnFire())
 			{
 				m_bCollected = true;
 				m_Timer = std::chrono::milliseconds(0);  // We have to reset the timer.
@@ -198,6 +189,21 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 		return;
 	}
+}
+
+
+
+
+
+bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtCactusContact)
+	{
+		Destroy(true);
+		return true;
+	}
+
+	return super::DoTakeDamage(a_TDI);
 }
 
 
@@ -261,7 +267,3 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
 	return false;
 }
-
-
-
-

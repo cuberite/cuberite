@@ -994,6 +994,7 @@ void cLuaState::Push(cEntity * a_Entity)
 						return "cEntity";
 					}
 				}  // switch (EntityType)
+				UNREACHABLE("Unsupported entity type");
 			}();
 		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
 	}
