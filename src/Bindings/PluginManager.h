@@ -444,6 +444,12 @@ private:
 
 	/** Returns the folders that are specified in the settings ini to load plugins from. */
 	AStringVector GetFoldersToLoad(cSettingsRepositoryInterface & a_Settings);
+
+	/** Calls a_HookFunction on each plugin registered to the hook HookName.
+	Returns false if the action is to continue or true if the plugin wants to abort.
+	Accessible only from within PluginManager.cpp */
+	template <typename HookFunction>
+	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
 } ;  // tolua_export
 
 
