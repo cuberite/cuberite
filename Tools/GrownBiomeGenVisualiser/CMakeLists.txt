@@ -11,7 +11,6 @@ enable_profile()
 
 
 # Set include paths to the used libraries:
-include_directories(SYSTEM "../../lib")
 include_directories("../../src")
 
 

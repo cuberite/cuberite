@@ -8,8 +8,6 @@ set_lib_flags()
 
 
 # Set include paths to the used libraries:
-include_directories(SYSTEM "../../lib")
-include_directories(SYSTEM "../../lib/mbedtls/include")
 include_directories("../../src")
 
 function(flatten_files arg1)
@@ -20,8 +18,6 @@ function(flatten_files arg1)
 	endforeach()
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
-
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 set_exe_flags()
 

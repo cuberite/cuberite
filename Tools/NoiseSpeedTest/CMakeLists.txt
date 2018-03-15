@@ -7,7 +7,6 @@ set_lib_flags()
 enable_profile()
 
 # Set include paths to the used libraries:
-include_directories(SYSTEM "../../lib")
 include_directories("../../src")
 
 set_exe_flags()

@@ -10,7 +10,6 @@ set_lib_flags()
 enable_profile()
 
 # Set include paths to the used libraries:
-include_directories(SYSTEM "../../lib")
 include_directories("../../src")
 
 
@@ -22,11 +21,6 @@ function(flatten_files arg1)
 	endforeach()
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
-
-
-# Include the libraries:
-
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 set_exe_flags()
 
