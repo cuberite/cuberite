@@ -137,21 +137,6 @@ else()
 	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
 endif()
 
-
-# This has to be done before any flags have been set up.
-if(${BUILD_TOOLS})
-	message("Building tools")
-	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
-	add_subdirectory(Tools/MCADefrag/)
-	add_subdirectory(Tools/NoiseSpeedTest/)
-	add_subdirectory(Tools/ProtoProxy/)
-endif()
-
-if(${BUILD_UNSTABLE_TOOLS})
-	message("Building unstable tools")
-	add_subdirectory(Tools/GeneratorPerformanceTest/)
-endif()
-
 include(SetFlags.cmake)
 set_flags()
 set_lib_flags()
@@ -205,6 +190,19 @@ endif()
 set_exe_flags()
 
 add_subdirectory(src)
+
+if(${BUILD_TOOLS})
+	message("Building tools")
+	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
+	add_subdirectory(Tools/MCADefrag/)
+	add_subdirectory(Tools/NoiseSpeedTest/)
+	add_subdirectory(Tools/ProtoProxy/)
+endif()
+
+if(${BUILD_UNSTABLE_TOOLS})
+	message("Building unstable tools")
+	add_subdirectory(Tools/GeneratorPerformanceTest/)
+endif()
 
 if(${SELF_TEST})
 	message("Tests enabled")
