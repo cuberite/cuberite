@@ -138,17 +138,6 @@ set_flags()
 set_lib_flags()
 enable_profile()
 
-# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
-if (WIN32)
-	add_definitions(-DLUA_BUILD_AS_DLL)
-endif()
-
-# The Expat library is linked in statically, make the source files aware of that:
-add_definitions(-DXML_STATIC)
-
-# Let Lua use additional checks on its C API. This is only compiled into Debug builds:
-add_definitions(-DLUA_USE_APICHECK)
-
 # Self Test Mode enables extra checks at startup
 if(${SELF_TEST})
 	add_definitions(-DSELF_TEST)

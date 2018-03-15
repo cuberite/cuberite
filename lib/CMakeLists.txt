@@ -81,6 +81,16 @@ add_subdirectory(luaexpat)
 add_subdirectory(libevent EXCLUDE_FROM_ALL)
 add_subdirectory(fmt)
 
+# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
+if (WIN32)
+	target_compile_definitions(lua PUBLIC LUA_BUILD_AS_DLL)
+endif()
+
+# The Expat library is linked in statically, make the source files aware of that:
+target_compile_definitions(expat PUBLIC XML_STATIC)
+
+# Let Lua use additional checks on its C API. This is only compiled into Debug builds:
+target_compile_definitions(lua PUBLIC LUA_USE_APICHECK)
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:
 get_property(SQLITECPP_INCLUDES DIRECTORY "SQLiteCpp" PROPERTY INCLUDE_DIRECTORIES)
