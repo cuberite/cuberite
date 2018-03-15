@@ -1,11 +1,5 @@
 project (Cuberite)
 
-
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
-
 set(FOLDERS
 	OSSupport HTTP Items Blocks Protocol Generating mbedTLS++ Bindings
 	WorldStorage Mobs Entities Simulator Simulator/IncrementalRedstoneSimulator
@@ -160,9 +154,6 @@ SET (HDRS
 )
 
 include_directories(".")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
@@ -361,7 +352,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt TCLAP)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")

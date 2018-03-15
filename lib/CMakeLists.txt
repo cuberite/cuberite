@@ -92,11 +92,20 @@ target_compile_definitions(expat PUBLIC XML_STATIC)
 # Let Lua use additional checks on its C API. This is only compiled into Debug builds:
 target_compile_definitions(lua PUBLIC LUA_USE_APICHECK)
 
-# Add proper include directories so that SQLiteCpp can find SQLite3:
-get_property(SQLITECPP_INCLUDES DIRECTORY "SQLiteCpp" PROPERTY INCLUDE_DIRECTORIES)
-set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/sqlite/")
-set_property(DIRECTORY SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+# We set the current directory to the tolua++ include directory to allow overwriting
+# the header file with Bindings/tolua++.h
+target_include_directories(tolualib INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Set the proper include directories on the targets
+target_include_directories(mbedtls PUBLIC mbedtls/include)
+target_include_directories(SQLiteCpp PUBLIC SQLiteCpp/include)
+
+# Because we don't use SQLiteCpp's internal sqlite library, we need to add the includes manually
+target_include_directories(SQLiteCpp PUBLIC sqlite)
 
 # Prettify jsoncpp_lib_static name in VS solution explorer
 set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")
+
+# Create a TCLAP CMake target
+add_library(TCLAP INTERFACE)
+target_include_directories(TCLAP INTERFACE TCLAP/include)
