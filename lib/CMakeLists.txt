@@ -20,6 +20,10 @@ set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonC
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
 set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
 
+# Set options for mbedtls, disable their programs and tests
+set(ENABLE_TESTING OFF CACHE BOOL "Disable tests")
+set(ENABLE_PROGRAMS OFF CACHE BOOL "Disable programs")
+
 # Check that the libraries are present:
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
 	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")
@@ -66,6 +70,7 @@ endif()
 
 # Include all the libraries:
 add_subdirectory(jsoncpp)
+add_subdirectory(mbedtls EXCLUDE_FROM_ALL)
 add_subdirectory(zlib)
 add_subdirectory(lua)
 add_subdirectory(tolua++ EXCLUDE_FROM_ALL)

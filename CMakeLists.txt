@@ -173,10 +173,6 @@ if (WIN32)
 	add_subdirectory(lib/luaproxy/)
 endif()
 
-# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
-# (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/mbedtls.cmake EXCLUDE_FROM_ALL)
-
 if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
 	# mbed TLS uses the frame pointer's register in inline assembly for its bignum implementation:
 	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
