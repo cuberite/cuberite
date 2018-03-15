@@ -32,7 +32,5 @@ SET (HDRS
 	ProtocolRecognizer.h
 )
 
-if (NOT MSVC)
-	add_library(Protocol ${SRCS} ${HDRS})
-	target_link_libraries(Protocol fmt::fmt)
-endif()
+add_library(Protocol ${SRCS} ${HDRS})
+target_link_libraries(Protocol fmt::fmt zlib jsoncpp_lib_static SQLiteCpp mbedTLS++)

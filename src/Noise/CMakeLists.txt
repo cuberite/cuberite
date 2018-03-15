@@ -13,7 +13,5 @@ SET (HDRS
 	RidgedNoise.h
 )
 
-if(NOT MSVC)
-	add_library(Noise ${SRCS} ${HDRS})
-	target_link_libraries(Noise fmt::fmt OSSupport)
-endif()
+add_library(Noise ${SRCS} ${HDRS})
+target_link_libraries(Noise fmt::fmt OSSupport)

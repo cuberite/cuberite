@@ -102,7 +102,5 @@ SET (HDRS
 	WorldInterface.h
 )
 
-if(NOT MSVC)
-	add_library(Blocks ${SRCS} ${HDRS})
-	target_link_libraries(Blocks fmt::fmt)
-endif()
+add_library(Blocks ${SRCS} ${HDRS})
+target_link_libraries(Blocks fmt::fmt mbedTLS++ SQLiteCpp)

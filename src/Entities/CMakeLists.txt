@@ -60,7 +60,5 @@ SET (HDRS
 	ThrownSnowballEntity.h
 	WitherSkullEntity.h)
 
-if(NOT MSVC)
-	add_library(Entities ${SRCS} ${HDRS})
-	target_link_libraries(Entities fmt::fmt WorldStorage)
-endif()
+add_library(Entities ${SRCS} ${HDRS})
+target_link_libraries(Entities fmt::fmt WorldStorage jsoncpp_lib_static mbedTLS++ SQLiteCpp)

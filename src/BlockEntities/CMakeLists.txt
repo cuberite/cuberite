@@ -46,7 +46,5 @@ SET (HDRS
 	SignEntity.h
 )
 
-if(NOT MSVC)
-	add_library(BlockEntities ${SRCS} ${HDRS})
-	target_link_libraries(BlockEntities fmt::fmt)
-endif()
+add_library(BlockEntities ${SRCS} ${HDRS})
+target_link_libraries(BlockEntities fmt::fmt mbedTLS++ jsoncpp_lib_static SQLiteCpp)

@@ -58,7 +58,5 @@ SET (HDRS
 	ItemAxe.h
 )
 
-if(NOT MSVC)
-	add_library(Items ${SRCS} ${HDRS})
-	target_link_libraries(Items fmt::fmt)
-endif()
+add_library(Items ${SRCS} ${HDRS})
+target_link_libraries(Items fmt::fmt mbedTLS++ SQLiteCpp jsoncpp_lib_static)

@@ -31,8 +31,5 @@ set (HDRS
 	PressurePlateHandler.h
 )
 
-if(NOT MSVC)
-	add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
-	target_link_libraries(IncrementalRedstoneSimulator fmt::fmt)
-endif()
-
+add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
+target_link_libraries(IncrementalRedstoneSimulator fmt::fmt)

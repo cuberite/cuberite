@@ -81,7 +81,5 @@ SET (HDRS
 	Zombie.h
 	ZombiePigman.h)
 
-if(NOT MSVC)
-	add_library(Mobs ${SRCS} ${HDRS})
-	target_link_libraries(Mobs fmt::fmt)
-endif()
+add_library(Mobs ${SRCS} ${HDRS})
+target_link_libraries(Mobs fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

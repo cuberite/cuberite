@@ -32,7 +32,5 @@ SET (HDRS
 	UrlParser.h
 )
 
-if(NOT MSVC)
-	add_library(HTTPServer ${SRCS} ${HDRS})
-	target_link_libraries(HTTPServer fmt::fmt)
-endif()
+add_library(HTTPServer ${SRCS} ${HDRS})
+target_link_libraries(HTTPServer fmt::fmt mbedTLS++)

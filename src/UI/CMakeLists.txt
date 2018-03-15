@@ -36,7 +36,5 @@ SET (HDRS
 	MinecartWithChestWindow.h
 	WindowOwner.h)
 
-if(NOT MSVC)
-	add_library(UI ${SRCS} ${HDRS})
-	target_link_libraries(UI fmt::fmt)
-endif()
+add_library(UI ${SRCS} ${HDRS})
+target_link_libraries(UI fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

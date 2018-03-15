@@ -35,7 +35,5 @@ set(HDRS
 	X509Cert.h
 )
 
-if(NOT MSVC)
-	add_library(mbedTLS++ ${SRCS} ${HDRS})
-	target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
-endif()
+add_library(mbedTLS++ ${SRCS} ${HDRS})
+target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
