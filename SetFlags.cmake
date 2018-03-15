@@ -67,7 +67,7 @@ macro(set_flags)
 		add_definitions(-DUNICODE -D_UNICODE)
 	elseif(APPLE)
 
-		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			execute_process(
 				COMMAND ${CMAKE_C_COMPILER} -dumpversion
 				OUTPUT_VARIABLE GCC_VERSION
@@ -80,7 +80,7 @@ macro(set_flags)
 		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 
 		#on os x clang adds pthread for us but we need to add it for gcc
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
 			add_flags_lnk("-stdlib=libc++")
 		else()
@@ -91,7 +91,7 @@ macro(set_flags)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-		
+
 		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
@@ -100,7 +100,7 @@ macro(set_flags)
 			add_flags_lnk("-pthread")
 		endif()
 
-		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			execute_process(
 				COMMAND ${CMAKE_C_COMPILER} -dumpversion
 				OUTPUT_VARIABLE GCC_VERSION
@@ -134,7 +134,7 @@ macro(set_flags)
 		message(FATAL_ERROR "The CROSSCOMPILE flag has been renamed to NO_NATIVE_OPTIMIZATION. Please update your build scripts to compile Cuberite.")
 	endif()
 
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		get_clang_version()
 	endif()
 
@@ -169,7 +169,7 @@ macro(set_lib_flags)
 	# Preference is for dl on unknown systems as it is specified in POSIX
 	# the dynamic loader is used by lua and sqllite.
 	if (UNIX)
-		if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+		if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 			set(DYNAMIC_LOADER ltdl)
 		else()
 			set(DYNAMIC_LOADER dl)
@@ -257,13 +257,13 @@ macro(set_exe_flags)
 		# we support non-IEEE 754 fpus so can make no guarentees about error
 		add_flags_cxx("-ffast-math")
 
-		if(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+		if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 			# backtrace() and friends are in libexecinfo
 			add_flags_lnk("-lexecinfo")
 		endif()
 
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			if (CLANG_VERSION VERSION_LESS 3.0)
 				message(FATAL_ERROR "Cuberite requires clang version 3.0 or higher, your version is ${CLANG_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
@@ -271,15 +271,15 @@ macro(set_exe_flags)
 			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
 			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
 			add_flags_cxx("-Wno-switch-enum")  # This is a pretty useless warning, we've already got -Wswitch which is what we need
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
+			if (CLANG_VERSION VERSION_GREATER 3.0)
 				# flags that are not present in 3.0
 				add_flags_cxx("-Wno-implicit-fallthrough")
 			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.1)
+			if (CLANG_VERSION VERSION_GREATER 3.1)
 				# flags introduced in 3.2
 				add_flags_cxx("-Wno-documentation")
 			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+			if (CLANG_VERSION VERSION_GREATER 3.5)
 				include(CheckCXXCompilerFlag)
 				check_cxx_compiler_flag(-Wno-reserved-id-macro HAS_NO_RESERVED_ID_MACRO)
 				check_cxx_compiler_flag(-Wno-documentation-unknown-command HAS_NO_DOCUMENTATION_UNKNOWN)
@@ -292,10 +292,10 @@ macro(set_exe_flags)
 					add_flags_cxx("-Wno-documentation-unknown-command")
 				endif()
 			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
+			if (CLANG_VERSION VERSION_GREATER 3.5)
 				add_flags_cxx("-Wno-error=disabled-macro-expansion")
 			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.7)
+			if (CLANG_VERSION VERSION_GREATER 3.7)
 				check_cxx_compiler_flag(-Wno-double-promotion HAS_NO_DOUBLE_PROMOTION)
 				if (HAS_NO_DOUBLE_PROMOTION)
 					add_flags_cxx("-Wno-double-promotion")
