@@ -59,4 +59,4 @@ SET (HDRS
 )
 
 add_library(Items ${SRCS} ${HDRS})
-target_link_libraries(Items fmt::fmt mbedTLS++ SQLiteCpp jsoncpp_lib_static)
+target_link_libraries(Items PRIVATE fmt::fmt mbedTLS++ SQLiteCpp jsoncpp_lib_static)

@@ -177,4 +177,4 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 add_library(Bindings ${SRCS} ${HDRS})
-target_link_libraries(Bindings fmt::fmt lua SQLiteCpp tolualib mbedtls HTTPServer jsoncpp_lib_static)
+target_link_libraries(Bindings PRIVATE fmt::fmt SQLiteCpp tolualib mbedtls HTTPServer jsoncpp_lib_static PUBLIC lua)

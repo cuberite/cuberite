@@ -33,4 +33,4 @@ set (HDRS
 )
 
 add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
-target_link_libraries(IncrementalRedstoneSimulator fmt::fmt)
+target_link_libraries(IncrementalRedstoneSimulator PRIVATE fmt::fmt)

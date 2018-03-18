@@ -103,4 +103,4 @@ SET (HDRS
 )
 
 add_library(Blocks ${SRCS} ${HDRS})
-target_link_libraries(Blocks fmt::fmt mbedTLS++ SQLiteCpp)
+target_link_libraries(Blocks PRIVATE fmt::fmt mbedTLS++ SQLiteCpp)

@@ -30,4 +30,4 @@ SET (HDRS
 )
 
 add_library(Simulator ${SRCS} ${HDRS})
-target_link_libraries(Simulator fmt::fmt mbedTLS++ SQLiteCpp)
+target_link_libraries(Simulator PRIVATE fmt::fmt mbedTLS++ SQLiteCpp)

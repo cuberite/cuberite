@@ -33,4 +33,4 @@ SET (HDRS
 )
 
 add_library(Protocol ${SRCS} ${HDRS})
-target_link_libraries(Protocol fmt::fmt zlib jsoncpp_lib_static SQLiteCpp mbedTLS++)
+target_link_libraries(Protocol PRIVATE fmt::fmt zlib jsoncpp_lib_static SQLiteCpp mbedTLS++)

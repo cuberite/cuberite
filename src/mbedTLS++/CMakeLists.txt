@@ -34,4 +34,4 @@ set(HDRS
 )
 
 add_library(mbedTLS++ ${SRCS} ${HDRS})
-target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
+target_link_libraries(mbedTLS++ PRIVATE fmt::fmt PUBLIC mbedtls)

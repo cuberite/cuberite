@@ -33,4 +33,4 @@ SET (HDRS
 )
 
 add_library(HTTPServer ${SRCS} ${HDRS})
-target_link_libraries(HTTPServer fmt::fmt mbedTLS++)
+target_link_libraries(HTTPServer PRIVATE fmt::fmt mbedTLS++)

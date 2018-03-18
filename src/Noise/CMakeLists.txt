@@ -14,4 +14,4 @@ SET (HDRS
 )
 
 add_library(Noise ${SRCS} ${HDRS})
-target_link_libraries(Noise fmt::fmt OSSupport)
+target_link_libraries(Noise PRIVATE fmt::fmt OSSupport)

@@ -82,4 +82,4 @@ SET (HDRS
 	ZombiePigman.h)
 
 add_library(Mobs ${SRCS} ${HDRS})
-target_link_libraries(Mobs fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)
+target_link_libraries(Mobs PRIVATE fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

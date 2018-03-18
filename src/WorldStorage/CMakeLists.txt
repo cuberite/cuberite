@@ -29,4 +29,4 @@ SET (HDRS
 )
 
 add_library(WorldStorage ${SRCS} ${HDRS})
-target_link_libraries(WorldStorage fmt::fmt OSSupport jsoncpp_lib_static mbedTLS++ SQLiteCpp)
+target_link_libraries(WorldStorage PRIVATE fmt::fmt OSSupport jsoncpp_lib_static mbedTLS++ SQLiteCpp zlib)

@@ -61,4 +61,4 @@ SET (HDRS
 	WitherSkullEntity.h)
 
 add_library(Entities ${SRCS} ${HDRS})
-target_link_libraries(Entities fmt::fmt WorldStorage jsoncpp_lib_static mbedTLS++ SQLiteCpp)
+target_link_libraries(Entities PRIVATE fmt::fmt WorldStorage jsoncpp_lib_static mbedTLS++ SQLiteCpp)

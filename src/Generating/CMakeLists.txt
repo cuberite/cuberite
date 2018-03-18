@@ -75,4 +75,4 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_library(Generating ${SRCS} ${HDRS})
-target_link_libraries(Generating fmt::fmt OSSupport Blocks Bindings SQLiteCpp)
+target_link_libraries(Generating PRIVATE fmt::fmt OSSupport Blocks Bindings SQLiteCpp mbedTLS++)

@@ -37,4 +37,4 @@ SET (HDRS
 	WindowOwner.h)
 
 add_library(UI ${SRCS} ${HDRS})
-target_link_libraries(UI fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)
+target_link_libraries(UI PRIVATE fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

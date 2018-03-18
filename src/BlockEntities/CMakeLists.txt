@@ -47,4 +47,4 @@ SET (HDRS
 )
 
 add_library(BlockEntities ${SRCS} ${HDRS})
-target_link_libraries(BlockEntities fmt::fmt mbedTLS++ jsoncpp_lib_static SQLiteCpp)
+target_link_libraries(BlockEntities PRIVATE fmt::fmt mbedTLS++ jsoncpp_lib_static SQLiteCpp)
