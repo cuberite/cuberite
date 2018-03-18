@@ -47,4 +47,4 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_library(OSSupport ${SRCS} ${HDRS})
-target_link_libraries(OSSupport fmt::fmt zlib mbedTLS++)
+target_link_libraries(OSSupport fmt::fmt zlib mbedTLS++ event_core)

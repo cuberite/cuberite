@@ -155,9 +155,6 @@ project (Cuberite)
 add_subdirectory(lib)
 link_directories(lib/jsoncpp/src/lib_json)
 
-# Add proper includes for LibEvent's event-config.h header:
-include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
-
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
 endif()

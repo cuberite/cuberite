@@ -153,8 +153,6 @@ SET (HDRS
 	XMLParser.h
 )
 
-include_directories(".")
-
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
