@@ -1565,8 +1565,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 			break;
 		}
 
-		// Add wolves in forest and spruce forests
-		case biForest:
+		// Add wolves in taiga biomes
 		case biTaiga:
 		case biMegaTaiga:
 		case biColdTaiga:
