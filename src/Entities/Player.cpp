@@ -1604,12 +1604,18 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
+	// Clamp the positions to exactly representable single-precision floating point values
+	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
+	const double ClampedPosX = Clamp(a_PosX, -167770000.0, 167770000.0);
+	const double ClampedPosY = Clamp(a_PosY, -167770000.0, 167770000.0);
+	const double ClampedPosZ = Clamp(a_PosZ, -167770000.0, 167770000.0);
+
 	//  ask plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(ClampedPosX, ClampedPosY, ClampedPosZ)))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		SetPosition(ClampedPosX, ClampedPosY, ClampedPosZ);
 		FreezeInternal(GetPosition(), false);
-		m_LastGroundHeight = a_PosY;
+		m_LastGroundHeight = ClampedPosY;
 		m_bIsTeleporting = true;
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
