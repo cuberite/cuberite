@@ -62,7 +62,7 @@ AString GetUUIDFolderName(const cUUID & a_Uuid)
 {
 	AString UUID = a_Uuid.ToShortString();
 
-	AString res("players/");
+	AString res(FILE_IO_PREFIX "players/");
 	res.append(UUID, 0, 2);
 	res.push_back('/');
 	return res;
@@ -2287,7 +2287,7 @@ void cPlayer::OpenHorseInventory()
 
 bool cPlayer::SaveToDisk()
 {
-	cFile::CreateFolderRecursive(FILE_IO_PREFIX + GetUUIDFolderName(m_UUID));
+	cFile::CreateFolderRecursive(GetUUIDFolderName(m_UUID));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -2909,7 +2909,7 @@ AString cPlayer::GetUUIDFileName(const cUUID & a_UUID)
 {
 	AString UUID = a_UUID.ToLongString();
 
-	AString res("players/");
+	AString res(FILE_IO_PREFIX "players/");
 	res.append(UUID, 0, 2);
 	res.push_back('/');
 	res.append(UUID, 2, AString::npos);
