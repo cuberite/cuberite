@@ -31,9 +31,9 @@ public:
 			case E_BLOCK_END_PORTAL_FRAME:
 			{
 				// Fill the portal frame. E_META_END_PORTAL_EYE is the bit for holding the eye of ender.
-				if ((FacingMeta & E_META_END_PORTAL_EYE) != E_META_END_PORTAL_EYE)
+				if ((FacingMeta & E_META_END_PORTAL_FRAME_EYE) != E_META_END_PORTAL_FRAME_EYE)
 				{
-					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_END_PORTAL_FRAME, FacingMeta | E_META_END_PORTAL_EYE);
+					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_END_PORTAL_FRAME, FacingMeta | E_META_END_PORTAL_FRAME_EYE);
 					if (!a_Player->IsGameModeCreative())
 					{
 						a_Player->GetInventory().RemoveOneEquippedItem();

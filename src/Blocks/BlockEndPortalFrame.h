@@ -78,9 +78,9 @@ public:
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		// E_META_END_PORTAL_EYE is the bit which signifies the eye of ender is in it.
+		// E_META_END_PORTAL_FRAME_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);
-		if ((a_BlockMeta & E_META_END_PORTAL_EYE) == E_META_END_PORTAL_EYE)
+		if ((a_BlockMeta & E_META_END_PORTAL_FRAME_EYE) == E_META_END_PORTAL_FRAME_EYE)
 		{
 			// LOG("Location is %d %d %d", a_BlockX, a_BlockY, a_BlockZ);
 			// Direction is the first two bits, masked by 0x3
@@ -258,7 +258,7 @@ public:
 	bool IsValidFrame(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_ShouldFace)
 	{
 		return ((a_BlockType == E_BLOCK_END_PORTAL_FRAME)
-			&& (a_BlockMeta == (a_ShouldFace | E_META_END_PORTAL_EYE))
+			&& (a_BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
 		);
 	}
 
