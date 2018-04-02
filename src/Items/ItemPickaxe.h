@@ -16,6 +16,21 @@ public:
 
 	}
 
+
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaAttackEntity:       return 2;
+			case dlaBreakBlock:         return 1;
+			case dlaBreakBlockInstant:  return 0;
+		}
+		UNREACHABLE("Unsupported durability loss action");
+	}
+
+
+
 	char PickaxeLevel()
 	{
 		switch (m_ItemType)
@@ -173,7 +188,3 @@ public:
 	}
 
 } ;
-
-
-
-

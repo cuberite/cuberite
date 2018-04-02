@@ -193,10 +193,10 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	// Take damage when touching water, drowning damage seems to be most appropriate
+	// Take damage when wet, drowning damage seems to be most appropriate
 	if (
 		cChunkDef::IsValidHeight(POSY_TOINT) &&
-		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsSwimming())
+		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
 	)
 	{
 		EventLosePlayer();

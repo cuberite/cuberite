@@ -156,4 +156,3 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		m_BurnedWithFlintAndSteel = true;
 	}
 }
-

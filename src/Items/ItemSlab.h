@@ -1,12 +1,4 @@
 
-// ItemSlab.h
-
-// Declares the cItemSlabHandler responsible for handling slabs, when in their item form.
-
-
-
-
-
 #pragma once
 
 #include "ItemHandler.h"
@@ -126,7 +118,3 @@ protected:
 	/** The block type to use when the slab combines into a doubleslab block. */
 	BLOCKTYPE m_DoubleSlabBlockType;
 };
-
-
-
-

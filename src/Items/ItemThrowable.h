@@ -1,11 +1,5 @@
 
-// ItemThrowable.h
-
 // Declares the itemhandlers for throwable items: eggs, snowballs, ender pearls, and eyes of ender.
-
-
-
-
 
 #pragma once
 
@@ -157,7 +151,3 @@ public:
 	}
 
 };
-
-
-
-

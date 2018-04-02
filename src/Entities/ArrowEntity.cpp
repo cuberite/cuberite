@@ -66,10 +66,7 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 		case psInSurvivalOrCreative: return (a_Player.IsGameModeSurvival() || a_Player.IsGameModeCreative());
 		case psInCreative:           return a_Player.IsGameModeCreative();
 	}
-	ASSERT(!"Unhandled pickup state");
-	#ifndef __clang__
-		return false;
-	#endif
+	UNREACHABLE("Unsupported arrow pickup state");
 }
 
 
@@ -123,7 +120,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	double KnockbackAmount = 11 + 10 * PunchLevel;
 	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
 
-	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
+	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
 		a_EntityHit.StartBurning(100);
 	}
@@ -218,7 +215,3 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
-
-
-
-

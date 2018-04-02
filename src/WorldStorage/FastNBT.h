@@ -125,41 +125,8 @@ enum class eNBTParseError
 	npUnknownTag,
 };
 
-
-
-
-
-class cNBTParseErrorCategory final:
-	public std::error_category
-{
-	cNBTParseErrorCategory() = default;
-public:
-	/** Category name */
-	virtual const char * name() const NOEXCEPT override
-	{
-		return "NBT parse error";
-	}
-
-	/** Maps a parse error code to an error message */
-	virtual AString message(int a_Condition) const override;
-
-	/** Returns the canonical error category instance. */
-	static const cNBTParseErrorCategory & Get()
-	{
-		static cNBTParseErrorCategory Category;
-		return Category;
-	}
-};
-
-
-
-
-
 // The following is required to make an error_code constructible from an eNBTParseError
-inline std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
-{
-	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
-}
+std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT;
 
 namespace std
 {

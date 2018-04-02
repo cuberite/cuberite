@@ -48,15 +48,15 @@ public:
 	/** Move assign from another cChunkData */
 	void Assign(cChunkData && a_Other);
 
-	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z) const;
-	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
+	BLOCKTYPE GetBlock(Vector3i a_RelPos) const;
+	void SetBlock(Vector3i a_RelPos, BLOCKTYPE a_Block);
 
-	NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const;
-	bool SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble);
+	NIBBLETYPE GetMeta(Vector3i a_RelPos) const;
+	bool SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Nibble);
 
-	NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const;
+	NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const;
 
-	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
+	NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const;
 
 	/** Return a pointer to the chunk section or nullptr if all air */
 	const sChunkSection * GetSection(size_t a_SectionNum) const;

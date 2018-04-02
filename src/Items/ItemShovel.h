@@ -21,6 +21,21 @@ public:
 	{
 	}
 
+
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaAttackEntity:      return 2;
+			case dlaBreakBlock:        return 1;
+			case dlaBreakBlockInstant: return 0;
+		}
+		UNREACHABLE("Unsupported durability loss action");
+	}
+
+
+
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -31,7 +46,7 @@ public:
 			BlockHandler(Block)->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			a_Player->UseEquippedItem();
+			a_Player->UseEquippedItem(cItemHandler::dlaBreakBlock);
 			return true;
 		}
 		return false;

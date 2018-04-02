@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 add_definitions(-DTEST_GLOBALS=1)
 
@@ -28,7 +29,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(CompositeChat-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(CompositeChat-exe jsoncpp_lib_static)
+target_link_libraries(CompositeChat-exe jsoncpp_lib_static fmt::fmt)
 add_test(NAME CompositeChat-test COMMAND CompositeChat-exe)
 
 

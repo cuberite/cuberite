@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 project (MCADefrag)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
@@ -92,4 +93,4 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(MCADefrag zlib)
+target_link_libraries(MCADefrag zlib fmt::fmt)
