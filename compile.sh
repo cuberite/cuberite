@@ -470,6 +470,7 @@ fi
 
 # Git: Submodules.
 echo " --- Updating submodules..."
+git submodule sync
 git submodule update --init
 
 
