@@ -2048,13 +2048,6 @@ void cClientHandle::Tick(float a_Dt)
 
 	ProcessProtocolInOut();
 
-	m_TicksSinceLastPacket += 1;
-	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
-	{
-		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-		return;
-	}
-
 	// If player has been kicked, terminate the connection:
 	if (m_State == csKicked)
 	{
@@ -2068,6 +2061,13 @@ void cClientHandle::Tick(float a_Dt)
 			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 		);
 		Destroy();
+		return;
+	}
+
+	m_TicksSinceLastPacket += 1;
+	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
+	{
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		return;
 	}
 
