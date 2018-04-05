@@ -4,20 +4,12 @@ project (MCADefrag)
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
+include(FlattenFiles)
 include(SetFlags)
 set_flags()
 set_lib_flags()
 enable_profile()
 
-
-function(flatten_files arg1)
-	set(res "")
-	foreach(f ${${arg1}})
-		get_filename_component(f ${f} ABSOLUTE)
-		list(APPEND res ${f})
-	endforeach()
-	set(${arg1} "${res}" PARENT_SCOPE)
-endfunction()
 
 set_exe_flags()
 
