@@ -171,6 +171,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		set(ADDITIONAL_FLAGS "-Wno-zero-as-null-pointer-constant")
 	endif()
 	set_source_files_properties(Bindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast -Wno-missing-prototypes ${ADDITIONAL_FLAGS}")
+	set_source_files_properties(ManualBindings.cpp LuaState.cpp LuaChunkStay.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast")
 endif()
 
 add_library(Bindings ${SRCS} ${HDRS})

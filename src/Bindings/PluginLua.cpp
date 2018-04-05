@@ -7,8 +7,6 @@
 
 #ifdef __APPLE__
 	#define LUA_USE_MACOSX
-#else
-	#define LUA_USE_POSIX
 #endif
 
 #include "PluginLua.h"

@@ -97,7 +97,7 @@ target_compile_definitions(lua PUBLIC LUA_USE_APICHECK)
 target_include_directories(tolualib INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Set the proper include directories on the targets
-target_include_directories(mbedtls PUBLIC mbedtls/include)
+target_include_directories(mbedtls SYSTEM PUBLIC mbedtls/include)
 target_include_directories(SQLiteCpp PUBLIC SQLiteCpp/include)
 target_include_directories(zlib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 foreach(INCLUDE_DIR ${LIBEVENT_INCLUDE_DIRS})
@@ -112,4 +112,4 @@ set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")
 
 # Create a TCLAP CMake target
 add_library(TCLAP INTERFACE)
-target_include_directories(TCLAP INTERFACE TCLAP/include)
+target_include_directories(TCLAP SYSTEM INTERFACE TCLAP/include)
