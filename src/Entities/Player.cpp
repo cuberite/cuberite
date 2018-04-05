@@ -1607,7 +1607,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		ResetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
 		m_LastGroundHeight = a_PosY;
 		m_bIsTeleporting = true;
@@ -1996,7 +1996,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		VERIFY(!GetWorld()->RemovePlayer(*this, false));
 
 		// Set position to the new position
-		SetPosition(a_NewPosition);
+		ResetPosition(a_NewPosition);
 		FreezeInternal(a_NewPosition, false);
 
 		// Stop all mobs from targeting this player
