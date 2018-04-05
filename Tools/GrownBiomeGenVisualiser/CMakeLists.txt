@@ -58,4 +58,3 @@ add_executable(GrownBiomeGenVisualiser
 
 target_link_libraries(GrownBiomeGenVisualiser PRIVATE fmt::fmt OSSupport Noise)
 target_include_directories(GrownBiomeGenVisualiser PRIVATE ../../src) # For SHARED_HDR
-set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)

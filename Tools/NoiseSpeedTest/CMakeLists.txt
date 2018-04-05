@@ -47,8 +47,3 @@ add_executable(NoiseSpeedTest
 )
 target_include_directories(NoiseSpeedTest PRIVATE ../../src/) # For the SHARED_HDR
 target_link_libraries(NoiseSpeedTest PRIVATE fmt::fmt OSSupport Noise)
-
-set_target_properties(
-	NoiseSpeedTest
-	PROPERTIES FOLDER Tools
-)

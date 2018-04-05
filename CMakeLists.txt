@@ -214,7 +214,9 @@ if (MSVC)
 
 	if(${BUILD_TOOLS})
 		set_target_properties(
+			GrownBiomeGenVisualiser
 			MCADefrag
+			NoiseSpeedTest
 			ProtoProxy
 			PROPERTIES FOLDER Tools
 		)
