@@ -214,6 +214,7 @@ if (MSVC)
 
 	if(${BUILD_TOOLS})
 		set_target_properties(
+			GeneratorPerformanceTest
 			GrownBiomeGenVisualiser
 			MCADefrag
 			NoiseSpeedTest
