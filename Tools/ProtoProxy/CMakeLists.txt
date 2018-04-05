@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project (ProtoProxy)
 
 include(../../SetFlags.cmake)
@@ -7,8 +7,6 @@ set_flags()
 set_lib_flags()
 
 
-# Set include paths to the used libraries:
-include_directories("../../src")
 
 function(flatten_files arg1)
 	set(res "")
@@ -26,12 +24,6 @@ set(SHARED_SRC
 	../../src/ByteBuffer.cpp
 	../../src/StringUtils.cpp
 	../../src/UUID.cpp
-	../../src/mbedTLS++/AesCfb128Decryptor.cpp
-	../../src/mbedTLS++/AesCfb128Encryptor.cpp
-	../../src/mbedTLS++/CryptoKey.cpp
-	../../src/mbedTLS++/CtrDrbgContext.cpp
-	../../src/mbedTLS++/EntropyContext.cpp
-	../../src/mbedTLS++/RsaPrivateKey.cpp
 	../../src/LoggerListeners.cpp
 	../../src/Logger.cpp
 )
@@ -39,37 +31,11 @@ set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
 	../../src/UUID.h
-	../../src/mbedTLS++/AesCfb128Decryptor.h
-	../../src/mbedTLS++/AesCfb128Encryptor.h
-	../../src/mbedTLS++/CryptoKey.h
-	../../src/mbedTLS++/CtrDrbgContext.h
-	../../src/mbedTLS++/EntropyContext.h
-	../../src/mbedTLS++/RsaPrivateKey.h
-)
-set(SHARED_OSS_SRC
-	../../src/OSSupport/CriticalSection.cpp
-	../../src/OSSupport/Event.cpp
-	../../src/OSSupport/File.cpp
-	../../src/OSSupport/IsThread.cpp
-	../../src/OSSupport/StackTrace.cpp
-	../../src/OSSupport/WinStackWalker.cpp
-)
-
-set(SHARED_OSS_HDR
-	../../src/OSSupport/CriticalSection.h
-	../../src/OSSupport/Event.h
-	../../src/OSSupport/File.h
-	../../src/OSSupport/IsThread.h
-	../../src/OSSupport/StackTrace.h
-	../../src/OSSupport/WinStackWalker.h
 )
 
 flatten_files(SHARED_SRC)
 flatten_files(SHARED_HDR)
-flatten_files(SHARED_OSS_SRC)
-flatten_files(SHARED_OSS_HDR)
 source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
-source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 
 
 
@@ -92,8 +58,6 @@ add_executable(ProtoProxy
 	${HEADERS}
 	${SHARED_SRC}
 	${SHARED_HDR}
-	${SHARED_OSS_SRC}
-	${SHARED_OSS_HDR}
 )
-
-target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt)
+target_include_directories(ProtoProxy PRIVATE ../../src/) # For the SHARED_HDRs
+target_link_libraries(ProtoProxy PRIVATE zlib mbedtls fmt::fmt OSSupport)
