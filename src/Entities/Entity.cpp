@@ -2203,8 +2203,16 @@ Vector3d cEntity::GetLookVector(void) const
 // Set position
 void cEntity::SetPosition(const Vector3d & a_Position)
 {
+	// Clamp the positions to exactly representable single-precision floating point values
+	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
+	const double MaxFloat = std::pow(2, std::numeric_limits<float>().digits);
+
+	const double ClampedPosX = Clamp(a_Position.x, -MaxFloat, MaxFloat);
+	const double ClampedPosY = Clamp(a_Position.y, -MaxFloat, MaxFloat);
+	const double ClampedPosZ = Clamp(a_Position.z, -MaxFloat, MaxFloat);
+
 	m_LastPosition = m_Position;
-	m_Position = a_Position;
+	m_Position = {ClampedPosX, ClampedPosY, ClampedPosZ};
 }
 
 

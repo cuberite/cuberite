@@ -1604,14 +1604,6 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	// Clamp the positions to exactly representable single-precision floating point values
-	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
-	const double MaxFloat = std::pow(2, std::numeric_limits<float>().digits);
-
-	a_PosX = Clamp(a_PosX, -MaxFloat, MaxFloat);
-	a_PosY = Clamp(a_PosY, 0.0, MaxFloat);
-	a_PosZ = Clamp(a_PosZ, -MaxFloat, MaxFloat);
-
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
