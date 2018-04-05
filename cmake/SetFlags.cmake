@@ -37,7 +37,6 @@ macro(set_flags)
 
 		if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
 			message("Including CodeCoverage")
-			set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
 			include(CodeCoverage)
 		endif()
 	endif()

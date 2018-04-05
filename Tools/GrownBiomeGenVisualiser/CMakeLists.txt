@@ -4,7 +4,7 @@ project (GrownBiomeGenVisualiser)
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
 
-include(../../SetFlags.cmake)
+include(SetFlags)
 set_flags()
 set_lib_flags()
 enable_profile()

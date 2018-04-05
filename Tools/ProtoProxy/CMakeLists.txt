@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project (ProtoProxy)
 
-include(../../SetFlags.cmake)
+include(SetFlags)
 
 set_flags()
 set_lib_flags()

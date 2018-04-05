@@ -23,6 +23,8 @@ if (MSVC)
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/" "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 # These env variables are used for configuring Travis CI builds.
 if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
 	message("Setting build type to $ENV{TRAVIS_CUBERITE_BUILD_TYPE}")
@@ -121,7 +123,7 @@ set(SELF_TEST OFF CACHE BOOL "")
 
 # Check whether Lua can be used:
 if (NOT(DISABLE_SYSTEM_LUA))
-	include(CheckLua.cmake)
+	include(CheckLua)
 	if(HAS_LUA_INTERPRETER)
 		message(STATUS "Lua has been found in your system and will be used for the build.")
 		set(USE_SYSTEM_LUA 1)
@@ -133,7 +135,7 @@ else()
 	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
 endif()
 
-include(SetFlags.cmake)
+include(SetFlags)
 set_flags()
 set_lib_flags()
 enable_profile()
