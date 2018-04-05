@@ -1606,9 +1606,11 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	// Clamp the positions to exactly representable single-precision floating point values
 	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
-	const double ClampedPosX = Clamp(a_PosX, -167770000.0, 167770000.0);
-	const double ClampedPosY = Clamp(a_PosY, -167770000.0, 167770000.0);
-	const double ClampedPosZ = Clamp(a_PosZ, -167770000.0, 167770000.0);
+	const double MaxFloat = std::pow(2, std::numeric_limits<float>().digits);
+
+	const double ClampedPosX = Clamp(a_PosX, -MaxFloat, MaxFloat);
+	const double ClampedPosY = Clamp(a_PosY, -MaxFloat, MaxFloat);
+	const double ClampedPosZ = Clamp(a_PosZ, -MaxFloat, MaxFloat);
 
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(ClampedPosX, ClampedPosY, ClampedPosZ)))
