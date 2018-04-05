@@ -167,10 +167,6 @@ foreach(folder ${FOLDERS})
 endforeach(folder)
 
 if (NOT MSVC)
-	# Bindings need to reference other folders, so they are done here instead
-	# lib dependencies are not included
-	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
-
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
@@ -198,8 +194,6 @@ else ()
 
 	source_group("Resources" FILES Resources/Cuberite.rc Resources/resource_Cuberite.h)
 	source_group("" FILES ${SOURCE})
-
-	include_directories("${PROJECT_SOURCE_DIR}")
 
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(
