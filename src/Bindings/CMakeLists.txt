@@ -1,8 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-include_directories (".")
-
 SET (SRCS
 	Bindings.cpp
 	DeprecatedBindings.cpp
@@ -177,4 +174,5 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 add_library(Bindings ${SRCS} ${HDRS})
+target_include_directories(Bindings PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Bindings PRIVATE fmt::fmt SQLiteCpp tolualib mbedtls HTTPServer jsoncpp_lib_static PUBLIC lua)

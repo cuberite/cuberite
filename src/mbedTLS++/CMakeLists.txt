@@ -34,4 +34,5 @@ set(HDRS
 )
 
 add_library(mbedTLS++ ${SRCS} ${HDRS})
+target_include_directories(mbedTLS++ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(mbedTLS++ PRIVATE fmt::fmt PUBLIC mbedtls)

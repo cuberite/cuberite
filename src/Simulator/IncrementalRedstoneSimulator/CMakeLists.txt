@@ -1,8 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-include_directories ("${PROJECT_SOURCE_DIR}/../../")
-
 set (SRCS
 	IncrementalRedstoneSimulator.cpp
 )
@@ -33,4 +30,5 @@ set (HDRS
 )
 
 add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
+target_include_directories(IncrementalRedstoneSimulator PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ../..)
 target_link_libraries(IncrementalRedstoneSimulator PRIVATE fmt::fmt)

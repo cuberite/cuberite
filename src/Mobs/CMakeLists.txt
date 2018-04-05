@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	AggressiveMonster.cpp
 	Bat.cpp
@@ -82,4 +80,5 @@ SET (HDRS
 	ZombiePigman.h)
 
 add_library(Mobs ${SRCS} ${HDRS})
+target_include_directories(Mobs PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Mobs PRIVATE fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	BeaconEntity.cpp
 	BedEntity.cpp
@@ -47,4 +45,5 @@ SET (HDRS
 )
 
 add_library(BlockEntities ${SRCS} ${HDRS})
+target_include_directories(BlockEntities PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(BlockEntities PRIVATE fmt::fmt mbedTLS++ jsoncpp_lib_static SQLiteCpp)

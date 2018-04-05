@@ -75,4 +75,5 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_library(Generating ${SRCS} ${HDRS})
+target_include_directories(Generating PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Generating PRIVATE fmt::fmt OSSupport Blocks Bindings SQLiteCpp mbedTLS++)

@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	Authenticator.cpp
 	ChunkDataSerializer.cpp
@@ -33,4 +31,5 @@ SET (HDRS
 )
 
 add_library(Protocol ${SRCS} ${HDRS})
+target_include_directories(Protocol PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Protocol PRIVATE fmt::fmt zlib jsoncpp_lib_static SQLiteCpp mbedTLS++)

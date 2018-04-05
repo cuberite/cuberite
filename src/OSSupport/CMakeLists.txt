@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	CriticalSection.cpp
 	Errors.cpp
@@ -47,4 +45,5 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_library(OSSupport ${SRCS} ${HDRS})
+target_include_directories(OSSupport PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(OSSupport PRIVATE fmt::fmt mbedTLS++ event_core PUBLIC zlib)

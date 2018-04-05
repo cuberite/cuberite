@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	DelayedFluidSimulator.cpp
 	FireSimulator.cpp
@@ -30,4 +28,5 @@ SET (HDRS
 )
 
 add_library(Simulator ${SRCS} ${HDRS})
+target_include_directories(Simulator PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Simulator PRIVATE fmt::fmt mbedTLS++ SQLiteCpp)

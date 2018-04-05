@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	BlockBed.cpp
 	BlockDoor.cpp
@@ -103,4 +101,5 @@ SET (HDRS
 )
 
 add_library(Blocks ${SRCS} ${HDRS})
+target_include_directories(Blocks PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Blocks PRIVATE fmt::fmt mbedTLS++ SQLiteCpp)

@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	Noise.cpp
 )
@@ -14,4 +12,5 @@ SET (HDRS
 )
 
 add_library(Noise ${SRCS} ${HDRS})
+target_include_directories(Noise PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Noise PRIVATE fmt::fmt OSSupport)

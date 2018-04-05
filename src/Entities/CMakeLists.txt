@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	ArrowEntity.cpp
 	Boat.cpp
@@ -61,4 +59,5 @@ SET (HDRS
 	WitherSkullEntity.h)
 
 add_library(Entities ${SRCS} ${HDRS})
+target_include_directories(Entities PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
 target_link_libraries(Entities PRIVATE fmt::fmt WorldStorage jsoncpp_lib_static mbedTLS++ SQLiteCpp)
