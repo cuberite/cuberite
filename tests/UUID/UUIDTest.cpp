@@ -114,7 +114,7 @@ static void UUIDNil()
 static void UUIDType()
 {
 	// From issue #4209
-	const char TestStrings[][37]
+	const char TestStrings[][33]
 	{
 		"31cfcbeea8f2324a86dbccb1d5aaa6f8",
 		"3f2e1dd234a03b6b824c5a0e74083b1e"
