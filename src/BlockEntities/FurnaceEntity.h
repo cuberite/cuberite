@@ -84,13 +84,13 @@ public:
 	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
-	/** Calculates and returns the experience reward for the current recipe */
+	/** Calculates, resets, and returns the experience reward in this furnace */
 	int GetReward(void);
 
-	/** Gets the last person to modify the input slot **/
-	cPlayer* GetLastSmelter(void) { return m_LastSmelter; }
+	/** Gets the last person to modify the input slot */
+	cPlayer *GetLastSmelter(void) { return m_LastSmelter; }
 
-	/** Sets the last person to modify the input slot **/
+	/** Sets the last person to modify the input slot */
 	void SetLastSmelter(cPlayer & a_LastSmelter) { m_LastSmelter = & a_LastSmelter; }
 
 	// tolua_end
@@ -121,8 +121,8 @@ protected:
 	/** The item that is being smelted */
 	cItem m_LastInput;
 
-	/** The last person to put something in the input slot of this furnace **/
-	cPlayer* m_LastSmelter;
+	/** The last person to put something in the input slot of this furnace */
+	cPlayer *m_LastSmelter;
 
 	/** Set to true when the furnace entity has been destroyed to prevent the block being set again */
 	bool m_IsDestroyed;
@@ -142,7 +142,7 @@ protected:
 	/** Amount of ticks that the current fuel has been burning */
 	int m_TimeBurned;
 
-	/** Running total of experience that can be picked up **/
+	/** Running total of experience that can be picked up */
 	float m_RewardCounter;
 
 	/** Is the block currently being loaded into the world? */

@@ -964,6 +964,37 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Returns true if there's time before the current fuel is depleted",
 			},
+			GetReward =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Calculates, resets, and returns the experience reward in this furnace",
+			},
+			GetLastSmelter =
+			{
+				Returns =
+				{
+					{
+						Type = "cPlayer",
+					},
+				},
+				Notes = "Gets the last person to modify the input slot",
+			},
+			SetLastSmelter =
+			{
+				Params =
+				{
+					{
+						Name = "LastSmelter",
+						Type = "cPlayer",
+					},
+				},
+				Notes = "Sets the last person to modify the input slot",
+			},
 			SetFuelSlot =
 			{
 				Params =
