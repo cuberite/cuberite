@@ -1909,7 +1909,6 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	m_Furnace->SetLastSmelter(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 

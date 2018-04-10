@@ -974,27 +974,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Calculates, resets, and returns the experience reward in this furnace",
 			},
-			GetLastSmelter =
-			{
-				Returns =
-				{
-					{
-						Type = "cPlayer",
-					},
-				},
-				Notes = "Gets the last person to modify the input slot",
-			},
-			SetLastSmelter =
-			{
-				Params =
-				{
-					{
-						Name = "LastSmelter",
-						Type = "cPlayer",
-					},
-				},
-				Notes = "Sets the last person to modify the input slot",
-			},
 			SetFuelSlot =
 			{
 				Params =

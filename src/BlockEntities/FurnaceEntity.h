@@ -87,12 +87,6 @@ public:
 	/** Calculates, resets, and returns the experience reward in this furnace */
 	int GetAndResetReward(void);
 
-	/** Gets the last person to modify the input slot */
-	cPlayer *GetLastSmelter(void) { return m_LastSmelter; }
-
-	/** Sets the last person to modify the input slot */
-	void SetLastSmelter(cPlayer & a_LastSmelter) { m_LastSmelter = & a_LastSmelter; }
-
 	// tolua_end
 
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)
@@ -120,9 +114,6 @@ protected:
 
 	/** The item that is being smelted */
 	cItem m_LastInput;
-
-	/** The last person to put something in the input slot of this furnace */
-	cPlayer *m_LastSmelter;
 
 	/** Set to true when the furnace entity has been destroyed to prevent the block being set again */
 	bool m_IsDestroyed;
