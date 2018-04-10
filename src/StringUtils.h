@@ -150,6 +150,9 @@ extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 extern bool StringToFloat(const AString & a_String, float & a_Num);
 
 
+
+
+
 /** Parses any integer type. Checks bounds and returns errors out of band. */
 template <class T>
 bool StringToInteger(const AString & a_str, T & a_Num)

@@ -23,7 +23,7 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_LastSmelter(nullptr),
@@ -175,11 +175,11 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 
 
-int cFurnaceEntity::GetReward(void)
+int cFurnaceEntity::GetAndResetReward(void)
 {
 	int Reward = FloorC(m_RewardCounter);
 	float Remainder = m_RewardCounter - static_cast<float>(Reward);
-	// Remainder is used as the percentage chance of getting an extra xp point
+	// Remainder is used as the percent chance of getting an extra xp point
 	if (GetRandomProvider().RandBool(Remainder))
 	{
 		Reward++;

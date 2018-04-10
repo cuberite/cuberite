@@ -85,7 +85,7 @@ public:
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
 	/** Calculates, resets, and returns the experience reward in this furnace */
-	int GetReward(void);
+	int GetAndResetReward(void);
 
 	/** Gets the last person to modify the input slot */
 	cPlayer *GetLastSmelter(void) { return m_LastSmelter; }

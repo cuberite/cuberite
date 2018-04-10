@@ -964,7 +964,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Returns true if there's time before the current fuel is depleted",
 			},
-			GetReward =
+			GetAndResetReward =
 			{
 				Returns =
 				{
