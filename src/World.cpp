@@ -1199,7 +1199,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 				else
 				{
 					auto & Wolf = static_cast<cWolf &>(Monster);
-					if (Wolf.IsAngry())
+					if (!Wolf.IsAngry() && !Wolf.IsTame())
 					{
 						Monster.Destroy(true);
 					}
