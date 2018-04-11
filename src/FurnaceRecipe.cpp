@@ -161,6 +161,7 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
 	int CookTime = 200;
+	float Reward = 0;
 	std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
 	std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
 
@@ -189,18 +190,27 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 			return;
 		}
 	}
-
-	if (!ParseItem(Sides[1], *OutputItem))
+	const AStringVector & OutputSplit = StringSplit(Sides[1], "$");
+	if (!ParseItem(OutputSplit[0], *OutputItem))
 	{
-		LOGWARNING("furnace.txt: line %d: Cannot parse output item \"%s\".", a_LineNum, Sides[1].c_str());
+		LOGWARNING("furnace.txt: line %d: Cannot parse output item \"%s\".", a_LineNum, OutputSplit[0].c_str());
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
-
+	if (OutputSplit.size() > 1)
+	{
+		if (!StringToFloat(OutputSplit[1], Reward))
+		{
+			LOGWARNING("furnace.txt: line %d: Cannot parse reward \"%s\".", a_LineNum, OutputSplit[1].c_str());
+			LOGINFO("Offending line: \"%s\"", a_Line.c_str());
+			return;
+		}
+	}
 	cRecipe Recipe;
 	Recipe.In = InputItem.release();
 	Recipe.Out = OutputItem.release();
 	Recipe.CookTime = CookTime;
+	Recipe.Reward = Reward;
 	m_pState->Recipes.push_back(Recipe);
 }
 
