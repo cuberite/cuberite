@@ -59,6 +59,7 @@ logs
 players
 world
 world_nether
+world_the_end
 
 # cmake stuff
 CMakeFiles/
@@ -111,6 +112,10 @@ Server/cuberite_api.lua
 Server/official_undocumented.lua
 Server/NewlyUndocumented.lua
 Server/.luacheckrc
+compile_commands.json
 
 # compile.sh folder
 build-cuberite
+
+# clang-tidy
+tidy-fixes.yaml
