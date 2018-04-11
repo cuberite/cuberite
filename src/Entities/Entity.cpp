@@ -1541,7 +1541,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
 
 	// Set position to the new position
-	SetPosition(a_NewPosition);
+	ResetPosition(a_NewPosition);
 
 	// Stop all mobs from targeting this entity
 	// Stop this entity from targeting other mobs
@@ -1759,6 +1759,16 @@ void cEntity::HandleAir(void)
 
 
 
+void cEntity::ResetPosition(Vector3d a_NewPos)
+{
+	SetPosition(a_NewPos);
+	m_LastSentPosition = GetPosition();
+}
+
+
+
+
+
 void cEntity::OnStartedBurning(void)
 {
 	// Broadcast the change:
@@ -1850,7 +1860,7 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask the plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		ResetPosition({a_PosX, a_PosY, a_PosZ});
 		m_World->BroadcastTeleportEntity(*this);
 	}
 }

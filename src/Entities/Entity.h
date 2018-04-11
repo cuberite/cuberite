@@ -666,6 +666,10 @@ protected:
 	m_IsHeadInWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
+	/** Set the entities position and last sent position.
+	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
+	void ResetPosition(Vector3d a_NewPos);
+
 private:
 
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
