@@ -84,6 +84,9 @@ public:
 	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
+	/** Calculates, resets, and returns the experience reward in this furnace */
+	int GetAndResetReward(void);
+
 	// tolua_end
 
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)
@@ -129,6 +132,9 @@ protected:
 
 	/** Amount of ticks that the current fuel has been burning */
 	int m_TimeBurned;
+
+	/** Running total of experience that can be picked up */
+	float m_RewardCounter;
 
 	/** Is the block currently being loaded into the world? */
 	bool m_IsLoading;
