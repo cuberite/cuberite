@@ -178,7 +178,7 @@ UInt8 cUUID::Version() const
 
 UInt8 cUUID::Variant() const
 {
-	const Byte VariantBits = static_cast<Byte>((m_UUID[9] >> 5) & 0x07);
+	const Byte VariantBits = static_cast<Byte>((m_UUID[8] >> 5) & 0x07);
 
 	/* Variant bits format:
 		bits | variant |      Description

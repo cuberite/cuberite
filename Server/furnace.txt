@@ -19,12 +19,13 @@
 #
 # **** Recipe and result ****
 #
-# Cobble @ 200 = Stone -> Produces 1 smooth stone from 1 cobblestone in 200 ticks (10 seconds)
+# Cobble @ 200 = Stone $ 15    -> Produces 1 smooth stone from 1 cobblestone in 200 ticks (10 seconds). Rewards 15 experience.
 #
 # Write in full:
-#    Cobble  :   0    ,   1    @  200  =    1     :   1    ,   1
-#   ItemType : Damage , Amount @ ticks = ItemType : Damage , Amount
+#    Cobble  :   0    ,   1    @  200  =    1     :   1    ,   1     $    10
+#   ItemType : Damage , Amount @ ticks = ItemType : Damage , Amount  $ Experience 
 #
+#   If the experience paramater isn't included, experience reward will default to zero.
 #
 # **** Fuel ****
 #
@@ -42,74 +43,73 @@
 #--------------------------
 # Smelting recipes
 
-Beef                = Steak
-BlackTerracotta     = BlackGlazedTerracotta
-BlueTerracotta      = BlueGlazedTerracotta
-BrownTerracotta     = BrownGlazedTerracotta
-Cactus              = CactusGreen
-ChainmailBoots      = IronNugget
-ChainmailChestplate = IronNugget
-ChainmailHelmet     = IronNugget
-ChainmailLeggings   = IronNugget
-Chicken             = CookedChicken
-ChorusFruit         = PoppedChorusFruit
-Clay                = Brick
-ClayBlock           = HardenedClay
-CoalOre             = Coal
-Cobblestone         = Stone
-CrackedStonebrick   = Stonebrick
-CyanTerracotta      = CyanGlazedTerracotta
-DiamondOre          = Diamond
-EmeraldOre          = Emerald
-Fish                = CookedFish
-GoldOre             = GoldIngot
-GoldAxe             = GoldNugget
-GoldBoots           = GoldNugget
-GoldChestplate      = GoldNugget
-GoldHorseArmor      = GoldNugget
-GoldHelmet          = GoldNugget
-GoldHoe             = GoldNugget
-GoldPants           = GoldNugget
-GoldPickaxe         = GoldNugget
-GoldShovel          = GoldNugget
-GoldSword           = GoldNugget
-GrayTerracotta      = GrayGlazedTerracotta
-GreenTerracotta     = GreenGlazedTerracotta
-IronOre             = IronIngot
-IronAxe             = IronNugget
-IronBoots           = IronNugget
-IronChestplate      = IronNugget
-IronHorseArmor      = IronNugget
-IronHelmet          = IronNugget
-IronHoe             = IronNugget
-IronLeggings        = IronNugget
-IronPickaxe         = IronNugget
-IronShovel          = IronNugget
-IronSword           = IronNugget
-LapisOre            = LapisLazuli
-LightBlueTerracotta = LightBlueGlazedTerracotta
-LightGrayTerracotta = LightGrayGlazedTerracotta
-LimeTerracotta      = LimeGlazedTerracotta
-Log                 = CharCoal
-Log2                = CharCoal
-MagentaTerracotta   = MagentaGlazedTerracotta
-Mutton              = CookedMutton
-NetherQuartzOre     = NetherQuartz
-Netherrack          = NetherBrick
-OrangeTerracotta    = OrangeGlazedTerracotta
-PinkTerracotta      = PinkGlazedTerracotta
-Porkchop            = CookedPorkchop
-Potato              = BakedPotato
-PurpleTerracotta    = PurpleGlazedTerracotta
-Rabbit              = CookedRabbit
-RedTerracotta       = RedGlazedTerracotta
-RedstoneOre         = Redstone
-Salmon              = CookedSalmon
-Sand                = Glass
-StoneBrick          = CrackedStoneBricks
-WetSponge           = Sponge
-WhiteTerracotta     = WhiteGlazedTerracotta
-YellowTerracotta    = YellowGlazedTerracotta
+Beef                = Steak                              $ 0.35
+BlackTerracotta     = BlackGlazedTerracotta              $ 0.1
+BlueTerracotta      = BlueGlazedTerracotta               $ 0.1
+BrownTerracotta     = BrownGlazedTerracotta              $ 0.10
+Cactus              = CactusGreen                        $ 0.2
+ChainmailBoots      = IronNugget                         $ 0.1
+ChainmailChestplate = IronNugget                         $ 0.1
+ChainmailHelmet     = IronNugget                         $ 0.1
+ChainmailLeggings   = IronNugget                         $ 0.1
+Chicken             = CookedChicken                      $ 0.35
+ChorusFruit         = PoppedChorusFruit                  $ 0.1
+Clay                = Brick                              $ 0.3
+ClayBlock           = HardenedClay                       $ 0.35
+CoalOre             = Coal                               $ 0.1
+Cobblestone         = Stone                              $ 0.1
+CyanTerracotta      = CyanGlazedTerracotta               $ 0.1
+DiamondOre          = Diamond                            $ 1.0
+EmeraldOre          = Emerald                            $ 1.0
+Fish                = CookedFish                         $ 0.35
+GoldOre             = GoldIngot                          $ 1.0
+GoldAxe             = GoldNugget                         $ 0.1
+GoldBoots           = GoldNugget                         $ 0.1
+GoldChestplate      = GoldNugget                         $ 0.1
+GoldHorseArmor      = GoldNugget                         $ 0.1
+GoldHelmet          = GoldNugget                         $ 0.1
+GoldHoe             = GoldNugget                         $ 0.1
+GoldPants           = GoldNugget                         $ 0.1
+GoldPickaxe         = GoldNugget                         $ 0.1
+GoldShovel          = GoldNugget                         $ 0.1
+GoldSword           = GoldNugget                         $ 0.1
+GrayTerracotta      = GrayGlazedTerracotta               $ 0.1
+GreenTerracotta     = GreenGlazedTerracotta              $ 0.1
+IronOre             = IronIngot                          $ 0.7
+IronAxe             = IronNugget                         $ 0.1
+IronBoots           = IronNugget                         $ 0.1
+IronChestplate      = IronNugget                         $ 0.1
+IronHorseArmor      = IronNugget                         $ 0.1
+IronHelmet          = IronNugget                         $ 0.1
+IronHoe             = IronNugget                         $ 0.1
+IronLeggings        = IronNugget                         $ 0.1
+IronPickaxe         = IronNugget                         $ 0.1
+IronShovel          = IronNugget                         $ 0.1
+IronSword           = IronNugget                         $ 0.1
+LapisOre            = LapisLazuli                        $ 0.2
+LightBlueTerracotta = LightBlueGlazedTerracotta          $ 0.1
+LightGrayTerracotta = LightGrayGlazedTerracotta          $ 0.1
+LimeTerracotta      = LimeGlazedTerracotta               $ 0.1
+Log                 = CharCoal                           $ 0.15
+Log2                = CharCoal                           $ 0.15
+MagentaTerracotta   = MagentaGlazedTerracotta            $ 0.1
+Mutton              = CookedMutton                       $ 0.35
+NetherQuartzOre     = NetherQuartz                       $ 0.2
+Netherrack          = NetherBrick                        $ 0.1
+OrangeTerracotta    = OrangeGlazedTerracotta             $ 0.1
+PinkTerracotta      = PinkGlazedTerracotta               $ 0.1
+Porkchop            = CookedPorkchop                     $ 0.35
+Potato              = BakedPotato                        $ 0.35
+PurpleTerracotta    = PurpleGlazedTerracotta             $ 0.1
+Rabbit              = CookedRabbit                       $ 0.35
+RedTerracotta       = RedGlazedTerracotta                $ 0.1
+RedstoneOre         = Redstone                           $ 0.7
+Salmon              = CookedSalmon                       $ 0.35
+Sand                = Glass                              $ 0.1
+StoneBrick          = CrackedStoneBricks                 $ 0.1
+WetSponge           = Sponge                             $ 0.15
+WhiteTerracotta     = WhiteGlazedTerracotta              $ 0.1
+YellowTerracotta    = YellowGlazedTerracotta             $ 0.1
 
 
 
