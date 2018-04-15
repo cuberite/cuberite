@@ -171,7 +171,7 @@ set_exe_flags()
 
 add_subdirectory(src)
 
-if(${BUILD_TOOLS})
+if(BUILD_TOOLS)
 	message("Building tools")
 	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
 	add_subdirectory(Tools/MCADefrag/)
@@ -179,12 +179,12 @@ if(${BUILD_TOOLS})
 	add_subdirectory(Tools/ProtoProxy/)
 endif()
 
-if(${BUILD_UNSTABLE_TOOLS})
+if(BUILD_UNSTABLE_TOOLS)
 	message("Building unstable tools")
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
-if(${SELF_TEST})
+if(SELF_TEST)
 	message("Tests enabled")
 	enable_testing()
 	add_subdirectory(tests)
@@ -214,7 +214,7 @@ if (MSVC)
 		PROPERTIES FOLDER Support
 	)
 
-	if(${BUILD_TOOLS})
+	if(BUILD_TOOLS)
 		set_target_properties(
 			GrownBiomeGenVisualiser
 			MCADefrag
@@ -224,7 +224,7 @@ if (MSVC)
 		)
 	endif()
 
-	if(${BUILD_UNSTABLE_TOOLS})
+	if(BUILD_UNSTABLE_TOOLS)
 		set_target_properties(
 			GeneratorPerformanceTest
 			PROPERTIES FOLDER Tools
