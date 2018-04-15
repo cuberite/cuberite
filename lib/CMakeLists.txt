@@ -66,7 +66,7 @@ target_include_directories(tolualib INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 # Set the proper include directories on the targets
 target_include_directories(mbedtls SYSTEM PUBLIC mbedtls/include)
 target_include_directories(SQLiteCpp PUBLIC SQLiteCpp/include)
-target_include_directories(zlib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(zlib SYSTEM PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 foreach(INCLUDE_DIR ${LIBEVENT_INCLUDE_DIRS})
 	target_include_directories(event_core PUBLIC $<BUILD_INTERFACE:${INCLUDE_DIR}>)
 endforeach()
