@@ -216,12 +216,18 @@ if (MSVC)
 
 	if(${BUILD_TOOLS})
 		set_target_properties(
-			GeneratorPerformanceTest
 			GrownBiomeGenVisualiser
 			MCADefrag
 			NoiseSpeedTest
 			ProtoProxy
 			PROPERTIES FOLDER Tools
 		)
+	endif()
+
+	if(${BUILD_UNSTABLE_TOOLS})
+		set_target_properties(
+			GeneratorPerformanceTest
+			PROPERTIES FOLDER Tools
+		)	
 	endif()
 endif()
