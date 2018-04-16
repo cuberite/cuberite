@@ -234,6 +234,14 @@ public:
 				a_Player->UseEquippedItem(1);
 				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
 			}
+			else
+			{
+				BLOCKTYPE Block = a_World->GetBlock(FloaterInfo.GetPos() - Vector3d(0, 0.1, 0));
+				if ((Block != E_BLOCK_AIR) && !IsBlockWater(Block))
+				{
+					a_Player->UseEquippedItem(2);
+				}
+			}
 		}
 		else
 		{

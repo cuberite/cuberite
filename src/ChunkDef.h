@@ -144,6 +144,16 @@ public:
 		return ((a_Width >= 0) && (a_Width < Width));
 	}
 
+	/** Validates a chunk relative coordinate. Returns false if the coordiante is out of bounds for a chunk. */
+	inline static bool IsValidRelPos(Vector3i a_RelPos)
+	{
+		return (
+			IsValidWidth(a_RelPos.x) &&
+			IsValidHeight(a_RelPos.y) &&
+			IsValidWidth(a_RelPos.z)
+		);
+	}
+
 	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{

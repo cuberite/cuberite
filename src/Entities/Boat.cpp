@@ -207,10 +207,7 @@ AString cBoat::MaterialToString(eMaterial a_Material)
 		case bmAcacia:  return "acacia";
 		case bmDarkOak: return "dark_oak";
 	}
-	ASSERT(!"Unhandled boat material");
-	#ifndef __clang__
-		return "oak";
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 
@@ -264,9 +261,7 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
 		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
 	}
-	#ifndef __clang__
-		return cItem(E_ITEM_BOAT);
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 

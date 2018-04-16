@@ -152,14 +152,8 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 				return ePathFinderStatus::PATH_FOUND;
 			}
 		}
-		#ifndef __clang__
-		default:
-		{
-			return ePathFinderStatus::PATH_FOUND;
-			// Fixes GCC warning: "control reaches end of non-void function".
-		}
-		#endif
 	}
+	UNREACHABLE("Unsupported path finder status");
 }
 
 
