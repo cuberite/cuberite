@@ -40,6 +40,8 @@ AllFiles.lst
 .cproject
 .project
 *.cbp
+## KDevelop
+*.kdev*
 
 # world inside source
 ChunkWorx.ini

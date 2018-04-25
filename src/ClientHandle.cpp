@@ -127,13 +127,11 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			if (!m_Username.empty())
-			{
-				// Send the Offline PlayerList packet:
-				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
-			}
 			m_Player->DestroyNoScheduling(true);
 		}
+		// Send the Offline PlayerList packet:
+		cRoot::Get()->BroadcastPlayerListsRemovePlayer(*m_Player);
+
 		m_PlayerPtr.reset();
 		m_Player = nullptr;
 	}
@@ -2050,13 +2048,6 @@ void cClientHandle::Tick(float a_Dt)
 
 	ProcessProtocolInOut();
 
-	m_TicksSinceLastPacket += 1;
-	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
-	{
-		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-		return;
-	}
-
 	// If player has been kicked, terminate the connection:
 	if (m_State == csKicked)
 	{
@@ -2070,6 +2061,13 @@ void cClientHandle::Tick(float a_Dt)
 			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 		);
 		Destroy();
+		return;
+	}
+
+	m_TicksSinceLastPacket += 1;
+	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
+	{
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		return;
 	}
 

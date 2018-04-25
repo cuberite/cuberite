@@ -14,6 +14,7 @@
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"
 #include "../IniFile.h"
+#include "../MobSpawner.h"
 
 
 
@@ -1549,102 +1550,27 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 
 eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 {
-
-	std::set<eMonsterType> ListOfSpawnables;
+	std::vector<eMonsterType> ListOfSpawnables;
 	int chunkX = a_ChunkDesc.GetChunkX();
 	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise2DInt(chunkX + chunkZ, chunkZ) / 7) % cChunkDef::Width;
 
-	// Check biomes first to get a list of animals
-	switch (a_ChunkDesc.GetBiome(x, z))
+	for (auto MobType : cMobSpawner::GetAllowedMobTypes(a_ChunkDesc.GetBiome(x, z)))
 	{
-		// No animals in deserts or non-overworld dimensions
-		case biNether:
-		case biEnd:
-		case biDesertHills:
-		case biDesert:
-		case biDesertM:
+		if (cMonster::FamilyFromType(MobType) == cMonster::eFamily::mfPassive)
 		{
-			return mtInvalidType;
-		}
-
-		// Mooshroom only - no other mobs on mushroom islands
-		case biMushroomIsland:
-		case biMushroomShore:
-		{
-			return mtMooshroom;
-		}
-
-		// Add squid in ocean biomes
-		case biOcean:
-		case biFrozenOcean:
-		case biFrozenRiver:
-		case biRiver:
-		case biDeepOcean:
-		{
-			ListOfSpawnables.insert(mtSquid);
-			break;
-		}
-
-		// Add ocelots in jungle biomes
-		case biJungle:
-		case biJungleHills:
-		case biJungleEdge:
-		case biJungleM:
-		case biJungleEdgeM:
-		{
-			ListOfSpawnables.insert(mtOcelot);
-			break;
-		}
-
-		// Add horses in plains-like biomes
-		case biPlains:
-		case biSunflowerPlains:
-		case biSavanna:
-		case biSavannaPlateau:
-		case biSavannaM:
-		case biSavannaPlateauM:
-		{
-			ListOfSpawnables.insert(mtHorse);
-			break;
-		}
-
-		// Add wolves in forest and spruce forests
-		case biForest:
-		case biTaiga:
-		case biMegaTaiga:
-		case biColdTaiga:
-		case biColdTaigaM:
-		{
-			ListOfSpawnables.insert(mtWolf);
-			break;
-		}
-		// Nothing special about this biome
-		default:
-		{
-			break;
+			ListOfSpawnables.push_back(MobType);
 		}
 	}
-	ListOfSpawnables.insert(mtChicken);
-	ListOfSpawnables.insert(mtCow);
-	ListOfSpawnables.insert(mtPig);
-	ListOfSpawnables.insert(mtSheep);
 
 	if (ListOfSpawnables.empty())
 	{
 		return mtInvalidType;
 	}
 
-	auto MobIter = ListOfSpawnables.begin();
-	using diff_type =
-		std::iterator_traits<decltype(MobIter)>::difference_type;
-	diff_type RandMob = static_cast<diff_type>
-		(static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7)
-		% ListOfSpawnables.size());
-	std::advance(MobIter, RandMob);
-
-	return *MobIter;
+	auto RandMob = (static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size());
+	return ListOfSpawnables[RandMob];
 }
 
 
