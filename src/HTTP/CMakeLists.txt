@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	EnvelopeParser.cpp
 	HTTPFormParser.cpp
@@ -32,7 +30,6 @@ SET (HDRS
 	UrlParser.h
 )
 
-if(NOT MSVC)
-	add_library(HTTPServer ${SRCS} ${HDRS})
-	target_link_libraries(HTTPServer fmt::fmt)
-endif()
+add_library(HTTPServer ${SRCS} ${HDRS})
+target_include_directories(HTTPServer PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
+target_link_libraries(HTTPServer PRIVATE fmt::fmt mbedTLS++)

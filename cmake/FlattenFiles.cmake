@@ -1,0 +1,8 @@
+function(flatten_files arg1)
+	set(res "")
+	foreach(f ${${arg1}})
+		get_filename_component(f ${f} ABSOLUTE)
+		list(APPEND res ${f})
+	endforeach()
+	set(${arg1} "${res}" PARENT_SCOPE)
+endfunction()

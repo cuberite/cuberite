@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 set (SRCS
 	IncrementalRedstoneSimulator.cpp
 )
@@ -31,8 +29,6 @@ set (HDRS
 	PressurePlateHandler.h
 )
 
-if(NOT MSVC)
-	add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
-	target_link_libraries(IncrementalRedstoneSimulator fmt::fmt)
-endif()
-
+add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
+target_include_directories(IncrementalRedstoneSimulator PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ../..)
+target_link_libraries(IncrementalRedstoneSimulator PRIVATE fmt::fmt)

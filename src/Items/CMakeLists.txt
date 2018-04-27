@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	ItemHandler.cpp
 )
@@ -58,7 +56,6 @@ SET (HDRS
 	ItemAxe.h
 )
 
-if(NOT MSVC)
-	add_library(Items ${SRCS} ${HDRS})
-	target_link_libraries(Items fmt::fmt)
-endif()
+add_library(Items ${SRCS} ${HDRS})
+target_include_directories(Items PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
+target_link_libraries(Items PRIVATE fmt::fmt mbedTLS++ SQLiteCpp jsoncpp_lib_static)

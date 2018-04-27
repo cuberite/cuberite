@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	EnchantmentSerializer.cpp
 	FastNBT.cpp
@@ -28,7 +26,6 @@ SET (HDRS
 	WorldStorage.h
 )
 
-if(NOT MSVC)
-	add_library(WorldStorage ${SRCS} ${HDRS})
-	target_link_libraries(WorldStorage fmt::fmt OSSupport)
-endif()
+add_library(WorldStorage ${SRCS} ${HDRS})
+target_include_directories(WorldStorage PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
+target_link_libraries(WorldStorage PRIVATE fmt::fmt OSSupport jsoncpp_lib_static mbedTLS++ SQLiteCpp zlib)

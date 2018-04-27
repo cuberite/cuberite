@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	SlotArea.cpp
 	Window.cpp
@@ -36,7 +34,6 @@ SET (HDRS
 	MinecartWithChestWindow.h
 	WindowOwner.h)
 
-if(NOT MSVC)
-	add_library(UI ${SRCS} ${HDRS})
-	target_link_libraries(UI fmt::fmt)
-endif()
+add_library(UI ${SRCS} ${HDRS})
+target_include_directories(UI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" PRIVATE ..)
+target_link_libraries(UI PRIVATE fmt::fmt jsoncpp_lib_static mbedTLS++ SQLiteCpp)

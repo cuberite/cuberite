@@ -1,14 +1,11 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project (NoiseSpeedTest)
 
-include(../../SetFlags.cmake)
+include(SetFlags)
 set_flags()
 set_lib_flags()
 enable_profile()
 
-# Set include paths to the used libraries:
-include_directories(SYSTEM "../../lib")
-include_directories("../../src")
 
 set_exe_flags()
 
@@ -16,22 +13,10 @@ set_exe_flags()
 set(SHARED_SRC
 	../../src/Logger.cpp
 	../../src/LoggerListeners.cpp
-	../../src/OSSupport/CriticalSection.cpp
-	../../src/OSSupport/File.cpp
-	../../src/OSSupport/StackTrace.cpp
-	../../src/OSSupport/WinStackWalker.cpp
-	../../src/Noise/Noise.cpp
 	../../src/StringUtils.cpp
 )
 
 set(SHARED_HDR
-	../../src/Noise/Noise.h
-	../../src/Noise/OctavedNoise.h
-	../../src/Noise/RidgedNoise.h
-	../../src/OSSupport/CriticalSection.h
-	../../src/OSSupport/File.h
-	../../src/OSSupport/StackTrace.h
-	../../src/OSSupport/WinStackWalker.h
 	../../src/StringUtils.h
 )
 
@@ -60,10 +45,5 @@ add_executable(NoiseSpeedTest
 	${SHARED_SRC}
 	${SHARED_HDR}
 )
-
-target_link_libraries(NoiseSpeedTest fmt::fmt)
-
-set_target_properties(
-	NoiseSpeedTest
-	PROPERTIES FOLDER Tools
-)
+target_include_directories(NoiseSpeedTest PRIVATE ../../src/) # For the SHARED_HDR
+target_link_libraries(NoiseSpeedTest PRIVATE fmt::fmt OSSupport Noise)

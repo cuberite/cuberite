@@ -1,10 +1,9 @@
 project(GeneratorPerformanceTest)
 
-include_directories(../../src/Generating)
-include_directories(../../src)
-include_directories(../../lib)
+set(SOURCES
+	GeneratorPerformanceTest.cpp
+)
 
-add_executable(GeneratorPerformanceTest GeneratorPerformanceTest.cpp ../../src/StringUtils ../../src/MCLogger ../../src/Log ../../src/BlockID ../../src/Noise ../../src/Enchantments ../../src/BlockArea)
-
-target_link_libraries(GeneratorPerformanceTest Generating)
-
+add_executable(GeneratorPerformanceTest ${SOURCES})
+target_include_directories(GeneratorPerformanceTest PRIVATE ../../src/) # TODO: Just for Globals.h! Remove this dependency
+target_link_libraries(GeneratorPerformanceTest PRIVATE Generating fmt::fmt OSSupport) # TODO fmt also just for Globals.h

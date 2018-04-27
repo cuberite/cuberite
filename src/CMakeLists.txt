@@ -1,13 +1,7 @@
 project (Cuberite)
 
-
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
-
 set(FOLDERS
-	OSSupport HTTP Items Blocks Protocol Generating mbedTLS++ Bindings
+	mbedTLS++ OSSupport HTTP Items Blocks Protocol Generating Bindings
 	WorldStorage Mobs Entities Simulator Simulator/IncrementalRedstoneSimulator
 	BlockEntities UI Noise
 )
@@ -159,11 +153,6 @@ SET (HDRS
 	XMLParser.h
 )
 
-include_directories(".")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
-include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
-
 configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -171,17 +160,14 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors ")
 	set_source_files_properties(Statistics.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(StringCompression.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast")
 endif()
 
+foreach(folder ${FOLDERS})
+	add_subdirectory(${folder})
+endforeach(folder)
+
 if (NOT MSVC)
-	# Bindings need to reference other folders, so they are done here instead
-	# lib dependencies are not included
-	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
-
-	foreach(folder ${FOLDERS})
-		add_subdirectory(${folder})
-	endforeach(folder)
-
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
@@ -201,51 +187,14 @@ if (NOT MSVC)
 		list(APPEND SOURCE "Resources/Cuberite.rc")
 	endif()
 else ()
-	# MSVC-specific handling: Put all files into one project, separate by the folders:
-
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
-
-	# Add all subfolders as solution-folders:
-	function(includefolder PATH)
-		FILE(GLOB FOLDER_FILES
-			"${PATH}/*.cpp"
-			"${PATH}/*.h"
-			"${PATH}/*.rc"
-			"${PATH}/*.pkg"
-		)
-		string(REPLACE "/" "\\" PROJECT_PATH ${PATH})
-		source_group("${PROJECT_PATH}" FILES ${FOLDER_FILES})
-	endfunction(includefolder)
-
-	foreach(folder ${FOLDERS})
-		add_subdirectory(${folder})
-		includefolder(${folder})
-
-		# Get all source files in this folder:
-		get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
-		foreach (src ${FOLDER_SRCS})
-			list(APPEND SOURCE "${folder}/${src}")
-		endforeach(src)
-
-		# Get all headers in this folder:
-		get_directory_property(FOLDER_HDRS DIRECTORY ${folder} DEFINITION HDRS)
-		foreach (hdr ${FOLDER_HDRS})
-			list(APPEND SOURCE "${folder}/${hdr}")
-		endforeach(hdr)
-
-		# Include this folder's CMakeLists.txt in the project:
-		list(APPEND SOURCE "${folder}/CMakeLists.txt")
-		source_group("${folder}" FILES "${folder}/CMakeLists.txt")
-	endforeach(folder)
 
 	list(APPEND SOURCE "${SRCS}")
 	list(APPEND SOURCE "${HDRS}")
 	list(APPEND SOURCE "Bindings/AllToLua.pkg")
 
-	includefolder("Resources")
+	source_group("Resources" FILES Resources/Cuberite.rc Resources/resource_Cuberite.h)
 	source_group("" FILES ${SOURCE})
-
-	include_directories("${PROJECT_SOURCE_DIR}")
 
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(
@@ -343,14 +292,12 @@ if (MSVC)
 endif ()
 
 
-if (NOT MSVC)
-	target_link_libraries(${CMAKE_PROJECT_NAME}
-		OSSupport HTTPServer Bindings Items Blocks Noise
-		Protocol Generating WorldStorage
-		Mobs Entities Simulator IncrementalRedstoneSimulator
-		BlockEntities UI mbedTLS++
-	)
-endif ()
+target_link_libraries(${CMAKE_PROJECT_NAME}
+	OSSupport HTTPServer Bindings Items Blocks Noise
+	Protocol Generating WorldStorage
+	Mobs Entities Simulator IncrementalRedstoneSimulator
+	BlockEntities UI mbedTLS++
+)
 
 if (WIN32)
 	target_link_libraries(${CMAKE_PROJECT_NAME} expat tolualib ws2_32.lib Psapi.lib)
@@ -361,7 +308,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt TCLAP)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")

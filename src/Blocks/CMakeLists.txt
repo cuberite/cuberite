@@ -1,7 +1,5 @@
 project (Cuberite)
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
 SET (SRCS
 	BlockBed.cpp
 	BlockDoor.cpp
@@ -102,7 +100,6 @@ SET (HDRS
 	WorldInterface.h
 )
 
-if(NOT MSVC)
-	add_library(Blocks ${SRCS} ${HDRS})
-	target_link_libraries(Blocks fmt::fmt)
-endif()
+add_library(Blocks ${SRCS} ${HDRS})
+target_include_directories(Blocks PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" ..) # .. public because of FunctionRef.h in WorldInterface.h
+target_link_libraries(Blocks PRIVATE fmt::fmt mbedTLS++ SQLiteCpp)
