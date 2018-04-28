@@ -4,9 +4,17 @@
 
 dependencies:
  pre:
-  - sudo apt-get install lua5.1
+  - sudo apt-get update
+  - sudo apt-get install lua5.1 cmake clang-3.9 clang-tidy-3.9
+  - sudo ln -s /usr/bin/clang-tidy-3.9 /usr/bin/clang-tidy
+  - sudo ln -s /usr/bin/clang-apply-replacements-3.9 /usr/bin/clang-apply-replacements
+  - pip install PyYAML
 
 test:
  override:
   - cd src && find . -name \*.cpp -or -name \*.h > AllFiles.lst && lua CheckBasicStyle.lua
   - cd src/Bindings && lua CheckBindingsDependencies.lua
+  - curl -O "https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/master/clang-tidy/tool/run-clang-tidy.py"
+  - chmod +x run-clang-tidy.py
+  - git submodule update --init
+  - ./clang-tidy.sh
