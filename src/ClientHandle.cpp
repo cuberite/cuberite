@@ -136,11 +136,6 @@ cClientHandle::~cClientHandle()
 		m_Player = nullptr;
 	}
 
-	if (!m_HasSentDC)
-	{
-		SendDisconnect("Server shut down? Kthnxbai");
-	}
-
 	m_Protocol.reset();
 
 	LOGD("ClientHandle at %p deleted", static_cast<void *>(this));
