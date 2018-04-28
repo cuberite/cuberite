@@ -944,24 +944,23 @@ void cPlayer::ApplyArmorDamage(int DamageBlocked)
 
 	for (int i = 0; i < 4; i++)
 	{
+		const cItem & ArmorPiece = m_Inventory.GetArmorSlot(i);
+		if (ArmorPiece.IsEmpty())
+		{
+			continue;
+		}
 		// (60 + (40 / (UnbreakingLevel + 1)))% chance the armor takes damage
 		// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
-		unsigned int UnbreakingLevel = m_Inventory.GetArmorSlot(i).m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+		unsigned int UnbreakingLevel = ArmorPiece.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
 		double chance = (0.6 + (0.4 / (UnbreakingLevel + 1)));
 
 		// When durability is reduced by multiple points
 		// Unbreaking is applied for each point of reduction.
-		for (int dp = 1; dp <= ArmorDamage; dp++)
+		std::binomial_distribution<short> Dist(ArmorDamage, chance);
+		short ReducedDamage = Dist(GetRandomProvider().Engine());
+		if (m_Inventory.DamageItem(cInventory::invArmorOffset + i, ReducedDamage))
 		{
-			if (!GetRandomProvider().RandBool(chance))
-			{
-				continue;
-			}
-
-			if (m_Inventory.DamageItem(cInventory::invArmorOffset + i, 1))
-			{
-				m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-			}
+			m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		}
 	}
 }
