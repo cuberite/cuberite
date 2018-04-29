@@ -159,7 +159,7 @@ template class SizeChecker<UInt8,  1>;
 #ifdef _WIN32
 
 	#define WIN32_LEAN_AND_MEAN
-	#define _WIN32_WINNT _WIN32_WINNT_WS03  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher
+	#define _WIN32_WINNT _WIN32_WINNT_VISTA  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher
 
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#define NOMINMAX
