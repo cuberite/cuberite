@@ -120,7 +120,7 @@ protected:
 
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
-	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
+	std::array<unsigned char, cChunkDef::Width * cChunkDef::Width> m_BiomeMap;
 	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
 	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 

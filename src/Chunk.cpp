@@ -1629,11 +1629,7 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 {
-	struct
-	{
-		int x, y, z;
-	}
-	Coords[] =
+	static const std::array<Vector3i, 6> Coords =
 	{
 		{ 1,  0,  0},
 		{-1,  0,  0},
@@ -1642,9 +1638,9 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 		{ 0,  0,  1},
 		{ 0,  0, -1},
 	} ;
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (const auto & Coord : Coords)
 	{
-		UnboundedQueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
+		UnboundedQueueTickBlock(a_RelX + Coord.x, a_RelY + Coords.y, a_RelZ + Coords.z);
 	}  // for i - Coords[]
 }
 

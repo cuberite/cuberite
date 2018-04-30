@@ -6,7 +6,7 @@
 #include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
-
+#include <unordered_map>
 
 
 
@@ -301,31 +301,26 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	}
 
 	// Decode using a built-in map:
-	static struct
+	static const std::unordered_map<AString, eDimension> DimensionMap =
 	{
-		eDimension m_Dimension;
-		const char * m_String;
-	} DimensionMap [] =
-	{
-		{ dimOverworld, "Overworld"},
-		{ dimOverworld, "Normal"},
-		{ dimOverworld, "World"},
-		{ dimNether,    "Nether"},
-		{ dimNether,    "Hell"},  // Alternate name for Nether
-		{ dimEnd,       "End"},
-		{ dimEnd,       "Sky"},  // Old name for End
+		{ "overworld", dimOverworld },
+		{ "normal"   , dimOverworld },
+		{ "world"    , dimOverworld },
+		{ "nether"   , dimNether    },
+		{ "hell"     , dimNether    },  // Alternate name for Nether
+		{ "end"      , dimEnd       },
+		{ "sky"      , dimEnd       },  // Old name for End
 	} ;
-	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
-	{
-		if (NoCaseCompare(DimensionMap[i].m_String, a_DimensionString) == 0)
-		{
-			return DimensionMap[i].m_Dimension;
-		}
-	}  // for i - DimensionMap[]
 
-	// Not found
-	LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", a_DimensionString.c_str());
-	return dimOverworld;
+	AString DimensionName = StrToLower(a_DimensionString);
+	if(DimensionMap.count(DimensionName) == 0)
+	{
+		// Not found
+		LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", a_DimensionString.c_str());
+		return dimOverworld;
+	}
+
+	return DimensionMap[DimensionName];
 }
 
 
@@ -334,29 +329,18 @@ eDimension StringToDimension(const AString & a_DimensionString)
 
 AString DimensionToString(eDimension a_Dimension)
 {
-	// Decode using a built-in map:
-	static struct
+	switch(a_Dimension)
 	{
-		eDimension m_Dimension;
-		const char * m_String;
-	} DimensionMap[] =
-	{
-		{ dimOverworld, "Overworld" },
-		{ dimNether, "Nether" },
-		{ dimEnd, "End" },
-	};
-
-	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
-	{
-		if (DimensionMap[i].m_Dimension == a_Dimension)
+		case dimOverworld: return "Overworld";
+		case dimNether:    return "Nether";
+		case dimEnd:       return "End";
+		default:
 		{
-			return DimensionMap[i].m_String;
+			// Not found
+			LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", static_cast<int>(a_Dimension));
+			return "Overworld";
 		}
-	}  // for i - DimensionMap[]
-
-	// Not found
-	LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", static_cast<int>(a_Dimension));
-	return "Overworld";
+	}
 }
 
 
@@ -408,64 +392,59 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 	}
 
 	// Decode using a built-in map:
-	static struct
-	{
-		eDamageType  m_DamageType;
-		const char * m_String;
-	} DamageTypeMap [] =
+	static const std::unordered_map<AString, eDamageType> DamageTypeMap =
 	{
 		// Cannonical names:
-		{ dtAttack,          "dtAttack"},
-		{ dtRangedAttack,    "dtRangedAttack"},
-		{ dtLightning,       "dtLightning"},
-		{ dtFalling,         "dtFalling"},
-		{ dtDrowning,        "dtDrowning"},
-		{ dtSuffocating,     "dtSuffocation"},
-		{ dtStarving,        "dtStarving"},
-		{ dtCactusContact,   "dtCactusContact"},
-		{ dtLavaContact,     "dtLavaContact"},
-		{ dtPoisoning,       "dtPoisoning"},
-		{ dtWithering,       "dtWithering"},
-		{ dtOnFire,          "dtOnFire"},
-		{ dtFireContact,     "dtFireContact"},
-		{ dtInVoid,          "dtInVoid"},
-		{ dtPotionOfHarming, "dtPotionOfHarming"},
-		{ dtAdmin,           "dtAdmin"},
-		{ dtExplosion,       "dtExplosion"},
+		{ "dtattack"         , dtAttack        	 },
+		{ "dtrangedattack"   , dtRangedAttack 	 },
+		{ "dtlightning"      , dtLightning  	 },
+		{ "dtfalling"        , dtFalling       	 },
+		{ "dtdrowning"       , dtDrowning        },
+		{ "dtsuffocation"    , dtSuffocating     },
+		{ "dtstarving"       , dtStarving      	 },
+		{ "dtcactuscontact"  , dtCactusContact   },
+		{ "dtlavacontact"    , dtLavaContact     },
+		{ "dtpoisoning"      , dtPoisoning       },
+		{ "dtwithering"      , dtWithering       },
+		{ "dtonfire"         , dtOnFire        	 },
+		{ "dtfirecontact"    , dtFireContact     },
+		{ "dtinvoid"         , dtInVoid      	 },
+		{ "dtpotionofharming", dtPotionOfHarming },
+		{ "dtadmin"          , dtAdmin           },
+		{ "dtexplosion"      , dtExplosion       },
 
 		// Common synonyms:
-		{ dtAttack,        "dtPawnAttack"},
-		{ dtAttack,        "dtEntityAttack"},
-		{ dtAttack,        "dtMob"},
-		{ dtAttack,        "dtMobAttack"},
-		{ dtRangedAttack,  "dtArrowAttack"},
-		{ dtRangedAttack,  "dtArrow"},
-		{ dtRangedAttack,  "dtProjectile"},
-		{ dtFalling,       "dtFall"},
-		{ dtDrowning,      "dtDrown"},
-		{ dtSuffocating,   "dtSuffocation"},
-		{ dtStarving,      "dtStarvation"},
-		{ dtStarving,      "dtHunger"},
-		{ dtCactusContact, "dtCactus"},
-		{ dtCactusContact, "dtCactuses"},
-		{ dtCactusContact, "dtCacti"},
-		{ dtLavaContact,   "dtLava"},
-		{ dtPoisoning,     "dtPoison"},
-		{ dtWithering,     "dtWither"},
-		{ dtOnFire,        "dtBurning"},
-		{ dtFireContact,   "dtInFire"},
-		{ dtAdmin,         "dtPlugin"},
+		{ "dtpawnattack"     , dtAttack          },
+		{ "dtentityattack"   , dtAttack        	 },
+		{ "dtmob"            , dtAttack        	 },
+		{ "dtmobattack"      , dtAttack        	 },
+		{ "dtarrowattack"    , dtRangedAttack  	 },
+		{ "dtarrow"          , dtRangedAttack  	 },
+		{ "dtprojectile"     , dtRangedAttack  	 },
+		{ "dtfall"           , dtFalling   		 },
+		{ "dtdrown"          , dtDrowning      	 },
+		{ "dtsuffocation"    , dtSuffocating   	 },
+		{ "dtstarvation"     , dtStarving    	 },
+		{ "dthunger"         , dtStarving      	 },
+		{ "dtcactus"         , dtCactusContact	 },
+		{ "dtcactuses"       , dtCactusContact 	 },
+		{ "dtcacti"          , dtCactusContact 	 },
+		{ "dtlava"           , dtLavaContact  	 },
+		{ "dtpoison"         , dtPoisoning    	 },
+		{ "dtwither"         , dtWithering     	 },
+		{ "dtburning"        , dtOnFire      	 },
+		{ "dtinfire"         , dtFireContact   	 },
+		{ "dtplugin"         , dtAdmin    		 },
 	} ;
-	for (size_t i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
-	{
-		if (NoCaseCompare(DamageTypeMap[i].m_String, a_DamageTypeString) == 0)
-		{
-			return DamageTypeMap[i].m_DamageType;
-		}
-	}  // for i - DamageTypeMap[]
 
-	// Not found:
-	return static_cast<eDamageType>(-1);
+	AString DamageTypeName = StrToLower(a_DamageTypeString);
+	if(DamageTypeMap.count(DamageTypeName) == 0)
+	{
+		// Not found:
+		return static_cast<eDamageType>(-1);
+	}
+
+	return DamageTypeMap[DamageTypeName];
 }
 
 

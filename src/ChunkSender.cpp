@@ -300,7 +300,7 @@ void cChunkSender::Entity(cEntity *)
 
 void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
+	for (size_t i = 0; i < m_BiomeMap.size(); i++)
 	{
 		if ((*a_BiomeMap)[i] < 255)
 		{
@@ -312,7 +312,7 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 			// TODO: MCS-specific biome, need to map to some basic MC biome:
 			ASSERT(!"Unimplemented MCS-specific biome");
 		}
-	}  // for i - m_BiomeMap[]
+	}  // for i - m_BiomeMap
 }
 
 

@@ -7,6 +7,7 @@
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
 #include "Noise/Noise.h"
+#include <unordered_map>
 
 
 
@@ -327,37 +328,33 @@ bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 
 int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 {
-	static const struct
+	static const std::unordered_map<AString, eEnchantment> EnchantmentNames =
 	{
-		int m_Value;
-		const char * m_Name;
-	} EnchantmentNames[] =
-	{
-		{ enchProtection,           "Protection" },
-		{ enchFireProtection,       "FireProtection" },
-		{ enchFeatherFalling,       "FeatherFalling" },
-		{ enchBlastProtection,      "BlastProtection" },
-		{ enchProjectileProtection, "ProjectileProtection" },
-		{ enchRespiration,          "Respiration" },
-		{ enchAquaAffinity,         "AquaAffinity" },
-		{ enchThorns,               "Thorns" },
-		{ enchDepthStrider,         "DepthStrider" },
-		{ enchSharpness,            "Sharpness" },
-		{ enchSmite,                "Smite" },
-		{ enchBaneOfArthropods,     "BaneOfArthropods" },
-		{ enchKnockback,            "Knockback" },
-		{ enchFireAspect,           "FireAspect" },
-		{ enchLooting,              "Looting" },
-		{ enchEfficiency,           "Efficiency" },
-		{ enchSilkTouch,            "SilkTouch" },
-		{ enchUnbreaking,           "Unbreaking" },
-		{ enchFortune,              "Fortune" },
-		{ enchPower,                "Power" },
-		{ enchPunch,                "Punch" },
-		{ enchFlame,                "Flame" },
-		{ enchInfinity,             "Infinity" },
-		{ enchLuckOfTheSea,         "LuckOfTheSea" },
-		{ enchLure,                 "Lure" },
+		{ "protection"          , enchProtection           },
+		{ "fireprotection"      , enchFireProtection       },
+		{ "featherfalling"      , enchFeatherFalling       },
+		{ "blastprotection"     , enchBlastProtection      },
+		{ "projectileprotection", enchProjectileProtection },
+		{ "respiration"         , enchRespiration          },
+		{ "aquaaffinity"        , enchAquaAffinity         },
+		{ "thorns"              , enchThorns               },
+		{ "depthstrider"        , enchDepthStrider         },
+		{ "sharpness"           , enchSharpness            },
+		{ "smite"               , enchSmite                },
+		{ "baneofarthropods"    , enchBaneOfArthropods     },
+		{ "knockback"           , enchKnockback            },
+		{ "fireaspect"          , enchFireAspect           },
+		{ "looting"             , enchLooting              },
+		{ "efficiency"          , enchEfficiency           },
+		{ "silktouch"           , enchSilkTouch            },
+		{ "unbreaking"          , enchUnbreaking           },
+		{ "fortune"             , enchFortune              },
+		{ "power"               , enchPower                },
+		{ "punch"               , enchPunch                },
+		{ "flame"               , enchFlame                },
+		{ "infinity"            , enchInfinity             },
+		{ "luckofthesea"        , enchLuckOfTheSea         },
+		{ "lure"                , enchLure                 },
 	} ;
 
 	// First try to parse as a number:
@@ -368,14 +365,13 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 	}
 
 	// It wasn't a number, do a lookup:
-	for (size_t i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
+	AString EnchantmentName = StrToLower(a_EnchantmentName);
+	if(EnchantmentNames.count(EnchantmentName) == 0)
 	{
-		if (NoCaseCompare(EnchantmentNames[i].m_Name, a_EnchantmentName) == 0)
-		{
-			return EnchantmentNames[i].m_Value;
-		}
-	}  // for i - EnchantmentNames[]
-	return -1;
+		return -1;
+	}
+
+	return EnchantmentNames[EnchantmentName];
 }
 
 

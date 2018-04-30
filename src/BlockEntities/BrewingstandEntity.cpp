@@ -61,14 +61,8 @@ void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = reinterpret_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
-	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
-	{
-		m_CurrentBrewingRecipes[i] = src.m_CurrentBrewingRecipes[i];
-	}
-	for (size_t i = 0; i < ARRAYCOUNT(m_Results); ++i)
-	{
-		m_Results[i] = src.m_Results[i];
-	}
+	m_CurrentBrewingRecipes = src.m_CurrentBrewingRecipes;
+	m_Results = src.m_Results;
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
 }

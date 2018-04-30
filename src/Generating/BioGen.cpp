@@ -20,10 +20,7 @@
 
 void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = m_Biome;
-	}
+	std::fill(begin(a_BiomeMap), end(a_BiomeMap), m_Biome);
 }
 
 
@@ -230,7 +227,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 	}
 
 	// There were no biomes, add default biomes:
-	static EMCSBiome Biomes[] =
+	static std::array<EMCSBiome, 21> Biomes =
 	{
 		biOcean,
 		biPlains,
@@ -254,11 +251,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 		biJungle,
 		biJungleHills,
 	} ;
-	m_Biomes.reserve(ARRAYCOUNT(Biomes));
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
-	{
-		m_Biomes.push_back(Biomes[i]);
-	}
+	m_Biomes.insert(end(m_Biomes), begin(Biomes), end(Biomes));
 	m_BiomesCount = static_cast<int>(m_Biomes.size());
 }
 
@@ -638,7 +631,7 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(HumidityMap);
 
 	// Re-map into integral values in [0 .. 255] range:
-	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
+	for (size_t idx = 0; idx < a_TemperatureMap.size(); idx++)
 	{
 		a_TemperatureMap[idx] = Clamp(static_cast<int>(128 + TemperatureMap[idx] * 128), 0, 255);
 		a_HumidityMap[idx]    = Clamp(static_cast<int>(128 + HumidityMap[idx]    * 128), 0, 255);
@@ -804,7 +797,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		EMCSBiome OuterBiome;
 	} ;
 
-	static BiomeLevels bgOcean[] =
+	static const std::array<BiomeLevels, 11> bgOcean =
 	{
 		{ biOcean, biOcean, },
 		{ biOcean, biOcean, },
@@ -818,7 +811,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biDeepOcean, biDeepOcean, },
 		{ biMushroomIsland, biMushroomShore, }
 	} ;
-	static BiomeLevels bgFrozen[] =
+	static const std::array<BiomeLevels, 10> bgFrozen =
 	{
 		{ biIcePlains,         biIcePlains, },
 		{ biIceMountains,      biIceMountains, },
@@ -831,7 +824,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biExtremeHillsPlus,  biExtremeHillsEdge, },
 		{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
 	} ;
-	static BiomeLevels bgTemperate[] =
+	static const std::array<BiomeLevels, 13> bgTemperate =
 	{
 		{ biBirchForestHills,  biBirchForest, },
 		{ biBirchForest,       biBirchForest, },
@@ -847,7 +840,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSwampland,         biSwampland, },
 		{ biSwamplandM,        biSwamplandM, },
 	} ;
-	static BiomeLevels bgWarm[] =
+	static const std::array<BiomeLevels, 6> bgWarm =
 	{
 		{ biDesertHills,    biDesert, },
 		{ biDesert,         biDesert, },
@@ -856,7 +849,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSavanna,        biSavanna, },
 		{ biSavannaM,       biSavannaM, },
 	} ;
-	static BiomeLevels bgMesa[] =
+	static const std::array<BiomeLevels, 7> bgMesa =
 	{
 		{ biMesaPlateau,    biMesa, },
 		{ biMesaPlateauF,   biMesa, },
@@ -866,7 +859,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSavanna,        biSavanna, },
 		{ biSavannaPlateau, biSavanna, },
 	} ;
-	static BiomeLevels bgConifers[] =
+	static const std::array<BiomeLevels, 5> bgConifers =
 	{
 		{ biTaiga,                biTaiga, },
 		{ biTaigaM,               biTaigaM, },
@@ -874,32 +867,33 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
 		{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
 	} ;
-	static BiomeLevels bgDenseTrees[] =
+	static const std::array<BiomeLevels, 3> bgDenseTrees =
 	{
 		{ biJungleHills, biJungle, },
 		{ biJungle, biJungleEdge, },
 		{ biJungleM, biJungleEdgeM, },
 	} ;
-	static struct
+	struct BiomeGroup
 	{
-		BiomeLevels * Biomes;
+		const BiomeLevels * Biomes;
 		size_t        Count;
-	} BiomeGroups[] =
+	};
+	static const std::array<BiomeGroup, 12> BiomeGroups =
 	{
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgMesa,       ARRAYCOUNT(bgMesa), },
-		{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
+		{ bgOcean.data()     , bgOcean.size()      },
+		{ bgOcean.data()     , bgOcean.size()      },
+		{ bgFrozen.data()    , bgFrozen.size()     },
+		{ bgFrozen.data()    , bgFrozen.size()     },
+		{ bgTemperate.data() , bgTemperate.size()  },
+		{ bgTemperate.data() , bgTemperate.size()  },
+		{ bgConifers.data()  , bgConifers.size()   },
+		{ bgConifers.data()  , bgConifers.size()   },
+		{ bgWarm.data()      , bgWarm.size()       },
+		{ bgWarm.data()      , bgWarm.size()       },
+		{ bgMesa.data()      , bgMesa.size()       },
+		{ bgDenseTrees.data(), bgDenseTrees.size() },
 	} ;
-	size_t Group = static_cast<size_t>(a_BiomeGroup) % ARRAYCOUNT(BiomeGroups);
+	size_t Group = static_cast<size_t>(a_BiomeGroup) % BiomeGroups.size();
 	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;
 	return (a_DistLevel > 0) ? BiomeGroups[Group].Biomes[Index].InnerBiome : BiomeGroups[Group].Biomes[Index].OuterBiome;
 }

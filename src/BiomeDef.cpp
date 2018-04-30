@@ -4,85 +4,87 @@
 // Implements biome helper functions
 
 #include "Globals.h"
+#include <unordered_map>
 
 
 
 
-// The "map" used for biome <-> string conversions:
-static struct
+struct BiomePair
 {
-	EMCSBiome    m_Biome;
-	const char * m_String;
-} g_BiomeMap[] =
+	const char *m_String;
+	EMCSBiome m_Biome;
+};
+// The map used for biome <-> string conversions:
+static const std::array<AString, EMCSBiome> g_BiomeMap =
 {
-	{biOcean,            "Ocean"},
-	{biPlains,           "Plains"},
-	{biDesert,           "Desert"},
-	{biExtremeHills,     "ExtremeHills"},
-	{biForest,           "Forest"},
-	{biTaiga,            "Taiga"},
-	{biSwampland,        "Swampland"},
-	{biRiver,            "River"},
-	{biNether,           "Hell"},
-	{biNether,           "Nether"},
-	{biEnd,              "Sky"},
-	{biEnd,              "End"},
-	{biFrozenOcean,      "FrozenOcean"},
-	{biFrozenRiver,      "FrozenRiver"},
-	{biIcePlains,        "IcePlains"},
-	{biIcePlains,        "Tundra"},
-	{biIceMountains,     "IceMountains"},
-	{biMushroomIsland,   "MushroomIsland"},
-	{biMushroomShore,    "MushroomShore"},
-	{biBeach,            "Beach"},
-	{biDesertHills,      "DesertHills"},
-	{biForestHills,      "ForestHills"},
-	{biTaigaHills,       "TaigaHills"},
-	{biExtremeHillsEdge, "ExtremeHillsEdge"},
-	{biJungle,           "Jungle"},
-	{biJungleHills,      "JungleHills"},
+	{"Ocean"               , biOcean                },
+	{"Plains"              , biPlains               },
+	{"Desert"              , biDesert               },
+	{"ExtremeHills"        , biExtremeHills         },
+	{"Forest"              , biForest               },
+	{"Taiga"               , biTaiga                },
+	{"Swampland"           , biSwampland            },
+	{"River"               , biRiver                },
+	{"Hell"                , biNether               },
+	{"Nether"              , biNether               },
+	{"Sky"                 , biEnd                  },
+	{"End"                 , biEnd                  },
+	{"FrozenOcean"         , biFrozenOcean          },
+	{"FrozenRiver"         , biFrozenRiver          },
+	{"IcePlains"           , biIcePlains            },
+	{"Tundra"              , biIcePlains            },
+	{"IceMountains"        , biIceMountains         },
+	{"MushroomIsland"      , biMushroomIsland       },
+	{"MushroomShore"       , biMushroomShore        },
+	{"Beach"               , biBeach                },
+	{"DesertHills"         , biDesertHills          },
+	{"ForestHills"         , biForestHills          },
+	{"TaigaHills"          , biTaigaHills           },
+	{"ExtremeHillsEdge"    , biExtremeHillsEdge     },
+	{"Jungle"              , biJungle               },
+	{"JungleHills"         , biJungleHills          },
 
 	// Release 1.7 biomes:
-	{biJungleEdge,       "JungleEdge"},
-	{biDeepOcean,        "DeepOcean"},
-	{biStoneBeach,       "StoneBeach"},
-	{biColdBeach,        "ColdBeach"},
-	{biBirchForest,      "BirchForest"},
-	{biBirchForestHills, "BirchForestHills"},
-	{biRoofedForest,     "RoofedForest"},
-	{biColdTaiga,        "ColdTaiga"},
-	{biColdTaigaHills,   "ColdTaigaHills"},
-	{biMegaTaiga,        "MegaTaiga"},
-	{biMegaTaigaHills,   "MegaTaigaHills"},
-	{biExtremeHillsPlus, "ExtremeHillsPlus"},
-	{biSavanna,          "Savanna"},
-	{biSavannaPlateau,   "SavannaPlateau"},
-	{biMesa,             "Mesa"},
-	{biMesaPlateauF,     "MesaPlateauF"},
-	{biMesaPlateau,      "MesaPlateau"},
+	{"JungleEdge"          , biJungleEdge          },
+	{"DeepOcean"           , biDeepOcean           },
+	{"StoneBeach"          , biStoneBeach          },
+	{"ColdBeach"           , biColdBeach           },
+	{"BirchForest"         , biBirchForest         },
+	{"BirchForestHills"    , biBirchForestHills    },
+	{"RoofedForest"        , biRoofedForest        },
+	{"ColdTaiga"           , biColdTaiga           },
+	{"ColdTaigaHills"      , biColdTaigaHills      },
+	{"MegaTaiga"           , biMegaTaiga           },
+	{"MegaTaigaHills"      , biMegaTaigaHills      },
+	{"ExtremeHillsPlus"    , biExtremeHillsPlus    },
+	{"Savanna"             , biSavanna             },
+	{"SavannaPlateau"      , biSavannaPlateau      },
+	{"Mesa"                , biMesa                },
+	{"MesaPlateauF"        , biMesaPlateauF        },
+	{"MesaPlateau"         , biMesaPlateau         },
 
 	// Release 1.7 variants:
-	{biSunflowerPlains,      "SunflowerPlains"},
-	{biDesertM,              "DesertM"},
-	{biExtremeHillsM,        "ExtremeHillsM"},
-	{biFlowerForest,         "FlowerForest"},
-	{biTaigaM,               "TaigaM"},
-	{biSwamplandM,           "SwamplandM"},
-	{biIcePlainsSpikes,      "IcePlainsSpikes"},
-	{biJungleM,              "JungleM"},
-	{biJungleEdgeM,          "JungleEdgeM"},
-	{biBirchForestM,         "BirchForestM"},
-	{biBirchForestHillsM,    "BirchForestHillsM"},
-	{biRoofedForestM,        "RoofedForestM"},
-	{biColdTaigaM,           "ColdTaigaM"},
-	{biMegaSpruceTaiga,      "MegaSpruceTaiga"},
-	{biMegaSpruceTaigaHills, "MegaSpruceTaigaHills"},
-	{biExtremeHillsPlusM,    "ExtremeHillsPlusM"},
-	{biSavannaM,             "SavannaM"},
-	{biSavannaPlateauM,      "SavannaPlateauM"},
-	{biMesaBryce,            "MesaBryce"},
-	{biMesaPlateauFM,        "MesaPlateauFM"},
-	{biMesaPlateauM,         "MesaPlateauM"},
+	{"SunflowerPlains"     , biSunflowerPlains     },
+	{"DesertM"             , biDesertM             },
+	{"ExtremeHillsM"       , biExtremeHillsM       },
+	{"FlowerForest"        , biFlowerForest        },
+	{"TaigaM"              , biTaigaM              },
+	{"SwamplandM"          , biSwamplandM          },
+	{"IcePlainsSpikes"     , biIcePlainsSpikes     },
+	{"JungleM"             , biJungleM             },
+	{"JungleEdgeM"         , biJungleEdgeM         },
+	{"BirchForestM"        , biBirchForestM        },
+	{"BirchForestHillsM"   , biBirchForestHillsM   },
+	{"RoofedForestM"       , biRoofedForestM       },
+	{"ColdTaigaM"          , biColdTaigaM          },
+	{"MegaSpruceTaiga"     , biMegaSpruceTaiga     },
+	{"MegaSpruceTaigaHills", biMegaSpruceTaigaHills},
+	{"ExtremeHillsPlusM"   , biExtremeHillsPlusM   },
+	{"SavannaM"            , biSavannaM            },
+	{"SavannaPlateauM"     , biSavannaPlateauM     },
+	{"MesaBryce"           , biMesaBryce           },
+	{"MesaPlateauFM"       , biMesaPlateauFM       },
+	{"MesaPlateauM"        , biMesaPlateauM        },
 } ;
 
 
@@ -107,13 +109,13 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		return biInvalidBiome;
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(g_BiomeMap); i++)
+	for (const auto & Biome : g_BiomeMap)
 	{
-		if (NoCaseCompare(g_BiomeMap[i].m_String, a_BiomeString) == 0)
+		if (NoCaseCompare(Biome.m_String, a_BiomeString) == 0)
 		{
-			return g_BiomeMap[i].m_Biome;
+			return Biome.m_Biome;
 		}
-	}  // for i - BiomeMap[]
+	}
 	return biInvalidBiome;
 }
 
@@ -123,11 +125,11 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 
 AString BiomeToString(int a_Biome)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(g_BiomeMap); i++)
+	for (const auto & Biome : g_BiomeMap)
 	{
-		if (g_BiomeMap[i].m_Biome == a_Biome)
+		if (Biome.m_Biome == a_Biome)
 		{
-			return g_BiomeMap[i].m_String;
+			return Biome.m_String;
 		}
 	}
 	return AString();

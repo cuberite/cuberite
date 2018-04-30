@@ -50,7 +50,7 @@ public:
 
 private:
 
-	AString  m_Line[4];
+	std::array<AString, 4> m_Line;
 } ;  // tolua_export
 
 

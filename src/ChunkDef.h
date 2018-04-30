@@ -89,7 +89,7 @@ public:
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
-	typedef EMCSBiome BiomeMap[Width * Width];
+	typedef std::array<EMCSBiome, Width * Width> BiomeMap;
 
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
 	typedef BLOCKTYPE BlockTypes[NumBlocks];

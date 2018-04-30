@@ -120,10 +120,10 @@ protected:
 	const short m_NeedBrewingTime = 400;
 
 	/** Store the current brewing recipes */
-	const cBrewingRecipes::cRecipe * m_CurrentBrewingRecipes[3] = {};
+	const std::array<cBrewingRecipes::cRecipe *, 3> m_CurrentBrewingRecipes = {};
 
 	/** Result items for the  bottle inputs */
-	cItem m_Results[3];
+	std::array<cItem, 3> m_Results;
 
 	/** Amount of ticks that the current item has been brewed */
 	short m_TimeBrewed;
