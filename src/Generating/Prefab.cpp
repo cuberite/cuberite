@@ -323,11 +323,7 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 	ASSERT(a_CharMapDef != nullptr);
 
 	// Initialize the charmap to all-invalid values:
-	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
-	{
-		a_CharMapOut[i].m_BlockType = 0;
-		a_CharMapOut[i].m_BlockMeta = 16;  // Mark unassigned entries with a meta that is impossible otherwise
-	}
+	std::fill(begin(a_CharMapOut), end(a_CharMapOut), { 0, 16 }); // Mark unassigned entries with a meta that is impossible otherwise
 
 	// Process the lines in the definition:
 	AStringVector Lines = StringSplitAndTrim(a_CharMapDef, "\n");

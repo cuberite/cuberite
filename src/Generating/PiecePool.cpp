@@ -8,6 +8,7 @@
 #include "PiecePool.h"
 #include "VerticalStrategy.h"
 #include "VerticalLimit.h"
+#include <unordered_map>
 
 
 
@@ -389,11 +390,7 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 	}
 
 	// Compare to string representation:
-	static const struct
-	{
-		const char * m_String;
-		eDirection m_Value;
-	} StringDirections[] =
+	static const std::unordered_map<AString, eDirection> StringDirections =
 	{
 		{"x-", dirXM},
 		{"x+", dirXP},
@@ -421,17 +418,14 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 		{"y+/x+/z+", dirYP_XP_ZP},
 	};
 	auto lcValue = StrToLower(a_Value);
-	for (size_t i = 0; i < ARRAYCOUNT(StringDirections); i++)
+	if(StringDirections.count(lcValue) == 0)
 	{
-		if (strcmp(lcValue.c_str(), StringDirections[i].m_String) == 0)
-		{
-			a_Out = StringDirections[i].m_Value;
-			return true;
-		}
+		// Not understood, failure:
+		return false;
 	}
 
-	// Not understood, failure:
-	return false;
+	a_Out = StringDirections[lcValue];
+	return true;
 }
 
 

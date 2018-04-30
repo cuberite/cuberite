@@ -380,9 +380,8 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	// Get a list of pools that support each biome within the chunk:
 	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close
 	auto availablePools = m_Pools;
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (auto biome : Biomes)
 	{
-		auto biome = Biomes[i];
 		availablePools.erase(std::remove_if(availablePools.begin(), availablePools.end(),
 			[biome](std::shared_ptr<cVillagePiecePool> & a_Pool)
 			{

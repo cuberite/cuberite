@@ -690,7 +690,7 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Map for biome -> its beach:
-		static const int ToBeach[] =
+		static const std::array<int, 40> ToBeach =
 		{
 			/* biOcean            */ biOcean,
 			/* biPlains           */ biBeach,
@@ -756,7 +756,7 @@ public:
 					if (IsBiomeOcean(above) || IsBiomeOcean(below) || IsBiomeOcean(left) || IsBiomeOcean(right))
 					{
 						// First convert the value to a regular biome (drop the M flag), then modulo by our biome count:
-						val = ToBeach[(val % 128) % ARRAYCOUNT(ToBeach)];
+						val = ToBeach[(val % 128) % ToBeach.size()];
 					}
 				}
 				a_Values[x + z * a_SizeX] = val;
@@ -935,74 +935,74 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Define the per-biome-group biomes:
-		static const int oceanBiomes[] =
+		static const std::array<int, 1> oceanBiomes =
 		{
 			biOcean,  // biDeepOcean,
 		};
 
 		// Same as oceanBiomes, there are no rare oceanic biomes (mushroom islands are handled separately)
-		static const int rareOceanBiomes[] =
+		static const std::array<int, 1> rareOceanBiomes =
 		{
 			biOcean,
 		};
 
-		static const int desertBiomes[] =
+		static const std::array<int, 9> desertBiomes =
 		{
 			biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
 		};
 
-		static const int rareDesertBiomes[] =
+		static const std::array<int, 2> rareDesertBiomes =
 		{
 			biMesaPlateau, biMesaPlateauF,
 		};
 
-		static const int temperateBiomes[] =
+		static const std::array<int, 7> temperateBiomes =
 		{
 			biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
 		};
 
-		static const int rareTemperateBiomes[] =
+		static const std::array<int, 1> rareTemperateBiomes =
 		{
 			biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
 		};
 
-		static const int mountainBiomes[] =
+		static const std::array<int, 4> mountainBiomes =
 		{
 			biExtremeHills, biForest, biTaiga, biPlains,
 		};
 
-		static const int rareMountainBiomes[] =
+		static const std::array<int, 1> rareMountainBiomes =
 		{
 			biMegaTaiga,
 		};
 
-		static const int iceBiomes[] =
+		static const std::array<int, 5> iceBiomes =
 		{
 			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
 		};
 
 		// Same as iceBiomes, there's no rare ice biome
-		static const int rareIceBiomes[] =
+		static const std::array<int, 5> rareIceBiomes =
 		{
 			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
 		};
 
-		static const cBiomesInGroups biomesInGroups[] =
+		static const std::array<cBiomesInGroups, 5> biomesInGroups =
 		{
-			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(oceanBiomes)),     oceanBiomes},
-			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(desertBiomes)),    desertBiomes},
-			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(temperateBiomes)), temperateBiomes},
-			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(mountainBiomes)),  mountainBiomes},
-			/* bgIce */       { static_cast<int>(ARRAYCOUNT(iceBiomes)),       iceBiomes},
+			/* bgOcean */     { static_cast<int>(oceanBiomes.size()),     oceanBiomes.data()     },
+			/* bgDesert */    { static_cast<int>(desertBiomes.size()),    desertBiomes.data()    },
+			/* bgTemperate */ { static_cast<int>(temperateBiomes.size()), temperateBiomes.data() },
+			/* bgMountains */ { static_cast<int>(mountainBiomes.size()),  mountainBiomes.data()  },
+			/* bgIce */       { static_cast<int>(iceBiomes.size()),       iceBiomes.data()       },
 		};
 
-		static const cBiomesInGroups rareBiomesInGroups[] =
+		static const std::array<cBiomesInGroups, 5> rareBiomesInGroups =
 		{
-			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(rareOceanBiomes)),     rareOceanBiomes},
-			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(rareDesertBiomes)),    rareDesertBiomes},
-			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(rareTemperateBiomes)), rareTemperateBiomes},
-			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(rareMountainBiomes)),  rareMountainBiomes},
-			/* bgIce */       { static_cast<int>(ARRAYCOUNT(rareIceBiomes)),       rareIceBiomes},
+			/* bgOcean */     { static_cast<int>(rareOceanBiomes.size()),     rareOceanBiomes.data()     },
+			/* bgDesert */    { static_cast<int>(rareDesertBiomes.size()),    rareDesertBiomes.data()    },
+			/* bgTemperate */ { static_cast<int>(rareTemperateBiomes.size()), rareTemperateBiomes.data() },
+			/* bgMountains */ { static_cast<int>(rareMountainBiomes.size()),  rareMountainBiomes.data()  },
+			/* bgIce */       { static_cast<int>(rareIceBiomes.size()),       rareIceBiomes.data()       },
 		};
 
 		// Generate the underlying values, representing biome groups:
@@ -1017,8 +1017,8 @@ public:
 			{
 				int val = a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
-					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
-					biomesInGroups[static_cast<size_t>(val) % ARRAYCOUNT(biomesInGroups)];
+					rareBiomesInGroups[(val & (bgfRare - 1)) % rareBiomesInGroups.size()] :
+					biomesInGroups[static_cast<size_t>(val) % biomesInGroups.size()];
 				int rnd = (super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
 			}

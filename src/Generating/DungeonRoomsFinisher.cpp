@@ -197,7 +197,7 @@ protected:
 		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, static_cast<NIBBLETYPE>(a_Chest.y));
 
 		// Fill the chest with random loot
-		static const cLootProbab LootProbab[] =
+		static const std::array<cLootProbab, 22> LootProbab =
 		{
 			// Item,                          MinAmount, MaxAmount, Weight
 			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
@@ -229,7 +229,7 @@ protected:
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
-		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, LootProbab.size(), NumSlots, Seed);
 	}
 
 

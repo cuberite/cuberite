@@ -155,10 +155,7 @@ void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 	// If the chunk is outside out range, fill the shape with zeroes:
 	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
 	{
-		for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
-		{
-			a_Shape[i] = 0;
-		}
+		std::fill(begin(a_Shape), end(a_Shape), 0);
 		return;
 	}
 

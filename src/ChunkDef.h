@@ -84,7 +84,7 @@ public:
 	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
-	typedef HEIGHTTYPE HeightMap[Width * Width];
+	typedef std::array<HEIGHTTYPE, Width * Width> HeightMap;
 
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
@@ -92,10 +92,10 @@ public:
 	typedef std::array<EMCSBiome, Width * Width> BiomeMap;
 
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef BLOCKTYPE BlockTypes[NumBlocks];
+	typedef std::array<BLOCKTYPE, NumBlocks> BlockTypes;
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+	typedef std::array<NIBBLETYPE, NumBlocks / 2> BlockNibbles;
 
 	/** The storage wrapper used for compressed blockdata residing in RAMz */
 	typedef std::vector<BLOCKTYPE> COMPRESSED_BLOCKTYPE;

@@ -65,9 +65,9 @@ cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(int a_BlockX, int a_B
 	rnd = rnd >> 16;
 
 	// Choose a random supported rotation:
-	int Rotations[4] = {0};
+	std::array<int, 4> Rotations = {};
 	int NumRotations = 1;
-	for (size_t i = 1; i < ARRAYCOUNT(Rotations); i++)
+	for (size_t i = 1; i < Rotations.size(); i++)
 	{
 		if (StartingPiece->CanRotateCCW(static_cast<int>(i)))
 		{

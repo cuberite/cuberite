@@ -57,9 +57,9 @@ public:
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
 	{
-		int heights[cChunkDef::Width * cChunkDef::Width];
+		std::array<int, cChunkDef::Width * cChunkDef::Width> heights;
 		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights);
-		for (size_t i = 0; i < ARRAYCOUNT(heights); i++)
+		for (size_t i = 0; i < heights.size(); i++)
 		{
 			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));
 		}
@@ -80,10 +80,7 @@ protected:
 
 void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
-	{
-		a_HeightMap[i] = m_Height;
-	}
+	std::fill(begin(a_HeightMap), end(a_HeightMap), m_Height);
 }
 
 
@@ -595,8 +592,7 @@ void cHeiGenBiomal::InitializeHeightGen(cIniFile & a_IniFile)
 NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
-	int BiomeCounts[256];
-	memset(BiomeCounts, 0, sizeof(BiomeCounts));
+	std::array<int, 256> BiomeCounts = {};
 	int Sum = 0;
 	for (int z = -8; z <= 8; z++)
 	{
@@ -622,7 +618,7 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 		NOISE_DATATYPE Height = 0;
 		int BlockX = a_ChunkX * cChunkDef::Width + a_RelX;
 		int BlockZ = a_ChunkZ * cChunkDef::Width + a_RelZ;
-		for (size_t i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
+		for (size_t i = 0; i < BiomeCounts.size(); i++)
 		{
 			if (BiomeCounts[i] == 0)
 			{

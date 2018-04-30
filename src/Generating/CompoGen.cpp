@@ -146,12 +146,10 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
 
 	// The patterns to use for different situations, must be same length!
-	const BLOCKTYPE PatternGround[] = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
-	const BLOCKTYPE PatternBeach[]  = {m_BlockBeach,  m_BlockBeach,  m_BlockBeach,  m_BlockBeachBottom} ;
-	const BLOCKTYPE PatternOcean[]  = {m_BlockMiddle, m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
-	static int PatternLength = ARRAYCOUNT(PatternGround);
-	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternBeach));
-	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternOcean));
+	static const int PATTERN_LENGTH = 4;
+	const std::array<BLOCKTYPE, PATTERN_LENGTH> PatternGround = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
+	const std::array<BLOCKTYPE, PATTERN_LENGTH> PatternBeach  = {m_BlockBeach,  m_BlockBeach,  m_BlockBeach,  m_BlockBeachBottom} ;
+	const std::array<BLOCKTYPE, PATTERN_LENGTH> PatternOcean  = {m_BlockMiddle, m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
 
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{

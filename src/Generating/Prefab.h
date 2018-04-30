@@ -165,7 +165,7 @@ protected:
 	};
 
 	/** Maps letters in the sDef::m_Image onto a sBlockTypeDef block type definition. */
-	typedef sBlockTypeDef CharMap[256];
+	typedef std::array<sBlockTypeDef, 256> CharMap;
 
 	/** Maps generator tree depth to weight. */
 	typedef std::map<int, int> cDepthWeight;
@@ -173,7 +173,7 @@ protected:
 
 	/** The cBlockArea that contains the block definitions for the prefab.
 	The index identifies the number of CCW rotations applied (0 = no rotation, 1 = 1 CCW rotation, ...). */
-	cBlockArea m_BlockArea[4];
+	std::array<cBlockArea, 4> m_BlockArea;
 
 	/** The size of the prefab */
 	Vector3i m_Size;

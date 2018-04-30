@@ -445,7 +445,7 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 	Vector3i StartPoint = Vector3i(a_RelX, a_RelY, a_RelZ);
 
 	// Array with possible directions for a string of glowstone to go to.
-	const Vector3i AvailableDirections[] =
+	static const std::array<Vector3i, 9> AvailableDirections =
 	{
 		{ -1,  0,  0 }, { 1, 0, 0 },
 		{  0, -1,  0 },  // Don't let the glowstone go up
@@ -469,13 +469,13 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 
 		for (int j = 0; j < a_Size; j++)
 		{
-			Vector3i Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
+			Vector3i Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z)) % AvailableDirections.size()];
 			int Attempts = 2;  // multiply by 1 would make no difference, so multiply by 2 instead
 
 			while (Direction.Equals(PreviousDirection))
 			{
 				// To make the glowstone branches look better we want to make the direction change every time.
-				Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
+				Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z)) % AvailableDirections.size()];
 				Attempts++;
 			}
 
@@ -961,15 +961,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
-	int res = 0;
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		if (IsAllowedBiome(a_BiomeMap[i]))
-		{
-			res++;
-		}
-	}  // for i - a_BiomeMap[]
-	return m_Amount * res / 256;
+	return m_Amount * std::count_if(begin(a_BiomeMap), end(a_BiomeMap), IsAllowedBiome) / 256;
 }
 
 
@@ -1163,10 +1155,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 				{
 					continue;
 				}
-				static const struct
-				{
-					int x, y, z;
-				} Coords[] =
+				static const std::array<Vector3i, 5> Coords =
 				{
 					{1, 0, 0},
 					{-1, 0, 0},
@@ -1175,20 +1164,20 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{0, -1, 0}
 				} ;
 				BLOCKTYPE BlockToSet = a_StationaryFluid;  // By default, don't simulate this block
-				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+				for (const auto & Coord : Coords)
 				{
-					if ((y == 0) && (Coords[i].y < 0))
+					if ((y == 0) && (Coord.y < 0))
 					{
 						continue;
 					}
-					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
+					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Coord.x, y + Coord.y, z + Coord.z);
 					if ((Neighbor == E_BLOCK_AIR) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
 						BlockToSet = a_Fluid;
 						break;
 					}
-				}  // for i - Coords[]
+				}
 				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockToSet);
 			}  // for y
 		}  // for x
@@ -1329,10 +1318,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 		return false;
 	}
 
-	static const struct
-	{
-		int x, y, z;
-	} Coords[] =
+	static const std::array<Vector3i, 5> Coords =
 	{
 		{-1,  0,  0},
 		{ 1,  0,  0},
@@ -1341,9 +1327,9 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 		{ 0,  0,  1},
 	} ;
 	int NumAirNeighbors = 0;
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (const auto & Coord : Coords)
 	{
-		switch (a_ChunkDesc.GetBlockType(x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
+		switch (a_ChunkDesc.GetBlockType(x + Coord.x, y + Coord.y, z + Coord.z))
 		{
 			case E_BLOCK_AIR:
 			{

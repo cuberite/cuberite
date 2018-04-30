@@ -64,7 +64,7 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 		return otDummy;
 	}
 
-	return TypeMap[a_Name];
+		return TypeMap[a_Name];
 }
 
 

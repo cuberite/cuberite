@@ -197,10 +197,7 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 
 void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = biExtremeHills;
-	}
+	std::fill(begin(a_BiomeMap), end(a_BiomeMap), biExtremeHills);
 }
 
 
@@ -261,11 +258,11 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
 
 	// Precalculate a "height" array:
-	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Z> Height;  // Output for the cubic noise heightmap ("source")
 	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 5, EndX / 5, StartZ / 5, EndZ / 5);
-	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
+	for (auto && CurHeight : Height)
 	{
-		Height[i] = Height[i] * m_HeightAmplification;
+		CurHeight *= m_HeightAmplification;
 	}
 
 	// Modify the noise by height data:

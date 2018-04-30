@@ -319,8 +319,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
-	int BiomeCounts[256];
-	memset(BiomeCounts, 0, sizeof(BiomeCounts));
+	std::array<int, 256> BiomeCounts = {};
 	int Sum = 0;
 	for (int z = -8; z <= 8; z++)
 	{
@@ -351,9 +350,9 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	// For each biome type that has a nonzero count, calc its amps and add it:
 	NOISE_DATATYPE AmpX = 0;
 	NOISE_DATATYPE AmpZ = 0;
-	for (size_t i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
+	for (auto CurCount : BiomeCounts)
 	{
-		if (BiomeCounts[i] <= 0)
+		if (CurCount <= 0)
 		{
 			continue;
 		}
@@ -366,8 +365,8 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 		ASSERT(m_GenParam[i].m_DistortAmpX < 100);
 		*/
 
-		AmpX += BiomeCounts[i] * m_GenParam[i].m_DistortAmpX;
-		AmpZ += BiomeCounts[i] * m_GenParam[i].m_DistortAmpZ;
+		AmpX += CurCount * m_GenParam[i].m_DistortAmpX;
+		AmpZ += CurCount * m_GenParam[i].m_DistortAmpZ;
 	}
 	a_DistortAmpX = AmpX / Sum;
 	a_DistortAmpZ = AmpZ / Sum;

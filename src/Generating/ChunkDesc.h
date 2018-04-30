@@ -33,7 +33,7 @@ public:
 	0 = air
 	1 = solid
 	Indexed as [y + 256 * x + 256 * 16 * z]. */
-	typedef Byte Shape[256 * 16 * 16];
+	typedef std::array<Byte, 256 * 16 * 16> Shape;
 
 	/** Uncompressed block metas, 1 meta per byte */
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];

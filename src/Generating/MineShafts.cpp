@@ -742,7 +742,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 
 void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 {
-	static const cLootProbab LootProbab[] =
+	static const std::array<cLootProbab, 11> LootProbab =
 	{
 		// Item,                          MinAmount, MaxAmount, Weight
 		{ cItem(E_ITEM_IRON),             1,         5,         10 },
@@ -803,7 +803,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(x, z);
-		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, LootProbab.size(), NumSlots, Seed);
 	}
 }
 
@@ -1022,11 +1022,12 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 
 void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 {
-	struct
+	struct DirCoords
 	{
 		int x, y, z;
 		eDirection dir;
-	} Exits[] =
+	};
+	static const std::array<DirCoords, 8> Exits =
 	{
 		// Bottom level:
 		{-1, 1,  2, dirXM},
@@ -1039,17 +1040,17 @@ void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 		{ 5, 5,  2, dirXP},
 		{ 2, 5,  5, dirZP},
 	} ;
-	for (size_t i = 0; i < ARRAYCOUNT(Exits); i++)
+	for (const auto & Exit : Exits)
 	{
-		if (m_BoundingBox.p1.y + Exits[i].y >= m_BoundingBox.p2.y)
+		if (m_BoundingBox.p1.y + Exit.y >= m_BoundingBox.p2.y)
 		{
 			// This exit is not available (two-level exit on a one-level crossing)
 			continue;
 		}
 
-		int Height = m_BoundingBox.p1.y + Exits[i].y;
-		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Exits[i].x, Height, m_BoundingBox.p1.z + Exits[i].z, Exits[i].dir, a_Noise, a_RecursionLevel);
-	}  // for i
+		int Height = m_BoundingBox.p1.y + Exit.y;
+		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Exit.x, Height, m_BoundingBox.p1.z + Exit.z, Exit.dir, a_Noise, a_RecursionLevel);
+	}
 }
 
 
