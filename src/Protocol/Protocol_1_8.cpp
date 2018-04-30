@@ -1572,11 +1572,11 @@ void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 
 	Json::StyledWriter JsonWriter;
-	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
-	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
+	std::array<AString, 4> Lines = { a_Line1, a_Line2, a_Line3, a_Line4 };
+	for (const auto & Line : Lines)
 	{
 		Json::Value RootValue;
-		RootValue["text"] = Lines[i];
+		RootValue["text"] = Line;
 		Pkt.WriteString(JsonWriter.write(RootValue).c_str());
 	}
 }

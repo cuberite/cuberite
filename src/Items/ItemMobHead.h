@@ -139,7 +139,7 @@ public:
 	)
 	{
 		// Image for the wither at the X axis:
-		static const sSetBlock ImageWitherX[] =
+		static const std::array<sSetBlock, 9> ImageWitherX =
 		{
 			{-1,  0, 0, E_BLOCK_HEAD,     0},
 			{ 0,  0, 0, E_BLOCK_HEAD,     0},
@@ -153,7 +153,7 @@ public:
 		};
 
 		// Image for the wither at the Z axis:
-		static const sSetBlock ImageWitherZ[] =
+		static const std::array<sSetBlock, 9> ImageWitherZ =
 		{
 			{ 0,  0, -1, E_BLOCK_HEAD,     0},
 			{ 0,  0,  0, E_BLOCK_HEAD,     0},
@@ -169,12 +169,12 @@ public:
 		// Try to spawn the wither from each image:
 		return (
 			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherX, ARRAYCOUNT(ImageWitherX),
+				a_World, a_Player, ImageWitherX.data(), ImageWitherX.size(),
 				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			) ||
 			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherZ, ARRAYCOUNT(ImageWitherZ),
+				a_World, a_Player, ImageWitherZ.data(), ImageWitherZ.size(),
 				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			)

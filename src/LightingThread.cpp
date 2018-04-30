@@ -48,30 +48,17 @@ class cReader :
 	}  // BlockTypes()
 
 
-	virtual void HeightMap(const cChunkDef::HeightMap * a_Heightmap) override
+	virtual void HeightMap(const cChunkDef::HeightMap & a_Heightmap) override
 	{
 		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
-		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;
-		const ROW * InputRows  = reinterpret_cast<const ROW *>(a_Heightmap);
-		ROW * OutputRows = reinterpret_cast<ROW *>(m_HeightMap);
-		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
-		for (int z = 0; z < cChunkDef::Width; z++)
+		for (int InputIdx = 0; InputIdx < cChunkDef::Width; InputIdx++, OutputIdx += 3)
 		{
-			OutputRows[OutputIdx] = InputRows[InputIdx++];
-			OutputIdx += 3;
-		}  // for z
+			std::copy_n(a_Heightmap.begin() + 16 * InputIdx, 16, m_HeightMap + 16 * OutputIdx);
+		}
 
 		// Find the highest block in the entire chunk, use it as a base for m_MaxHeight:
-		HEIGHTTYPE MaxHeight = m_MaxHeight;
-		for (size_t i = 0; i < ARRAYCOUNT(*a_Heightmap); i++)
-		{
-			if ((*a_Heightmap)[i] > MaxHeight)
-			{
-				MaxHeight = (*a_Heightmap)[i];
-			}
-		}
-		m_MaxHeight = MaxHeight;
+		m_MaxHeight = std::max_element(begin(a_Heightmap), end(a_Heightmap));
 	}
 
 public:
@@ -342,8 +329,8 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		}  // for z
 	}  // for x
 
-	memset(m_BlockLight, 0, sizeof(m_BlockLight));
-	memset(m_SkyLight,   0, sizeof(m_SkyLight));
+	m_BlockLight = {};
+	m_SkyLight = {};
 	m_MaxHeight = Reader.m_MaxHeight;
 }
 
@@ -360,7 +347,7 @@ void cLightingThread::PrepareSkyLight(void)
 	// Fill the top of the chunk with all-light:
 	if (m_MaxHeight < cChunkDef::Height - 1)
 	{
-		std::fill(m_SkyLight + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight + ARRAYCOUNT(m_SkyLight), 15);
+		std::fill(m_SkyLight.begin() + (m_MaxHeight + 1) * BlocksPerYLayer, end(m_SkyLight), 15);
 	}
 
 	// Walk every column that has all XZ neighbors

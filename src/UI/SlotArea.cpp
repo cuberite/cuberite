@@ -1607,11 +1607,12 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	cBlockArea Area;
 	Area.Read(a_World, m_BlockX - 2, m_BlockX + 2, m_BlockY, m_BlockY + 1, m_BlockZ - 2, m_BlockZ + 2);
 
-	static const struct
+	struct BookshelfCoord
 	{
 		int m_BookX, m_BookY, m_BookZ;  // Coords to check for bookcases
 		int m_AirX, m_AirY, m_AirZ;  // Coords to check for air; if not air, the bookcase won't be counted
-	} CheckCoords[] =
+	};
+	static const std::array<BookshelfCoord, 32> CheckCoords =
 	{
 		{ 0, 0, 0, 1, 0, 1 },  // Bookcase at {0, 0, 0}, air at {1, 0, 1}
 		{ 0, 0, 1, 1, 0, 1 },  // Bookcase at {0, 0, 1}, air at {1, 0, 1}
@@ -1648,16 +1649,16 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 		{ 1, 1, 0, 1, 1, 1 },  // Bookcase at {1, 1, 0}, air at {1, 1, 1}
 	};
 
-	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
+	for (const auto & Coord : CheckCoords)
 	{
 		if (
-			(Area.GetRelBlockType(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
-			(Area.GetRelBlockType(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
+			(Area.GetRelBlockType(Coord.m_AirX, Coord.m_AirY, Coord.m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
+			(Area.GetRelBlockType(Coord.m_BookX, Coord.m_BookY, Coord.m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
 		)
 		{
 			Bookshelves++;
 		}
-	}  // for i - CheckCoords
+	}
 
 	return Bookshelves;
 }

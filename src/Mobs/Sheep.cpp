@@ -142,10 +142,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
 {
-	static const struct
+	struct Inheritance
 	{
 		short Parent1, Parent2, Child;
-	} ColorInheritance[] =
+	};
+	static const std::array<Inheritance, 9> ColorInheritance =
 	{
 		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },
 		{ E_META_WOOL_BLUE,   E_META_WOOL_GREEN, E_META_WOOL_CYAN       },
@@ -159,14 +160,14 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 	};
 	cSheep * Parent1 = static_cast<cSheep *>(a_Parent1);
 	cSheep * Parent2 = static_cast<cSheep *>(a_Parent2);
-	for (size_t i = 0; i < ARRAYCOUNT(ColorInheritance); i++)
+	for (const auto & CurInheritance : ColorInheritance)
 	{
 		if (
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent1) && (Parent2->GetFurColor() == ColorInheritance[i].Parent2)) ||
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent2) && (Parent2->GetFurColor() == ColorInheritance[i].Parent1))
+			((Parent1->GetFurColor() == CurInheritance.Parent1) && (Parent2->GetFurColor() == CurInheritance.Parent2)) ||
+			((Parent1->GetFurColor() == CurInheritance.Parent2) && (Parent2->GetFurColor() == CurInheritance.Parent1))
 		)
 		{
-			SetFurColor(ColorInheritance[i].Child);
+			SetFurColor(CurInheritance.Child);
 			m_World->BroadcastEntityMetadata(*this);
 			return;
 		}

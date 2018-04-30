@@ -149,8 +149,8 @@ typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
 
 static pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
 
-static wchar_t g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
-static char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
+static std::array<wchar_t, MAX_PATH> g_DumpFileName;  // Filename of the dump file; hes to be created before the dump handler kicks in
+static std::array<char, 128 * 1024>  g_ExceptionStack;  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
 static MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
 
 
@@ -471,7 +471,7 @@ int main(int argc, char ** argv)
 		g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
 		if (g_WriteMiniDump != nullptr)
 		{
-			_snwprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, L"crash_mcs_%x.dmp", GetCurrentProcessId());
+			_snwprintf_s(g_DumpFileName.data(), g_DumpFileName.size(), _TRUNCATE, L"crash_mcs_%x.dmp", GetCurrentProcessId());
 			SetUnhandledExceptionFilter(LastChanceExceptionFilter);
 		}
 	#endif  // 32-bit Windows app compiled in MSVC

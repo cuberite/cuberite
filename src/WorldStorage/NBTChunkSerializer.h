@@ -59,8 +59,8 @@ class cNBTChunkSerializer :
 {
 public:
 	cChunkDef::BiomeMap m_Biomes;
-	unsigned char m_VanillaBiomes[cChunkDef::Width * cChunkDef::Width];
-	int m_VanillaHeightMap[cChunkDef::Width * cChunkDef::Width];
+	std::array<unsigned char, cChunkDef::Width * cChunkDef::Width> m_VanillaBiomes;
+	std::array<int, cChunkDef::Width * cChunkDef::Width> m_VanillaHeightMap;
 	bool m_BiomesAreValid;
 
 

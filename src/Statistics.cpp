@@ -113,11 +113,11 @@ const AString & cStatInfo::GetName(const eStatistic a_Type)
 
 eStatistic cStatInfo::GetType(const AString & a_Name)
 {
-	for (unsigned int i = 0; i < ARRAYCOUNT(ms_Info); ++i)
+	for (const auto & Info : ms_Info)
 	{
-		if (NoCaseCompare(ms_Info[i].m_Name, a_Name) == 0)
+		if (NoCaseCompare(Info.m_Name, a_Name) == 0)
 		{
-			return ms_Info[i].m_Type;
+			return Info.m_Type;
 		}
 	}
 

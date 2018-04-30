@@ -506,12 +506,12 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
 	if (Serializer.m_BiomesAreValid)
 	{
-		a_Writer.AddByteArray("Biomes",    reinterpret_cast<const char *>(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
-		a_Writer.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
+		a_Writer.AddByteArray("Biomes",    reinterpret_cast<const char *>(Serializer.m_VanillaBiomes.data()), Serializer.m_VanillaBiomes.size());
+		a_Writer.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(Serializer.m_Biomes.data()),         Serializer.m_Biomes.size());
 	}
 
 	// Save heightmap (Vanilla require this):
-	a_Writer.AddIntArray("HeightMap", reinterpret_cast<const int *>(Serializer.m_VanillaHeightMap), ARRAYCOUNT(Serializer.m_VanillaHeightMap));
+	a_Writer.AddIntArray("HeightMap", reinterpret_cast<const int *>(Serializer.m_VanillaHeightMap.data()), Serializer.m_VanillaHeightMap.size());
 
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
@@ -524,16 +524,16 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		}
 
 		a_Writer.BeginCompound("");
-		a_Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(Section->m_BlockTypes), ARRAYCOUNT(Section->m_BlockTypes));
-		a_Writer.AddByteArray("Data",   reinterpret_cast<const char *>(Section->m_BlockMetas), ARRAYCOUNT(Section->m_BlockMetas));
+		a_Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(Section->m_BlockTypes.data()), Section->m_BlockTypes.size());
+		a_Writer.AddByteArray("Data",   reinterpret_cast<const char *>(Section->m_BlockMetas.data()), Section->m_BlockMetas.size());
 
 		#ifdef DEBUG_SKYLIGHT
-			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
+			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight.data()), Section->m_BlockSkyLight.size());
 		#else
-			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockLight),    ARRAYCOUNT(Section->m_BlockLight));
+			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockLight.data()),    Section->m_BlockLight.size());
 		#endif
 
-		a_Writer.AddByteArray("SkyLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
+		a_Writer.AddByteArray("SkyLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight.data()), Section->m_BlockSkyLight.size());
 		a_Writer.AddByte("Y", static_cast<unsigned char>(Y));
 		a_Writer.EndCompound();
 	}
@@ -560,7 +560,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 
 
 
-cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+cChunkDef::BiomeMap & cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
 	{
@@ -572,14 +572,14 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 		return nullptr;
 	}
 	const unsigned char * VanillaBiomeData = reinterpret_cast<const unsigned char *>(a_NBT.GetData(a_TagIdx));
-	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	for (auto && Biome : a_BiomeMap)
 	{
 		if ((VanillaBiomeData)[i] == 0xff)
 		{
 			// Unassigned biomes
 			return nullptr;
 		}
-		(*a_BiomeMap)[i] = static_cast<EMCSBiome>(VanillaBiomeData[i]);
+		Biome = static_cast<EMCSBiome>(VanillaBiomeData[i]);
 	}
 	return a_BiomeMap;
 }
@@ -588,7 +588,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 
 
 
-cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+cChunkDef::BiomeMap & cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_IntArray))
 	{
@@ -600,10 +600,10 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		return nullptr;
 	}
 	const char * BiomeData = (a_NBT.GetData(a_TagIdx));
-	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	for (size_t i = 0; i < a_BiomeMap.size(); i++)
 	{
-		(*a_BiomeMap)[i] = static_cast<EMCSBiome>(GetBEInt(&BiomeData[i * 4]));
-		if ((*a_BiomeMap)[i] == 0xff)
+		a_BiomeMap[i] = static_cast<EMCSBiome>(GetBEInt(&BiomeData[i * 4]));
+		if (a_BiomeMap[i] == 0xff)
 		{
 			// Unassigned biomes
 			return nullptr;
@@ -3620,15 +3620,15 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 
 	// Doesn't fit, append to the end of file (we're wasting a lot of space, TODO: fix this later)
 	unsigned MaxLocation = 2 << 8;  // Minimum sector is #2 - after the headers
-	for (size_t i = 0; i < ARRAYCOUNT(m_Header); i++)
+	for (auto Header : m_Header)
 	{
-		ChunkLocation = ntohl(m_Header[i]);
+		ChunkLocation = ntohl(Header);
 		ChunkLocation = ChunkLocation + ((ChunkLocation & 0xff) << 8);  // Add the number of sectors used; don't care about the 4th byte
 		if (MaxLocation < ChunkLocation)
 		{
 			MaxLocation = ChunkLocation;
 		}
-	}  // for i - m_Header[]
+	}
 	return MaxLocation >> 8;
 }
 

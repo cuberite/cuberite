@@ -5,12 +5,12 @@
 
 AString GetOSErrorString( int a_ErrNo)
 {
-	char buffer[ 1024 ];
+	std::array<char, 1024> buffer;
 	AString Out;
 
 	#ifdef _WIN32
 
-	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), nullptr);
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, a_ErrNo, 0, buffer.data(), buffer.size(), nullptr);
 	Printf(Out, "%d: %s", a_ErrNo, buffer);
 	if (!Out.empty() && (Out[Out.length() - 1] == '\n'))
 	{
@@ -24,7 +24,7 @@ AString GetOSErrorString( int a_ErrNo)
 
 	#if defined(__GLIBC__) && defined( _GNU_SOURCE) && !defined(ANDROID)  // GNU version of strerror_r()
 
-	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer));
+	char * res = strerror_r( errno, buffer.data(), buffer.size());
 	if (res != nullptr)
 	{
 		Printf(Out, "%d: %s", a_ErrNo, res);
@@ -33,10 +33,10 @@ AString GetOSErrorString( int a_ErrNo)
 
 	#else  // XSI version of strerror_r():
 
-	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer));
+	int res = strerror_r( errno, buffer.data(), buffer.size());
 	if (res == 0)
 	{
-		Printf(Out, "%d: %s", a_ErrNo, buffer);
+		Printf(Out, "%d: %s", a_ErrNo, buffer.data());
 		return Out;
 	}
 

@@ -37,10 +37,8 @@ public:
 
 		if (Block == E_BLOCK_AIR)
 		{
-			static const struct  // Define all the possible painting titles
-			{
-				AString Title;
-			} gPaintingTitlesList[] =
+			// Define all the possible painting titles
+			static const std::array<AString, 26> PaintingTitlesList =
 			{
 				{ "Kebab" },
 				{ "Aztec" },
@@ -70,7 +68,7 @@ public:
 				{ "BurningSkull" }
 			};
 
-			auto Painting = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto Painting = cpp14::make_unique<cPainting>(PaintingTitlesList[a_World->GetTickRandomNumber(PaintingTitlesList.size() - 1)], a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
 			auto PaintingPtr = Painting.get();
 			if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 			{

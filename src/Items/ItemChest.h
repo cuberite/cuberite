@@ -73,7 +73,7 @@ public:
 		}
 
 		// Check that there is at most one single neighbor of the same chest type:
-		static const Vector3i CrossCoords[] =
+		static const std::array<Vector3i, 4> CrossCoords =
 		{
 			{-1, 0,  0},
 			{ 0, 0, -1},
@@ -81,9 +81,9 @@ public:
 			{ 0, 0,  1},
 		};
 		int NeighborIdx = -1;
-		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+		for (const auto & Coord : CrossCoords)
 		{
-			if (a_World.GetBlock(a_BlockX + CrossCoords[i].x, a_BlockY, a_BlockZ + CrossCoords[i].z) != m_ItemType)
+			if (a_World.GetBlock(a_BlockX + Coord.x, a_BlockY, a_BlockZ + Coord.z) != m_ItemType)
 			{
 				continue;
 			}
@@ -95,16 +95,16 @@ public:
 			NeighborIdx = static_cast<int>(i);
 
 			// Check that this neighbor is a single chest:
-			int bx = a_BlockX + CrossCoords[i].x;
-			int bz = a_BlockZ + CrossCoords[i].z;
-			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
+			int bx = a_BlockX + Coord.x;
+			int bz = a_BlockZ + Coord.z;
+			for (const auto & NeighbourCoord : CrossCoords)
 			{
-				if (a_World.GetBlock(bx + CrossCoords[j].x, a_BlockY, bz + CrossCoords[j].z) == m_ItemType)
+				if (a_World.GetBlock(bx + NeighbourCoord.x, a_BlockY, bz + NeighbourCoord.z) == m_ItemType)
 				{
 					return false;
 				}
-			}  // for j
-		}  // for i
+			}
+		}
 
 		// Get the meta of the placed chest; take existing neighbors into account:
 		BLOCKTYPE ChestBlockType = static_cast<BLOCKTYPE>(m_ItemType);

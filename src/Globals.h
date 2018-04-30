@@ -286,9 +286,6 @@ template class SizeChecker<UInt8,  1>;
 
 // Common definitions:
 
-/** Evaluates to the number of elements in an array (compile-time!) */
-#define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
-
 /** Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)") */
 #define KiB * 1024
 #define MiB * 1024 * 1024

@@ -684,19 +684,19 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 
 	// A search grid (searches clockwise around the origin)
 	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 2.0f);
-	static const Vector3i ChunkOffset[] =
+	static const std::array<Vector3i, 8> ChunkOffset =
 	{
-		Vector3i(0, 0, HalfChunk),
-		Vector3i(HalfChunk, 0, HalfChunk),
-		Vector3i(HalfChunk, 0, 0),
-		Vector3i(HalfChunk, 0, -HalfChunk),
-		Vector3i(0, 0, -HalfChunk),
-		Vector3i(-HalfChunk, 0, -HalfChunk),
-		Vector3i(-HalfChunk, 0, 0),
-		Vector3i(-HalfChunk, 0, HalfChunk),
+		{ 0,          0, HalfChunk  },
+		{ HalfChunk,  0, HalfChunk  },
+		{ HalfChunk,  0, 0          },
+		{ HalfChunk,  0, -HalfChunk },
+		{ 0,          0, -HalfChunk },
+		{ -HalfChunk, 0, -HalfChunk },
+		{ -HalfChunk, 0, 0          },
+		{ -HalfChunk, 0, HalfChunk  },
 	};
 
-	static const int PerRadiSearchCount = ARRAYCOUNT(ChunkOffset);
+	static const int PerRadiSearchCount = ChunkOffset.size();
 
 	for (int RadiusOffset = 1; RadiusOffset < (a_MaxSpawnRadius * 2); ++RadiusOffset)
 	{
@@ -730,7 +730,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 {
 	// All this blocks can only be found above ground.
 	// Apart from netherrack (as the Nether is technically a massive cave)
-	static const BLOCKTYPE ValidSpawnBlocks[] =
+	static const std::array<BLOCKTYPE, 5> ValidSpawnBlocks =
 	{
 		E_BLOCK_GRASS,
 		E_BLOCK_SAND,
@@ -738,8 +738,6 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 		E_BLOCK_SNOW_BLOCK,
 		E_BLOCK_NETHERRACK
 	};
-
-	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
 	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
@@ -773,9 +771,9 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 
 		// Is the floor block ok
 		bool ValidSpawnBlock = false;
-		for (int BlockIndex = 0; BlockIndex < ValidSpawnBlocksCount; ++BlockIndex)
+		for (auto Block : ValidSpawnBlocks)
 		{
-			ValidSpawnBlock |= (ValidSpawnBlocks[BlockIndex] == FloorBlock);
+			ValidSpawnBlock |= (Block == FloorBlock);
 		}
 
 		if (!ValidSpawnBlock)
@@ -808,24 +806,22 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 	}
 
 	// Check that surrounding blocks are neither solid or liquid
-	static const Vector3i SurroundingCoords[] =
+	static const std::array<Vector3i, 8> SurroundingCoords =
 	{
-		Vector3i(0,  0,  1),
-		Vector3i(1,  0,  1),
-		Vector3i(1,  0,  0),
-		Vector3i(1,  0, -1),
-		Vector3i(0,  0, -1),
-		Vector3i(-1, 0, -1),
-		Vector3i(-1, 0,  0),
-		Vector3i(-1, 0,  1),
+		{ 0,  0,  1 },
+		{ 1,  0,  1 },
+		{ 1,  0,  0 },
+		{ 1,  0, -1 },
+		{ 0,  0, -1 },
+		{ -1, 0, -1 },
+		{ -1, 0,  0 },
+		{ -1, 0,  1 },
 	};
 
-	static const int SurroundingCoordsCount = ARRAYCOUNT(SurroundingCoords);
-
-	for (int CoordIndex = 0; CoordIndex < SurroundingCoordsCount; ++CoordIndex)
+	for (const auto & Coord : SurroundingCoords)
 	{
-		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
-		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
+		const int XPos = a_PosX + Coord.x;
+		const int ZPos = a_PosZ + Coord.z;
 
 		const BLOCKTYPE BlockType = GetBlock(XPos, a_PosY, ZPos);
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
@@ -1138,16 +1134,15 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 	if (m_bAnimals)
 	{
 		// Spawning is enabled, spawn now:
-		static const cMonster::eFamily AllFamilies[] =
+		static const std::array<cMonster::eFamily, 4> AllFamilies =
 		{
 			cMonster::mfHostile,
 			cMonster::mfPassive,
 			cMonster::mfAmbient,
 			cMonster::mfWater,
 		} ;
-		for (size_t i = 0; i < ARRAYCOUNT(AllFamilies); i++)
+		for (auto Family : AllFamilies)
 		{
-			cMonster::eFamily Family = AllFamilies[i];
 			cTickTime SpawnDelay = cTickTime(cMonster::GetSpawnDelay(Family));
 			if (
 				(m_LastSpawnMonster[Family] > m_WorldAge - SpawnDelay) ||  // Not reached the needed ticks before the next round

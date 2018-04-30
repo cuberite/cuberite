@@ -116,20 +116,20 @@ protected:
 	// The blobs are XZY organized as a whole, instead of 3x3 XZY-organized subarrays ->
 	//  -> This means data has to be scatterred when reading and gathered when writing!
 	static const int BlocksPerYLayer = cChunkDef::Width * cChunkDef::Width * 3 * 3;
-	BLOCKTYPE  m_BlockTypes[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
-	HEIGHTTYPE m_HeightMap [BlocksPerYLayer];
+	std::array<BLOCKTYPE, BlocksPerYLayer * cChunkDef::Height>  m_BlockTypes;
+	std::array<NIBBLETYPE, BlocksPerYLayer * cChunkDef::Height> m_BlockLight;
+	std::array<NIBBLETYPE, BlocksPerYLayer * cChunkDef::Height> m_SkyLight;
+	std::array<HEIGHTTYPE, BlocksPerYLayer> m_HeightMap;
 
 	// Seed management (5.7 MiB)
 	// Two buffers, in each calc step one is set as input and the other as output, then in the next step they're swapped
 	// Each seed is represented twice in this structure - both as a "list" and as a "position".
 	// "list" allows fast traversal from seed to seed
 	// "position" allows fast checking if a coord is already a seed
-	unsigned char m_IsSeed1 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx1[BlocksPerYLayer * cChunkDef::Height];
-	unsigned char m_IsSeed2 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::Height];
+	std::array<unsigned char, BlocksPerYLayer * cChunkDef::Height> m_IsSeed1;
+	std::array<unsigned int,  BlocksPerYLayer * cChunkDef::Height> m_SeedIdx1;
+	std::array<unsigned char, BlocksPerYLayer * cChunkDef::Height> m_IsSeed2;
+	std::array<unsigned int,  BlocksPerYLayer * cChunkDef::Height> m_SeedIdx2;
 	size_t m_NumSeeds;
 
 	virtual void Execute(void) override;
@@ -165,8 +165,8 @@ protected:
 		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)
 	{
-		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
-		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
+		ASSERT(a_SrcIdx < m_SkyLight.size());
+		ASSERT(a_DstIdx < m_BlockTypes.size());
 
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
 		{

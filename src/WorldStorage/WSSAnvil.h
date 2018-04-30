@@ -79,10 +79,10 @@ protected:
 
 		// The header, copied from the file so we don't have to seek to it all the time
 		// First 1024 entries are chunk locations - the 3 + 1 byte sector-offset and sector-count
-		unsigned m_Header[MCA_MAX_CHUNKS];
+		std::array<unsigned, MCA_MAX_CHUNKS> m_Header;
 
 		// Chunk timestamps, following the chunk headers
-		unsigned m_TimeStamps[MCA_MAX_CHUNKS];
+		std::array<unsigned, MCA_MAX_CHUNKS> m_TimeStamps;
 
 		/** Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number. */
 		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data);

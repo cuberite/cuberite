@@ -949,10 +949,10 @@ void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap * a_HeightMap)
 
 
 
-void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap & a_BiomeMap)
 {
-	memcpy(m_Biomes, a_BiomeMap, sizeof(m_Biomes));
-	for (size_t i = 0; i < ARRAYCOUNT(m_Biomes); i++)
+	m_Biomes = a_BiomeMap;
+	for (size_t i = 0; i < m_Biomes.size(); i++)
 	{
 		if ((*a_BiomeMap)[i] < 255)
 		{

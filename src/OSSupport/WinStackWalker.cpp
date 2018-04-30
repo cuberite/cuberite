@@ -140,9 +140,9 @@ public:
 		}
 		// Dynamically load the Entry-Points for dbghelp.dll:
 		// First try to load the newsest one from
-		TCHAR szTemp[4096];
+		std::array<TCHAR, 4096> szTemp;
 		// But before wqe do this, we first check if the ".local" file exists
-		if (GetModuleFileName(nullptr, szTemp, sizeof(szTemp)) > 0)
+		if (GetModuleFileName(nullptr, szTemp.data(), szTemp.size()) > 0)
 		{
 			_tcscat_s(szTemp, _T(".local"));
 			if (GetFileAttributes(szTemp) == INVALID_FILE_ATTRIBUTES)
@@ -150,7 +150,7 @@ public:
 				// ".local" file does not exist, so we can try to load the dbghelp.dll from the "Debugging Tools for Windows"
 				// Ok, first try the new path according to the archtitecture:
 				#ifdef _M_IX86
-					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, ARRAYCOUNT(szTemp)) > 0))
+					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
 						_tcscat_s(szTemp, _T("\\Debugging Tools for Windows (x86)\\dbghelp.dll"));
 						// now check if the file exists:
@@ -160,7 +160,7 @@ public:
 						}
 					}
 				#elif _M_X64
-					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, ARRAYCOUNT(szTemp)) > 0))
+					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
 						_tcscat_s(szTemp, _T("\\Debugging Tools for Windows (x64)\\dbghelp.dll"));
 						// now check if the file exists:
@@ -170,7 +170,7 @@ public:
 						}
 					}
 				#elif _M_IA64
-					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, ARRAYCOUNT(szTemp)) > 0))
+					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
 						_tcscat_s(szTemp, _T("\\Debugging Tools for Windows (ia64)\\dbghelp.dll"));
 						// now check if the file exists:
@@ -181,7 +181,7 @@ public:
 					}
 				#endif
 				// If still not found, try the old directories...
-				if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, ARRAYCOUNT(szTemp)) > 0))
+				if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 				{
 					_tcscat_s(szTemp, _T("\\Debugging Tools for Windows\\dbghelp.dll"));
 					// now check if the file exists:
@@ -192,7 +192,7 @@ public:
 				}
 				#if defined _M_X64 || defined _M_IA64
 					// Still not found? Then try to load the (old) 64-Bit version:
-					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, ARRAYCOUNT(szTemp)) > 0))
+					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
 						_tcscat_s(szTemp, _T("\\Debugging Tools for Windows 64-Bit\\dbghelp.dll"));
 						if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
@@ -396,7 +396,7 @@ private:
 		typedef BOOL(__stdcall *tM32N)(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
 
 		// try both dlls...
-		const TCHAR *dllname[] = { _T("kernel32.dll"), _T("tlhelp32.dll") };
+		const std::array<TCHAR *, 2> dllname = { _T("kernel32.dll"), _T("tlhelp32.dll") };
 		HINSTANCE hToolhelp = nullptr;
 		tCT32S pCT32S = nullptr;
 		tM32F pM32F = nullptr;
@@ -407,9 +407,9 @@ private:
 		me.dwSize = sizeof(me);
 		BOOL keepGoing;
 
-		for (size_t i = 0; i < ARRAYCOUNT(dllname); i++)
+		for (auto name : dllname)
 		{
-			hToolhelp = LoadLibrary(dllname[i]);
+			hToolhelp = LoadLibrary(name);
 			if (hToolhelp == nullptr)
 			{
 				continue;
