@@ -709,9 +709,6 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_Rel
 		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_CACTUS);
 	}
 
-	// Update chunk height after adding cactus
-	a_ChunkDesc.SetHeight(a_RelX, a_RelZ, a_RelY);
-
 	return true;
 }
 
@@ -770,9 +767,6 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 		// All conditions met, place a sugarcane here
 		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_SUGARCANE);
 	}
-
-	// Update the chunk's height after adding sugarcane
-	a_ChunkDesc.SetHeight(a_RelX, a_RelZ, a_RelY);
 
 	return true;
 }
