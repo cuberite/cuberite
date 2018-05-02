@@ -83,7 +83,7 @@ void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size
 
 void cSslHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 {
-	const char * OutgoingData = reinterpret_cast<const char *>(a_Data);
+	const char * OutgoingData = static_cast<const char *>(a_Data);
 	size_t pos = 0;
 	for (;;)
 	{

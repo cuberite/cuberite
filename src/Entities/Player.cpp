@@ -968,7 +968,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
+		cPlayer * Attacker = static_cast<cPlayer *>(a_TDI.Attacker);
 
 		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
 		{
@@ -1098,7 +1098,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
-		cPlayer * Killer = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
+		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
 		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
@@ -1139,7 +1139,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 	}
 	else if (a_Victim->IsMob())
 	{
-		if (reinterpret_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(achKillMonster);
 		}
@@ -2529,7 +2529,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
 			case cEntity::etMonster:
 			{
-				cMonster * Monster = reinterpret_cast<cMonster *>(m_AttachedTo);
+				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
 					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;

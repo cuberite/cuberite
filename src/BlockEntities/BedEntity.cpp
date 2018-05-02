@@ -23,7 +23,7 @@ cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Bloc
 void cBedEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cBedEntity &>(a_Src);
+	auto & src = static_cast<const cBedEntity &>(a_Src);
 	m_Color = src.m_Color;
 }
 

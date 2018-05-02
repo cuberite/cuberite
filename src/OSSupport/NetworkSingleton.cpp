@@ -173,7 +173,7 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 
 void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Events, void * a_Self)
 {
-	auto self = reinterpret_cast<cNetworkSingleton *>(a_Self);
+	auto self = static_cast<cNetworkSingleton *>(a_Self);
 	ASSERT(self != nullptr);
 	self->m_StartupEvent.Set();
 }

@@ -539,7 +539,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if (entity->IsMob())
 		{
-			auto & Monster = reinterpret_cast<cMonster &>(*entity);
+			auto & Monster = static_cast<cMonster &>(*entity);
 			currentPosition = Monster.GetPosition();
 			for (const auto & PlayerPos : PlayerPositions)
 			{
@@ -1902,11 +1902,11 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 			MarkDirty();
 			if (Entity->IsPickup())
 			{
-				reinterpret_cast<cPickup *>(Entity.get())->CollectedBy(a_Player);
+				static_cast<cPickup &>(*Entity).CollectedBy(a_Player);
 			}
 			else
 			{
-				reinterpret_cast<cProjectileEntity *>(Entity.get())->CollectedBy(a_Player);
+				static_cast<cProjectileEntity &>(*Entity).CollectedBy(a_Player);
 			}
 		}
 		else if (SqrDist < 5 * 5)

@@ -48,7 +48,7 @@ void cBlockEntityWithItems::Destroy(void)
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cBlockEntityWithItems &>(a_Src);
+	auto & src = static_cast<const cBlockEntityWithItems &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 }
 
