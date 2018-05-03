@@ -47,14 +47,14 @@ cSetChunkData::cSetChunkData(
 	ASSERT(a_BlockMetas != nullptr);
 
 	// Copy block types and metas:
-    memcpy(m_BlockTypes.data(), a_BlockTypes, sizeof(cChunkDef::BlockTypes));
-    memcpy(m_BlockMetas.data(), a_BlockMetas, sizeof(cChunkDef::BlockNibbles));
+	memcpy(m_BlockTypes.data(), a_BlockTypes, sizeof(cChunkDef::BlockTypes));
+	memcpy(m_BlockMetas.data(), a_BlockMetas, sizeof(cChunkDef::BlockNibbles));
 
 	// Copy lights, if both given:
 	if ((a_BlockLight != nullptr) && (a_SkyLight != nullptr))
 	{
-        memcpy(m_BlockLight.data(), a_BlockLight, sizeof(m_BlockLight));
-        memcpy(m_SkyLight.data(),   a_SkyLight,   sizeof(m_SkyLight));
+		memcpy(m_BlockLight.data(), a_BlockLight, sizeof(m_BlockLight));
+		memcpy(m_SkyLight.data(),   a_SkyLight,   sizeof(m_SkyLight));
 		m_IsLightValid = true;
 	}
 	else
@@ -65,7 +65,7 @@ cSetChunkData::cSetChunkData(
 	// Copy the heightmap, if available:
 	if (a_HeightMap != nullptr)
 	{
-        memcpy(m_HeightMap.data(), a_HeightMap, sizeof(m_HeightMap));
+		memcpy(m_HeightMap.data(), a_HeightMap, sizeof(m_HeightMap));
 		m_IsHeightMapValid = true;
 	}
 	else
@@ -76,7 +76,7 @@ cSetChunkData::cSetChunkData(
 	// Copy biomes, if available:
 	if (a_Biomes != nullptr)
 	{
-        memcpy(m_Biomes.data(), a_Biomes, sizeof(m_Biomes));
+		memcpy(m_Biomes.data(), a_Biomes, sizeof(m_Biomes));
 		m_AreBiomesValid = true;
 	}
 	else
@@ -101,10 +101,10 @@ void cSetChunkData::CalculateHeightMap(void)
 		{
 			for (int y = cChunkDef::Height - 1; y > -1; y--)
 			{
-                size_t index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
+				size_t index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
 				if (m_BlockTypes[index] != E_BLOCK_AIR)
 				{
-                    m_HeightMap[static_cast<size_t>(x + z * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[static_cast<size_t>(x + z * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y
@@ -124,7 +124,7 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 	{
 		cBlockEntity * BlockEntity = itr->second;
 		BLOCKTYPE EntityBlockType = BlockEntity->GetBlockType();
-        BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes.data(), BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ());
+		BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes.data(), BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ());
 		if (EntityBlockType != WorldBlockType)
 		{
 			// Bad blocktype, remove the block entity:

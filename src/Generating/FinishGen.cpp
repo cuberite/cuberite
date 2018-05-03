@@ -447,17 +447,18 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 
 	// Array with possible directions for a string of glowstone to go to.
 	static const std::array<Vector3i, 9> AvailableDirections =
-    {{
-		{ -1,  0,  0 }, { 1, 0, 0 },
-		{  0, -1,  0 },  // Don't let the glowstone go up
-		{  0,  0, -1 }, { 0, 0, 1 },
+	{
+		{
+			{ -1,  0,  0 }, { 1, 0, 0 },
+			{  0, -1,  0 },  // Don't let the glowstone go up
+			{  0,  0, -1 }, { 0, 0, 1 },
 
-		// Diagonal direction. Only X or Z with Y.
-		// If all were changed the glowstone string looks awkward
-		{ 0, -1,  1 }, {  1, -1, 0 },
-		{ 0, -1, -1 }, { -1, -1, 0 },
-
-    }};
+			// Diagonal direction. Only X or Z with Y.
+			// If all were changed the glowstone string looks awkward
+			{ 0, -1,  1 }, {  1, -1, 0 },
+			{ 0, -1, -1 }, { -1, -1, 0 },
+		}
+	};
 
 	for (int i = 1; i <= a_NumStrings; i++)
 	{
@@ -962,7 +963,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
-    return m_Amount * static_cast<int>(std::count_if(begin(a_BiomeMap), end(a_BiomeMap), std::bind(&cFinishGenSingleTopBlock::IsAllowedBiome, this, std::placeholders::_1)) / 256);
+	return m_Amount * static_cast<int>(std::count_if(begin(a_BiomeMap), end(a_BiomeMap), std::bind(&cFinishGenSingleTopBlock::IsAllowedBiome, this, std::placeholders::_1)) / 256);
 }
 
 
@@ -1024,7 +1025,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
-            size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
+			size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
 			if (BlockTypes[Index] == E_BLOCK_AIR)
 			{
 				BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
@@ -1151,19 +1152,21 @@ void cFinishGenPreSimulator::StationarizeFluid(
 		{
 			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); y >= 0; y--)
 			{
-                BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z);
+				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z);
 				if ((Block != a_Fluid) && (Block != a_StationaryFluid))
 				{
 					continue;
 				}
 				static const std::array<Vector3i, 5> Coords =
-                {{
-					{1, 0, 0},
-					{-1, 0, 0},
-					{0, 0, 1},
-					{0, 0, -1},
-					{0, -1, 0}
-                }};
+				{
+					{
+						{1, 0, 0},
+						{-1, 0, 0},
+						{0, 0, 1},
+						{0, 0, -1},
+						{0, -1, 0}
+					}
+				};
 				BLOCKTYPE BlockToSet = a_StationaryFluid;  // By default, don't simulate this block
 				for (const auto & Coord : Coords)
 				{
@@ -1171,7 +1174,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{
 						continue;
 					}
-                    BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes.data(), x + Coord.x, y + Coord.y, z + Coord.z);
+					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes.data(), x + Coord.x, y + Coord.y, z + Coord.z);
 					if ((Neighbor == E_BLOCK_AIR) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
@@ -1179,7 +1182,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 						break;
 					}
 				}
-                cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, BlockToSet);
+				cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, BlockToSet);
 			}  // for y
 		}  // for x
 	}  // for z
@@ -1189,21 +1192,21 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
-            if (cChunkDef::GetBlock(a_BlockTypes.data(), 0, y, i) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), 0, y, i) == a_StationaryFluid)
 			{
-                cChunkDef::SetBlock(a_BlockTypes.data(), 0, y, i, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), 0, y, i, a_Fluid);
 			}
-            if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, 0) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, 0) == a_StationaryFluid)
 			{
-                cChunkDef::SetBlock(a_BlockTypes.data(), i, y, 0, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), i, y, 0, a_Fluid);
 			}
-            if (cChunkDef::GetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i) == a_StationaryFluid)
 			{
-                cChunkDef::SetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i, a_Fluid);
 			}
-            if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1) == a_StationaryFluid)
 			{
-                cChunkDef::SetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1, a_Fluid);
 			}
 		}
 	}
@@ -1320,13 +1323,15 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	}
 
 	static const std::array<Vector3i, 5> Coords =
-    {{
-		{-1,  0,  0},
-		{ 1,  0,  0},
-		{ 0, -1,  0},
-		{ 0,  0, -1},
-		{ 0,  0,  1},
-    }};
+	{
+		{
+			{-1,  0,  0},
+			{ 1,  0,  0},
+			{ 0, -1,  0},
+			{ 0,  0, -1},
+			{ 0,  0,  1},
+		}
+	};
 	int NumAirNeighbors = 0;
 	for (const auto & Coord : Coords)
 	{
@@ -1730,7 +1735,7 @@ void cFinishGenOreNests::GenerateOre(
 							continue;
 						}
 
-                        size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ));
+						size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ));
 						auto blockType = blockTypes[Index];
 						if ((blockType == E_BLOCK_STONE) || (blockType == E_BLOCK_NETHERRACK))
 						{

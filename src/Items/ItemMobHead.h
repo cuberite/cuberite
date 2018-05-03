@@ -103,13 +103,15 @@ public:
 		}
 
 		// Check for all relevant wither locations:
-		static const Vector3i RelCoords[] =
+		static const std::array<Vector3i, 5> RelCoords =
 		{
-			{ 0, 0,  0},
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
+			{
+				{ 0, 0,  0},
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+			}
 		};
 		for (auto & RelCoord : RelCoords)
 		{
@@ -121,7 +123,7 @@ public:
 			{
 				return true;
 			}
-		}  // for i - RelCoords[]
+		}
 
 		return false;
 	}
@@ -140,31 +142,35 @@ public:
 	{
 		// Image for the wither at the X axis:
 		static const std::array<sSetBlock, 9> ImageWitherX =
-		{{
-			{-1,  0, 0, E_BLOCK_HEAD,     0},
-			{ 0,  0, 0, E_BLOCK_HEAD,     0},
-			{ 1,  0, 0, E_BLOCK_HEAD,     0},
-			{-1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{-1, -2, 0, E_BLOCK_AIR,      0},
-			{ 0, -2, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -2, 0, E_BLOCK_AIR,      0},
-		}};
+		{
+			{
+				{-1,  0, 0, E_BLOCK_HEAD,     0},
+				{ 0,  0, 0, E_BLOCK_HEAD,     0},
+				{ 1,  0, 0, E_BLOCK_HEAD,     0},
+				{-1, -1, 0, E_BLOCK_SOULSAND, 0},
+				{ 0, -1, 0, E_BLOCK_SOULSAND, 0},
+				{ 1, -1, 0, E_BLOCK_SOULSAND, 0},
+				{-1, -2, 0, E_BLOCK_AIR,      0},
+				{ 0, -2, 0, E_BLOCK_SOULSAND, 0},
+				{ 1, -2, 0, E_BLOCK_AIR,      0},
+			}
+		};
 
 		// Image for the wither at the Z axis:
 		static const std::array<sSetBlock, 9> ImageWitherZ =
-		{{
-			{ 0,  0, -1, E_BLOCK_HEAD,     0},
-			{ 0,  0,  0, E_BLOCK_HEAD,     0},
-			{ 0,  0,  1, E_BLOCK_HEAD,     0},
-			{ 0, -1, -1, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  1, E_BLOCK_SOULSAND, 0},
-			{ 0, -2, -1, E_BLOCK_AIR,      0},
-			{ 0, -2,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -2,  1, E_BLOCK_AIR,      0},
-		}};
+		{
+			{
+				{ 0,  0, -1, E_BLOCK_HEAD,     0},
+				{ 0,  0,  0, E_BLOCK_HEAD,     0},
+				{ 0,  0,  1, E_BLOCK_HEAD,     0},
+				{ 0, -1, -1, E_BLOCK_SOULSAND, 0},
+				{ 0, -1,  0, E_BLOCK_SOULSAND, 0},
+				{ 0, -1,  1, E_BLOCK_SOULSAND, 0},
+				{ 0, -2, -1, E_BLOCK_AIR,      0},
+				{ 0, -2,  0, E_BLOCK_SOULSAND, 0},
+				{ 0, -2,  1, E_BLOCK_AIR,      0},
+			}
+		};
 
 		// Try to spawn the wither from each image:
 		return (

@@ -129,7 +129,7 @@ protected:
 
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-    virtual void BiomeData    (const cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void BiomeData    (const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 

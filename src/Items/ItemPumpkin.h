@@ -106,10 +106,12 @@ public:
 
 		// Check the two arm directions (X, Z) using a loop over two sets of offset vectors:
 		static const std::array<Vector3i, 2> ArmOffsets =
-		{{
-			{1, 0, 0},
-			{0, 0, 1},
-		}};
+		{
+			{
+				{1, 0, 0},
+				{0, 0, 1},
+			}
+		};
 		for (const auto & Offset : ArmOffsets)
 		{
 			// If the arm blocks don't match, bail out of this loop repetition:

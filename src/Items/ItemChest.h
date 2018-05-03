@@ -74,12 +74,14 @@ public:
 
 		// Check that there is at most one single neighbor of the same chest type:
 		static const std::array<Vector3i, 4> CrossCoords =
-		{{
-			{-1, 0,  0},
-			{ 0, 0, -1},
-			{ 1, 0,  0},
-			{ 0, 0,  1},
-		}};
+		{
+			{
+				{-1, 0,  0},
+				{ 0, 0, -1},
+				{ 1, 0,  0},
+				{ 0, 0,  1},
+			}
+		};
 		int NeighborIdx = -1;
 		for (size_t i = 0; i < CrossCoords.size(); i++)
 		{

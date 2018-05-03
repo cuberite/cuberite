@@ -120,7 +120,7 @@ protected:
 	const short m_NeedBrewingTime = 400;
 
 	/** Store the current brewing recipes */
-    std::array<const cBrewingRecipes::cRecipe *, 3> m_CurrentBrewingRecipes = {};
+	std::array<const cBrewingRecipes::cRecipe *, 3> m_CurrentBrewingRecipes = {};
 
 	/** Result items for the  bottle inputs */
 	std::array<cItem, 3> m_Results;

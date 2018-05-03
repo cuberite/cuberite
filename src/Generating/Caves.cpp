@@ -502,24 +502,24 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-                    if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z)))
 					{
-                        cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_AIR);
+						cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_AIR);
 					}
 				}
 				else if (SqDist <= SqRad * 2)
 				{
-                    if (cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z) == E_BLOCK_SAND)
+					if (cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z) == E_BLOCK_SAND)
 					{
-                        size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
+						size_t Index = static_cast<size_t>(cChunkDef::MakeIndexNoCheck(x, y, z));
 						if (a_BlockMetas[Index] == 1)
 						{
 							a_BlockMetas[Index] = 0;
-                            cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_RED_SANDSTONE);
+							cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_RED_SANDSTONE);
 						}
 						else
 						{
-                            cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_SANDSTONE);
+							cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_SANDSTONE);
 						}
 					}
 				}

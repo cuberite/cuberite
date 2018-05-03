@@ -36,7 +36,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a
 		return;
 	}
 
-    m_PropertyValue[static_cast<size_t>(a_Property)] = a_Value;
+	m_PropertyValue[static_cast<size_t>(a_Property)] = a_Value;
 	super::SetProperty(a_Property, a_Value, a_Player);
 }
 
@@ -53,7 +53,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 		return;
 	}
 
-    m_PropertyValue[static_cast<size_t>(a_Property)] = a_Value;
+	m_PropertyValue[static_cast<size_t>(a_Property)] = a_Value;
 	super::SetProperty(a_Property, a_Value);
 }
 
@@ -69,7 +69,7 @@ short cEnchantingWindow::GetPropertyValue(short a_Property)
 		return 0;
 	}
 
-    return m_PropertyValue[static_cast<size_t>(a_Property)];
+	return m_PropertyValue[static_cast<size_t>(a_Property)];
 }
 
 

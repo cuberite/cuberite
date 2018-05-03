@@ -41,26 +41,30 @@
 #endif
 
 static const std::array<Vector3i, 4> g_CrossCoords =
-{{
-	{ 1, 0,  0},
-	{-1, 0,  0},
-	{ 0, 0,  1},
-	{ 0, 0, -1},
-}};
+{
+	{
+		{ 1, 0,  0},
+		{-1, 0,  0},
+		{ 0, 0,  1},
+		{ 0, 0, -1},
+	}
+};
 
 
 
 
 
 static const std::array<Vector3i, 6> g_NeighborCoords =
-{{
-	{ 1,  0,  0},
-	{-1,  0,  0},
-	{ 0,  1,  0},
-	{ 0, -1,  0},
-	{ 0,  0,  1},
-	{ 0,  0, -1},
-}};
+{
+	{
+		{ 1,  0,  0},
+		{-1,  0,  0},
+		{ 0,  1,  0},
+		{ 0, -1,  0},
+		{ 0,  0,  1},
+		{ 0,  0, -1},
+	}
+};
 
 #ifdef __clang__
 	#pragma clang diagnostic pop
@@ -121,7 +125,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
-        auto Raining = std::any_of(std::begin(g_CrossCoords), std::end(g_CrossCoords),
+		auto Raining = std::any_of(std::begin(g_CrossCoords), std::end(g_CrossCoords),
 			[this, AbsPos](Vector3i cc)
 			{
 				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
@@ -380,7 +384,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-    for (auto & Coord : g_NeighborCoords)
+	for (auto & Coord : g_NeighborCoords)
 	{
 		BLOCKTYPE  BlockType;
 		int X = a_RelX + Coord.x;

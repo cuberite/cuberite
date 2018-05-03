@@ -743,20 +743,22 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 {
 	static const std::array<cLootProbab, 11> LootProbab =
-    {{
-		// Item,                          MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_IRON),             1,         5,         10 },
-		{ cItem(E_ITEM_GOLD),             1,         3,          5 },
-		{ cItem(E_ITEM_REDSTONE_DUST),    4,         9,          5 },
-		{ cItem(E_ITEM_DIAMOND),          1,         2,          3 },
-		{ cItem(E_ITEM_DYE, 1, 4),        4,         9,          5 },  // lapis lazuli dye
-		{ cItem(E_ITEM_COAL),             3,         8,         10 },
-		{ cItem(E_ITEM_BREAD),            1,         3,         15 },
-		{ cItem(E_ITEM_IRON_PICKAXE),     1,         1,          1 },
-		{ cItem(E_BLOCK_MINECART_TRACKS), 4,         8,          1 },
-		{ cItem(E_ITEM_MELON_SEEDS),      2,         4,         10 },
-		{ cItem(E_ITEM_PUMPKIN_SEEDS),    2,         4,         10 },
-    }};
+	{
+		{
+			// Item,                          MinAmount, MaxAmount, Weight
+			{ cItem(E_ITEM_IRON),             1,         5,         10 },
+			{ cItem(E_ITEM_GOLD),             1,         3,          5 },
+			{ cItem(E_ITEM_REDSTONE_DUST),    4,         9,          5 },
+			{ cItem(E_ITEM_DIAMOND),          1,         2,          3 },
+			{ cItem(E_ITEM_DYE, 1, 4),        4,         9,          5 },  // lapis lazuli dye
+			{ cItem(E_ITEM_COAL),             3,         8,         10 },
+			{ cItem(E_ITEM_BREAD),            1,         3,         15 },
+			{ cItem(E_ITEM_IRON_PICKAXE),     1,         1,          1 },
+			{ cItem(E_BLOCK_MINECART_TRACKS), 4,         8,          1 },
+			{ cItem(E_ITEM_MELON_SEEDS),      2,         4,         10 },
+			{ cItem(E_ITEM_PUMPKIN_SEEDS),    2,         4,         10 },
+		}
+	};
 
 	if (m_ChestPosition < 0)
 	{
@@ -803,7 +805,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(x, z);
-        ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab.data(), LootProbab.size(), NumSlots, Seed);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab.data(), LootProbab.size(), NumSlots, Seed);
 	}
 }
 
@@ -1028,18 +1030,20 @@ void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 		eDirection dir;
 	};
 	static const std::array<DirCoords, 8> Exits =
-    {{
-		// Bottom level:
-		{-1, 1,  2, dirXM},
-		{ 2, 1, -1, dirZM},
-		{ 5, 1,  2, dirXP},
-		{ 2, 1,  5, dirZP},
-		// Top level:
-		{-1, 5,  2, dirXM},
-		{ 2, 5, -1, dirZM},
-		{ 5, 5,  2, dirXP},
-		{ 2, 5,  5, dirZP},
-    }};
+	{
+		{
+			// Bottom level:
+			{-1, 1,  2, dirXM},
+			{ 2, 1, -1, dirZM},
+			{ 5, 1,  2, dirXP},
+			{ 2, 1,  5, dirZP},
+			// Top level:
+			{-1, 5,  2, dirXM},
+			{ 2, 5, -1, dirZM},
+			{ 5, 5,  2, dirXP},
+			{ 2, 5,  5, dirZP},
+		}
+	};
 	for (const auto & Exit : Exits)
 	{
 		if (m_BoundingBox.p1.y + Exit.y >= m_BoundingBox.p2.y)

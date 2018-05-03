@@ -685,22 +685,24 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	// A search grid (searches clockwise around the origin)
 	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 2.0f);
 	static const std::array<Vector3i, 8> ChunkOffset =
-    {{
-		{ 0,          0, HalfChunk  },
-		{ HalfChunk,  0, HalfChunk  },
-		{ HalfChunk,  0, 0          },
-		{ HalfChunk,  0, -HalfChunk },
-		{ 0,          0, -HalfChunk },
-		{ -HalfChunk, 0, -HalfChunk },
-		{ -HalfChunk, 0, 0          },
-		{ -HalfChunk, 0, HalfChunk  },
-    }};
+	{
+		{
+			{ 0,          0, HalfChunk  },
+			{ HalfChunk,  0, HalfChunk  },
+			{ HalfChunk,  0, 0          },
+			{ HalfChunk,  0, -HalfChunk },
+			{ 0,          0, -HalfChunk },
+			{ -HalfChunk, 0, -HalfChunk },
+			{ -HalfChunk, 0, 0          },
+			{ -HalfChunk, 0, HalfChunk  },
+		}
+	};
 
 	for (int RadiusOffset = 1; RadiusOffset < (a_MaxSpawnRadius * 2); ++RadiusOffset)
 	{
-        for (const auto & Offset : ChunkOffset)
+		for (const auto & Offset : ChunkOffset)
 		{
-            const Vector3i PotentialSpawn = BiomeOffset + (Offset * RadiusOffset);
+			const Vector3i PotentialSpawn = BiomeOffset + (Offset * RadiusOffset);
 
 			if (CanSpawnAt(PotentialSpawn.x, SpawnY, PotentialSpawn.z))
 			{
@@ -805,16 +807,18 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 
 	// Check that surrounding blocks are neither solid or liquid
 	static const std::array<Vector3i, 8> SurroundingCoords =
-    {{
-		{ 0,  0,  1 },
-		{ 1,  0,  1 },
-		{ 1,  0,  0 },
-		{ 1,  0, -1 },
-		{ 0,  0, -1 },
-		{ -1, 0, -1 },
-		{ -1, 0,  0 },
-		{ -1, 0,  1 },
-    }};
+	{
+		{
+			{ 0,  0,  1 },
+			{ 1,  0,  1 },
+			{ 1,  0,  0 },
+			{ 1,  0, -1 },
+			{ 0,  0, -1 },
+			{ -1, 0, -1 },
+			{ -1, 0,  0 },
+			{ -1, 0,  1 },
+		}
+	};
 
 	for (const auto & Coord : SurroundingCoords)
 	{
@@ -4176,9 +4180,9 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 
 	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
-        a_ChunkDesc.GetBlockTypes().data(), BlockMetas.data(),
+		a_ChunkDesc.GetBlockTypes().data(), BlockMetas.data(),
 		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
-        &a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
+		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		std::move(a_ChunkDesc.GetEntities()), std::move(a_ChunkDesc.GetBlockEntities()),
 		true
 	);

@@ -42,12 +42,14 @@ public:
 			int x, z;
 		};
 		static const std::array<XZ, 4> Coords =
-		{{
-			{-1,  0},
-			{ 1,  0},
-			{ 0, -1},
-			{ 0,  1},
-		}};
+		{
+			{
+				{-1,  0},
+				{ 1,  0},
+				{ 0, -1},
+				{ 0,  1},
+			}
+		};
 		for (const auto & Coord : Coords)
 		{
 			BLOCKTYPE BlockType;

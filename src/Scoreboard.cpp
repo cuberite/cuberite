@@ -42,29 +42,29 @@ AString cObjective::TypeToString(eType a_Type)
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
 	static const std::unordered_map<AString, eType> TypeMap =
-    {
-		{"dummy"              , otDummy             },
-		{"deathCount"         , otDeathCount        },
-		{"playerKillCount"    , otPlayerKillCount   },
-		{"totalKillCount"     , otTotalKillCount    },
-		{"health"             , otHealth            },
-		{"achievement"        , otAchievement       },
-		{"stat"               , otStat              },
-		{"stat.craftItem"     , otStatItemCraft     },
-		{"stat.useItem"       , otStatItemUse       },
-		{"stat.breakItem"     , otStatItemBreak     },
-		{"stat.mineBlock"     , otStatBlockMine     },
-		{"stat.killEntity"    , otStatEntityKill    },
+	{
+		{"dummy",               otDummy             },
+		{"deathCount",          otDeathCount        },
+		{"playerKillCount",     otPlayerKillCount   },
+		{"totalKillCount",      otTotalKillCount    },
+		{"health",              otHealth            },
+		{"achievement",         otAchievement       },
+		{"stat",                otStat              },
+		{"stat.craftItem",      otStatItemCraft     },
+		{"stat.useItem",        otStatItemUse       },
+		{"stat.breakItem",      otStatItemBreak     },
+		{"stat.mineBlock",      otStatBlockMine     },
+		{"stat.killEntity",     otStatEntityKill    },
 		{"stat.entityKilledBy", otStatEntityKilledBy}
 	};
 
-    AString lName = StrToLower(a_Name);
-    if(TypeMap.count(lName) == 0)
+	AString lName = StrToLower(a_Name);
+	if (TypeMap.count(lName) == 0)
 	{
 		return otDummy;
 	}
 
-    return TypeMap.at(lName);
+	return TypeMap.at(lName);
 }
 
 

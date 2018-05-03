@@ -934,12 +934,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BLOCKTYPE GotBlock;
 
 		static const std::array<Vector3i, 4> CrossCoords =
-        {{
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
-        }};
+		{
+			{
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+			}
+		};
 
 		bool IsNoAirSurrounding = true;
 		for (const auto & Coord : CrossCoords)
@@ -951,8 +953,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-                NextPos.x += Coord.x;
-                NextPos.z += Coord.z;
+				NextPos.x += Coord.x;
+				NextPos.z += Coord.z;
 				IsNoAirSurrounding = false;
 				break;
 			}

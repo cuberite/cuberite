@@ -36,7 +36,7 @@ public:
 	typedef std::array<Byte, 256 * 16 * 16> Shape;
 
 	/** Uncompressed block metas, 1 meta per byte */
-    typedef std::array<NIBBLETYPE, cChunkDef::NumBlocks> BlockNibbleBytes;
+	typedef std::array<NIBBLETYPE, cChunkDef::NumBlocks> BlockNibbleBytes;
 
 
 	cChunkDesc(int a_ChunkX, int a_ChunkZ);
@@ -208,7 +208,7 @@ public:
 
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
-    inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
+	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
 	// CANNOT, different compression!
 	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
 	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas())); }

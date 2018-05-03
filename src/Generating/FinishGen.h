@@ -318,7 +318,7 @@ public:
 		// Load the allowed biomes into m_IsBiomeAllowed
 		for (auto AllowedBiome : a_Biomes)
 		{
-            m_IsBiomeAllowed[static_cast<size_t>(AllowedBiome)] = true;
+			m_IsBiomeAllowed[static_cast<size_t>(AllowedBiome)] = true;
 		}
 	}
 
@@ -335,7 +335,7 @@ protected:
 	/** Returns true if the given biome is a biome that is allowed. */
 	inline bool IsAllowedBiome(EMCSBiome a_Biome)
 	{
-        return m_IsBiomeAllowed[static_cast<size_t>(a_Biome)];
+		return m_IsBiomeAllowed[static_cast<size_t>(a_Biome)];
 	}
 
 	/** Returns true if the given blocktype may be below m_BlockType */

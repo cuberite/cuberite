@@ -304,23 +304,23 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	static const std::unordered_map<AString, eDimension> DimensionMap =
 	{
 		{ "overworld", dimOverworld },
-		{ "normal"   , dimOverworld },
-		{ "world"    , dimOverworld },
-		{ "nether"   , dimNether    },
-		{ "hell"     , dimNether    },  // Alternate name for Nether
-		{ "end"      , dimEnd       },
-		{ "sky"      , dimEnd       },  // Old name for End
+		{ "normal",    dimOverworld },
+		{ "world",     dimOverworld },
+		{ "nether",    dimNether    },
+		{ "hell",      dimNether    },  // Alternate name for Nether
+		{ "end",       dimEnd       },
+		{ "sky",       dimEnd       },  // Old name for End
 	} ;
 
 	AString DimensionName = StrToLower(a_DimensionString);
-	if(DimensionMap.count(DimensionName) == 0)
+	if (DimensionMap.count(DimensionName) == 0)
 	{
 		// Not found
 		LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", a_DimensionString.c_str());
 		return dimOverworld;
 	}
 
-    return DimensionMap.at(DimensionName);
+	return DimensionMap.at(DimensionName);
 }
 
 
@@ -329,7 +329,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 
 AString DimensionToString(eDimension a_Dimension)
 {
-	switch(a_Dimension)
+	switch (a_Dimension)
 	{
 		case dimOverworld: return "Overworld";
 		case dimNether:    return "Nether";
@@ -395,56 +395,56 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 	static const std::unordered_map<AString, eDamageType> DamageTypeMap =
 	{
 		// Cannonical names:
-		{ "dtattack"         , dtAttack        	 },
-		{ "dtrangedattack"   , dtRangedAttack 	 },
-		{ "dtlightning"      , dtLightning  	 },
-		{ "dtfalling"        , dtFalling       	 },
-		{ "dtdrowning"       , dtDrowning        },
-		{ "dtsuffocation"    , dtSuffocating     },
-		{ "dtstarving"       , dtStarving      	 },
-		{ "dtcactuscontact"  , dtCactusContact   },
-		{ "dtlavacontact"    , dtLavaContact     },
-		{ "dtpoisoning"      , dtPoisoning       },
-		{ "dtwithering"      , dtWithering       },
-		{ "dtonfire"         , dtOnFire        	 },
-		{ "dtfirecontact"    , dtFireContact     },
-		{ "dtinvoid"         , dtInVoid      	 },
+		{ "dtattack",          dtAttack        	 },
+		{ "dtrangedattack",    dtRangedAttack 	 },
+		{ "dtlightning",       dtLightning  	 },
+		{ "dtfalling",         dtFalling       	 },
+		{ "dtdrowning",        dtDrowning        },
+		{ "dtsuffocation",     dtSuffocating     },
+		{ "dtstarving",        dtStarving      	 },
+		{ "dtcactuscontact",   dtCactusContact   },
+		{ "dtlavacontact",     dtLavaContact     },
+		{ "dtpoisoning",       dtPoisoning       },
+		{ "dtwithering",       dtWithering       },
+		{ "dtonfire",          dtOnFire        	 },
+		{ "dtfirecontact",     dtFireContact     },
+		{ "dtinvoid",          dtInVoid      	 },
 		{ "dtpotionofharming", dtPotionOfHarming },
-		{ "dtadmin"          , dtAdmin           },
-		{ "dtexplosion"      , dtExplosion       },
+		{ "dtadmin",           dtAdmin           },
+		{ "dtexplosion",       dtExplosion       },
 
 		// Common synonyms:
-		{ "dtpawnattack"     , dtAttack          },
-		{ "dtentityattack"   , dtAttack        	 },
-		{ "dtmob"            , dtAttack        	 },
-		{ "dtmobattack"      , dtAttack        	 },
-		{ "dtarrowattack"    , dtRangedAttack  	 },
-		{ "dtarrow"          , dtRangedAttack  	 },
-		{ "dtprojectile"     , dtRangedAttack  	 },
-		{ "dtfall"           , dtFalling   		 },
-		{ "dtdrown"          , dtDrowning      	 },
-		{ "dtsuffocation"    , dtSuffocating   	 },
-		{ "dtstarvation"     , dtStarving    	 },
-		{ "dthunger"         , dtStarving      	 },
-		{ "dtcactus"         , dtCactusContact	 },
-		{ "dtcactuses"       , dtCactusContact 	 },
-		{ "dtcacti"          , dtCactusContact 	 },
-		{ "dtlava"           , dtLavaContact  	 },
-		{ "dtpoison"         , dtPoisoning    	 },
-		{ "dtwither"         , dtWithering     	 },
-		{ "dtburning"        , dtOnFire      	 },
-		{ "dtinfire"         , dtFireContact   	 },
-		{ "dtplugin"         , dtAdmin    		 },
+		{ "dtpawnattack",      dtAttack          },
+		{ "dtentityattack",    dtAttack        	 },
+		{ "dtmob",             dtAttack        	 },
+		{ "dtmobattack",       dtAttack        	 },
+		{ "dtarrowattack",     dtRangedAttack  	 },
+		{ "dtarrow",           dtRangedAttack  	 },
+		{ "dtprojectile",      dtRangedAttack  	 },
+		{ "dtfall",            dtFalling   		 },
+		{ "dtdrown",           dtDrowning      	 },
+		{ "dtsuffocation",     dtSuffocating   	 },
+		{ "dtstarvation",      dtStarving    	 },
+		{ "dthunger",          dtStarving      	 },
+		{ "dtcactus",          dtCactusContact	 },
+		{ "dtcactuses",        dtCactusContact 	 },
+		{ "dtcacti",           dtCactusContact 	 },
+		{ "dtlava",            dtLavaContact  	 },
+		{ "dtpoison",          dtPoisoning    	 },
+		{ "dtwither",          dtWithering     	 },
+		{ "dtburning",         dtOnFire      	 },
+		{ "dtinfire",          dtFireContact   	 },
+		{ "dtplugin",          dtAdmin    		 },
 	} ;
 
 	AString DamageTypeName = StrToLower(a_DamageTypeString);
-	if(DamageTypeMap.count(DamageTypeName) == 0)
+	if (DamageTypeMap.count(DamageTypeName) == 0)
 	{
 		// Not found:
 		return static_cast<eDamageType>(-1);
 	}
 
-    return DamageTypeMap.at(DamageTypeName);
+	return DamageTypeMap.at(DamageTypeName);
 }
 
 

@@ -198,38 +198,40 @@ protected:
 
 		// Fill the chest with random loot
 		static const std::array<cLootProbab, 22> LootProbab =
-        {{
-			// Item,                          MinAmount, MaxAmount, Weight
-			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
-			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
-			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
-			{ cItem(E_ITEM_GOLD),                1,         4,         2 },
-			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
-			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
-			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
-			{ cItem(E_ITEM_IRON),                1,         4,        10 },
-			{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
-			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
-			{ cItem(E_ITEM_STRING),              1,         4,        10 },
-			{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
-			{ cItem(E_ITEM_COAL),                1,         4,        10 },
-			{ cItem(E_ITEM_BONE),                1,         4,        10 },
-			{ cItem(E_ITEM_ROTTEN_FLESH),        1,         4,        10 },
-			{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
-			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
-			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
-			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
-			{ cItem(E_ITEM_BEETROOT_SEEDS),      2,         4,        10 },
-			{ cItem(E_ITEM_MELON_SEEDS),         2,         4,        10 },
-			{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
-        }};
+		{
+			{
+				// Item,                          MinAmount, MaxAmount, Weight
+				{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
+				{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
+				{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
+				{ cItem(E_ITEM_GOLD),                1,         4,         2 },
+				{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
+				{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
+				{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
+				{ cItem(E_ITEM_IRON),                1,         4,        10 },
+				{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
+				{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
+				{ cItem(E_ITEM_STRING),              1,         4,        10 },
+				{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
+				{ cItem(E_ITEM_COAL),                1,         4,        10 },
+				{ cItem(E_ITEM_BONE),                1,         4,        10 },
+				{ cItem(E_ITEM_ROTTEN_FLESH),        1,         4,        10 },
+				{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
+				{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
+				{ cItem(E_ITEM_BREAD),               1,         1,        10 },
+				{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
+				{ cItem(E_ITEM_BEETROOT_SEEDS),      2,         4,        10 },
+				{ cItem(E_ITEM_MELON_SEEDS),         2,         4,        10 },
+				{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
+			}
+		};
 
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
-        ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab.data(), LootProbab.size(), NumSlots, Seed);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab.data(), LootProbab.size(), NumSlots, Seed);
 	}
 
 
@@ -328,7 +330,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	int idx = RelX * 256 + RelZ * 16 * 256;
 	for (int y = 6; y < cChunkDef::Height; y++)
 	{
-        if (shape[static_cast<size_t>(idx + y)] != 0)
+		if (shape[static_cast<size_t>(idx + y)] != 0)
 		{
 			continue;
 		}

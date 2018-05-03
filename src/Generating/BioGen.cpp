@@ -798,101 +798,117 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 	} ;
 
 	static const std::array<BiomeLevels, 11> bgOcean =
-	{{
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biDeepOcean, },
-		{ biOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biMushroomIsland, biMushroomShore, }
-	}};
+	{
+		{
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biDeepOcean, },
+			{ biOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biMushroomIsland, biMushroomShore, }
+		}
+	};
 	static const std::array<BiomeLevels, 10> bgFrozen =
-	{{
-		{ biIcePlains,         biIcePlains, },
-		{ biIceMountains,      biIceMountains, },
-		{ biFrozenOcean,       biFrozenRiver, },
-		{ biColdTaiga,         biColdTaiga, },
-		{ biColdTaigaHills,    biColdTaigaHills, },
-		{ biColdTaigaM,        biColdTaigaM, },
-		{ biIcePlainsSpikes,   biIcePlainsSpikes, },
-		{ biExtremeHills,      biExtremeHillsEdge, },
-		{ biExtremeHillsPlus,  biExtremeHillsEdge, },
-		{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
-	}};
+	{
+		{
+			{ biIcePlains,         biIcePlains, },
+			{ biIceMountains,      biIceMountains, },
+			{ biFrozenOcean,       biFrozenRiver, },
+			{ biColdTaiga,         biColdTaiga, },
+			{ biColdTaigaHills,    biColdTaigaHills, },
+			{ biColdTaigaM,        biColdTaigaM, },
+			{ biIcePlainsSpikes,   biIcePlainsSpikes, },
+			{ biExtremeHills,      biExtremeHillsEdge, },
+			{ biExtremeHillsPlus,  biExtremeHillsEdge, },
+			{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
+		}
+	};
 	static const std::array<BiomeLevels, 13> bgTemperate =
-	{{
-		{ biBirchForestHills,  biBirchForest, },
-		{ biBirchForest,       biBirchForest, },
-		{ biBirchForestHillsM, biBirchForestM, },
-		{ biBirchForestM,      biBirchForestM, },
-		{ biForest,            biForestHills, },
-		{ biFlowerForest,      biFlowerForest, },
-		{ biRoofedForest,      biForest, },
-		{ biRoofedForest,      biRoofedForest, },
-		{ biRoofedForestM,     biForest, },
-		{ biPlains,            biPlains, },
-		{ biSunflowerPlains,   biSunflowerPlains, },
-		{ biSwampland,         biSwampland, },
-		{ biSwamplandM,        biSwamplandM, },
-	}};
+	{
+		{
+			{ biBirchForestHills,  biBirchForest, },
+			{ biBirchForest,       biBirchForest, },
+			{ biBirchForestHillsM, biBirchForestM, },
+			{ biBirchForestM,      biBirchForestM, },
+			{ biForest,            biForestHills, },
+			{ biFlowerForest,      biFlowerForest, },
+			{ biRoofedForest,      biForest, },
+			{ biRoofedForest,      biRoofedForest, },
+			{ biRoofedForestM,     biForest, },
+			{ biPlains,            biPlains, },
+			{ biSunflowerPlains,   biSunflowerPlains, },
+			{ biSwampland,         biSwampland, },
+			{ biSwamplandM,        biSwamplandM, },
+		}
+	};
 	static const std::array<BiomeLevels, 6> bgWarm =
-	{{
-		{ biDesertHills,    biDesert, },
-		{ biDesert,         biDesert, },
-		{ biDesertM,        biDesertM, },
-		{ biSavannaPlateau, biSavanna, },
-		{ biSavanna,        biSavanna, },
-		{ biSavannaM,       biSavannaM, },
-	}};
+	{
+		{
+			{ biDesertHills,    biDesert, },
+			{ biDesert,         biDesert, },
+			{ biDesertM,        biDesertM, },
+			{ biSavannaPlateau, biSavanna, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaM,       biSavannaM, },
+		}
+	};
 	static const std::array<BiomeLevels, 7> bgMesa =
-	{{
-		{ biMesaPlateau,    biMesa, },
-		{ biMesaPlateauF,   biMesa, },
-		{ biMesaPlateauFM,  biMesa, },
-		{ biMesaPlateauM,   biMesa, },
-		{ biMesaBryce,      biMesaBryce, },
-		{ biSavanna,        biSavanna, },
-		{ biSavannaPlateau, biSavanna, },
-	}};
+	{
+		{
+			{ biMesaPlateau,    biMesa, },
+			{ biMesaPlateauF,   biMesa, },
+			{ biMesaPlateauFM,  biMesa, },
+			{ biMesaPlateauM,   biMesa, },
+			{ biMesaBryce,      biMesaBryce, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaPlateau, biSavanna, },
+		}
+	};
 	static const std::array<BiomeLevels, 5> bgConifers =
-	{{
-		{ biTaiga,                biTaiga, },
-		{ biTaigaM,               biTaigaM, },
-		{ biMegaTaiga,            biMegaTaiga, },
-		{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
-		{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
-	}};
+	{
+		{
+			{ biTaiga,                biTaiga, },
+			{ biTaigaM,               biTaigaM, },
+			{ biMegaTaiga,            biMegaTaiga, },
+			{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
+			{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
+		}
+	};
 	static const std::array<BiomeLevels, 3> bgDenseTrees =
-	{{
-		{ biJungleHills, biJungle, },
-		{ biJungle, biJungleEdge, },
-		{ biJungleM, biJungleEdgeM, },
-	}};
+	{
+		{
+			{ biJungleHills, biJungle, },
+			{ biJungle, biJungleEdge, },
+			{ biJungleM, biJungleEdgeM, },
+		}
+	};
 	struct BiomeGroup
 	{
 		const BiomeLevels * Biomes;
 		size_t        Count;
 	};
 	static const std::array<BiomeGroup, 12> BiomeGroups =
-	{{
-		{ bgOcean.data()     , bgOcean.size()      },
-		{ bgOcean.data()     , bgOcean.size()      },
-		{ bgFrozen.data()    , bgFrozen.size()     },
-		{ bgFrozen.data()    , bgFrozen.size()     },
-		{ bgTemperate.data() , bgTemperate.size()  },
-		{ bgTemperate.data() , bgTemperate.size()  },
-		{ bgConifers.data()  , bgConifers.size()   },
-		{ bgConifers.data()  , bgConifers.size()   },
-		{ bgWarm.data()      , bgWarm.size()       },
-		{ bgWarm.data()      , bgWarm.size()       },
-		{ bgMesa.data()      , bgMesa.size()       },
-		{ bgDenseTrees.data(), bgDenseTrees.size() },
-	}};
+	{
+		{
+			{ bgOcean.data(),      bgOcean.size()      },
+			{ bgOcean.data(),      bgOcean.size()      },
+			{ bgFrozen.data(),     bgFrozen.size()     },
+			{ bgFrozen.data(),     bgFrozen.size()     },
+			{ bgTemperate.data(),  bgTemperate.size()  },
+			{ bgTemperate.data(),  bgTemperate.size()  },
+			{ bgConifers.data(),   bgConifers.size()   },
+			{ bgConifers.data(),   bgConifers.size()   },
+			{ bgWarm.data(),       bgWarm.size()       },
+			{ bgWarm.data(),       bgWarm.size()       },
+			{ bgMesa.data(),       bgMesa.size()       },
+			{ bgDenseTrees.data(), bgDenseTrees.size() },
+		}
+	};
 	size_t Group = static_cast<size_t>(a_BiomeGroup) % BiomeGroups.size();
 	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;
 	return (a_DistLevel > 0) ? BiomeGroups[Group].Biomes[Index].InnerBiome : BiomeGroups[Group].Biomes[Index].OuterBiome;

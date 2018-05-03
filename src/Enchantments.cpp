@@ -330,31 +330,31 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 {
 	static const std::unordered_map<AString, eEnchantment> EnchantmentNames =
 	{
-		{ "protection"          , enchProtection           },
-		{ "fireprotection"      , enchFireProtection       },
-		{ "featherfalling"      , enchFeatherFalling       },
-		{ "blastprotection"     , enchBlastProtection      },
+		{ "protection",           enchProtection           },
+		{ "fireprotection",       enchFireProtection       },
+		{ "featherfalling",       enchFeatherFalling       },
+		{ "blastprotection",      enchBlastProtection      },
 		{ "projectileprotection", enchProjectileProtection },
-		{ "respiration"         , enchRespiration          },
-		{ "aquaaffinity"        , enchAquaAffinity         },
-		{ "thorns"              , enchThorns               },
-		{ "depthstrider"        , enchDepthStrider         },
-		{ "sharpness"           , enchSharpness            },
-		{ "smite"               , enchSmite                },
-		{ "baneofarthropods"    , enchBaneOfArthropods     },
-		{ "knockback"           , enchKnockback            },
-		{ "fireaspect"          , enchFireAspect           },
-		{ "looting"             , enchLooting              },
-		{ "efficiency"          , enchEfficiency           },
-		{ "silktouch"           , enchSilkTouch            },
-		{ "unbreaking"          , enchUnbreaking           },
-		{ "fortune"             , enchFortune              },
-		{ "power"               , enchPower                },
-		{ "punch"               , enchPunch                },
-		{ "flame"               , enchFlame                },
-		{ "infinity"            , enchInfinity             },
-		{ "luckofthesea"        , enchLuckOfTheSea         },
-		{ "lure"                , enchLure                 },
+		{ "respiration",          enchRespiration          },
+		{ "aquaaffinity",         enchAquaAffinity         },
+		{ "thorns",               enchThorns               },
+		{ "depthstrider",         enchDepthStrider         },
+		{ "sharpness",            enchSharpness            },
+		{ "smite",                enchSmite                },
+		{ "baneofarthropods",     enchBaneOfArthropods     },
+		{ "knockback",            enchKnockback            },
+		{ "fireaspect",           enchFireAspect           },
+		{ "looting",              enchLooting              },
+		{ "efficiency",           enchEfficiency           },
+		{ "silktouch",            enchSilkTouch            },
+		{ "unbreaking",           enchUnbreaking           },
+		{ "fortune",              enchFortune              },
+		{ "power",                enchPower                },
+		{ "punch",                enchPunch                },
+		{ "flame",                enchFlame                },
+		{ "infinity",             enchInfinity             },
+		{ "luckofthesea",         enchLuckOfTheSea         },
+		{ "lure",                 enchLure                 },
 	} ;
 
 	// First try to parse as a number:
@@ -366,12 +366,12 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 
 	// It wasn't a number, do a lookup:
 	AString EnchantmentName = StrToLower(a_EnchantmentName);
-	if(EnchantmentNames.count(EnchantmentName) == 0)
+	if (EnchantmentNames.count(EnchantmentName) == 0)
 	{
 		return -1;
 	}
 
-    return EnchantmentNames.at(EnchantmentName);
+	return EnchantmentNames.at(EnchantmentName);
 }
 
 

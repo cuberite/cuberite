@@ -418,13 +418,13 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 		{"y+/x+/z+", dirYP_XP_ZP},
 	};
 	auto lcValue = StrToLower(a_Value);
-	if(StringDirections.count(lcValue) == 0)
+	if (StringDirections.count(lcValue) == 0)
 	{
 		// Not understood, failure:
 		return false;
 	}
 
-    a_Out = StringDirections.at(lcValue);
+	a_Out = StringDirections.at(lcValue);
 	return true;
 }
 

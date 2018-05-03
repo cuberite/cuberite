@@ -47,7 +47,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 	};
 
 	// Find the minimum distance:
-    int MinCost = *std::min_element(begin(Cost), end(Cost));
+	int MinCost = *std::min_element(begin(Cost), end(Cost));
 
 	// Spread in all directions where the distance matches the minimum:
 	if (Cost[0] == MinCost)

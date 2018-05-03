@@ -23,54 +23,64 @@ typedef struct
 } sMetaCoords;
 
 static const std::array<sCoords, 4> Corners =
-{{
-	{-1, -1},
-	{-1, 1},
-	{1, -1},
-	{1, 1},
-}};
+{
+	{
+		{-1, -1},
+		{-1, 1},
+		{1, -1},
+		{1, 1},
+	}
+};
 
 // BigO = a big ring of blocks, used for generating horz slices of treetops, the number indicates the radius
 
 static const std::array<sCoords, 4> BigO1 =
-{{
-	/* -1 */           {0, -1},
-	/*  0 */ {-1,  0},          {1,  0},
-	/*  1 */           {0,  1},
-}};
+{
+	{
+		/* -1 */           {0, -1},
+		/*  0 */ {-1,  0},          {1,  0},
+		/*  1 */           {0,  1},
+	}
+};
 
 static const std::array<sCoords, 20> BigO2 =
-{{
-	/* -2 */           {-1, -2}, {0, -2}, {1, -2},
-	/* -1 */ {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1},
-	/*  0 */ {-2,  0}, {-1,  0},          {1,  0}, {2,  0},
-	/*  1 */ {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1},
-	/*  2 */           {-1,  2}, {0,  2}, {1,  2},
-}};
+{
+	{
+		/* -2 */           {-1, -2}, {0, -2}, {1, -2},
+		/* -1 */ {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1},
+		/*  0 */ {-2,  0}, {-1,  0},          {1,  0}, {2,  0},
+		/*  1 */ {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1},
+		/*  2 */           {-1,  2}, {0,  2}, {1,  2},
+	}
+};
 
 static const std::array<sCoords, 44> BigO3 =
-{{
-	/* -3 */           {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3},
-	/* -2 */ {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2},
-	/* -1 */ {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1},
-	/*  0 */ {-3,  0}, {-2,  0}, {-1,  0},          {1,  0}, {2,  0}, {3,  0},
-	/*  1 */ {-3,  1}, {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1}, {3,  1},
-	/*  2 */ {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2},
-	/*  3 */           {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3},
-}};
+{
+	{
+		/* -3 */           {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3},
+		/* -2 */ {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2},
+		/* -1 */ {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1},
+		/*  0 */ {-3,  0}, {-2,  0}, {-1,  0},          {1,  0}, {2,  0}, {3,  0},
+		/*  1 */ {-3,  1}, {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1}, {3,  1},
+		/*  2 */ {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2},
+		/*  3 */           {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3},
+	}
+};
 
 static const std::array<sCoords, 68> BigO4 =  // Part of Big Jungle tree
-{{
-	/* -4 */                     {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
-	/* -3 */           {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
-	/* -2 */ {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2},
-	/* -1 */ {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1},
-	/*  0 */ {-4,  0}, {-3,  0}, {-2,  0}, {-1,  0},          {1,  0}, {2,  0}, {3,  0}, {4,  0},
-	/*  1 */ {-4,  1}, {-3,  1}, {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1}, {3,  1}, {4,  1},
-	/*  2 */ {-4,  2}, {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2}, {4,  2},
-	/*  3 */           {-3,  3}, {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3}, {3,  3},
-	/*  4 */                     {-2,  4}, {-1,  4}, {0,  4}, {1,  4}, {2,  4},
-}};
+{
+	{
+		/* -4 */                     {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
+		/* -3 */           {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
+		/* -2 */ {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2},
+		/* -1 */ {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1},
+		/*  0 */ {-4,  0}, {-3,  0}, {-2,  0}, {-1,  0},          {1,  0}, {2,  0}, {3,  0}, {4,  0},
+		/*  1 */ {-4,  1}, {-3,  1}, {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1}, {3,  1}, {4,  1},
+		/*  2 */ {-4,  2}, {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2}, {4,  2},
+		/*  3 */           {-3,  3}, {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3}, {3,  3},
+		/*  4 */                     {-2,  4}, {-1,  4}, {0,  4}, {1,  4}, {2,  4},
+	}
+};
 
 
 
@@ -375,28 +385,29 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 
 	// Array with possible directions for a branch to go to.
 	static const std::array<Vector3d, 32> AvailableDirections =
-    {{
-		{ -1, 0, 0 }, { 0, 0, -1  },
-		{ -1, 0, 1 }, { -1, 0, -1 },
-		{ 1, 0, 1  }, { 1, 0, -1  },
-		{ 1, 0, 0  }, { 0, 0, 1   },
+	{
+		{
+			{ -1, 0, 0 }, { 0, 0, -1  },
+			{ -1, 0, 1 }, { -1, 0, -1 },
+			{ 1, 0, 1  }, { 1, 0, -1  },
+			{ 1, 0, 0  }, { 0, 0, 1   },
 
-		{ -0.5, 0, 0   }, { 0, 0, -0.5    },
-		{ -0.5, 0, 0.5 }, { -0.5, 0, -0.5 },
-		{ 0.5, 0, 0.5  }, { 0.5, 0, -0.5  },
-		{ 0.5, 0, 0    }, { 0, 0, 0.5     },
+			{ -0.5, 0, 0   }, { 0, 0, -0.5    },
+			{ -0.5, 0, 0.5 }, { -0.5, 0, -0.5 },
+			{ 0.5, 0, 0.5  }, { 0.5, 0, -0.5  },
+			{ 0.5, 0, 0    }, { 0, 0, 0.5     },
 
-		{ -1, 0.5, 0 }, { 0, 0.5, -1  },
-		{ -1, 0.5, 1 }, { -1, 0.5, -1 },
-		{ 1, 0.5, 1  }, { 1, 0.5, -1  },
-		{ 1, 0.5, 0  }, { 0, 0.5, 1   },
+			{ -1, 0.5, 0 }, { 0, 0.5, -1  },
+			{ -1, 0.5, 1 }, { -1, 0.5, -1 },
+			{ 1, 0.5, 1  }, { 1, 0.5, -1  },
+			{ 1, 0.5, 0  }, { 0, 0.5, 1   },
 
-		{ -0.5, 0.5, 0   },  { 0, 0.5, -0.5    },
-		{ -0.5, 0.5, 0.5 },  { -0.5, 0.5, -0.5 },
-		{ 0.5, 0.5, 0.5  },  { 0.5, 0.5, -0.5  },
-		{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
-
-    }};
+			{ -0.5, 0.5, 0   },  { 0, 0.5, -0.5    },
+			{ -0.5, 0.5, 0.5 },  { -0.5, 0.5, -0.5 },
+			{ 0.5, 0.5, 0.5  },  { 0.5, 0.5, -0.5  },
+			{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
+		}
+	};
 
 	// Create branches
 	for (int i = 4; i < Height; i++)
@@ -531,12 +542,14 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 
 	// Array with possible directions for a branch to go to.
 	static const std::array<Vector3i, 8> AvailableDirections =
-    {{
-		{ -1, 1, 0 }, { 0, 1, -1 },
-		{ -1, 1, 1 }, { -1, 1, -1 },
-		{ 1, 1, 1 }, { 1, 1, -1 },
-		{ 1, 1, 0 }, { 0, 1, 1 },
-    }};
+	{
+		{
+			{ -1, 1, 0 }, { 0, 1, -1 },
+			{ -1, 1, 1 }, { -1, 1, -1 },
+			{ 1, 1, 1 }, { 1, 1, -1 },
+			{ 1, 1, 0 }, { 0, 1, 1 },
+		}
+	};
 
 	// Set the starting point of the branch
 	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
@@ -848,13 +861,15 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 	// One more layer is above the trunk, push the central leaves:
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, h, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
 
-    static const std::array<sCoordsArr, 4> BigOs =
-    {{
-        {BigO1.data(), BigO1.size()},
-        {BigO2.data(), BigO2.size()},
-        {BigO3.data(), BigO3.size()},
-        {BigO4.data(), BigO4.size()},
-    }};
+	static const std::array<sCoordsArr, 4> BigOs =
+	{
+		{
+			{BigO1.data(), BigO1.size()},
+			{BigO2.data(), BigO2.size()},
+			{BigO3.data(), BigO3.size()},
+			{BigO4.data(), BigO4.size()},
+		}
+	};
 
 	// Layers expanding in size, then collapsing again:
 	// LOGD("Generating %d layers of pine leaves, SameSizeMax = %d", NumLeavesLayers, SameSizeMax);
@@ -867,7 +882,7 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 			break;
 		}
 		ASSERT(static_cast<size_t>(LayerSize) < BigOs.size());
-        PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[static_cast<size_t>(LayerSize)].Coords, BigOs[static_cast<size_t>(LayerSize)].Coords + BigOs[static_cast<size_t>(LayerSize)].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
+		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[static_cast<size_t>(LayerSize)].Coords, BigOs[static_cast<size_t>(LayerSize)].Coords + BigOs[static_cast<size_t>(LayerSize)].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
 	}
 }
@@ -879,18 +894,20 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Vines are around the BigO3, but not in the corners; need proper meta for direction
-    static const std::array<sMetaCoords, 20> Vines =
-    {{
-		{-2, -4, 1}, {-1, -4, 1}, {0, -4, 1}, {1, -4, 1}, {2, -4, 1},  // North face
-		{-2,  4, 4}, {-1,  4, 4}, {0,  4, 4}, {1,  4, 4}, {2,  4, 4},  // South face
-		{4,  -2, 2}, {4,  -1, 2}, {4,  0, 2}, {4,  1, 2}, {4,  2, 2},  // East face
-		{-4, -2, 8}, {-4, -1, 8}, {-4, 0, 8}, {-4, 1, 8}, {-4, 2, 8},  // West face
-    }};
+	static const std::array<sMetaCoords, 20> Vines =
+	{
+		{
+			{-2, -4, 1}, {-1, -4, 1}, {0, -4, 1}, {1, -4, 1}, {2, -4, 1},  // North face
+			{-2,  4, 4}, {-1,  4, 4}, {0,  4, 4}, {1,  4, 4}, {2,  4, 4},  // South face
+			{4,  -2, 2}, {4,  -1, 2}, {4,  0, 2}, {4,  1, 2}, {4,  2, 2},  // East face
+			{-4, -2, 8}, {-4, -1, 8}, {-4, 0, 8}, {-4, 1, 8}, {-4, 2, 8},  // West face
+		}
+	};
 
 	int Height = 3 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 8) % 3;
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height));
-    a_OtherBlocks.reserve(2 * BigO2.size() + 2 * BigO3.size() + static_cast<size_t>(Height) * Vines.size() + 20);
+	a_OtherBlocks.reserve(2 * BigO2.size() + 2 * BigO3.size() + static_cast<size_t>(Height) * Vines.size() + 20);
 
 	for (int i = 0; i < Height; i++)
 	{
@@ -899,7 +916,7 @@ void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 	int hei = a_BlockY + Height - 2;
 
 	// Put vines around the lowermost leaves layer:
-    PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
+	PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
 
 	// The lower two leaves layers are BigO3 with log in the middle and possibly corners:
 	for (int i = 0; i < 2; i++)
@@ -925,15 +942,15 @@ void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 void GetAppleBushImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-    a_OtherBlocks.reserve(3 + BigO2.size() + BigO1.size());
+	a_OtherBlocks.reserve(3 + BigO2.size() + BigO1.size());
 
 	int hei = a_BlockY;
 	a_LogBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LOG, E_META_LOG_JUNGLE));
-    PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO2, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO2, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	hei++;
 
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
-    PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO1, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO1, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	hei++;
 
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
@@ -964,19 +981,21 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	// TODO: Generate proper jungle trees with branches
 
 	// Vines are around the BigO4, but not in the corners; need proper meta for direction
-    static const std::array<sMetaCoords, 20> Vines =
-    {{
-		{-2, -5, 1}, {-1, -5, 1}, {0, -5, 1}, {1, -5, 1}, {2, -5, 1},  // North face
-		{-2,  5, 4}, {-1,  5, 4}, {0,  5, 4}, {1,  5, 4}, {2,  5, 4},  // South face
-		{5,  -2, 2}, {5,  -1, 2}, {5,  0, 2}, {5,  1, 2}, {5,  2, 2},  // East face
-		{-5, -2, 8}, {-5, -1, 8}, {-5, 0, 8}, {-5, 1, 8}, {-5, 2, 8},  // West face
-		// TODO: vines around the trunk, proper metas and height
-    }};
+	static const std::array<sMetaCoords, 20> Vines =
+	{
+		{
+			{-2, -5, 1}, {-1, -5, 1}, {0, -5, 1}, {1, -5, 1}, {2, -5, 1},  // North face
+			{-2,  5, 4}, {-1,  5, 4}, {0,  5, 4}, {1,  5, 4}, {2,  5, 4},  // South face
+			{5,  -2, 2}, {5,  -1, 2}, {5,  0, 2}, {5,  1, 2}, {5,  2, 2},  // East face
+			{-5, -2, 8}, {-5, -1, 8}, {-5, 0, 8}, {-5, 1, 8}, {-5, 2, 8},  // West face
+			// TODO: vines around the trunk, proper metas and height
+		}
+	};
 
 	int Height = 24 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 24;
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
-    a_OtherBlocks.reserve(2 * BigO4.size() + BigO3.size() + static_cast<size_t>(Height) * Vines.size() + 50);
+	a_OtherBlocks.reserve(2 * BigO4.size() + BigO3.size() + static_cast<size_t>(Height) * Vines.size() + 50);
 
 	for (int i = 0; i < Height; i++)
 	{
@@ -997,7 +1016,7 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	}
 
 	// Put vines around the lowermost leaves layer:
-    PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
+	PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
 
 	// The lower two leaves layers are BigO4 with log in the middle and possibly corners:
 	for (int i = 0; i < 2; i++)
@@ -1020,23 +1039,25 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Vines are around the BigO3, but not in the corners; need proper meta for direction
-    static const std::array<sMetaCoords, 19> Vines =
-    {{
-		{-2, -4, 1}, {-1, -4, 1}, {0, -4, 1}, {1, -4, 1}, {2, -4, 1},  // North face
-		{-2,  4, 4}, {-1,  4, 4}, {0,  4, 4}, {1,  4, 4}, {2,  4, 4},  // South face
-		{4,  -2, 2}, {4,  -1, 2}, {4,  0, 2}, {4,  1, 2}, {4,  2, 2},  // East face
-		{-4, -2, 8}, {-4, -1, 8}, {-4, 0, 8}, {-4, 1, 8},              // West face
-		// TODO: proper metas and height: {0,  1, 1},  {0, -1, 4},  {-1, 0, 2}, {1,  1, 8},  // Around the tunk
-    }};
+	static const std::array<sMetaCoords, 19> Vines =
+	{
+		{
+			{-2, -4, 1}, {-1, -4, 1}, {0, -4, 1}, {1, -4, 1}, {2, -4, 1},  // North face
+			{-2,  4, 4}, {-1,  4, 4}, {0,  4, 4}, {1,  4, 4}, {2,  4, 4},  // South face
+			{4,  -2, 2}, {4,  -1, 2}, {4,  0, 2}, {4,  1, 2}, {4,  2, 2},  // East face
+			{-4, -2, 8}, {-4, -1, 8}, {-4, 0, 8}, {-4, 1, 8},              // West face
+			// TODO: proper metas and height: {0,  1, 1},  {0, -1, 4},  {-1, 0, 2}, {1,  1, 8},  // Around the tunk
+		}
+	};
 
 	int Height = 7 + (a_Noise.IntNoise3DInt(a_BlockX + 5 * a_Seq, a_BlockY, a_BlockZ + 5 * a_Seq) / 5) % 3;
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height));
 	a_OtherBlocks.reserve(
-        2 * BigO3.size() +            // O3 layer, 2x
-        2 * BigO2.size() +            // O2 layer, 2x
-        BigO1.size() + 1 +            // Plus on the top
-        static_cast<size_t>(Height) * Vines.size() +  // Vines
+		2 * BigO3.size() +            // O3 layer, 2x
+		2 * BigO2.size() +            // O2 layer, 2x
+		BigO1.size() + 1 +            // Plus on the top
+		static_cast<size_t>(Height) * Vines.size() +  // Vines
 		50  // some safety
 	);
 
@@ -1047,7 +1068,7 @@ void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	int hei = a_BlockY + Height - 3;
 
 	// Put vines around the lowermost leaves layer:
-    PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
+	PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines.data(), Vines.size(), E_BLOCK_VINES);
 
 	// The lower two leaves layers are BigO3 with log in the middle and possibly corners:
 	for (int i = 0; i < 2; i++)
