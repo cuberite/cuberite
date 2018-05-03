@@ -371,7 +371,7 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		return -1;
 	}
 
-	return EnchantmentNames[EnchantmentName];
+    return EnchantmentNames.at(EnchantmentName);
 }
 
 

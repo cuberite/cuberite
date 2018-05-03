@@ -128,8 +128,8 @@ protected:
 
 	// cChunkDataSeparateCollector overrides:
 	virtual void LightIsValid(bool a_IsLightValid) override;
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) override;
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override;
+    virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) override;
+    virtual void BiomeData(const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity(cEntity * a_Entity) override;
 	virtual void BlockEntity(cBlockEntity * a_Entity) override;
 } ;  // class cNBTChunkSerializer

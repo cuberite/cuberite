@@ -364,10 +364,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	cChunkDef::BlockNibbles BlockLight;
 	cChunkDef::BlockNibbles SkyLight;
 
-	memset(BlockTypes, E_BLOCK_AIR, sizeof(BlockTypes));
-	memset(MetaData,   0,           sizeof(MetaData));
-	memset(SkyLight,   0xff,        sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
-	memset(BlockLight, 0x00,        sizeof(BlockLight));
+    std::fill(begin(BlockTypes), end(BlockTypes), E_BLOCK_AIR);
+    std::fill(begin(MetaData),   end(MetaData),   0);
+    std::fill(begin(SkyLight),   end(SkyLight),   0xff);  // By default, data not present in the NBT means air, which means full skylight
+    std::fill(begin(BlockLight), end(BlockLight), 0x00);
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -401,26 +401,26 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		{
 			continue;
 		}
-		CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(BlockTypes[y * 4096])), 4096);
-		CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(MetaData[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "SkyLight",   reinterpret_cast<char *>(&(SkyLight[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "BlockLight", reinterpret_cast<char *>(&(BlockLight[y * 2048])), 2048);
+        CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(BlockTypes[static_cast<size_t>(y * 4096)])), 4096);
+        CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(MetaData[  static_cast<size_t>(y * 2048)])), 2048);
+        CopyNBTData(a_NBT, Child, "SkyLight",   reinterpret_cast<char *>(&(SkyLight[  static_cast<size_t>(y * 2048)])), 2048);
+        CopyNBTData(a_NBT, Child, "BlockLight", reinterpret_cast<char *>(&(BlockLight[static_cast<size_t>(y * 2048)])), 2048);
 	}  // for itr - LevelSections[]
 
 	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
 	cChunkDef::BiomeMap BiomeMap;
-	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
+    cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
 	if (Biomes == nullptr)
 	{
 		// MCS-style biomes not available, load vanilla-style:
-		Biomes = LoadVanillaBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
+        Biomes = LoadVanillaBiomeMapFromNBT(BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
 	}
 
 	// Load the entities from NBT:
 	cEntityList      Entities;
 	cBlockEntities   BlockEntities;
-	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes, MetaData);
+    LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
+    LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes.data(), MetaData.data());
 
 	bool IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 
@@ -462,9 +462,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-		BlockTypes, MetaData,
-		IsLightValid ? BlockLight : nullptr,
-		IsLightValid ? SkyLight : nullptr,
+        BlockTypes.data(), MetaData.data(),
+        IsLightValid ? BlockLight.data() : nullptr,
+        IsLightValid ? SkyLight.data() : nullptr,
 		nullptr, Biomes,
 		std::move(Entities), std::move(BlockEntities),
 		false
@@ -560,7 +560,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 
 
 
-cChunkDef::BiomeMap & cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
 	{
@@ -572,29 +572,29 @@ cChunkDef::BiomeMap & cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 		return nullptr;
 	}
 	const unsigned char * VanillaBiomeData = reinterpret_cast<const unsigned char *>(a_NBT.GetData(a_TagIdx));
-	for (auto && Biome : a_BiomeMap)
+    for (size_t i = 0; i < a_BiomeMap.size(); i++)
 	{
 		if ((VanillaBiomeData)[i] == 0xff)
 		{
 			// Unassigned biomes
 			return nullptr;
 		}
-		Biome = static_cast<EMCSBiome>(VanillaBiomeData[i]);
+        a_BiomeMap[i] = static_cast<EMCSBiome>(VanillaBiomeData[i]);
 	}
-	return a_BiomeMap;
+    return &a_BiomeMap;
 }
 
 
 
 
 
-cChunkDef::BiomeMap & cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_IntArray))
 	{
 		return nullptr;
 	}
-	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
+    if (a_NBT.GetDataLength(a_TagIdx) != sizeof(a_BiomeMap))
 	{
 		// The biomes stored don't match in size
 		return nullptr;
@@ -609,7 +609,7 @@ cChunkDef::BiomeMap & cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_Bio
 			return nullptr;
 		}
 	}
-	return a_BiomeMap;
+    return &a_BiomeMap;
 }
 
 
@@ -3415,20 +3415,20 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 	}
 
 	// Load the header:
-	if (m_File.Read(m_Header, sizeof(m_Header)) != sizeof(m_Header))
+    if (m_File.Read(m_Header.data(), sizeof(m_Header)) != sizeof(m_Header))
 	{
 		// Cannot read the header - perhaps the file has just been created?
 		// Try writing a nullptr header for chunk offsets:
-		memset(m_Header, 0, sizeof(m_Header));
+        std::fill(begin(m_Header), end(m_Header), 0);
 		writeOutNeeded = true;
 	}
 
 	// Load the TimeStamps:
-	if (m_File.Read(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+    if (m_File.Read(m_TimeStamps.data(), sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
 	{
 		// Cannot read the time stamps - perhaps the file has just been created?
 		// Try writing a nullptr header for timestamps:
-		memset(m_TimeStamps, 0, sizeof(m_TimeStamps));
+        std::fill(begin(m_TimeStamps), end(m_TimeStamps), 0);
 		writeOutNeeded = true;
 	}
 
@@ -3436,8 +3436,8 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 	{
 		m_File.Seek(0);
 		if (
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||           // Write chunk offsets
-			(m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))  // Write chunk timestamps
+            (m_File.Write(m_Header.data(), sizeof(m_Header)) != sizeof(m_Header)) ||           // Write chunk offsets
+            (m_File.Write(m_TimeStamps.data(), sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))  // Write chunk timestamps
 		)
 		{
 			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
@@ -3469,7 +3469,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	{
 		LocalZ = 32 + LocalZ;
 	}
-	unsigned ChunkLocation = ntohl(m_Header[LocalX + 32 * LocalZ]);
+    unsigned ChunkLocation = ntohl(m_Header[static_cast<size_t>(LocalX + 32 * LocalZ)]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
 	if (ChunkOffset < 2)
 	{
@@ -3580,22 +3580,22 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	}
 
 	// Store the header info in the table
-	m_Header[LocalX + 32 * LocalZ] = htonl(static_cast<UInt32>((ChunkSector << 8) | ChunkSize));
+    m_Header[static_cast<size_t>(LocalX + 32 * LocalZ)] = htonl(static_cast<UInt32>((ChunkSector << 8) | ChunkSize));
 
 	// Set the modification time
-	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(static_cast<UInt32>(time(nullptr)));
+    m_TimeStamps[static_cast<size_t>(LocalX + 32 * LocalZ)] =  htonl(static_cast<UInt32>(time(nullptr)));
 
 	if (m_File.Seek(0) < 0)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], seeking in file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
 		return false;
 	}
-	if (m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))
+    if (m_File.Write(m_Header.data(), sizeof(m_Header)) != sizeof(m_Header))
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing header to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
 		return false;
 	}
-	if (m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+    if (m_File.Write(m_TimeStamps.data(), sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing timestamps to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
 		return false;
@@ -3611,7 +3611,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data)
 {
 	// See if it fits the current location:
-	unsigned ChunkLocation = ntohl(m_Header[a_LocalX + 32 * a_LocalZ]);
+    unsigned ChunkLocation = ntohl(m_Header[static_cast<size_t>(a_LocalX + 32 * a_LocalZ)]);
 	unsigned ChunkLen = ChunkLocation & 0xff;
 	if (a_Data.size() + MCA_CHUNK_HEADER_LENGTH <= (ChunkLen * 4096))
 	{

@@ -58,7 +58,7 @@ public:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
 	{
 		std::array<int, cChunkDef::Width * cChunkDef::Width> heights;
-		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights);
+        m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights.data());
 		for (size_t i = 0; i < heights.size(); i++)
 		{
 			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));
@@ -162,7 +162,7 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_HeightMap, m_CacheData[Idx].m_HeightMap, sizeof(a_HeightMap));
+        a_HeightMap = m_CacheData[Idx].m_HeightMap;
 
 		m_NumHits++;
 		m_TotalChain += i;
@@ -180,7 +180,7 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_HeightMap, a_HeightMap, sizeof(a_HeightMap));
+    m_CacheData[Idx].m_HeightMap = a_HeightMap;
 	m_CacheData[Idx].m_ChunkX = a_ChunkX;
 	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
 }
@@ -607,7 +607,7 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 			int ModX = FinalX % cChunkDef::Width;
 			EMCSBiome Biome = cChunkDef::GetBiome(a_BiomeNeighbors[IdxX][IdxZ], ModX, ModZ);
 			int WeightX = 9 - abs(x);
-			BiomeCounts[Biome] += WeightX + WeightZ;
+            BiomeCounts[static_cast<size_t>(Biome)] += WeightX + WeightZ;
 			Sum += WeightX + WeightZ;
 		}  // for x
 	}  // for z

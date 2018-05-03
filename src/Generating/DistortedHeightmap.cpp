@@ -221,7 +221,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 	// Upscale the distorted heightmap into full dimensions:
 	LinearUpscale3DArray(
 		DistHei, DIM_X, DIM_Y, DIM_Z,
-		m_DistortedHeightmap, INTERPOL_X, INTERPOL_Y, INTERPOL_Z
+        m_DistortedHeightmap.data(), INTERPOL_X, INTERPOL_Y, INTERPOL_Z
 	);
 
 	// DEBUG: Debug3DNoise(m_DistortedHeightmap, 17, 257, 17, Printf("DistortedHeightmap_%d_%d", m_CurChunkX, m_CurChunkZ));
@@ -241,7 +241,7 @@ void cDistortedHeightmap::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape
 			int idx = x + 17 * 257 * z;
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 16 * 256] = (y < m_DistortedHeightmap[idx + y * 17]) ? 1 : 0;
+                a_Shape[static_cast<size_t>(y + x * 256 + z * 16 * 256)] = (y < m_DistortedHeightmap[static_cast<size_t>(idx + y * 17)]) ? 1 : 0;
 			}  // for y
 		}  // for x
 	}  // for z
@@ -334,7 +334,7 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 			int ModX = FinalX % cChunkDef::Width;
 			EMCSBiome Biome = cChunkDef::GetBiome(a_Neighbors[IdxX][IdxZ], ModX, ModZ);
 			int WeightX = 9 - abs(x);
-			BiomeCounts[Biome] += WeightX + WeightZ;
+            BiomeCounts[static_cast<size_t>(Biome)] += WeightX + WeightZ;
 			Sum += WeightX + WeightZ;
 		}  // for x
 	}  // for z
@@ -350,9 +350,9 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	// For each biome type that has a nonzero count, calc its amps and add it:
 	NOISE_DATATYPE AmpX = 0;
 	NOISE_DATATYPE AmpZ = 0;
-	for (auto CurCount : BiomeCounts)
+    for (size_t i = 0; i < BiomeCounts.size(); i++)
 	{
-		if (CurCount <= 0)
+        if (BiomeCounts[i] <= 0)
 		{
 			continue;
 		}
@@ -365,8 +365,8 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 		ASSERT(m_GenParam[i].m_DistortAmpX < 100);
 		*/
 
-		AmpX += CurCount * m_GenParam[i].m_DistortAmpX;
-		AmpZ += CurCount * m_GenParam[i].m_DistortAmpZ;
+        AmpX += BiomeCounts[i] * m_GenParam[i].m_DistortAmpX;
+        AmpZ += BiomeCounts[i] * m_GenParam[i].m_DistortAmpZ;
 	}
 	a_DistortAmpX = AmpX / Sum;
 	a_DistortAmpZ = AmpZ / Sum;

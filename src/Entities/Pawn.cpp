@@ -320,22 +320,22 @@ void cPawn::HandleFalling(void)
 		int x, z;
 	};
 	static const std::array<XZ, 5> CrossSampleCoords =
-	{
+    {{
 		{ 0, 0 },
 		{ 1, 0 },
 		{ -1, 0 },
 		{ 0, 1 },
 		{ 0, -1 },
-	};
+    }};
 
 	/* The blocks we're interested in relative to the player to account for larger than 1 blocks.
 	This can be extended to do additional checks in case there are blocks that are represented as one block
 	in memory but have a hitbox larger than 1 (like fences) */
 	static const std::array<Vector3i, 2> BlockSampleOffsets =
-	{
+    {{
 		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)
 		{ 0, -1, 0 },  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water (i.e. on side of pool)
-	};
+    }};
 
 	/* Here's the rough outline of how this mechanism works:
 	We take the player's pointlike position (sole of feet), and expand it into a crosslike shape.
@@ -349,9 +349,9 @@ void cPawn::HandleFalling(void)
 		Vector3d CrossTestPosition = GetPosition() + Vector3d(Coord.x * HalfWidth, -EPS, Coord.z * HalfWidth);
 
 		/* We go through the blocks that we consider "relevant" */
-		for (const auto & Offset : BlockSampleOffsets)
+        for (size_t i = 0; i < BlockSampleOffsets.size(); i++)
 		{
-			Vector3i BlockTestPosition = CrossTestPosition.Floor() + Offset;
+            Vector3i BlockTestPosition = CrossTestPosition.Floor() + BlockSampleOffsets[i];
 
 			if (!cChunkDef::IsValidHeight(BlockTestPosition.y))
 			{
@@ -362,7 +362,7 @@ void cPawn::HandleFalling(void)
 			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
 
 			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
-			if (j == 0)
+            if (i == 0)
 			{
 				IsFootInWater |= IsBlockWater(Block);
 				IsFootInLiquid |= IsFootInWater || IsBlockLava(Block) || (Block == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...

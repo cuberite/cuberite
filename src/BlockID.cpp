@@ -320,7 +320,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 		return dimOverworld;
 	}
 
-	return DimensionMap[DimensionName];
+    return DimensionMap.at(DimensionName);
 }
 
 
@@ -444,7 +444,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		return static_cast<eDamageType>(-1);
 	}
 
-	return DamageTypeMap[DamageTypeName];
+    return DamageTypeMap.at(DamageTypeName);
 }
 
 

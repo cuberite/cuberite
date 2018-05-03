@@ -156,18 +156,18 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Height = a_ChunkDesc.GetHeight(x, z);
-			const BLOCKTYPE * Pattern;
+            const std::array<BLOCKTYPE, PATTERN_LENGTH> * Pattern;
 			if (Height > m_SeaLevel + m_BeachHeight)
 			{
-				Pattern = PatternGround;
+                Pattern = &PatternGround;
 			}
 			else if (Height > m_SeaLevel - m_BeachDepth)
 			{
-				Pattern = PatternBeach;
+                Pattern = &PatternBeach;
 			}
 			else
 			{
-				Pattern = PatternOcean;
+                Pattern = &PatternOcean;
 			}
 
 			// Fill water from sealevel down to height (if any):
@@ -179,7 +179,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
+                a_ChunkDesc.SetBlockType(x, y, z, (Height - y < static_cast<int>(Pattern->size())) ? Pattern->at(static_cast<size_t>(Height - y)) : m_BlockBottom);
 			}
 
 			// The last layer is always bedrock:
@@ -401,9 +401,9 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_ChunkDesc.GetBlockTypes(),             m_CacheData[Idx].m_BlockTypes, sizeof(a_ChunkDesc.GetBlockTypes()));
-		memcpy(a_ChunkDesc.GetBlockMetasUncompressed(), m_CacheData[Idx].m_BlockMetas, sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
-		memcpy(a_ChunkDesc.GetHeightMap(),              m_CacheData[Idx].m_HeightMap,  sizeof(a_ChunkDesc.GetHeightMap()));
+        a_ChunkDesc.GetBlockTypes()             = m_CacheData[Idx].m_BlockTypes;
+        a_ChunkDesc.GetBlockMetasUncompressed() = m_CacheData[Idx].m_BlockMetas;
+        a_ChunkDesc.GetHeightMap()              = m_CacheData[Idx].m_HeightMap;
 
 		m_NumHits++;
 		m_TotalChain += i;
@@ -421,9 +421,9 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BlockTypes, a_ChunkDesc.GetBlockTypes(),             sizeof(a_ChunkDesc.GetBlockTypes()));
-	memcpy(m_CacheData[Idx].m_BlockMetas, a_ChunkDesc.GetBlockMetasUncompressed(), sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
-	memcpy(m_CacheData[Idx].m_HeightMap,  a_ChunkDesc.GetHeightMap(),              sizeof(a_ChunkDesc.GetHeightMap()));
+    m_CacheData[Idx].m_BlockTypes = a_ChunkDesc.GetBlockTypes();
+    m_CacheData[Idx].m_BlockMetas = a_ChunkDesc.GetBlockMetasUncompressed();
+    m_CacheData[Idx].m_HeightMap  = a_ChunkDesc.GetHeightMap();
 	m_CacheData[Idx].m_ChunkX = ChunkX;
 	m_CacheData[Idx].m_ChunkZ = ChunkZ;
 }

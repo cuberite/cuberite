@@ -40,7 +40,7 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	cChunkDef::BlockTypes blocks;
-	m_World->GetChunkBlockTypes(a_ChunkX, a_ChunkZ, blocks);
+    m_World->GetChunkBlockTypes(a_ChunkX, a_ChunkZ, blocks.data());
 
 	// Iterate through all of the blocks in the chunk
 	for (unsigned int i = 0; i < cChunkDef::NumBlocks; i++)

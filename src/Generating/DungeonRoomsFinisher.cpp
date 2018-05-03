@@ -198,7 +198,7 @@ protected:
 
 		// Fill the chest with random loot
 		static const std::array<cLootProbab, 22> LootProbab =
-		{
+        {{
 			// Item,                          MinAmount, MaxAmount, Weight
 			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
 			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
@@ -222,14 +222,14 @@ protected:
 			{ cItem(E_ITEM_BEETROOT_SEEDS),      2,         4,        10 },
 			{ cItem(E_ITEM_MELON_SEEDS),         2,         4,        10 },
 			{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
-		} ;
+        }};
 
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
-		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, LootProbab.size(), NumSlots, Seed);
+        ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab.data(), LootProbab.size(), NumSlots, Seed);
 	}
 
 
@@ -328,7 +328,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	int idx = RelX * 256 + RelZ * 16 * 256;
 	for (int y = 6; y < cChunkDef::Height; y++)
 	{
-		if (shape[idx + y] != 0)
+        if (shape[static_cast<size_t>(idx + y)] != 0)
 		{
 			continue;
 		}

@@ -117,7 +117,7 @@ protected:
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
 	int m_LastChunkX;
 	int m_LastChunkZ;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+    std::array<NOISE_DATATYPE, 17 * 17 * 257> m_NoiseArray;  // x + 17 * z + 17 * 17 * y
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */

@@ -63,7 +63,7 @@ void cSignEntity::SetLine(int a_Index, const AString & a_Line)
 		LOGWARNING("%s: setting a non-existent line %d (value \"%s\"", __FUNCTION__, a_Index, a_Line.c_str());
 		return;
 	}
-	m_Line[a_Index] = a_Line;
+    m_Line[static_cast<size_t>(a_Index)] = a_Line;
 }
 
 
@@ -77,7 +77,7 @@ AString cSignEntity::GetLine(int a_Index) const
 		LOGWARNING("%s: requesting a non-existent line %d", __FUNCTION__, a_Index);
 		return "";
 	}
-	return m_Line[a_Index];
+    return m_Line[static_cast<size_t>(a_Index)];
 }
 
 

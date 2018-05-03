@@ -36,7 +36,7 @@ struct MonsterTypeName
 	const char * m_VanillaNameNBT;
 };
 static const std::array<MonsterTypeName, 31> g_MobTypeNames =
-{
+{{
 	{mtBat,          "bat",          "Bat",             "bat"},
 	{mtBlaze,        "blaze",        "Blaze",           "blaze"},
 	{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
@@ -68,7 +68,7 @@ static const std::array<MonsterTypeName, 31> g_MobTypeNames =
 	{mtWolf,         "wolf",         "Wolf",            "wolf"},
 	{mtZombie,       "zombie",       "Zombie",          "zombie"},
 	{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
-} ;
+}};
 
 
 

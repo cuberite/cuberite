@@ -168,11 +168,11 @@ void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 		{
 			for (int y = 0; y < MaxY; y++)
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = (m_NoiseArray[y * 17 * 17 + z * 17 + z] > 0) ? 1 : 0;
+                a_Shape[static_cast<size_t>((x + 16 * z) * 256 + y)] = (m_NoiseArray[static_cast<size_t>(y * 17 * 17 + z * 17 + z)] > 0) ? 1 : 0;
 			}
 			for (int y = MaxY; y < cChunkDef::Height; y++)
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = 0;
+                a_Shape[static_cast<size_t>((x + 16 * z) * 256 + y)] = 0;
 			}
 		}  // for x
 	}  // for z
@@ -191,7 +191,7 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				if (a_Shape[(x + 16 * z) * 256 + y] != 0)
+                if (a_Shape[static_cast<size_t>((x + 16 * z) * 256 + y)] != 0)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_END_STONE);
 				}

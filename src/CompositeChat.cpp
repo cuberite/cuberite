@@ -158,7 +158,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 			case ':':
 			{
-				static const std::array<AString> LinkPrefixes =
+                static const std::array<AString, 2> LinkPrefixes =
 				{
 					"http",
 					"https"

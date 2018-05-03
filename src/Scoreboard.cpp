@@ -42,7 +42,7 @@ AString cObjective::TypeToString(eType a_Type)
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
 	static const std::unordered_map<AString, eType> TypeMap =
-	{
+    {
 		{"dummy"              , otDummy             },
 		{"deathCount"         , otDeathCount        },
 		{"playerKillCount"    , otPlayerKillCount   },
@@ -58,13 +58,13 @@ cObjective::eType cObjective::StringToType(const AString & a_Name)
 		{"stat.entityKilledBy", otStatEntityKilledBy}
 	};
 
-	a_Name = StrToLower(a_Name);
-	if(TypeMap.count(a_Name) == 0)
+    AString lName = StrToLower(a_Name);
+    if(TypeMap.count(lName) == 0)
 	{
 		return otDummy;
 	}
 
-		return TypeMap[a_Name];
+    return TypeMap.at(lName);
 }
 
 

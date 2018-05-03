@@ -164,12 +164,12 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		static const std::array<Vector3i, 4> Coords =
-		{
+        {{
 			{  1, 0,  0 },
 			{ -1, 0,  0 },
 			{  0, 0,  1 },
 			{  0, 0, -1 },
-		} ;
+        }};
 		for (const auto & Coord : Coords)
 		{
 			if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))
@@ -335,12 +335,12 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 	FLUID_LOG("  Checking neighbors for source creation");
 
 	static const std::array<Vector3i, 4> NeighborCoords =
-	{
+    {{
 		{ -1, 0,  0 },
 		{  1, 0,  0 },
 		{  0, 0, -1 },
 		{  0, 0,  1 },
-	} ;
+    }};
 
 	int NumNeeded = m_NumNeighborsForSource;
 	for (const auto & Coord : NeighborCoords)
@@ -390,12 +390,12 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	static const std::array<Vector3i, 4> Coords =
-	{
+    {{
 		{  1, 0,  0 },
 		{ -1, 0,  0 },
 		{  0, 0,  1 },
 		{  0, 0, -1 },
-	};
+    }};
 	for (const auto & Coord : Coords)
 	{
 		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))

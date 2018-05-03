@@ -159,7 +159,7 @@ void cChunkDesc::SetHeightFromShape(const Shape & a_Shape)
 		{
 			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
-				if (a_Shape[y + x * 256 + z * 16 * 256] != 0)
+                if (a_Shape[static_cast<size_t>(y + x * 256 + z * 16 * 256)] != 0)
 				{
 					cChunkDef::SetHeight(m_HeightMap, x, z, y);
 					break;
@@ -182,12 +182,12 @@ void cChunkDesc::GetShapeFromHeight(Shape & a_Shape) const
 			int height = cChunkDef::GetHeight(m_HeightMap, x, z);
 			for (int y = 0; y <= height; y++)
 			{
-				a_Shape[y + x * 256 + z * 16 * 256] = 1;
+                a_Shape[static_cast<size_t>(y + x * 256 + z * 16 * 256)] = 1;
 			}
 
 			for (int y = height + 1; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 16 * 256] = 0;
+                a_Shape[static_cast<size_t>(y + x * 256 + z * 16 * 256)] = 0;
 			}  // for y
 		}  // for x
 	}  // for z
@@ -396,7 +396,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 
 HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 {
-	return std::max_element(begin(m_HeightMap), end(m_HeightMap));
+    return *std::max_element(begin(m_HeightMap), end(m_HeightMap));
 }
 
 
@@ -405,7 +405,7 @@ HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 
 HEIGHTTYPE cChunkDesc::GetMinHeight(void) const
 {
-	return std::min_element(begin(m_HeightMap), end(m_HeightMap));
+    return *std::min_element(begin(m_HeightMap), end(m_HeightMap));
 }
 
 
@@ -621,9 +621,9 @@ void cChunkDesc::UpdateHeightmap(void)
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
-	for (auto && DestMeta : a_DestMetas)
+    for(size_t i = 0; i < a_DestMetas.size(); i++)
 	{
-		DestMeta = static_cast<NIBBLETYPE>(AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4));
+        a_DestMetas[i] = static_cast<NIBBLETYPE>(AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4));
 	}
 }
 

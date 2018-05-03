@@ -51,7 +51,7 @@ protected:
 
 	int m_CurChunkX;
 	int m_CurChunkZ;
-	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
+    std::array<NOISE_DATATYPE, 17 * 257 * 17> m_DistortedHeightmap;
 
 	/** The bime generator to query for biomes. */
 	cBiomeGenPtr m_BiomeGen;

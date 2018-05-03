@@ -375,13 +375,13 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		int x, z;
 	};
 	static const std::array<XZ, 4> Coords =
-	{
+    {{
 		{1, 0},
 		{-1, 0},
 		{0, 1},
 		{0, -1},
-	} ;
-	for (const auto & Coord : Coords))
+    }};
+    for (const auto & Coord : Coords)
 	{
 		int x = m_RelX + Coord.x;
 		int z = m_RelZ + Coord.z;
@@ -398,10 +398,10 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 			continue;
 		}
 
-		cChestEntity * SideChest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z));
+        cChestEntity * SideChest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(m_PosX + Coord.x, m_PosY + 1, m_PosZ + Coord.z));
 		if (SideChest == nullptr)
 		{
-			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
+            LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coord.x, m_PosY + 1, m_PosZ + Coord.z);
 		}
 		else
 		{
@@ -542,12 +542,12 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		int x, z;
 	};
 	static const std::array<XZ, 4> Coords =
-	{
+    {{
 		{1, 0},
 		{-1, 0},
 		{0, 1},
 		{0, -1},
-	} ;
+    }};
 	int RelX = a_BlockX - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = a_BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width;
 	for (const auto & Coord : Coords)
@@ -567,10 +567,10 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 			continue;
 		}
 
-		cChestEntity * Chest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z));
+        cChestEntity * Chest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(a_BlockX + Coord.x, a_BlockY, a_BlockZ + Coord.z));
 		if (Chest == nullptr)
 		{
-			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z, x, z);
+            LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coord.x, a_BlockY, a_BlockZ + Coord.z, x, z);
 			continue;
 		}
 		if (MoveItemsToGrid(*Chest))

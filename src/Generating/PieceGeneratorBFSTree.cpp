@@ -71,11 +71,11 @@ cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(int a_BlockX, int a_B
 	{
 		if (StartingPiece->CanRotateCCW(static_cast<int>(i)))
 		{
-			Rotations[NumRotations] = static_cast<int>(i);
+            Rotations[static_cast<size_t>(NumRotations)] = static_cast<int>(i);
 			NumRotations += 1;
 		}
 	}
-	int Rotation = Rotations[rnd % NumRotations];
+    int Rotation = Rotations[static_cast<size_t>(rnd % NumRotations)];
 	int BlockY = StartingPiece->GetStartingPieceHeight(a_BlockX, a_BlockZ);
 	ASSERT(BlockY >= 0);  // The vertical strategy should have been provided and should give valid coords
 

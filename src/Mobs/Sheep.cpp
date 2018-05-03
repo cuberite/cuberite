@@ -147,7 +147,7 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 		short Parent1, Parent2, Child;
 	};
 	static const std::array<Inheritance, 9> ColorInheritance =
-	{
+    {{
 		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },
 		{ E_META_WOOL_BLUE,   E_META_WOOL_GREEN, E_META_WOOL_CYAN       },
 		{ E_META_WOOL_YELLOW, E_META_WOOL_RED,   E_META_WOOL_ORANGE     },
@@ -157,7 +157,7 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 		{ E_META_WOOL_PURPLE, E_META_WOOL_PINK,  E_META_WOOL_MAGENTA    },
 		{ E_META_WOOL_WHITE,  E_META_WOOL_GRAY,  E_META_WOOL_LIGHTGRAY  },
 		{ E_META_WOOL_BLUE,   E_META_WOOL_WHITE, E_META_WOOL_LIGHTBLUE  },
-	};
+    }};
 	cSheep * Parent1 = static_cast<cSheep *>(a_Parent1);
 	cSheep * Parent2 = static_cast<cSheep *>(a_Parent2);
 	for (const auto & CurInheritance : ColorInheritance)

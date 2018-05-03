@@ -15,8 +15,8 @@ struct BiomePair
 	EMCSBiome m_Biome;
 };
 // The map used for biome <-> string conversions:
-static const std::array<AString, EMCSBiome> g_BiomeMap =
-{
+static const std::array<BiomePair, 64> g_BiomeMap =
+{{
 	{"Ocean"               , biOcean                },
 	{"Plains"              , biPlains               },
 	{"Desert"              , biDesert               },
@@ -85,7 +85,7 @@ static const std::array<AString, EMCSBiome> g_BiomeMap =
 	{"MesaBryce"           , biMesaBryce           },
 	{"MesaPlateauFM"       , biMesaPlateauFM       },
 	{"MesaPlateauM"        , biMesaPlateauM        },
-} ;
+}};
 
 
 

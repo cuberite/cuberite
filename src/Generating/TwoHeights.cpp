@@ -51,7 +51,7 @@ public:
 		LinearUpscale3DArray(smallChoice, 33, 5, 5, choice, 8, 4, 4);
 
 		// Generate the shape:
-		int idxShape = 0;
+        size_t idxShape = 0;
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)

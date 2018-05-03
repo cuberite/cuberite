@@ -1613,7 +1613,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 		int m_AirX, m_AirY, m_AirZ;  // Coords to check for air; if not air, the bookcase won't be counted
 	};
 	static const std::array<BookshelfCoord, 32> CheckCoords =
-	{
+    {{
 		{ 0, 0, 0, 1, 0, 1 },  // Bookcase at {0, 0, 0}, air at {1, 0, 1}
 		{ 0, 0, 1, 1, 0, 1 },  // Bookcase at {0, 0, 1}, air at {1, 0, 1}
 		{ 0, 0, 2, 1, 0, 2 },  // Bookcase at {0, 0, 2}, air at {1, 0, 2}
@@ -1647,7 +1647,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 		{ 3, 1, 0, 3, 1, 1 },  // Bookcase at {3, 1, 0}, air at {3, 1, 1}
 		{ 2, 1, 0, 2, 1, 1 },  // Bookcase at {2, 1, 0}, air at {2, 1, 1}
 		{ 1, 1, 0, 1, 1, 1 },  // Bookcase at {1, 1, 0}, air at {1, 1, 1}
-	};
+    }};
 
 	for (const auto & Coord : CheckCoords)
 	{

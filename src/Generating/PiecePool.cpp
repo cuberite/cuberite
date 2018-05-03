@@ -424,7 +424,7 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 		return false;
 	}
 
-	a_Out = StringDirections[lcValue];
+    a_Out = StringDirections.at(lcValue);
 	return true;
 }
 
