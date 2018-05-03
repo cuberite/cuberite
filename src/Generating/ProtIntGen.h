@@ -692,46 +692,48 @@ public:
 		// Map for biome -> its beach:
 		static const std::array<int, 40> ToBeach =
 		{
-			/* biOcean            */ biOcean,
-			/* biPlains           */ biBeach,
-			/* biDesert           */ biBeach,
-			/* biExtremeHills     */ biStoneBeach,
-			/* biForest           */ biBeach,
-			/* biTaiga            */ biColdBeach,
-			/* biSwampland        */ biSwampland,
-			/* biRiver            */ biRiver,
-			/* biNether           */ biNether,
-			/* biEnd              */ biEnd,
-			/* biFrozenOcean      */ biColdBeach,
-			/* biFrozenRiver      */ biColdBeach,
-			/* biIcePlains        */ biColdBeach,
-			/* biIceMountains     */ biColdBeach,
-			/* biMushroomIsland   */ biMushroomShore,
-			/* biMushroomShore    */ biMushroomShore,
-			/* biBeach            */ biBeach,
-			/* biDesertHills      */ biBeach,
-			/* biForestHills      */ biBeach,
-			/* biTaigaHills       */ biColdBeach,
-			/* biExtremeHillsEdge */ biStoneBeach,
-			/* biJungle           */ biBeach,
-			/* biJungleHills      */ biBeach,
-			/* biJungleEdge       */ biBeach,
-			/* biDeepOcean        */ biOcean,
-			/* biStoneBeach       */ biStoneBeach,
-			/* biColdBeach        */ biColdBeach,
-			/* biBirchForest      */ biBeach,
-			/* biBirchForestHills */ biBeach,
-			/* biRoofedForest     */ biBeach,
-			/* biColdTaiga        */ biColdBeach,
-			/* biColdTaigaHills   */ biColdBeach,
-			/* biMegaTaiga        */ biStoneBeach,
-			/* biMegaTaigaHills   */ biStoneBeach,
-			/* biExtremeHillsPlus */ biStoneBeach,
-			/* biSavanna          */ biBeach,
-			/* biSavannaPlateau   */ biBeach,
-			/* biMesa             */ biMesa,
-			/* biMesaPlateauF     */ biMesa,
-			/* biMesaPlateau      */ biMesa,
+			{
+				/* biOcean            */ biOcean,
+				/* biPlains           */ biBeach,
+				/* biDesert           */ biBeach,
+				/* biExtremeHills     */ biStoneBeach,
+				/* biForest           */ biBeach,
+				/* biTaiga            */ biColdBeach,
+				/* biSwampland        */ biSwampland,
+				/* biRiver            */ biRiver,
+				/* biNether           */ biNether,
+				/* biEnd              */ biEnd,
+				/* biFrozenOcean      */ biColdBeach,
+				/* biFrozenRiver      */ biColdBeach,
+				/* biIcePlains        */ biColdBeach,
+				/* biIceMountains     */ biColdBeach,
+				/* biMushroomIsland   */ biMushroomShore,
+				/* biMushroomShore    */ biMushroomShore,
+				/* biBeach            */ biBeach,
+				/* biDesertHills      */ biBeach,
+				/* biForestHills      */ biBeach,
+				/* biTaigaHills       */ biColdBeach,
+				/* biExtremeHillsEdge */ biStoneBeach,
+				/* biJungle           */ biBeach,
+				/* biJungleHills      */ biBeach,
+				/* biJungleEdge       */ biBeach,
+				/* biDeepOcean        */ biOcean,
+				/* biStoneBeach       */ biStoneBeach,
+				/* biColdBeach        */ biColdBeach,
+				/* biBirchForest      */ biBeach,
+				/* biBirchForestHills */ biBeach,
+				/* biRoofedForest     */ biBeach,
+				/* biColdTaiga        */ biColdBeach,
+				/* biColdTaigaHills   */ biColdBeach,
+				/* biMegaTaiga        */ biStoneBeach,
+				/* biMegaTaigaHills   */ biStoneBeach,
+				/* biExtremeHillsPlus */ biStoneBeach,
+				/* biSavanna          */ biBeach,
+				/* biSavannaPlateau   */ biBeach,
+				/* biMesa             */ biMesa,
+				/* biMesaPlateauF     */ biMesa,
+				/* biMesaPlateau      */ biMesa,
+			}
 		};
 
 		// Generate the underlying values:
@@ -937,54 +939,74 @@ public:
 		// Define the per-biome-group biomes:
 		static const std::array<int, 1> oceanBiomes =
 		{
-			biOcean,  // biDeepOcean,
+			{
+				biOcean,  // biDeepOcean,
+			}
 		};
 
 		// Same as oceanBiomes, there are no rare oceanic biomes (mushroom islands are handled separately)
 		static const std::array<int, 1> rareOceanBiomes =
 		{
-			biOcean,
+			{
+				biOcean,
+			}
 		};
 
 		static const std::array<int, 9> desertBiomes =
 		{
-			biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
+			{
+				biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
+			}
 		};
 
 		static const std::array<int, 2> rareDesertBiomes =
 		{
-			biMesaPlateau, biMesaPlateauF,
+			{
+				biMesaPlateau, biMesaPlateauF,
+			}
 		};
 
 		static const std::array<int, 7> temperateBiomes =
 		{
-			biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
+			{
+				biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
+			}
 		};
 
 		static const std::array<int, 1> rareTemperateBiomes =
 		{
-			biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
+			{
+				biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
+			}
 		};
 
 		static const std::array<int, 4> mountainBiomes =
 		{
-			biExtremeHills, biForest, biTaiga, biPlains,
+			{
+				biExtremeHills, biForest, biTaiga, biPlains,
+			}
 		};
 
 		static const std::array<int, 1> rareMountainBiomes =
 		{
-			biMegaTaiga,
+			{
+				biMegaTaiga,
+			}
 		};
 
 		static const std::array<int, 5> iceBiomes =
 		{
-			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			{
+				biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			}
 		};
 
 		// Same as iceBiomes, there's no rare ice biome
 		static const std::array<int, 5> rareIceBiomes =
 		{
-			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			{
+				biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			}
 		};
 
 		static const std::array<cBiomesInGroups, 5> biomesInGroups =

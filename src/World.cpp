@@ -732,11 +732,13 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 	// Apart from netherrack (as the Nether is technically a massive cave)
 	static const std::array<BLOCKTYPE, 5> ValidSpawnBlocks =
 	{
-		E_BLOCK_GRASS,
-		E_BLOCK_SAND,
-		E_BLOCK_SNOW,
-		E_BLOCK_SNOW_BLOCK,
-		E_BLOCK_NETHERRACK
+		{
+			E_BLOCK_GRASS,
+			E_BLOCK_SAND,
+			E_BLOCK_SNOW,
+			E_BLOCK_SNOW_BLOCK,
+			E_BLOCK_NETHERRACK
+		}
 	};
 
 	// Increase this by two, because we need two more blocks for body and head
@@ -1138,10 +1140,12 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 		// Spawning is enabled, spawn now:
 		static const std::array<cMonster::eFamily, 4> AllFamilies =
 		{
-			cMonster::mfHostile,
-			cMonster::mfPassive,
-			cMonster::mfAmbient,
-			cMonster::mfWater,
+			{
+				cMonster::mfHostile,
+				cMonster::mfPassive,
+				cMonster::mfAmbient,
+				cMonster::mfWater,
+			}
 		} ;
 		for (auto Family : AllFamilies)
 		{
