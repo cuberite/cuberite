@@ -673,6 +673,11 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
 {
+	if (!IsDesertVariant(a_ChunkDesc.GetBiome(a_RelX, a_RelZ)))
+	{
+		return false;
+	}
+
 	int CactusHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxCactusHeight);
 
 	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
@@ -846,7 +851,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				case E_BLOCK_SAND:
 				{
-					if (val1 + val2 > 0.5f && IsDesertVariant(a_ChunkDesc.GetBiome(x, z)))
+					if (val1 + val2 > 0.5f)
 					{
 						if (!TryAddCactus(a_ChunkDesc, x, Top, z))
 						{
