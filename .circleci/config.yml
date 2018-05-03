@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  checkout_cuberite:
+    docker:
+    - image: circleci/cuberite-primary:0.0.1
+    steps:
+    - checkout
+    
+  check_basic_style:
+    working_directory: ~/cuberite/cuberite/src
+    docker:
+    - image: circleci/cuberite-primary:0.0.1
+    steps:
+    - run: find . -name \*.cpp -or -name \*.h > AllFiles.lst
+    - run: lua CheckBasicStyle.lua
+    
+  check_binding_dependencies:
+    working_directory: ~/cuberite/cuberite/src/Bindings
+    docker:
+    - image: circleci/cuberite-primary:0.0.1
+    steps:
+    - run: lua CheckBindingsDependencies.lua
+    
+workflows:
+  version: 2
+  checks:
+    jobs:
+    - checkout_cuberite
+    - check_basic_style:
+      requires:
+      - checkout_cuberite
+    - check_binding_dependencies:
+      requires:
+      - checkout_cuberite
