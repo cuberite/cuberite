@@ -117,7 +117,7 @@ void cCommandBlockEntity::Activate(void)
 void cCommandBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cCommandBlockEntity &>(a_Src);
+	auto & src = static_cast<const cCommandBlockEntity &>(a_Src);
 	m_Command = src.m_Command;
 	m_LastOutput = src.m_LastOutput;
 	m_Result = src.m_Result;
