@@ -403,15 +403,15 @@ void cChunkData::CopyBlockLight(NIBBLETYPE * a_Dest) const
 
 void cChunkData::CopySkyLight(NIBBLETYPE * a_Dest) const
 {
-	for (size_t i = 0; i < NumSections; i++)
+	for (size_t i = 0; i < m_Sections.size(); i++)
 	{
 		if (m_Sections[i] != nullptr)
 		{
-			memcpy(&a_Dest[i * SectionBlockCount / 2], &m_Sections[i]->m_BlockSkyLight, sizeof(m_Sections[i]->m_BlockSkyLight));
+			memcpy(&a_Dest[i * SectionBlockCount / 2], m_Sections[i]->m_BlockSkyLight.data(), m_Sections[i]->m_BlockSkyLight.size());
 		}
 		else
 		{
-			memset(&a_Dest[i * SectionBlockCount / 2], 0xff, sizeof(m_Sections[i]->m_BlockSkyLight));
+			memset(&a_Dest[i * SectionBlockCount / 2], 0xff, sChunkSection::m_BlockSkyLight.size());
 		}
 	}
 }

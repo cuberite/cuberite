@@ -39,7 +39,7 @@ public:
 		{
 			// Define all the possible painting titles
 			static const std::array<AString, 26> PaintingTitlesList =
-			{
+			{{
 				{ "Kebab" },
 				{ "Aztec" },
 				{ "Alban" },
@@ -66,9 +66,9 @@ public:
 				{ "Pointer" },
 				{ "Pigscene" },
 				{ "BurningSkull" }
-			};
+			}};
 
-			auto Painting = cpp14::make_unique<cPainting>(PaintingTitlesList[a_World->GetTickRandomNumber(PaintingTitlesList.size() - 1)], a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto Painting = cpp14::make_unique<cPainting>(PaintingTitlesList[static_cast<size_t>(a_World->GetTickRandomNumber(PaintingTitlesList.size() - 1))], a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
 			auto PaintingPtr = Painting.get();
 			if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 			{

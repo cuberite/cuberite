@@ -125,14 +125,14 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	// Write the block lights:
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
+			Packet.WriteBuf(a_Section.m_BlockLight.data(), sizeof(a_Section.m_BlockLight));
 		}
 	);
 
 	// Write the sky lights:
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBuf(a_Section.m_BlockSkyLight, sizeof(a_Section.m_BlockSkyLight));
+			Packet.WriteBuf(a_Section.m_BlockSkyLight.data(), sizeof(a_Section.m_BlockSkyLight));
 		}
 	);
 
@@ -260,11 +260,11 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 			Packet.WriteBEUInt64(TempLong);
 
 			// Write lighting:
-			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
+			Packet.WriteBuf(a_Section.m_BlockLight.data(), sizeof(a_Section.m_BlockLight));
 			if (m_Dimension == dimOverworld)
 			{
 				// Skylight is only sent in the overworld; the nether and end do not use it
-				Packet.WriteBuf(a_Section.m_BlockSkyLight, sizeof(a_Section.m_BlockSkyLight));
+				Packet.WriteBuf(a_Section.m_BlockSkyLight.data(), sizeof(a_Section.m_BlockSkyLight));
 			}
 		}
 	);
@@ -393,11 +393,11 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 			Packet.WriteBEUInt64(TempLong);
 
 			// Write lighting:
-			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
+			Packet.WriteBuf(a_Section.m_BlockLight.data(), sizeof(a_Section.m_BlockLight));
 			if (m_Dimension == dimOverworld)
 			{
 				// Skylight is only sent in the overworld; the nether and end do not use it
-				Packet.WriteBuf(a_Section.m_BlockSkyLight, sizeof(a_Section.m_BlockSkyLight));
+				Packet.WriteBuf(a_Section.m_BlockSkyLight.data(), sizeof(a_Section.m_BlockSkyLight));
 			}
 		}
 	);

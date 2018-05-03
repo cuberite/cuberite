@@ -117,7 +117,7 @@ public:
 
 private:
 
-	sChunkSection * m_Sections[NumSections];
+	std::array<sChunkSection *, NumSections> m_Sections;
 
 	cAllocationPool<sChunkSection> & m_Pool;
 

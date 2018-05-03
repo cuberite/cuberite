@@ -76,7 +76,7 @@ public:
 	const cItem & GetFuelSlot(void) const { return GetSlot(bsFuel); }
 
 	/** Get the expected result item for the given slot number */
-	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[a_SlotNumber]; }
+	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[static_cast<size_t>(a_SlotNumber)]; }
 
 	/** Sets the item in the left bottle slot  */
 	void SetLeftBottleSlot(const cItem & a_Item) { SetSlot(bsLeftBottle, a_Item); }

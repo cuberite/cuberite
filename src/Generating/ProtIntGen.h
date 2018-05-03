@@ -988,22 +988,22 @@ public:
 		};
 
 		static const std::array<cBiomesInGroups, 5> biomesInGroups =
-		{
+		{{
 			/* bgOcean */     { static_cast<int>(oceanBiomes.size()),     oceanBiomes.data()     },
 			/* bgDesert */    { static_cast<int>(desertBiomes.size()),    desertBiomes.data()    },
 			/* bgTemperate */ { static_cast<int>(temperateBiomes.size()), temperateBiomes.data() },
 			/* bgMountains */ { static_cast<int>(mountainBiomes.size()),  mountainBiomes.data()  },
 			/* bgIce */       { static_cast<int>(iceBiomes.size()),       iceBiomes.data()       },
-		};
+		}};
 
 		static const std::array<cBiomesInGroups, 5> rareBiomesInGroups =
-		{
+		{{
 			/* bgOcean */     { static_cast<int>(rareOceanBiomes.size()),     rareOceanBiomes.data()     },
 			/* bgDesert */    { static_cast<int>(rareDesertBiomes.size()),    rareDesertBiomes.data()    },
 			/* bgTemperate */ { static_cast<int>(rareTemperateBiomes.size()), rareTemperateBiomes.data() },
 			/* bgMountains */ { static_cast<int>(rareMountainBiomes.size()),  rareMountainBiomes.data()  },
 			/* bgIce */       { static_cast<int>(rareIceBiomes.size()),       rareIceBiomes.data()       },
-		};
+		}};
 
 		// Generate the underlying values, representing biome groups:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);

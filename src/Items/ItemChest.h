@@ -74,16 +74,16 @@ public:
 
 		// Check that there is at most one single neighbor of the same chest type:
 		static const std::array<Vector3i, 4> CrossCoords =
-		{
+		{{
 			{-1, 0,  0},
 			{ 0, 0, -1},
 			{ 1, 0,  0},
 			{ 0, 0,  1},
-		};
+		}};
 		int NeighborIdx = -1;
-		for (const auto & Coord : CrossCoords)
+		for (size_t i = 0; i < CrossCoords.size(); i++)
 		{
-			if (a_World.GetBlock(a_BlockX + Coord.x, a_BlockY, a_BlockZ + Coord.z) != m_ItemType)
+			if (a_World.GetBlock(a_BlockX + CrossCoords[i].x, a_BlockY, a_BlockZ + CrossCoords[i].z) != m_ItemType)
 			{
 				continue;
 			}
@@ -95,8 +95,8 @@ public:
 			NeighborIdx = static_cast<int>(i);
 
 			// Check that this neighbor is a single chest:
-			int bx = a_BlockX + Coord.x;
-			int bz = a_BlockZ + Coord.z;
+			int bx = a_BlockX + CrossCoords[i].x;
+			int bz = a_BlockZ + CrossCoords[i].z;
 			for (const auto & NeighbourCoord : CrossCoords)
 			{
 				if (a_World.GetBlock(bx + NeighbourCoord.x, a_BlockY, bz + NeighbourCoord.z) == m_ItemType)
@@ -142,7 +142,7 @@ public:
 		// Adjust the existing chest, if any:
 		if (NeighborIdx != -1)
 		{
-			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
+			a_World.FastSetBlock(a_BlockX + CrossCoords[static_cast<size_t>(NeighborIdx)].x, a_BlockY, a_BlockZ + CrossCoords[static_cast<size_t>(NeighborIdx)].z, ChestBlockType, Meta);
 		}
 
 		// Remove the "placed" item:

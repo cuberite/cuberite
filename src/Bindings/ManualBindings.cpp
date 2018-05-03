@@ -1906,7 +1906,7 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	mbedtls_sha1(SourceString, len, sha1Output);
+	mbedtls_sha1(SourceString, len, sha1Output.data());
 
 	// Convert the sha1 checksum to hex string:
 	std::stringstream Output;

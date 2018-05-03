@@ -26,8 +26,8 @@ cChunkDesc::cChunkDesc(int a_ChunkX, int a_ChunkZ) :
 	memset(m_BlockTypes, 0, sizeof(cChunkDef::BlockTypes));
 	memset(m_BlockMeta,  0, sizeof(cChunkDef::BlockNibbles));
 	*/
-	memset(m_BiomeMap,   0, sizeof(cChunkDef::BiomeMap));
-	memset(m_HeightMap,  0, sizeof(cChunkDef::HeightMap));
+	m_BiomeMap = {};
+	m_HeightMap = {};
 }
 
 

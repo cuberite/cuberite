@@ -64,7 +64,7 @@
 
 
 bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler * cItemHandler::m_ItemHandler[2268];
+std::array<cItemHandler *, 2268> cItemHandler::m_ItemHandler;
 
 
 
@@ -85,14 +85,14 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 	if (!m_HandlerInitialized)
 	{
 		// We need to initialize
-		memset(m_ItemHandler, 0, sizeof(m_ItemHandler));
+		m_ItemHandler = {};
 		m_HandlerInitialized = true;
 	}
-	if (m_ItemHandler[a_ItemType] == nullptr)
+	if (m_ItemHandler[static_cast<size_t>(a_ItemType)] == nullptr)
 	{
-		m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
+		m_ItemHandler[static_cast<size_t>(a_ItemType)] = CreateItemHandler(a_ItemType);
 	}
-	return m_ItemHandler[a_ItemType];
+	return m_ItemHandler[static_cast<size_t>(a_ItemType)];
 }
 
 

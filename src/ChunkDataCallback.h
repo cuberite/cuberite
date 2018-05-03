@@ -91,10 +91,10 @@ protected:
 
 	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes);
-		a_ChunkBuffer.CopyMetas(m_BlockMetas);
-		a_ChunkBuffer.CopyBlockLight(m_BlockLight);
-		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
+		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes.data());
+		a_ChunkBuffer.CopyMetas(m_BlockMetas.data());
+		a_ChunkBuffer.CopyBlockLight(m_BlockLight.data());
+		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight.data());
 	}
 } ;
 

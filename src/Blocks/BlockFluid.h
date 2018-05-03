@@ -121,14 +121,14 @@ public:
 
 		// Try to set it on fire:
 		static const std::array<Vector3i, 6> CrossCoords =
-		{
+		{{
 			{-1,  0,  0},
 			{ 1,  0,  0},
 			{ 0, -1,  0},
 			{ 0,  1,  0},
 			{ 0,  0, -1},
 			{ 0,  0,  1},
-		} ;
+		}};
 		int RelX = a_RelX + x;
 		int RelY = a_RelY + y;
 		int RelZ = a_RelZ + z;
