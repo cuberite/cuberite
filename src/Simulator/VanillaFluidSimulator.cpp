@@ -40,10 +40,12 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 	// Calculate the distance to the nearest "hole" in each direction:
 	std::array<int, 4> Cost =
 	{
-		CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     X_PLUS),
-		CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     X_MINUS),
-		CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, Z_PLUS),
-		CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, Z_MINUS),
+		{
+			CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     X_PLUS),
+			CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     X_MINUS),
+			CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, Z_PLUS),
+			CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, Z_MINUS),
+		}
 	};
 
 	// Find the minimum distance:
