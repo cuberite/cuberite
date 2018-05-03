@@ -993,10 +993,10 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
 
 	m_MaximumCost = 0;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
+	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
 
 	int PosX, PosY, PosZ;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
+	static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
@@ -1142,7 +1142,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	int NameChangeExp = 0;
-	const AString & RepairedItemName = reinterpret_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
+	const AString & RepairedItemName = static_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name

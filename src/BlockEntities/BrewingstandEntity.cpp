@@ -59,7 +59,7 @@ void cBrewingstandEntity::Destroy()
 void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cBrewingstandEntity &>(a_Src);
+	auto & src = static_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
 	m_CurrentBrewingRecipes = src.m_CurrentBrewingRecipes;
 	m_Results = src.m_Results;

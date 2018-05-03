@@ -44,7 +44,7 @@ void cFlowerPotEntity::Destroy(void)
 void cFlowerPotEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cFlowerPotEntity &>(a_Src);
+	auto & src = static_cast<const cFlowerPotEntity &>(a_Src);
 	m_Item = src.m_Item;
 }
 

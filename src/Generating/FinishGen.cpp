@@ -673,24 +673,66 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
-bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
+bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
 {
+	if (!IsDesertVariant(a_ChunkDesc.GetBiome(a_RelX, a_RelZ)))
+	{
+		return false;
+	}
+
+	int CactusHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxCactusHeight);
+
+	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
+	if (a_RelY + CactusHeight >= cChunkDef::Height - 1)
+	{
+		CactusHeight = cChunkDef::Height - a_RelY - 1;
+	}
+
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
-		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
-		(a_RelY < 1) || (a_RelY >= cChunkDef::Height - 2) ||
-		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
+		(a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) ||
+		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width - 1)
 	)
 	{
 		return false;
 	}
 
-	// Only allow dirt, grass or sand below sugarcane:
+	for (int i = 0; i < CactusHeight; i++)
+	{
+		const bool cactusExists = i != 0;
+
+		const int y = a_RelY + 1;
+		if (
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX + 1, y, a_RelZ)) 	 ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX - 1, y, a_RelZ)) 	 ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ + 1)) ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ - 1))
+		)
+		{
+			return cactusExists;
+		}
+
+		// All conditions are met, we can place a cactus here
+		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_CACTUS);
+	}
+
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// cFinishGenSprinkleFoliage:
+
+bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
+{
+	int SugarcaneHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxSugarcaneHeight);
+
+	// Only allow dirt, grass, sand and sugarcane below sugarcane:
 	switch (a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ))
 	{
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
 		case E_BLOCK_SAND:
+		case E_BLOCK_SUGARCANE:
 		{
 			break;
 		}
@@ -700,19 +742,39 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 		}
 	}
 
-	// Water is required next to the block below the sugarcane:
+	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
+	if (a_RelY + SugarcaneHeight >= cChunkDef::Height - 1)
+	{
+		SugarcaneHeight = cChunkDef::Height - a_RelY - 1;
+	}
+
+	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1))
+		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
+		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
 	)
 	{
 		return false;
 	}
 
-	// All conditions met, place a sugarcane here:
-	a_ChunkDesc.SetBlockType(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
+	// Water is required next to the block below the sugarcane (if the block below isn't sugarcane already)
+	if (
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1)) &&
+		a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ) != E_BLOCK_SUGARCANE
+	)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < SugarcaneHeight; i++)
+	{
+		// All conditions met, place a sugarcane here
+		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_SUGARCANE);
+	}
+
 	return true;
 }
 
@@ -780,7 +842,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
-						++Top;
+						// Checks and block placing are handled in the TryAddSugarcane method
 					}
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
@@ -791,29 +853,22 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				case E_BLOCK_SAND:
 				{
-					int y = Top + 1;
-					if (
-						(x > 0) && (x < cChunkDef::Width - 1) &&
-						(z > 0) && (z < cChunkDef::Width - 1) &&
-						(val1 + val2 > 0.5f) &&
-						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
-						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
-					)
+					if (val1 + val2 > 0.5f)
 					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
+						if (!TryAddCactus(a_ChunkDesc, x, Top, z))
+						{
+							TryAddSugarcane(a_ChunkDesc, x, Top, z);
+						}
 					}
-					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
+					else
 					{
-						++Top;
+						TryAddSugarcane(a_ChunkDesc, x, Top, z);
 					}
 					break;
 				}
 			}  // switch (TopBlock)
 			a_ChunkDesc.SetHeight(x, z, Top);
-		}  // for y
+		}  // for x
 	}  // for z
 }
 

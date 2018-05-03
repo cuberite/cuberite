@@ -32,7 +32,7 @@ cJukeboxEntity::~cJukeboxEntity()
 void cJukeboxEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cJukeboxEntity &>(a_Src);
+	auto & src = static_cast<const cJukeboxEntity &>(a_Src);
 	m_Record = src.m_Record;
 }
 
