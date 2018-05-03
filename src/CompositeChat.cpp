@@ -160,8 +160,10 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 			{
 				static const std::array<AString, 2> LinkPrefixes =
 				{
-					"http",
-					"https"
+					{
+						"http",
+						"https"
+					}
 				};
 				for (const auto & Prefix : LinkPrefixes)
 				{
