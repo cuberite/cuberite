@@ -110,8 +110,6 @@ private:
 	AString m_Name;
 
 	eStatistic m_Depends;
-
-	static std::array<cStatInfo, 56> ms_Info;
 };
 
 

@@ -7,7 +7,7 @@
 
 
 
-std::array<cStatInfo, statCount> cStatInfo::ms_Info =
+static std::array<cStatInfo, statCount> ms_Info =
 {
 	{
 		// The order must match the order of enum eStatistic
