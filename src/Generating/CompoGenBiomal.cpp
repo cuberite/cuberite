@@ -251,27 +251,31 @@ protected:
 		cNoise patternNoise(a_Seed);
 		static const std::array<NIBBLETYPE, 15> allowedColors =
 		{
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_WHITE,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_LIGHTGRAY,
+			{
+				E_META_STAINED_CLAY_YELLOW,
+				E_META_STAINED_CLAY_YELLOW,
+				E_META_STAINED_CLAY_RED,
+				E_META_STAINED_CLAY_RED,
+				E_META_STAINED_CLAY_WHITE,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_LIGHTGRAY,
+			}
 		} ;
 		static const std::array<int, 12> layerSizes =  // Adjust the chance so that thinner layers occur more commonly
 		{
-			1, 1, 1, 1, 1, 1,
-			2, 2, 2, 2,
-			3, 3,
+			{
+				1, 1, 1, 1, 1, 1,
+				2, 2, 2, 2,
+				3, 3,
+			}
 		} ;
 		int idx = static_cast<int>(m_MesaPattern.size()) - 1;
 		while (idx >= 0)
