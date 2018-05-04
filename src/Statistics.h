@@ -111,7 +111,7 @@ private:
 
 	eStatistic m_Depends;
 
-	static std::array<cStatInfo, statCount> ms_Info;
+	static std::array<cStatInfo, 56> ms_Info;
 };
 
 
