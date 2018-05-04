@@ -167,6 +167,7 @@ typedef unsigned char Byte;
 
 
 // STL stuff:
+#include <array>
 #include <vector>
 #include <list>
 #include <deque>
