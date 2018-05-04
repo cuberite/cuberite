@@ -13,20 +13,22 @@
 
 static const std::array<cPiece::cConnector::eDirection, 14> g_AllDirections =
 {
-	cPiece::cConnector::dirXM,
-	cPiece::cConnector::dirXP,
-	cPiece::cConnector::dirYM,
-	cPiece::cConnector::dirYP,
-	cPiece::cConnector::dirZM,
-	cPiece::cConnector::dirZP,
-	cPiece::cConnector::dirYM_XM_ZM,
-	cPiece::cConnector::dirYM_XM_ZP,
-	cPiece::cConnector::dirYM_XP_ZM,
-	cPiece::cConnector::dirYM_XP_ZP,
-	cPiece::cConnector::dirYP_XM_ZM,
-	cPiece::cConnector::dirYP_XM_ZP,
-	cPiece::cConnector::dirYP_XP_ZM,
-	cPiece::cConnector::dirYP_XP_ZP,
+	{
+		cPiece::cConnector::dirXM,
+		cPiece::cConnector::dirXP,
+		cPiece::cConnector::dirYM,
+		cPiece::cConnector::dirYP,
+		cPiece::cConnector::dirZM,
+		cPiece::cConnector::dirZP,
+		cPiece::cConnector::dirYM_XM_ZM,
+		cPiece::cConnector::dirYM_XM_ZP,
+		cPiece::cConnector::dirYM_XP_ZM,
+		cPiece::cConnector::dirYM_XP_ZP,
+		cPiece::cConnector::dirYP_XM_ZM,
+		cPiece::cConnector::dirYP_XM_ZP,
+		cPiece::cConnector::dirYP_XP_ZM,
+		cPiece::cConnector::dirYP_XP_ZP,
+	}
 };
 
 
