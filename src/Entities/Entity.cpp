@@ -653,7 +653,10 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 {
 	int TotalEPF = 0;
 
-	const std::array<cItem, 4> ArmorItems = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+	const std::array<cItem, 4> ArmorItems =
+	{
+		{ GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() }
+	};
 	for (const auto & Item : ArmorItems)
 	{
 		if ((a_DamageType != dtInVoid) && (a_DamageType != dtAdmin) && (a_DamageType != dtStarving))
