@@ -179,7 +179,7 @@ static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a
 	ExcInformation.ClientPointers = 0;
 
 	// Write the dump file:
-	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	HANDLE dumpFile = CreateFile(g_DumpFileName.data(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, g_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : nullptr, nullptr, nullptr);
 	CloseHandle(dumpFile);
 
