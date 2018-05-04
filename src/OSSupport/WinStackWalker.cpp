@@ -152,7 +152,7 @@ public:
 				#ifdef _M_IX86
 					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
-						_tcscat_s(szTemp.data(), _T("\\Debugging Tools for Windows (x86)\\dbghelp.dll"));
+						_tcscat_s(szTemp.data(), szTemp.size(), _T("\\Debugging Tools for Windows (x86)\\dbghelp.dll"));
 						// now check if the file exists:
 						if (GetFileAttributes(szTemp.data()) != INVALID_FILE_ATTRIBUTES)
 						{
@@ -172,7 +172,7 @@ public:
 				#elif _M_IA64
 					if ((m_hDbhHelp == nullptr) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp.data(), szTemp.size()) > 0))
 					{
-						_tcscat_s(szTemp.data(), _T("\\Debugging Tools for Windows (ia64)\\dbghelp.dll"));
+						_tcscat_s(szTemp.data(), szTemp.size(), _T("\\Debugging Tools for Windows (ia64)\\dbghelp.dll"));
 						// now check if the file exists:
 						if (GetFileAttributes(szTemp.data()) != INVALID_FILE_ATTRIBUTES)
 						{
