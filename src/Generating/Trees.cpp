@@ -337,8 +337,11 @@ void GetSmallAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 
 	int Random = a_Noise.IntNoise3DInt(a_BlockX + 64 * a_Seq, a_BlockY, a_BlockZ) >> 3;
 
-	HEIGHTTYPE Heights[] = {1, 2, 2, 3} ;
-	HEIGHTTYPE Height = 1 + Heights[Random & 3];
+	static const std::array<HEIGHTTYPE, 4> Heights =
+	{
+		{1, 2, 2, 3}
+	};
+	HEIGHTTYPE Height = 1 + Heights[static_cast<size_t>(Random & 3)];
 	Random >>= 2;
 
 	// Pre-alloc so that we don't realloc too often later:
@@ -741,8 +744,11 @@ void GetSpruceTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 	// (each of the mod8 remainders has a very different chance of occurrence) - that's why we divide by 8
 	int MyRandom = a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY + 32 * a_Seq, a_BlockZ) / 8;
 
-	static const HEIGHTTYPE  sHeights[] = {1, 2, 2, 3};
-	HEIGHTTYPE Height = sHeights[MyRandom & 3];
+	static const std::array<HEIGHTTYPE, 4> sHeights =
+	{
+		{1, 2, 2, 3}
+	};
+	HEIGHTTYPE Height = sHeights[static_cast<size_t>(MyRandom & 3)];
 	MyRandom >>= 2;
 
 	// Prealloc, so that we don't realloc too often later:
@@ -766,8 +772,11 @@ void GetSpruceTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 	MyRandom >>= 1;
 
 	// 1 to 3 sections of leaves layers:
-	static const int sNumSections[] = {1, 2, 2, 3};
-	int NumSections = sNumSections[MyRandom & 3];
+	static const std::array<int, 4> sNumSections =
+	{
+		{1, 2, 2, 3}
+	};
+	int NumSections = sNumSections[static_cast<size_t>(MyRandom & 3)];
 	MyRandom >>= 2;
 	for (int i = 0; i < NumSections; i++)
 	{
