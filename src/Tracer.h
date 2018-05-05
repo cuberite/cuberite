@@ -72,12 +72,12 @@ private:
 
 	static const std::array<const Vector3f, 6> & m_NormalTable(void);
 
-	Vector3f dir;
-	Vector3f tDelta;
-	Vector3i pos;
-	Vector3i end1;
-	Vector3i step;
-	Vector3f tMax;
+	Vector3f m_dir;
+	Vector3f m_tDelta;
+	Vector3i m_pos;
+	Vector3i m_end1;
+	Vector3i m_step;
+	Vector3f m_tMax;
 };
 
 // tolua_end

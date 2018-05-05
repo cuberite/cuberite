@@ -279,13 +279,13 @@ void cNetherPortalScanner::OnDisabled(void)
 	Vector3d Position = m_PortalLoc;
 	if (m_Dir == Direction::Y)
 	{
-		Position.x += OutOffset;
-		Position.z += AcrossOffset;
+		Position.x += m_OutOffset;
+		Position.z += m_AcrossOffset;
 	}
 	else if (m_Dir == Direction::X)
 	{
-		Position.x += AcrossOffset;
-		Position.z += OutOffset;
+		Position.x += m_AcrossOffset;
+		Position.z += m_OutOffset;
 	}
 
 	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
