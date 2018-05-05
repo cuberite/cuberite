@@ -63,15 +63,8 @@ class cReader :
 		}  // for z
 
 		// Find the highest block in the entire chunk, use it as a base for m_MaxHeight:
-		HEIGHTTYPE MaxHeight = m_MaxHeight;
-		for (size_t i = 0; i < a_Heightmap.size(); i++)
-		{
-			if (a_Heightmap[i] > MaxHeight)
-			{
-				MaxHeight = a_Heightmap[i];
-			}
-		}
-		m_MaxHeight = MaxHeight;
+		HEIGHTTYPE MaxHeight = *std::max_element(begin(a_Heightmap), end(a_Heightmap));
+		m_MaxHeight = std::max(m_MaxHeight, MaxHeight);
 	}
 
 public:
