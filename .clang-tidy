@@ -3,3 +3,4 @@ CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           m_
 WarningsAsErrors: '*'
+#HeaderFilterRegex: '.+/cuberite/src/[^\.].+'

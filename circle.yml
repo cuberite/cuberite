@@ -14,7 +14,7 @@ test:
  override:
   - cd src && find . -name \*.cpp -or -name \*.h > AllFiles.lst && lua CheckBasicStyle.lua
   - cd src/Bindings && lua CheckBindingsDependencies.lua
-  - curl -O "https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/45fb9b20ed7da2f6b95d83e5ef45bb536f49d8ca/clang-tidy/tool/run-clang-tidy.py"
-  - chmod +x run-clang-tidy.py
+  - curl -o "$HOME/bin/run-clang-tidy.py" "https://raw.githubusercontent.com/llvm-mirror/clang-tools-extra/45fb9b20ed7da2f6b95d83e5ef45bb536f49d8ca/clang-tidy/tool/run-clang-tidy.py"
+  - chmod +x "$HOME/bin/run-clang-tidy.py"
   - git submodule update --init
   - ./clang-tidy.sh
