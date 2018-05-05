@@ -145,7 +145,7 @@ protected:
 	static const int AVERAGING_SIZE = 9;
 
 	/** Type used for a single parameter across the entire (downscaled) chunk. */
-	typedef NOISE_DATATYPE ChunkParam[5 * 5];
+	typedef std::array<NOISE_DATATYPE, 5 * 5> ChunkParam;
 
 
 	/** The noise that is used to choose between density noise A and B. */
@@ -186,10 +186,10 @@ protected:
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
 	int m_LastChunkX;
 	int m_LastChunkZ;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
+	std::array<NOISE_DATATYPE, 17 * 17 * 257> m_NoiseArray;  // 257 * x + y + 257 * 17 * z
 
 	/** Weights for summing up neighboring biomes. */
-	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
+	std::array<std::array<NOISE_DATATYPE, AVERAGING_SIZE * 2 + 1>, AVERAGING_SIZE * 2 + 1> m_Weight;
 
 	/** The sum of m_Weight[]. */
 	NOISE_DATATYPE m_WeightSum;
