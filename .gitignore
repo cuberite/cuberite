@@ -119,3 +119,4 @@ build-cuberite
 
 # clang-tidy
 tidy-fixes.yaml
+tidy-build

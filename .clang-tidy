@@ -2,3 +2,4 @@ Checks: '-*,readability-identifier-naming'
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           m_
+WarningsAsErrors: '*'
