@@ -213,10 +213,10 @@ public:
 		ASSERT(lowerSizeZ > 0);
 
 		// Generate the underlying data with half the resolution:
-		int lowerData[m_BufferSize];
-		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 		const size_t lowStepX = (lowerSizeX - 1) * 2;
-		int cache[m_BufferSize];
+		std::array<int, m_BufferSize> cache;
 
 		// Discreet-interpolate the values into twice the size:
 		for (size_t z = 0; z < lowerSizeZ - 1; ++z)
@@ -244,7 +244,7 @@ public:
 		// Copy from Cache into a_Values; take into account the even / odd offsets in a_Min:
 		for (size_t z = 0; z < a_SizeZ; ++z)
 		{
-			memcpy(a_Values + z * a_SizeX, cache + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));
+			memcpy(a_Values + z * a_SizeX, cache.data() + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));
 		}
 	}
 
@@ -277,8 +277,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Smooth - for each square check if the surroundings are the same, if so, expand them diagonally.
 		// Also get rid of single-pixel irregularities (A-B-A):
@@ -349,8 +349,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 1;
 		size_t lowerSizeZ = a_SizeZ + 1;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average - add all 4 "neighbors" and divide by 4:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -393,8 +393,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 4;
 		size_t lowerSizeZ = a_SizeZ + 4;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Calculate the weighted average of all 16 "neighbors":
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -443,8 +443,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 3;
 		size_t lowerSizeZ = a_SizeZ + 3;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Calculate the weighted average the neighbors:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -582,8 +582,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average random values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -639,8 +639,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average random values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -740,8 +740,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Add beaches between ocean and biomes:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -842,8 +842,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Change the biomes on incompatible edges into an edge biome:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1152,8 +1152,8 @@ public:
 		// Generate the underlying data:
 		ASSERT(a_SizeX * a_SizeZ <= m_BufferSize);
 		m_Biomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int riverData[m_BufferSize];
-		m_Rivers->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, riverData);
+		std::array<int, m_BufferSize> riverData;
+		m_Rivers->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, riverData.data());
 
 		// Mix the values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1217,8 +1217,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Detect the edges:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1275,8 +1275,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Add the mushroom islands:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1460,8 +1460,8 @@ public:
 	{
 		// Generate the base biomes and the alterations:
 		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int alterations[m_BufferSize];
-		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+		std::array<int, m_BufferSize> alterations;
+		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations.data());
 
 		// Change the biomes into their alternate versions:
 		size_t len = a_SizeX * a_SizeZ;
@@ -1526,8 +1526,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Convert incompatible edges into neutral biomes:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1684,8 +1684,8 @@ public:
 	{
 		// Generate the underlying biomes and the alterations:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int alterations[m_BufferSize];
-		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+		std::array<int, m_BufferSize> alterations;
+		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations.data());
 
 		// Wherever alterations are nonzero, change into alternate biome, if available:
 		size_t len = a_SizeX * a_SizeZ;
