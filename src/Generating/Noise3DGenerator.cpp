@@ -206,15 +206,15 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
-	NOISE_DATATYPE Noise[17 * 257 * 17];
-	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
+	std::array<NOISE_DATATYPE, 17 * 257 * 17> Noise;
+	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise.data());
 
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int y = 0; y < cChunkDef::Height; y++)
 		{
-			int idx = z * 17 * 257 + y * 17;
+			size_t idx = static_cast<size_t>(z * 17 * 257 + y * 17);
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
@@ -655,12 +655,12 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint)
 {
 	// Generate the 3 * 3 chunks of biomes around this chunk:
-	cChunkDef::BiomeMap neighborBiomes[3 * 3];
+	std::array<cChunkDef::BiomeMap, 3 * 3> neighborBiomes;
 	for (int z = 0; z < 3; z++)
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[x + 3 * z]);
+			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[static_cast<size_t>(x + 3 * z)]);
 		}
 	}
 
@@ -682,7 +682,7 @@ void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, 
 					int colx = 16 + x * 4 + relx - AVERAGING_SIZE;   // Biome X coord relative to the neighborBiomes start
 					int neicellx = colx / 16;	                       // Chunk X coord relative to the neighborBiomes start
 					int neirelx  = colx % 16;	                       // Biome X coord relative to cz in neighborBiomes
-					EMCSBiome biome = cChunkDef::GetBiome(neighborBiomes[neicellx + neicellz * 3], neirelx, neirelz);
+					EMCSBiome biome = cChunkDef::GetBiome(neighborBiomes[static_cast<size_t>(neicellx + neicellz * 3)], neirelx, neirelz);
 					NOISE_DATATYPE heightAmp, midPoint;
 					GetBiomeParams(biome, heightAmp, midPoint);
 					totalHeightAmp += heightAmp * m_Weight[static_cast<size_t>(relz)][static_cast<size_t>(relx)];
