@@ -19,6 +19,7 @@ fi
 
 if [ $TIDY_FAILED -eq 0 ]; then
 	echo "clang-tidy: No violations found"
+	exit 1
 else
 	echo "clang-tidy: Found violations"
 fi
