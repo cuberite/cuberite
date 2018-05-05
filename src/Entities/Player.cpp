@@ -936,11 +936,7 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 {
-	short ArmorDamage = static_cast<short>(a_DamageBlocked / 4);
-	if (ArmorDamage == 0)
-	{
-		ArmorDamage = 1;
-	}
+	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
 
 	for (int i = 0; i < 4; i++)
 	{
