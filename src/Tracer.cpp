@@ -78,9 +78,9 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	m_dir = a_Direction;
 
 	// decide which direction to start walking in
-	m_step.x = SigNum(dir.x);
-	m_step.y = SigNum(dir.y);
-	m_step.z = SigNum(dir.z);
+	m_step.x = SigNum(m_dir.x);
+	m_step.y = SigNum(m_dir.y);
+	m_step.z = SigNum(m_dir.z);
 
 
 	// normalize the direction vector
@@ -108,7 +108,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	if (m_dir.z != 0.f)
 	{
-		m_tDelta.z = 1 / std::abs(dir.z);
+		m_tDelta.z = 1 / std::abs(m_dir.z);
 	}
 	else
 	{
@@ -183,7 +183,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	m_end1.z = static_cast<int>(floorf(End.z));
 
 	// check if first is occupied
-	if (m_pos.Equals(end1))
+	if (m_pos.Equals(m_end1))
 	{
 		return false;
 	}
@@ -260,7 +260,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		// or if the block is not air and not water. That way mobs can still see underwater.
 		if ((!a_LineOfSight && cBlockInfo::IsSolid(BlockID)) || (a_LineOfSight && (BlockID != E_BLOCK_AIR) && !IsBlockWater(BlockID)))
 		{
-			BlockHitPosition = pos;
+			BlockHitPosition = m_pos;
 			int Normal = GetHitNormal(a_Start, End, m_pos);
 			if (Normal > 0)
 			{
