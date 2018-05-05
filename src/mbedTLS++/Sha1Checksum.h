@@ -19,7 +19,7 @@
 class cSha1Checksum
 {
 public:
-	typedef Byte Checksum[20];  // The type used for storing the checksum
+	typedef std::array<Byte, 20> Checksum;  // The type used for storing the checksum
 
 	cSha1Checksum(void);
 

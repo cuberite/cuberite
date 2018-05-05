@@ -155,12 +155,12 @@ void cProtocol_1_8_0::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		Byte Decrypted[512];
+		std::array<Byte, 512> Decrypted;
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
+			m_Decryptor.ProcessData(Decrypted.data(), reinterpret_cast<const Byte *>(a_Data), NumBytes);
+			AddReceivedData(reinterpret_cast<const char *>(Decrypted.data()), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
@@ -1708,17 +1708,17 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
 	// Compress the data:
-	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
+	std::array<char, MAX_COMPRESSED_PACKET_LEN> CompressedData;
 
 	uLongf CompressedSize = compressBound(static_cast<uLongf>(a_Packet.size()));
-	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
+	if (CompressedSize >= CompressedData.size())
 	{
 		ASSERT(!"Too high packet size.");
 		return false;
 	}
 
 	int Status = compress2(
-		reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
+		reinterpret_cast<Bytef *>(CompressedData.data()), &CompressedSize,
 		reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
 	);
 	if (Status != Z_OK)
@@ -1740,7 +1740,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	a_CompressedData.clear();
 	a_CompressedData.reserve(LengthData.size() + CompressedSize);
 	a_CompressedData.append(LengthData.data(), LengthData.size());
-	a_CompressedData.append(CompressedData, CompressedSize);
+	a_CompressedData.append(CompressedData.data(), CompressedSize);
 	return true;
 }
 
@@ -2241,8 +2241,8 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	}
 
 	// Decrypt the symmetric encryption key using privkey:
-	Byte DecryptedKey[MAX_ENC_LEN];
-	res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncKey.data()), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	std::array<Byte, MAX_ENC_LEN> DecryptedKey;
+	res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncKey.data()), EncKey.size(), DecryptedKey.data(), sizeof(DecryptedKey));
 	if (res != 16)
 	{
 		LOGD("Bad key length");
@@ -2250,7 +2250,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 		return;
 	}
 
-	StartEncryption(DecryptedKey);
+	StartEncryption(DecryptedKey.data());
 	m_Client->HandleLogin(m_Client->GetUsername());
 }
 
@@ -2638,15 +2638,15 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	AString Lines[4];
+	std::array<AString, 4> Lines;
 	Json::Value root;
 	Json::Reader reader;
-	for (int i = 0; i < 4; i++)
+	for (auto && CurLine : Lines)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
 		if (reader.parse(Line, root, false))
 		{
-			Lines[i] = root.asString();
+			CurLine = root.asString();
 		}
 	}
 
@@ -2982,7 +2982,7 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
 	Checksum.Update(a_Key, 16);
 	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
-	Byte Digest[20];
+	std::array<Byte, 20> Digest;
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
