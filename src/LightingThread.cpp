@@ -342,8 +342,8 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		}  // for z
 	}  // for x
 
-	memset(m_BlockLight.data(), 0, sizeof(m_BlockLight));
-	memset(m_SkyLight.data(),   0, sizeof(m_SkyLight));
+	m_BlockLight.fill(0);
+	m_SkyLight.fill(0);
 	m_MaxHeight = Reader.m_MaxHeight;
 }
 
@@ -354,7 +354,7 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 void cLightingThread::PrepareSkyLight(void)
 {
 	// Clear seeds:
-	memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
+	m_IsSeed1.fill(0);
 	m_NumSeeds = 0;
 
 	// Fill the top of the chunk with all-light:
@@ -420,8 +420,8 @@ void cLightingThread::PrepareSkyLight(void)
 void cLightingThread::PrepareBlockLight()
 {
 	// Clear seeds:
-	memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
-	memset(m_IsSeed2.data(), 0, sizeof(m_IsSeed2));
+	m_IsSeed1.fill(0);
+	m_IsSeed2.fill(0);
 	m_NumSeeds = 0;
 
 	// Add each emissive block into the seeds:
@@ -452,7 +452,7 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 	while (m_NumSeeds > 0)
 	{
 		// Buffer 1 -> buffer 2
-		memset(m_IsSeed2.data(), 0, sizeof(m_IsSeed2));
+		m_IsSeed2.fill(0);
 		NumSeeds2 = 0;
 		CalcLightStep(a_Light, m_NumSeeds, m_IsSeed1.data(), m_SeedIdx1.data(), NumSeeds2, m_IsSeed2.data(), m_SeedIdx2.data());
 		if (NumSeeds2 == 0)
@@ -461,7 +461,7 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 		}
 
 		// Buffer 2 -> buffer 1
-		memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
+		m_IsSeed1.fill(0);
 		m_NumSeeds = 0;
 		CalcLightStep(a_Light, NumSeeds2, m_IsSeed2.data(), m_SeedIdx2.data(), m_NumSeeds, m_IsSeed1.data(), m_SeedIdx1.data());
 	}
