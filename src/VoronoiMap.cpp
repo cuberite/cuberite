@@ -95,9 +95,9 @@ int cVoronoiMap::GetValueAt(
 	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
 	int MinDist2 = MinDist;
 	int res = 0;  // Will be overriden
-	for (int x = 0; x < 5; x++)
+	for (size_t x = 0; x < m_SeedX.size(); x++)
 	{
-		for (int y = 0; y < 5; y++)
+		for (size_t y = 0; y < m_SeedX[0].size(); y++)
 		{
 			int SeedX = m_SeedX[x][y];
 			int SeedY = m_SeedZ[x][y];
@@ -109,7 +109,7 @@ int cVoronoiMap::GetValueAt(
 				NearestSeedY = SeedY;
 				MinDist2 = MinDist;
 				MinDist = Dist;
-				res = m_Noise3.IntNoise2DInt(x + CellX - 2, y + CellY - 2);
+				res = m_Noise3.IntNoise2DInt(static_cast<int>(x) + CellX - 2, static_cast<int>(y) + CellY - 2);
 			}
 			else if (Dist < MinDist2)
 			{
@@ -144,9 +144,9 @@ void cVoronoiMap::FindNearestSeeds(
 	int SecondNearestSeedX = 0, SecondNearestSeedY = 0;
 	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
 	int MinDist2 = MinDist;
-	for (int x = 0; x < 5; x++)
+	for (size_t x = 0; x < m_SeedX.size(); x++)
 	{
-		for (int y = 0; y < 5; y++)
+		for (size_t y = 0; y < m_SeedX[0].size(); y++)
 		{
 			int SeedX = m_SeedX[x][y];
 			int SeedY = m_SeedZ[x][y];
@@ -199,8 +199,8 @@ void cVoronoiMap::UpdateCell(int a_CellX, int a_CellZ)
 		{
 			int OffsetX = (m_Noise1.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_JitterSize;
 			int OffsetZ = (m_Noise2.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_JitterSize;
-			m_SeedX[x][z] = BaseX + OffsetX;
-			m_SeedZ[x][z] = (NoiseBaseZ + z) * m_CellSize + OddRowOffset + OffsetZ;
+			m_SeedX[static_cast<size_t>(x)][static_cast<size_t>(z)] = BaseX + OffsetX;
+			m_SeedZ[static_cast<size_t>(x)][static_cast<size_t>(z)] = (NoiseBaseZ + z) * m_CellSize + OddRowOffset + OffsetZ;
 		}  // for z
 	}  // for x
 	m_CurrentCellX = a_CellX;
