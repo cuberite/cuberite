@@ -198,7 +198,7 @@ protected:
 		float m_HeightFreq3, m_HeightAmp3;
 		float m_BaseHeight;
 	} ;
-	static const sGenParam m_GenParam[256];
+	static const std::array<sGenParam, 256> m_GenParam;
 
 
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
