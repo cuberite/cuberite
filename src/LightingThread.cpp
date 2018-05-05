@@ -353,7 +353,7 @@ void cLightingThread::PrepareSkyLight(void)
 	// Fill the top of the chunk with all-light:
 	if (m_MaxHeight < cChunkDef::Height - 1)
 	{
-		std::fill(m_SkyLight.data() + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight.data() + m_SkyLight.size(), 15);
+		std::fill(begin(m_SkyLight) + (m_MaxHeight + 1) * BlocksPerYLayer, end(m_SkyLight), 15);
 	}
 
 	// Walk every column that has all XZ neighbors
