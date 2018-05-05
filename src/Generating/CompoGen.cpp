@@ -65,32 +65,34 @@ void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 
 void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
-	static BLOCKTYPE Blocks[] =
+	static const std::array<BLOCKTYPE, 23> Blocks =
 	{
-		E_BLOCK_STONE,
-		E_BLOCK_COBBLESTONE,
-		E_BLOCK_LOG,
-		E_BLOCK_PLANKS,
-		E_BLOCK_SANDSTONE,
-		E_BLOCK_WOOL,
-		E_BLOCK_COAL_ORE,
-		E_BLOCK_IRON_ORE,
-		E_BLOCK_GOLD_ORE,
-		E_BLOCK_DIAMOND_ORE,
-		E_BLOCK_LAPIS_ORE,
-		E_BLOCK_REDSTONE_ORE,
-		E_BLOCK_IRON_BLOCK,
-		E_BLOCK_GOLD_BLOCK,
-		E_BLOCK_DIAMOND_BLOCK,
-		E_BLOCK_LAPIS_BLOCK,
-		E_BLOCK_BRICK,
-		E_BLOCK_MOSSY_COBBLESTONE,
-		E_BLOCK_OBSIDIAN,
-		E_BLOCK_NETHERRACK,
-		E_BLOCK_SOULSAND,
-		E_BLOCK_NETHER_BRICK,
-		E_BLOCK_BEDROCK,
-	} ;
+		{
+			E_BLOCK_STONE,
+			E_BLOCK_COBBLESTONE,
+			E_BLOCK_LOG,
+			E_BLOCK_PLANKS,
+			E_BLOCK_SANDSTONE,
+			E_BLOCK_WOOL,
+			E_BLOCK_COAL_ORE,
+			E_BLOCK_IRON_ORE,
+			E_BLOCK_GOLD_ORE,
+			E_BLOCK_DIAMOND_ORE,
+			E_BLOCK_LAPIS_ORE,
+			E_BLOCK_REDSTONE_ORE,
+			E_BLOCK_IRON_BLOCK,
+			E_BLOCK_GOLD_BLOCK,
+			E_BLOCK_DIAMOND_BLOCK,
+			E_BLOCK_LAPIS_BLOCK,
+			E_BLOCK_BRICK,
+			E_BLOCK_MOSSY_COBBLESTONE,
+			E_BLOCK_OBSIDIAN,
+			E_BLOCK_NETHERRACK,
+			E_BLOCK_SOULSAND,
+			E_BLOCK_NETHER_BRICK,
+			E_BLOCK_BEDROCK,
+		}
+	};
 
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
@@ -99,7 +101,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunk
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			BLOCKTYPE BlockType = Blocks[a_ChunkDesc.GetBiome(x, z)];
+			BLOCKTYPE BlockType = Blocks[static_cast<size_t>(a_ChunkDesc.GetBiome(x, z))];
 			for (int y = a_ChunkDesc.GetHeight(x, z); y >= 0; y--)
 			{
 				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
@@ -243,10 +245,10 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
 	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
 
-	int FloorBuf1[17 * 17];
-	int FloorBuf2[17 * 17];
-	int * FloorHi = FloorBuf1;
-	int * FloorLo = FloorBuf2;
+	std::array<int, 17 * 17> FloorBuf1;
+	std::array<int, 17 * 17> FloorBuf2;
+	int * FloorHi = FloorBuf1.data();
+	int * FloorLo = FloorBuf2.data();
 	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 
