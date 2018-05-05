@@ -38,17 +38,17 @@ public:
 		m_HeightB.GenHeightMap(a_ChunkX, a_ChunkZ, heightsB);
 
 		// Generate the choice noise:
-		NOISE_DATATYPE smallChoice[33 * 5 * 5];
-		NOISE_DATATYPE workspace[33 * 5 * 5];
+		std::array<NOISE_DATATYPE, 33 * 5 * 5> smallChoice;
+		std::array<NOISE_DATATYPE, 33 * 5 * 5> workspace;
 		NOISE_DATATYPE startX = 0;
 		NOISE_DATATYPE endX = 256 * m_FrequencyY;
 		NOISE_DATATYPE startY =  a_ChunkX * cChunkDef::Width * m_FrequencyX;
 		NOISE_DATATYPE endY   = (a_ChunkX * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyX;
 		NOISE_DATATYPE startZ =  a_ChunkZ * cChunkDef::Width * m_FrequencyZ;
 		NOISE_DATATYPE endZ   = (a_ChunkZ * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyZ;
-		m_Choice.Generate3D(smallChoice, 33, 5, 5, startX, endX, startY, endY, startZ, endZ, workspace);
-		NOISE_DATATYPE choice[257 * 17 * 17];
-		LinearUpscale3DArray(smallChoice, 33, 5, 5, choice, 8, 4, 4);
+		m_Choice.Generate3D(smallChoice.data(), 33, 5, 5, startX, endX, startY, endY, startZ, endZ, workspace.data());
+		std::array<NOISE_DATATYPE, 257 * 17 * 17> choice;
+		LinearUpscale3DArray(smallChoice.data(), 33, 5, 5, choice.data(), 8, 4, 4);
 
 		// Generate the shape:
 		size_t idxShape = 0;
@@ -56,7 +56,7 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				int idxChoice = 257 * 17 * z + 257 * x;
+				size_t idxChoice = static_cast<size_t>(257 * 17 * z + 257 * x);
 				NOISE_DATATYPE heightA = static_cast<NOISE_DATATYPE>(cChunkDef::GetHeight(heightsA, x, z));
 				NOISE_DATATYPE heightB = static_cast<NOISE_DATATYPE>(cChunkDef::GetHeight(heightsB, x, z));
 				for (int y = 0; y < cChunkDef::Height; y++)
