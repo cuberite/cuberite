@@ -23,95 +23,97 @@ Usually you'd want to keep both numbers the same.
 The numbers are "relative", not absolute maximum; overhangs of a slightly larger size are possible
 due to the way that noise is calculated.
 */
-const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
+const std::array<cDistortedHeightmap::sGenParam, 256> cDistortedHeightmap::m_GenParam =
 {
-	/* Biome              |   AmpX | AmpZ */
-	/* biOcean            */ { 1.5f,  1.5f},
-	/* biPlains           */ { 0.5f,  0.5f},
-	/* biDesert           */ { 0.5f,  0.5f},
-	/* biExtremeHills     */ {16.0f, 16.0f},
-	/* biForest           */ { 3.0f,  3.0f},
-	/* biTaiga            */ { 1.5f,  1.5f},
+	{
+		/* Biome              |   AmpX | AmpZ */
+		/* biOcean            */ { 1.5f,  1.5f},
+		/* biPlains           */ { 0.5f,  0.5f},
+		/* biDesert           */ { 0.5f,  0.5f},
+		/* biExtremeHills     */ {16.0f, 16.0f},
+		/* biForest           */ { 3.0f,  3.0f},
+		/* biTaiga            */ { 1.5f,  1.5f},
 
-	/* biSwampland        */ { 0.0f,  0.0f},
-	/* biRiver            */ { 0.0f,  0.0f},
-	/* biNether           */ { 0.0f,  0.0f},  // Unused, but must be here due to indexing
-	/* biSky              */ { 0.0f,  0.0f},  // Unused, but must be here due to indexing
-	/* biFrozenOcean      */ { 0.0f,  0.0f},
-	/* biFrozenRiver      */ { 0.0f,  0.0f},
-	/* biIcePlains        */ { 0.0f,  0.0f},
-	/* biIceMountains     */ { 8.0f,  8.0f},
-	/* biMushroomIsland   */ { 4.0f,  4.0f},
-	/* biMushroomShore    */ { 0.0f,  0.0f},
-	/* biBeach            */ { 0.0f,  0.0f},
-	/* biDesertHills      */ { 5.0f,  5.0f},
-	/* biForestHills      */ { 6.0f,  6.0f},
-	/* biTaigaHills       */ { 8.0f,  8.0f},
-	/* biExtremeHillsEdge */ { 7.0f,  7.0f},
-	/* biJungle           */ { 4.0f,  4.0f},
-	/* biJungleHills      */ { 8.0f,  8.0f},
-	/* biJungleEdge       */ { 3.0f,  3.0f},  // 23
-	/* biDeepOcean        */ { 1.0f,  1.0f},  // 24
-	/* biStoneBeach       */ { 1.0f,  1.0f},  // 25
-	/* biColdBeach        */ { 1.0f,  1.0f},  // 26
-	/* biBirchForest      */ { 3.0f,  3.0f},  // 27
-	/* biBirchForestHills */ { 6.0f,  6.0f},  // 28
-	/* biRoofedForest     */ { 3.0f,  3.0f},  // 29
-	/* biColdTaiga        */ { 0.5f,  0.5f},  // 30
-	/* biColdTaigaHills   */ { 4.0f,  4.0f},  // 31
-	/* biMegaTaiga        */ { 1.0f,  1.0f},  // 32
-	/* biMegaTaigaHills   */ { 4.0f,  4.0f},  // 33
-	/* biExtremeHillsPlus */ {32.0f, 32.0f},  // 34  - anyone say extreme plus? Make it extreme plus, then :)
-	/* biSavanna          */ { 2.0f,  2.0f},  // 35
-	/* biSavannaPlateau   */ { 3.0f,  3.0f},  // 36
-	/* biMesa             */ { 2.0f,  2.0f},  // 37
-	/* biMesaPlateauF     */ { 2.0f,  2.0f},  // 38
-	/* biMesaPlateau      */ { 2.0f,  2.0f},  // 39
+		/* biSwampland        */ { 0.0f,  0.0f},
+		/* biRiver            */ { 0.0f,  0.0f},
+		/* biNether           */ { 0.0f,  0.0f},  // Unused, but must be here due to indexing
+		/* biSky              */ { 0.0f,  0.0f},  // Unused, but must be here due to indexing
+		/* biFrozenOcean      */ { 0.0f,  0.0f},
+		/* biFrozenRiver      */ { 0.0f,  0.0f},
+		/* biIcePlains        */ { 0.0f,  0.0f},
+		/* biIceMountains     */ { 8.0f,  8.0f},
+		/* biMushroomIsland   */ { 4.0f,  4.0f},
+		/* biMushroomShore    */ { 0.0f,  0.0f},
+		/* biBeach            */ { 0.0f,  0.0f},
+		/* biDesertHills      */ { 5.0f,  5.0f},
+		/* biForestHills      */ { 6.0f,  6.0f},
+		/* biTaigaHills       */ { 8.0f,  8.0f},
+		/* biExtremeHillsEdge */ { 7.0f,  7.0f},
+		/* biJungle           */ { 4.0f,  4.0f},
+		/* biJungleHills      */ { 8.0f,  8.0f},
+		/* biJungleEdge       */ { 3.0f,  3.0f},  // 23
+		/* biDeepOcean        */ { 1.0f,  1.0f},  // 24
+		/* biStoneBeach       */ { 1.0f,  1.0f},  // 25
+		/* biColdBeach        */ { 1.0f,  1.0f},  // 26
+		/* biBirchForest      */ { 3.0f,  3.0f},  // 27
+		/* biBirchForestHills */ { 6.0f,  6.0f},  // 28
+		/* biRoofedForest     */ { 3.0f,  3.0f},  // 29
+		/* biColdTaiga        */ { 0.5f,  0.5f},  // 30
+		/* biColdTaigaHills   */ { 4.0f,  4.0f},  // 31
+		/* biMegaTaiga        */ { 1.0f,  1.0f},  // 32
+		/* biMegaTaigaHills   */ { 4.0f,  4.0f},  // 33
+		/* biExtremeHillsPlus */ {32.0f, 32.0f},  // 34  - anyone say extreme plus? Make it extreme plus, then :)
+		/* biSavanna          */ { 2.0f,  2.0f},  // 35
+		/* biSavannaPlateau   */ { 3.0f,  3.0f},  // 36
+		/* biMesa             */ { 2.0f,  2.0f},  // 37
+		/* biMesaPlateauF     */ { 2.0f,  2.0f},  // 38
+		/* biMesaPlateau      */ { 2.0f,  2.0f},  // 39
 
-	// biomes 40 .. 128 are unused, 89 empty placeholders here:
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 40 .. 49
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 50 .. 59
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 60 .. 69
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 70 .. 79
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 80 .. 89
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 90 .. 99
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 100 .. 109
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
+		// biomes 40 .. 128 are unused, 89 empty placeholders here:
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 40 .. 49
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 50 .. 59
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 60 .. 69
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 70 .. 79
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 80 .. 89
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 90 .. 99
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 100 .. 109
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
 
-	// Release 1.7 biome variants:
-	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
-	/* biDesertM              */ { 1.0f,  1.0f},  // 130
-	/* biExtremeHillsM        */ {16.0f, 16.0f},  // 131
-	/* biFlowerForest         */ { 4.0f,  4.0f},  // 132
-	/* biTaigaM               */ { 3.0f,  3.0f},  // 133
-	/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
+		// Release 1.7 biome variants:
+		/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
+		/* biDesertM              */ { 1.0f,  1.0f},  // 130
+		/* biExtremeHillsM        */ {16.0f, 16.0f},  // 131
+		/* biFlowerForest         */ { 4.0f,  4.0f},  // 132
+		/* biTaigaM               */ { 3.0f,  3.0f},  // 133
+		/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
 
-	// Biomes 135 .. 139 unused, 5 empty placeholders here:
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 135 .. 139
+		// Biomes 135 .. 139 unused, 5 empty placeholders here:
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 135 .. 139
 
-	/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
+		/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
 
-	// Biomes 141 .. 148 unused, 8 empty placeholders here:
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 141 .. 148
+		// Biomes 141 .. 148 unused, 8 empty placeholders here:
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 141 .. 148
 
-	/* biJungleM              */ { 4.0f,  4.0f},  // 149
-	{0.0f, 0.0f},                                 // 150
-	/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},     // 152 .. 154
-	/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
-	/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
-	/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
-	/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
-	{0.0f, 0.0f},                                 // 159
-	/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
-	/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
-	/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
-	/* biSavannaM             */ { 2.0f,  2.0f},  // 163
-	/* biSavannaPlateauM      */ { 3.0f,  3.0f},  // 164
-	/* biMesaBryce            */ { 0.5f,  0.5f},  // 165
-	/* biMesaPlateauFM        */ { 2.0f,  2.0f},  // 166
-	/* biMesaPlateauM         */ { 2.0f,  2.0f},  // 167
+		/* biJungleM              */ { 4.0f,  4.0f},  // 149
+		{0.0f, 0.0f},                                 // 150
+		/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
+		{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},     // 152 .. 154
+		/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
+		/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
+		/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
+		/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
+		{0.0f, 0.0f},                                 // 159
+		/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
+		/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
+		/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
+		/* biSavannaM             */ { 2.0f,  2.0f},  // 163
+		/* biSavannaPlateauM      */ { 3.0f,  3.0f},  // 164
+		/* biMesaBryce            */ { 0.5f,  0.5f},  // 165
+		/* biMesaPlateauFM        */ { 2.0f,  2.0f},  // 166
+		/* biMesaPlateauM         */ { 2.0f,  2.0f},  // 167
+	}
 } ;
 
 
@@ -183,9 +185,9 @@ void cDistortedHeightmap::PrepareState(int a_ChunkX, int a_ChunkZ)
 void cDistortedHeightmap::GenerateHeightArray(void)
 {
 	// Generate distortion noise:
-	NOISE_DATATYPE DistortNoiseX[DIM_X * DIM_Y * DIM_Z];
-	NOISE_DATATYPE DistortNoiseZ[DIM_X * DIM_Y * DIM_Z];
-	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Y * DIM_Z> DistortNoiseX;
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Y * DIM_Z> DistortNoiseZ;
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Y * DIM_Z> Workspace;
 	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width) / m_FrequencyX;
 	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_CurChunkX + 1) * cChunkDef::Width - 1) / m_FrequencyX;
 	NOISE_DATATYPE StartY = 0;
@@ -193,25 +195,25 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width) / m_FrequencyZ;
 	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_CurChunkZ + 1) * cChunkDef::Width - 1) / m_FrequencyZ;
 
-	m_NoiseDistortX.Generate3D(DistortNoiseX, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
-	m_NoiseDistortZ.Generate3D(DistortNoiseZ, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
+	m_NoiseDistortX.Generate3D(DistortNoiseX.data(), DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace.data());
+	m_NoiseDistortZ.Generate3D(DistortNoiseZ.data(), DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace.data());
 
 	// The distorted heightmap, before linear upscaling
-	NOISE_DATATYPE DistHei[DIM_X * DIM_Y * DIM_Z];
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Y * DIM_Z> DistHei;
 
 	// Distort the heightmap using the distortion:
-	for (int z = 0; z < DIM_Z; z++)
+	for (size_t z = 0; z < DIM_Z; z++)
 	{
-		int AmpIdx = z * DIM_X;
-		for (int y = 0; y < DIM_Y; y++)
+		size_t AmpIdx = z * DIM_X;
+		for (size_t y = 0; y < DIM_Y; y++)
 		{
-			int NoiseArrayIdx = z * DIM_X * DIM_Y + y * DIM_X;
-			for (int x = 0; x < DIM_X; x++)
+			size_t NoiseArrayIdx = z * DIM_X * DIM_Y + y * DIM_X;
+			for (size_t x = 0; x < DIM_X; x++)
 			{
 				NOISE_DATATYPE DistX = DistortNoiseX[NoiseArrayIdx + x] * m_DistortAmpX[AmpIdx + x];
 				NOISE_DATATYPE DistZ = DistortNoiseZ[NoiseArrayIdx + x] * m_DistortAmpZ[AmpIdx + x];
-				DistX += static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X);
-				DistZ += static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z);
+				DistX += static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width + static_cast<int>(x) * INTERPOL_X);
+				DistZ += static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width + static_cast<int>(z) * INTERPOL_Z);
 				// Adding 0.5 helps alleviate the interpolation artifacts
 				DistHei[NoiseArrayIdx + x] = static_cast<NOISE_DATATYPE>(GetHeightmapAt(DistX, DistZ)) + static_cast<NOISE_DATATYPE>(0.5);
 			}
@@ -220,7 +222,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 
 	// Upscale the distorted heightmap into full dimensions:
 	LinearUpscale3DArray(
-		DistHei, DIM_X, DIM_Y, DIM_Z,
+		DistHei.data(), DIM_X, DIM_Y, DIM_Z,
 		m_DistortedHeightmap.data(), INTERPOL_X, INTERPOL_Y, INTERPOL_Z
 	);
 
@@ -299,7 +301,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[static_cast<size_t>(x + 1)][static_cast<size_t>(z + 1)]);
 		}  // for x
 	}  // for z
 
@@ -307,7 +309,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = 0; x < DIM_Z; x++)
 		{
-			GetDistortAmpsAt(Biomes, x * INTERPOL_X, z * INTERPOL_Z, m_DistortAmpX[x + DIM_X * z], m_DistortAmpZ[x + DIM_X * z]);
+			GetDistortAmpsAt(Biomes, x * INTERPOL_X, z * INTERPOL_Z, m_DistortAmpX[static_cast<size_t>(x + DIM_X * z)], m_DistortAmpZ[static_cast<size_t>(x + DIM_X * z)]);
 		}
 	}
 }
@@ -324,13 +326,13 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	for (int z = -8; z <= 8; z++)
 	{
 		int FinalZ = a_RelZ + z + cChunkDef::Width;
-		int IdxZ = FinalZ / cChunkDef::Width;
+		size_t IdxZ = static_cast<size_t>(FinalZ / cChunkDef::Width);
 		int ModZ = FinalZ % cChunkDef::Width;
 		int WeightZ = 9 - abs(z);
 		for (int x = -8; x <= 8; x++)
 		{
 			int FinalX = a_RelX + x + cChunkDef::Width;
-			int IdxX = FinalX / cChunkDef::Width;
+			size_t IdxX = static_cast<size_t>(FinalX / cChunkDef::Width);
 			int ModX = FinalX % cChunkDef::Width;
 			EMCSBiome Biome = cChunkDef::GetBiome(a_Neighbors[IdxX][IdxZ], ModX, ModZ);
 			int WeightX = 9 - abs(x);
