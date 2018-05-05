@@ -1033,7 +1033,7 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[x + cChunkDef::Width * z]));
+				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[static_cast<size_t>(x + cChunkDef::Width * z)]));
 			}
 		}
 	}
