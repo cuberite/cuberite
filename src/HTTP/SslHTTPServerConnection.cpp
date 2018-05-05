@@ -55,11 +55,11 @@ void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size
 		}
 
 		// Try to read as many bytes from SSL's decryption as possible:
-		char Buffer[32000];
-		int NumRead = m_Ssl.ReadPlain(Buffer, sizeof(Buffer));
+		std::array<char, 32000> Buffer;
+		int NumRead = m_Ssl.ReadPlain(Buffer.data(), sizeof(Buffer));
 		if (NumRead > 0)
 		{
-			super::OnReceivedData(Buffer, static_cast<size_t>(NumRead));
+			super::OnReceivedData(Buffer.data(), static_cast<size_t>(NumRead));
 			// The link may have closed while processing the data, bail out:
 			return;
 		}
@@ -99,11 +99,11 @@ void cSslHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 		}
 
 		// Read as many bytes from SSL's "outgoing" buffer as possible:
-		char Buffer[32000];
-		size_t NumBytes = m_Ssl.ReadOutgoing(Buffer, sizeof(Buffer));
+		std::array<char, 32000> Buffer;
+		size_t NumBytes = m_Ssl.ReadOutgoing(Buffer.data(), sizeof(Buffer));
 		if (NumBytes > 0)
 		{
-			m_Link->Send(Buffer, NumBytes);
+			m_Link->Send(Buffer.data(), NumBytes);
 		}
 
 		// If both failed, bail out:
