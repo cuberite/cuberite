@@ -21,7 +21,7 @@ class Matrix4
 
 public:
 
-	T cell[16];
+	std::array<T, 16> cell;
 
 	// tolua_begin
 
@@ -50,7 +50,7 @@ public:
 
 	inline T & operator [] (int a_N)
 	{
-		ASSERT(a_N < 16);
+		ASSERT(a_N < static_cast<int>(cell.size()));
 		return cell[a_N];
 	}
 
