@@ -249,7 +249,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	ReadChunks(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 
 	PrepareBlockLight();
-	CalcLight(m_BlockLight);
+	CalcLight(m_BlockLight.data());
 
 	PrepareSkyLight();
 
@@ -280,7 +280,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	}
 	//*/
 
-	CalcLight(m_SkyLight);
+	CalcLight(m_SkyLight.data());
 
 	/*
 	// DEBUG: Save XY slices of the chunk data and lighting for visual inspection:
@@ -313,8 +313,8 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	}
 	//*/
 
-	CompressLight(m_BlockLight, BlockLight.data());
-	CompressLight(m_SkyLight, SkyLight.data());
+	CompressLight(m_BlockLight.data(), BlockLight.data());
+	CompressLight(m_SkyLight.data(), SkyLight.data());
 
 	m_World.ChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ, BlockLight, SkyLight);
 
@@ -330,7 +330,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 {
-	cReader Reader(m_BlockTypes, m_HeightMap);
+	cReader Reader(m_BlockTypes.data(), m_HeightMap.data());
 
 	for (int z = 0; z < 3; z++)
 	{
@@ -342,8 +342,8 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		}  // for z
 	}  // for x
 
-	memset(m_BlockLight, 0, sizeof(m_BlockLight));
-	memset(m_SkyLight,   0, sizeof(m_SkyLight));
+	memset(m_BlockLight.data(), 0, sizeof(m_BlockLight));
+	memset(m_SkyLight.data(),   0, sizeof(m_SkyLight));
 	m_MaxHeight = Reader.m_MaxHeight;
 }
 
@@ -354,13 +354,13 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 void cLightingThread::PrepareSkyLight(void)
 {
 	// Clear seeds:
-	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
+	memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
 	m_NumSeeds = 0;
 
 	// Fill the top of the chunk with all-light:
 	if (m_MaxHeight < cChunkDef::Height - 1)
 	{
-		std::fill(m_SkyLight + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight + ARRAYCOUNT(m_SkyLight), 15);
+		std::fill(m_SkyLight.data() + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight.data() + m_SkyLight.size(), 15);
 	}
 
 	// Walk every column that has all XZ neighbors
@@ -371,42 +371,42 @@ void cLightingThread::PrepareSkyLight(void)
 		{
 			int idx = BaseZ + x;
 			// Find the lowest block in this column that receives full sunlight (go through transparent blocks):
-			int Current = m_HeightMap[idx];
+			int Current = m_HeightMap[static_cast<size_t>(idx)];
 			ASSERT(Current < cChunkDef::Height);
 			while (
 				(Current >= 0) &&
-				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer]) &&
-				!cBlockInfo::IsSkylightDispersant(m_BlockTypes[idx + Current * BlocksPerYLayer])
+				cBlockInfo::IsTransparent(m_BlockTypes[static_cast<size_t>(idx + Current * BlocksPerYLayer)]) &&
+				!cBlockInfo::IsSkylightDispersant(m_BlockTypes[static_cast<size_t>(idx + Current * BlocksPerYLayer)])
 			)
 			{
 				Current -= 1;  // Sunlight goes down unchanged through this block
 			}
 			Current += 1;  // Point to the last sunlit block, rather than the first non-transparent one
 			// The other neighbors don't need transparent-block-checking. At worst we'll have a few dud seeds above the ground.
-			int Neighbor1 = m_HeightMap[idx + 1] + 1;  // X + 1
-			int Neighbor2 = m_HeightMap[idx - 1] + 1;  // X - 1
-			int Neighbor3 = m_HeightMap[idx + cChunkDef::Width * 3] + 1;  // Z + 1
-			int Neighbor4 = m_HeightMap[idx - cChunkDef::Width * 3] + 1;  // Z - 1
+			int Neighbor1 = m_HeightMap[static_cast<size_t>(idx + 1)] + 1;  // X + 1
+			int Neighbor2 = m_HeightMap[static_cast<size_t>(idx - 1)] + 1;  // X - 1
+			int Neighbor3 = m_HeightMap[static_cast<size_t>(idx + cChunkDef::Width * 3)] + 1;  // Z + 1
+			int Neighbor4 = m_HeightMap[static_cast<size_t>(idx - cChunkDef::Width * 3)] + 1;  // Z - 1
 			int MaxNeighbor = std::max(std::max(Neighbor1, Neighbor2), std::max(Neighbor3, Neighbor4));  // Maximum of the four neighbors
 
 			// Fill the column from m_MaxHeight to Current with all-light:
 			for (int y = m_MaxHeight, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
 			{
-				m_SkyLight[Index] = 15;
+				m_SkyLight[static_cast<size_t>(Index)] = 15;
 			}
 
 			// Add Current as a seed:
 			if (Current < cChunkDef::Height)
 			{
 				int CurrentIdx = idx + Current * BlocksPerYLayer;
-				m_IsSeed1[CurrentIdx] = true;
+				m_IsSeed1[static_cast<size_t>(CurrentIdx)] = true;
 				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(CurrentIdx);
 			}
 
 			// Add seed from Current up to the highest neighbor:
 			for (int y = Current + 1, Index = idx + y * BlocksPerYLayer; y < MaxNeighbor; y++, Index += BlocksPerYLayer)
 			{
-				m_IsSeed1[Index] = true;
+				m_IsSeed1[static_cast<size_t>(Index)] = true;
 				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Index);
 			}
 		}
@@ -420,12 +420,12 @@ void cLightingThread::PrepareSkyLight(void)
 void cLightingThread::PrepareBlockLight()
 {
 	// Clear seeds:
-	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
-	memset(m_IsSeed2, 0, sizeof(m_IsSeed2));
+	memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
+	memset(m_IsSeed2.data(), 0, sizeof(m_IsSeed2));
 	m_NumSeeds = 0;
 
 	// Add each emissive block into the seeds:
-	for (int Idx = 0; Idx < (m_MaxHeight * BlocksPerYLayer); ++Idx)
+	for (size_t Idx = 0; Idx < (m_MaxHeight * BlocksPerYLayer); ++Idx)
 	{
 		if (cBlockInfo::GetLightValue(m_BlockTypes[Idx]) == 0)
 		{
@@ -452,18 +452,18 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 	while (m_NumSeeds > 0)
 	{
 		// Buffer 1 -> buffer 2
-		memset(m_IsSeed2, 0, sizeof(m_IsSeed2));
+		memset(m_IsSeed2.data(), 0, sizeof(m_IsSeed2));
 		NumSeeds2 = 0;
-		CalcLightStep(a_Light, m_NumSeeds, m_IsSeed1, m_SeedIdx1, NumSeeds2, m_IsSeed2, m_SeedIdx2);
+		CalcLightStep(a_Light, m_NumSeeds, m_IsSeed1.data(), m_SeedIdx1.data(), NumSeeds2, m_IsSeed2.data(), m_SeedIdx2.data());
 		if (NumSeeds2 == 0)
 		{
 			return;
 		}
 
 		// Buffer 2 -> buffer 1
-		memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
+		memset(m_IsSeed1.data(), 0, sizeof(m_IsSeed1));
 		m_NumSeeds = 0;
-		CalcLightStep(a_Light, NumSeeds2, m_IsSeed2, m_SeedIdx2, m_NumSeeds, m_IsSeed1, m_SeedIdx1);
+		CalcLightStep(a_Light, NumSeeds2, m_IsSeed2.data(), m_SeedIdx2.data(), m_NumSeeds, m_IsSeed1.data(), m_SeedIdx1.data());
 	}
 }
 
