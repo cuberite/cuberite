@@ -63,7 +63,7 @@ private:
 	/** Determines which face on the block a collision occured, if it does occur
 	Returns 0 if the block is air, water or no collision occured
 	Return 1 through 6 for the following block faces, repectively: -x, -z, x, z, y, -y */
-	int GetHitNormal(const Vector3f & start, const Vector3f & end, const Vector3i &  a_BlockPos);
+	int GetHitNormal(const Vector3f &a_Start, const Vector3f & a_End, const Vector3i &  a_BlockPos);
 
 	/** Signum function */
 	int SigNum(float a_Num);
@@ -72,12 +72,12 @@ private:
 
 	static const std::array<const Vector3f, 6> & m_NormalTable(void);
 
-	Vector3f dir;
-	Vector3f tDelta;
-	Vector3i pos;
-	Vector3i end1;
-	Vector3i step;
-	Vector3f tMax;
+	Vector3f m_Dir;
+	Vector3f m_tDelta;
+	Vector3i m_Pos;
+	Vector3i m_End1;
+	Vector3i m_Step;
+	Vector3f m_tMax;
 };
 
 // tolua_end
