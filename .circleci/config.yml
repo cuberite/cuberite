@@ -22,11 +22,22 @@ jobs:
     - run: lua CheckBasicStyle.lua
     - run: cd Bindings && lua CheckBindingsDependencies.lua
 
+  clang-tidy:
+    working_directory: ~/cuberite
+    docker:
+    - image: peterbell10/cuberite-circleci:0.0.2
+    steps:
+    - restore_cache: { keys: [ "cuberite-{{ .Environment.CIRCLE_SHA1 }}" ] }
+    - run: ./clang-tidy.sh -j 2
+
 workflows:
   version: 2
   checks:
     jobs:
     - checkout_cuberite
     - check_basic_style:
+        requires:
+        - checkout_cuberite
+    - clang-tidy:
         requires:
         - checkout_cuberite
