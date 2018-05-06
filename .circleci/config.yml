@@ -3,9 +3,10 @@ jobs:
   checkout_cuberite:
     working_directory: ~/cuberite
     docker:
-    - image: peterbell10/cuberite-circleci:0.0.1
+    - image: peterbell10/cuberite-circleci:0.0.2
     steps:
     - checkout
+    - run: git submodule update --init
     - save_cache:
         key: "cuberite-{{ .Environment.CIRCLE_SHA1 }}"
         paths:
@@ -14,19 +15,12 @@ jobs:
   check_basic_style:
     working_directory: ~/cuberite/src
     docker:
-    - image: peterbell10/cuberite-circleci:0.0.1
+    - image: peterbell10/cuberite-circleci:0.0.2
     steps:
     - restore_cache: { keys: [ "cuberite-{{ .Environment.CIRCLE_SHA1 }}" ] }
     - run: find . -name \*.cpp -or -name \*.h > AllFiles.lst
     - run: lua CheckBasicStyle.lua
-
-  check_binding_dependencies:
-    working_directory: ~/cuberite/src/Bindings
-    docker:
-    - image: peterbell10/cuberite-circleci:0.0.1
-    steps:
-    - restore_cache: { keys: [ "cuberite-{{ .Environment.CIRCLE_SHA1 }}" ] }
-    - run: lua CheckBindingsDependencies.lua
+    - run: cd Bindings && lua CheckBindingsDependencies.lua
 
 workflows:
   version: 2
@@ -34,8 +28,5 @@ workflows:
     jobs:
     - checkout_cuberite
     - check_basic_style:
-        requires:
-        - checkout_cuberite
-    - check_binding_dependencies:
         requires:
         - checkout_cuberite
