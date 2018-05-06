@@ -2,5 +2,7 @@ Checks: '-*,readability-identifier-naming'
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           m_
+#- key:             readability-identifier-naming.PrivateMemberCase
+#  value:           CamelCase
 WarningsAsErrors: '*'
 #HeaderFilterRegex: '.+/cuberite/src/[^\.].+'

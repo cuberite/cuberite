@@ -75,40 +75,40 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	ASSERT(a_Direction.HasNonZeroLength());
 
 	// calculate the direction of the ray (linear algebra)
-	m_dir = a_Direction;
+	m_Dir = a_Direction;
 
 	// decide which direction to start walking in
-	m_step.x = SigNum(m_dir.x);
-	m_step.y = SigNum(m_dir.y);
-	m_step.z = SigNum(m_dir.z);
+	m_Step.x = SigNum(m_Dir.x);
+	m_Step.y = SigNum(m_Dir.y);
+	m_Step.z = SigNum(m_Dir.z);
 
 
 	// normalize the direction vector
-	m_dir.Normalize();
+	m_Dir.Normalize();
 
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
 	// same but y-direction
-	if (m_dir.x != 0.f)
+	if (m_Dir.x != 0.f)
 	{
-		m_tDelta.x = 1 / std::abs(m_dir.x);
+		m_tDelta.x = 1 / std::abs(m_Dir.x);
 	}
 	else
 	{
 		m_tDelta.x = 0;
 	}
-	if (m_dir.y != 0.f)
+	if (m_Dir.y != 0.f)
 	{
-		m_tDelta.y = 1 / std::abs(m_dir.y);
+		m_tDelta.y = 1 / std::abs(m_Dir.y);
 	}
 	else
 	{
 		m_tDelta.y = 0;
 	}
-	if (m_dir.z != 0.f)
+	if (m_Dir.z != 0.f)
 	{
-		m_tDelta.z = 1 / std::abs(m_dir.z);
+		m_tDelta.z = 1 / std::abs(m_Dir.z);
 	}
 	else
 	{
@@ -117,36 +117,36 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 
 	// start voxel coordinates
-	m_pos.x = static_cast<int>(floorf(a_Start.x));
-	m_pos.y = static_cast<int>(floorf(a_Start.y));
-	m_pos.z = static_cast<int>(floorf(a_Start.z));
+	m_Pos.x = static_cast<int>(floorf(a_Start.x));
+	m_Pos.y = static_cast<int>(floorf(a_Start.y));
+	m_Pos.z = static_cast<int>(floorf(a_Start.z));
 
 	// calculate distance to first intersection in the voxel we start from
-	if (m_dir.x < 0)
+	if (m_Dir.x < 0)
 	{
-		m_tMax.x = (static_cast<float>(m_pos.x) - a_Start.x) / m_dir.x;
+		m_tMax.x = (static_cast<float>(m_Pos.x) - a_Start.x) / m_Dir.x;
 	}
 	else
 	{
-		m_tMax.x = (static_cast<float>(m_pos.x + 1) - a_Start.x) / m_dir.x;  // TODO: Possible division by zero
+		m_tMax.x = (static_cast<float>(m_Pos.x + 1) - a_Start.x) / m_Dir.x;  // TODO: Possible division by zero
 	}
 
-	if (m_dir.y < 0)
+	if (m_Dir.y < 0)
 	{
-		m_tMax.y = (static_cast<float>(m_pos.y) - a_Start.y) / m_dir.y;
+		m_tMax.y = (static_cast<float>(m_Pos.y) - a_Start.y) / m_Dir.y;
 	}
 	else
 	{
-		m_tMax.y = (static_cast<float>(m_pos.y + 1) - a_Start.y) / m_dir.y;  // TODO: Possible division by zero
+		m_tMax.y = (static_cast<float>(m_Pos.y + 1) - a_Start.y) / m_Dir.y;  // TODO: Possible division by zero
 	}
 
-	if (m_dir.z < 0)
+	if (m_Dir.z < 0)
 	{
-		m_tMax.z = (static_cast<float>(m_pos.z) - a_Start.z) / m_dir.z;
+		m_tMax.z = (static_cast<float>(m_Pos.z) - a_Start.z) / m_Dir.z;
 	}
 	else
 	{
-		m_tMax.z = (static_cast<float>(m_pos.z + 1) - a_Start.z) / m_dir.z;  // TODO: Possible division by zero
+		m_tMax.z = (static_cast<float>(m_Pos.z + 1) - a_Start.z) / m_Dir.z;  // TODO: Possible division by zero
 	}
 }
 
@@ -169,21 +169,21 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 
 	SetValues(a_Start, a_Direction);
 
-	Vector3f End = a_Start + (m_dir * static_cast<float>(a_Distance));
+	Vector3f End = a_Start + (m_Dir * static_cast<float>(a_Distance));
 
 	if (End.y < 0)
 	{
-		float dist = -a_Start.y / m_dir.y;  // No division by 0 possible
-		End = a_Start + (m_dir * dist);
+		float dist = -a_Start.y / m_Dir.y;  // No division by 0 possible
+		End = a_Start + (m_Dir * dist);
 	}
 
 	// end voxel coordinates
-	m_end1.x = static_cast<int>(floorf(End.x));
-	m_end1.y = static_cast<int>(floorf(End.y));
-	m_end1.z = static_cast<int>(floorf(End.z));
+	m_End1.x = static_cast<int>(floorf(End.x));
+	m_End1.y = static_cast<int>(floorf(End.y));
+	m_End1.z = static_cast<int>(floorf(End.z));
 
 	// check if first is occupied
-	if (m_pos.Equals(m_end1))
+	if (m_Pos.Equals(m_End1))
 	{
 		return false;
 	}
@@ -197,51 +197,51 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		if ((m_tMax.x < m_tMax.y) && (m_tMax.x < m_tMax.z))
 		{
 			m_tMax.x += m_tDelta.x;
-			m_pos.x += m_step.x;
+			m_Pos.x += m_Step.x;
 		}
 		else if (m_tMax.y < m_tMax.z)
 		{
 			m_tMax.y += m_tDelta.y;
-			m_pos.y += m_step.y;
+			m_Pos.y += m_Step.y;
 		}
 		else
 		{
 			m_tMax.z += m_tDelta.z;
-			m_pos.z += m_step.z;
+			m_Pos.z += m_Step.z;
 		}
 
-		if (m_step.x > 0.0f)
+		if (m_Step.x > 0.0f)
 		{
-			if (m_pos.x >= m_end1.x)
+			if (m_Pos.x >= m_End1.x)
 			{
 				reachedX = true;
 			}
 		}
-		else if (m_pos.x <= m_end1.x)
+		else if (m_Pos.x <= m_End1.x)
 		{
 			reachedX = true;
 		}
 
-		if (m_step.y > 0.0f)
+		if (m_Step.y > 0.0f)
 		{
-			if (m_pos.y >= m_end1.y)
+			if (m_Pos.y >= m_End1.y)
 			{
 				reachedY = true;
 			}
 		}
-		else if (m_pos.y <= m_end1.y)
+		else if (m_Pos.y <= m_End1.y)
 		{
 			reachedY = true;
 		}
 
-		if (m_step.z > 0.0f)
+		if (m_Step.z > 0.0f)
 		{
-			if (m_pos.z >= m_end1.z)
+			if (m_Pos.z >= m_End1.z)
 			{
 				reachedZ = true;
 			}
 		}
-		else if (m_pos.z <= m_end1.z)
+		else if (m_Pos.z <= m_End1.z)
 		{
 			reachedZ = true;
 		}
@@ -251,17 +251,17 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return false;
 		}
 
-		if ((m_pos.y < 0) || (m_pos.y >= cChunkDef::Height))
+		if ((m_Pos.y < 0) || (m_Pos.y >= cChunkDef::Height))
 		{
 			return false;
 		}
-		BLOCKTYPE BlockID = m_World->GetBlock(m_pos);
+		BLOCKTYPE BlockID = m_World->GetBlock(m_Pos);
 		// Block is counted as a collision if we are not doing a line of sight and it is solid,
 		// or if the block is not air and not water. That way mobs can still see underwater.
 		if ((!a_LineOfSight && cBlockInfo::IsSolid(BlockID)) || (a_LineOfSight && (BlockID != E_BLOCK_AIR) && !IsBlockWater(BlockID)))
 		{
-			BlockHitPosition = m_pos;
-			int Normal = GetHitNormal(a_Start, End, m_pos);
+			BlockHitPosition = m_Pos;
+			int Normal = GetHitNormal(a_Start, End, m_Pos);
 			if (Normal > 0)
 			{
 				HitNormal = m_NormalTable()[static_cast<size_t>(Normal - 1)];

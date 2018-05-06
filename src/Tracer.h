@@ -72,11 +72,11 @@ private:
 
 	static const std::array<const Vector3f, 6> & m_NormalTable(void);
 
-	Vector3f m_dir;
+	Vector3f m_Dir;
 	Vector3f m_tDelta;
-	Vector3i m_pos;
-	Vector3i m_end1;
-	Vector3i m_step;
+	Vector3i m_Pos;
+	Vector3i m_End1;
+	Vector3i m_Step;
 	Vector3f m_tMax;
 };
 
