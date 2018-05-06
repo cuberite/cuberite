@@ -6,17 +6,11 @@ CheckOptions:
   value:           aNy_CasE
 - key:             readability-identifier-naming.ClassConstantPrefix
   value:           ''
-- key:             readability-identifier-naming.ConstantMemberCase
-  value:           aNy_CasE
-- key:             readability-identifier-naming.ConstantMemberPrefix
-  value:           ''
 #- key:             readability-identifier-naming.PrivateMemberCase
 #  value:           CamelCase
 #- key:             readability-identifier-naming.FunctionCase
 #  value:           CamelCase
 #- key:             readability-identifier-naming.EnumCase
-#  value:           CamelCase
-#- key:             readability-identifier-naming.EnumPrefix
-#  value:           'e'
+#  value:           camelBack
 WarningsAsErrors: '*'
 #HeaderFilterRegex: '.+/cuberite/src/[^\.].+'
