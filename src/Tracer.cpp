@@ -346,7 +346,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 
 
 
-int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, const Vector3i & a_BlockPos)
+int cTracer::GetHitNormal(const Vector3f & a_Start, const Vector3f & a_End, const Vector3i & a_BlockPos)
 {
 	Vector3i SmallBlockPos = a_BlockPos;
 	BLOCKTYPE BlockID = static_cast<BLOCKTYPE>(m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z));
@@ -359,19 +359,19 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	Vector3f BlockPos;
 	BlockPos = Vector3f(SmallBlockPos);
 
-	Vector3f Look = (a_end - a_start);
+	Vector3f Look = (a_End - a_Start);
 	Look.Normalize();
 
 	float dot = Look.Dot(Vector3f(-1, 0, 0));  // first face normal is x -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.x, a_start.y, a_end.x, a_end.y, BlockPos.x, BlockPos.y, BlockPos.x, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.x, a_Start.y, a_End.x, a_End.y, BlockPos.x, BlockPos.y, BlockPos.x, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.x, a_start.z, a_end.x, a_end.z, BlockPos.x, BlockPos.z, BlockPos.x, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.x, a_Start.z, a_End.x, a_End.z, BlockPos.x, BlockPos.z, BlockPos.x, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos, Vector3f(-1, 0, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(-1, 0, 0));
 				return 1;
 			}
 		}
@@ -379,13 +379,13 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	dot = Look.Dot(Vector3f(0, 0, -1));  // second face normal is z -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.z, a_start.y, a_end.z, a_end.y, BlockPos.z, BlockPos.y, BlockPos.z, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.z, a_Start.y, a_End.z, a_End.y, BlockPos.z, BlockPos.y, BlockPos.z, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.z, a_start.x, a_end.z, a_end.x, BlockPos.z, BlockPos.x, BlockPos.z, BlockPos.x + 1);
+			Lines = LinesCross(a_Start.z, a_Start.x, a_End.z, a_End.x, BlockPos.z, BlockPos.x, BlockPos.z, BlockPos.x + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos, Vector3f(0, 0, -1));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(0, 0, -1));
 				return 2;
 			}
 		}
@@ -393,13 +393,13 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	dot = Look.Dot(Vector3f(1, 0, 0));  // third face normal is x 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.x, a_start.y, a_end.x, a_end.y, BlockPos.x + 1, BlockPos.y, BlockPos.x + 1, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.x, a_Start.y, a_End.x, a_End.y, BlockPos.x + 1, BlockPos.y, BlockPos.x + 1, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.x, a_start.z, a_end.x, a_end.z, BlockPos.x + 1, BlockPos.z, BlockPos.x + 1, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.x, a_Start.z, a_End.x, a_End.z, BlockPos.x + 1, BlockPos.z, BlockPos.x + 1, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos + Vector3f(1, 0, 0), Vector3f(1, 0, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(1, 0, 0), Vector3f(1, 0, 0));
 				return 3;
 			}
 		}
@@ -407,13 +407,13 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	dot = Look.Dot(Vector3f(0, 0, 1));  // fourth face normal is z 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.z, a_start.y, a_end.z, a_end.y, BlockPos.z + 1, BlockPos.y, BlockPos.z + 1, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.z, a_Start.y, a_End.z, a_End.y, BlockPos.z + 1, BlockPos.y, BlockPos.z + 1, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.z, a_start.x, a_end.z, a_end.x, BlockPos.z + 1, BlockPos.x, BlockPos.z + 1, BlockPos.x + 1);
+			Lines = LinesCross(a_Start.z, a_Start.x, a_End.z, a_End.x, BlockPos.z + 1, BlockPos.x, BlockPos.z + 1, BlockPos.x + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos + Vector3f(0, 0, 1), Vector3f(0, 0, 1));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(0, 0, 1), Vector3f(0, 0, 1));
 				return 4;
 			}
 		}
@@ -421,13 +421,13 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	dot = Look.Dot(Vector3f(0, 1, 0));  // fifth face normal is y 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.y, a_start.x, a_end.y, a_end.x, BlockPos.y + 1, BlockPos.x, BlockPos.y + 1, BlockPos.x + 1);
+		int Lines = LinesCross(a_Start.y, a_Start.x, a_End.y, a_End.x, BlockPos.y + 1, BlockPos.x, BlockPos.y + 1, BlockPos.x + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.y, a_start.z, a_end.y, a_end.z, BlockPos.y + 1, BlockPos.z, BlockPos.y + 1, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.y, a_Start.z, a_End.y, a_End.z, BlockPos.y + 1, BlockPos.z, BlockPos.y + 1, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos + Vector3f(0, 1, 0), Vector3f(0, 1, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(0, 1, 0), Vector3f(0, 1, 0));
 				return 5;
 			}
 		}
@@ -435,13 +435,13 @@ int cTracer::GetHitNormal(const Vector3f & a_start, const Vector3f & a_end, cons
 	dot = Look.Dot(Vector3f(0, -1, 0));  // sixth face normal is y -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(a_start.y, a_start.x, a_end.y, a_end.x, BlockPos.y, BlockPos.x, BlockPos.y, BlockPos.x + 1);
+		int Lines = LinesCross(a_Start.y, a_Start.x, a_End.y, a_End.x, BlockPos.y, BlockPos.x, BlockPos.y, BlockPos.x + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(a_start.y, a_start.z, a_end.y, a_end.z, BlockPos.y, BlockPos.z, BlockPos.y, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.y, a_Start.z, a_End.y, a_End.z, BlockPos.y, BlockPos.z, BlockPos.y, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(a_start, a_end, BlockPos, Vector3f(0, -1, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(0, -1, 0));
 				return 6;
 			}
 		}
