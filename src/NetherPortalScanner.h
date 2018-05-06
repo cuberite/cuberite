@@ -39,8 +39,8 @@ private:
 	static const int SearchSolidBaseWidth = 3;
 
 	/** Where to place the player out from the face and across the face */
-	const double m_OutOffset = 2;
-	const double m_AcrossOffset = 0.5;
+	const double OutOffset = 2;  // NOLINT
+	const double AcrossOffset = 0.5;  // NOLINT
 
 	/** Builds a portal. */
 	void BuildNetherPortal(Vector3i a_Location, Direction a_Direction, bool a_IncludePlatform);

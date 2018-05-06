@@ -4,5 +4,11 @@ CheckOptions:
   value:           m_
 #- key:             readability-identifier-naming.PrivateMemberCase
 #  value:           CamelCase
+#- key:             readability-identifier-naming.FunctionCase
+#  value:           CamelCase
+#- key:             readability-identifier-naming.Enum
+#  value:           CamelCase
+#- key:             readability-identifier-naming.EnumPrefix
+#  value:           e
 WarningsAsErrors: '*'
 #HeaderFilterRegex: '.+/cuberite/src/[^\.].+'
