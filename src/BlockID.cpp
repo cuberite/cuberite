@@ -190,7 +190,7 @@ protected:
 
 
 bool cBlockIDMap::m_bHasRunInit = false;
-static cBlockIDMap g_gsBlockIDMap;
+static cBlockIDMap g_BlockIDMap;
 
 
 
@@ -224,11 +224,11 @@ int BlockStringToType(const AString & a_BlockTypeString)
 		return res;
 	}
 
-	if (!g_gsBlockIDMap.m_bHasRunInit)
+	if (!g_BlockIDMap.m_bHasRunInit)
 	{
-		g_gsBlockIDMap.init();
+		g_BlockIDMap.init();
 	}
-	return g_gsBlockIDMap.Resolve(TrimString(a_BlockTypeString));
+	return g_BlockIDMap.Resolve(TrimString(a_BlockTypeString));
 }
 
 
@@ -242,11 +242,11 @@ bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 		ItemName = ItemName.substr(10);
 	}
 
-	if (!g_gsBlockIDMap.m_bHasRunInit)
+	if (!g_BlockIDMap.m_bHasRunInit)
 	{
-		g_gsBlockIDMap.init();
+		g_BlockIDMap.init();
 	}
-	return g_gsBlockIDMap.ResolveItem(ItemName, a_Item);
+	return g_BlockIDMap.ResolveItem(ItemName, a_Item);
 }
 
 
@@ -255,11 +255,11 @@ bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 
 AString ItemToString(const cItem & a_Item)
 {
-	if (!g_gsBlockIDMap.m_bHasRunInit)
+	if (!g_BlockIDMap.m_bHasRunInit)
 	{
-		g_gsBlockIDMap.init();
+		g_BlockIDMap.init();
 	}
-	return g_gsBlockIDMap.Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
+	return g_BlockIDMap.Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
 }
 
 
@@ -268,11 +268,11 @@ AString ItemToString(const cItem & a_Item)
 
 AString ItemTypeToString(short a_ItemType)
 {
-	if (!g_gsBlockIDMap.m_bHasRunInit)
+	if (!g_BlockIDMap.m_bHasRunInit)
 	{
-		g_gsBlockIDMap.init();
+		g_BlockIDMap.init();
 	}
-	return g_gsBlockIDMap.Desolve(a_ItemType, -1);
+	return g_BlockIDMap.Desolve(a_ItemType, -1);
 }
 
 
