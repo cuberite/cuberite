@@ -51,7 +51,7 @@ public:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	static bool IsFlower(short a_m_ItemType, short a_m_ItemData);
+	static bool IsFlower(short a_ItemType, short a_ItemData);
 
 private:
 

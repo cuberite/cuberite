@@ -107,7 +107,7 @@ public:  // tolua_export
 	/** Formats the type of message with the proper color and prefix for sending to the client. */
 	static AString FormatMessageType(bool a_ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 
-	static AString FormatChatPrefix(bool a_ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString a_m_Color1, AString a_m_Color2);
+	static AString FormatChatPrefix(bool a_ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString a_Color1, AString a_Color2);
 
 	void Kick(const AString & a_Reason);  // tolua_export
 

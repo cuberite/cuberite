@@ -167,7 +167,7 @@ public:
 
 protected:
 	int m_ItemType;
-	static cItemHandler * CreateItemHandler(int a_m_ItemType);
+	static cItemHandler * CreateItemHandler(int a_ItemType);
 
 	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
 	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
