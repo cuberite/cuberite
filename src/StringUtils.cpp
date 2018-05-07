@@ -52,40 +52,40 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & Printf(AString & str, const char * format, fmt::ArgList args)
+AString & Printf(AString & a_str, const char * a_format, fmt::ArgList a_args)
 {
 	ASSERT(format != nullptr);
-	str = fmt::sprintf(format, args);
-	return str;
+	a_str = fmt::sprintf(a_format, a_args);
+	return a_str;
 }
 
 
 
 
 
-AString Printf(const char * format, fmt::ArgList args)
+AString Printf(const char * a_format, fmt::ArgList a_args)
 {
 	ASSERT(format != nullptr);
-	return fmt::sprintf(format, args);
+	return fmt::sprintf(a_format, a_args);
 }
 
 
 
 
 
-AStringVector StringSplit(const AString & str, const AString & delim)
+AStringVector StringSplit(const AString & a_str, const AString & a_delim)
 {
 	AStringVector results;
 	size_t cutAt = 0;
 	size_t Prev = 0;
-	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
+	while ((cutAt = a_str.find_first_of(a_delim, Prev)) != a_str.npos)
 	{
-		results.push_back(str.substr(Prev, cutAt - Prev));
+		results.push_back(a_str.substr(Prev, cutAt - Prev));
 		Prev = cutAt + 1;
 	}
-	if (Prev < str.length())
+	if (Prev < a_str.length())
 	{
-		results.push_back(str.substr(Prev));
+		results.push_back(a_str.substr(Prev));
 	}
 	return results;
 }
@@ -93,7 +93,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
-AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
+AStringVector StringSplitWithQuotes(const AString & a_str, const AString & a_delim)
 {
 	AStringVector results;
 
@@ -101,7 +101,7 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 	size_t Prev = 0;
 	size_t cutAtQuote = 0;
 
-	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
+	while ((cutAt = a_str.find_first_of(a_delim, Prev)) != a_str.npos)
 	{
 		if (cutAt == Prev)
 		{
@@ -110,14 +110,14 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 			Prev = Prev + 1;
 			continue;
 		}
-		AString current = str.substr(Prev, cutAt - Prev);
+		AString current = a_str.substr(Prev, cutAt - Prev);
 		if ((current.front() == '"') || (current.front() == '\''))
 		{
 			Prev += 1;
-			cutAtQuote = str.find_first_of(current.front(), Prev);
-			if (cutAtQuote != str.npos)
+			cutAtQuote = a_str.find_first_of(current.front(), Prev);
+			if (cutAtQuote != a_str.npos)
 			{
-				current = str.substr(Prev, cutAtQuote - Prev);
+				current = a_str.substr(Prev, cutAtQuote - Prev);
 				cutAt = cutAtQuote + 1;
 			}
 		}
@@ -126,9 +126,9 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 		Prev = cutAt + 1;
 	}
 
-	if (Prev < str.length())
+	if (Prev < a_str.length())
 	{
-		AString current = str.substr(Prev);
+		AString current = a_str.substr(Prev);
 
 		// If the remant is wrapped in matching quotes, remove them:
 		if (
@@ -185,19 +185,19 @@ AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimeter)
 
 
 
-AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
+AStringVector StringSplitAndTrim(const AString & a_str, const AString & a_delim)
 {
 	AStringVector results;
 	size_t cutAt = 0;
 	size_t Prev = 0;
-	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
+	while ((cutAt = a_str.find_first_of(a_delim, Prev)) != a_str.npos)
 	{
-		results.push_back(TrimString(str.substr(Prev, cutAt - Prev)));
+		results.push_back(TrimString(a_str.substr(Prev, cutAt - Prev)));
 		Prev = cutAt + 1;
 	}
-	if (Prev < str.length())
+	if (Prev < a_str.length())
 	{
-		results.push_back(TrimString(str.substr(Prev)));
+		results.push_back(TrimString(a_str.substr(Prev)));
 	}
 	return results;
 }
@@ -205,13 +205,13 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 
 
 
-AString TrimString(const AString & str)
+AString TrimString(const AString & a_str)
 {
-	size_t len = str.length();
+	size_t len = a_str.length();
 	size_t start = 0;
 	while (start < len)
 	{
-		if (static_cast<unsigned char>(str[start]) > 32)
+		if (static_cast<unsigned char>(a_str[start]) > 32)
 		{
 			break;
 		}
@@ -225,45 +225,45 @@ AString TrimString(const AString & str)
 	size_t end = len;
 	while (end >= start)
 	{
-		if (static_cast<unsigned char>(str[end]) > 32)
+		if (static_cast<unsigned char>(a_str[end]) > 32)
 		{
 			break;
 		}
 		--end;
 	}
 
-	return str.substr(start, end - start + 1);
+	return a_str.substr(start, end - start + 1);
 }
 
 
 
 
 
-AString & InPlaceLowercase(AString & s)
+AString & InPlaceLowercase(AString & a_s)
 {
-	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-	return s;
+	std::transform(a_s.begin(), a_s.end(), a_s.begin(), ::tolower);
+	return a_s;
 }
 
 
 
 
 
-AString & InPlaceUppercase(AString & s)
+AString & InPlaceUppercase(AString & a_s)
 {
-	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-	return s;
+	std::transform(a_s.begin(), a_s.end(), a_s.begin(), ::toupper);
+	return a_s;
 }
 
 
 
 
 
-AString StrToLower(const AString & s)
+AString StrToLower(const AString & a_s)
 {
 	AString res;
-	res.resize(s.size());
-	std::transform(s.begin(), s.end(), res.begin(), ::tolower);
+	res.resize(a_s.size());
+	std::transform(a_s.begin(), a_s.end(), res.begin(), ::tolower);
 	return res;
 }
 
@@ -271,11 +271,11 @@ AString StrToLower(const AString & s)
 
 
 
-AString StrToUpper(const AString & s)
+AString StrToUpper(const AString & a_s)
 {
 	AString res;
-	res.resize(s.size());
-	std::transform(s.begin(), s.end(), res.begin(), ::toupper);
+	res.resize(a_s.size());
+	std::transform(a_s.begin(), a_s.end(), res.begin(), ::toupper);
 	return res;
 }
 
@@ -283,12 +283,12 @@ AString StrToUpper(const AString & s)
 
 
 
-int NoCaseCompare(const AString & s1, const AString & s2)
+int NoCaseCompare(const AString & a_s1, const AString & a_s2)
 {
 	#ifdef _MSC_VER
 		return _stricmp(s1.c_str(), s2.c_str());
 	#else
-		return strcasecmp(s1.c_str(), s2.c_str());
+		return strcasecmp(a_s1.c_str(), a_s2.c_str());
 	#endif  // else _MSC_VER
 }
 
@@ -296,12 +296,12 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 
 
 
-size_t RateCompareString(const AString & s1, const AString & s2)
+size_t RateCompareString(const AString & a_s1, const AString & a_s2)
 {
 	size_t MatchedLetters = 0;
-	size_t s1Length = s1.length();
+	size_t s1Length = a_s1.length();
 
-	if (s1Length > s2.length())
+	if (s1Length > a_s2.length())
 	{
 		// Definitely not a match
 		return 0;
@@ -309,8 +309,8 @@ size_t RateCompareString(const AString & s1, const AString & s2)
 
 	for (size_t i = 0; i < s1Length; i++)
 	{
-		char c1 = static_cast<char>(toupper(s1[i]));
-		char c2 = static_cast<char>(toupper(s2[i]));
+		char c1 = static_cast<char>(toupper(a_s1[i]));
+		char c2 = static_cast<char>(toupper(a_s2[i]));
 		if (c1 == c2)
 		{
 			++MatchedLetters;
@@ -327,19 +327,19 @@ size_t RateCompareString(const AString & s1, const AString & s2)
 
 
 
-void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
+void ReplaceString(AString & a_iHayStack, const AString & a_iNeedle, const AString & a_iReplaceWith)
 {
 	// find always returns the current position for an empty needle; prevent endless loop
-	if (iNeedle.empty())
+	if (a_iNeedle.empty())
 	{
 		return;
 	}
 
-	size_t pos1 = iHayStack.find(iNeedle);
+	size_t pos1 = a_iHayStack.find(a_iNeedle);
 	while (pos1 != AString::npos)
 	{
-		iHayStack.replace( pos1, iNeedle.size(), iReplaceWith);
-		pos1 = iHayStack.find(iNeedle, pos1 + iReplaceWith.size());
+		a_iHayStack.replace( pos1, a_iNeedle.size(), a_iReplaceWith);
+		pos1 = a_iHayStack.find(a_iNeedle, pos1 + a_iReplaceWith.size());
 	}
 }
 
@@ -449,7 +449,7 @@ Notice from the original file:
 
 
 
-static const Byte trailingBytesForUTF8[256] =
+static const Byte g_trailingBytesForUTF8[256] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -465,7 +465,7 @@ static const Byte trailingBytesForUTF8[256] =
 
 
 
-static const unsigned int offsetsFromUTF8[6] =
+static const unsigned int g_offsetsFromUTF8[6] =
 {
 	0x00000000UL, 0x00003080UL, 0x000E2080UL,
 	0x03C82080UL, 0xFA082080UL, 0x82082080UL
@@ -475,11 +475,11 @@ static const unsigned int offsetsFromUTF8[6] =
 
 
 
-static bool isLegalUTF8(const unsigned char * source, int length)
+static bool isLegalUTF8(const unsigned char * a_source, int a_length)
 {
 	unsigned char a;
-	const unsigned char * srcptr = source + length;
-	switch (length)
+	const unsigned char * srcptr = a_source + a_length;
+	switch (a_length)
 	{
 		default: return false;
 		// Everything else falls through when "true"...
@@ -491,7 +491,7 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 			{
 				return false;
 			}
-			switch (*source)
+			switch (*a_source)
 			{
 				// no fall-through in this inner switch
 				case 0xe0: if (a < 0xa0) return false; break;
@@ -501,9 +501,9 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 				default:   if (a < 0x80) return false;
 			}
 		}
-		case 1: if ((*source >= 0x80) && (*source < 0xc2)) return false;
+		case 1: if ((*a_source >= 0x80) && (*a_source < 0xc2)) return false;
 	}
-	if (*source > 0xf4)
+	if (*a_source > 0xf4)
 	{
 		return false;
 	}
@@ -528,7 +528,7 @@ std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 	while (source < sourceEnd)
 	{
 		unsigned int ch = 0;
-		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+		unsigned short extraBytesToRead = g_trailingBytesForUTF8[*source];
 		if (source + extraBytesToRead >= sourceEnd)
 		{
 			return UTF16;
@@ -549,7 +549,7 @@ std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 			case 1: ch += *source++; ch <<= 6;
 			case 0: ch += *source++;
 		}
-		ch -= offsetsFromUTF8[extraBytesToRead];
+		ch -= g_offsetsFromUTF8[extraBytesToRead];
 
 		if (ch <= UNI_MAX_BMP)
 		{
@@ -824,29 +824,29 @@ AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_
 
 
 /** Converts one Hex character in a Base64 encoding into the data value */
-static inline int UnBase64(char c)
+static inline int UnBase64(char a_c)
 {
-	if ((c >='A') && (c <= 'Z'))
+	if ((a_c >='A') && (a_c <= 'Z'))
 	{
-		return c - 'A';
+		return a_c - 'A';
 	}
-	if ((c >='a') && (c <= 'z'))
+	if ((a_c >='a') && (a_c <= 'z'))
 	{
-		return c - 'a' + 26;
+		return a_c - 'a' + 26;
 	}
-	if ((c >= '0') && (c <= '9'))
+	if ((a_c >= '0') && (a_c <= '9'))
 	{
-		return c - '0' + 52;
+		return a_c - '0' + 52;
 	}
-	if (c == '+')
+	if (a_c == '+')
 	{
 		return 62;
 	}
-	if (c == '/')
+	if (a_c == '/')
 	{
 		return 63;
 	}
-	if (c == '=')
+	if (a_c == '=')
 	{
 		return -1;
 	}

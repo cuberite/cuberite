@@ -60,7 +60,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // The arrays to use for the top block pattern definitions:
 
-static cPattern::BlockInfo tbGrass[] =
+static cPattern::BlockInfo g_tbGrass[] =
 {
 	{E_BLOCK_GRASS, 0},
 	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
@@ -68,7 +68,7 @@ static cPattern::BlockInfo tbGrass[] =
 	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbSand[] =
+static cPattern::BlockInfo g_tbSand[] =
 {
 	{ E_BLOCK_SAND, 0},
 	{ E_BLOCK_SAND, 0},
@@ -76,7 +76,7 @@ static cPattern::BlockInfo tbSand[] =
 	{ E_BLOCK_SANDSTONE, 0},
 } ;
 
-static cPattern::BlockInfo tbDirt[] =
+static cPattern::BlockInfo g_tbDirt[] =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -84,7 +84,7 @@ static cPattern::BlockInfo tbDirt[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbPodzol[] =
+static cPattern::BlockInfo g_tbPodzol[] =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -92,7 +92,7 @@ static cPattern::BlockInfo tbPodzol[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbGrassLess[] =
+static cPattern::BlockInfo g_tbGrassLess[] =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -100,7 +100,7 @@ static cPattern::BlockInfo tbGrassLess[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbMycelium[] =
+static cPattern::BlockInfo g_tbMycelium[] =
 {
 	{E_BLOCK_MYCELIUM, 0},
 	{E_BLOCK_DIRT,     0},
@@ -108,7 +108,7 @@ static cPattern::BlockInfo tbMycelium[] =
 	{E_BLOCK_DIRT,     0},
 } ;
 
-static cPattern::BlockInfo tbGravel[] =
+static cPattern::BlockInfo g_tbGravel[] =
 {
 	{E_BLOCK_GRAVEL, 0},
 	{E_BLOCK_GRAVEL, 0},
@@ -116,7 +116,7 @@ static cPattern::BlockInfo tbGravel[] =
 	{E_BLOCK_STONE,  0},
 } ;
 
-static cPattern::BlockInfo tbStone[] =
+static cPattern::BlockInfo g_tbStone[] =
 {
 	{E_BLOCK_STONE,   0},
 	{E_BLOCK_STONE,   0},
@@ -129,7 +129,7 @@ static cPattern::BlockInfo tbStone[] =
 ////////////////////////////////////////////////////////////////////////////////
 // Ocean floor pattern top-block definitions:
 
-static cPattern::BlockInfo tbOFSand[] =
+static cPattern::BlockInfo g_tbOFSand[] =
 {
 	{E_BLOCK_SAND, 0},
 	{E_BLOCK_SAND, 0},
@@ -137,7 +137,7 @@ static cPattern::BlockInfo tbOFSand[] =
 	{E_BLOCK_SANDSTONE, 0}
 } ;
 
-static cPattern::BlockInfo tbOFClay[] =
+static cPattern::BlockInfo g_tbOFClay[] =
 {
 	{ E_BLOCK_CLAY, 0},
 	{ E_BLOCK_CLAY, 0},
@@ -145,7 +145,7 @@ static cPattern::BlockInfo tbOFClay[] =
 	{ E_BLOCK_SAND, 0},
 } ;
 
-static cPattern::BlockInfo tbOFOrangeClay[] =
+static cPattern::BlockInfo g_tbOFOrangeClay[] =
 {
 	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
 	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
@@ -160,18 +160,18 @@ static cPattern::BlockInfo tbOFOrangeClay[] =
 ////////////////////////////////////////////////////////////////////////////////
 // Individual patterns to use:
 
-static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
-static cPattern patSand     (tbSand,      ARRAYCOUNT(tbSand));
-static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
-static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
-static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
-static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
-static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
-static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
+static cPattern g_patGrass    (g_tbGrass,     ARRAYCOUNT(g_tbGrass));
+static cPattern g_patSand     (g_tbSand,      ARRAYCOUNT(g_tbSand));
+static cPattern g_patDirt     (g_tbDirt,      ARRAYCOUNT(g_tbDirt));
+static cPattern g_patPodzol   (g_tbPodzol,    ARRAYCOUNT(g_tbPodzol));
+static cPattern g_patGrassLess(g_tbGrassLess, ARRAYCOUNT(g_tbGrassLess));
+static cPattern g_patMycelium (g_tbMycelium,  ARRAYCOUNT(g_tbMycelium));
+static cPattern g_patGravel   (g_tbGravel,    ARRAYCOUNT(g_tbGravel));
+static cPattern g_patStone    (g_tbStone,     ARRAYCOUNT(g_tbStone));
 
-static cPattern patOFSand      (tbOFSand,       ARRAYCOUNT(tbOFSand));
-static cPattern patOFClay      (tbOFClay,       ARRAYCOUNT(tbOFClay));
-static cPattern patOFOrangeClay(tbOFOrangeClay, ARRAYCOUNT(tbOFOrangeClay));
+static cPattern g_patOFSand      (g_tbOFSand,       ARRAYCOUNT(g_tbOFSand));
+static cPattern g_patOFClay      (g_tbOFClay,       ARRAYCOUNT(g_tbOFClay));
+static cPattern g_patOFOrangeClay(g_tbOFOrangeClay, ARRAYCOUNT(g_tbOFOrangeClay));
 
 
 
@@ -354,7 +354,7 @@ protected:
 			case biSavannaM:
 			case biSavannaPlateauM:
 			{
-				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patGrass.Get(), a_ShapeColumn);
+				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, g_patGrass.Get(), a_ShapeColumn);
 				return;
 			}
 
@@ -367,7 +367,7 @@ protected:
 				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
 				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-				const cPattern::BlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
+				const cPattern::BlockInfo * Pattern = (Val < -0.9) ? g_patGrassLess.Get() : ((Val > 0) ? g_patPodzol.Get() : g_patGrass.Get());
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
@@ -377,14 +377,14 @@ protected:
 			case biDesertM:
 			case biBeach:
 			{
-				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patSand.Get(), a_ShapeColumn);
+				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, g_patSand.Get(), a_ShapeColumn);
 				return;
 			}
 
 			case biMushroomIsland:
 			case biMushroomShore:
 			{
-				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patMycelium.Get(), a_ShapeColumn);
+				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, g_patMycelium.Get(), a_ShapeColumn);
 				return;
 			}
 
@@ -409,7 +409,7 @@ protected:
 				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
 				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-				const cPattern::BlockInfo * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
+				const cPattern::BlockInfo * Pattern = (Val < 0.0) ? g_patStone.Get() : g_patGrass.Get();
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
@@ -469,7 +469,7 @@ protected:
 			// Select the ocean-floor pattern to use:
 			if (a_ChunkDesc.GetBiome(a_RelX, a_RelZ) == biDeepOcean)
 			{
-				a_Pattern = patGravel.Get();
+				a_Pattern = g_patGravel.Get();
 			}
 			else
 			{
@@ -493,7 +493,7 @@ protected:
 		if (Top < m_SeaLevel)
 		{
 			// The terrain is below sealevel, handle as regular ocean with red sand floor:
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patOFOrangeClay.Get(), a_ShapeColumn);
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, g_patOFOrangeClay.Get(), a_ShapeColumn);
 			return;
 		}
 
@@ -586,15 +586,15 @@ protected:
 		NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
 		if (Val < -0.95)
 		{
-			return patOFClay.Get();
+			return g_patOFClay.Get();
 		}
 		else if (Val < 0)
 		{
-			return patOFSand.Get();
+			return g_patOFSand.Get();
 		}
 		else
 		{
-			return patDirt.Get();
+			return g_patDirt.Get();
 		}
 	}
 } ;

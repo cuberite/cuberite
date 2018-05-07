@@ -1030,18 +1030,18 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 
 
 
-bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
+bool cMinecart::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(TDI.Attacker)->IsGameModeCreative())
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
-		TDI.FinalDamage = static_cast<int>(GetMaxHealth());  // Instant hit for creative
+		a_TDI.FinalDamage = static_cast<int>(GetMaxHealth());  // Instant hit for creative
 		SetInvulnerableTicks(0);
-		return super::DoTakeDamage(TDI);  // No drops for creative
+		return super::DoTakeDamage(a_TDI);  // No drops for creative
 	}
 
-	m_LastDamage = TDI.FinalDamage;
-	if (!super::DoTakeDamage(TDI))
+	m_LastDamage = a_TDI.FinalDamage;
+	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -1266,9 +1266,9 @@ void cMinecartWithChest::Destroyed()
 	auto posX = GetPosX();
 	auto posY = GetPosY() + 1;
 	auto posZ = GetPosZ();
-	GetWorld()->ScheduleTask(1, [Pickups, posX, posY, posZ](cWorld & World)
+	GetWorld()->ScheduleTask(1, [Pickups, posX, posY, posZ](cWorld & a_World)
 	{
-		World.SpawnItemPickups(Pickups, posX, posY, posZ, 4);
+		a_World.SpawnItemPickups(Pickups, posX, posY, posZ, 4);
 	});
 }
 

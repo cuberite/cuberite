@@ -11,10 +11,10 @@
 
 
 
-cVillager::cVillager(eVillagerType VillagerType) :
+cVillager::cVillager(eVillagerType a_VillagerType) :
 	super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", 0.6, 1.8),
 	m_ActionCountDown(-1),
-	m_Type(VillagerType),
+	m_Type(a_VillagerType),
 	m_VillagerAction(false)
 {
 }

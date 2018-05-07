@@ -27,9 +27,9 @@ public:
 			Output.m_ItemType = E_ITEM_POTION;
 		}
 
-		cItem Input;
-		cItem Output;
-		cItem Ingredient;
+		cItem m_Input;
+		cItem m_Output;
+		cItem m_Ingredient;
 	};
 
 	/** Returns a recipe for the specified input, nullptr if no recipe found */

@@ -19,13 +19,13 @@ class cTracer
 public:
 
 	/** Contains the position of the block that caused the collision */
-	Vector3f BlockHitPosition;
+	Vector3f m_BlockHitPosition;
 
 	/** Contains which face was hit */
-	Vector3f HitNormal;
+	Vector3f m_HitNormal;
 
 	/** Contains the exact position where a collision occured. (BlockHitPosition + Offset on block) */
-	Vector3f RealHit;
+	Vector3f m_RealHit;
 
 
 	cTracer(cWorld * a_World);

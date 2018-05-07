@@ -85,9 +85,9 @@ void cFlowerPotEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
+bool cFlowerPotEntity::IsFlower(short a_m_ItemType, short a_m_ItemData)
 {
-	switch (m_ItemType)
+	switch (a_m_ItemType)
 	{
 		case E_BLOCK_DANDELION:
 		case E_BLOCK_FLOWER:
@@ -101,7 +101,7 @@ bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 		}
 		case E_BLOCK_TALL_GRASS:
 		{
-			return (m_ItemData == static_cast<short>(2));
+			return (a_m_ItemData == static_cast<short>(2));
 		}
 		default:
 		{

@@ -16,28 +16,28 @@
 /** Discriminator byte values prefixing the FML|HS packets to determine their type. */
 namespace Discriminator
 {
-	static const Int8 ServerHello = 0;
-	static const Int8 ClientHello = 1;
-	static const Int8 ModList = 2;
-	static const Int8 RegistryData = 3;
+	static const Int8 g_ServerHello = 0;
+	static const Int8 g_ClientHello = 1;
+	static const Int8 g_ModList = 2;
+	static const Int8 g_RegistryData = 3;
 	// static const Int8 HandshakeReset = -2;
-	static const Int8 HandshakeAck = -1;
+	static const Int8 g_HandshakeAck = -1;
 }
 
 /** Client handshake state phases. */
 namespace ClientPhase
 {
-	static const Int8 WAITINGSERVERDATA = 2;
-	static const Int8 WAITINGSERVERCOMPLETE = 3;
-	static const Int8 PENDINGCOMPLETE = 4;
-	static const Int8 COMPLETE = 5;
+	static const Int8 g_WAITINGSERVERDATA = 2;
+	static const Int8 g_WAITINGSERVERCOMPLETE = 3;
+	static const Int8 g_PENDINGCOMPLETE = 4;
+	static const Int8 g_COMPLETE = 5;
 }
 
 /** Server handshake state phases. */
 namespace ServerPhase
 {
-	static const Int8 WAITINGCACK = 2;
-	static const Int8 COMPLETE = 3;
+	static const Int8 g_WAITINGCACK = 2;
+	static const Int8 g_COMPLETE = 3;
 }
 
 
@@ -55,7 +55,7 @@ cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
 
 
 
-void cForgeHandshake::SetError(const AString & message)
+void cForgeHandshake::SetError(const AString & a_message)
 {
 	LOGD("Forge handshake error: %s", message.c_str());
 	m_Errored = true;
@@ -126,7 +126,7 @@ void cForgeHandshake::SendServerHello()
 	AString Message;
 	cByteBuffer Buf(6);
 	// Discriminator | Byte | Always 0 for ServerHello
-	Buf.WriteBEInt8(Discriminator::ServerHello);
+	Buf.WriteBEInt8(Discriminator::g_ServerHello);
 	// FML protocol Version | Byte | Determined from NetworkRegistery. Currently 2.
 	Buf.WriteBEInt8(2);
 	// Dimension TODO
@@ -232,7 +232,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 	cByteBuffer Buf(256 * ModCount);
 
-	Buf.WriteBEInt8(Discriminator::ModList);
+	Buf.WriteBEInt8(Discriminator::g_ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
 	for (const auto & item: ServerMods)
 	{
@@ -261,10 +261,10 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 
 	switch (Phase)
 	{
-		case ClientPhase::WAITINGSERVERDATA:
+		case ClientPhase::g_WAITINGSERVERDATA:
 		{
 			cByteBuffer Buf(1024);
-			Buf.WriteBEInt8(Discriminator::RegistryData);
+			Buf.WriteBEInt8(Discriminator::g_RegistryData);
 
 			// TODO: send real registry data
 			bool HasMore = false;
@@ -285,30 +285,30 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * 
 			break;
 		}
 
-		case ClientPhase::WAITINGSERVERCOMPLETE:
+		case ClientPhase::g_WAITINGSERVERCOMPLETE:
 		{
 			LOGD("Client finished receiving registry data; acknowledging");
 
 			AString Ack;
-			Ack.push_back(Discriminator::HandshakeAck);
-			Ack.push_back(ServerPhase::WAITINGCACK);
+			Ack.push_back(Discriminator::g_HandshakeAck);
+			Ack.push_back(ServerPhase::g_WAITINGCACK);
 			m_Client->SendPluginMessage("FML|HS", Ack);
 			break;
 		}
 
-		case ClientPhase::PENDINGCOMPLETE:
+		case ClientPhase::g_PENDINGCOMPLETE:
 		{
 			LOGD("Client is pending completion; sending complete ack");
 
 			AString Ack;
-			Ack.push_back(Discriminator::HandshakeAck);
-			Ack.push_back(ServerPhase::COMPLETE);
+			Ack.push_back(Discriminator::g_HandshakeAck);
+			Ack.push_back(ServerPhase::g_COMPLETE);
 			m_Client->SendPluginMessage("FML|HS", Ack);
 
 			break;
 		}
 
-		case ClientPhase::COMPLETE:
+		case ClientPhase::g_COMPLETE:
 		{
 			// Now finish logging in
 			m_Client->FinishAuthenticate(m_Name, m_UUID, m_Properties);
@@ -350,9 +350,9 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 	switch (Discriminator)
 	{
-		case Discriminator::ClientHello:  HandleClientHello(a_Client, a_Data, a_Size); break;
-		case Discriminator::ModList:      HandleModList(a_Client, a_Data, a_Size); break;
-		case Discriminator::HandshakeAck: HandleHandshakeAck(a_Client, a_Data, a_Size); break;
+		case Discriminator::g_ClientHello:  HandleClientHello(a_Client, a_Data, a_Size); break;
+		case Discriminator::g_ModList:      HandleModList(a_Client, a_Data, a_Size); break;
+		case Discriminator::g_HandshakeAck: HandleHandshakeAck(a_Client, a_Data, a_Size); break;
 
 		default:
 		{

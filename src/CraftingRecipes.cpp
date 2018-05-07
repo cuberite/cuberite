@@ -66,53 +66,53 @@ cCraftingGrid::~cCraftingGrid()
 
 
 
-cItem & cCraftingGrid::GetItem(int x, int y) const
+cItem & cCraftingGrid::GetItem(int a_x, int a_y) const
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((a_x < 0) || (a_x >= m_Width) || (a_y < 0) || (a_y >= m_Height))
 	{
 		LOGERROR("Attempted to get an invalid item from a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
-			x, y, m_Width, m_Height
+			a_x, a_y, m_Width, m_Height
 		);
 		return m_Items[0];
 	}
-	return m_Items[x + m_Width * y];
+	return m_Items[a_x + m_Width * a_y];
 }
 
 
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int a_x, int a_y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((a_x < 0) || (a_x >= m_Width) || (a_y < 0) || (a_y >= m_Height))
 	{
 		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
-			x, y, m_Width, m_Height
+			a_x, a_y, m_Width, m_Height
 		);
 		return;
 	}
 
-	m_Items[x + m_Width * y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	m_Items[a_x + m_Width * a_y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }
 
 
 
 
 
-void cCraftingGrid::SetItem(int x, int y, const cItem & a_Item)
+void cCraftingGrid::SetItem(int a_x, int a_y, const cItem & a_Item)
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((a_x < 0) || (a_x >= m_Width) || (a_y < 0) || (a_y >= m_Height))
 	{
 		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
-			x, y, m_Width, m_Height
+			a_x, a_y, m_Width, m_Height
 		);
 		return;
 	}
 
-	m_Items[x + m_Width * y] = a_Item;
+	m_Items[a_x + m_Width * a_y] = a_Item;
 }
 
 

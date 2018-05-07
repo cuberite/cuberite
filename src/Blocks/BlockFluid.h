@@ -87,7 +87,7 @@ public:
 	}
 
 	/** Called to tick the block */
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & a_cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		if (a_Chunk.GetWorld()->ShouldLavaSpawnFire())
 		{
@@ -122,7 +122,7 @@ public:
 		// Try to set it on fire:
 		static struct
 		{
-			int x, y, z;
+			int m_x, m_y, m_z;
 		} CrossCoords[] =
 		{
 			{-1,  0,  0},

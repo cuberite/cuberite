@@ -111,7 +111,7 @@ private:
 
 	eStatistic m_Depends;
 
-	static cStatInfo ms_Info[statCount];
+	static cStatInfo m_ms_Info[statCount];
 };
 
 

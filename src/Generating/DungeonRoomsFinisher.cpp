@@ -14,7 +14,7 @@
 
 
 /** Height, in blocks, of the internal dungeon room open space. This many air blocks Y-wise. */
-static const int ROOM_HEIGHT = 4;
+static const int g_ROOM_HEIGHT = 4;
 
 
 
@@ -249,7 +249,7 @@ protected:
 		}
 
 		int b = m_FloorHeight + 1;  // Bottom
-		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
+		int t = m_FloorHeight + 1 + g_ROOM_HEIGHT;  // Top
 		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
 		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, E_BLOCK_AIR);  // Insides
 

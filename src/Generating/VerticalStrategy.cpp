@@ -12,7 +12,7 @@
 
 
 // Constant that is added to random seed
-static const int SEED_OFFSET = 135;
+static const int g_SEED_OFFSET = 135;
 
 
 
@@ -159,7 +159,7 @@ public:
 
 	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_Seed = a_Seed + SEED_OFFSET;
+		m_Seed = a_Seed + g_SEED_OFFSET;
 	}
 
 protected:
@@ -206,7 +206,7 @@ public:
 
 	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
 	{
-		m_Seed = a_Seed + SEED_OFFSET;
+		m_Seed = a_Seed + g_SEED_OFFSET;
 		m_HeightGen = a_HeightGen;
 	}
 
@@ -262,7 +262,7 @@ public:
 
 	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
 	{
-		m_Seed = a_Seed + SEED_OFFSET;
+		m_Seed = a_Seed + g_SEED_OFFSET;
 		m_HeightGen = a_HeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}

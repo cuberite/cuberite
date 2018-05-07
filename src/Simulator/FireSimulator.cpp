@@ -40,7 +40,7 @@
 	#pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
-static const Vector3i gCrossCoords[] =
+static const Vector3i g_gCrossCoords[] =
 {
 	{ 1, 0,  0},
 	{-1, 0,  0},
@@ -52,7 +52,7 @@ static const Vector3i gCrossCoords[] =
 
 
 
-static const Vector3i gNeighborCoords[] =
+static const Vector3i g_gNeighborCoords[] =
 {
 	{ 1,  0,  0},
 	{-1,  0,  0},
@@ -121,10 +121,10 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
-		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
-			[this, AbsPos](Vector3i cc)
+		auto Raining = std::any_of(std::begin(g_gCrossCoords), std::end(g_gCrossCoords),
+			[this, AbsPos](Vector3i a_cc)
 			{
-				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
+				return (m_World.IsWeatherWetAtXYZ(AbsPos + a_cc));
 			}
 		);
 
@@ -298,11 +298,11 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(g_gCrossCoords); i++)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
-		if (a_Chunk->UnboundedRelGetBlock(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockType, BlockMeta))
+		if (a_Chunk->UnboundedRelGetBlock(a_RelX + g_gCrossCoords[i].x, a_RelY, a_RelZ + g_gCrossCoords[i].z, BlockType, BlockMeta))
 		{
 			if (IsFuel(BlockType))
 			{
@@ -380,7 +380,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	for (auto & Coord : gNeighborCoords)
+	for (auto & Coord : g_gNeighborCoords)
 	{
 		BLOCKTYPE  BlockType;
 		int X = a_RelX + Coord.x;
@@ -441,9 +441,9 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		return false;
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(g_gNeighborCoords); i++)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + g_gNeighborCoords[i].x, a_RelY + g_gNeighborCoords[i].y, a_RelZ + g_gNeighborCoords[i].z, BlockType, BlockMeta))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;

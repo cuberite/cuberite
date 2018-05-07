@@ -19,7 +19,7 @@ public :
 	a_MobFamily is the Family of mobs that this spawner will spawn
 	a_AllowedTypes is the set of types allowed for mobs it will spawn. Empty set would result in no spawn at all
 	Allowed mobs thah are not of the right Family will not be include (no warning). */
-	cMobSpawner(cMonster::eFamily MobFamily, const std::set<eMonsterType> & a_AllowedTypes);
+	cMobSpawner(cMonster::eFamily a_MobFamily, const std::set<eMonsterType> & a_AllowedTypes);
 
 	/** Check if specified block can be a Pack center for this spawner */
 	bool CheckPackCenter(BLOCKTYPE a_BlockType);
@@ -28,7 +28,7 @@ public :
 	If this is the first of a Pack, determine the type of monster
 	a_Biome, BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
 	a_MaxPackSize is set to the maximal size for a pack this type of mob */
-	cMonster * TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
+	cMonster * TryToSpawnHere(cChunk * a_Chunk, int a_A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
 
 	/** Mark the beginning of a new Pack.
 	All mobs of the same Pack are the same type */

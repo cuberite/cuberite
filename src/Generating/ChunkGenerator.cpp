@@ -13,10 +13,10 @@
 
 
 /** If the generation queue size exceeds this number, a warning will be output */
-const unsigned int QUEUE_WARNING_LIMIT = 1000;
+const unsigned int g_QUEUE_WARNING_LIMIT = 1000;
 
 /** If the generation queue size exceeds this number, chunks with no clients will be skipped */
-const unsigned int QUEUE_SKIP_LIMIT = 500;
+const unsigned int g_QUEUE_SKIP_LIMIT = 500;
 
 
 
@@ -116,7 +116,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 		cCSLock Lock(m_CS);
 
 		// Add to queue, issue a warning if too many:
-		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
+		if (m_Queue.size() >= g_QUEUE_WARNING_LIMIT)
 		{
 			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%zu)", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
@@ -231,7 +231,7 @@ void cChunkGenerator::Execute(void)
 		}
 
 		cQueueItem item = m_Queue.front();  // Get next chunk from the queue
-		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
+		bool SkipEnabled = (m_Queue.size() > g_QUEUE_SKIP_LIMIT);
 		m_Queue.erase(m_Queue.begin());  // Remove the item from the queue
 		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();

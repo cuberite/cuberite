@@ -115,7 +115,7 @@ public:
 				Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
 				static const struct
 				{
-					int x, z;
+					int m_x, m_z;
 				} Coords[] =
 				{
 					{ 1,  0},  // east,  XP

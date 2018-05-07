@@ -38,10 +38,10 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
+bool cBoat::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	m_LastDamage = 10;
-	if (!super::DoTakeDamage(TDI))
+	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -50,9 +50,9 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 	if (GetHealth() <= 0)
 	{
-		if (TDI.Attacker != nullptr)
+		if (a_TDI.Attacker != nullptr)
 		{
-			if (TDI.Attacker->IsPlayer())
+			if (a_TDI.Attacker->IsPlayer())
 			{
 				cItems Pickups;
 				Pickups.Add(MaterialToItem(m_Material));
@@ -153,9 +153,9 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 
 
-void cBoat::SetLastDamage(int TimeSinceLastHit)
+void cBoat::SetLastDamage(int a_TimeSinceLastHit)
 {
-	m_LastDamage = TimeSinceLastHit;
+	m_LastDamage = a_TimeSinceLastHit;
 }
 
 

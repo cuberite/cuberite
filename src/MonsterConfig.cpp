@@ -26,8 +26,8 @@ struct cMonsterConfig::sAttributesStruct
 
 struct cMonsterConfig::sMonsterConfigState
 {
-	AString MonsterTypes;
-	std::list< sAttributesStruct > AttributesList;
+	AString m_MonsterTypes;
+	std::list< sAttributesStruct > m_AttributesList;
 };
 
 

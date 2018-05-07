@@ -21,16 +21,16 @@ public:
 
 	struct cFuel
 	{
-		cItem * In;
-		int BurnTime;  ///< How long this fuel burns, in ticks
+		cItem * m_In;
+		int m_BurnTime;  ///< How long this fuel burns, in ticks
 	};
 
 	struct cRecipe
 	{
-		cItem * In;
-		cItem * Out;
-		int CookTime;  ///< How long this recipe takes to smelt, in ticks
-		float Reward;  ///< Experience reward for creating 1 of this item
+		cItem * m_In;
+		cItem * m_Out;
+		int m_CookTime;  ///< How long this recipe takes to smelt, in ticks
+		float m_Reward;  ///< Experience reward for creating 1 of this item
 	};
 
 	/** Returns a recipe for the specified input, nullptr if no recipe found */

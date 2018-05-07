@@ -52,16 +52,16 @@ static AString PrintAddress(SOCKET_ADDRESS & a_Addr)
 
 #elif !defined(ANDROID)  // _WIN32
 
-static AString PrintAddress(ifaddrs * InterfaceAddress)
+static AString PrintAddress(ifaddrs * a_InterfaceAddress)
 {
-	switch (InterfaceAddress->ifa_addr->sa_family)
+	switch (a_InterfaceAddress->ifa_addr->sa_family)
 	{
 		case AF_INET:
 		{  // IPv4
 			char AddressBuffer[INET_ADDRSTRLEN];
 			sockaddr_in InternetSocket;
 
-			std::memcpy(&InternetSocket, InterfaceAddress->ifa_addr, sizeof(InternetSocket));
+			std::memcpy(&InternetSocket, a_InterfaceAddress->ifa_addr, sizeof(InternetSocket));
 			inet_ntop(AF_INET, &InternetSocket.sin_addr, AddressBuffer, INET_ADDRSTRLEN);
 			return AddressBuffer;
 		}
@@ -70,13 +70,13 @@ static AString PrintAddress(ifaddrs * InterfaceAddress)
 			char AddressBuffer[INET6_ADDRSTRLEN];
 			sockaddr_in6 InternetSocket;
 
-			std::memcpy(&InternetSocket, InterfaceAddress->ifa_addr, sizeof(InternetSocket));
+			std::memcpy(&InternetSocket, a_InterfaceAddress->ifa_addr, sizeof(InternetSocket));
 			inet_ntop(AF_INET6, &InternetSocket.sin6_addr, AddressBuffer, INET6_ADDRSTRLEN);
 			return AddressBuffer;
 		}
 		default:
 		{
-			LOG("Unknown address family: %i", InterfaceAddress->ifa_addr->sa_family);
+			LOG("Unknown address family: %i", a_InterfaceAddress->ifa_addr->sa_family);
 			return "";
 		}
 	}

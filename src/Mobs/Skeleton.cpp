@@ -9,9 +9,9 @@
 
 
 
-cSkeleton::cSkeleton(bool IsWither) :
+cSkeleton::cSkeleton(bool a_IsWither) :
 	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
-	m_bIsWither(IsWither)
+	m_bIsWither(a_IsWither)
 {
 	SetBurnsInDaylight(true);
 }

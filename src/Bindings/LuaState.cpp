@@ -37,13 +37,13 @@ extern "C"
 // fwd: "SQLite/lsqlite3.c"
 extern "C"
 {
-	int luaopen_lsqlite3(lua_State * L);
+	int luaopen_lsqlite3(lua_State * a_L);
 }
 
 // fwd: "LuaExpat/lxplib.c":
 extern "C"
 {
-	int luaopen_lxp(lua_State * L);
+	int luaopen_lxp(lua_State * a_L);
 }
 
 
@@ -2005,7 +2005,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
+int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList a_argp)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -2013,7 +2013,7 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
 	VERIFY(lua_getinfo(m_LuaState, "n", &entry));
 
 	// Compose the error message:
-	AString msg = Printf(a_MsgFormat, argp);
+	AString msg = Printf(a_MsgFormat, a_argp);
 	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
 
 	// Log everything into the console:

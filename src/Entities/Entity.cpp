@@ -599,7 +599,7 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
-void cEntity::ApplyArmorDamage(int DamageBlocked)
+void cEntity::ApplyArmorDamage(int a_DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
 	return;
@@ -938,7 +938,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		static const struct
 		{
-			int x, y, z;
+			int m_x, m_y, m_z;
 		} gCrossCoords[] =
 		{
 			{ 1, 0,  0},

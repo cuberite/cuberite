@@ -15,9 +15,9 @@
 
 // 2D and 3D Interpolation is optimized by precalculating the ratios into static-sized arrays
 // These arrays enforce a max size of the dest array, but the limits are settable here:
-const int MAX_INTERPOL_SIZEX = 256;  ///< Maximum X-size of the interpolated array
-const int MAX_INTERPOL_SIZEY = 512;  ///< Maximum Y-size of the interpolated array
-const int MAX_INTERPOL_SIZEZ = 256;  ///< Maximum Z-size of the interpolated array
+const int g_MAX_INTERPOL_SIZEX = 256;  ///< Maximum X-size of the interpolated array
+const int g_MAX_INTERPOL_SIZEY = 512;  ///< Maximum Y-size of the interpolated array
+const int g_MAX_INTERPOL_SIZEZ = 256;  ///< Maximum Z-size of the interpolated array
 
 
 

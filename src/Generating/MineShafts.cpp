@@ -1024,8 +1024,8 @@ void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 {
 	struct
 	{
-		int x, y, z;
-		eDirection dir;
+		int m_x, m_y, m_z;
+		eDirection m_dir;
 	} Exits[] =
 	{
 		// Bottom level:

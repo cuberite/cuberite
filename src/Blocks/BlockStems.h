@@ -23,7 +23,7 @@ public:
 		a_Pickups.push_back(cItem(ItemType, 1, 0));
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & a_cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
 		if (Action == paGrowth)

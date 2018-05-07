@@ -27,9 +27,9 @@
 // tolua_begin
 struct HTTPFormData
 {
-	std::string Name;
-	std::string Value;
-	std::string Type;
+	std::string m_Name;
+	std::string m_Value;
+	std::string m_Type;
 } ;
 // tolua_end
 
@@ -43,27 +43,27 @@ struct HTTPRequest
 	typedef std::map< std::string, HTTPFormData > FormDataMap;
 
 	/** The entire URL presented to the HTTP server. */
-	AString URL;
+	AString m_URL;
 
 	/** HTTP method used for the request ("GET", "POST" etc.) */
-	AString Method;
+	AString m_Method;
 
 	/** The Path part of the request's URL (excluding GET params). */
-	AString Path;
+	AString m_Path;
 
 	/** Name of the logged-in user. Empty if not logged in. */
-	AString Username;
+	AString m_Username;
 
 	// tolua_end
 
 	/** Parameters given in the URL, after the questionmark */
-	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap m_Params;     // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method) */
-	StringStringMap PostParams;  // >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap m_PostParams;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Same as PostParams */
-	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
+	FormDataMap m_FormData;       // >> EXPORTED IN MANUALBINDINGS <<
 } ;  // tolua_export
 
 
@@ -73,7 +73,7 @@ struct HTTPRequest
 // tolua_begin
 struct HTTPTemplateRequest
 {
-	HTTPRequest Request;
+	HTTPRequest m_Request;
 } ;
 // tolua_end
 
@@ -83,11 +83,11 @@ struct HTTPTemplateRequest
 
 struct sWebAdminPage
 {
-	AString Content;
-	AString PluginName;
-	AString TabTitle;
-	AString TabUrlPath;
-	AString ContentType;
+	AString m_Content;
+	AString m_PluginName;
+	AString m_TabTitle;
+	AString m_TabUrlPath;
+	AString m_ContentType;
 };
 
 

@@ -14,7 +14,7 @@
 
 
 /** Number of milliseconds per cycle */
-const int CYCLE_MILLISECONDS = 100;
+const int g_CYCLE_MILLISECONDS = 100;
 
 
 
@@ -109,7 +109,7 @@ void cDeadlockDetect::Execute(void)
 			}
 		);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_MILLISECONDS));
+		std::this_thread::sleep_for(std::chrono::milliseconds(g_CYCLE_MILLISECONDS));
 	}  // while (should run)
 }
 
@@ -141,7 +141,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 	if (WorldAge.m_Age == a_Age)
 	{
 		WorldAge.m_NumCyclesSame += 1;
-		if (WorldAge.m_NumCyclesSame > (m_IntervalSec * 1000) / CYCLE_MILLISECONDS)
+		if (WorldAge.m_NumCyclesSame > (m_IntervalSec * 1000) / g_CYCLE_MILLISECONDS)
 		{
 			DeadlockDetected(a_WorldName, a_Age);
 		}

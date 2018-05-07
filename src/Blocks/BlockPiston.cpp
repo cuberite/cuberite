@@ -104,9 +104,9 @@ void cBlockPistonHandler::PushBlocks(
 	// Sort blocks to move the blocks first, which are farest away from the piston
 	// This prevents the overwriting of existing blocks
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
+	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a_a, const Vector3i & a_b)
 	{
-		return a.Dot(a_PushDir) > b.Dot(a_PushDir);
+		return a_a.Dot(a_PushDir) > a_b.Dot(a_PushDir);
 	});
 
 	// Move every block

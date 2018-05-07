@@ -98,7 +98,7 @@ public:
 	void Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast);
 
 	/** Sets entity position to where is leashed this mob */
-	void SetLeashToPos(Vector3d * pos) { m_LeashToPos = std::unique_ptr<Vector3d>(pos); }
+	void SetLeashToPos(Vector3d * a_pos) { m_LeashToPos = std::unique_ptr<Vector3d>(a_pos); }
 
 	/** Gets entity position to where mob should be leashed */
 	Vector3d * GetLeashToPos() const { return m_LeashToPos.get(); }
@@ -282,7 +282,7 @@ protected:
 	bool m_CanPickUpLoot;
 	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
-	void HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn);
+	void HandleDaylightBurning(cChunk & a_Chunk, bool a_WouldBurn);
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;

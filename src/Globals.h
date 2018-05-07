@@ -390,9 +390,9 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 namespace cpp14
 {
 	template <class T, class... Args>
-	std::unique_ptr<T> make_unique(Args&&... args)
+	std::unique_ptr<T> make_unique(Args&&... a_args)
 	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+		return std::unique_ptr<T>(new T(std::forward<Args>(a_args)...));
 	}
 }
 

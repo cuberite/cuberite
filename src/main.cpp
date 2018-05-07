@@ -371,7 +371,7 @@ static void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 
 
 
-static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char ** argv)
+static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int a_argc, char ** a_argv)
 {
 	try
 	{
@@ -388,7 +388,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
 		TCLAP::SwitchArg noFileLogArg    ("",  "no-log-file",         "Disable logging to file", cmd);
 		TCLAP::SwitchArg runAsServiceArg ("d", "service",             "Run as a service on Windows, or daemon on UNIX like systems", cmd);
-		cmd.parse(argc, argv);
+		cmd.parse(a_argc, a_argv);
 
 		// Copy the parsed args' values into a settings repository:
 		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
@@ -463,7 +463,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 ////////////////////////////////////////////////////////////////////////////////
 // main:
 
-int main(int argc, char ** argv)
+int main(int a_argc, char ** a_argv)
 {
 	// Magic code to produce dump-files on Windows if the server crashes:
 	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
@@ -510,7 +510,7 @@ int main(int argc, char ** argv)
 	#endif
 
 	// Make sure m_RunAsService is set correctly before checking it's value
-	ParseArguments(argc, argv);
+	ParseArguments(a_argc, a_argv);
 
 	// Attempt to run as a service
 	if (cRoot::m_RunAsService)
@@ -550,7 +550,7 @@ int main(int argc, char ** argv)
 
 			while (!cRoot::m_TerminateEventRaised)
 			{
-				UniversalMain(ParseArguments(argc, argv));
+				UniversalMain(ParseArguments(a_argc, a_argv));
 			}
 		#endif
 	}
@@ -559,7 +559,7 @@ int main(int argc, char ** argv)
 		while (!cRoot::m_TerminateEventRaised)
 		{
 			// Not running as a service, do normal startup
-			UniversalMain(ParseArguments(argc, argv));
+			UniversalMain(ParseArguments(a_argc, a_argv));
 		}
 	}
 	return EXIT_SUCCESS;

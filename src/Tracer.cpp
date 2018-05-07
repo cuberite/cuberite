@@ -12,7 +12,7 @@
 
 
 
-const float FLOAT_EPSILON = 0.0001f;  // TODO: Stash this in some header where it can be reused
+const float g_FLOAT_EPSILON = 0.0001f;  // TODO: Stash this in some header where it can be reused
 
 
 const std::array<const Vector3f, 6>& cTracer::m_NormalTable(void)
@@ -277,20 +277,20 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 
 
 // return 1 = hit, other is not hit
-static int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
+static int LinesCross(float a_x0, float a_y0, float a_x1, float a_y1, float a_x2, float a_y2, float a_x3, float a_y3)
 {
 	// float linx, liny;
 
-	float d = (x1 - x0) * (y3 - y2) - (y1 - y0) * (x3 - x2);
+	float d = (a_x1 - a_x0) * (a_y3 - a_y2) - (a_y1 - a_y0) * (a_x3 - a_x2);
 	if (std::abs(d) < 0.001)
 	{
 		return 0;
 	}
 
-	float AB = ((y0 - y2) * (x3 - x2) - (x0 - x2) * (y3 - y2)) / d;
+	float AB = ((a_y0 - a_y2) * (a_x3 - a_x2) - (a_x0 - a_x2) * (a_y3 - a_y2)) / d;
 	if ((AB >= 0.0) && (AB <= 1.0))
 	{
-		float CD = ((y0 - y2) * (x1 - x0) - (x0 - x2) * (y1 - y0)) / d;
+		float CD = ((a_y0 - a_y2) * (a_x1 - a_x0) - (a_x0 - a_x2) * (a_y1 - a_y0)) / d;
 		if ((CD >= 0.0) && (CD <= 1.0))
 		{
 			// linx = x0 + AB * (x1 - x0);
@@ -318,7 +318,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 	float     D = a_PlaneNormal.Dot(u);      // dot(Pn.n, u);
 	float     N = -(a_PlaneNormal.Dot(w));  // -dot(a_Plane.n, w);
 
-	if (std::abs(D) < FLOAT_EPSILON)
+	if (std::abs(D) < g_FLOAT_EPSILON)
 	{
 		// segment is parallel to plane
 		if (N == 0.0)

@@ -17,8 +17,8 @@ public:
 	// These are the min and max coordinates (X and Z) for a straight fence.
 	// 0.4 and 0.6 are really just guesses, but they seem pretty good.
 	// (0.4 to 0.6 is a fence that's 0.2 wide, down the center of the block)
-	const double MIN_COORD = 0.4;
-	const double MAX_COORD = 0.6;
+	const double m_MIN_COORD = 0.4;
+	const double m_MAX_COORD = 0.6;
 
 	cBlockFenceHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)

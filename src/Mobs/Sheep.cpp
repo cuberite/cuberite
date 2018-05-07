@@ -144,7 +144,7 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 {
 	static const struct
 	{
-		short Parent1, Parent2, Child;
+		short m_Parent1, m_Parent2, m_Child;
 	} ColorInheritance[] =
 	{
 		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },

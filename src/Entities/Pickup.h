@@ -25,7 +25,7 @@ public:
 
 	CLASS_PROTODEF(cPickup)
 
-	cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true);
+	cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool a_IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true);
 
 	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }

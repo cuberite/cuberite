@@ -295,7 +295,7 @@ public:
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore. */
 		template <typename... Args>
-		bool Call(Args &&... args)
+		bool Call(Args &&... a_args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -307,7 +307,7 @@ public:
 			{
 				return false;
 			}
-			return cLuaState(m_Ref.GetLuaState()).Call(m_Ref, std::forward<Args>(args)...);
+			return cLuaState(m_Ref.GetLuaState()).Call(m_Ref, std::forward<Args>(a_args)...);
 		}
 
 		/** Set the contained callback to the function in the specified Lua state's stack position.
@@ -377,7 +377,7 @@ public:
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
 		template <typename... Args>
-		bool CallTableFn(const char * a_FnName, Args &&... args)
+		bool CallTableFn(const char * a_FnName, Args &&... a_args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -389,7 +389,7 @@ public:
 			{
 				return false;
 			}
-			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, std::forward<Args>(args)...);
+			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, std::forward<Args>(a_args)...);
 		}
 
 		/** Calls the Lua function stored under the specified name in the referenced table, if still available.
@@ -397,7 +397,7 @@ public:
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
 		template <typename... Args>
-		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
+		bool CallTableFnWithSelf(const char * a_FnName, Args &&... a_args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -409,7 +409,7 @@ public:
 			{
 				return false;
 			}
-			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, m_Ref, std::forward<Args>(args)...);
+			return cLuaState(m_Ref.GetLuaState()).CallTableFn(m_Ref, a_FnName, m_Ref, std::forward<Args>(a_args)...);
 		}
 
 		/** Set the contained reference to the table in the specified Lua state's stack position.
@@ -664,9 +664,9 @@ public:
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T>
-	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
+	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * a_unused = nullptr)
 	{
-		UNUSED(unused);
+		UNUSED(a_unused);
 		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
 		{
 			return false;
@@ -741,7 +741,7 @@ public:
 	A special param of cRet & signifies the end of param list and the start of return values.
 	Example call: Call(Fn, Param1, Param2, Param3, cLuaState::Return, Ret1, Ret2) */
 	template <typename FnT, typename... Args>
-	bool Call(const FnT & a_Function, Args &&... args)
+	bool Call(const FnT & a_Function, Args &&... a_args)
 	{
 		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
@@ -750,19 +750,19 @@ public:
 			// Pushing the function failed
 			return false;
 		}
-		auto res = PushCallPop(std::forward<Args>(args)...);
+		auto res = PushCallPop(std::forward<Args>(a_args)...);
 		return res;
 	}
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
 	template <typename Arg1, typename... Args>
-	inline bool GetStackValues(int a_StartStackPos, Arg1 && a_Arg1, Args &&... args)
+	inline bool GetStackValues(int a_StartStackPos, Arg1 && a_Arg1, Args &&... a_args)
 	{
 		if (!GetStackValue(a_StartStackPos, std::forward<Arg1>(a_Arg1)))
 		{
 			return false;
 		}
-		return GetStackValues(a_StartStackPos + 1, std::forward<Args>(args)...);
+		return GetStackValues(a_StartStackPos + 1, std::forward<Args>(a_args)...);
 	}
 
 	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
@@ -809,10 +809,10 @@ public:
 	bool IsParamNumber(int a_Param);
 
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
-	bool ReportErrors(int status);
+	bool ReportErrors(int a_status);
 
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
-	static bool ReportErrors(lua_State * a_LuaState, int status);
+	static bool ReportErrors(lua_State * a_LuaState, int a_status);
 
 	/** Logs all items in the current stack trace to the server console */
 	void LogStackTrace(int a_StartingDepth = 0);
@@ -913,14 +913,14 @@ protected:
 	A special param of cRet & signifies the end of param list and the start of return values.
 	Example call: CallTableFn(TableRef, "FnName", Param1, Param2, Param3, cLuaState::Return, Ret1, Ret2) */
 	template <typename... Args>
-	bool CallTableFn(const cRef & a_TableRef, const char * a_FnName, Args &&... args)
+	bool CallTableFn(const cRef & a_TableRef, const char * a_FnName, Args &&... a_args)
 	{
 		if (!PushFunction(a_TableRef, a_FnName))
 		{
 			// Pushing the function failed
 			return false;
 		}
-		return PushCallPop(std::forward<Args>(args)...);
+		return PushCallPop(std::forward<Args>(a_args)...);
 	}
 
 	/** Variadic template terminator: If there's nothing more to push / pop, just call the function.
@@ -932,16 +932,16 @@ protected:
 
 	/** Variadic template recursor: More params to push. Push them and recurse. */
 	template <typename T, typename... Args>
-	inline bool PushCallPop(T && a_Param, Args &&... args)
+	inline bool PushCallPop(T && a_Param, Args &&... a_args)
 	{
 		Push(std::forward<T>(a_Param));
 		m_NumCurrentFunctionArgs += 1;
-		return PushCallPop(std::forward<Args>(args)...);
+		return PushCallPop(std::forward<Args>(a_args)...);
 	}
 
 	/** Variadic template terminator: If there's nothing more to push, but return values to collect, call the function and collect the returns. */
 	template <typename... Args>
-	bool PushCallPop(cLuaState::cRet, Args &&... args)
+	bool PushCallPop(cLuaState::cRet, Args &&... a_args)
 	{
 		// Calculate the number of return values (number of args left):
 		int NumReturns = sizeof...(args);
@@ -953,7 +953,7 @@ protected:
 		}
 
 		// Collect the return values:
-		GetStackValues(-NumReturns, std::forward<Args>(args)...);
+		GetStackValues(-NumReturns, std::forward<Args>(a_args)...);
 		lua_pop(m_LuaState, NumReturns);
 
 		// All successful:

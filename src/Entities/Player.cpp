@@ -934,9 +934,9 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
-void cPlayer::ApplyArmorDamage(int DamageBlocked)
+void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 {
-	short ArmorDamage = static_cast<short>(DamageBlocked / 4);
+	short ArmorDamage = static_cast<short>(a_DamageBlocked / 4);
 	if (ArmorDamage == 0)
 	{
 		ArmorDamage = 1;
@@ -1818,7 +1818,7 @@ AString cPlayer::GetColor(void) const
 	}
 
 	// Return the color, including the delimiter:
-	return cChatColor::Delimiter + m_MsgNameColorCode;
+	return cChatColor::m_Delimiter + m_MsgNameColorCode;
 }
 
 

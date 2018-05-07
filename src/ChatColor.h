@@ -9,36 +9,36 @@
 class cChatColor
 {
 public:
-	static const char * Delimiter;
+	static const char * m_Delimiter;
 
 	/** @deprecated use ChatColor::Delimiter instead */
-	static const char * Color;
+	static const char * m_Color;
 
-	static const char * Black;
-	static const char * Navy;
-	static const char * Green;
-	static const char * Blue;
-	static const char * Red;
-	static const char * Purple;
-	static const char * Gold;
-	static const char * LightGray;
-	static const char * Gray;
-	static const char * DarkPurple;
-	static const char * LightGreen;
-	static const char * LightBlue;
-	static const char * Rose;
-	static const char * LightPurple;
-	static const char * Yellow;
-	static const char * White;
+	static const char * m_Black;
+	static const char * m_Navy;
+	static const char * m_Green;
+	static const char * m_Blue;
+	static const char * m_Red;
+	static const char * m_Purple;
+	static const char * m_Gold;
+	static const char * m_LightGray;
+	static const char * m_Gray;
+	static const char * m_DarkPurple;
+	static const char * m_LightGreen;
+	static const char * m_LightBlue;
+	static const char * m_Rose;
+	static const char * m_LightPurple;
+	static const char * m_Yellow;
+	static const char * m_White;
 
 	// Styles
 	// source: http://wiki.vg/Chat
-	static const char * Random;
-	static const char * Bold;
-	static const char * Strikethrough;
-	static const char * Underlined;
-	static const char * Italic;
-	static const char * Plain;
+	static const char * m_Random;
+	static const char * m_Bold;
+	static const char * m_Strikethrough;
+	static const char * m_Underlined;
+	static const char * m_Italic;
+	static const char * m_Plain;
 };
 
 // tolua_end

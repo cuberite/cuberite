@@ -45,7 +45,7 @@ namespace Json
 class cRoot
 {
 public:
-	static cRoot * Get() { return s_Root; }
+	static cRoot * Get() { return m_s_Root; }
 	// tolua_end
 
 	static bool m_TerminateEventRaised;
@@ -245,7 +245,7 @@ private:
 	/** Does the actual work of executing a command */
 	void DoExecuteConsoleCommand(const AString & a_Cmd);
 
-	static cRoot * s_Root;
+	static cRoot * m_s_Root;
 
 	static void InputThread(cRoot & a_Params);
 };  // tolua_export

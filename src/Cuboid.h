@@ -10,18 +10,18 @@ class cCuboid
 {
 public:
 	// p1 is expected to have the smaller of the coords; Sort() swaps coords to match this
-	Vector3i p1, p2;
+	Vector3i m_p1, m_p2;
 
 	cCuboid(void) {}
-	cCuboid(const Vector3i & a_p1, const Vector3i & a_p2) : p1(a_p1), p2(a_p2) {}
-	cCuboid(int a_X1, int a_Y1, int a_Z1) : p1(a_X1, a_Y1, a_Z1), p2(a_X1, a_Y1, a_Z1) {}
+	cCuboid(const Vector3i & a_p1, const Vector3i & a_p2) : m_p1(a_p1), m_p2(a_p2) {}
+	cCuboid(int a_X1, int a_Y1, int a_Z1) : m_p1(a_X1, a_Y1, a_Z1), m_p2(a_X1, a_Y1, a_Z1) {}
 
 	#ifdef TOLUA_EXPOSITION  // tolua isn't aware of implicitly generated copy constructors
 		cCuboid(const cCuboid & a_Cuboid);
 	#endif
 
 	// DEPRECATED, use cCuboid(Vector3i, Vector3i) instead
-	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2)
+	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : m_p1(a_X1, a_Y1, a_Z1), m_p2(a_X2, a_Y2, a_Z2)
 	{
 		LOGWARNING("cCuboid(int, int, int, int, int, int) constructor is deprecated, use cCuboid(Vector3i, Vector3i) constructor instead.");
 	}
@@ -55,12 +55,12 @@ public:
 		);
 	}
 
-	bool IsInside(Vector3i v) const
+	bool IsInside(Vector3i a_v) const
 	{
 		return (
-			(v.x >= p1.x) && (v.x <= p2.x) &&
-			(v.y >= p1.y) && (v.y <= p2.y) &&
-			(v.z >= p1.z) && (v.z <= p2.z)
+			(a_v.x >= p1.x) && (a_v.x <= p2.x) &&
+			(a_v.y >= p1.y) && (a_v.y <= p2.y) &&
+			(a_v.z >= p1.z) && (a_v.z <= p2.z)
 		);
 	}
 
@@ -73,12 +73,12 @@ public:
 		);
 	}
 
-	bool IsInside(Vector3d v) const
+	bool IsInside(Vector3d a_v) const
 	{
 		return (
-			(v.x >= p1.x) && (v.x <= p2.x) &&
-			(v.y >= p1.y) && (v.y <= p2.y) &&
-			(v.z >= p1.z) && (v.z <= p2.z)
+			(a_v.x >= p1.x) && (a_v.x <= p2.x) &&
+			(a_v.y >= p1.y) && (a_v.y <= p2.y) &&
+			(a_v.z >= p1.z) && (a_v.z <= p2.z)
 		);
 	}
 

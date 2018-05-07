@@ -119,7 +119,7 @@ public:
 	If FromBook is true, then this function returns the XP multiplier if
 	the enchantment is coming from a book, otherwise it returns the normal
 	item multiplier. */
-	static int GetXPCostMultiplier(int a_EnchantmentID, bool FromBook);
+	static int GetXPCostMultiplier(int a_EnchantmentID, bool a_FromBook);
 
 	/** Get the maximum level the enchantment can have */
 	static unsigned int GetLevelCap(int a_EnchantmentID);

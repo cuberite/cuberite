@@ -479,7 +479,7 @@ protected:
 	);
 
 	template <bool MetasValid>
-	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
+	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * a_SrcMetas, NIBBLETYPE * a_DstMetas);
 
 	/** Clears the block entities from the specified container, freeing each blockentity. */
 	static void ClearBlockEntities(cBlockEntities & a_BlockEntities);

@@ -121,12 +121,12 @@ public:
 
 	struct FoodInfo
 	{
-		int    FoodLevel;
-		double Saturation;
+		int    m_FoodLevel;
+		double m_Saturation;
 
 		FoodInfo(int a_FoodLevel, double a_Saturation) :
-			FoodLevel(a_FoodLevel),
-			Saturation(a_Saturation)
+			m_FoodLevel(a_FoodLevel),
+			m_Saturation(a_Saturation)
 		{
 		}
 	} ;
@@ -167,7 +167,7 @@ public:
 
 protected:
 	int m_ItemType;
-	static cItemHandler * CreateItemHandler(int m_ItemType);
+	static cItemHandler * CreateItemHandler(int a_m_ItemType);
 
 	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
 	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized

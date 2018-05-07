@@ -462,8 +462,8 @@ private:
 			}
 		};
 
-		int ChunkX;
-		int ChunkZ;
+		int m_ChunkX;
+		int m_ChunkZ;
 	};
 
 	typedef std::list<cChunkStay *> cChunkStays;

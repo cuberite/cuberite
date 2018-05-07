@@ -24,66 +24,66 @@ typedef std::map<AString, AString> AStringMap;
 
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
+extern AString & Printf(AString & a_Dst, const char * a_format, fmt::ArgList a_args);
 FMT_VARIADIC(AString &, Printf, AString &, const char *)
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, fmt::ArgList args);
+extern AString Printf(const char * a_format, fmt::ArgList a_args);
 FMT_VARIADIC(AString, Printf, const char *)
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */
 template <typename... Args>
-extern AString & AppendPrintf(AString & a_Dst, const char * format, const Args & ... args)
+extern AString & AppendPrintf(AString & a_Dst, const char * a_format, const Args & ... a_args)
 {
-	a_Dst += Printf(format, args...);
+	a_Dst += Printf(a_format, a_args...);
 	return a_Dst;
 }
 
 /** Split the string at any of the listed delimiters.
 Return the splitted strings as a stringvector. */
-extern AStringVector StringSplit(const AString & str, const AString & delim);
+extern AStringVector StringSplit(const AString & a_str, const AString & a_delim);
 
 /** Split the string at any of the listed delimiters. Keeps quoted content together
 Resolves issue #490
 Return the splitted strings as a stringvector. */
-extern AStringVector StringSplitWithQuotes(const AString & str, const AString & delim);
+extern AStringVector StringSplitWithQuotes(const AString & a_str, const AString & a_delim);
 
 /** Join a list of strings with the given delimiter between entries. */
 AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimiter);
 
 /** Split the string at any of the listed delimiters and trim each value.
 Returns the splitted strings as a stringvector. */
-extern AStringVector StringSplitAndTrim(const AString & str, const AString & delim);
+extern AStringVector StringSplitAndTrim(const AString & a_str, const AString & a_delim);
 
 /** Trims whitespace at both ends of the string.
 Returns a trimmed copy of the original string. */
-extern AString TrimString(const AString & str);  // tolua_export
+extern AString TrimString(const AString & a_str);  // tolua_export
 
 /** In-place string conversion to uppercase.
 Returns the same string object. */
-extern AString & InPlaceUppercase(AString & s);
+extern AString & InPlaceUppercase(AString & a_s);
 
 /** In-place string conversion to lowercase.
 Returns the same string object. */
-extern AString & InPlaceLowercase(AString & s);
+extern AString & InPlaceLowercase(AString & a_s);
 
 /** Returns an upper-cased copy of the string */
-extern AString StrToUpper(const AString & s);
+extern AString StrToUpper(const AString & a_s);
 
 /** Returns a lower-cased copy of the string */
-extern AString StrToLower(const AString & s);
+extern AString StrToLower(const AString & a_s);
 
 /** Case-insensitive string comparison.
 Returns 0 if the strings are the same, <0 if s1 < s2 and >0 if s1 > s2. */
-extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
+extern int NoCaseCompare(const AString & a_s1, const AString & a_s2);  // tolua_export
 
 /** Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]. */
-extern size_t RateCompareString(const AString & s1, const AString & s2);
+extern size_t RateCompareString(const AString & a_s1, const AString & a_s2);
 
 /** Replaces each occurence of iNeedle in iHayStack with iReplaceWith */
-extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
+extern void ReplaceString(AString & a_iHayStack, const AString & a_iNeedle, const AString & a_iReplaceWith);  // tolua_export
 
 /** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);

@@ -128,13 +128,13 @@ protected:
 	std::vector<BiomeInfo> m_FlowersPerBiome;
 
 	/** The maximum number of foliage per clump */
-	const int MAX_NUM_FOLIAGE = 8;
+	const int m_MAX_NUM_FOLIAGE = 8;
 
 	/** The mininum number of foliage per clump */
-	const int MIN_NUM_FOLIAGE = 4;
+	const int m_MIN_NUM_FOLIAGE = 4;
 
 	/** The maximum range a foliage can be placed from the center of the clump */
-	const int RANGE_FROM_CENTER = 5;
+	const int m_RANGE_FROM_CENTER = 5;
 
 	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
@@ -440,7 +440,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Tries to place a spring at the specified coords, checks neighbors. Returns true if successful. */
-	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
+	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int a_x, int a_y, int a_z);
 } ;
 
 
@@ -469,7 +469,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true */
-	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_x, int a_y, int a_z, eMonsterType a_AnimalToSpawn);
 
 	/** Picks a random animal from biome-dependant list for a random position in the chunk.
 	Returns the chosen mob type, or mtInvalid if no mob chosen. */

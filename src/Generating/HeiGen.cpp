@@ -315,15 +315,15 @@ cHeiGenClassic::cHeiGenClassic(int a_Seed) :
 
 
 
-float cHeiGenClassic::GetNoise(float x, float y)
+float cHeiGenClassic::GetNoise(float a_x, float a_y)
 {
-	float oct1 = m_Noise.CubicNoise2D(x * m_HeightFreq1, y * m_HeightFreq1) * m_HeightAmp1;
-	float oct2 = m_Noise.CubicNoise2D(x * m_HeightFreq2, y * m_HeightFreq2) * m_HeightAmp2;
-	float oct3 = m_Noise.CubicNoise2D(x * m_HeightFreq3, y * m_HeightFreq3) * m_HeightAmp3;
+	float oct1 = m_Noise.CubicNoise2D(a_x * m_HeightFreq1, a_y * m_HeightFreq1) * m_HeightAmp1;
+	float oct2 = m_Noise.CubicNoise2D(a_x * m_HeightFreq2, a_y * m_HeightFreq2) * m_HeightAmp2;
+	float oct3 = m_Noise.CubicNoise2D(a_x * m_HeightFreq3, a_y * m_HeightFreq3) * m_HeightAmp3;
 
-	float height = m_Noise.CubicNoise2D(x * 0.1f, y * 0.1f) * 2;
+	float height = m_Noise.CubicNoise2D(a_x * 0.1f, a_y * 0.1f) * 2;
 
-	float flatness = ((m_Noise.CubicNoise2D(x * 0.5f, y * 0.5f) + 1.f) * 0.5f) * 1.1f;  // 0 ... 1.5
+	float flatness = ((m_Noise.CubicNoise2D(a_x * 0.5f, a_y * 0.5f) + 1.f) * 0.5f) * 1.1f;  // 0 ... 1.5
 	flatness *= flatness * flatness;
 
 	return (oct1 + oct2 + oct3) * flatness + height;

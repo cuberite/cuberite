@@ -95,12 +95,12 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
+cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool a_IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
 	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
 	, m_Timer(0)
 	, m_Item(a_Item)
 	, m_bCollected(false)
-	, m_bIsPlayerCreated(IsPlayerCreated)
+	, m_bIsPlayerCreated(a_IsPlayerCreated)
 	, m_bCanCombine(a_CanCombine)
 	, m_Lifetime(cTickTime(a_LifetimeTicks))
 {

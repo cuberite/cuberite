@@ -11,7 +11,7 @@
 
 
 
-cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
+cHorse::cHorse(int a_Type, int a_Color, int a_Style, int a_TameTimes) :
 	super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", 1.4, 1.6),
 	cEntityWindowOwner(this),
 	m_bHasChest(false),
@@ -19,10 +19,10 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 	m_bIsRearing(false),
 	m_bIsMouthOpen(false),
 	m_bIsTame(false),
-	m_Type(Type),
-	m_Color(Color),
-	m_Style(Style),
-	m_TimesToTame(TameTimes),
+	m_Type(a_Type),
+	m_Color(a_Color),
+	m_Style(a_Style),
+	m_TimesToTame(a_TameTimes),
 	m_TameAttemptTimes(0),
 	m_RearTickCount(0),
 	m_MaxSpeed(14.0)

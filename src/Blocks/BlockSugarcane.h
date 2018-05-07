@@ -38,7 +38,7 @@ public:
 			{
 				static const struct
 				{
-					int x, z;
+					int m_x, m_z;
 				} Coords[] =
 				{
 					{-1,  0},
@@ -72,7 +72,7 @@ public:
 		return false;
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & a_cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		if (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth)
 		{
