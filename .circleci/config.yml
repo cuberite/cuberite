@@ -2,7 +2,7 @@ version: 2
 jobs:
   checkout_cuberite:
     working_directory: ~/cuberite
-    docker:
+    docker: &cube_docker
     - image: peterbell10/cuberite-circleci:0.0.3
     steps:
     - checkout
@@ -14,8 +14,7 @@ jobs:
 
   check_basic_style:
     working_directory: ~/cuberite/src
-    docker:
-    - image: peterbell10/cuberite-circleci:0.0.3
+    docker: *cube_docker
     steps:
     - restore_cache: { keys: [ "cuberite-{{ .Environment.CIRCLE_SHA1 }}" ] }
     - run: find . -name \*.cpp -or -name \*.h > AllFiles.lst
@@ -24,8 +23,7 @@ jobs:
 
   clang-tidy:
     working_directory: ~/cuberite
-    docker:
-    - image: peterbell10/cuberite-circleci:0.0.3
+    docker: *cube_docker
     steps:
     - restore_cache: { keys: [ "cuberite-{{ .Environment.CIRCLE_SHA1 }}" ] }
     - run: ./clang-tidy.sh -j 2
