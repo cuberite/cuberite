@@ -1424,6 +1424,11 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	bool Success = false;
+
+	bool SuccessBlockUsable = false;
+	bool SuccessPlaceable = false;
+	bool SuccessItemUsable = false;
+
 	if (
 		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
 		IsWithinReach && !m_Player->IsFrozen()
@@ -1447,7 +1452,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				{
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-					Success = true;
+					SuccessBlockUsable = true;
 				}
 			}
 			else
@@ -1457,7 +1462,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			}
 		}
-		else if (Placeable)
+
+		if (!SuccessBlockUsable && Placeable)
 		{
 			// TODO: Double check that we don't need this for using item and for packet out of range
 			m_NumBlockChangeInteractionsThisTick++;
@@ -1467,9 +1473,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				return;
 			}
 			// place a block
-			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			SuccessPlaceable = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		}
-		else
+
+		if(!SuccessBlockUsable && !SuccessPlaceable)
 		{
 			// Use an item in hand with a target block
 			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
@@ -1478,10 +1485,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				cBlockInServerPluginInterface PluginInterface(*World);
 				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-				Success = true;
+				SuccessItemUsable = true;
 			}
 		}
 	}
+
+	Success = (SuccessBlockUsable || SuccessPlaceable || SuccessItemUsable);
+
 	if (!Success)
 	{
 		// Update the target block including the block above and below for 2 block high things
