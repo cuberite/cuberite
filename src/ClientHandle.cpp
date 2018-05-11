@@ -1476,7 +1476,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			SuccessPlaceable = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		}
 
-		if(!SuccessBlockUsable && !SuccessPlaceable)
+		if (!SuccessBlockUsable && !SuccessPlaceable)
 		{
 			// Use an item in hand with a target block
 			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
