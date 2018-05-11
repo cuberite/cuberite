@@ -1423,8 +1423,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	bool Success = false;
-
 	bool SuccessBlockUsable = false;
 	bool SuccessPlaceable = false;
 	bool SuccessItemUsable = false;
@@ -1490,9 +1488,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		}
 	}
 
-	Success = (SuccessBlockUsable || SuccessPlaceable || SuccessItemUsable);
-
-	if (!Success)
+	if (!SuccessBlockUsable && !SuccessPlaceable && !SuccessItemUsable)
 	{
 		// Update the target block including the block above and below for 2 block high things
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
