@@ -140,7 +140,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		return {};
 	}
 
-	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta)
+	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta) -> NIBBLETYPE
 		{
 			// Falling water blocks are always full height (0)
 			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
