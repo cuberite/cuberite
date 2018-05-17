@@ -135,14 +135,19 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		return {};
 	}
 
-	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
-
-	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(m_World.GetBlock(a_X, a_Y, a_Z)))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
 
-	NIBBLETYPE CentralPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z) & 0x07;
+	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta)
+		{
+			// Falling water blocks are always full height (0)
+			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
+		};
+
+	auto BlockMeta = m_World.GetBlockMeta(a_X, a_Y, a_Z);
+	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
 	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
@@ -154,13 +159,11 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		{ a_X, a_Y, a_Z - 1 }
 	};
 
-	for (unsigned long i = 0; i < ARRAYCOUNT(LevelPoint); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(LevelPoint); i++)
 	{
-		BlockID = m_World.GetBlock(Points[i].x, Points[i].y, Points[i].z);
-
-		if (IsAllowedBlock(BlockID))
+		if (IsAllowedBlock(m_World.GetBlock(Points[i])))
 		{
-			LevelPoint[i] = 0x07 & m_World.GetBlockMeta(Points[i].x, Points[i].y, Points[i].z);
+			LevelPoint[i] = HeightFromMeta(m_World.GetBlockMeta(Points[i]));
 		}
 		else
 		{
@@ -174,6 +177,11 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 
 	Direction.x = LevelPoint[0] - LevelPoint[2];
 	Direction.z = LevelPoint[1] - LevelPoint[3];
+
+	if ((BlockMeta & 0x08) != 0)  // Test falling bit
+	{
+		Direction.y = -1.0f;
+	}
 
 	if (Direction.HasNonZeroLength())
 	{
