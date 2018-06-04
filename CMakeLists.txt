@@ -278,6 +278,12 @@ if (WIN32)
 	add_subdirectory(lib/luaproxy/)
 endif()
 
+if (CYGWIN)
+	add_definitions(-D_GNU_SOURCE)
+	set(M_PI 3.14159265358979323846264338327950288) # This should be moved elsewhere
+	target_compile_options(SQLiteCpp PRIVATE -fno-stack-protector)
+endif()
+
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those)
 include(lib/mbedtls.cmake EXCLUDE_FROM_ALL)
