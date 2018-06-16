@@ -71,6 +71,9 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
+	/** Returns the currently equipped shield; empty item if none */
+	virtual cItem GetEquippedShield(void) const override { return m_Inventory.GetShieldSlot(); }
+
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
