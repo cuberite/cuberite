@@ -6312,6 +6312,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Returns the item in the \"boots\" slot of the armor grid. Note that the returned item is read-only",
 				},
+				GetEquippedShield =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item in the \"shield\" slot of the armor grid. Note that the returned item is read-only",
+				},
 				GetEquippedChestplate =
 				{
 					Returns =
