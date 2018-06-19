@@ -3317,6 +3317,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
 				},
+        GetEquippedShield =
+        {
+          Returns =
+          {
+            {
+              Type = "cItem",
+            },
+          },
+          Notes = "Returns the shield that the entity has equipped. Returns an empty cItem if no shield equipped or not applicable.",
+        },
 				GetGravity =
 				{
 					Returns =
@@ -6311,16 +6321,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						},
 					},
 					Notes = "Returns the item in the \"boots\" slot of the armor grid. Note that the returned item is read-only",
-				},
-				GetEquippedShield =
-				{
-					Returns =
-					{
-						{
-							Type = "cItem",
-						},
-					},
-					Notes = "Returns the item in the \"shield\" slot of the armor grid. Note that the returned item is read-only",
 				},
 				GetEquippedChestplate =
 				{
