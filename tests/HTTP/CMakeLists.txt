@@ -15,6 +15,8 @@ set (HTTP_SRCS
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.cpp
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
@@ -25,6 +27,8 @@ set (HTTP_HDRS
 	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.h
 	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
 )
 

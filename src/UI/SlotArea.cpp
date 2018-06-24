@@ -993,10 +993,10 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
 
 	m_MaximumCost = 0;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
+	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
 
 	int PosX, PosY, PosZ;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
+	static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
@@ -1142,7 +1142,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	int NameChangeExp = 0;
-	const AString & RepairedItemName = reinterpret_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
+	const AString & RepairedItemName = static_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
@@ -1909,7 +1909,6 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	UNUSED(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
@@ -1932,6 +1931,12 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
 {
+	int Reward = m_Furnace->GetAndResetReward();
+	if (Reward > 0)
+	{
+		a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+	}
+
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{

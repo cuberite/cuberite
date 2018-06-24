@@ -79,7 +79,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	if (
 		(a_Killer != nullptr) &&
 		a_Killer->IsProjectile() &&
-		((reinterpret_cast<cProjectileEntity *>(a_Killer))->GetCreatorUniqueID() != cEntity::INVALID_ID))
+		((static_cast<cProjectileEntity *>(a_Killer))->GetCreatorUniqueID() != cEntity::INVALID_ID))
 	{
 		auto ProjectileCreatorCallback = [](cEntity & a_Entity)
 			{

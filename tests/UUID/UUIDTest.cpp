@@ -10,7 +10,8 @@
 /** Test that FromString -> ToShortString preserves the original value for short UUIDs. */
 static void UUIDFromStringToShortString()
 {
-	const char TestStrings[][33]{
+	const char TestStrings[][33]
+	{
 		"0123456789abcdef0123456789ABCDEF",
 		"d188b2648cc311e7bb31be2e44b06b34",
 		"e760d270d8b34288b895d9f78a31e083",
@@ -38,7 +39,8 @@ static void UUIDFromStringToShortString()
 /** Test that FromString -> ToLongString preserves the original value for long UUIDs. */
 static void UUIDFromStringToLongString()
 {
-	const char TestStrings[][37]{
+	const char TestStrings[][37]
+	{
 		"01234567-89ab-cdef-0123-456789ABCDEF",
 		"d188b264-8cc3-11e7-bb31-be2e44b06b34",
 		"e760d270-d8b3-4288-b895-d9f78a31e083",
@@ -108,6 +110,30 @@ static void UUIDNil()
 
 
 
+/** Test that variant and version numbers are read correctly. */
+static void UUIDType()
+{
+	// From issue #4209
+	const char TestStrings[][33]
+	{
+		"31cfcbeea8f2324a86dbccb1d5aaa6f8",
+		"3f2e1dd234a03b6b824c5a0e74083b1e"
+	};
+
+	for (const auto & String : TestStrings)
+	{
+		cUUID UUID;
+		assert_test(UUID.FromString(String));
+		assert_test(UUID.Variant() == 1);
+		assert_test(UUID.Version() == 3);
+	}
+
+}
+
+
+
+
+
 int main(int argc, char * argv[])
 {
 	LOG("UUID tests started");
@@ -123,6 +149,9 @@ int main(int argc, char * argv[])
 
 	LOG("Testing nil UUIDs");
 	UUIDNil();
+
+	LOG("Testing UUID type information");
+	UUIDType();
 
 	LOG("UUID tests finished");
 }

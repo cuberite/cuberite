@@ -23,6 +23,7 @@ if (WIN32)
 		${OSSupport_SRCS}
 		${OSSupport_HDRS}
 	)
+	target_link_libraries(OSSupport PUBLIC fmt::fmt)
 endif()
 
 # Define individual tests:
