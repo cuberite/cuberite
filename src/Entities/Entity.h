@@ -351,6 +351,9 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const { return cItem(); }
+
 	/** Applies damage to the armor after the armor blocked the given amount */
 	virtual void ApplyArmorDamage(int DamageBlocked);
 
