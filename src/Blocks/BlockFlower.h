@@ -16,6 +16,11 @@ public:
 	{
 	}
 
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
