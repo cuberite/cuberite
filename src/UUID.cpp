@@ -11,8 +11,8 @@
 /** UUID normalised in textual form. */
 struct sShortUUID
 {
-	char Data[32]{};
-	bool IsValid = false;
+	char m_Data[32]{};
+	bool m_IsValid = false;
 };
 
 /** Returns the given UUID in shortened form with IsValid indicating success.

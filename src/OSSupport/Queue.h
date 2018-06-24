@@ -82,14 +82,14 @@ public:
 
 	/** Dequeues an item from the queue if any are present.
 	Returns true if successful. Value of item is undefined if dequeuing was unsuccessful. */
-	bool TryDequeueItem(ItemType & item)
+	bool TryDequeueItem(ItemType & a_item)
 	{
 		cCSLock Lock(m_CS);
 		if (m_Contents.empty())
 		{
 			return false;
 		}
-		item = m_Contents.front();
+		a_item = m_Contents.front();
 		m_Contents.pop_front();
 		m_evtRemoved.Set();
 		return true;

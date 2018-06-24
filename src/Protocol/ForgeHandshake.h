@@ -22,10 +22,10 @@ public:
 	/** True if the client advertised itself as a Forge client. */
 	bool m_IsForgeClient;
 
-	cForgeHandshake(cClientHandle * client);
+	cForgeHandshake(cClientHandle * a_client);
 
 	/** Add the registered Forge mods to the server ping list packet. */
-	void AugmentServerListPing(Json::Value & ResponseValue);
+	void AugmentServerListPing(Json::Value & a_ResponseValue);
 
 	/** Begin the Forge Modloader Handshake (FML|HS) sequence. */
 	void BeginForgeHandshake(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
@@ -53,7 +53,7 @@ private:
 	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
 
 	/** Set errored state to prevent further handshake message processing. */
-	void SetError(const AString & message);
+	void SetError(const AString & a_message);
 
 	/** Parse the client ModList packet of installed Forge mods and versions. */
 	AStringMap ParseModList(const char * a_Data, size_t a_Size);

@@ -800,8 +800,8 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 	// TODO: Move this into settings
 	struct BiomeLevels
 	{
-		EMCSBiome InnerBiome;
-		EMCSBiome OuterBiome;
+		EMCSBiome m_InnerBiome;
+		EMCSBiome m_OuterBiome;
 	} ;
 
 	static BiomeLevels bgOcean[] =
@@ -882,8 +882,8 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 	} ;
 	static struct
 	{
-		BiomeLevels * Biomes;
-		size_t        Count;
+		BiomeLevels * m_Biomes;
+		size_t        m_Count;
 	} BiomeGroups[] =
 	{
 		{ bgOcean,      ARRAYCOUNT(bgOcean), },
@@ -995,10 +995,10 @@ public:
 			std::make_shared<cIntGenBiomeGroupEdges<6>> (
 			std::make_shared<cIntGenAddIslands     <8>> (a_Seed + 2000, 200,
 			std::make_shared<cIntGenZoom           <8>> (a_Seed + 7,
-			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 8, 50, bgOcean,
-			std::make_shared<cIntGenReplaceRandomly<6>> (a_Seed + 101, bgIce, bgTemperate, 150,
+			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 8, 50, g_bgOcean,
+			std::make_shared<cIntGenReplaceRandomly<6>> (a_Seed + 101, g_bgIce, g_bgTemperate, 150,
 			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2000, 200,
-			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 9, 50, bgOcean,
+			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 9, 50, g_bgOcean,
 			std::make_shared<cIntGenLandOcean      <5>> (a_Seed + 100, 30)
 			| MakeIntGen<cIntGenZoom           <6>> (a_Seed + 10)
 		)))))))))))))))))))))))))))));
@@ -1099,10 +1099,10 @@ public:
 			std::make_shared<cProtIntGenBiomeGroupEdges>(
 			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2000, 200,
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 7,
-			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 8, 50, bgOcean,
-			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 101, bgIce, bgTemperate, 150,
+			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 8, 50, g_bgOcean,
+			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 101, g_bgIce, g_bgTemperate, 150,
 			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2000, 200,
-			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 9, 50, bgOcean,
+			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 9, 50, g_bgOcean,
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 10,
 			std::make_shared<cProtIntGenLandOcean      >(a_Seed + 100, 30
 		)))))))))))))))))))))))))))))));

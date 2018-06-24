@@ -130,7 +130,7 @@ protected:
 	float m_HeightFreq2, m_HeightAmp2;
 	float m_HeightFreq3, m_HeightAmp3;
 
-	float GetNoise(float x, float y);
+	float GetNoise(float a_x, float a_y);
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;

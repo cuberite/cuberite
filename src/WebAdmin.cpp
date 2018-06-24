@@ -15,7 +15,7 @@
 
 
 
-static const char DEFAULT_WEBADMIN_PORTS[] = "8080";
+static const char g_DEFAULT_WEBADMIN_PORTS[] = "8080";
 
 
 
@@ -92,7 +92,7 @@ bool cWebAdmin::Init(void)
 
 	// Read the ports to be used:
 	// Note that historically the ports were stored in the "Port" and "PortsIPv6" values
-	m_Ports = ReadUpgradeIniPorts(m_IniFile, "WebAdmin", "Ports", "Port", "PortsIPv6", DEFAULT_WEBADMIN_PORTS);
+	m_Ports = ReadUpgradeIniPorts(m_IniFile, "WebAdmin", "Ports", "Port", "PortsIPv6", g_DEFAULT_WEBADMIN_PORTS);
 
 	if (!m_HTTPServer.Initialize())
 	{
@@ -237,7 +237,7 @@ bool cWebAdmin::LoadIniFile(void)
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
 		m_IniFile.AddHeaderComment(" Please restart Cuberite to apply changes made in this file!");
-		m_IniFile.SetValue("WebAdmin", "Ports", DEFAULT_WEBADMIN_PORTS);
+		m_IniFile.SetValue("WebAdmin", "Ports", g_DEFAULT_WEBADMIN_PORTS);
 		m_IniFile.WriteFile("webadmin.ini");
 	}
 

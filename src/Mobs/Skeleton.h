@@ -13,7 +13,7 @@ class cSkeleton :
 	typedef cAggressiveMonster super;
 
 public:
-	cSkeleton(bool IsWither);
+	cSkeleton(bool a_IsWither);
 
 	CLASS_PROTODEF(cSkeleton)
 

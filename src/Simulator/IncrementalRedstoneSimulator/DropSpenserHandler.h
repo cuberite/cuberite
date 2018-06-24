@@ -17,9 +17,9 @@ public:
 	{
 		return (a_Meta & E_META_DROPSPENSER_ACTIVATED) != 0;
 	}
-	inline static NIBBLETYPE SetActivationState(NIBBLETYPE a_Meta, bool IsOn)
+	inline static NIBBLETYPE SetActivationState(NIBBLETYPE a_Meta, bool a_IsOn)
 	{
-		if (IsOn)
+		if (a_IsOn)
 		{
 			return a_Meta | E_META_DROPSPENSER_ACTIVATED;  // set the bit
 		}

@@ -20,8 +20,9 @@ Here are the conventions:
    - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
  - All variable names and function names use CamelCase style, with the exception of single letter variables.  
    - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad()` `GoodVariableName` `badVariableName`.
- - All member variables start with `m_`, all function parameters start with `a_`, all class names start with `c`.
-   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
+ - All member variables start with `m_`, all function parameters start with `a_`, all global variables start with `g_`, all class names start with `c`.
+   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); };`
+   - `static const bool g_ICanProgram = true;`
  - Function parameters that are coordinates should be passed using an appropriate storage container, and not as three separate arguments.
    - e.g. for a block position, Vector3i. For an entity position, Vector3d. For a chunk coordinate, cChunkCoords.
    - For a 3-dimensional box of blocks, use cCuboid. For an axis-aligned bounding box, use cBoundingBox.

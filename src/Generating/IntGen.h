@@ -37,13 +37,13 @@ by using templates.
 
 
 /** Constants representing the biome group designators. */
-const int bgOcean        = 0;
-const int bgDesert       = 1;
-const int bgTemperate    = 2;
-const int bgMountains    = 3;
-const int bgIce          = 4;
-const int bgLandOceanMax = 4;  // Maximum biome group value generated in the landOcean generator
-const int bgfRare        = 1024;  // Flag added to values to generate rare biomes for the group
+const int g_bgOcean        = 0;
+const int g_bgDesert       = 1;
+const int g_bgTemperate    = 2;
+const int g_bgMountains    = 3;
+const int g_bgIce          = 4;
+const int g_bgLandOceanMax = 4;  // Maximum biome group value generated in the landOcean generator
+const int g_bgfRare        = 1024;  // Flag added to values to generate rare biomes for the group
 
 
 
@@ -232,14 +232,14 @@ public:
 			for (int x = 0; x < SizeX; x++)
 			{
 				int rnd = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
-				a_Values[x + SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 101) % bgLandOceanMax + 1) : 0;
+				a_Values[x + SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 101) % g_bgLandOceanMax + 1) : 0;
 			}
 		}
 
 		// If the centerpoint of the world is within the area, set it to bgTemperate, always:
 		if ((a_MinX <= 0) && (a_MinZ <= 0) && (a_MinX + SizeX > 0) && (a_MinZ + SizeZ > 0))
 		{
-			a_Values[-a_MinX - a_MinZ * SizeX] = bgTemperate;
+			a_Values[-a_MinX - a_MinZ * SizeX] = g_bgTemperate;
 		}
 	}
 
@@ -529,12 +529,12 @@ public:
 		{
 			for (int x = 0; x < SizeX; x++)
 			{
-				if (a_Values[x + z * SizeX] == bgOcean)
+				if (a_Values[x + z * SizeX] == g_bgOcean)
 				{
 					int rnd = super::m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
 					if (rnd % 1000 < m_Chance)
 					{
-						a_Values[x + z * SizeX] = (rnd / 1003) % bgLandOceanMax;
+						a_Values[x + z * SizeX] = (rnd / 1003) % g_bgLandOceanMax;
 					}
 				}
 			}  // for x
@@ -591,7 +591,7 @@ public:
 				switch (val)
 				{
 					// Desert should neighbor only oceans, desert and temperates; change to temperate when another:
-					case bgDesert:
+					case g_bgDesert:
 					{
 						if (
 							!isDesertCompatible(above) ||
@@ -600,22 +600,22 @@ public:
 							!isDesertCompatible(right)
 						)
 						{
-							val = bgTemperate;
+							val = g_bgTemperate;
 						}
 						break;
 					}  // case bgDesert
 
 					// Ice should not neighbor deserts; change to temperate:
-					case bgIce:
+					case g_bgIce:
 					{
 						if (
-							(above == bgDesert) ||
-							(below == bgDesert) ||
-							(left  == bgDesert) ||
-							(right == bgDesert)
+							(above == g_bgDesert) ||
+							(below == g_bgDesert) ||
+							(left  == g_bgDesert) ||
+							(right == g_bgDesert)
 						)
 						{
-							val = bgTemperate;
+							val = g_bgTemperate;
 						}
 						break;
 					}  // case bgIce
@@ -633,9 +633,9 @@ protected:
 	{
 		switch (a_BiomeGroup)
 		{
-			case bgOcean:
-			case bgDesert:
-			case bgTemperate:
+			case g_bgOcean:
+			case g_bgDesert:
+			case g_bgTemperate:
 			{
 				return true;
 			}
@@ -754,8 +754,8 @@ public:
 			for (int x = 0; x < SizeX; x++)
 			{
 				size_t val = static_cast<size_t>(a_Values[x + IdxZ]);
-				const cBiomesInGroups & Biomes = (val > bgfRare) ?
-					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
+				const cBiomesInGroups & Biomes = (val > g_bgfRare) ?
+					rareBiomesInGroups[(val & (g_bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
 					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];
 				int rnd = (super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
@@ -767,8 +767,8 @@ protected:
 
 	struct cBiomesInGroups
 	{
-		const int Count;
-		const int * Biomes;
+		const int m_Count;
+		const int * m_Biomes;
 	};
 
 
@@ -1151,7 +1151,7 @@ public:
 				if (rnd % 1000 < m_Chance)
 				{
 					int idx = x + SizeX * z;
-					a_Values[idx] = a_Values[idx] | bgfRare;
+					a_Values[idx] = a_Values[idx] | g_bgfRare;
 				}
 			}
 		}

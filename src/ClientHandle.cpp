@@ -45,17 +45,17 @@
 
 /** The interval for sending pings to clients.
 Vanilla sends one ping every 1 second. */
-static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
+static const std::chrono::milliseconds g_PING_TIME_MS = std::chrono::milliseconds(1000);
 
 
 
 
 
 
-int cClientHandle::s_ClientCount = 0;
+int cClientHandle::m_s_ClientCount = 0;
 
 
-float cClientHandle::FASTBREAK_PERCENTAGE;
+float cClientHandle::m_FASTBREAK_PERCENTAGE;
 
 
 
@@ -97,8 +97,8 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 {
 	m_Protocol = cpp14::make_unique<cProtocolRecognizer>(this);
 
-	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
-	m_UniqueID = s_ClientCount;
+	m_s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
+	m_UniqueID = m_s_ClientCount;
 	m_PingStartTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
@@ -219,15 +219,15 @@ void cClientHandle::GenerateOfflineUUID(void)
 
 
 
-AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
+AString cClientHandle::FormatChatPrefix(bool a_ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString a_Color1, AString a_Color2)
 {
-	if (ShouldAppendChatPrefixes)
+	if (a_ShouldAppendChatPrefixes)
 	{
-		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+		return Printf("%s[%s] %s", a_Color1.c_str(), a_ChatPrefixS.c_str(), a_Color2.c_str());
 	}
 	else
 	{
-		return Printf("%s", m_Color1.c_str());
+		return Printf("%s", a_Color1.c_str());
 	}
 }
 
@@ -235,28 +235,28 @@ AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a
 
 
 
-AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
+AString cClientHandle::FormatMessageType(bool a_ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	switch (a_ChatPrefix)
 	{
 		case mtCustom:      return "";
-		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Rose,   cChatColor::White);
-		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Yellow, cChatColor::White);
-		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Green,  cChatColor::White);
-		case mtWarning:     return FormatChatPrefix(ShouldAppendChatPrefixes, "WARN",  cChatColor::Rose,   cChatColor::White);
-		case mtFatal:       return FormatChatPrefix(ShouldAppendChatPrefixes, "FATAL", cChatColor::Red,    cChatColor::White);
-		case mtDeath:       return FormatChatPrefix(ShouldAppendChatPrefixes, "DEATH", cChatColor::Gray,   cChatColor::White);
-		case mtJoin:        return FormatChatPrefix(ShouldAppendChatPrefixes, "JOIN",  cChatColor::Yellow, cChatColor::White);
-		case mtLeave:       return FormatChatPrefix(ShouldAppendChatPrefixes, "LEAVE", cChatColor::Yellow, cChatColor::White);
+		case mtFailure:     return FormatChatPrefix(a_ShouldAppendChatPrefixes, "INFO",  cChatColor::m_Rose,   cChatColor::m_White);
+		case mtInformation: return FormatChatPrefix(a_ShouldAppendChatPrefixes, "INFO",  cChatColor::m_Yellow, cChatColor::m_White);
+		case mtSuccess:     return FormatChatPrefix(a_ShouldAppendChatPrefixes, "INFO",  cChatColor::m_Green,  cChatColor::m_White);
+		case mtWarning:     return FormatChatPrefix(a_ShouldAppendChatPrefixes, "WARN",  cChatColor::m_Rose,   cChatColor::m_White);
+		case mtFatal:       return FormatChatPrefix(a_ShouldAppendChatPrefixes, "FATAL", cChatColor::m_Red,    cChatColor::m_White);
+		case mtDeath:       return FormatChatPrefix(a_ShouldAppendChatPrefixes, "DEATH", cChatColor::m_Gray,   cChatColor::m_White);
+		case mtJoin:        return FormatChatPrefix(a_ShouldAppendChatPrefixes, "JOIN",  cChatColor::m_Yellow, cChatColor::m_White);
+		case mtLeave:       return FormatChatPrefix(a_ShouldAppendChatPrefixes, "LEAVE", cChatColor::m_Yellow, cChatColor::m_White);
 		case mtPrivateMessage:
 		{
-			if (ShouldAppendChatPrefixes)
+			if (a_ShouldAppendChatPrefixes)
 			{
-				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue, a_AdditionalData.c_str(), cChatColor::White, cChatColor::Italic);
+				return Printf("%s[MSG: %s] %s%s", cChatColor::m_LightBlue, a_AdditionalData.c_str(), cChatColor::m_White, cChatColor::m_Italic);
 			}
 			else
 			{
-				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
+				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::m_LightBlue);
 			}
 		}
 		case mtMaxPlusOne: break;
@@ -694,9 +694,9 @@ void cClientHandle::HandlePing(void)
 
 	Printf(Reply, "%s%s%zu%s%zu",
 		Server.GetDescription().c_str(),
-		cChatColor::Delimiter,
+		cChatColor::m_Delimiter,
 		Server.GetNumPlayers(),
-		cChatColor::Delimiter,
+		cChatColor::m_Delimiter,
 		Server.GetMaxPlayers()
 	);
 	Kick(Reply);
@@ -805,10 +805,10 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 
 
 
-void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
+void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float a_FlyingSpeed, float a_WalkingSpeed)
 {
-	UNUSED(FlyingSpeed);  // Ignore the client values for these
-	UNUSED(WalkingSpeed);
+	UNUSED(a_FlyingSpeed);  // Ignore the client values for these
+	UNUSED(a_WalkingSpeed);
 
 	m_Player->SetCanFly(a_CanFly);
 	m_Player->SetFlying(a_IsFlying);
@@ -1314,7 +1314,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	{
 		// Fix for very fast tools.
 		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
-		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
+		if (m_BreakProgress < m_FASTBREAK_PERCENTAGE)
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
 			// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
@@ -2113,7 +2113,7 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
+		if ((m_PingStartTime + g_PING_TIME_MS <= std::chrono::steady_clock::now()))
 		{
 			m_PingID++;
 			m_PingStartTime = std::chrono::steady_clock::now();

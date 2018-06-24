@@ -180,40 +180,40 @@ public:
 	}
 
 
-	inline static int MakeIndex(int x, int y, int z)
+	inline static int MakeIndex(int a_x, int a_y, int a_z)
 	{
 		if (
-			(x < Width)  && (x > -1) &&
-			(y < Height) && (y > -1) &&
-			(z < Width)  && (z > -1)
+			(a_x < Width)  && (a_x > -1) &&
+			(a_y < Height) && (a_y > -1) &&
+			(a_z < Width)  && (a_z > -1)
 		)
 		{
-			return MakeIndexNoCheck(x, y, z);
+			return MakeIndexNoCheck(a_x, a_y, a_z);
 		}
-		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
+		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", a_x, a_y, a_z);
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
 		return 0;
 	}
 
 
-	inline static int MakeIndexNoCheck(int x, int y, int z)
+	inline static int MakeIndexNoCheck(int a_x, int a_y, int a_z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
+			return a_x + (a_z * cChunkDef::Width) + (a_y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
 		#endif
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+	inline static Vector3i IndexToCoordinate( unsigned int a_index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+				a_index % cChunkDef::Width,                       // X
+				a_index / (cChunkDef::Width * cChunkDef::Width),  // Y
+				(a_index / cChunkDef::Width) % cChunkDef::Width   // Z
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
@@ -304,11 +304,11 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, bool a_IsSkyLightNibble = false)
+	static NIBBLETYPE GetNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_x, int a_y, int a_z, bool a_IsSkyLightNibble = false)
 	{
-		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
+		if ((a_x < Width) && (a_x > -1) && (a_y < Height) && (a_y > -1) && (a_z < Width) && (a_z > -1))
 		{
-			size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
+			size_t Index = static_cast<size_t>(MakeIndexNoCheck(a_x, a_y, a_z));
 			if ((Index / 2) >= a_Buffer.size())
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
@@ -320,11 +320,11 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
+	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int a_x, int a_y, int a_z)
 	{
-		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
+		if ((a_x < Width) && (a_x > -1) && (a_y < Height) && (a_y > -1) && (a_z < Width) && (a_z > -1))
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
+			int Index = MakeIndexNoCheck(a_x, a_y, a_z);
 			return (a_Buffer[static_cast<size_t>(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
@@ -347,19 +347,19 @@ public:
 	}
 
 
-	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
+	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int a_x, int a_y, int a_z, NIBBLETYPE a_Nibble)
 	{
 		if (
-			(x >= Width)  || (x < 0) ||
-			(y >= Height) || (y < 0) ||
-			(z >= Width)  || (z < 0)
+			(a_x >= Width)  || (a_x < 0) ||
+			(a_y >= Height) || (a_y < 0) ||
+			(a_z >= Width)  || (a_z < 0)
 		)
 		{
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
 
-		size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
+		size_t Index = static_cast<size_t>(MakeIndexNoCheck(a_x, a_y, a_z));
 		if ((Index / 2) >= a_Buffer.size())
 		{
 			a_Buffer.resize(((Index / 2) + 1));
@@ -530,18 +530,18 @@ public:
 template <typename X> class cCoordWithData
 {
 public:
-	int x;
-	int y;
-	int z;
-	X   Data;
+	int m_x;
+	int m_y;
+	int m_z;
+	X   m_Data;
 
 	cCoordWithData(int a_X, int a_Y, int a_Z) :
-		x(a_X), y(a_Y), z(a_Z), Data()
+		m_x(a_X), m_y(a_Y), m_z(a_Z), m_Data()
 	{
 	}
 
 	cCoordWithData(int a_X, int a_Y, int a_Z, const X & a_Data) :
-		x(a_X), y(a_Y), z(a_Z), Data(a_Data)
+		m_x(a_X), m_y(a_Y), m_z(a_Z), m_Data(a_Data)
 	{
 	}
 } ;

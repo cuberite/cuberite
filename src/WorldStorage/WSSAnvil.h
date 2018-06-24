@@ -142,7 +142,7 @@ protected:
 	/** Loads contentents of an Items[] list tag into a cItemGrid
 	ItemGrid begins at the specified slot offset
 	Slots outside the ItemGrid range are ignored */
-	void LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int s_SlotOffset = 0);
+	void LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int a_s_SlotOffset = 0);
 
 	/** Decodes the text contained within a sign.
 	Older versions used direct string representation, newer versions use JSON-formatted string.

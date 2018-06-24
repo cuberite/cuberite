@@ -26,31 +26,31 @@ class cManualBindings
 {
 public:
 	/** Binds all the manually implemented functions to tolua_S. */
-	static void Bind(lua_State * tolua_S);
+	static void Bind(lua_State * a_tolua_S);
 
 protected:
 	/** Binds the manually implemented cNetwork-related API to tolua_S.
 	Implemented in ManualBindings_Network.cpp. */
-	static void BindNetwork(lua_State * tolua_S);
+	static void BindNetwork(lua_State * a_tolua_S);
 
 	/** Binds the manually implemented cRankManager glue code to tolua_S.
 	Implemented in ManualBindings_RankManager.cpp. */
-	static void BindRankManager(lua_State * tolua_S);
+	static void BindRankManager(lua_State * a_tolua_S);
 
 	/** Binds the manually implemented cWorld API functions to tolua_S.
 	Implemented in ManualBindings_World.cpp. */
-	static void BindWorld(lua_State * tolua_S);
+	static void BindWorld(lua_State * a_tolua_S);
 
 	/** Binds the manually implemented cBlockArea API functions to tlua_S.
 	Implemented in ManualBindings_BlockArea.cpp. */
-	static void BindBlockArea(lua_State * tolua_S);
+	static void BindBlockArea(lua_State * a_tolua_S);
 
 
 public:
 	// Helper functions:
-	static cPluginLua * GetLuaPlugin(lua_State * L);
-	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
-	static int lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList);
+	static cPluginLua * GetLuaPlugin(lua_State * a_L);
+	static int tolua_do_error(lua_State * a_L, const char * a_pMsg, tolua_Error * a_pToLuaError);
+	static int lua_do_error(lua_State * a_L, const char * a_pFormat, fmt::ArgList a_ArgList);
 	FMT_VARIADIC(static int, lua_do_error, lua_State *, const char *)
 
 
@@ -60,10 +60,10 @@ public:
 		class Ty2,
 		bool (Ty1::*DoWithFn)(const AString &, cFunctionRef<bool(Ty2 &)>)
 	>
-	static int DoWith(lua_State * tolua_S)
+	static int DoWith(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamString(2) ||
 			!L.CheckParamFunction(3)
@@ -79,15 +79,15 @@ public:
 		L.GetStackValues(1, Self, ItemName, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 		}
 		if (ItemName.empty() || (ItemName[0] == 0))
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
 		// Call the DoWith function:
@@ -114,10 +114,10 @@ public:
 		class Ty2,
 		bool (Ty1::*DoWithFn)(const AString &, cFunctionRef<bool(Ty2 &)>)
 	>
-	static int StaticDoWith(lua_State * tolua_S)
+	static int StaticDoWith(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamString(2) ||
 			!L.CheckParamFunction(3)
@@ -132,11 +132,11 @@ public:
 		L.GetStackValues(2, ItemName, FnRef);
 		if (ItemName.empty() || (ItemName[0] == 0))
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
 		// Call the DoWith function:
@@ -162,10 +162,10 @@ public:
 		class Ty2,
 		bool (Ty1::*DoWithFn)(UInt32, cFunctionRef<bool(Ty2 &)>)
 	>
-	static int DoWithID(lua_State * tolua_S)
+	static int DoWithID(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamNumber(2) ||
 			!L.CheckParamFunction(3)
@@ -181,11 +181,11 @@ public:
 		L.GetStackValues(1, Self, ItemID, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
 		// Call the DoWith function:
@@ -212,10 +212,10 @@ public:
 		class ITEM,
 		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>)
 	>
-	static int DoWithXYZ(lua_State * tolua_S)
+	static int DoWithXYZ(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamNumber(2, 4) ||
 			!L.CheckParamFunction(5) ||
@@ -234,11 +234,11 @@ public:
 		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
 		}
 
 		// Call the DoWith function:
@@ -266,10 +266,10 @@ public:
 		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
 		bool (SELF::*CoordCheckFn)(int, int, int) const
 	>
-	static int DoWithXYZ(lua_State * tolua_S)
+	static int DoWithXYZ(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamNumber(2, 4) ||
 			!L.CheckParamFunction(5) ||
@@ -288,15 +288,15 @@ public:
 		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
 		}
 		if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
 		{
-			return lua_do_error(tolua_S, Printf("Error in function call '#funcname#': The provided coordinates ({%d, %d, %d}) are not valid",
+			return lua_do_error(a_tolua_S, Printf("Error in function call '#funcname#': The provided coordinates ({%d, %d, %d}) are not valid",
 				BlockX, BlockY, BlockZ
 			).c_str());
 		}
@@ -324,10 +324,10 @@ public:
 		class Ty2,
 		bool (Ty1::*ForEachFn)(int, int, cFunctionRef<bool(Ty2 &)>)
 	>
-	static int ForEachInChunk(lua_State * tolua_S)
+	static int ForEachInChunk(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamNumber(2, 3) ||
 			!L.CheckParamFunction(4) ||
@@ -345,11 +345,11 @@ public:
 		L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #4");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #4");
 		}
 
 		// Call the DoWith function:
@@ -375,10 +375,10 @@ public:
 		class Ty2,
 		bool (Ty1::*ForEachFn)(const cBoundingBox &, cFunctionRef<bool(Ty2 &)>)
 	>
-	static int ForEachInBox(lua_State * tolua_S)
+	static int ForEachInBox(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamUserType(1, "cWorld") ||
 			!L.CheckParamUserType(2, "cBoundingBox") ||
@@ -402,7 +402,7 @@ public:
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 		}
 
 		bool res = (Self->*ForEachFn)(*Box, [&](Ty2 & a_Item)
@@ -433,10 +433,10 @@ public:
 		class Ty2,
 		bool (Ty1::*ForEachFn)(cFunctionRef<bool(Ty2 &)>)
 	>
-	static int ForEach(lua_State * tolua_S)
+	static int ForEach(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamFunction(2) ||
 			!L.CheckParamEnd(3)
@@ -451,11 +451,11 @@ public:
 		L.GetStackValues(1, Self, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'.");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Invalid 'self'.");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
 		}
 
 		// Call the enumeration:
@@ -482,10 +482,10 @@ public:
 		class Ty2,
 		bool (Ty1::*ForEachFn)(cFunctionRef<bool(Ty2 &)>)
 	>
-	static int StaticForEach(lua_State * tolua_S)
+	static int StaticForEach(lua_State * a_tolua_S)
 	{
 		// Check params:
-		cLuaState L(tolua_S);
+		cLuaState L(a_tolua_S);
 		if (
 			!L.CheckParamFunction(2) ||
 			!L.CheckParamEnd(3)
@@ -498,7 +498,7 @@ public:
 		cLuaState::cRef FnRef(L, 2);
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
+			return lua_do_error(a_tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #1");
 		}
 
 		// Call the enumeration:

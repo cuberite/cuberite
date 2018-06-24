@@ -17,24 +17,24 @@
 
 /* get function: g_BlockLightValue */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockLightValue
-static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockLightValue(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::GetLightValue(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -47,24 +47,24 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 
 /* get function: g_BlockSpreadLightFalloff */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockSpreadLightFalloff
-static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::GetSpreadLightFalloff(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -77,24 +77,24 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 
 /* get function: g_BlockTransparent */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockTransparent
-static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockTransparent(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::IsTransparent(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -107,24 +107,24 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 
 /* get function: g_BlockOneHitDig */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockOneHitDig
-static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::IsOneHitDig(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -137,24 +137,24 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 
 /* get function: g_BlockPistonBreakable */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockPistonBreakable
-static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::IsPistonBreakable(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -167,24 +167,24 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 
 /* get function: g_BlockIsSnowable */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSnowable
-static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::IsSnowable(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -197,24 +197,24 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 
 /* get function: g_BlockIsSolid */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
-static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::IsSolid(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -227,24 +227,24 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 
 /* get function: g_BlockFullyOccupiesVoxel */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockFullyOccupiesVoxel
-static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
+static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	int BlockType = 0;
 	#ifndef TOLUA_RELEASE
 	{
 		tolua_Error tolua_err;
-		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		if (!tolua_isnumber(a_tolua_S, 2, 0, &tolua_err))
 		{
-			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+			tolua_error(a_tolua_S, "#vinvalid type in array indexing.", &tolua_err);
 		}
 	}
 	#endif
 	LuaState.GetStackValue(2, BlockType);
 	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
 	{
-		tolua_error(tolua_S, "array indexing out of range.", nullptr);
+		tolua_error(a_tolua_S, "array indexing out of range.", nullptr);
 	}
 	LuaState.Push(cBlockInfo::FullyOccupiesVoxel(static_cast<BLOCKTYPE>(BlockType)));
 	return 1;
@@ -256,15 +256,15 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 
 
 /* function: StringToMobType */
-static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
+static int tolua_AllToLua_StringToMobType00(lua_State* a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	#ifndef TOLUA_RELEASE
 	tolua_Error tolua_err;
 	if (
-		!tolua_iscppstring(tolua_S, 1, 0, &tolua_err) ||
-		!tolua_isnoobj(tolua_S, 2, &tolua_err)
+		!tolua_iscppstring(a_tolua_S, 1, 0, &tolua_err) ||
+		!tolua_isnoobj(a_tolua_S, 2, &tolua_err)
 		)
 		goto tolua_lerror;
 	else
@@ -291,9 +291,9 @@ tolua_lerror:
 
 
 
-static int tolua_cBlockInfo_Get(lua_State * tolua_S)
+static int tolua_cBlockInfo_Get(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (
 		!L.CheckParamStaticSelf("cBlockInfo") ||
 		!L.CheckParamNumber(2)
@@ -317,9 +317,9 @@ static int tolua_cBlockInfo_Get(lua_State * tolua_S)
 
 
 
-static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
+static int tolua_cBlockInfo_GetPlaceSound(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (
 		!L.CheckParamStaticSelf("cBlockInfo") ||
 		!L.CheckParamNumber(2)
@@ -338,9 +338,9 @@ static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
 
 
 
-static int tolua_get_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
+static int tolua_get_cBlockInfo_m_PlaceSound(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (!L.CheckParamSelf("const cBlockInfo"))
 	{
 		return 0;
@@ -356,9 +356,9 @@ static int tolua_get_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
 
 
 
-static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
+static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (!L.CheckParamSelf("cBlockInfo"))
 	{
 		return 0;
@@ -377,9 +377,9 @@ static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
 \tparam VariableType The type of the variable being accessed.
 \tparam GetterFunction The function called to get the value returned to lua. */
 template <typename VariableType, VariableType (*GetterFunction)(BLOCKTYPE)>
-static int tolua_get_cBlockInfo(lua_State * tolua_S)
+static int tolua_get_cBlockInfo(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (!L.CheckParamSelf("const cBlockInfo"))
 	{
 		return 0;
@@ -400,9 +400,9 @@ static int tolua_get_cBlockInfo(lua_State * tolua_S)
 
 
 /** cBlockInfo variables: Print deprecation message on assignment. */
-static int tolua_set_cBlockInfo(lua_State * tolua_S)
+static int tolua_set_cBlockInfo(lua_State * a_tolua_S)
 {
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (!L.CheckParamSelf("cBlockInfo"))
 	{
 		return 0;
@@ -417,10 +417,10 @@ static int tolua_set_cBlockInfo(lua_State * tolua_S)
 
 
 
-static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
+static int tolua_get_cItem_m_Lore(lua_State * a_tolua_S)
 {
 	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (!L.CheckParamSelf("const cItem"))
 	{
 		return 0;
@@ -442,10 +442,10 @@ static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 
 
 
-static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
+static int tolua_set_cItem_m_Lore(lua_State * a_tolua_S)
 {
 	// Maintain legacy m_Lore variable as Lore table split by ` (grave-accent)
-	cLuaState L(tolua_S);
+	cLuaState L(a_tolua_S);
 	if (
 		!L.CheckParamSelf("cItem") ||
 		!L.CheckParamString(2)
@@ -511,9 +511,9 @@ static int tolua_cTracer_Trace(lua_State * a_LuaState)
 
 
 /** function: cWorld:SetSignLines */
-static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
+static int tolua_cWorld_SetSignLines(lua_State * a_tolua_S)
 {
-	cLuaState LuaState(tolua_S);
+	cLuaState LuaState(a_tolua_S);
 
 	#ifndef TOLUA_RELEASE
 	if (
@@ -602,69 +602,69 @@ int tolua_Vector3_Clamp(lua_State * a_LuaState)
 
 
 
-void DeprecatedBindings::Bind(lua_State * tolua_S)
+void DeprecatedBindings::Bind(lua_State * a_tolua_S)
 {
-	tolua_beginmodule(tolua_S, nullptr);
+	tolua_beginmodule(a_tolua_S, nullptr);
 
-	tolua_array(tolua_S, "g_BlockLightValue",          tolua_get_AllToLua_g_BlockLightValue,          nullptr);
-	tolua_array(tolua_S, "g_BlockSpreadLightFalloff",  tolua_get_AllToLua_g_BlockSpreadLightFalloff,  nullptr);
-	tolua_array(tolua_S, "g_BlockTransparent",         tolua_get_AllToLua_g_BlockTransparent,         nullptr);
-	tolua_array(tolua_S, "g_BlockOneHitDig",           tolua_get_AllToLua_g_BlockOneHitDig,           nullptr);
-	tolua_array(tolua_S, "g_BlockPistonBreakable",     tolua_get_AllToLua_g_BlockPistonBreakable,     nullptr);
-	tolua_array(tolua_S, "g_BlockIsSnowable",          tolua_get_AllToLua_g_BlockIsSnowable,          nullptr);
-	tolua_array(tolua_S, "g_BlockIsSolid",             tolua_get_AllToLua_g_BlockIsSolid,             nullptr);
-	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  nullptr);
+	tolua_array(a_tolua_S, "g_BlockLightValue",          tolua_get_AllToLua_g_BlockLightValue,          nullptr);
+	tolua_array(a_tolua_S, "g_BlockSpreadLightFalloff",  tolua_get_AllToLua_g_BlockSpreadLightFalloff,  nullptr);
+	tolua_array(a_tolua_S, "g_BlockTransparent",         tolua_get_AllToLua_g_BlockTransparent,         nullptr);
+	tolua_array(a_tolua_S, "g_BlockOneHitDig",           tolua_get_AllToLua_g_BlockOneHitDig,           nullptr);
+	tolua_array(a_tolua_S, "g_BlockPistonBreakable",     tolua_get_AllToLua_g_BlockPistonBreakable,     nullptr);
+	tolua_array(a_tolua_S, "g_BlockIsSnowable",          tolua_get_AllToLua_g_BlockIsSnowable,          nullptr);
+	tolua_array(a_tolua_S, "g_BlockIsSolid",             tolua_get_AllToLua_g_BlockIsSolid,             nullptr);
+	tolua_array(a_tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  nullptr);
 
-	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
+	tolua_function(a_tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
 
-	tolua_beginmodule(tolua_S, "cBlockInfo");
-		tolua_function(tolua_S, "Get",                    tolua_cBlockInfo_Get);
-		tolua_function(tolua_S, "GetPlaceSound",          tolua_cBlockInfo_GetPlaceSound);
-		tolua_variable(tolua_S, "m_PlaceSound",           tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
-		tolua_variable(tolua_S, "m_LightValue",           tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetLightValue        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_SpreadLightFalloff",   tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetSpreadLightFalloff>, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_Transparent",          tolua_get_cBlockInfo<bool,       cBlockInfo::IsTransparent        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_OneHitDig",            tolua_get_cBlockInfo<bool,       cBlockInfo::IsOneHitDig          >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_PistonBreakable",      tolua_get_cBlockInfo<bool,       cBlockInfo::IsPistonBreakable    >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsRainBlocker",        tolua_get_cBlockInfo<bool,       cBlockInfo::IsRainBlocker        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSkylightDispersant", tolua_get_cBlockInfo<bool,       cBlockInfo::IsSkylightDispersant >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSnowable",           tolua_get_cBlockInfo<bool,       cBlockInfo::IsSnowable           >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSolid",              tolua_get_cBlockInfo<bool,       cBlockInfo::IsSolid              >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_UseableBySpectator",   tolua_get_cBlockInfo<bool,       cBlockInfo::IsUseableBySpectator >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_FullyOccupiesVoxel",   tolua_get_cBlockInfo<bool,       cBlockInfo::FullyOccupiesVoxel   >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_CanBeTerraformed",     tolua_get_cBlockInfo<bool,       cBlockInfo::CanBeTerraformed     >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_BlockHeight",          tolua_get_cBlockInfo<float,      cBlockInfo::GetBlockHeight       >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_Hardness",             tolua_get_cBlockInfo<float,      cBlockInfo::GetHardness          >, tolua_set_cBlockInfo);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cBlockInfo");
+		tolua_function(a_tolua_S, "Get",                    tolua_cBlockInfo_Get);
+		tolua_function(a_tolua_S, "GetPlaceSound",          tolua_cBlockInfo_GetPlaceSound);
+		tolua_variable(a_tolua_S, "m_PlaceSound",           tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
+		tolua_variable(a_tolua_S, "m_LightValue",           tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetLightValue        >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_SpreadLightFalloff",   tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetSpreadLightFalloff>, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_Transparent",          tolua_get_cBlockInfo<bool,       cBlockInfo::IsTransparent        >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_OneHitDig",            tolua_get_cBlockInfo<bool,       cBlockInfo::IsOneHitDig          >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_PistonBreakable",      tolua_get_cBlockInfo<bool,       cBlockInfo::IsPistonBreakable    >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_IsRainBlocker",        tolua_get_cBlockInfo<bool,       cBlockInfo::IsRainBlocker        >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_IsSkylightDispersant", tolua_get_cBlockInfo<bool,       cBlockInfo::IsSkylightDispersant >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_IsSnowable",           tolua_get_cBlockInfo<bool,       cBlockInfo::IsSnowable           >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_IsSolid",              tolua_get_cBlockInfo<bool,       cBlockInfo::IsSolid              >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_UseableBySpectator",   tolua_get_cBlockInfo<bool,       cBlockInfo::IsUseableBySpectator >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_FullyOccupiesVoxel",   tolua_get_cBlockInfo<bool,       cBlockInfo::FullyOccupiesVoxel   >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_CanBeTerraformed",     tolua_get_cBlockInfo<bool,       cBlockInfo::CanBeTerraformed     >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_BlockHeight",          tolua_get_cBlockInfo<float,      cBlockInfo::GetBlockHeight       >, tolua_set_cBlockInfo);
+		tolua_variable(a_tolua_S, "m_Hardness",             tolua_get_cBlockInfo<float,      cBlockInfo::GetHardness          >, tolua_set_cBlockInfo);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cItem");
-		tolua_variable(tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cItem");
+		tolua_variable(a_tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cTracer");
-		tolua_function(tolua_S, "Trace", tolua_cTracer_Trace);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cTracer");
+		tolua_function(a_tolua_S, "Trace", tolua_cTracer_Trace);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cWorld");
-		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cWorld");
+		tolua_function(a_tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "Vector3i");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<int>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<int>);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "Vector3i");
+		tolua_function(a_tolua_S,"abs",   tolua_Vector3_Abs<int>);
+		tolua_function(a_tolua_S,"clamp", tolua_Vector3_Clamp<int>);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "Vector3f");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<float>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<float>);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "Vector3f");
+		tolua_function(a_tolua_S,"abs",   tolua_Vector3_Abs<float>);
+		tolua_function(a_tolua_S,"clamp", tolua_Vector3_Clamp<float>);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "Vector3d");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<double>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<double>);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "Vector3d");
+		tolua_function(a_tolua_S,"abs",   tolua_Vector3_Abs<double>);
+		tolua_function(a_tolua_S,"clamp", tolua_Vector3_Clamp<double>);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_endmodule(tolua_S);
+	tolua_endmodule(a_tolua_S);
 }
 
 

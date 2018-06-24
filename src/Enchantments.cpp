@@ -205,9 +205,9 @@ unsigned int cEnchantments::GetLevelCap(int a_EnchantmentID)
 
 
 
-int cEnchantments::GetXPCostMultiplier(int a_EnchantmentID, bool FromBook)
+int cEnchantments::GetXPCostMultiplier(int a_EnchantmentID, bool a_FromBook)
 {
-	if (FromBook)
+	if (a_FromBook)
 	{
 		switch (a_EnchantmentID)
 		{

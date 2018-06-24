@@ -52,7 +52,7 @@ private:
 	std::vector<AString> m_Comments;
 
 	/** If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is */
-	AString CheckCase(const AString & s) const;
+	AString CheckCase(const AString & a_s) const;
 
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
@@ -103,48 +103,48 @@ public:
 	bool HasValue(const AString & a_KeyName, const AString & a_ValueName) const override;
 
 	/** Returns index of specified key, or noID if not found */
-	int FindKey(const AString & keyname) const;
+	int FindKey(const AString & a_keyname) const;
 
 	/** Returns index of specified value, in the specified key, or noID if not found */
-	int FindValue(const int keyID, const AString & valuename) const;
+	int FindValue(const int a_keyID, const AString & a_valuename) const;
 
 	/** Returns number of keys currently in the ini */
 	int GetNumKeys(void) const { return static_cast<int>(m_Keys.size()); }
 
 	/** Add a key name */
-	int AddKeyName(const AString & keyname) override;
+	int AddKeyName(const AString & a_keyname) override;
 
 	// Returns key names by index.
-	AString GetKeyName(const int keyID) const;
+	AString GetKeyName(const int a_keyID) const;
 
 	// Returns number of values stored for specified key.
-	int GetNumValues(const AString & keyname) const;
-	int GetNumValues(const int keyID) const;
+	int GetNumValues(const AString & a_keyname) const;
+	int GetNumValues(const int a_keyID) const;
 
 	// Returns value name by index for a given keyname or keyID.
-	AString GetValueName(const AString & keyname, const int valueID) const;
-	AString GetValueName(const int keyID, const int valueID) const;
+	AString GetValueName(const AString & a_keyname, const int a_valueID) const;
+	AString GetValueName(const int a_keyID, const int a_valueID) const;
 
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key / value not found.
-	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const override;
-	AString GetValue (const int keyID,    const int valueID,    const AString & defValue = "")    const;
-	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
-	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;
-	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const
+	AString GetValue (const AString & a_keyname, const AString & a_valuename, const AString & a_defValue = "")    const override;
+	AString GetValue (const int a_keyID,    const int a_valueID,    const AString & a_defValue = "")    const;
+	double  GetValueF(const AString & a_keyname, const AString & a_valuename, const double    a_defValue = 0)     const;
+	int     GetValueI(const AString & a_keyname, const AString & a_valuename, const int       a_defValue = 0)     const;
+	bool    GetValueB(const AString & a_keyname, const AString & a_valuename, const bool      a_defValue = false) const
 	{
-		return (GetValueI(keyname, valuename, defValue ? 1 : 0) != 0);
+		return (GetValueI(a_keyname, a_valuename, a_defValue ? 1 : 0) != 0);
 	}
 
 	// Gets the value; if not found, write the default to the INI file
-	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "") override;
-	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
-	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0) override;
-	Int64   GetValueSetI(const AString & keyname, const AString & valuename, const Int64     defValue = 0) override;
-	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false) override
+	AString GetValueSet (const AString & a_keyname, const AString & a_valuename, const AString & a_defValue = "") override;
+	double  GetValueSetF(const AString & a_keyname, const AString & a_valuename, const double    a_defValue = 0.0);
+	int     GetValueSetI(const AString & a_keyname, const AString & a_valuename, const int       a_defValue = 0) override;
+	Int64   GetValueSetI(const AString & a_keyname, const AString & a_valuename, const Int64     a_defValue = 0) override;
+	bool    GetValueSetB(const AString & a_keyname, const AString & a_valuename, const bool      a_defValue = false) override
 	{
-		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
+		return (GetValueSetI(a_keyname, a_valuename, a_defValue ? 1 : 0) != 0);
 	}
 
 	// Adds a new value to the specified key.
@@ -161,7 +161,7 @@ public:
 	// Specify the optional parameter as false (0) if you do not want the value created if it doesn't exist.
 	// Returns true if value set, false otherwise.
 	// Overloaded to accept string, int, and double.
-	bool SetValue (const int keyID, const int valueID, const AString & value);
+	bool SetValue (const int a_keyID, const int a_valueID, const AString & a_value);
 	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true) override;
 	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true) override;
 	bool SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists = true);
@@ -173,12 +173,12 @@ public:
 
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
-	bool DeleteValueByID(const int keyID, const int valueID);
-	bool DeleteValue(const AString & keyname, const AString & valuename) override;
+	bool DeleteValueByID(const int a_keyID, const int a_valueID);
+	bool DeleteValue(const AString & a_keyname, const AString & a_valuename) override;
 
 	// Deletes specified key and all values contained within.
 	// Returns true if key existed and deleted, false otherwise.
-	bool DeleteKey(const AString & keyname);
+	bool DeleteKey(const AString & a_keyname);
 
 	// Header comment functions.
 	// Header comments are those comments before the first key.
@@ -187,13 +187,13 @@ public:
 	int GetNumHeaderComments(void) {return static_cast<int>(m_Comments.size());}
 
 	/** Adds a header comment */
-	void AddHeaderComment(const AString & comment);
+	void AddHeaderComment(const AString & a_comment);
 
 	/** Returns a header comment, or empty string if out of range */
-	AString GetHeaderComment(const int commentID) const;
+	AString GetHeaderComment(const int a_commentID) const;
 
 	/** Deletes a header comment. Returns true if successful */
-	bool DeleteHeaderComment(int commentID);
+	bool DeleteHeaderComment(int a_commentID);
 
 	/** Deletes all header comments */
 	void DeleteHeaderComments(void) {m_Comments.clear();}
@@ -206,28 +206,28 @@ public:
 	// the CIniFile::WriteFile() is called.
 
 	/** Get number of key comments */
-	int GetNumKeyComments(const int keyID) const;
+	int GetNumKeyComments(const int a_keyID) const;
 
 	/** Get number of key comments */
-	int GetNumKeyComments(const AString & keyname) const;
+	int GetNumKeyComments(const AString & a_keyname) const;
 
 	/** Add a key comment */
-	bool AddKeyComment(const int keyID, const AString & comment);
+	bool AddKeyComment(const int a_keyID, const AString & a_comment);
 
 	/** Add a key comment */
-	bool AddKeyComment(const AString & keyname, const AString & comment) override;
+	bool AddKeyComment(const AString & a_keyname, const AString & a_comment) override;
 
 	/** Return a key comment */
-	AString GetKeyComment(const int keyID, const int commentID) const;
-	AString GetKeyComment(const AString & keyname, const int commentID) const override;
+	AString GetKeyComment(const int a_keyID, const int a_commentID) const;
+	AString GetKeyComment(const AString & a_keyname, const int a_commentID) const override;
 
 	// Delete a key comment.
-	bool DeleteKeyComment(const int keyID, const int commentID);
-	bool DeleteKeyComment(const AString & keyname, const int commentID) override;
+	bool DeleteKeyComment(const int a_keyID, const int a_commentID);
+	bool DeleteKeyComment(const AString & a_keyname, const int a_commentID) override;
 
 	// Delete all comments for a key.
-	bool DeleteKeyComments(const int keyID);
-	bool DeleteKeyComments(const AString & keyname);
+	bool DeleteKeyComments(const int a_keyID);
+	bool DeleteKeyComments(const AString & a_keyname);
 };
 
 // tolua_end

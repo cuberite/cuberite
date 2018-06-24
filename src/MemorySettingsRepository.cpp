@@ -6,9 +6,9 @@
 
 
 
-bool cMemorySettingsRepository::KeyExists(const AString keyname) const
+bool cMemorySettingsRepository::KeyExists(const AString a_keyname) const
 {
-	return m_Map.count(keyname) != 0;
+	return m_Map.count(a_keyname) != 0;
 }
 
 
@@ -43,7 +43,7 @@ int cMemorySettingsRepository::AddKeyName(const AString & a_keyname)
 
 
 
-bool cMemorySettingsRepository::AddKeyComment(const AString & keyname, const AString & comment)
+bool cMemorySettingsRepository::AddKeyComment(const AString & a_keyname, const AString & a_comment)
 {
 	return false;
 }
@@ -52,7 +52,7 @@ bool cMemorySettingsRepository::AddKeyComment(const AString & keyname, const ASt
 
 
 
-AString cMemorySettingsRepository::GetKeyComment(const AString & keyname, const int commentID) const
+AString cMemorySettingsRepository::GetKeyComment(const AString & a_keyname, const int a_commentID) const
 {
 	return "";
 }
@@ -61,7 +61,7 @@ AString cMemorySettingsRepository::GetKeyComment(const AString & keyname, const 
 
 
 
-bool cMemorySettingsRepository::DeleteKeyComment(const AString & keyname, const int commentID)
+bool cMemorySettingsRepository::DeleteKeyComment(const AString & a_keyname, const int a_commentID)
 {
 	return false;
 }
@@ -120,17 +120,17 @@ std::vector<std::pair<AString, AString>> cMemorySettingsRepository::GetValues(AS
 
 
 
-AString cMemorySettingsRepository::GetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)    const
+AString cMemorySettingsRepository::GetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_defValue)    const
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
 	{
-		return defValue;
+		return a_defValue;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
 	if (iter == outerIter->second.end())
 	{
-		return defValue;
+		return a_defValue;
 	}
 	return iter->second.getStringValue();
 }
@@ -139,19 +139,19 @@ AString cMemorySettingsRepository::GetValue (const AString & a_KeyName, const AS
 
 
 
-AString cMemorySettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)
+AString cMemorySettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & a_defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
 	if (iter == outerIter->second.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	return iter->second.getStringValue();
 }
@@ -160,19 +160,19 @@ AString cMemorySettingsRepository::GetValueSet (const AString & a_KeyName, const
 
 
 
-int cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const int defValue)
+int cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const int a_defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
 	{
-		AddValue(a_KeyName, a_ValueName, static_cast<Int64>(defValue));
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, static_cast<Int64>(a_defValue));
+		return a_defValue;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
 	if (iter == outerIter->second.end())
 	{
-		AddValue(a_KeyName, a_ValueName, static_cast<Int64>(defValue));
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, static_cast<Int64>(a_defValue));
+		return a_defValue;
 	}
 	return static_cast<int>(iter->second.getIntValue());
 }
@@ -181,19 +181,19 @@ int cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const ASt
 
 
 
-Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 defValue)
+Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 a_defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
 	if (iter == outerIter->second.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	return iter->second.getIntValue();
 }
@@ -201,19 +201,19 @@ Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const A
 
 
 
-bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
+bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool a_defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
 	if (iter == outerIter->second.end())
 	{
-		AddValue(a_KeyName, a_ValueName, defValue);
-		return defValue;
+		AddValue(a_KeyName, a_ValueName, a_defValue);
+		return a_defValue;
 	}
 	return iter->second.getBoolValue();
 }

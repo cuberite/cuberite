@@ -20,10 +20,10 @@
 
 
 /** The maximum age for items to be kept in the cache. Any item older than this will be removed. */
-const Int64 MAX_AGE = 7 * 24 * 60 * 60;  // 7 days ago
+const Int64 g_MAX_AGE = 7 * 24 * 60 * 60;  // 7 days ago
 
 /** The maximum number of names to send in a single query */
-const int MAX_PER_QUERY = 100;
+const int g_MAX_PER_QUERY = 100;
 
 
 
@@ -580,7 +580,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 		db.exec("DELETE FROM UUIDToProfile");
 
 		// Save all cache entries - m_PlayerNameToUUID:
-		Int64 LimitDateTime = time(nullptr) - MAX_AGE;
+		Int64 LimitDateTime = time(nullptr) - g_MAX_AGE;
 		{
 			SQLite::Statement stmt(db, "INSERT INTO PlayerNameToUUID(PlayerName, UUID, DateTime) VALUES (?, ?, ?)");
 			cCSLock Lock(m_CSNameToUUID);
@@ -663,7 +663,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		Json::Value root;
 		int Count = 0;
 		AStringVector::iterator itr = a_NamesToQuery.begin(), end = a_NamesToQuery.end();
-		for (; (itr != end) && (Count < MAX_PER_QUERY); ++itr, ++Count)
+		for (; (itr != end) && (Count < g_MAX_PER_QUERY); ++itr, ++Count)
 		{
 			Json::Value req(*itr);
 			root.append(req);
@@ -889,7 +889,7 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UU
 
 void cMojangAPI::Update(void)
 {
-	Int64 LimitDateTime = time(nullptr) - MAX_AGE;
+	Int64 LimitDateTime = time(nullptr) - g_MAX_AGE;
 
 	// Re-query all playernames that are stale:
 	AStringVector PlayerNames;

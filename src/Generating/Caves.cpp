@@ -35,8 +35,8 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 
 
-const int MIN_RADIUS = 3;
-const int MAX_RADIUS = 8;
+const int g_MIN_RADIUS = 3;
+const int g_MAX_RADIUS = 8;
 
 
 
@@ -207,7 +207,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			len += (PrevY - itr->m_BlockY) * (PrevY - itr->m_BlockY);
 			len += (PrevZ - itr->m_BlockZ) * (PrevZ - itr->m_BlockZ);
 			len = 3 * static_cast<int>(sqrt(static_cast<double>(len))) / 4;
-			int Rad = std::min(MAX_RADIUS, std::max(MIN_RADIUS, (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1));
+			int Rad = std::min(g_MAX_RADIUS, std::max(g_MIN_RADIUS, (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1));
 			Random /= 4;
 			int x = (itr->m_BlockX + PrevX) / 2 + (Random % (len + 1) - len / 2);
 			Random /= 256;
@@ -681,7 +681,7 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 	*/
 
 	// Algorithm of choice: random value in the range of zero to random value - heavily towards zero
-	int res = MIN_RADIUS + (rnd >> 8) % ((rnd % (MAX_RADIUS - MIN_RADIUS)) + 1);
+	int res = g_MIN_RADIUS + (rnd >> 8) % ((rnd % (g_MAX_RADIUS - g_MIN_RADIUS)) + 1);
 	return res;
 }
 
@@ -705,10 +705,10 @@ cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_Gri
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenMarbleCaves:
 
-static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise)
+static float GetMarbleNoise( float a_x, float a_y, float a_z, cNoise & a_Noise)
 {
 	static const float PI_2 = 1.57079633f;
-	float oct1 = (a_Noise.CubicNoise3D(x * 0.1f, y * 0.1f, z * 0.1f)) * 4;
+	float oct1 = (a_Noise.CubicNoise3D(a_x * 0.1f, a_y * 0.1f, a_z * 0.1f)) * 4;
 
 	oct1 = oct1 * oct1 * oct1;
 	if (oct1 < 0.f)

@@ -372,7 +372,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
 	static const struct
 	{
-		int x, z;
+		int m_x, m_z;
 	}
 	Coords [] =
 	{
@@ -539,7 +539,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
 	static const struct
 	{
-		int x, z;
+		int m_x, m_z;
 	}
 	Coords [] =
 	{

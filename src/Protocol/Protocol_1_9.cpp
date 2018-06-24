@@ -62,11 +62,11 @@ Implements the 1.9 protocol classes:
 
 
 /** The slot number that the client uses to indicate "outside the window". */
-static const Int16 SLOT_NUM_OUTSIDE = -999;
+static const Int16 g_SLOT_NUM_OUTSIDE = -999;
 
 /** Value for main hand in Hand parameter for Protocol 1.9. */
-static const UInt32 MAIN_HAND = 0;
-static const UInt32 OFF_HAND = 1;
+static const UInt32 g_MAIN_HAND = 0;
+static const UInt32 g_OFF_HAND = 1;
 
 
 
@@ -98,8 +98,8 @@ static const UInt32 OFF_HAND = 1;
 
 
 
-const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
-const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
+const int g_MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+const uLongf g_MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
 
 
 
@@ -1751,10 +1751,10 @@ void cProtocol_1_9_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 bool cProtocol_1_9_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
 	// Compress the data:
-	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
+	char CompressedData[g_MAX_COMPRESSED_PACKET_LEN];
 
 	uLongf CompressedSize = compressBound(static_cast<uLongf>(a_Packet.size()));
-	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
+	if (CompressedSize >= g_MAX_COMPRESSED_PACKET_LEN)
 	{
 		ASSERT(!"Too high packet size.");
 		return false;
@@ -2264,7 +2264,7 @@ void cProtocol_1_9_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	{
 		return;
 	}
-	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	if ((EncKeyLength > g_MAX_ENC_LEN) || (EncNonceLength > g_MAX_ENC_LEN))
 	{
 		LOGD("Too long encryption");
 		m_Client->Kick("Hacked client");
@@ -2273,7 +2273,7 @@ void cProtocol_1_9_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 
 	// Decrypt EncNonce using privkey
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
-	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	UInt32 DecryptedNonce[g_MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncNonce.data()), EncNonce.size(), reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
 	if (res != 4)
 	{
@@ -2289,7 +2289,7 @@ void cProtocol_1_9_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	}
 
 	// Decrypt the symmetric encryption key using privkey:
-	Byte DecryptedKey[MAX_ENC_LEN];
+	Byte DecryptedKey[g_MAX_ENC_LEN];
 	res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncKey.data()), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
 	if (res != 16)
 	{
@@ -2750,7 +2750,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
-			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
+			if (Hand == g_MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
 			}
@@ -2846,8 +2846,8 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	eClickAction Action;
 	switch ((Mode << 8) | Button)
 	{
-		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
-		case 0x0001: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
+		case 0x0000: Action = (SlotNum != g_SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0001: Action = (SlotNum != g_SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
 		case 0x0100: Action = caShiftLeftClick;  break;
 		case 0x0101: Action = caShiftRightClick; break;
 		case 0x0200: Action = caNumber1;         break;
@@ -2860,17 +2860,17 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		case 0x0207: Action = caNumber8;         break;
 		case 0x0208: Action = caNumber9;         break;
 		case 0x0302: Action = caMiddleClick;     break;
-		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
-		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
-		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
-		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
-		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
-		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
-		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
-		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
-		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin             : caUnknown;     break;
-		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress          : caUnknown;     break;
-		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd               : caUnknown;     break;
+		case 0x0400: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0401: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
+		case 0x0500: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
+		case 0x0501: Action = (SlotNum != g_SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
+		case 0x0502: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
+		case 0x0504: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
+		case 0x0505: Action = (SlotNum != g_SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
+		case 0x0506: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
+		case 0x0508: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin             : caUnknown;     break;
+		case 0x0509: Action = (SlotNum != g_SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress          : caUnknown;     break;
+		case 0x050a: Action = (SlotNum == g_SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd               : caUnknown;     break;
 		case 0x0600: Action = caDblClick; break;
 		default:
 		{
@@ -3272,8 +3272,8 @@ eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 	// Convert hand parameter into eHand enum
 	switch (a_Hand)
 	{
-		case MAIN_HAND: return eHand::hMain;
-		case OFF_HAND: return eHand::hOff;
+		case g_MAIN_HAND: return eHand::hMain;
+		case g_OFF_HAND: return eHand::hOff;
 		default:
 		{
 			ASSERT(!"Unknown hand value");

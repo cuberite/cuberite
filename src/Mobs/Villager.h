@@ -25,7 +25,7 @@ public:
 		vtMax
 	} ;
 
-	cVillager(eVillagerType VillagerType);
+	cVillager(eVillagerType a_VillagerType);
 
 	CLASS_PROTODEF(cVillager)
 

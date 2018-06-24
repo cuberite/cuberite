@@ -1318,7 +1318,7 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingL
 
 
 
-void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
+void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool a_WouldBurn)
 {
 	if (!m_BurnsInDaylight)
 	{
@@ -1337,7 +1337,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 		return;
 	}
 
-	if (!IsOnFire() && WouldBurn)
+	if (!IsOnFire() && a_WouldBurn)
 	{
 		// Burn for 100 ticks, then decide again
 		StartBurning(100);

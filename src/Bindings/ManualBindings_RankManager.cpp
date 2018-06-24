@@ -15,12 +15,12 @@
 
 
 /** Binds cRankManager::AddGroup */
-static int tolua_cRankManager_AddGroup(lua_State * L)
+static int tolua_cRankManager_AddGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:AddGroup(GroupName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -44,12 +44,12 @@ static int tolua_cRankManager_AddGroup(lua_State * L)
 
 
 /** Binds cRankManager::AddGroupToRank */
-static int tolua_cRankManager_AddGroupToRank(lua_State * L)
+static int tolua_cRankManager_AddGroupToRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:AddGroupToRank(GroupName, RankName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -73,12 +73,12 @@ static int tolua_cRankManager_AddGroupToRank(lua_State * L)
 
 
 /** Binds cRankManager::AddPermissionToGroup */
-static int tolua_cRankManager_AddPermissionToGroup(lua_State * L)
+static int tolua_cRankManager_AddPermissionToGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:AddPermissionToGroup(Permission, GroupName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -102,12 +102,12 @@ static int tolua_cRankManager_AddPermissionToGroup(lua_State * L)
 
 
 /** Binds cRankManager::AddRank */
-static int tolua_cRankManager_AddRank(lua_State * L)
+static int tolua_cRankManager_AddRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:AddRank(RankName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 5) ||
@@ -131,12 +131,12 @@ static int tolua_cRankManager_AddRank(lua_State * L)
 
 
 /** Binds cRankManager::AddRestrictionToGroup */
-static int tolua_cRankManager_AddRestrictionToGroup(lua_State * L)
+static int tolua_cRankManager_AddRestrictionToGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:AddRestrictionToGroup(Restriction, GroupName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -160,9 +160,9 @@ static int tolua_cRankManager_AddRestrictionToGroup(lua_State * L)
 
 
 /** Binds cRankManager::ClearPlayerRanks */
-static int tolua_cRankManager_ClearPlayerRanks(lua_State * L)
+static int tolua_cRankManager_ClearPlayerRanks(lua_State * a_L)
 {
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -181,12 +181,12 @@ static int tolua_cRankManager_ClearPlayerRanks(lua_State * L)
 
 
 /** Binds cRankManager::GetAllGroups */
-static int tolua_cRankManager_GetAllGroups(lua_State * L)
+static int tolua_cRankManager_GetAllGroups(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllGroups() -> arraytable of GroupNames
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -208,12 +208,12 @@ static int tolua_cRankManager_GetAllGroups(lua_State * L)
 
 
 /** Binds cRankManager::GetAllPermissions */
-static int tolua_cRankManager_GetAllPermissions(lua_State * L)
+static int tolua_cRankManager_GetAllPermissions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllPermissions() -> arraytable of Permissions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -235,12 +235,12 @@ static int tolua_cRankManager_GetAllPermissions(lua_State * L)
 
 
 /** Binds cRankManager::GetAllPermissionsRestrictions */
-static int tolua_cRankManager_GetAllPermissionsRestrictions(lua_State * L)
+static int tolua_cRankManager_GetAllPermissionsRestrictions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllPermissionsRestrictions() -> arraytable of Permissions and Restrictions together
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -260,12 +260,12 @@ static int tolua_cRankManager_GetAllPermissionsRestrictions(lua_State * L)
 
 
 /** Binds cRankManager::GetAllPlayerUUIDs */
-static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * L)
+static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllPlayerUUIDs() -> arraytable of Player UUID's
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -295,12 +295,12 @@ static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * L)
 
 
 /** Binds cRankManager::GetAllRanks */
-static int tolua_cRankManager_GetAllRanks(lua_State * L)
+static int tolua_cRankManager_GetAllRanks(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllRanks() -> arraytable of RankNames
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -319,12 +319,12 @@ static int tolua_cRankManager_GetAllRanks(lua_State * L)
 
 
 /** Binds cRankManager::GetAllRestrictions */
-static int tolua_cRankManager_GetAllRestrictions(lua_State * L)
+static int tolua_cRankManager_GetAllRestrictions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetAllRestrictions() -> arraytable of Restrictions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -344,12 +344,12 @@ static int tolua_cRankManager_GetAllRestrictions(lua_State * L)
 
 
 /** Binds cRankManager::GetDefaultRank */
-static int tolua_cRankManager_GetDefaultRank(lua_State * L)
+static int tolua_cRankManager_GetDefaultRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetDefaultRank() -> string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamEnd(2)
@@ -368,12 +368,12 @@ static int tolua_cRankManager_GetDefaultRank(lua_State * L)
 
 
 /** Binds cRankManager::GetGroupPermissions */
-static int tolua_cRankManager_GetGroupPermissions(lua_State * L)
+static int tolua_cRankManager_GetGroupPermissions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetGroupPermissions(GroupName) -> arraytable of permissions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -400,12 +400,12 @@ static int tolua_cRankManager_GetGroupPermissions(lua_State * L)
 
 
 /** Binds cRankManager::GetGroupRestrictions */
-static int tolua_cRankManager_GetGroupRestrictions(lua_State * L)
+static int tolua_cRankManager_GetGroupRestrictions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetGroupRestrictions(GroupName) -> arraytable of restrictions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -432,12 +432,12 @@ static int tolua_cRankManager_GetGroupRestrictions(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerGroups */
-static int tolua_cRankManager_GetPlayerGroups(lua_State * L)
+static int tolua_cRankManager_GetPlayerGroups(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerGroups(PlayerUUID) -> arraytable of GroupNames
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -464,12 +464,12 @@ static int tolua_cRankManager_GetPlayerGroups(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerMsgVisuals */
-static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
+static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerMsgVisuals(PlayerUUID) -> string, string, string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -500,12 +500,12 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerPermissions */
-static int tolua_cRankManager_GetPlayerPermissions(lua_State * L)
+static int tolua_cRankManager_GetPlayerPermissions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerPermissions(PlayerUUID) -> arraytable of permissions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -532,12 +532,12 @@ static int tolua_cRankManager_GetPlayerPermissions(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerRestrictions */
-static int tolua_cRankManager_GetPlayerRestrictions(lua_State * L)
+static int tolua_cRankManager_GetPlayerRestrictions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerRestrictions(PlayerUUID) -> arraytable of restrictions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -564,12 +564,12 @@ static int tolua_cRankManager_GetPlayerRestrictions(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerRankName */
-static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
+static int tolua_cRankManager_GetPlayerRankName(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerRankName(PlayerUUID) -> string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -596,12 +596,12 @@ static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
 
 
 /** Binds cRankManager::GetPlayerName */
-static int tolua_cRankManager_GetPlayerName(lua_State * L)
+static int tolua_cRankManager_GetPlayerName(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetPlayerName(PlayerUUID) -> string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -628,12 +628,12 @@ static int tolua_cRankManager_GetPlayerName(lua_State * L)
 
 
 /** Binds cRankManager::GetRankGroups */
-static int tolua_cRankManager_GetRankGroups(lua_State * L)
+static int tolua_cRankManager_GetRankGroups(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetRankGroups(RankName) -> arraytable of groupnames
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -660,12 +660,12 @@ static int tolua_cRankManager_GetRankGroups(lua_State * L)
 
 
 /** Binds cRankManager::GetRankPermissions */
-static int tolua_cRankManager_GetRankPermissions(lua_State * L)
+static int tolua_cRankManager_GetRankPermissions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetRankPermissions(RankName) -> arraytable of permissions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -692,12 +692,12 @@ static int tolua_cRankManager_GetRankPermissions(lua_State * L)
 
 
 /** Binds cRankManager::GetRankRestrictions */
-static int tolua_cRankManager_GetRankRestrictions(lua_State * L)
+static int tolua_cRankManager_GetRankRestrictions(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetRankRestrictions(RankName) -> arraytable of restrictions
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -724,12 +724,12 @@ static int tolua_cRankManager_GetRankRestrictions(lua_State * L)
 
 
 /** Binds cRankManager::GetRankVisuals */
-static int tolua_cRankManager_GetRankVisuals(lua_State * L)
+static int tolua_cRankManager_GetRankVisuals(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GetRankVisuals(RankName) -> MsgPrefix, MsgSuffix, MsgNameColorCode
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -761,12 +761,12 @@ static int tolua_cRankManager_GetRankVisuals(lua_State * L)
 
 
 /** Binds cRankManager::GroupExists */
-static int tolua_cRankManager_GroupExists(lua_State * L)
+static int tolua_cRankManager_GroupExists(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:GroupExists(GroupName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -793,12 +793,12 @@ static int tolua_cRankManager_GroupExists(lua_State * L)
 
 
 /** Binds cRankManager::IsGroupInRank */
-static int tolua_cRankManager_IsGroupInRank(lua_State * L)
+static int tolua_cRankManager_IsGroupInRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:IsGroupInRank(GroupName, RankName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -825,12 +825,12 @@ static int tolua_cRankManager_IsGroupInRank(lua_State * L)
 
 
 /** Binds cRankManager::IsPermissionInGroup */
-static int tolua_cRankManager_IsPermissionInGroup(lua_State * L)
+static int tolua_cRankManager_IsPermissionInGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:IsPermissionInGroup(Permission, GroupName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -857,12 +857,12 @@ static int tolua_cRankManager_IsPermissionInGroup(lua_State * L)
 
 
 /** Binds cRankManager::IsRestrictionInGroup */
-static int tolua_cRankManager_IsRestrictionInGroup(lua_State * L)
+static int tolua_cRankManager_IsRestrictionInGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:IsRestrictionInGroup(Restriction, GroupName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -889,12 +889,12 @@ static int tolua_cRankManager_IsRestrictionInGroup(lua_State * L)
 
 
 /** Binds cRankManager::IsPlayerRankSet */
-static int tolua_cRankManager_IsPlayerRankSet(lua_State * L)
+static int tolua_cRankManager_IsPlayerRankSet(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:IsPlayerRankSet(PlayerUUID) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -921,12 +921,12 @@ static int tolua_cRankManager_IsPlayerRankSet(lua_State * L)
 
 
 /** Binds cRankManager::RankExists */
-static int tolua_cRankManager_RankExists(lua_State * L)
+static int tolua_cRankManager_RankExists(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RankExists(RankName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -953,12 +953,12 @@ static int tolua_cRankManager_RankExists(lua_State * L)
 
 
 /** Binds cRankManager::RemoveGroup */
-static int tolua_cRankManager_RemoveGroup(lua_State * L)
+static int tolua_cRankManager_RemoveGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemoveGroup(GroupName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -982,12 +982,12 @@ static int tolua_cRankManager_RemoveGroup(lua_State * L)
 
 
 /** Binds cRankManager::RemoveGroupFromRank */
-static int tolua_cRankManager_RemoveGroupFromRank(lua_State * L)
+static int tolua_cRankManager_RemoveGroupFromRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemoveGroupFromRank(GroupName, RankName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -1011,12 +1011,12 @@ static int tolua_cRankManager_RemoveGroupFromRank(lua_State * L)
 
 
 /** Binds cRankManager::RemovePermissionFromGroup */
-static int tolua_cRankManager_RemovePermissionFromGroup(lua_State * L)
+static int tolua_cRankManager_RemovePermissionFromGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemovePermissionFromGroup(Permission, GroupName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -1040,12 +1040,12 @@ static int tolua_cRankManager_RemovePermissionFromGroup(lua_State * L)
 
 
 /** Binds cRankManager::RemoveRestrictionFromGroup */
-static int tolua_cRankManager_RemoveRestrictionFromGroup(lua_State * L)
+static int tolua_cRankManager_RemoveRestrictionFromGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemoveRestrictionFromGroup(Restriction, GroupName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -1069,12 +1069,12 @@ static int tolua_cRankManager_RemoveRestrictionFromGroup(lua_State * L)
 
 
 /** Binds cRankManager::RemovePlayerRank */
-static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
+static int tolua_cRankManager_RemovePlayerRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemovePlayerRank(PlayerUUID)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -1098,12 +1098,12 @@ static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
 
 
 /** Binds cRankManager::RemoveRank */
-static int tolua_cRankManager_RemoveRank(lua_State * L)
+static int tolua_cRankManager_RemoveRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RemoveRank(RankName, [ReplacementRankName])
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -1128,12 +1128,12 @@ static int tolua_cRankManager_RemoveRank(lua_State * L)
 
 
 /** Binds cRankManager::RenameGroup */
-static int tolua_cRankManager_RenameGroup(lua_State * L)
+static int tolua_cRankManager_RenameGroup(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RenameGroup(OldName, NewName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -1160,12 +1160,12 @@ static int tolua_cRankManager_RenameGroup(lua_State * L)
 
 
 /** Binds cRankManager::RenameRank */
-static int tolua_cRankManager_RenameRank(lua_State * L)
+static int tolua_cRankManager_RenameRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:RenameRank(OldName, NewName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 3) ||
@@ -1192,12 +1192,12 @@ static int tolua_cRankManager_RenameRank(lua_State * L)
 
 
 /** Binds cRankManager::SetDefaultRank */
-static int tolua_cRankManager_SetDefaultRank(lua_State * L)
+static int tolua_cRankManager_SetDefaultRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:SetDefaultRank(RankName) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2) ||
@@ -1221,12 +1221,12 @@ static int tolua_cRankManager_SetDefaultRank(lua_State * L)
 
 
 /** Binds cRankManager::SetPlayerRank */
-static int tolua_cRankManager_SetPlayerRank(lua_State * L)
+static int tolua_cRankManager_SetPlayerRank(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:SetPlayerRank(PlayerUUID, PlayerName, RankName)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cRankManager") ||
 		!S.CheckParamUUID(2) ||
@@ -1252,12 +1252,12 @@ static int tolua_cRankManager_SetPlayerRank(lua_State * L)
 
 
 /** Binds cRankManager::SetRankVisuals */
-static int tolua_cRankManager_SetRankVisuals(lua_State * L)
+static int tolua_cRankManager_SetRankVisuals(lua_State * a_L)
 {
 	// Function signature:
 	// cRankManager:SetRankVisuals(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamUserTable(1, "cRankManager") ||
 		!S.CheckParamString(2, 5) ||
@@ -1280,57 +1280,57 @@ static int tolua_cRankManager_SetRankVisuals(lua_State * L)
 
 
 
-void cManualBindings::BindRankManager(lua_State * tolua_S)
+void cManualBindings::BindRankManager(lua_State * a_tolua_S)
 {
 	// Create the cRankManager class in the API:
-	tolua_usertype(tolua_S, "cRankManager");
-	tolua_cclass(tolua_S, "cRankManager", "cRankManager", "", nullptr);
+	tolua_usertype(a_tolua_S, "cRankManager");
+	tolua_cclass(a_tolua_S, "cRankManager", "cRankManager", "", nullptr);
 
 	// Fill in the functions (alpha-sorted):
-	tolua_beginmodule(tolua_S, "cRankManager");
-		tolua_function(tolua_S, "AddGroup",                      tolua_cRankManager_AddGroup);
-		tolua_function(tolua_S, "AddGroupToRank",                tolua_cRankManager_AddGroupToRank);
-		tolua_function(tolua_S, "AddPermissionToGroup",          tolua_cRankManager_AddPermissionToGroup);
-		tolua_function(tolua_S, "AddRestrictionToGroup",         tolua_cRankManager_AddRestrictionToGroup);
-		tolua_function(tolua_S, "AddRank",                       tolua_cRankManager_AddRank);
-		tolua_function(tolua_S, "ClearPlayerRanks",              tolua_cRankManager_ClearPlayerRanks);
-		tolua_function(tolua_S, "GetAllGroups",                  tolua_cRankManager_GetAllGroups);
-		tolua_function(tolua_S, "GetAllPermissions",             tolua_cRankManager_GetAllPermissions);
-		tolua_function(tolua_S, "GetAllRestrictions",            tolua_cRankManager_GetAllRestrictions);
-		tolua_function(tolua_S, "GetAllPermissionsRestrictions", tolua_cRankManager_GetAllPermissionsRestrictions);
-		tolua_function(tolua_S, "GetAllPlayerUUIDs",             tolua_cRankManager_GetAllPlayerUUIDs);
-		tolua_function(tolua_S, "GetAllRanks",                   tolua_cRankManager_GetAllRanks);
-		tolua_function(tolua_S, "GetDefaultRank",                tolua_cRankManager_GetDefaultRank);
-		tolua_function(tolua_S, "GetGroupPermissions",           tolua_cRankManager_GetGroupPermissions);
-		tolua_function(tolua_S, "GetGroupRestrictions",          tolua_cRankManager_GetGroupRestrictions);
-		tolua_function(tolua_S, "GetPlayerGroups",               tolua_cRankManager_GetPlayerGroups);
-		tolua_function(tolua_S, "GetPlayerMsgVisuals",           tolua_cRankManager_GetPlayerMsgVisuals);
-		tolua_function(tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerPermissions);
-		tolua_function(tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerRestrictions);
-		tolua_function(tolua_S, "GetPlayerRankName",             tolua_cRankManager_GetPlayerRankName);
-		tolua_function(tolua_S, "GetPlayerName",                 tolua_cRankManager_GetPlayerName);
-		tolua_function(tolua_S, "GetRankGroups",                 tolua_cRankManager_GetRankGroups);
-		tolua_function(tolua_S, "GetRankPermissions",            tolua_cRankManager_GetRankPermissions);
-		tolua_function(tolua_S, "GetRankRestrictions",           tolua_cRankManager_GetRankRestrictions);
-		tolua_function(tolua_S, "GetRankVisuals",                tolua_cRankManager_GetRankVisuals);
-		tolua_function(tolua_S, "GroupExists",                   tolua_cRankManager_GroupExists);
-		tolua_function(tolua_S, "IsGroupInRank",                 tolua_cRankManager_IsGroupInRank);
-		tolua_function(tolua_S, "IsPermissionInGroup",           tolua_cRankManager_IsPermissionInGroup);
-		tolua_function(tolua_S, "IsRestrictionInGroup",          tolua_cRankManager_IsRestrictionInGroup);
-		tolua_function(tolua_S, "IsPlayerRankSet",               tolua_cRankManager_IsPlayerRankSet);
-		tolua_function(tolua_S, "RankExists",                    tolua_cRankManager_RankExists);
-		tolua_function(tolua_S, "RemoveGroup",                   tolua_cRankManager_RemoveGroup);
-		tolua_function(tolua_S, "RemoveGroupFromRank",           tolua_cRankManager_RemoveGroupFromRank);
-		tolua_function(tolua_S, "RemovePermissionFromGroup",     tolua_cRankManager_RemovePermissionFromGroup);
-		tolua_function(tolua_S, "RemoveRestrictionFromGroup",    tolua_cRankManager_RemoveRestrictionFromGroup);
-		tolua_function(tolua_S, "RemovePlayerRank",              tolua_cRankManager_RemovePlayerRank);
-		tolua_function(tolua_S, "RemoveRank",                    tolua_cRankManager_RemoveRank);
-		tolua_function(tolua_S, "RenameGroup",                   tolua_cRankManager_RenameGroup);
-		tolua_function(tolua_S, "RenameRank",                    tolua_cRankManager_RenameRank);
-		tolua_function(tolua_S, "SetDefaultRank",                tolua_cRankManager_SetDefaultRank);
-		tolua_function(tolua_S, "SetPlayerRank",                 tolua_cRankManager_SetPlayerRank);
-		tolua_function(tolua_S, "SetRankVisuals",                tolua_cRankManager_SetRankVisuals);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cRankManager");
+		tolua_function(a_tolua_S, "AddGroup",                      tolua_cRankManager_AddGroup);
+		tolua_function(a_tolua_S, "AddGroupToRank",                tolua_cRankManager_AddGroupToRank);
+		tolua_function(a_tolua_S, "AddPermissionToGroup",          tolua_cRankManager_AddPermissionToGroup);
+		tolua_function(a_tolua_S, "AddRestrictionToGroup",         tolua_cRankManager_AddRestrictionToGroup);
+		tolua_function(a_tolua_S, "AddRank",                       tolua_cRankManager_AddRank);
+		tolua_function(a_tolua_S, "ClearPlayerRanks",              tolua_cRankManager_ClearPlayerRanks);
+		tolua_function(a_tolua_S, "GetAllGroups",                  tolua_cRankManager_GetAllGroups);
+		tolua_function(a_tolua_S, "GetAllPermissions",             tolua_cRankManager_GetAllPermissions);
+		tolua_function(a_tolua_S, "GetAllRestrictions",            tolua_cRankManager_GetAllRestrictions);
+		tolua_function(a_tolua_S, "GetAllPermissionsRestrictions", tolua_cRankManager_GetAllPermissionsRestrictions);
+		tolua_function(a_tolua_S, "GetAllPlayerUUIDs",             tolua_cRankManager_GetAllPlayerUUIDs);
+		tolua_function(a_tolua_S, "GetAllRanks",                   tolua_cRankManager_GetAllRanks);
+		tolua_function(a_tolua_S, "GetDefaultRank",                tolua_cRankManager_GetDefaultRank);
+		tolua_function(a_tolua_S, "GetGroupPermissions",           tolua_cRankManager_GetGroupPermissions);
+		tolua_function(a_tolua_S, "GetGroupRestrictions",          tolua_cRankManager_GetGroupRestrictions);
+		tolua_function(a_tolua_S, "GetPlayerGroups",               tolua_cRankManager_GetPlayerGroups);
+		tolua_function(a_tolua_S, "GetPlayerMsgVisuals",           tolua_cRankManager_GetPlayerMsgVisuals);
+		tolua_function(a_tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerPermissions);
+		tolua_function(a_tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerRestrictions);
+		tolua_function(a_tolua_S, "GetPlayerRankName",             tolua_cRankManager_GetPlayerRankName);
+		tolua_function(a_tolua_S, "GetPlayerName",                 tolua_cRankManager_GetPlayerName);
+		tolua_function(a_tolua_S, "GetRankGroups",                 tolua_cRankManager_GetRankGroups);
+		tolua_function(a_tolua_S, "GetRankPermissions",            tolua_cRankManager_GetRankPermissions);
+		tolua_function(a_tolua_S, "GetRankRestrictions",           tolua_cRankManager_GetRankRestrictions);
+		tolua_function(a_tolua_S, "GetRankVisuals",                tolua_cRankManager_GetRankVisuals);
+		tolua_function(a_tolua_S, "GroupExists",                   tolua_cRankManager_GroupExists);
+		tolua_function(a_tolua_S, "IsGroupInRank",                 tolua_cRankManager_IsGroupInRank);
+		tolua_function(a_tolua_S, "IsPermissionInGroup",           tolua_cRankManager_IsPermissionInGroup);
+		tolua_function(a_tolua_S, "IsRestrictionInGroup",          tolua_cRankManager_IsRestrictionInGroup);
+		tolua_function(a_tolua_S, "IsPlayerRankSet",               tolua_cRankManager_IsPlayerRankSet);
+		tolua_function(a_tolua_S, "RankExists",                    tolua_cRankManager_RankExists);
+		tolua_function(a_tolua_S, "RemoveGroup",                   tolua_cRankManager_RemoveGroup);
+		tolua_function(a_tolua_S, "RemoveGroupFromRank",           tolua_cRankManager_RemoveGroupFromRank);
+		tolua_function(a_tolua_S, "RemovePermissionFromGroup",     tolua_cRankManager_RemovePermissionFromGroup);
+		tolua_function(a_tolua_S, "RemoveRestrictionFromGroup",    tolua_cRankManager_RemoveRestrictionFromGroup);
+		tolua_function(a_tolua_S, "RemovePlayerRank",              tolua_cRankManager_RemovePlayerRank);
+		tolua_function(a_tolua_S, "RemoveRank",                    tolua_cRankManager_RemoveRank);
+		tolua_function(a_tolua_S, "RenameGroup",                   tolua_cRankManager_RenameGroup);
+		tolua_function(a_tolua_S, "RenameRank",                    tolua_cRankManager_RenameRank);
+		tolua_function(a_tolua_S, "SetDefaultRank",                tolua_cRankManager_SetDefaultRank);
+		tolua_function(a_tolua_S, "SetPlayerRank",                 tolua_cRankManager_SetPlayerRank);
+		tolua_function(a_tolua_S, "SetRankVisuals",                tolua_cRankManager_SetRankVisuals);
+	tolua_endmodule(a_tolua_S);
 }
 
 

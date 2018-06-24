@@ -54,11 +54,11 @@ class cMonster;
 // tolua_begin
 struct TakeDamageInfo
 {
-	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
-	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
-	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
-	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
+	eDamageType m_DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
+	cEntity *   m_Attacker;     // The attacking entity; valid only for dtAttack
+	int         m_RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
+	int         m_FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	Vector3d    m_Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
 // tolua_end
@@ -352,7 +352,7 @@ public:
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
 	/** Applies damage to the armor after the armor blocked the given amount */
-	virtual void ApplyArmorDamage(int DamageBlocked);
+	virtual void ApplyArmorDamage(int a_DamageBlocked);
 
 	// tolua_end
 

@@ -18,19 +18,19 @@ public:
 	{
 	public:
 		PoweringData(BLOCKTYPE a_PoweringBlock, unsigned char a_PowerLevel) :
-			PoweringBlock(a_PoweringBlock),
-			PowerLevel(a_PowerLevel)
+			m_PoweringBlock(a_PoweringBlock),
+			m_PowerLevel(a_PowerLevel)
 		{
 		}
 
 		PoweringData(void) :
-			PoweringBlock(E_BLOCK_AIR),
-			PowerLevel(0)
+			m_PoweringBlock(E_BLOCK_AIR),
+			m_PowerLevel(0)
 		{
 		}
 
-		BLOCKTYPE PoweringBlock;
-		unsigned char PowerLevel;
+		BLOCKTYPE m_PoweringBlock;
+		unsigned char m_PowerLevel;
 
 		inline friend bool operator < (const PoweringData & a_Lhs, const PoweringData & a_Rhs)
 		{

@@ -39,7 +39,7 @@ public:
 		{
 			static const struct  // Define all the possible painting titles
 			{
-				AString Title;
+				AString m_Title;
 			} gPaintingTitlesList[] =
 			{
 				{ "Kebab" },

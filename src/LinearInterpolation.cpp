@@ -96,10 +96,10 @@ void LinearInterpolate2DArray(
 	ASSERT(a_DstSizeY < MAX_INTERPOL_SIZEY);
 
 	// Calculate interpolation ratios and src indices along each axis:
-	float RatioX[MAX_INTERPOL_SIZEX];
-	float RatioY[MAX_INTERPOL_SIZEY];
-	int   SrcIdxX[MAX_INTERPOL_SIZEX];
-	int   SrcIdxY[MAX_INTERPOL_SIZEY];
+	float RatioX[g_MAX_INTERPOL_SIZEX];
+	float RatioY[g_MAX_INTERPOL_SIZEY];
+	int   SrcIdxX[g_MAX_INTERPOL_SIZEX];
+	int   SrcIdxY[g_MAX_INTERPOL_SIZEY];
 	for (int x = 1; x < a_DstSizeX; x++)
 	{
 		SrcIdxX[x] = x * (a_SrcSizeX - 1) / (a_DstSizeX - 1);
@@ -166,12 +166,12 @@ void LinearInterpolate3DArray(
 	ASSERT(a_DstSizeZ < MAX_INTERPOL_SIZEZ);
 
 	// Calculate interpolation ratios and src indices along each axis:
-	float RatioX[MAX_INTERPOL_SIZEX];
-	float RatioY[MAX_INTERPOL_SIZEY];
-	float RatioZ[MAX_INTERPOL_SIZEZ];
-	int   SrcIdxX[MAX_INTERPOL_SIZEX];
-	int   SrcIdxY[MAX_INTERPOL_SIZEY];
-	int   SrcIdxZ[MAX_INTERPOL_SIZEZ];
+	float RatioX[g_MAX_INTERPOL_SIZEX];
+	float RatioY[g_MAX_INTERPOL_SIZEY];
+	float RatioZ[g_MAX_INTERPOL_SIZEZ];
+	int   SrcIdxX[g_MAX_INTERPOL_SIZEX];
+	int   SrcIdxY[g_MAX_INTERPOL_SIZEY];
+	int   SrcIdxZ[g_MAX_INTERPOL_SIZEZ];
 	for (int x = 1; x < a_DstSizeX; x++)
 	{
 		SrcIdxX[x] = x * (a_SrcSizeX - 1) / (a_DstSizeX - 1);

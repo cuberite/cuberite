@@ -15,7 +15,7 @@ class cHorse :
 	typedef cPassiveMonster super;
 
 public:
-	cHorse(int Type, int Color, int Style, int TameTimes);
+	cHorse(int a_Type, int a_Color, int a_Style, int a_TameTimes);
 	virtual ~cHorse() override;
 
 	CLASS_PROTODEF(cHorse)

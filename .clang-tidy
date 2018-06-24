@@ -1,6 +1,13 @@
 Checks: '-*,readability-identifier-naming'
 CheckOptions:
-- key:             readability-identifier-naming.PrivateMemberPrefix
+- key:             readability-identifier-naming.MemberPrefix
+  value:           'm_'
+- key:             readability-identifier-naming.ParameterPrefix
+  value:           'a_'
+- key:             readability-identifier-naming.GlobalVariablePrefix
+  value:           'g_'
+# Disables the 'g_' prefix for static member variables
+- key:             readability-identifier-naming.ClassMemberPrefix
   value:           'm_'
 - key:             readability-identifier-naming.ClassConstantCase
   value:           aNy_CasE

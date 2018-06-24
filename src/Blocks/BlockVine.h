@@ -99,8 +99,8 @@ public:
 	{
 		static const struct
 		{
-			int x, z;
-			NIBBLETYPE Bit;
+			int m_x, m_z;
+			NIBBLETYPE m_Bit;
 		} Coords[] =
 		{
 			{ 0,  1, 1},  // south, ZP

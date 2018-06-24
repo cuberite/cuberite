@@ -32,8 +32,8 @@ namespace
 
 	struct sSectionIndices
 	{
-		int Section = 0;  // Index into m_Sections
-		int Index = 0;    // Index into a single sChunkSection
+		int m_Section = 0;  // Index into m_Sections
+		int m_Index = 0;    // Index into a single sChunkSection
 	};
 
 	sSectionIndices IndicesFromRelPos(Vector3i a_RelPos)

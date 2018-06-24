@@ -29,7 +29,7 @@ class cRabbit :
 
 public:
 	cRabbit();
-	cRabbit(eRabbitType Type, int MoreCarrotTicks = 0);
+	cRabbit(eRabbitType a_Type, int a_MoreCarrotTicks = 0);
 
 	CLASS_PROTODEF(cRabbit)
 

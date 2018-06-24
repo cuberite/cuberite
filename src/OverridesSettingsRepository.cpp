@@ -134,15 +134,15 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 
 
 
-AString cOverridesSettingsRepository::GetValue(const AString & a_KeyName, const AString & a_ValueName, const AString & defValue) const
+AString cOverridesSettingsRepository::GetValue(const AString & a_KeyName, const AString & a_ValueName, const AString & a_defValue) const
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
-		return m_Overrides->GetValue(a_KeyName, a_ValueName, defValue);
+		return m_Overrides->GetValue(a_KeyName, a_ValueName, a_defValue);
 	}
 	else
 	{
-		return m_Main->GetValue(a_KeyName, a_ValueName, defValue);
+		return m_Main->GetValue(a_KeyName, a_ValueName, a_defValue);
 	}
 }
 
@@ -150,15 +150,15 @@ AString cOverridesSettingsRepository::GetValue(const AString & a_KeyName, const 
 
 
 
-AString cOverridesSettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)
+AString cOverridesSettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & a_defValue)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
-		return m_Overrides->GetValueSet(a_KeyName, a_ValueName, defValue);
+		return m_Overrides->GetValueSet(a_KeyName, a_ValueName, a_defValue);
 	}
 	else
 	{
-		return m_Main->GetValueSet(a_KeyName, a_ValueName, defValue);
+		return m_Main->GetValueSet(a_KeyName, a_ValueName, a_defValue);
 	}
 }
 
@@ -166,15 +166,15 @@ AString cOverridesSettingsRepository::GetValueSet (const AString & a_KeyName, co
 
 
 
-int cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const int defValue)
+int cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const int a_defValue)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
-		return m_Overrides->GetValueSetI(a_KeyName, a_ValueName, defValue);
+		return m_Overrides->GetValueSetI(a_KeyName, a_ValueName, a_defValue);
 	}
 	else
 	{
-		return m_Main->GetValueSetI(a_KeyName, a_ValueName, defValue);
+		return m_Main->GetValueSetI(a_KeyName, a_ValueName, a_defValue);
 	}
 }
 
@@ -182,15 +182,15 @@ int cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const 
 
 
 
-Int64 cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 defValue)
+Int64 cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 a_defValue)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
-		return m_Overrides->GetValueSetI(a_KeyName, a_ValueName, defValue);
+		return m_Overrides->GetValueSetI(a_KeyName, a_ValueName, a_defValue);
 	}
 	else
 	{
-		return m_Main->GetValueSetI(a_KeyName, a_ValueName, defValue);
+		return m_Main->GetValueSetI(a_KeyName, a_ValueName, a_defValue);
 	}
 }
 
@@ -198,15 +198,15 @@ Int64 cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, cons
 
 
 
-bool cOverridesSettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
+bool cOverridesSettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool a_defValue)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
-		return m_Overrides->GetValueSetB(a_KeyName, a_ValueName, defValue);
+		return m_Overrides->GetValueSetB(a_KeyName, a_ValueName, a_defValue);
 	}
 	else
 	{
-		return m_Main->GetValueSetB(a_KeyName, a_ValueName, defValue);
+		return m_Main->GetValueSetB(a_KeyName, a_ValueName, a_defValue);
 	}
 }
 

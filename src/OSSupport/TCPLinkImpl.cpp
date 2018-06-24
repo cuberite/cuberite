@@ -88,12 +88,12 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 		{
 		}
 
-		void DoConnect(const sockaddr * a_IP, int size)
+		void DoConnect(const sockaddr * a_IP, int a_size)
 		{
 			// Make sure connect is only completed once
 			if (!m_IsConnecting)
 			{
-				int ErrCode = bufferevent_socket_connect(m_Link->m_BufferEvent, a_IP, size);
+				int ErrCode = bufferevent_socket_connect(m_Link->m_BufferEvent, a_IP, a_size);
 				if (ErrCode == 0)
 				{
 					m_IsConnecting = true;

@@ -21,8 +21,8 @@ typedef std::list<cFurnaceRecipe::cFuel> FuelList;
 
 struct cFurnaceRecipe::sFurnaceRecipeState
 {
-	RecipeList Recipes;
-	FuelList Fuel;
+	RecipeList m_Recipes;
+	FuelList m_Fuel;
 };
 
 

@@ -21,7 +21,7 @@ class Matrix4
 
 public:
 
-	T cell[16];
+	T m_cell[16];
 
 	// tolua_begin
 
@@ -121,7 +121,7 @@ public:
 		cell[11] = a_Pos.z;
 	}
 
-	inline void Concatenate(const Matrix4 & m2)
+	inline void Concatenate(const Matrix4 & a_m2)
 	{
 		Matrix4 res;
 
@@ -130,10 +130,10 @@ public:
 			for (unsigned int r = 0; r < 4; ++r)
 			{
 				res.cell[r * 4 + c] = (
-					cell[r * 4 + 0] * m2.cell[c + 0] +
-					cell[r * 4 + 1] * m2.cell[c + 4] +
-					cell[r * 4 + 2] * m2.cell[c + 8] +
-					cell[r * 4 + 3] * m2.cell[c + 12]
+					cell[r * 4 + 0] * a_m2.cell[c + 0] +
+					cell[r * 4 + 1] * a_m2.cell[c + 4] +
+					cell[r * 4 + 2] * a_m2.cell[c + 8] +
+					cell[r * 4 + 3] * a_m2.cell[c + 12]
 				);
 			}
 		}
@@ -141,11 +141,11 @@ public:
 		*this = res;
 	}
 
-	inline Vector3<T> Transform(const Vector3<T> & v) const
+	inline Vector3<T> Transform(const Vector3<T> & a_v) const
 	{
-		T x  = cell[0] * v.x + cell[1] * v.y + cell[2]  * v.z + cell[3];
-		T y  = cell[4] * v.x + cell[5] * v.y + cell[6]  * v.z + cell[7];
-		T z  = cell[8] * v.x + cell[9] * v.y + cell[10] * v.z + cell[11];
+		T x  = cell[0] * a_v.x + cell[1] * a_v.y + cell[2]  * a_v.z + cell[3];
+		T y  = cell[4] * a_v.x + cell[5] * a_v.y + cell[6]  * a_v.z + cell[7];
+		T z  = cell[8] * a_v.x + cell[9] * a_v.y + cell[10] * a_v.z + cell[11];
 
 		return Vector3<T>(x, y, z);
 	}

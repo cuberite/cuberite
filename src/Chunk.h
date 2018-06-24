@@ -65,7 +65,7 @@ public:
 		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
 	);
-	cChunk(cChunk & other) = delete;
+	cChunk(cChunk & a_other) = delete;
 	~cChunk();
 
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
@@ -137,7 +137,7 @@ public:
 	void Stay(bool a_Stay = true);
 
 	/** Recence all mobs proximities to players in order to know what to do with them */
-	void CollectMobCensus(cMobCensus & toFill);
+	void CollectMobCensus(cMobCensus & a_toFill);
 
 	/** Try to Spawn Monsters inside chunk */
 	void SpawnMobs(cMobSpawner & a_MobSpawner);

@@ -1220,7 +1220,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 				}
 				static const struct
 				{
-					int x, y, z;
+					int m_x, m_y, m_z;
 				} Coords[] =
 				{
 					{1, 0, 0},
@@ -1375,18 +1375,18 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z)
+bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int a_x, int a_y, int a_z)
 {
 	// In order to place a spring, it needs exactly one of the XZ neighbors or a below neighbor to be air
 	// Also, its neighbor on top of it must be non-air
-	if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
+	if (a_ChunkDesc.GetBlockType(a_x, a_y + 1, a_z) == E_BLOCK_AIR)
 	{
 		return false;
 	}
 
 	static const struct
 	{
-		int x, y, z;
+		int m_x, m_y, m_z;
 	} Coords[] =
 	{
 		{-1,  0,  0},
@@ -1398,7 +1398,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	int NumAirNeighbors = 0;
 	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		switch (a_ChunkDesc.GetBlockType(x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
+		switch (a_ChunkDesc.GetBlockType(a_x + Coords[i].x, a_y + Coords[i].y, a_z + Coords[i].z))
 		{
 			case E_BLOCK_AIR:
 			{
@@ -1416,7 +1416,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	}
 
 	// Has exactly one air neighbor, place a spring:
-	a_ChunkDesc.SetBlockTypeMeta(x, y, z, m_Fluid, 0);
+	a_ChunkDesc.SetBlockTypeMeta(a_x, a_y, a_z, m_Fluid, 0);
 	return true;
 }
 
@@ -1504,7 +1504,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
+bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_AnimalToSpawn)
 {
 	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
 	{
@@ -1516,12 +1516,12 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
 
 	// Check block below (opaque, grass, water), and above (air)
-	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet != E_BLOCK_WATER))
+	if ((a_AnimalToSpawn == mtSquid) && (BlockAtFeet != E_BLOCK_WATER))
 	{
 		return false;
 	}
 	if (
-		(AnimalToSpawn != mtSquid) &&
+		(a_AnimalToSpawn != mtSquid) &&
 		(BlockAtHead != E_BLOCK_AIR) &&
 		(BlockAtFeet != E_BLOCK_AIR) &&
 		(!cBlockInfo::IsTransparent(BlockUnderFeet))
@@ -1531,12 +1531,12 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	}
 	if (
 		(BlockUnderFeet != E_BLOCK_GRASS) &&
-		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) || (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
+		((a_AnimalToSpawn == mtWolf) || (a_AnimalToSpawn == mtRabbit) || (a_AnimalToSpawn == mtCow) || (a_AnimalToSpawn == mtSheep) || (a_AnimalToSpawn == mtChicken) || (a_AnimalToSpawn == mtPig))
 	)
 	{
 		return false;
 	}
-	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != E_BLOCK_MYCELIUM))
+	if ((a_AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != E_BLOCK_MYCELIUM))
 	{
 		return false;
 	}
@@ -1545,7 +1545,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	double AnimalY = a_RelY;
 	double AnimalZ = static_cast<double>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ + 0.5);
 
-	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
+	auto NewMob = cMonster::NewMonsterFromType(a_AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
 	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);

@@ -14,7 +14,7 @@
 
 
 
-static const int InfiniteCost = 100;
+static const int g_InfiniteCost = 100;
 
 
 
@@ -45,7 +45,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 	Cost[3] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, Z_MINUS);
 
 	// Find the minimum distance:
-	int MinCost = InfiniteCost;
+	int MinCost = g_InfiniteCost;
 	for (unsigned int i = 0; i < ARRAYCOUNT(Cost); ++i)
 	{
 		if (Cost[i] < MinCost)
@@ -79,7 +79,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 
 int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, Direction a_Dir, unsigned a_Iteration)
 {
-	int Cost = InfiniteCost;
+	int Cost = g_InfiniteCost;
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;

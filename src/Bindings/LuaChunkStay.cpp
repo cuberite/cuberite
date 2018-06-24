@@ -57,10 +57,10 @@ bool cLuaChunkStay::AddChunks(const cLuaState::cStackTable & a_ChunkCoordsTable)
 
 
 
-void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
+void cLuaChunkStay::AddChunkCoord(cLuaState & a_L, int a_Index)
 {
 	// Check that the element has 2 coords:
-	int NumCoords = luaL_getn(L, -1);
+	int NumCoords = luaL_getn(a_L, -1);
 	if (NumCoords != 2)
 	{
 		LOGWARNING("%s: Element #%d doesn't contain 2 coords (got %d). Ignoring the element.",
@@ -70,11 +70,11 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 	}
 
 	// Read the two coords from the element:
-	lua_rawgeti(L, -1, 1);
-	lua_rawgeti(L, -2, 2);
-	int ChunkX = luaL_checkint(L, -2);
-	int ChunkZ = luaL_checkint(L, -1);
-	lua_pop(L, 2);
+	lua_rawgeti(a_L, -1, 1);
+	lua_rawgeti(a_L, -2, 2);
+	int ChunkX = luaL_checkint(a_L, -2);
+	int ChunkZ = luaL_checkint(a_L, -1);
+	lua_pop(a_L, 2);
 
 	// Check that a coord is not yet present:
 	for (cChunkCoordsVector::iterator itr = m_Chunks.begin(), end = m_Chunks.end(); itr != end; ++itr)

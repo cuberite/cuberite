@@ -25,10 +25,10 @@ cFile::cFile(void) :
 
 
 
-cFile::cFile(const AString & iFileName, eMode iMode) :
+cFile::cFile(const AString & a_iFileName, eMode a_iMode) :
 	m_File(nullptr)
 {
-	Open(iFileName, iMode);
+	Open(a_iFileName, a_iMode);
 }
 
 
@@ -47,7 +47,7 @@ cFile::~cFile()
 
 
 
-bool cFile::Open(const AString & iFileName, eMode iMode)
+bool cFile::Open(const AString & a_iFileName, eMode a_iMode)
 {
 	ASSERT(!IsOpen());  // You should close the file before opening another one
 
@@ -57,7 +57,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	}
 
 	const char * Mode = nullptr;
-	switch (iMode)
+	switch (a_iMode)
 	{
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
@@ -73,10 +73,10 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	#ifdef _WIN32
 		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
 	#else
-		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
+		m_File = fopen((FILE_IO_PREFIX + a_iFileName).c_str(), Mode);
 	#endif  // _WIN32
 
-	if ((m_File == nullptr) && (iMode == fmReadWrite))
+	if ((m_File == nullptr) && (a_iMode == fmReadWrite))
 	{
 		// Fix for MS not following C spec, opening "a" mode files for writing at the end only
 		// The file open operation has been tried with "read update", fails if file not found
@@ -86,7 +86,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		#ifdef _WIN32
 			m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
 		#else
-			m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
+			m_File = fopen((FILE_IO_PREFIX + a_iFileName).c_str(), "wb+");
 		#endif  // _WIN32
 
 	}
@@ -193,7 +193,7 @@ int cFile::Write(const void * a_Buffer, size_t a_NumBytes)
 
 
 
-long cFile::Seek (int iPosition)
+long cFile::Seek (int a_iPosition)
 {
 	ASSERT(IsOpen());
 
@@ -202,7 +202,7 @@ long cFile::Seek (int iPosition)
 		return -1;
 	}
 
-	if (fseek(m_File, iPosition, SEEK_SET) != 0)
+	if (fseek(m_File, a_iPosition, SEEK_SET) != 0)
 	{
 		return -1;
 	}

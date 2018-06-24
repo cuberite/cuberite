@@ -38,7 +38,7 @@ public:
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 
@@ -74,9 +74,9 @@ public:
 	bool IsRightPaddleUsed(void) const { return m_RightPaddleUsed; }
 	bool IsLeftPaddleUsed(void) const { return m_LeftPaddleUsed; }
 
-	void SetLastDamage(int TimeSinceLastHit);
+	void SetLastDamage(int a_TimeSinceLastHit);
 
-	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
+	void UpdatePaddles(bool a_rightPaddleUsed, bool a_leftPaddleUsed);
 private:
 	int m_LastDamage;
 	int m_ForwardDirection;

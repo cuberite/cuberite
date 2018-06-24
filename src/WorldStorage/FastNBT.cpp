@@ -11,7 +11,7 @@
 
 
 /** If a list being loaded has more than this number of items, it's considered corrupted. */
-static const int MAX_LIST_ITEMS = 10000;
+static const int g_MAX_LIST_ITEMS = 10000;
 
 
 
@@ -255,7 +255,7 @@ eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 	NEEDBYTES(4, eNBTParseError::npListMissingLength);
 	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
-	if ((Count < 0) || (Count > MAX_LIST_ITEMS))
+	if ((Count < 0) || (Count > g_MAX_LIST_ITEMS))
 	{
 		return eNBTParseError::npListInvalidLength;
 	}

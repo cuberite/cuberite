@@ -56,11 +56,11 @@
 
 
 
-const int TIME_SUNSET        = 12000;
-const int TIME_NIGHT_START   = 13187;
-const int TIME_NIGHT_END     = 22812;
-const int TIME_SUNRISE       = 23999;
-const int TIME_SPAWN_DIVISOR =   148;
+const int g_TIME_SUNSET        = 12000;
+const int g_TIME_NIGHT_START   = 13187;
+const int g_TIME_NIGHT_END     = 22812;
+const int g_TIME_SUNRISE       = 23999;
+const int g_TIME_SPAWN_DIVISOR =   148;
 
 
 
@@ -1309,21 +1309,21 @@ void cWorld::TickClients(float a_Dt)
 void cWorld::UpdateSkyDarkness(void)
 {
 	int TempTime = std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count();
-	if (TempTime <= TIME_SUNSET)
+	if (TempTime <= g_TIME_SUNSET)
 	{
 		m_SkyDarkness = 0;
 	}
-	else if (TempTime <= TIME_NIGHT_START)
+	else if (TempTime <= g_TIME_NIGHT_START)
 	{
-		m_SkyDarkness = static_cast<NIBBLETYPE>((TIME_NIGHT_START - TempTime) / TIME_SPAWN_DIVISOR);
+		m_SkyDarkness = static_cast<NIBBLETYPE>((g_TIME_NIGHT_START - TempTime) / g_TIME_SPAWN_DIVISOR);
 	}
-	else if (TempTime <= TIME_NIGHT_END)
+	else if (TempTime <= g_TIME_NIGHT_END)
 	{
 		m_SkyDarkness = 8;
 	}
 	else
 	{
-		m_SkyDarkness = static_cast<NIBBLETYPE>((TIME_SUNRISE - TempTime) / TIME_SPAWN_DIVISOR);
+		m_SkyDarkness = static_cast<NIBBLETYPE>((g_TIME_SUNRISE - TempTime) / g_TIME_SPAWN_DIVISOR);
 	}
 }
 
@@ -2189,7 +2189,7 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
 {
 	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
@@ -2207,7 +2207,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
+			*itr, a_IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
@@ -2218,7 +2218,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool a_IsPlayerCreated)
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -2229,7 +2229,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 		auto Pickup = cpp14::make_unique<cPickup>(
 			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
+			*itr, a_IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
 		);
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
@@ -2255,9 +2255,9 @@ UInt32 cWorld::SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, cons
 
 
 
-UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
+	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), a_BlockType, a_BlockMeta);
 	auto FallingBlockPtr = FallingBlock.get();
 	auto ID = FallingBlock->GetUniqueID();
 	if (!FallingBlockPtr->Initialize(std::move(FallingBlock), *this))
@@ -3119,9 +3119,9 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveF
 	}
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & value) -> bool
+		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & a_value) -> bool
 		{
-			return (value.first.get() == &a_Player);
+			return (a_value.first.get() == &a_Player);
 		});
 	}
 	{

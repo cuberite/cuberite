@@ -30,7 +30,7 @@ public:
 
 	/** Called when the block gets ticked either by a random tick or by a queued tick.
 	Note that the coords are chunk-relative! */
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	virtual void OnUpdate(cChunkInterface & a_cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Returns the relative bounding box that must be entity-free in
 	order for the block to be placed. a_XM, a_XP, etc. stand for the
@@ -75,7 +75,7 @@ public:
 	static void NeighborChanged(cChunkInterface & a_ChunkInterface, int a_NeighborX, int a_NeighborY, int a_NeighborZ, eBlockFace a_WhichNeighbor);
 
 	/** Called when the player starts digging the block. */
-	virtual void OnDigging(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+	virtual void OnDigging(cChunkInterface & a_cChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {}
 
 	/** Called if the user right clicks the block and the block is useable
 	returns true if the use was successful, return false to use the block as a "normal" block */
@@ -126,7 +126,7 @@ public:
 	@param a_Player Player trying to build on the block
 	@param a_Meta Meta value of the block currently at a_Pos
 	*/
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
 
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */
@@ -139,7 +139,7 @@ public:
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
 	and wakes up all simulators on the block. */
-	virtual void Check(cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
+	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 
 	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.gamepedia.com/Map_item_format */
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta);

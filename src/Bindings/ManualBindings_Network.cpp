@@ -22,12 +22,12 @@
 // cNetwork API functions:
 
 /** Binds cNetwork::Connect */
-static int tolua_cNetwork_Connect(lua_State * L)
+static int tolua_cNetwork_Connect(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:Connect(Host, Port, Callbacks) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
@@ -70,12 +70,12 @@ static int tolua_cNetwork_Connect(lua_State * L)
 
 
 /** Binds cNetwork::CreateUDPEndpoint */
-static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
+static int tolua_cNetwork_CreateUDPEndpoint(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:CreateUDPEndpoint(Port, Callbacks) -> cUDPEndpoint
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamNumber(2) ||
@@ -106,8 +106,8 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	endpoint->Open(static_cast<UInt16>(port), endpoint);
 
 	// Register the endpoint to be garbage-collected by Lua:
-	tolua_pushusertype(L, endpoint.get(), "cUDPEndpoint");
-	tolua_register_gc(L, lua_gettop(L));
+	tolua_pushusertype(a_L, endpoint.get(), "cUDPEndpoint");
+	tolua_register_gc(a_L, lua_gettop(a_L));
 
 	// Return the endpoint object:
 	S.Push(endpoint.get());
@@ -119,12 +119,12 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 
 
 /** Binds cNetwork::EnumLocalIPAddresses */
-static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * L)
+static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:EnumLocalIPAddresses() -> {string, ...}
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamEnd(2)
@@ -143,12 +143,12 @@ static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * L)
 
 
 /** Binds cNetwork::HostnameToIP */
-static int tolua_cNetwork_HostnameToIP(lua_State * L)
+static int tolua_cNetwork_HostnameToIP(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:HostnameToIP(Host, Callbacks) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
@@ -179,12 +179,12 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 
 
 /** Binds cNetwork::IPToHostname */
-static int tolua_cNetwork_IPToHostname(lua_State * L)
+static int tolua_cNetwork_IPToHostname(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:IPToHostname(IP, Callbacks) -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamString(2) ||
@@ -215,12 +215,12 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 
 
 /** Binds cNetwork::Listen */
-static int tolua_cNetwork_Listen(lua_State * L)
+static int tolua_cNetwork_Listen(lua_State * a_L)
 {
 	// Function signature:
 	// cNetwork:Listen(Port, Callbacks) -> cServerHandle
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamStaticSelf("cNetwork") ||
 		!S.CheckParamNumber(2) ||
@@ -253,8 +253,8 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	srv->SetServerHandle(cNetwork::Listen(port16, srv), srv);
 
 	// Register the server to be garbage-collected by Lua:
-	tolua_pushusertype(L, srv.get(), "cServerHandle");
-	tolua_register_gc(L, lua_gettop(L));
+	tolua_pushusertype(a_L, srv.get(), "cServerHandle");
+	tolua_register_gc(a_L, lua_gettop(a_L));
 
 	// Return the server handle wrapper:
 	S.Push(srv.get());
@@ -270,9 +270,9 @@ static int tolua_cNetwork_Listen(lua_State * L)
 
 /** Called when Lua destroys the object instance.
 Close the server and let it deallocate on its own (it's in a SharedPtr). */
-static int tolua_collect_cServerHandle(lua_State * L)
+static int tolua_collect_cServerHandle(lua_State * a_L)
 {
-	auto Srv = static_cast<cLuaServerHandle *>(tolua_tousertype(L, 1, nullptr));
+	auto Srv = static_cast<cLuaServerHandle *>(tolua_tousertype(a_L, 1, nullptr));
 	ASSERT(Srv != nullptr);
 	Srv->Release();
 	return 0;
@@ -283,12 +283,12 @@ static int tolua_collect_cServerHandle(lua_State * L)
 
 
 /** Binds cLuaServerHandle::Close */
-static int tolua_cServerHandle_Close(lua_State * L)
+static int tolua_cServerHandle_Close(lua_State * a_L)
 {
 	// Function signature:
 	// ServerInstance:Close()
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cServerHandle") ||
 		!S.CheckParamEnd(2)
@@ -298,7 +298,7 @@ static int tolua_cServerHandle_Close(lua_State * L)
 	}
 
 	// Get the server handle:
-	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(a_L, 1));
 	ASSERT(Srv != nullptr);  // Checked by CheckParamSelf()
 
 	// Close it:
@@ -311,12 +311,12 @@ static int tolua_cServerHandle_Close(lua_State * L)
 
 
 /** Binds cLuaServerHandle::IsListening */
-static int tolua_cServerHandle_IsListening(lua_State * L)
+static int tolua_cServerHandle_IsListening(lua_State * a_L)
 {
 	// Function signature:
 	// ServerInstance:IsListening() -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cServerHandle") ||
 		!S.CheckParamEnd(2)
@@ -326,7 +326,7 @@ static int tolua_cServerHandle_IsListening(lua_State * L)
 	}
 
 	// Get the server handle:
-	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+	auto Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(a_L, 1));
 	ASSERT(Srv != nullptr);  // Checked by CheckParamSelf()
 
 	// Query it:
@@ -342,12 +342,12 @@ static int tolua_cServerHandle_IsListening(lua_State * L)
 // cTCPLink bindings (routed through cLuaTCPLink):
 
 /** Binds cLuaTCPLink::Close */
-static int tolua_cTCPLink_Close(lua_State * L)
+static int tolua_cTCPLink_Close(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:Close()
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -357,7 +357,7 @@ static int tolua_cTCPLink_Close(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Close the link:
@@ -370,12 +370,12 @@ static int tolua_cTCPLink_Close(lua_State * L)
 
 
 /** Binds cLuaTCPLink::GetLocalIP */
-static int tolua_cTCPLink_GetLocalIP(lua_State * L)
+static int tolua_cTCPLink_GetLocalIP(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:GetLocalIP() -> string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -385,7 +385,7 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the IP:
@@ -398,12 +398,12 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 
 
 /** Binds cLuaTCPLink::GetLocalPort */
-static int tolua_cTCPLink_GetLocalPort(lua_State * L)
+static int tolua_cTCPLink_GetLocalPort(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:GetLocalPort() -> number
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -413,7 +413,7 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the Port:
@@ -426,12 +426,12 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 
 
 /** Binds cLuaTCPLink::GetRemoteIP */
-static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
+static int tolua_cTCPLink_GetRemoteIP(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:GetRemoteIP() -> string
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -441,7 +441,7 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the IP:
@@ -454,12 +454,12 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 
 
 /** Binds cLuaTCPLink::GetRemotePort */
-static int tolua_cTCPLink_GetRemotePort(lua_State * L)
+static int tolua_cTCPLink_GetRemotePort(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:GetRemotePort() -> number
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -469,7 +469,7 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the Port:
@@ -482,12 +482,12 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 
 
 /** Binds cLuaTCPLink::Send */
-static int tolua_cTCPLink_Send(lua_State * L)
+static int tolua_cTCPLink_Send(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:Send(DataString)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamString(2) ||
@@ -498,7 +498,7 @@ static int tolua_cTCPLink_Send(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Get the data to send:
@@ -515,12 +515,12 @@ static int tolua_cTCPLink_Send(lua_State * L)
 
 
 /** Binds cLuaTCPLink::Shutdown */
-static int tolua_cTCPLink_Shutdown(lua_State * L)
+static int tolua_cTCPLink_Shutdown(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:Shutdown()
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamEnd(2)
@@ -530,7 +530,7 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Shutdown the link:
@@ -543,18 +543,18 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 
 
 /** Binds cLuaTCPLink::StartTLSClient */
-static int tolua_cTCPLink_StartTLSClient(lua_State * L)
+static int tolua_cTCPLink_StartTLSClient(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword) -> [true] or [nil, ErrMsg]
 
 	// Get the link:
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (!S.CheckParamSelf("cTCPLink"))
 	{
 		return 0;
 	}
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Read the (optional) params:
@@ -576,12 +576,12 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 
 
 /** Binds cLuaTCPLink::StartTLSServer */
-static int tolua_cTCPLink_StartTLSServer(lua_State * L)
+static int tolua_cTCPLink_StartTLSServer(lua_State * a_L)
 {
 	// Function signature:
 	// LinkInstance:StartTLSServer(OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData) -> [true] or [nil, ErrMsg]
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cTCPLink") ||
 		!S.CheckParamString(2, 4) ||
@@ -593,7 +593,7 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 	}
 
 	// Get the link:
-	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+	auto Link = *static_cast<cLuaTCPLink **>(lua_touserdata(a_L, 1));
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Read the params:
@@ -620,9 +620,9 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 
 /** Called when Lua destroys the object instance.
 Close the endpoint and let it deallocate on its own (it's in a SharedPtr). */
-static int tolua_collect_cUDPEndpoint(lua_State * L)
+static int tolua_collect_cUDPEndpoint(lua_State * a_L)
 {
-	auto endpoint = static_cast<cLuaUDPEndpoint *>(tolua_tousertype(L, 1, nullptr));
+	auto endpoint = static_cast<cLuaUDPEndpoint *>(tolua_tousertype(a_L, 1, nullptr));
 	ASSERT(endpoint != nullptr);
 	endpoint->Release();
 	return 0;
@@ -633,12 +633,12 @@ static int tolua_collect_cUDPEndpoint(lua_State * L)
 
 
 /** Binds cLuaUDPEndpoint::Close */
-static int tolua_cUDPEndpoint_Close(lua_State * L)
+static int tolua_cUDPEndpoint_Close(lua_State * a_L)
 {
 	// Function signature:
 	// EndpointInstance:Close()
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
@@ -648,7 +648,7 @@ static int tolua_cUDPEndpoint_Close(lua_State * L)
 	}
 
 	// Get the endpoint:
-	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(a_L, 1));
 	ASSERT(endpoint != nullptr);
 
 	// Close it:
@@ -661,12 +661,12 @@ static int tolua_cUDPEndpoint_Close(lua_State * L)
 
 
 /** Binds cLuaUDPEndpoint::EnableBroadcasts */
-static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
+static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * a_L)
 {
 	// Function signature:
 	// EndpointInstance:EnableBroadcasts()
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
@@ -676,7 +676,7 @@ static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
 	}
 
 	// Get the endpoint:
-	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(a_L, 1));
 	ASSERT(endpoint != nullptr);
 
 	// Enable the broadcasts:
@@ -689,12 +689,12 @@ static int tolua_cUDPEndpoint_EnableBroadcasts(lua_State * L)
 
 
 /** Binds cLuaUDPEndpoint::GetPort */
-static int tolua_cUDPEndpoint_GetPort(lua_State * L)
+static int tolua_cUDPEndpoint_GetPort(lua_State * a_L)
 {
 	// Function signature:
 	// Endpoint:GetPort() -> number
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
@@ -704,7 +704,7 @@ static int tolua_cUDPEndpoint_GetPort(lua_State * L)
 	}
 
 	// Get the endpoint:
-	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(a_L, 1));
 	ASSERT(endpoint != nullptr);
 
 	// Get the Port:
@@ -717,12 +717,12 @@ static int tolua_cUDPEndpoint_GetPort(lua_State * L)
 
 
 /** Binds cLuaUDPEndpoint::IsOpen */
-static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
+static int tolua_cUDPEndpoint_IsOpen(lua_State * a_L)
 {
 	// Function signature:
 	// Endpoint:IsOpen() -> bool
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamEnd(2)
@@ -732,7 +732,7 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 	}
 
 	// Get the endpoint:
-	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(a_L, 1));
 	ASSERT(endpoint != nullptr);
 
 	// Close it:
@@ -745,12 +745,12 @@ static int tolua_cUDPEndpoint_IsOpen(lua_State * L)
 
 
 /** Binds cLuaUDPEndpoint::Send */
-static int tolua_cUDPEndpoint_Send(lua_State * L)
+static int tolua_cUDPEndpoint_Send(lua_State * a_L)
 {
 	// Function signature:
 	// Endpoint:Send(DataString)
 
-	cLuaState S(L);
+	cLuaState S(a_L);
 	if (
 		!S.CheckParamSelf("cUDPEndpoint") ||
 		!S.CheckParamString(2, 3) ||
@@ -762,7 +762,7 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 	}
 
 	// Get the link:
-	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(L, 1));
+	auto endpoint = *static_cast<cLuaUDPEndpoint **>(lua_touserdata(a_L, 1));
 	ASSERT(endpoint != nullptr);
 
 	// Get the data to send:
@@ -1095,62 +1095,62 @@ static int tolua_cUrlClient_Request(lua_State * a_LuaState)
 ////////////////////////////////////////////////////////////////////////////////
 // Register the bindings:
 
-void cManualBindings::BindNetwork(lua_State * tolua_S)
+void cManualBindings::BindNetwork(lua_State * a_tolua_S)
 {
 	// Create the cNetwork API classes:
-	tolua_usertype(tolua_S, "cNetwork");
-	tolua_usertype(tolua_S, "cServerHandle");
-	tolua_usertype(tolua_S, "cTCPLink");
-	tolua_usertype(tolua_S, "cUDPEndpoint");
-	tolua_usertype(tolua_S, "cUrlClient");
-	tolua_cclass(tolua_S, "cNetwork",      "cNetwork",      "", nullptr);
-	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
-	tolua_cclass(tolua_S, "cTCPLink",      "cTCPLink",      "", nullptr);
-	tolua_cclass(tolua_S, "cUDPEndpoint",  "cUDPEndpoint",  "", tolua_collect_cUDPEndpoint);
-	tolua_cclass(tolua_S, "cUrlClient",    "cUrlClient",    "", nullptr);
+	tolua_usertype(a_tolua_S, "cNetwork");
+	tolua_usertype(a_tolua_S, "cServerHandle");
+	tolua_usertype(a_tolua_S, "cTCPLink");
+	tolua_usertype(a_tolua_S, "cUDPEndpoint");
+	tolua_usertype(a_tolua_S, "cUrlClient");
+	tolua_cclass(a_tolua_S, "cNetwork",      "cNetwork",      "", nullptr);
+	tolua_cclass(a_tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
+	tolua_cclass(a_tolua_S, "cTCPLink",      "cTCPLink",      "", nullptr);
+	tolua_cclass(a_tolua_S, "cUDPEndpoint",  "cUDPEndpoint",  "", tolua_collect_cUDPEndpoint);
+	tolua_cclass(a_tolua_S, "cUrlClient",    "cUrlClient",    "", nullptr);
 
 	// Fill in the functions (alpha-sorted):
-	tolua_beginmodule(tolua_S, "cNetwork");
-		tolua_function(tolua_S, "Connect",              tolua_cNetwork_Connect);
-		tolua_function(tolua_S, "CreateUDPEndpoint",    tolua_cNetwork_CreateUDPEndpoint);
-		tolua_function(tolua_S, "EnumLocalIPAddresses", tolua_cNetwork_EnumLocalIPAddresses);
-		tolua_function(tolua_S, "HostnameToIP",         tolua_cNetwork_HostnameToIP);
-		tolua_function(tolua_S, "IPToHostname",         tolua_cNetwork_IPToHostname);
-		tolua_function(tolua_S, "Listen",               tolua_cNetwork_Listen);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cNetwork");
+		tolua_function(a_tolua_S, "Connect",              tolua_cNetwork_Connect);
+		tolua_function(a_tolua_S, "CreateUDPEndpoint",    tolua_cNetwork_CreateUDPEndpoint);
+		tolua_function(a_tolua_S, "EnumLocalIPAddresses", tolua_cNetwork_EnumLocalIPAddresses);
+		tolua_function(a_tolua_S, "HostnameToIP",         tolua_cNetwork_HostnameToIP);
+		tolua_function(a_tolua_S, "IPToHostname",         tolua_cNetwork_IPToHostname);
+		tolua_function(a_tolua_S, "Listen",               tolua_cNetwork_Listen);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cServerHandle");
-		tolua_function(tolua_S, "Close",       tolua_cServerHandle_Close);
-		tolua_function(tolua_S, "IsListening", tolua_cServerHandle_IsListening);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cServerHandle");
+		tolua_function(a_tolua_S, "Close",       tolua_cServerHandle_Close);
+		tolua_function(a_tolua_S, "IsListening", tolua_cServerHandle_IsListening);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cTCPLink");
-		tolua_function(tolua_S, "Close",          tolua_cTCPLink_Close);
-		tolua_function(tolua_S, "GetLocalIP",     tolua_cTCPLink_GetLocalIP);
-		tolua_function(tolua_S, "GetLocalPort",   tolua_cTCPLink_GetLocalPort);
-		tolua_function(tolua_S, "GetRemoteIP",    tolua_cTCPLink_GetRemoteIP);
-		tolua_function(tolua_S, "GetRemotePort",  tolua_cTCPLink_GetRemotePort);
-		tolua_function(tolua_S, "Send",           tolua_cTCPLink_Send);
-		tolua_function(tolua_S, "Shutdown",       tolua_cTCPLink_Shutdown);
-		tolua_function(tolua_S, "StartTLSClient", tolua_cTCPLink_StartTLSClient);
-		tolua_function(tolua_S, "StartTLSServer", tolua_cTCPLink_StartTLSServer);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cTCPLink");
+		tolua_function(a_tolua_S, "Close",          tolua_cTCPLink_Close);
+		tolua_function(a_tolua_S, "GetLocalIP",     tolua_cTCPLink_GetLocalIP);
+		tolua_function(a_tolua_S, "GetLocalPort",   tolua_cTCPLink_GetLocalPort);
+		tolua_function(a_tolua_S, "GetRemoteIP",    tolua_cTCPLink_GetRemoteIP);
+		tolua_function(a_tolua_S, "GetRemotePort",  tolua_cTCPLink_GetRemotePort);
+		tolua_function(a_tolua_S, "Send",           tolua_cTCPLink_Send);
+		tolua_function(a_tolua_S, "Shutdown",       tolua_cTCPLink_Shutdown);
+		tolua_function(a_tolua_S, "StartTLSClient", tolua_cTCPLink_StartTLSClient);
+		tolua_function(a_tolua_S, "StartTLSServer", tolua_cTCPLink_StartTLSServer);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cUDPEndpoint");
-		tolua_function(tolua_S, "Close",            tolua_cUDPEndpoint_Close);
-		tolua_function(tolua_S, "EnableBroadcasts", tolua_cUDPEndpoint_EnableBroadcasts);
-		tolua_function(tolua_S, "GetPort",          tolua_cUDPEndpoint_GetPort);
-		tolua_function(tolua_S, "IsOpen",           tolua_cUDPEndpoint_IsOpen);
-		tolua_function(tolua_S, "Send",             tolua_cUDPEndpoint_Send);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cUDPEndpoint");
+		tolua_function(a_tolua_S, "Close",            tolua_cUDPEndpoint_Close);
+		tolua_function(a_tolua_S, "EnableBroadcasts", tolua_cUDPEndpoint_EnableBroadcasts);
+		tolua_function(a_tolua_S, "GetPort",          tolua_cUDPEndpoint_GetPort);
+		tolua_function(a_tolua_S, "IsOpen",           tolua_cUDPEndpoint_IsOpen);
+		tolua_function(a_tolua_S, "Send",             tolua_cUDPEndpoint_Send);
+	tolua_endmodule(a_tolua_S);
 
-	tolua_beginmodule(tolua_S, "cUrlClient");
-		tolua_function(tolua_S, "Delete",  tolua_cUrlClient_Delete);
-		tolua_function(tolua_S, "Get",     tolua_cUrlClient_Get);
-		tolua_function(tolua_S, "Post",    tolua_cUrlClient_Post);
-		tolua_function(tolua_S, "Put",     tolua_cUrlClient_Put);
-		tolua_function(tolua_S, "Request", tolua_cUrlClient_Request);
-	tolua_endmodule(tolua_S);
+	tolua_beginmodule(a_tolua_S, "cUrlClient");
+		tolua_function(a_tolua_S, "Delete",  tolua_cUrlClient_Delete);
+		tolua_function(a_tolua_S, "Get",     tolua_cUrlClient_Get);
+		tolua_function(a_tolua_S, "Post",    tolua_cUrlClient_Post);
+		tolua_function(a_tolua_S, "Put",     tolua_cUrlClient_Put);
+		tolua_function(a_tolua_S, "Request", tolua_cUrlClient_Request);
+	tolua_endmodule(a_tolua_S);
 }
 
 

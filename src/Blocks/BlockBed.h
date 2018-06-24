@@ -33,7 +33,7 @@ public:
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & Pickups, NIBBLETYPE Meta) override {}
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override {}
 
 	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 

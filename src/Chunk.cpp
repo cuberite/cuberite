@@ -522,9 +522,9 @@ void cChunk::Stay(bool a_Stay)
 
 
 
-void cChunk::CollectMobCensus(cMobCensus & toFill)
+void cChunk::CollectMobCensus(cMobCensus & a_toFill)
 {
-	toFill.CollectSpawnableChunk(*this);
+	a_toFill.CollectSpawnableChunk(*this);
 	std::vector<Vector3d> PlayerPositions;
 	PlayerPositions.reserve(m_LoadedByClient.size());
 	for (auto ClientHandle : m_LoadedByClient)
@@ -543,7 +543,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 			currentPosition = Monster.GetPosition();
 			for (const auto & PlayerPos : PlayerPositions)
 			{
-				toFill.CollectMob(Monster, *this, (currentPosition - PlayerPos).SqrLength());
+				a_toFill.CollectMob(Monster, *this, (currentPosition - PlayerPos).SqrLength());
 			}
 		}
 	}  // for itr - m_Entitites[]
@@ -1160,7 +1160,7 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
 			static const struct
 			{
-				int x, z;
+				int m_x, m_z;
 			} Coords[] =
 			{
 				{-1,  0},
@@ -1631,7 +1631,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 {
 	struct
 	{
-		int x, y, z;
+		int m_x, m_y, m_z;
 	}
 	Coords[] =
 	{

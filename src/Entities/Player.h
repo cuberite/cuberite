@@ -71,7 +71,7 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
-	virtual void ApplyArmorDamage(int DamageBlocked) override;
+	virtual void ApplyArmorDamage(int a_DamageBlocked) override;
 
 	// tolua_begin
 
@@ -737,7 +737,7 @@ protected:
 	virtual void Destroyed(void) override;
 
 	/** Filters out damage for creative mode / friendly fire */
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);

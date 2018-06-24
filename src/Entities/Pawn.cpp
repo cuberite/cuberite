@@ -317,7 +317,7 @@ void cPawn::HandleFalling(void)
 	/* The "cross" we sample around to account for the player width/girth */
 	static const struct
 	{
-		int x, z;
+		int m_x, m_z;
 	} CrossSampleCoords[] =
 	{
 		{ 0, 0 },
@@ -332,7 +332,7 @@ void cPawn::HandleFalling(void)
 	in memory but have a hitbox larger than 1 (like fences) */
 	static const struct
 	{
-		int x, y, z;
+		int m_x, m_y, m_z;
 	} BlockSampleOffsets[] =
 	{
 		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)

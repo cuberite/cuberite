@@ -39,9 +39,9 @@ public:
 	/** Returns if a block is a mechanism (something that accepts power and does something)
 	Used by torches to determine if they will power a block
 	*/
-	inline static bool IsMechanism(BLOCKTYPE Block)
+	inline static bool IsMechanism(BLOCKTYPE a_Block)
 	{
-		switch (Block)
+		switch (a_Block)
 		{
 			case E_BLOCK_ACACIA_DOOR:
 			case E_BLOCK_ACACIA_FENCE_GATE:

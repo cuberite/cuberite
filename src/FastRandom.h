@@ -185,13 +185,13 @@ struct cRandomDeviceSeeder
 	using result_type = std::random_device::result_type;
 
 	template <class Itr>
-	void generate(Itr first, Itr last)
+	void generate(Itr a_first, Itr a_last)
 	{
 		std::random_device rd;
 		std::uniform_int_distribution<result_type> dist;
-		for (; first != last; ++first)
+		for (; a_first != a_last; ++a_first)
 		{
-			*first = dist(rd);
+			*a_first = dist(rd);
 		}
 	}
 };

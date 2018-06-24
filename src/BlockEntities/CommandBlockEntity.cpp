@@ -175,7 +175,7 @@ void cCommandBlockEntity::Execute()
 		virtual void Out(const AString & a_Text)
 		{
 			// Overwrite field
-			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
+			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::m_Green, cChatColor::m_White) + a_Text);
 		}
 	} CmdBlockOutCb(this);
 
@@ -194,7 +194,7 @@ void cCommandBlockEntity::Execute()
 	}
 	else
 	{
-		SetLastOutput(cClientHandle::FormatChatPrefix(GetWorld()->ShouldUseChatPrefixes(), "FAILURE", cChatColor::Rose, cChatColor::White) + "Adminstration commands can not be executed");
+		SetLastOutput(cClientHandle::FormatChatPrefix(GetWorld()->ShouldUseChatPrefixes(), "FAILURE", cChatColor::m_Rose, cChatColor::m_White) + "Adminstration commands can not be executed");
 		LOGD("cCommandBlockEntity: Prevented execution of administration command %s", m_Command.c_str());
 	}
 

@@ -32,9 +32,9 @@ public:
 	// tolua_begin
 	int     GetWidth (void) const {return m_Width; }
 	int     GetHeight(void) const {return m_Height; }
-	cItem & GetItem  (int x, int y) const;
-	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth);
-	void    SetItem  (int x, int y, const cItem & a_Item);
+	cItem & GetItem  (int a_x, int a_y) const;
+	void    SetItem  (int a_x, int a_y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth);
+	void    SetItem  (int a_x, int a_y, const cItem & a_Item);
 	void    Clear    (void);
 
 	/** Removes items in a_Grid from m_Items[] (used by cCraftingRecipe::ConsumeIngredients()) */
@@ -70,7 +70,7 @@ public:
 	void          Clear               (void);
 	int           GetIngredientsWidth (void) const {return m_Ingredients.GetWidth(); }
 	int           GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
-	cItem &       GetIngredient       (int x, int y) const {return m_Ingredients.GetItem(x, y); }
+	cItem &       GetIngredient       (int a_x, int a_y) const {return m_Ingredients.GetItem(a_x, a_y); }
 	const cItem & GetResult           (void) const {return m_Result; }
 	void          SetResult           (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth);
 	void          SetResult           (const cItem & a_Item)
@@ -78,14 +78,14 @@ public:
 		m_Result = a_Item;
 	}
 
-	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+	void          SetIngredient       (int a_x, int a_y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 	{
-		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemCount, a_ItemHealth);
+		m_Ingredients.SetItem(a_x, a_y, a_ItemType, a_ItemCount, a_ItemHealth);
 	}
 
-	void          SetIngredient       (int x, int y, const cItem & a_Item)
+	void          SetIngredient       (int a_x, int a_y, const cItem & a_Item)
 	{
-		m_Ingredients.SetItem(x, y, a_Item);
+		m_Ingredients.SetItem(a_x, a_y, a_Item);
 	}
 
 	/** Consumes ingredients from the crafting grid specified */
@@ -122,7 +122,7 @@ protected:
 	struct cRecipeSlot
 	{
 		cItem m_Item;
-		int x, y;  // 1..3, or -1 for "any"
+		int m_x, m_y;  // 1..3, or -1 for "any"
 	} ;
 	typedef std::vector<cRecipeSlot> cRecipeSlots;
 

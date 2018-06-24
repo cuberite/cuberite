@@ -59,7 +59,7 @@ public:  // tolua_export
 	/** The percentage how much a block has to be broken.
 	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag.
 	Can be set in settings.ini [AntiCheat] FastBreakPercentage=(from 0 to 100) */
-	static float FASTBREAK_PERCENTAGE;
+	static float m_FASTBREAK_PERCENTAGE;
 
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
 	cClientHandle(const AString & a_IPString, int a_ViewDistance);
@@ -105,9 +105,9 @@ public:  // tolua_export
 	static bool IsUUIDOnline(const cUUID & a_UUID);  // Exported in ManualBindings.cpp
 
 	/** Formats the type of message with the proper color and prefix for sending to the client. */
-	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
+	static AString FormatMessageType(bool a_ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 
-	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+	static AString FormatChatPrefix(bool a_ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString a_Color1, AString a_Color2);
 
 	void Kick(const AString & a_Reason);  // tolua_export
 
@@ -343,7 +343,7 @@ public:  // tolua_export
 	void HandleOpenHorseInventory(UInt32 a_EntityID);
 
 	void HandlePing             (void);
-	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
+	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float a_FlyingSpeed, float a_WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
@@ -359,7 +359,7 @@ public:  // tolua_export
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
-	void HandleSteerVehicle     (float Forward, float Sideways);
+	void HandleSteerVehicle     (float a_Forward, float a_Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
 		int a_BlockX, int a_BlockY, int a_BlockZ,
@@ -522,7 +522,7 @@ private:
 	/** Number of place or break interactions this tick */
 	int m_NumBlockChangeInteractionsThisTick;
 
-	static int s_ClientCount;
+	static int m_s_ClientCount;
 
 	/** ID used for identification during authenticating. Assigned sequentially for each new instance. */
 	int m_UniqueID;

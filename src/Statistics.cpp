@@ -7,7 +7,7 @@
 
 
 
-cStatInfo cStatInfo::ms_Info[statCount] =
+cStatInfo cStatInfo::m_ms_Info[statCount] =
 {
 	// The order must match the order of enum eStatistic
 
@@ -104,7 +104,7 @@ const AString & cStatInfo::GetName(const eStatistic a_Type)
 {
 	ASSERT((a_Type > statInvalid) && (a_Type < statCount));
 
-	return ms_Info[a_Type].m_Name;
+	return m_ms_Info[a_Type].m_Name;
 }
 
 
@@ -113,11 +113,11 @@ const AString & cStatInfo::GetName(const eStatistic a_Type)
 
 eStatistic cStatInfo::GetType(const AString & a_Name)
 {
-	for (unsigned int i = 0; i < ARRAYCOUNT(ms_Info); ++i)
+	for (unsigned int i = 0; i < ARRAYCOUNT(m_ms_Info); ++i)
 	{
-		if (NoCaseCompare(ms_Info[i].m_Name, a_Name) == 0)
+		if (NoCaseCompare(m_ms_Info[i].m_Name, a_Name) == 0)
 		{
-			return ms_Info[i].m_Type;
+			return m_ms_Info[i].m_Type;
 		}
 	}
 
@@ -132,7 +132,7 @@ eStatistic cStatInfo::GetPrerequisite(const eStatistic a_Type)
 {
 	ASSERT((a_Type > statInvalid) && (a_Type < statCount));
 
-	return ms_Info[a_Type].m_Depends;
+	return m_ms_Info[a_Type].m_Depends;
 }
 
 

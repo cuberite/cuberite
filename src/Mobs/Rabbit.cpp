@@ -20,10 +20,10 @@ cRabbit::cRabbit(void) :
 
 
 
-cRabbit::cRabbit(eRabbitType Type, int MoreCarrotTicks) :
+cRabbit::cRabbit(eRabbitType a_Type, int a_MoreCarrotTicks) :
 	super("Rabbit", mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", 0.82, 0.68),
-	m_Type(Type),
-	m_MoreCarrotTicks(MoreCarrotTicks)
+	m_Type(a_Type),
+	m_MoreCarrotTicks(a_MoreCarrotTicks)
 {
 }
 
