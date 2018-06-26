@@ -23,7 +23,7 @@ AString GetOSErrorString( int a_ErrNo)
 	// According to https://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
 
 	// GNU version of strerror_r()
-	#if defined(__GLIBC__) && defined( _GNU_SOURCE) && !defined(ANDROID) \
+	#if (defined(__GLIBC__) && defined( _GNU_SOURCE) && !defined(ANDROID)) \
 		|| defined(__CYGWIN__)
 
 	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer));
