@@ -1772,7 +1772,11 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				Vector3i ActualBlock = {FloorC(Xpos), FloorC(Ypos), FloorC(Zpos)};
 				BLOCKTYPE Block = area.GetBlockType(ActualBlock.x, ActualBlock.y, ActualBlock.z);
 
+<<<<<<< HEAD
 				for (float Intensity = Random.RandReal(0.7f, 1.3f) * ExplosionStrength - cBlockInfo::GetOptimalBlastResistance(Block) - 0.225f;
+=======
+				for (float Intensity = Random.RandReal(0.7f, 1.3f) * a_ExplosionSize - cBlockInfo::GetOptimalBlastResistance(Block) - 0.225f;
+>>>>>>> d7f54c17858279b4619dfc50338ee2697eececcf
 					(Intensity > 0) && ((Ypos < cChunkDef::Height) || (Ypos >= 0));
 					Intensity -= 0.225f + cBlockInfo::GetOptimalBlastResistance(Block))  // Run more than 1352 times! #RealCritical
 				{
