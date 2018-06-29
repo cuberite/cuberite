@@ -1664,7 +1664,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	}
 
 	// Maximal possible Explosion size
-	int ExplosionSizeInt = CeilC(a_ExplosionSize * 1.733333) + 1;
+	int ExplosionSizeInt = CeilC(a_ExplosionSize * 1.733333f) + 1;
 	int bx = FloorC(a_BlockX);
 	int bz = FloorC(a_BlockZ);
 	int MinY = std::max(FloorC(a_BlockY - ExplosionSizeInt), 0);
@@ -1681,9 +1681,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		}
 		std::set<Vector3i> PulverizedBlocks;  // set seems to be the fastest container
 
-		float Angle111 = 0.173205;  // 92 precomputed values, because way faster than computing the same 507 values each time again
-		float Angle112[28] = {0.180870, 0.156754, 0.188319, 0.138101, 0.195283, 0.117170, 0.201448, 0.094009, 0.206474, 0.068825, 0.210042, 0.042008, 0.211897, 0.014126, 0.164365, 0.189652, 0.152706, 0.208235, 0.137249, 0.228748, 0.116847, 0.250387, 0.090453, 0.271360, 0.057735, 0.288675, 0.019912, 0.298675};
-		float Angle123[63] = {0.198294, 0.171855, 0.145415, 0.206474, 0.178944, 0.123884, 0.213801, 0.185295, 0.099774, 0.219839, 0.190527, 0.073280, 0.224161, 0.194273, 0.044832, 0.226420, 0.196230, 0.015095, 0.217770, 0.159698, 0.130662, 0.226420, 0.166041, 0.105662, 0.233628, 0.171327, 0.077876, 0.238835, 0.175146, 0.047767, 0.241573, 0.177153, 0.016105, 0.238835, 0.143301, 0.111456, 0.247342, 0.148405, 0.082447, 0.253546, 0.152128, 0.050709, 0.256829, 0.154097, 0.017122, 0.260242, 0.121446, 0.086747, 0.267497, 0.124832, 0.053499, 0.271360, 0.126635, 0.018091, 0.279616, 0.093205, 0.055923, 0.284037, 0.094679, 0.018936, 0.293548, 0.058710, 0.019570};
+		float Angle111 = 0.173205f;  // 92 precomputed values, because way faster than computing the same 507 values each time again
+		float Angle112[28] = {0.180870f, 0.156754f, 0.188319f, 0.138101f, 0.195283f, 0.117170f, 0.201448f, 0.094009f, 0.206474f, 0.068825f, 0.210042f, 0.042008f, 0.211897f, 0.014126f, 0.164365f, 0.189652f, 0.152706f, 0.208235f, 0.137249f, 0.228748f, 0.116847f, 0.250387f, 0.090453f, 0.271360f, 0.057735f, 0.288675f, 0.019912f, 0.298675f};
+		float Angle123[63] = {0.198294f, 0.171855f, 0.145415f, 0.206474f, 0.178944f, 0.123884f, 0.213801f, 0.185295f, 0.099774f, 0.219839f, 0.190527f, 0.073280f, 0.224161f, 0.194273f, 0.044832f, 0.226420f, 0.196230f, 0.015095f, 0.217770f, 0.159698f, 0.130662f, 0.226420f, 0.166041f, 0.105662f, 0.233628f, 0.171327f, 0.077876f, 0.238835f, 0.175146f, 0.047767f, 0.241573f, 0.177153f, 0.016105f, 0.238835f, 0.143301f, 0.111456f, 0.247342f, 0.148405f, 0.082447f, 0.253546f, 0.152128f, 0.050709f, 0.256829f, 0.154097f, 0.017122f, 0.260242f, 0.121446f, 0.086747f, 0.267497f, 0.124832f, 0.053499f, 0.271360f, 0.126635f, 0.018091f, 0.279616f, 0.093205f, 0.055923f, 0.284037f, 0.094679f, 0.018936f, 0.293548f, 0.058710f, 0.019570f};
 		auto & Random = GetRandomProvider();
 		float Xway = Angle111;
 		float Yway = Angle111;
@@ -1771,9 +1771,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				Vector3i ActualBlock = {FloorC(Xpos), FloorC(Ypos), FloorC(Zpos)};
 				BLOCKTYPE Block = area.GetBlockType(ActualBlock.x, ActualBlock.y, ActualBlock.z);
 
-				for (float Intensity = (0.7 + Random.RandReal(0.6)) * a_ExplosionSize - cBlockInfo::GetOptimalBlastResistance(Block) - 0.225;
-					(Intensity > 0.0) && ((Ypos < cChunkDef::Height) || (Ypos >= 0));
-					Intensity -= 0.225 + cBlockInfo::GetOptimalBlastResistance(Block))  // Run more than 1352 times! #RealCritical
+				for (float Intensity = (0.7f + Random.RandReal(0.6f)) * a_ExplosionSize - cBlockInfo::GetOptimalBlastResistance(Block) - 0.225;
+					(Intensity > 0) && ((Ypos < cChunkDef::Height) || (Ypos >= 0));
+					Intensity -= 0.225f + cBlockInfo::GetOptimalBlastResistance(Block))  // Run more than 1352 times! #RealCritical
 				{
 					if ((Block != E_BLOCK_AIR) && (PulverizedBlocks.insert(ActualBlock).second))
 					{  // Destroying only if the Block isn't already pulverized or air
@@ -1788,14 +1788,14 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							}
 							default:
 							{
-								if (Random.RandBool(0.25))  // 25% chance of pickups
+								if (Random.RandBool(0.25f))  // 25% chance of pickups
 								{
 									cItems Drops;
 									cBlockHandler * Handler = BlockHandler(Block);
 									Handler->ConvertToPickups(Drops, area.GetBlockMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
 									m_World->SpawnItemPickups(Drops, ActualBlock.x, ActualBlock.y, ActualBlock.z);
 								}
-								else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20))  // 20% chance of flinging stuff around
+								else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20f))  // 20% chance of flinging stuff around
 								{
 									// If the block is shrapnel-able, make a falling block entity out of it:
 									if (

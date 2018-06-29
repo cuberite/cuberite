@@ -51,11 +51,12 @@ public:
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
 	inline static float GetHardness               (BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
-	inline static float GetBlastResistance        (BLOCKTYPE a_Type) { return ((Get(a_Type).m_BlastResistance/0.3)-0.3)*5;}
-	// The BlastResistant-value for the explosion-algorithm (Optimisation, see cChunkMap->DoExplosionAt(...))
-	inline static float GetOptimalBlastResistance (BLOCKTYPE a_Type) { return Get(a_Type).m_BlastResistance;     }
 
 	// tolua_end
+
+	inline static float GetBlastResistance        (BLOCKTYPE a_Type) { return ((Get(a_Type).m_BlastResistance/0.3f)-0.3f)*5.0f;}
+	// The BlastResistant-value for the explosion-algorithm (Optimisation, see cChunkMap->DoExplosionAt(...))
+	inline static float GetOptimalBlastResistance (BLOCKTYPE a_Type) { return Get(a_Type).m_BlastResistance;     }
 
 	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler.get();       }
 
@@ -75,7 +76,7 @@ public:
 		m_CanBeTerraformed(false),
 		m_BlockHeight(1.0),
 		m_Hardness(0.0f),
-		m_BlastResistance(1.89),
+		m_BlastResistance(1.89f),
 		m_Handler()
 	{
 	}
