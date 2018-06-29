@@ -2336,7 +2336,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
+	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos + Vector3d(0.5, 0.5, 0.5), a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{

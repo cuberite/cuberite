@@ -1644,7 +1644,17 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a
 
 
 
-
+/*
+The block destruction model of this function is an optimized Version of the vanilla destruction model.
+For more information (highly recommended):
+> https://minecraft.gamepedia.com/Explosion
+> https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/Explosion.java
+How this function is optimized in relation to the vanilla?
+1. Instead of calculating each direction (the delta - x, y, z values per iteration of the traces), precalculating the values and compressing them (if the values 123 are one combination, also 132, 213, 231 ...)
+2. Rotation of the directions (via + / - on every axis (x y z))
+3. Pre-adaptation of the BlastResistance (in vanilla: each time ((BR / 5) + 0.3) * 0.3)
+=> Less sqrt & divisions in critical sections (>= 1352 cycles!)
+*/
 void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
@@ -1653,25 +1663,15 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		return;
 	}
 
-	bool ShouldDestroyBlocks = true;
-
-	// Don't explode if the explosion center is inside a liquid block:
-	if (IsBlockLiquid(m_World->GetBlock(FloorC(a_BlockX), FloorC(a_BlockY), FloorC(a_BlockZ))))
-	{
-		ShouldDestroyBlocks = false;
-	}
-
-	int ExplosionSizeInt = CeilC(a_ExplosionSize);
-	int ExplosionSizeSq = ExplosionSizeInt * ExplosionSizeInt;
-
+	// Maximal possible Explosion size
+	int ExplosionSizeInt = CeilC(a_ExplosionSize * 1.733333) + 1;
 	int bx = FloorC(a_BlockX);
-	int by = FloorC(a_BlockY);
 	int bz = FloorC(a_BlockZ);
-
 	int MinY = std::max(FloorC(a_BlockY - ExplosionSizeInt), 0);
 	int MaxY = std::min(CeilC(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
 
-	if (ShouldDestroyBlocks)
+	// No Block destruction in Water / Lava for potential acceleration
+	if (!IsBlockLiquid(m_World->GetBlock(FloorC(a_BlockX), FloorC(a_BlockY), FloorC(a_BlockZ))))
 	{
 		cBlockArea area;
 		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));
@@ -1679,123 +1679,201 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		{
 			return;
 		}
+		std::set<Vector3i> PulverizedBlocks;  // set seems to be the fastest container
 
-		for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
+		float Angle111 = 0.173205;  // 92 precomputed values, because way faster than computing the same 507 values each time again
+		float Angle112[28] = {0.180870, 0.156754, 0.188319, 0.138101, 0.195283, 0.117170, 0.201448, 0.094009, 0.206474, 0.068825, 0.210042, 0.042008, 0.211897, 0.014126, 0.164365, 0.189652, 0.152706, 0.208235, 0.137249, 0.228748, 0.116847, 0.250387, 0.090453, 0.271360, 0.057735, 0.288675, 0.019912, 0.298675};
+		float Angle123[63] = {0.198294, 0.171855, 0.145415, 0.206474, 0.178944, 0.123884, 0.213801, 0.185295, 0.099774, 0.219839, 0.190527, 0.073280, 0.224161, 0.194273, 0.044832, 0.226420, 0.196230, 0.015095, 0.217770, 0.159698, 0.130662, 0.226420, 0.166041, 0.105662, 0.233628, 0.171327, 0.077876, 0.238835, 0.175146, 0.047767, 0.241573, 0.177153, 0.016105, 0.238835, 0.143301, 0.111456, 0.247342, 0.148405, 0.082447, 0.253546, 0.152128, 0.050709, 0.256829, 0.154097, 0.017122, 0.260242, 0.121446, 0.086747, 0.267497, 0.124832, 0.053499, 0.271360, 0.126635, 0.018091, 0.279616, 0.093205, 0.055923, 0.284037, 0.094679, 0.018936, 0.293548, 0.058710, 0.019570};
+		auto & Random = GetRandomProvider();
+		float Xway = Angle111;
+		float Yway = Angle111;
+		float Zway = Angle111;
+
+		// Walkthrough through the angles
+		for (int i = 0; i < 169; i++)  // Run 169 times, #HalfCriticalSection
 		{
-			for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
+			// i == 0 already set
+			if ((0 < i) && (i < 43))  // 112 Values
 			{
-				if ((by + y >= cChunkDef::Height) || (by + y < 0))
+				switch (i % 3)
 				{
-					// Outside of the world
+					case 1:
+					{
+						int addr = (i - 1) / 3;
+						Xway = Angle112[addr];
+						Yway = Xway;
+						Zway = Angle112[++addr];
+						break;
+					}
+					case 2:
+					{
+						Yway = Zway;
+						Zway = Xway;
+						break;
+					}
+					default:  // 0
+					{
+						Xway = Yway;
+						Yway = Zway;
+					}
+				}
+			}
+			else if (0 < i)  // 123 Values
+			{
+				switch (i % 6)
+				{
+					case 1:
+					{
+						int addr = (i - 43) / 6;
+						Xway = Angle123[addr];
+						Yway = Angle123[++addr];
+						Zway = Angle123[++addr];
+						break;
+					}
+					case 3:
+					case 5:
+					{
+						float tmp = Yway;
+						Yway = Xway;
+						Xway = tmp;
+						break;
+					}
+					default:  // 0, 2, 4
+					{
+						float tmp = Yway;
+						Yway = Zway;
+						Zway = tmp;
+					}
+				}
+			}  // xyz-value-swapping
+
+			/*  Rotation +/- in every direction
+				dir: xyz
+				0  : +++
+				1  : ++-
+				2  : -+-
+				3  : -++
+				4  : --+
+				5  : ---
+				6  : +--
+				7  : +-+
+				E  : +++
+			*/
+			for (int dir = 0; dir < 8; dir++)  // Run 1352 times, #CriticalSection
+			{
+				double Xpos = a_BlockX + Xway;
+				double Ypos = a_BlockY + Yway;
+				if ((Ypos >= cChunkDef::Height) || (Ypos < 0))  // Outside of the world
+				{
 					continue;
 				}
-				for (int z = -ExplosionSizeInt; z < ExplosionSizeInt; z++)
+				double Zpos = a_BlockZ + Zway;
+				Vector3i ActualBlock = {FloorC(Xpos), FloorC(Ypos), FloorC(Zpos)};
+				BLOCKTYPE Block = area.GetBlockType(ActualBlock.x, ActualBlock.y, ActualBlock.z);
+
+				for (float Intensity = (0.7 + Random.RandReal(0.6)) * a_ExplosionSize - cBlockInfo::GetOptimalBlastResistance(Block) - 0.225;
+					(Intensity > 0.0) && ((Ypos < cChunkDef::Height) || (Ypos >= 0));
+					Intensity -= 0.225 + cBlockInfo::GetOptimalBlastResistance(Block))  // Run more than 1352 times! #RealCritical
 				{
-					if ((x * x + y * y + z * z) > ExplosionSizeSq)
-					{
-						// Too far away
-						continue;
-					}
-
-					BLOCKTYPE Block = area.GetBlockType(bx + x, by + y, bz + z);
-					switch (Block)
-					{
-						case E_BLOCK_TNT:
+					if ((Block != E_BLOCK_AIR) && (PulverizedBlocks.insert(ActualBlock).second))
+					{  // Destroying only if the Block isn't already pulverized or air
+						switch (Block)
 						{
-							// Activate the TNT, with a random fuse between 10 to 30 game ticks
-							int FuseTime = GetRandomProvider().RandInt(10, 30);
-							m_World->SpawnPrimedTNT({a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5}, FuseTime);
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
-							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-							break;
-						}
-
-						case E_BLOCK_OBSIDIAN:
-						case E_BLOCK_BEACON:
-						case E_BLOCK_BEDROCK:
-						case E_BLOCK_BARRIER:
-						case E_BLOCK_WATER:
-						case E_BLOCK_LAVA:
-						{
-							// These blocks are not affected by explosions
-							break;
-						}
-
-						case E_BLOCK_STATIONARY_WATER:
-						{
-							// Turn into simulated water:
-							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
-							break;
-						}
-
-						case E_BLOCK_STATIONARY_LAVA:
-						{
-							// Turn into simulated lava:
-							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
-							break;
-						}
-
-						case E_BLOCK_AIR:
-						{
-							// No pickups for air
-							break;
-						}
-
-						default:
-						{
-							auto & Random = GetRandomProvider();
-							if (Random.RandBool(0.25))  // 25% chance of pickups
+							case E_BLOCK_TNT:
 							{
-								cItems Drops;
-								cBlockHandler * Handler = BlockHandler(Block);
-
-								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
-								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+								// Activate the TNT, with a random fuse between 10 to 30 game ticks
+								m_World->SpawnPrimedTNT(ActualBlock, Random.RandInt(10, 30));
+								area.SetBlockTypeMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z, E_BLOCK_AIR, 0);
+								break;
 							}
-							else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20))  // 20% chance of flinging stuff around
+							default:
 							{
-								// If the block is shrapnel-able, make a falling block entity out of it:
-								if (
-									((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
-									((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
-								)
+								if (Random.RandBool(0.25))  // 25% chance of pickups
 								{
-									m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
+									cItems Drops;
+									cBlockHandler * Handler = BlockHandler(Block);
+									Handler->ConvertToPickups(Drops, area.GetBlockMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
+									m_World->SpawnItemPickups(Drops, ActualBlock.x, ActualBlock.y, ActualBlock.z);
+								}
+								else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20))  // 20% chance of flinging stuff around
+								{
+									// If the block is shrapnel-able, make a falling block entity out of it:
+									if (
+										((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
+										((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
+									)
+									{
+										m_World->SpawnFallingBlock(ActualBlock.x, ActualBlock.y + 5, ActualBlock.z, Block, area.GetBlockMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z));
+									}
+								}
+								// Destroy any block entities
+								if (cBlockEntity::IsBlockEntityBlockType(Block))
+								{
+									DoWithBlockEntityAt(ActualBlock.x, ActualBlock.y, ActualBlock.z, [](cBlockEntity & a_BE)
+										{
+											a_BE.Destroy();
+											return true;
+										}
+									);
 								}
 							}
-
-							// Destroy any block entities
-							if (cBlockEntity::IsBlockEntityBlockType(Block))
-							{
-								Vector3i BlockPos(bx + x, by + y, bz + z);
-								DoWithBlockEntityAt(BlockPos.x, BlockPos.y, BlockPos.z, [](cBlockEntity & a_BE)
-									{
-										a_BE.Destroy();
-										return true;
-									}
-								);
-							}
-
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
-							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
+						}  // switch Block
+					}  //  if !Air & !Already pulverized
+					Xpos += Xway;
+					Ypos += Yway;
+					Zpos += Zway;
+					ActualBlock = {FloorC(Xpos), FloorC(Ypos), FloorC(Zpos)};
+					Block = area.GetBlockType(ActualBlock.x, ActualBlock.y, ActualBlock.z);
+					switch (Block)
+					{
+						case E_BLOCK_STATIONARY_LAVA:
+						{
+							area.SetBlockTypeMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z, E_BLOCK_LAVA, 0);
 							break;
 						}
-					}  // switch (BlockType)
-				}  // for z
-			}  // for y
-		}  // for x
+						case E_BLOCK_STATIONARY_WATER:
+						{
+							area.SetBlockTypeMeta(ActualBlock.x, ActualBlock.y, ActualBlock.z, E_BLOCK_WATER, 0);
+							break;
+						}
+					}
+				}
+
+				// Rotation
+				if (dir%2 == 0)
+				{  // z-Negation
+					Zway = -Zway;
+				}
+				else if ((dir == 3) || (dir == 7))
+				{  // y-Negation
+					Yway = -Yway;
+				}
+				else
+				{  // x-Negation
+					Xway = -Xway;
+				}
+			}  // for dir
+		}  // for i
+
+		// Destroying the blocks - finally
+		for (Vector3i Destroyed : PulverizedBlocks)
+		{
+			area.SetBlockTypeMeta(Destroyed.x, Destroyed.y, Destroyed.z, E_BLOCK_AIR, 0);
+		}
+		a_BlocksAffected.insert(a_BlocksAffected.end(), PulverizedBlocks.begin(), PulverizedBlocks.end());
 		area.Write(*m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 	}
 
 	Vector3d ExplosionPos{ a_BlockX, a_BlockY, a_BlockZ };
 	cBoundingBox bbTNT(ExplosionPos, 0.5, 1);
-	bbTNT.Expand(ExplosionSizeInt * 2, ExplosionSizeInt * 2, ExplosionSizeInt * 2);
+	int EntityExpSize = CeilC(a_ExplosionSize) * 2;
+	bbTNT.Expand(EntityExpSize, EntityExpSize, EntityExpSize);
 
 	ForEachEntity([&](cEntity & a_Entity)
 		{
-			if (a_Entity.IsPickup() && (a_Entity.GetTicksAlive() < 20))
+			if (a_Entity.IsPickup())
 			{
-				// If pickup age is smaller than one second, it is invincible (so we don't kill pickups that were just spawned)
+				// Pickups aren't destoryed
 				return false;
 			}
 

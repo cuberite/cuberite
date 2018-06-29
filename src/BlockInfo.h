@@ -51,6 +51,9 @@ public:
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
 	inline static float GetHardness               (BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
+	inline static float GetBlastResistance        (BLOCKTYPE a_Type) { return ((Get(a_Type).m_BlastResistance/0.3)-0.3)*5;}
+	// The BlastResistant-value for the explosion-algorithm (Optimisation, see cChunkMap->DoExplosionAt(...))
+	inline static float GetOptimalBlastResistance (BLOCKTYPE a_Type) { return Get(a_Type).m_BlastResistance;     }
 
 	// tolua_end
 
@@ -72,6 +75,7 @@ public:
 		m_CanBeTerraformed(false),
 		m_BlockHeight(1.0),
 		m_Hardness(0.0f),
+		m_BlastResistance(1.89),
 		m_Handler()
 	{
 	}
@@ -118,6 +122,9 @@ private:
 
 	/** Block's hardness. The greater the value the longer the player needs to break the block. */
 	float m_Hardness;
+
+	/** Block's blast resistance used for explosions. */
+	float m_BlastResistance;
 
 	/** Custom deleter allows cBlockHandler to be an incomplete type. */
 	struct sHandlerDeleter
