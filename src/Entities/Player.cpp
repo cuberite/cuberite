@@ -1522,27 +1522,36 @@ void cPlayer::LoginSetGameMode( eGameMode a_GameMode)
 
 void cPlayer::SetCapabilities()
 {
-	if (!IsGameModeCreative() || IsGameModeSpectator())
+	// Fly ability
+	if (IsGameModeCreative() || IsGameModeSpectator())
+	{
+		SetCanFly(true);
+	}
+	else
 	{
 		SetFlying(false);
 		SetCanFly(false);
 	}
 
+	// Visible
 	if (IsGameModeSpectator())
 	{
 		SetVisible(false);
-		SetCanFly(true);
+	}
+	else
+	{
+		SetVisible(true);
+	}
 
+	// Set for spectator
+	if (IsGameModeSpectator())
+	{
 		// Clear the current dragging item of the player
 		if (GetWindow() != nullptr)
 		{
 			m_DraggingItem.Empty();
 			GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
 		}
-	}
-	else
-	{
-		SetVisible(true);
 	}
 }
 
@@ -2020,6 +2029,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			{
 				ch->SendWeather(a_World->GetWeather());
 			}
+
+			// Update game mode
+			SetGameMode(a_World->GetGameMode());
 		}
 
 		// Broadcast the player into the new world.
