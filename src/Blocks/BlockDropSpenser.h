@@ -35,6 +35,13 @@ public:
 		return true;
 	}
 
+	/** Called when the drop / dispenser is convert into pickup, ignore meta data */
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		UNUSED(a_BlockMeta);
+		a_Pickups.push_back(cItem(m_BlockType, 1));
+	}
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag. Lowest three bits are position. 0x08 == 1000
