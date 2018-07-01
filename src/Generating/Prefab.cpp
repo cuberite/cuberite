@@ -144,7 +144,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	const cBlockArea & Image = m_BlockArea[a_NumRotations];
+	const cBlockArea & Image = m_BlockArea[static_cast<size_t>(a_NumRotations)];
 
 	// If the placement is outside this chunk, bail out:
 	if (
@@ -323,11 +323,7 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 	ASSERT(a_CharMapDef != nullptr);
 
 	// Initialize the charmap to all-invalid values:
-	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
-	{
-		a_CharMapOut[i].m_BlockType = 0;
-		a_CharMapOut[i].m_BlockMeta = 16;  // Mark unassigned entries with a meta that is impossible otherwise
-	}
+	std::fill(begin(a_CharMapOut), end(a_CharMapOut), sBlockTypeDef { 0, 16 });  // Mark unassigned entries with a meta that is impossible otherwise
 
 	// Process the lines in the definition:
 	AStringVector Lines = StringSplitAndTrim(a_CharMapDef, "\n");

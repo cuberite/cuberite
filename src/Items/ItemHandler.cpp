@@ -64,7 +64,7 @@
 
 
 bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler * cItemHandler::m_ItemHandler[2268];
+std::array<cItemHandler *, 2268> cItemHandler::m_ItemHandler;
 
 
 
@@ -72,7 +72,7 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= ARRAYCOUNT(m_ItemHandler)))
+	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= m_ItemHandler.size()))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
@@ -85,14 +85,14 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 	if (!m_HandlerInitialized)
 	{
 		// We need to initialize
-		memset(m_ItemHandler, 0, sizeof(m_ItemHandler));
+		m_ItemHandler = {};
 		m_HandlerInitialized = true;
 	}
-	if (m_ItemHandler[a_ItemType] == nullptr)
+	if (m_ItemHandler[static_cast<size_t>(a_ItemType)] == nullptr)
 	{
-		m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
+		m_ItemHandler[static_cast<size_t>(a_ItemType)] = CreateItemHandler(a_ItemType);
 	}
-	return m_ItemHandler[a_ItemType];
+	return m_ItemHandler[static_cast<size_t>(a_ItemType)];
 }
 
 
@@ -312,12 +312,11 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 void cItemHandler::Deinit()
 {
-	for (size_t i = 0; i < ARRAYCOUNT(m_ItemHandler); i++)
+	for (auto && Handler : m_ItemHandler)
 	{
-		delete m_ItemHandler[i];
-		m_ItemHandler[i] = nullptr;
+		delete Handler;
+		Handler = nullptr;
 	}
-	memset(m_ItemHandler, 0, sizeof(m_ItemHandler));  // Don't leave any dangling pointers around, just in case
 	m_HandlerInitialized = false;
 }
 

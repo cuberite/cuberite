@@ -8,6 +8,7 @@
 #include "Scoreboard.h"
 #include "World.h"
 #include "ClientHandle.h"
+#include <unordered_map>
 
 
 
@@ -40,34 +41,30 @@ AString cObjective::TypeToString(eType a_Type)
 
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
-	static struct
+	static const std::unordered_map<AString, eType> TypeMap =
 	{
-		eType m_Type;
-		const char * m_String;
-	} TypeMap [] =
-	{
-		{otDummy,              "dummy"              },
-		{otDeathCount,         "deathCount"         },
-		{otPlayerKillCount,    "playerKillCount"    },
-		{otTotalKillCount,     "totalKillCount"     },
-		{otHealth,             "health"             },
-		{otAchievement,        "achievement"        },
-		{otStat,               "stat"               },
-		{otStatItemCraft,      "stat.craftItem"     },
-		{otStatItemUse,        "stat.useItem"       },
-		{otStatItemBreak,      "stat.breakItem"     },
-		{otStatBlockMine,      "stat.mineBlock"     },
-		{otStatEntityKill,     "stat.killEntity"    },
-		{otStatEntityKilledBy, "stat.entityKilledBy"}
+		{"dummy",               otDummy             },
+		{"deathCount",          otDeathCount        },
+		{"playerKillCount",     otPlayerKillCount   },
+		{"totalKillCount",      otTotalKillCount    },
+		{"health",              otHealth            },
+		{"achievement",         otAchievement       },
+		{"stat",                otStat              },
+		{"stat.craftItem",      otStatItemCraft     },
+		{"stat.useItem",        otStatItemUse       },
+		{"stat.breakItem",      otStatItemBreak     },
+		{"stat.mineBlock",      otStatBlockMine     },
+		{"stat.killEntity",     otStatEntityKill    },
+		{"stat.entityKilledBy", otStatEntityKilledBy}
 	};
-	for (size_t i = 0; i < ARRAYCOUNT(TypeMap); i++)
+
+	AString lName = StrToLower(a_Name);
+	if (TypeMap.count(lName) == 0)
 	{
-		if (NoCaseCompare(TypeMap[i].m_String, a_Name) == 0)
-		{
-			return TypeMap[i].m_Type;
-		}
-	}  // for i - TypeMap[]
-	return otDummy;
+		return otDummy;
+	}
+
+	return TypeMap.at(lName);
 }
 
 

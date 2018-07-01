@@ -30,10 +30,10 @@ public:
 	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; }
 
 	/** Called once to provide heightmap data */
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) { UNUSED(a_HeightMap); }
+	virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) { UNUSED(a_HeightMap); }
 
 	/** Called once to provide biome data */
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) { UNUSED(a_BiomeMap); }
+	virtual void BiomeData(const cChunkDef::BiomeMap & a_BiomeMap) { UNUSED(a_BiomeMap); }
 
 	/** Called once to let know if the chunk lighting is valid. Return value is ignored */
 	virtual void LightIsValid(bool a_IsLightValid) { UNUSED(a_IsLightValid); }
@@ -91,10 +91,10 @@ protected:
 
 	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes);
-		a_ChunkBuffer.CopyMetas(m_BlockMetas);
-		a_ChunkBuffer.CopyBlockLight(m_BlockLight);
-		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
+		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes.data());
+		a_ChunkBuffer.CopyMetas(m_BlockMetas.data());
+		a_ChunkBuffer.CopyBlockLight(m_BlockLight.data());
+		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight.data());
 	}
 } ;
 

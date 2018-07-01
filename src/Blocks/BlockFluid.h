@@ -120,34 +120,33 @@ public:
 		}
 
 		// Try to set it on fire:
-		static struct
+		static const std::array<Vector3i, 6> CrossCoords =
 		{
-			int x, y, z;
-		} CrossCoords[] =
-		{
-			{-1,  0,  0},
-			{ 1,  0,  0},
-			{ 0, -1,  0},
-			{ 0,  1,  0},
-			{ 0,  0, -1},
-			{ 0,  0,  1},
-		} ;
+			{
+				{-1,  0,  0},
+				{ 1,  0,  0},
+				{ 0, -1,  0},
+				{ 0,  1,  0},
+				{ 0,  0, -1},
+				{ 0,  0,  1},
+			}
+		};
 		int RelX = a_RelX + x;
 		int RelY = a_RelY + y;
 		int RelZ = a_RelZ + z;
-		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+		for (const auto & Coord : CrossCoords)
 		{
 			if (
-				((RelY + CrossCoords[i].y >= 0) && (RelY + CrossCoords[i].y < cChunkDef::Height)) &&
-				a_Chunk.UnboundedRelGetBlockType(RelX + CrossCoords[i].x, RelY + CrossCoords[i].y, RelZ + CrossCoords[i].z, BlockType) &&
+				((RelY + Coord.y >= 0) && (RelY + Coord.y < cChunkDef::Height)) &&
+				a_Chunk.UnboundedRelGetBlockType(RelX + Coord.x, RelY + Coord.y, RelZ + Coord.z, BlockType) &&
 				(BlockType == E_BLOCK_AIR)
 			)
 			{
 				// This is an air block next to a fuel next to lava, light it up:
-				a_Chunk.UnboundedRelSetBlock(RelX + CrossCoords[i].x, RelY + CrossCoords[i].y, RelZ + CrossCoords[i].z, E_BLOCK_FIRE, 0);
+				a_Chunk.UnboundedRelSetBlock(RelX + Coord.x, RelY + Coord.y, RelZ + Coord.z, E_BLOCK_FIRE, 0);
 				return true;
 			}
-		}  // for i - CrossCoords[]
+		}
 		return false;
 	}
 

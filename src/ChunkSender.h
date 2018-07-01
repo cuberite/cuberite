@@ -120,7 +120,7 @@ protected:
 
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
-	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
+	std::array<unsigned char, cChunkDef::Width * cChunkDef::Width> m_BiomeMap;
 	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
 	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 
@@ -129,7 +129,7 @@ protected:
 
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
+	virtual void BiomeData    (const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 

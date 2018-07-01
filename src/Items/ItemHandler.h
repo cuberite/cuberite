@@ -169,7 +169,7 @@ protected:
 	int m_ItemType;
 	static cItemHandler * CreateItemHandler(int m_ItemType);
 
-	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
+	static std::array<cItemHandler *, E_ITEM_LAST + 1> m_ItemHandler;
 	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
 };
 

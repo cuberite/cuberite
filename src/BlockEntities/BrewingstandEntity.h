@@ -76,7 +76,7 @@ public:
 	const cItem & GetFuelSlot(void) const { return GetSlot(bsFuel); }
 
 	/** Get the expected result item for the given slot number */
-	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[a_SlotNumber]; }
+	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[static_cast<size_t>(a_SlotNumber)]; }
 
 	/** Sets the item in the left bottle slot  */
 	void SetLeftBottleSlot(const cItem & a_Item) { SetSlot(bsLeftBottle, a_Item); }
@@ -120,10 +120,10 @@ protected:
 	const short m_NeedBrewingTime = 400;
 
 	/** Store the current brewing recipes */
-	const cBrewingRecipes::cRecipe * m_CurrentBrewingRecipes[3] = {};
+	std::array<const cBrewingRecipes::cRecipe *, 3> m_CurrentBrewingRecipes = {};
 
 	/** Result items for the  bottle inputs */
-	cItem m_Results[3];
+	std::array<cItem, 3> m_Results;
 
 	/** Amount of ticks that the current item has been brewed */
 	short m_TimeBrewed;

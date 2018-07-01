@@ -31,26 +31,19 @@ public:
 		NIBBLETYPE m_BlockMeta;
 	};
 
-	cPattern(BlockInfo * a_TopBlocks, size_t a_Count)
+	cPattern(const BlockInfo * a_TopBlocks, size_t a_Count)
 	{
 		// Copy the pattern into the top:
-		for (size_t i = 0; i < a_Count; i++)
-		{
-			m_Pattern[i] = a_TopBlocks[i];
-		}
+		auto nextElement = std::copy_n(a_TopBlocks, a_Count, begin(m_Pattern));
 
-		// Fill the rest with stone:
-		static BlockInfo Stone = {E_BLOCK_STONE, 0};
-		for (int i = static_cast<int>(a_Count); i < cChunkDef::Height; i++)
-		{
-			m_Pattern[i] = Stone;
-		}
+		// Fill the rest with stone
+		std::fill(nextElement, end(m_Pattern), BlockInfo {E_BLOCK_STONE, 0});
 	}
 
-	const BlockInfo * Get(void) const { return m_Pattern; }
+	const BlockInfo * Get(void) const { return m_Pattern.data(); }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::Height];
+	std::array<BlockInfo, cChunkDef::Height> m_Pattern;
 } ;
 
 
@@ -60,97 +53,119 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // The arrays to use for the top block pattern definitions:
 
-static cPattern::BlockInfo tbGrass[] =
+static const std::array<cPattern::BlockInfo, 4> tbGrass =
 {
-	{E_BLOCK_GRASS, 0},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-} ;
+	{
+		{E_BLOCK_GRASS, 0},
+		{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
+	}
+};
 
-static cPattern::BlockInfo tbSand[] =
+static const std::array<cPattern::BlockInfo, 4> tbSand =
 {
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SANDSTONE, 0},
-} ;
+	{
+		{ E_BLOCK_SAND, 0},
+		{ E_BLOCK_SAND, 0},
+		{ E_BLOCK_SAND, 0},
+		{ E_BLOCK_SANDSTONE, 0},
+	}
+};
 
-static cPattern::BlockInfo tbDirt[] =
+static const std::array<cPattern::BlockInfo, 4> tbDirt =
 {
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	{
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+	}
+};
 
-static cPattern::BlockInfo tbPodzol[] =
+static const std::array<cPattern::BlockInfo, 4> tbPodzol =
 {
-	{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	{
+		{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+	}
+};
 
-static cPattern::BlockInfo tbGrassLess[] =
+static const std::array<cPattern::BlockInfo, 4> tbGrassLess =
 {
-	{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	{
+		{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+		{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
+	}
+};
 
-static cPattern::BlockInfo tbMycelium[] =
+static const std::array<cPattern::BlockInfo, 4> tbMycelium =
 {
-	{E_BLOCK_MYCELIUM, 0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-} ;
+	{
+		{E_BLOCK_MYCELIUM, 0},
+		{E_BLOCK_DIRT,     0},
+		{E_BLOCK_DIRT,     0},
+		{E_BLOCK_DIRT,     0},
+	}
+};
 
-static cPattern::BlockInfo tbGravel[] =
+static const std::array<cPattern::BlockInfo, 4> tbGravel =
 {
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_STONE,  0},
-} ;
+	{
+		{E_BLOCK_GRAVEL, 0},
+		{E_BLOCK_GRAVEL, 0},
+		{E_BLOCK_GRAVEL, 0},
+		{E_BLOCK_STONE,  0},
+	}
+};
 
-static cPattern::BlockInfo tbStone[] =
+static const std::array<cPattern::BlockInfo, 4> tbStone =
 {
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-} ;
+	{
+		{E_BLOCK_STONE,   0},
+		{E_BLOCK_STONE,   0},
+		{E_BLOCK_STONE,   0},
+		{E_BLOCK_STONE,   0},
+	}
+};
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ocean floor pattern top-block definitions:
 
-static cPattern::BlockInfo tbOFSand[] =
+static const std::array<cPattern::BlockInfo, 4> tbOFSand =
 {
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SANDSTONE, 0}
-} ;
+	{
+		{E_BLOCK_SAND, 0},
+		{E_BLOCK_SAND, 0},
+		{E_BLOCK_SAND, 0},
+		{E_BLOCK_SANDSTONE, 0}
+	}
+};
 
-static cPattern::BlockInfo tbOFClay[] =
+static const std::array<cPattern::BlockInfo, 4> tbOFClay =
 {
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-} ;
+	{
+		{ E_BLOCK_CLAY, 0},
+		{ E_BLOCK_CLAY, 0},
+		{ E_BLOCK_SAND, 0},
+		{ E_BLOCK_SAND, 0},
+	}
+};
 
-static cPattern::BlockInfo tbOFOrangeClay[] =
+static const std::array<cPattern::BlockInfo, 3> tbOFOrangeClay =
 {
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-} ;
+	{
+		{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
+		{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
+		{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
+	}
+};
 
 
 
@@ -160,18 +175,18 @@ static cPattern::BlockInfo tbOFOrangeClay[] =
 ////////////////////////////////////////////////////////////////////////////////
 // Individual patterns to use:
 
-static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
-static cPattern patSand     (tbSand,      ARRAYCOUNT(tbSand));
-static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
-static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
-static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
-static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
-static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
-static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
+static const cPattern patGrass    (tbGrass.data(),     tbGrass.size());
+static const cPattern patSand     (tbSand.data(),      tbSand.size());
+static const cPattern patDirt     (tbDirt.data(),      tbDirt.size());
+static const cPattern patPodzol   (tbPodzol.data(),    tbPodzol.size());
+static const cPattern patGrassLess(tbGrassLess.data(), tbGrassLess.size());
+static const cPattern patMycelium (tbMycelium.data(),  tbMycelium.size());
+static const cPattern patGravel   (tbGravel.data(),    tbGravel.size());
+static const cPattern patStone    (tbStone.data(),     tbStone.size());
 
-static cPattern patOFSand      (tbOFSand,       ARRAYCOUNT(tbOFSand));
-static cPattern patOFClay      (tbOFClay,       ARRAYCOUNT(tbOFClay));
-static cPattern patOFOrangeClay(tbOFOrangeClay, ARRAYCOUNT(tbOFOrangeClay));
+static const cPattern patOFSand      (tbOFSand.data(),       tbOFSand.size());
+static const cPattern patOFClay      (tbOFClay.data(),       tbOFClay.size());
+static const cPattern patOFOrangeClay(tbOFOrangeClay.data(), tbOFOrangeClay.size());
 
 
 
@@ -197,7 +212,7 @@ protected:
 	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
-	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::Height];
+	std::array<cPattern::BlockInfo, 2 * cChunkDef::Height> m_MesaPattern;
 
 	/** Noise used for selecting between dirt and sand on the ocean floor. */
 	cNoise m_OceanFloorSelect;
@@ -214,7 +229,7 @@ protected:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				ComposeColumn(a_ChunkDesc, x, z, &(a_Shape[x * 256 + z * 16 * 256]));
+				ComposeColumn(a_ChunkDesc, x, z, &(a_Shape[static_cast<size_t>(x * 256 + z * 16 * 256)]));
 			}  // for x
 		}  // for z
 	}
@@ -234,31 +249,35 @@ protected:
 		// In a loop, choose whether to use one, two or three layers of stained clay, then choose a color and width for each layer
 		// Separate each group with another layer of hardened clay
 		cNoise patternNoise(a_Seed);
-		static NIBBLETYPE allowedColors[] =
+		static const std::array<NIBBLETYPE, 15> allowedColors =
 		{
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_WHITE,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_LIGHTGRAY,
+			{
+				E_META_STAINED_CLAY_YELLOW,
+				E_META_STAINED_CLAY_YELLOW,
+				E_META_STAINED_CLAY_RED,
+				E_META_STAINED_CLAY_RED,
+				E_META_STAINED_CLAY_WHITE,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_BROWN,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_ORANGE,
+				E_META_STAINED_CLAY_LIGHTGRAY,
+			}
 		} ;
-		static int layerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
+		static const std::array<int, 12> layerSizes =  // Adjust the chance so that thinner layers occur more commonly
 		{
-			1, 1, 1, 1, 1, 1,
-			2, 2, 2, 2,
-			3, 3,
+			{
+				1, 1, 1, 1, 1, 1,
+				2, 2, 2, 2,
+				3, 3,
+			}
 		} ;
-		int idx = ARRAYCOUNT(m_MesaPattern) - 1;
+		int idx = static_cast<int>(m_MesaPattern.size()) - 1;
 		while (idx >= 0)
 		{
 			// A layer group of 1 - 2 color stained clay:
@@ -267,8 +286,8 @@ protected:
 			rnd /= 2;
 			for (int lay = 0; lay < numLayers; lay++)
 			{
-				int numBlocks = layerSizes[(static_cast<size_t>(rnd) % ARRAYCOUNT(layerSizes))];
-				NIBBLETYPE Color = allowedColors[static_cast<size_t>(rnd / 4) % ARRAYCOUNT(allowedColors)];
+				int numBlocks = layerSizes[(static_cast<size_t>(rnd) % layerSizes.size())];
+				NIBBLETYPE Color = allowedColors[static_cast<size_t>(rnd / 4) % allowedColors.size()];
 				if (
 					((numBlocks == 3) && (numLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
 					(Color == E_META_STAINED_CLAY_WHITE))      // White stained clay can ever be only 1 block high
@@ -279,8 +298,8 @@ protected:
 				rnd /= 32;
 				for (int block = 0; block < numBlocks; block++, idx--)
 				{
-					m_MesaPattern[idx].m_BlockMeta = Color;
-					m_MesaPattern[idx].m_BlockType = E_BLOCK_STAINED_CLAY;
+					m_MesaPattern[static_cast<size_t>(idx)].m_BlockMeta = Color;
+					m_MesaPattern[static_cast<size_t>(idx)].m_BlockType = E_BLOCK_STAINED_CLAY;
 				}  // for block
 			}  // for lay
 
@@ -294,8 +313,8 @@ protected:
 			numBlocks = std::min(idx + 1, numBlocks);  // Limit by idx so that we don't have to check inside the loop
 			for (int block = 0; block < numBlocks; block++, idx--)
 			{
-				m_MesaPattern[idx].m_BlockMeta = 0;
-				m_MesaPattern[idx].m_BlockType = E_BLOCK_HARDENED_CLAY;
+				m_MesaPattern[static_cast<size_t>(idx)].m_BlockMeta = 0;
+				m_MesaPattern[static_cast<size_t>(idx)].m_BlockType = E_BLOCK_HARDENED_CLAY;
 			}  // for block
 		}  // while (idx >= 0)
 	}
@@ -523,7 +542,7 @@ protected:
 
 		// Difficult case: use the mesa pattern and watch for overhangs:
 		int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
-		const cPattern::BlockInfo * Pattern = m_MesaPattern;
+		const cPattern::BlockInfo * Pattern = m_MesaPattern.data();
 		bool HasHadWater = false;
 		for (int y = Top; y > 0; y--)
 		{

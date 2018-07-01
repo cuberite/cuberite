@@ -105,15 +105,15 @@ template <typename TYPE> void LinearUpscale2DArray(
 	ASSERT(a_UpscaleY < MAX_UPSCALE_Y);
 
 	// Pre-calculate the upscaling ratios:
-	TYPE RatioX[MAX_UPSCALE_X];
-	TYPE RatioY[MAX_UPSCALE_Y];
+	std::array<TYPE, MAX_UPSCALE_X> RatioX;
+	std::array<TYPE, MAX_UPSCALE_Y> RatioY;
 	for (int x = 0; x <= a_UpscaleX; x++)
 	{
-		RatioX[x] = static_cast<TYPE>(x) / a_UpscaleX;
+		RatioX[static_cast<size_t>(x)] = static_cast<TYPE>(x) / a_UpscaleX;
 	}
 	for (int y = 0; y <= a_UpscaleY; y++)
 	{
-		RatioY[y] = static_cast<TYPE>(y) / a_UpscaleY;
+		RatioY[static_cast<size_t>(y)] = static_cast<TYPE>(y) / a_UpscaleY;
 	}
 
 	// Interpolate each XY cell:
@@ -136,11 +136,11 @@ template <typename TYPE> void LinearUpscale2DArray(
 			{
 				int DestIdx = (DstY + CellY) * DstSizeX + DstX;
 				ASSERT(DestIdx + a_UpscaleX < DstSizeX * DstSizeY);
-				TYPE LoXInY = LoXLoY + (LoXHiY - LoXLoY) * RatioY[CellY];
-				TYPE HiXInY = HiXLoY + (HiXHiY - HiXLoY) * RatioY[CellY];
+				TYPE LoXInY = LoXLoY + (LoXHiY - LoXLoY) * RatioY[static_cast<size_t>(CellY)];
+				TYPE HiXInY = HiXLoY + (HiXHiY - HiXLoY) * RatioY[static_cast<size_t>(CellY)];
 				for (int CellX = 0; CellX <= a_UpscaleX; CellX++, DestIdx++)
 				{
-					a_Dst[DestIdx] = LoXInY + (HiXInY - LoXInY) * RatioX[CellX];
+					a_Dst[DestIdx] = LoXInY + (HiXInY - LoXInY) * RatioX[static_cast<size_t>(CellX)];
 				}
 			}  // for CellY
 		}  // for x
@@ -181,20 +181,20 @@ template <typename TYPE> void LinearUpscale3DArray(
 	ASSERT(a_UpscaleZ <= MAX_UPSCALE_Z);
 
 	// Pre-calculate the upscaling ratios:
-	TYPE RatioX[MAX_UPSCALE_X];
-	TYPE RatioY[MAX_UPSCALE_Y];
-	TYPE RatioZ[MAX_UPSCALE_Z];
+	std::array<TYPE, MAX_UPSCALE_X> RatioX;
+	std::array<TYPE, MAX_UPSCALE_Y> RatioY;
+	std::array<TYPE, MAX_UPSCALE_Z> RatioZ;
 	for (int x = 0; x <= a_UpscaleX; x++)
 	{
-		RatioX[x] = static_cast<TYPE>(x) / a_UpscaleX;
+		RatioX[static_cast<size_t>(x)] = static_cast<TYPE>(x) / a_UpscaleX;
 	}
 	for (int y = 0; y <= a_UpscaleY; y++)
 	{
-		RatioY[y] = static_cast<TYPE>(y) / a_UpscaleY;
+		RatioY[static_cast<size_t>(y)] = static_cast<TYPE>(y) / a_UpscaleY;
 	}
 	for (int z = 0; z <= a_UpscaleZ; z++)
 	{
-		RatioZ[z] = static_cast<TYPE>(z) / a_UpscaleZ;
+		RatioZ[static_cast<size_t>(z)] = static_cast<TYPE>(z) / a_UpscaleZ;
 	}
 
 	// Interpolate each XYZ cell:
@@ -223,19 +223,19 @@ template <typename TYPE> void LinearUpscale3DArray(
 				TYPE HiXHiYHiZ = a_Src[idx + 1 + a_SrcSizeX + a_SrcSizeX * a_SrcSizeY];
 				for (int CellZ = 0; CellZ <= a_UpscaleZ; CellZ++)
 				{
-					TYPE LoXLoYInZ = LoXLoYLoZ + (LoXLoYHiZ - LoXLoYLoZ) * RatioZ[CellZ];
-					TYPE LoXHiYInZ = LoXHiYLoZ + (LoXHiYHiZ - LoXHiYLoZ) * RatioZ[CellZ];
-					TYPE HiXLoYInZ = HiXLoYLoZ + (HiXLoYHiZ - HiXLoYLoZ) * RatioZ[CellZ];
-					TYPE HiXHiYInZ = HiXHiYLoZ + (HiXHiYHiZ - HiXHiYLoZ) * RatioZ[CellZ];
+					TYPE LoXLoYInZ = LoXLoYLoZ + (LoXLoYHiZ - LoXLoYLoZ) * RatioZ[static_cast<size_t>(CellZ)];
+					TYPE LoXHiYInZ = LoXHiYLoZ + (LoXHiYHiZ - LoXHiYLoZ) * RatioZ[static_cast<size_t>(CellZ)];
+					TYPE HiXLoYInZ = HiXLoYLoZ + (HiXLoYHiZ - HiXLoYLoZ) * RatioZ[static_cast<size_t>(CellZ)];
+					TYPE HiXHiYInZ = HiXHiYLoZ + (HiXHiYHiZ - HiXHiYLoZ) * RatioZ[static_cast<size_t>(CellZ)];
 					for (int CellY = 0; CellY <= a_UpscaleY; CellY++)
 					{
 						int DestIdx = (DstZ + CellZ) * DstSizeX * DstSizeY + (DstY + CellY) * DstSizeX + DstX;
 						ASSERT(DestIdx + a_UpscaleX < DstSizeX * DstSizeY * DstSizeZ);
-						TYPE LoXInY = LoXLoYInZ + (LoXHiYInZ - LoXLoYInZ) * RatioY[CellY];
-						TYPE HiXInY = HiXLoYInZ + (HiXHiYInZ - HiXLoYInZ) * RatioY[CellY];
+						TYPE LoXInY = LoXLoYInZ + (LoXHiYInZ - LoXLoYInZ) * RatioY[static_cast<size_t>(CellY)];
+						TYPE HiXInY = HiXLoYInZ + (HiXHiYInZ - HiXLoYInZ) * RatioY[static_cast<size_t>(CellY)];
 						for (int CellX = 0; CellX <= a_UpscaleX; CellX++, DestIdx++)
 						{
-							a_Dst[DestIdx] = LoXInY + (HiXInY - LoXInY) * RatioX[CellX];
+							a_Dst[DestIdx] = LoXInY + (HiXInY - LoXInY) * RatioX[static_cast<size_t>(CellX)];
 						}
 					}  // for CellY
 				}  // for CellZ

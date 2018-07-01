@@ -27,10 +27,7 @@ void cSignEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cSignEntity &>(a_Src);
-	for (size_t i = 0; i < ARRAYCOUNT(m_Line); ++i)
-	{
-		m_Line[i] = src.m_Line[i];
-	}
+	m_Line = src.m_Line;
 }
 
 
@@ -61,12 +58,12 @@ void cSignEntity::SetLines(const AString & a_Line1, const AString & a_Line2, con
 
 void cSignEntity::SetLine(int a_Index, const AString & a_Line)
 {
-	if ((a_Index < 0) || (a_Index >= static_cast<int>(ARRAYCOUNT(m_Line))))
+	if ((a_Index < 0) || (a_Index >= static_cast<int>(m_Line.size())))
 	{
 		LOGWARNING("%s: setting a non-existent line %d (value \"%s\"", __FUNCTION__, a_Index, a_Line.c_str());
 		return;
 	}
-	m_Line[a_Index] = a_Line;
+	m_Line[static_cast<size_t>(a_Index)] = a_Line;
 }
 
 
@@ -75,12 +72,12 @@ void cSignEntity::SetLine(int a_Index, const AString & a_Line)
 
 AString cSignEntity::GetLine(int a_Index) const
 {
-	if ((a_Index < 0) || (a_Index >= static_cast<int>(ARRAYCOUNT(m_Line))))
+	if ((a_Index < 0) || (a_Index >= static_cast<int>(m_Line.size())))
 	{
 		LOGWARNING("%s: requesting a non-existent line %d", __FUNCTION__, a_Index);
 		return "";
 	}
-	return m_Line[a_Index];
+	return m_Line[static_cast<size_t>(a_Index)];
 }
 
 

@@ -428,10 +428,10 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
 	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
 
-	int FloorBuf1[17 * 17];
-	int FloorBuf2[17 * 17];
-	int * FloorHi = FloorBuf1;
-	int * FloorLo = FloorBuf2;
+	std::array<int, 17 * 17> FloorBuf1;
+	std::array<int, 17 * 17> FloorBuf2;
+	int * FloorHi = FloorBuf1.data();
+	int * FloorLo = FloorBuf2.data();
 	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int BaseY = 63;
@@ -491,10 +491,9 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 {
-	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (const auto & Biome : a_ChunkDesc.GetBiomeMap())
 	{
-		switch (Biomes[i])
+		switch (Biome)
 		{
 			case biExtremeHills:
 			case biExtremeHillsEdge:
@@ -506,7 +505,7 @@ bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 				break;
 			}
 		}
-	}  // for i
+	}
 	return false;
 }
 

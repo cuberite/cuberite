@@ -37,40 +37,40 @@ public:
 
 		if (Block == E_BLOCK_AIR)
 		{
-			static const struct  // Define all the possible painting titles
+			// Define all the possible painting titles
+			static const std::array<AString, 26> PaintingTitlesList =
 			{
-				AString Title;
-			} gPaintingTitlesList[] =
-			{
-				{ "Kebab" },
-				{ "Aztec" },
-				{ "Alban" },
-				{ "Aztec2" },
-				{ "Bomb" },
-				{ "Plant" },
-				{ "Wasteland" },
-				{ "Wanderer" },
-				{ "Graham" },
-				{ "Pool" },
-				{ "Courbet" },
-				{ "Sunset" },
-				{ "Sea" },
-				{ "Creebet" },
-				{ "Match" },
-				{ "Bust" },
-				{ "Stage" },
-				{ "Void" },
-				{ "SkullAndRoses" },
-				{ "Wither" },
-				{ "Fighters" },
-				{ "Skeleton" },
-				{ "DonkeyKong" },
-				{ "Pointer" },
-				{ "Pigscene" },
-				{ "BurningSkull" }
+				{
+					{ "Kebab" },
+					{ "Aztec" },
+					{ "Alban" },
+					{ "Aztec2" },
+					{ "Bomb" },
+					{ "Plant" },
+					{ "Wasteland" },
+					{ "Wanderer" },
+					{ "Graham" },
+					{ "Pool" },
+					{ "Courbet" },
+					{ "Sunset" },
+					{ "Sea" },
+					{ "Creebet" },
+					{ "Match" },
+					{ "Bust" },
+					{ "Stage" },
+					{ "Void" },
+					{ "SkullAndRoses" },
+					{ "Wither" },
+					{ "Fighters" },
+					{ "Skeleton" },
+					{ "DonkeyKong" },
+					{ "Pointer" },
+					{ "Pigscene" },
+					{ "BurningSkull" }
+				}
 			};
 
-			auto Painting = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto Painting = cpp14::make_unique<cPainting>(PaintingTitlesList[static_cast<size_t>(a_World->GetTickRandomNumber(PaintingTitlesList.size() - 1))], a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
 			auto PaintingPtr = Painting.get();
 			if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 			{

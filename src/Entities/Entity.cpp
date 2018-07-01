@@ -511,10 +511,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		unsigned int ThornsLevel = 0;
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
-		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+		const std::array<cItem, 4> ArmorItems =
 		{
-			const cItem & Item = ArmorItems[i];
+			{ GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() }
+		};
+		for (const auto & Item : ArmorItems)
+		{
 			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
 		}
 
@@ -651,11 +653,12 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 {
 	int TotalEPF = 0;
 
-	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
-	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+	const std::array<cItem, 4> ArmorItems =
 	{
-		const cItem & Item = ArmorItems[i];
-
+		{ GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() }
+	};
+	for (const auto & Item : ArmorItems)
+	{
 		if ((a_DamageType != dtInVoid) && (a_DamageType != dtAdmin) && (a_DamageType != dtStarving))
 		{
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
@@ -936,33 +939,32 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Push out entity.
 		BLOCKTYPE GotBlock;
 
-		static const struct
+		static const std::array<Vector3i, 4> CrossCoords =
 		{
-			int x, y, z;
-		} gCrossCoords[] =
-		{
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
-		} ;
+			{
+				{ 1, 0,  0},
+				{-1, 0,  0},
+				{ 0, 0,  1},
+				{ 0, 0, -1},
+			}
+		};
 
 		bool IsNoAirSurrounding = true;
-		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		for (const auto & Coord : CrossCoords)
 		{
-			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + Coord.x, BlockY, RelBlockZ + Coord.z, GotBlock))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
 			}
 			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-				NextPos.x += gCrossCoords[i].x;
-				NextPos.z += gCrossCoords[i].z;
+				NextPos.x += Coord.x;
+				NextPos.z += Coord.z;
 				IsNoAirSurrounding = false;
 				break;
 			}
-		}  // for i - gCrossCoords[]
+		}
 
 		if (IsNoAirSurrounding)
 		{

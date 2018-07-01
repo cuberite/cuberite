@@ -35,17 +35,17 @@ int main(int argc, char ** argv)
 	cChunkData Data(Pool);
 	cChunkDef::BlockTypes   BlockTypes;
 	cChunkDef::BlockNibbles BlockMetas;
-	memset(BlockTypes, 0x01, sizeof(BlockTypes));
-	memset(BlockMetas, 0x02, sizeof(BlockMetas));
-	Data.SetBlockTypes(BlockTypes);
-	Data.SetMetas(BlockMetas);
+	std::fill(begin(BlockTypes), end(BlockTypes), 0x01);
+	std::fill(begin(BlockMetas), end(BlockMetas), 0x02);
+	Data.SetBlockTypes(BlockTypes.data());
+	Data.SetMetas(BlockMetas.data());
 
 	// Try to read varying amounts of blocktypes from the cChunkData.
 	// Verify that the exact amount of memory is copied, by copying to a larger buffer and checking its boundaries
-	BLOCKTYPE TestBuffer[5 * cChunkDef::NumBlocks];
+	std::array<BLOCKTYPE, 5 * cChunkDef::NumBlocks> TestBuffer;
 	size_t WritePosIdx = 2 * cChunkDef::NumBlocks;
 	BLOCKTYPE * WritePosition = &TestBuffer[WritePosIdx];
-	memset(TestBuffer, 0x03, sizeof(TestBuffer));
+	std::fill(begin(TestBuffer), end(TestBuffer), 0x03);
 	size_t LastReportedStep = 1;
 	for (size_t idx = 0; idx < 5000; idx += 73)
 	{
@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
 				assert_test(TestBuffer[i] == 0x03);
 			}
 			// Verify the space after the copied data hasn't been changed:
-			for (size_t i = WritePosIdx + idx + len; i < ARRAYCOUNT(TestBuffer); i++)
+			for (size_t i = WritePosIdx + idx + len; i < TestBuffer.size(); i++)
 			{
 				assert_test(TestBuffer[i] == 0x03);
 			}

@@ -42,7 +42,7 @@ const int MAX_PER_QUERY = 100;
 /** Returns the CA certificates that should be trusted for Mojang-related connections. */
 static cX509CertPtr GetCACerts(void)
 {
-	static const char CertString[] =
+	static const AString CertString =
 		// GeoTrust root CA cert
 		// Currently used for signing *.mojang.com's cert
 		// Exported from Mozilla Firefox's built-in CA repository
@@ -146,13 +146,12 @@ static cX509CertPtr GetCACerts(void)
 	static auto X509Cert = [&]()
 	{
 		auto Cert = std::make_shared<cX509Cert>();
-		VERIFY(0 == Cert->Parse(CertString, sizeof(CertString)));
+		VERIFY(0 == Cert->Parse(CertString.data(), CertString.length()));
 		return Cert;
 	}();
 
 	return X509Cert;
 }
-
 
 
 
@@ -472,11 +471,11 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 	}
 
 	// Read the HTTP response:
-	unsigned char buf[1024];
+	std::array<unsigned char, 1024> buf;
 
 	for (;;)
 	{
-		int ret = Socket.Receive(buf, sizeof(buf));
+		int ret = Socket.Receive(buf.data(), sizeof(buf));
 
 		if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
 		{
@@ -498,7 +497,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 			break;
 		}
 
-		a_Response.append(reinterpret_cast<const char *>(buf), static_cast<size_t>(ret));
+		a_Response.append(reinterpret_cast<const char *>(buf.data()), static_cast<size_t>(ret));
 	}
 
 	return true;

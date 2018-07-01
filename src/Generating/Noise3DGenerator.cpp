@@ -197,10 +197,7 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 
 void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = biExtremeHills;
-	}
+	std::fill(begin(a_BiomeMap), end(a_BiomeMap), biExtremeHills);
 }
 
 
@@ -209,15 +206,15 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
-	NOISE_DATATYPE Noise[17 * 257 * 17];
-	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
+	std::array<NOISE_DATATYPE, 17 * 257 * 17> Noise;
+	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise.data());
 
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int y = 0; y < cChunkDef::Height; y++)
 		{
-			int idx = z * 17 * 257 + y * 17;
+			size_t idx = static_cast<size_t>(z * 17 * 257 + y * 17);
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
@@ -261,11 +258,11 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
 
 	// Precalculate a "height" array:
-	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
-	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 5, EndX / 5, StartZ / 5, EndZ / 5);
-	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Z> Height;  // Output for the cubic noise heightmap ("source")
+	m_Cubic.Generate2D(Height.data(), DIM_X, DIM_Z, StartX / 5, EndX / 5, StartZ / 5, EndZ / 5);
+	for (auto && CurHeight : Height)
 	{
-		Height[i] = Height[i] * m_HeightAmplification;
+		CurHeight *= m_HeightAmplification;
 	}
 
 	// Modify the noise by height data:
@@ -278,7 +275,7 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 			NOISE_DATATYPE * CurRow = &(NoiseO[y * DIM_X + z * DIM_X * DIM_Y]);
 			for (int x = 0; x < DIM_X; x++)
 			{
-				CurRow[x] += AddHeight + Height[x + DIM_X * z];
+				CurRow[x] += AddHeight + Height[static_cast<size_t>(x + DIM_X * z)];
 			}
 		}
 	}
@@ -441,25 +438,25 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	m_LastChunkZ = a_ChunkZ;
 
 	// Generate all the noises:
-	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
-	NOISE_DATATYPE Workspace[5 * 5 * 33];
-	NOISE_DATATYPE DensityNoiseA[5 * 5 * 33];
-	NOISE_DATATYPE DensityNoiseB[5 * 5 * 33];
-	NOISE_DATATYPE BaseNoise[5 * 5];
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> ChoiceNoise;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> Workspace;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> DensityNoiseA;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> DensityNoiseB;
+	std::array<NOISE_DATATYPE, 5 * 5> BaseNoise;
 	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
 	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
 	// Note that we have to swap the X and Y coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "x":
-	m_ChoiceNoise.Generate3D  (ChoiceNoise,   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace);
-	m_DensityNoiseA.Generate3D(DensityNoiseA, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
-	m_DensityNoiseB.Generate3D(DensityNoiseB, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
-	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
+	m_ChoiceNoise.Generate3D  (ChoiceNoise.data(),   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace.data());
+	m_DensityNoiseA.Generate3D(DensityNoiseA.data(), 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace.data());
+	m_DensityNoiseB.Generate3D(DensityNoiseB.data(), 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace.data());
+	m_BaseNoise.Generate2D    (BaseNoise.data(),     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace.data());
 
 	// Calculate the final noise based on the partial noises:
 	for (int z = 0; z < 5; z++)
 	{
 		for (int x = 0; x < 5; x++)
 		{
-			NOISE_DATATYPE curBaseNoise = BaseNoise[x + 5 * z];
+			NOISE_DATATYPE curBaseNoise = BaseNoise[static_cast<size_t>(x + 5 * z)];
 			for (int y = 0; y < 33; y++)
 			{
 				NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - m_MidPoint) * m_HeightAmplification;
@@ -477,12 +474,12 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 				}
 
 				// Decide between the two density noises:
-				int idx = 33 * x + 33 * 5 * z + y;
+				size_t idx = static_cast<size_t>(33 * x + 33 * 5 * z + y);
 				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace.data(), 33, 5, 5, m_NoiseArray.data(), 8, 4, 4);
 }
 
 
@@ -500,7 +497,7 @@ void cNoise3DComposable::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape 
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
+				a_Shape[static_cast<size_t>(y + x * 256 + z * 256 * 16)] = (m_NoiseArray[static_cast<size_t>(y + 257 * x + 257 * 17 * z)] > m_AirThreshold) ? 0 : 1;
 			}
 		}  // for x
 	}  // for z
@@ -528,8 +525,8 @@ cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_Bi
 	{
 		for (int x = 0; x <= AVERAGING_SIZE * 2; x++)
 		{
-			m_Weight[z][x] = static_cast<NOISE_DATATYPE>((AVERAGING_SIZE - std::abs(AVERAGING_SIZE - x)) + (AVERAGING_SIZE - std::abs(AVERAGING_SIZE - z)));
-			m_WeightSum += m_Weight[z][x];
+			m_Weight[static_cast<size_t>(z)][static_cast<size_t>(x)] = static_cast<NOISE_DATATYPE>((AVERAGING_SIZE - std::abs(AVERAGING_SIZE - x)) + (AVERAGING_SIZE - std::abs(AVERAGING_SIZE - z)));
+			m_WeightSum += m_Weight[static_cast<size_t>(z)][static_cast<size_t>(x)];
 		}
 	}
 }
@@ -606,23 +603,23 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 	CalcBiomeParamArrays(a_ChunkX, a_ChunkZ, HeightAmp, MidPoint);
 
 	// Generate all the noises:
-	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
-	NOISE_DATATYPE Workspace[5 * 5 * 33];
-	NOISE_DATATYPE DensityNoiseA[5 * 5 * 33];
-	NOISE_DATATYPE DensityNoiseB[5 * 5 * 33];
-	NOISE_DATATYPE BaseNoise[5 * 5];
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> ChoiceNoise;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> Workspace;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> DensityNoiseA;
+	std::array<NOISE_DATATYPE, 5 * 5 * 33> DensityNoiseB;
+	std::array<NOISE_DATATYPE, 5 * 5> BaseNoise;
 	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
 	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
 	// Note that we have to swap the X and Y coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "x":
-	m_ChoiceNoise.Generate3D  (ChoiceNoise,   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace);
-	m_DensityNoiseA.Generate3D(DensityNoiseA, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
-	m_DensityNoiseB.Generate3D(DensityNoiseB, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
-	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
+	m_ChoiceNoise.Generate3D  (ChoiceNoise.data(),   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace.data());
+	m_DensityNoiseA.Generate3D(DensityNoiseA.data(), 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace.data());
+	m_DensityNoiseB.Generate3D(DensityNoiseB.data(), 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace.data());
+	m_BaseNoise.Generate2D    (BaseNoise.data(),     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace.data());
 
 	// Calculate the final noise based on the partial noises:
-	for (int z = 0; z < 5; z++)
+	for (size_t z = 0; z < 5; z++)
 	{
-		for (int x = 0; x < 5; x++)
+		for (size_t x = 0; x < 5; x++)
 		{
 			NOISE_DATATYPE curMidPoint = MidPoint[x + 5 * z];
 			NOISE_DATATYPE curHeightAmp = HeightAmp[x + 5 * z];
@@ -643,12 +640,12 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 				}
 
 				// Decide between the two density noises:
-				int idx = 33 * x + y + 33 * 5 * z;
+				size_t idx = 33 * x + static_cast<size_t>(y) + 33 * 5 * z;
 				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace.data(), 33, 5, 5, m_NoiseArray.data(), 8, 4, 4);
 }
 
 
@@ -658,12 +655,12 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint)
 {
 	// Generate the 3 * 3 chunks of biomes around this chunk:
-	cChunkDef::BiomeMap neighborBiomes[3 * 3];
+	std::array<cChunkDef::BiomeMap, 3 * 3> neighborBiomes;
 	for (int z = 0; z < 3; z++)
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[x + 3 * z]);
+			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[static_cast<size_t>(x + 3 * z)]);
 		}
 	}
 
@@ -685,15 +682,15 @@ void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, 
 					int colx = 16 + x * 4 + relx - AVERAGING_SIZE;   // Biome X coord relative to the neighborBiomes start
 					int neicellx = colx / 16;	                       // Chunk X coord relative to the neighborBiomes start
 					int neirelx  = colx % 16;	                       // Biome X coord relative to cz in neighborBiomes
-					EMCSBiome biome = cChunkDef::GetBiome(neighborBiomes[neicellx + neicellz * 3], neirelx, neirelz);
+					EMCSBiome biome = cChunkDef::GetBiome(neighborBiomes[static_cast<size_t>(neicellx + neicellz * 3)], neirelx, neirelz);
 					NOISE_DATATYPE heightAmp, midPoint;
 					GetBiomeParams(biome, heightAmp, midPoint);
-					totalHeightAmp += heightAmp * m_Weight[relz][relx];
-					totalMidPoint += midPoint * m_Weight[relz][relx];
+					totalHeightAmp += heightAmp * m_Weight[static_cast<size_t>(relz)][static_cast<size_t>(relx)];
+					totalMidPoint += midPoint * m_Weight[static_cast<size_t>(relz)][static_cast<size_t>(relx)];
 				}  // for relx
 			}  // for relz
-			a_HeightAmp[x + 5 * z] = totalHeightAmp / m_WeightSum;
-			a_MidPoint[x + 5 * z] = totalMidPoint / m_WeightSum;
+			a_HeightAmp[static_cast<size_t>(x + 5 * z)] = totalHeightAmp / m_WeightSum;
+			a_MidPoint[static_cast<size_t>(x + 5 * z)] = totalMidPoint / m_WeightSum;
 		}  // for x
 	}  // for z
 }
@@ -794,7 +791,7 @@ void cBiomalNoise3DComposable::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
+				a_Shape[static_cast<size_t>(y + x * 256 + z * 256 * 16)] = (m_NoiseArray[static_cast<size_t>(y + 257 * x + 257 * 17 * z)] > m_AirThreshold) ? 0 : 1;
 			}
 		}  // for x
 	}  // for z

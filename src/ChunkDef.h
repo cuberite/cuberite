@@ -84,18 +84,18 @@ public:
 	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
-	typedef HEIGHTTYPE HeightMap[Width * Width];
+	typedef std::array<HEIGHTTYPE, Width * Width> HeightMap;
 
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
-	typedef EMCSBiome BiomeMap[Width * Width];
+	typedef std::array<EMCSBiome, Width * Width> BiomeMap;
 
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef BLOCKTYPE BlockTypes[NumBlocks];
+	typedef std::array<BLOCKTYPE, NumBlocks> BlockTypes;
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+	typedef std::array<NIBBLETYPE, NumBlocks / 2> BlockNibbles;
 
 	/** The storage wrapper used for compressed blockdata residing in RAMz */
 	typedef std::vector<BLOCKTYPE> COMPRESSED_BLOCKTYPE;
@@ -261,7 +261,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_HeightMap[a_X + Width * a_Z];
+		return a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -269,7 +269,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_HeightMap[a_X + Width * a_Z] = a_Height;
+		a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Height;
 	}
 
 
@@ -277,7 +277,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BiomeMap[a_X + Width * a_Z];
+		return a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -285,7 +285,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
+		a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Biome;
 	}
 
 

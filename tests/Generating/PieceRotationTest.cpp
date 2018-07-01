@@ -11,22 +11,24 @@
 
 
 
-static cPiece::cConnector::eDirection g_AllDirections[] =
+static const std::array<cPiece::cConnector::eDirection, 14> g_AllDirections =
 {
-	cPiece::cConnector::dirXM,
-	cPiece::cConnector::dirXP,
-	cPiece::cConnector::dirYM,
-	cPiece::cConnector::dirYP,
-	cPiece::cConnector::dirZM,
-	cPiece::cConnector::dirZP,
-	cPiece::cConnector::dirYM_XM_ZM,
-	cPiece::cConnector::dirYM_XM_ZP,
-	cPiece::cConnector::dirYM_XP_ZM,
-	cPiece::cConnector::dirYM_XP_ZP,
-	cPiece::cConnector::dirYP_XM_ZM,
-	cPiece::cConnector::dirYP_XM_ZP,
-	cPiece::cConnector::dirYP_XP_ZM,
-	cPiece::cConnector::dirYP_XP_ZP,
+	{
+		cPiece::cConnector::dirXM,
+		cPiece::cConnector::dirXP,
+		cPiece::cConnector::dirYM,
+		cPiece::cConnector::dirYP,
+		cPiece::cConnector::dirZM,
+		cPiece::cConnector::dirZP,
+		cPiece::cConnector::dirYM_XM_ZM,
+		cPiece::cConnector::dirYM_XM_ZP,
+		cPiece::cConnector::dirYM_XP_ZM,
+		cPiece::cConnector::dirYM_XP_ZP,
+		cPiece::cConnector::dirYP_XM_ZM,
+		cPiece::cConnector::dirYP_XM_ZP,
+		cPiece::cConnector::dirYP_XP_ZM,
+		cPiece::cConnector::dirYP_XP_ZP,
+	}
 };
 
 
@@ -66,13 +68,13 @@ public:
 /** Tests that rotating a direction in one way and then the opposite way produces the original direction. */
 static void testBackAndForth()
 {
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto rotated = cPiece::cConnector::RotateDirectionCW(g_AllDirections[i]);
 		auto back = cPiece::cConnector::RotateDirectionCCW(rotated);
 		EXPECT(back == g_AllDirections[i]);
 	}
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto rotated = cPiece::cConnector::RotateDirectionCCW(g_AllDirections[i]);
 		auto back = cPiece::cConnector::RotateDirectionCW(rotated);
@@ -88,7 +90,7 @@ static void testBackAndForth()
 static void testFullRotation()
 {
 	// Rotate 90 degrees CCW four times:
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto d = g_AllDirections[i];
 		for (int j = 0; j < 4; ++j)
@@ -99,7 +101,7 @@ static void testFullRotation()
 	}
 
 	// Rotate 90 degrees CW four times:
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto d = g_AllDirections[i];
 		for (int j = 0; j < 4; ++j)
@@ -110,7 +112,7 @@ static void testFullRotation()
 	}
 
 	// Rotate 180 degrees twice:
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto d = g_AllDirections[i];
 		d = cPiece::cConnector::RotateDirection(d);
@@ -128,7 +130,7 @@ template <class Fn>
 static void testPermutation(Fn & a_Fn)
 {
 	std::map<cPiece::cConnector::eDirection, int> numDest;
-	for (size_t i = 0; i < ARRAYCOUNT(g_AllDirections); ++i)
+	for (size_t i = 0; i < g_AllDirections.size(); ++i)
 	{
 		auto d = a_Fn(g_AllDirections[i]);
 		EXPECT(numDest[d] == 0);

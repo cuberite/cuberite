@@ -163,16 +163,18 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		static const Vector3i Coords[] =
+		static const std::array<Vector3i, 4> Coords =
 		{
-			Vector3i( 1, 0,  0),
-			Vector3i(-1, 0,  0),
-			Vector3i( 0, 0,  1),
-			Vector3i( 0, 0, -1),
-		} ;
-		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+			{
+				{  1, 0,  0 },
+				{ -1, 0,  0 },
+				{  0, 0,  1 },
+				{  0, 0, -1 },
+			}
+		};
+		for (const auto & Coord : Coords)
 		{
-			if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+			if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))
 			{
 				continue;
 			}
@@ -187,7 +189,7 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 				);
 				return false;
 			}
-		}  // for i - Coords[]
+		}
 	}  // if not fed from above
 
 	// Block is not fed, decrease by m_Falloff levels:
@@ -334,20 +336,22 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 {
 	FLUID_LOG("  Checking neighbors for source creation");
 
-	static const Vector3i NeighborCoords[] =
+	static const std::array<Vector3i, 4> NeighborCoords =
 	{
-		Vector3i(-1, 0,  0),
-		Vector3i( 1, 0,  0),
-		Vector3i( 0, 0, -1),
-		Vector3i( 0, 0,  1),
-	} ;
+		{
+			{ -1, 0,  0 },
+			{  1, 0,  0 },
+			{  0, 0, -1 },
+			{  0, 0,  1 },
+		}
+	};
 
 	int NumNeeded = m_NumNeighborsForSource;
-	for (size_t i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
+	for (const auto & Coord : NeighborCoords)
 	{
-		int x = a_RelX + NeighborCoords[i].x;
-		int y = a_RelY + NeighborCoords[i].y;
-		int z = a_RelZ + NeighborCoords[i].z;
+		int x = a_RelX + Coord.x;
+		int y = a_RelY + Coord.y;
+		int z = a_RelZ + Coord.z;
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		if (!a_Chunk->UnboundedRelGetBlock(x, y, z, BlockType, BlockMeta))
@@ -389,16 +393,18 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	static const Vector3i Coords[] =
+	static const std::array<Vector3i, 4> Coords =
 	{
-		Vector3i( 1, 0,  0),
-		Vector3i(-1, 0,  0),
-		Vector3i( 0, 0,  1),
-		Vector3i( 0, 0, -1),
+		{
+			{  1, 0,  0 },
+			{ -1, 0,  0 },
+			{  0, 0,  1 },
+			{  0, 0, -1 },
+		}
 	};
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	for (const auto & Coord : Coords)
 	{
-		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))
 		{
 			continue;
 		}
@@ -406,7 +412,7 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 		{
 			ShouldHarden = true;
 		}
-	}  // for i - Coords[]
+	}
 
 	if (ShouldHarden)
 	{

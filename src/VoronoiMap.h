@@ -78,10 +78,10 @@ protected:
 	int m_CurrentCellZ;
 
 	/** The seeds of cells around m_CurrentCellX, m_CurrentCellZ, X-coords */
-	int m_SeedX[5][5];
+	std::array<std::array<int, 5>, 5> m_SeedX;
 
 	/** The seeds of cells around m_CurrentCellX, m_CurrentCellZ, X-coords */
-	int m_SeedZ[5][5];
+	std::array<std::array<int, 5>, 5> m_SeedZ;
 
 
 	/** Updates the cached cell seeds to match the specified cell. Noop if cell pos already matches.

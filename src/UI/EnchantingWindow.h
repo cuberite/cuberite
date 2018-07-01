@@ -35,7 +35,7 @@ public:
 	cSlotArea * m_SlotArea;
 
 protected:
-	short m_PropertyValue[3];
+	std::array<short, 3> m_PropertyValue;
 	int m_BlockX, m_BlockY, m_BlockZ;
 };
 

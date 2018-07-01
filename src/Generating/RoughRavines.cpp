@@ -84,7 +84,7 @@ protected:
 	float m_Roughness;
 
 	/** Number to add to the radius based on the height. This creates the "ledges" in the ravine walls. */
-	float m_PerHeightRadius[cChunkDef::Height];
+	std::array<float, cChunkDef::Height> m_PerHeightRadius;
 
 
 	/** Recursively subdivides the line between the points of the specified index.
@@ -145,7 +145,7 @@ protected:
 			}
 			for (int i = 0; i < NumBlocks; i++)
 			{
-				m_PerHeightRadius[h + i] = Val;
+				m_PerHeightRadius[static_cast<size_t>(h + i)] = Val;
 			}
 			h += NumBlocks;
 		}
@@ -197,7 +197,7 @@ protected:
 				int Top = std::min(CeilC(itr->m_Top), +cChunkDef::Height);
 				for (int y = std::max(FloorC(itr->m_Bottom), 1); y <= Top; y++)
 				{
-					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
+					if ((itr->m_Radius + m_PerHeightRadius[static_cast<size_t>(y)]) * (itr->m_Radius + m_PerHeightRadius[static_cast<size_t>(y)]) < DistSq)
 					{
 						continue;
 					}

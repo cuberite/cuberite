@@ -1822,15 +1822,15 @@ static int tolua_cPlugin_GetLocalDirectory(lua_State * tolua_S)
 static int tolua_md5(lua_State * tolua_S)
 {
 	// Calculate the raw md5 checksum byte array:
-	unsigned char Output[16];
+	std::array<unsigned char, 16> Output;
 	size_t len = 0;
 	const unsigned char * SourceString = reinterpret_cast<const unsigned char *>(lua_tolstring(tolua_S, 1, &len));
 	if (SourceString == nullptr)
 	{
 		return 0;
 	}
-	mbedtls_md5(SourceString, len, Output);
-	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
+	mbedtls_md5(SourceString, len, Output.data());
+	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output.data()), Output.size());
 	return 1;
 }
 
@@ -1853,21 +1853,21 @@ static int tolua_md5_obsolete(lua_State * tolua_S)
 static int tolua_md5HexString(lua_State * tolua_S)
 {
 	// Calculate the raw md5 checksum byte array:
-	unsigned char md5Output[16];
+	std::array<unsigned char, 16> md5Output;
 	size_t len = 0;
 	const unsigned char * SourceString = reinterpret_cast<const unsigned char *>(lua_tolstring(tolua_S, 1, &len));
 	if (SourceString == nullptr)
 	{
 		return 0;
 	}
-	mbedtls_md5(SourceString, len, md5Output);
+	mbedtls_md5(SourceString, len, md5Output.data());
 
 	// Convert the md5 checksum to hex string:
 	std::stringstream Output;
 	Output << std::hex << std::setfill('0');
-	for (size_t i = 0; i < ARRAYCOUNT(md5Output); i++)
+	for (auto md5Char : md5Output)
 	{
-		Output << std::setw(2) << static_cast<unsigned short>(md5Output[i]);  // Need to cast to a number, otherwise a char is output
+		Output << std::setw(2) << static_cast<unsigned short>(md5Char);  // Need to cast to a number, otherwise a char is output
 	}
 	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
 	return 1;
@@ -1880,15 +1880,15 @@ static int tolua_md5HexString(lua_State * tolua_S)
 static int tolua_sha1(lua_State * tolua_S)
 {
 	// Calculate the raw SHA1 checksum byte array from the input string:
-	unsigned char Output[20];
+	std::array<unsigned char, 20> Output;
 	size_t len = 0;
 	const unsigned char * SourceString = reinterpret_cast<const unsigned char *>(lua_tolstring(tolua_S, 1, &len));
 	if (SourceString == nullptr)
 	{
 		return 0;
 	}
-	mbedtls_sha1(SourceString, len, Output);
-	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output), ARRAYCOUNT(Output));
+	mbedtls_sha1(SourceString, len, Output.data());
+	lua_pushlstring(tolua_S, reinterpret_cast<const char *>(Output.data()), Output.size());
 	return 1;
 }
 
@@ -1899,21 +1899,21 @@ static int tolua_sha1(lua_State * tolua_S)
 static int tolua_sha1HexString(lua_State * tolua_S)
 {
 	// Calculate the raw SHA1 checksum byte array from the input string:
-	unsigned char sha1Output[20];
+	std::array<unsigned char, 20> sha1Output;
 	size_t len = 0;
 	const unsigned char * SourceString = reinterpret_cast<const unsigned char *>(lua_tolstring(tolua_S, 1, &len));
 	if (SourceString == nullptr)
 	{
 		return 0;
 	}
-	mbedtls_sha1(SourceString, len, sha1Output);
+	mbedtls_sha1(SourceString, len, sha1Output.data());
 
 	// Convert the sha1 checksum to hex string:
 	std::stringstream Output;
 	Output << std::hex << std::setfill('0');
-	for (size_t i = 0; i < ARRAYCOUNT(sha1Output); i++)
+	for (auto sha1Char : sha1Output)
 	{
-		Output << std::setw(2) << static_cast<unsigned short>(sha1Output[i]);  // Need to cast to a number, otherwise a char is output
+		Output << std::setw(2) << static_cast<unsigned short>(sha1Char);  // Need to cast to a number, otherwise a char is output
 	}
 	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
 	return 1;

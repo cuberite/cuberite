@@ -7,73 +7,75 @@
 
 
 
-cStatInfo cStatInfo::ms_Info[statCount] =
+static std::array<cStatInfo, statCount> ms_Info =
 {
-	// The order must match the order of enum eStatistic
+	{
+		// The order must match the order of enum eStatistic
 
-	// https://minecraft.gamepedia.com/Achievements
+		// https://minecraft.gamepedia.com/Achievements
 
-	/*             Type          |      Name            |  Prerequisite      */
-	cStatInfo(achOpenInv,           "achievement.openInventory"),
-	cStatInfo(achMineWood,          "achievement.mineWood",           achOpenInv),
-	cStatInfo(achCraftWorkbench,    "achievement.buildWorkBench",     achMineWood),
-	cStatInfo(achCraftPickaxe,      "achievement.buildPickaxe",       achCraftWorkbench),
-	cStatInfo(achCraftFurnace,      "achievement.buildFurnace",       achCraftPickaxe),
-	cStatInfo(achAcquireIron,       "achievement.acquireIron",        achCraftFurnace),
-	cStatInfo(achCraftHoe,          "achievement.buildHoe",           achCraftWorkbench),
-	cStatInfo(achMakeBread,         "achievement.makeBread",          achCraftHoe),
-	cStatInfo(achBakeCake,          "achievement.bakeCake",           achCraftHoe),
-	cStatInfo(achCraftBetterPick,   "achievement.buildBetterPickaxe", achCraftPickaxe),
-	cStatInfo(achCookFish,          "achievement.cookFish",           achAcquireIron),
-	cStatInfo(achOnARail,           "achievement.onARail",            achAcquireIron),
-	cStatInfo(achCraftSword,        "achievement.buildSword",         achCraftWorkbench),
-	cStatInfo(achKillMonster,       "achievement.killEnemy",          achCraftSword),
-	cStatInfo(achKillCow,           "achievement.killCow",            achCraftSword),
-	cStatInfo(achFlyPig,            "achievement.flyPig",             achKillCow),
-	cStatInfo(achSnipeSkeleton,     "achievement.snipeSkeleton",      achKillMonster),
-	cStatInfo(achDiamonds,          "achievement.diamonds",           achAcquireIron),
-	cStatInfo(achEnterPortal,       "achievement.portal",             achDiamonds),
-	cStatInfo(achReturnToSender,    "achievement.ghast",              achEnterPortal),
-	cStatInfo(achBlazeRod,          "achievement.blazeRod",           achEnterPortal),
-	cStatInfo(achBrewPotion,        "achievement.potion",             achBlazeRod),
-	cStatInfo(achEnterTheEnd,       "achievement.theEnd",             achBlazeRod),
-	cStatInfo(achDefeatDragon,      "achievement.theEnd2",            achEnterTheEnd),
-	cStatInfo(achCraftEnchantTable, "achievement.enchantments",       achDiamonds),
-	cStatInfo(achOverkill,          "achievement.overkill",           achCraftEnchantTable),
-	cStatInfo(achBookshelf,         "achievement.bookcase",           achCraftEnchantTable),
-	cStatInfo(achExploreAllBiomes,  "achievement.exploreAllBiomes",   achEnterTheEnd),
-	cStatInfo(achSpawnWither,       "achievement.spawnWither",        achDefeatDragon),
-	cStatInfo(achKillWither,        "achievement.killWither",         achSpawnWither),
-	cStatInfo(achFullBeacon,        "achievement.fullBeacon",         achKillWither),
-	cStatInfo(achBreedCow,          "achievement.breedCow",           achKillCow),
-	cStatInfo(achThrowDiamonds,     "achievement.diamondsToYou",      achDiamonds),
+		/*             Type          |      Name            |  Prerequisite      */
+		cStatInfo(achOpenInv,           "achievement.openInventory"),
+		cStatInfo(achMineWood,          "achievement.mineWood",           achOpenInv),
+		cStatInfo(achCraftWorkbench,    "achievement.buildWorkBench",     achMineWood),
+		cStatInfo(achCraftPickaxe,      "achievement.buildPickaxe",       achCraftWorkbench),
+		cStatInfo(achCraftFurnace,      "achievement.buildFurnace",       achCraftPickaxe),
+		cStatInfo(achAcquireIron,       "achievement.acquireIron",        achCraftFurnace),
+		cStatInfo(achCraftHoe,          "achievement.buildHoe",           achCraftWorkbench),
+		cStatInfo(achMakeBread,         "achievement.makeBread",          achCraftHoe),
+		cStatInfo(achBakeCake,          "achievement.bakeCake",           achCraftHoe),
+		cStatInfo(achCraftBetterPick,   "achievement.buildBetterPickaxe", achCraftPickaxe),
+		cStatInfo(achCookFish,          "achievement.cookFish",           achAcquireIron),
+		cStatInfo(achOnARail,           "achievement.onARail",            achAcquireIron),
+		cStatInfo(achCraftSword,        "achievement.buildSword",         achCraftWorkbench),
+		cStatInfo(achKillMonster,       "achievement.killEnemy",          achCraftSword),
+		cStatInfo(achKillCow,           "achievement.killCow",            achCraftSword),
+		cStatInfo(achFlyPig,            "achievement.flyPig",             achKillCow),
+		cStatInfo(achSnipeSkeleton,     "achievement.snipeSkeleton",      achKillMonster),
+		cStatInfo(achDiamonds,          "achievement.diamonds",           achAcquireIron),
+		cStatInfo(achEnterPortal,       "achievement.portal",             achDiamonds),
+		cStatInfo(achReturnToSender,    "achievement.ghast",              achEnterPortal),
+		cStatInfo(achBlazeRod,          "achievement.blazeRod",           achEnterPortal),
+		cStatInfo(achBrewPotion,        "achievement.potion",             achBlazeRod),
+		cStatInfo(achEnterTheEnd,       "achievement.theEnd",             achBlazeRod),
+		cStatInfo(achDefeatDragon,      "achievement.theEnd2",            achEnterTheEnd),
+		cStatInfo(achCraftEnchantTable, "achievement.enchantments",       achDiamonds),
+		cStatInfo(achOverkill,          "achievement.overkill",           achCraftEnchantTable),
+		cStatInfo(achBookshelf,         "achievement.bookcase",           achCraftEnchantTable),
+		cStatInfo(achExploreAllBiomes,  "achievement.exploreAllBiomes",   achEnterTheEnd),
+		cStatInfo(achSpawnWither,       "achievement.spawnWither",        achDefeatDragon),
+		cStatInfo(achKillWither,        "achievement.killWither",         achSpawnWither),
+		cStatInfo(achFullBeacon,        "achievement.fullBeacon",         achKillWither),
+		cStatInfo(achBreedCow,          "achievement.breedCow",           achKillCow),
+		cStatInfo(achThrowDiamonds,     "achievement.diamondsToYou",      achDiamonds),
 
-	// https://minecraft.gamepedia.com/Statistics
+		// https://minecraft.gamepedia.com/Statistics
 
-	/*             Type         |     Name          */
-	cStatInfo(statGamesQuit,      "stat.leaveGame"),
-	cStatInfo(statMinutesPlayed,  "stat.playOneMinute"),
-	cStatInfo(statDistWalked,     "stat.walkOneCm"),
-	cStatInfo(statDistSwum,       "stat.swimOneCm"),
-	cStatInfo(statDistFallen,     "stat.fallOneCm"),
-	cStatInfo(statDistClimbed,    "stat.climbOneCm"),
-	cStatInfo(statDistFlown,      "stat.flyOneCm"),
-	cStatInfo(statDistDove,       "stat.diveOneCm"),
-	cStatInfo(statDistMinecart,   "stat.minecartOneCm"),
-	cStatInfo(statDistBoat,       "stat.boatOneCm"),
-	cStatInfo(statDistPig,        "stat.pigOneCm"),
-	cStatInfo(statDistHorse,      "stat.horseOneCm"),
-	cStatInfo(statJumps,          "stat.jump"),
-	cStatInfo(statItemsDropped,   "stat.drop"),
-	cStatInfo(statDamageDealt,    "stat.damageDealt"),
-	cStatInfo(statDamageTaken,    "stat.damageTaken"),
-	cStatInfo(statDeaths,         "stat.deaths"),
-	cStatInfo(statMobKills,       "stat.mobKills"),
-	cStatInfo(statAnimalsBred,    "stat.animalsBred"),
-	cStatInfo(statPlayerKills,    "stat.playerKills"),
-	cStatInfo(statFishCaught,     "stat.fishCaught"),
-	cStatInfo(statJunkFished,     "stat.junkFished"),
-	cStatInfo(statTreasureFished, "stat.treasureFished")
+		/*             Type         |     Name          */
+		cStatInfo(statGamesQuit,      "stat.leaveGame"),
+		cStatInfo(statMinutesPlayed,  "stat.playOneMinute"),
+		cStatInfo(statDistWalked,     "stat.walkOneCm"),
+		cStatInfo(statDistSwum,       "stat.swimOneCm"),
+		cStatInfo(statDistFallen,     "stat.fallOneCm"),
+		cStatInfo(statDistClimbed,    "stat.climbOneCm"),
+		cStatInfo(statDistFlown,      "stat.flyOneCm"),
+		cStatInfo(statDistDove,       "stat.diveOneCm"),
+		cStatInfo(statDistMinecart,   "stat.minecartOneCm"),
+		cStatInfo(statDistBoat,       "stat.boatOneCm"),
+		cStatInfo(statDistPig,        "stat.pigOneCm"),
+		cStatInfo(statDistHorse,      "stat.horseOneCm"),
+		cStatInfo(statJumps,          "stat.jump"),
+		cStatInfo(statItemsDropped,   "stat.drop"),
+		cStatInfo(statDamageDealt,    "stat.damageDealt"),
+		cStatInfo(statDamageTaken,    "stat.damageTaken"),
+		cStatInfo(statDeaths,         "stat.deaths"),
+		cStatInfo(statMobKills,       "stat.mobKills"),
+		cStatInfo(statAnimalsBred,    "stat.animalsBred"),
+		cStatInfo(statPlayerKills,    "stat.playerKills"),
+		cStatInfo(statFishCaught,     "stat.fishCaught"),
+		cStatInfo(statJunkFished,     "stat.junkFished"),
+		cStatInfo(statTreasureFished, "stat.treasureFished")
+	}
 };
 
 
@@ -104,7 +106,7 @@ const AString & cStatInfo::GetName(const eStatistic a_Type)
 {
 	ASSERT((a_Type > statInvalid) && (a_Type < statCount));
 
-	return ms_Info[a_Type].m_Name;
+	return ms_Info[static_cast<size_t>(a_Type)].m_Name;
 }
 
 
@@ -113,11 +115,11 @@ const AString & cStatInfo::GetName(const eStatistic a_Type)
 
 eStatistic cStatInfo::GetType(const AString & a_Name)
 {
-	for (unsigned int i = 0; i < ARRAYCOUNT(ms_Info); ++i)
+	for (const auto & Info : ms_Info)
 	{
-		if (NoCaseCompare(ms_Info[i].m_Name, a_Name) == 0)
+		if (NoCaseCompare(Info.m_Name, a_Name) == 0)
 		{
-			return ms_Info[i].m_Type;
+			return Info.m_Type;
 		}
 	}
 
@@ -132,7 +134,7 @@ eStatistic cStatInfo::GetPrerequisite(const eStatistic a_Type)
 {
 	ASSERT((a_Type > statInvalid) && (a_Type < statCount));
 
-	return ms_Info[a_Type].m_Depends;
+	return ms_Info[static_cast<size_t>(a_Type)].m_Depends;
 }
 
 

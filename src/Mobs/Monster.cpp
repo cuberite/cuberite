@@ -28,46 +28,49 @@ Needs to be alpha-sorted by the strings, because binary search is used in String
 The strings need to be lowercase (for more efficient comparisons in StringToMobType())
 m_VanillaName is the name that vanilla use for this mob.
 */
-static const struct
+struct MonsterTypeName
 {
 	eMonsterType m_Type;
 	const char * m_lcName;
 	const char * m_VanillaName;
 	const char * m_VanillaNameNBT;
-} g_MobTypeNames[] =
+};
+static const std::array<MonsterTypeName, 31> g_MobTypeNames =
 {
-	{mtBat,          "bat",          "Bat",             "bat"},
-	{mtBlaze,        "blaze",        "Blaze",           "blaze"},
-	{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
-	{mtChicken,      "chicken",      "Chicken",         "chicken"},
-	{mtCow,          "cow",          "Cow",             "cow"},
-	{mtCreeper,      "creeper",      "Creeper",         "creeper"},
-	{mtEnderman,     "enderman",     "Enderman",        "enderman"},
-	{mtEnderDragon,  "enderdragon",  "EnderDragon",     "ender_dragon"},
-	{mtGhast,        "ghast",        "Ghast",           "ghast"},
-	{mtGiant,        "giant",        "Giant",           "giant"},
-	{mtGuardian,     "guardian",     "Guardian",        "guardian"},
-	{mtHorse,        "horse",        "EntityHorse",     "horse"},
-	{mtIronGolem,    "irongolem",    "VillagerGolem",   "iron_golem"},
-	{mtMagmaCube,    "magmacube",    "LavaSlime",       "magma_cube"},
-	{mtMooshroom,    "mooshroom",    "MushroomCow",     "mooshroom"},
-	{mtOcelot,       "ocelot",       "Ozelot",          "ocelot"},
-	{mtPig,          "pig",          "Pig",             "pig"},
-	{mtRabbit,       "rabbit",       "Rabbit",          "rabbit"},
-	{mtSheep,        "sheep",        "Sheep",           "sheep"},
-	{mtSilverfish,   "silverfish",   "Silverfish",      "silverfish"},
-	{mtSkeleton,     "skeleton",     "Skeleton",        "skeleton"},
-	{mtSlime,        "slime",        "Slime",           "slime"},
-	{mtSnowGolem,    "snowgolem",    "SnowMan",         "snow_golem"},
-	{mtSpider,       "spider",       "Spider",          "spider"},
-	{mtSquid,        "squid",        "Squid",           "squid"},
-	{mtVillager,     "villager",     "Villager",        "villager"},
-	{mtWitch,        "witch",        "Witch",           "witch"},
-	{mtWither,       "wither",       "WitherBoss",      "wither"},
-	{mtWolf,         "wolf",         "Wolf",            "wolf"},
-	{mtZombie,       "zombie",       "Zombie",          "zombie"},
-	{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
-} ;
+	{
+		{mtBat,          "bat",          "Bat",             "bat"},
+		{mtBlaze,        "blaze",        "Blaze",           "blaze"},
+		{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
+		{mtChicken,      "chicken",      "Chicken",         "chicken"},
+		{mtCow,          "cow",          "Cow",             "cow"},
+		{mtCreeper,      "creeper",      "Creeper",         "creeper"},
+		{mtEnderman,     "enderman",     "Enderman",        "enderman"},
+		{mtEnderDragon,  "enderdragon",  "EnderDragon",     "ender_dragon"},
+		{mtGhast,        "ghast",        "Ghast",           "ghast"},
+		{mtGiant,        "giant",        "Giant",           "giant"},
+		{mtGuardian,     "guardian",     "Guardian",        "guardian"},
+		{mtHorse,        "horse",        "EntityHorse",     "horse"},
+		{mtIronGolem,    "irongolem",    "VillagerGolem",   "iron_golem"},
+		{mtMagmaCube,    "magmacube",    "LavaSlime",       "magma_cube"},
+		{mtMooshroom,    "mooshroom",    "MushroomCow",     "mooshroom"},
+		{mtOcelot,       "ocelot",       "Ozelot",          "ocelot"},
+		{mtPig,          "pig",          "Pig",             "pig"},
+		{mtRabbit,       "rabbit",       "Rabbit",          "rabbit"},
+		{mtSheep,        "sheep",        "Sheep",           "sheep"},
+		{mtSilverfish,   "silverfish",   "Silverfish",      "silverfish"},
+		{mtSkeleton,     "skeleton",     "Skeleton",        "skeleton"},
+		{mtSlime,        "slime",        "Slime",           "slime"},
+		{mtSnowGolem,    "snowgolem",    "SnowMan",         "snow_golem"},
+		{mtSpider,       "spider",       "Spider",          "spider"},
+		{mtSquid,        "squid",        "Squid",           "squid"},
+		{mtVillager,     "villager",     "Villager",        "villager"},
+		{mtWitch,        "witch",        "Witch",           "witch"},
+		{mtWither,       "wither",       "WitherBoss",      "wither"},
+		{mtWolf,         "wolf",         "Wolf",            "wolf"},
+		{mtZombie,       "zombie",       "Zombie",          "zombie"},
+		{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
+	}
+};
 
 
 
@@ -915,11 +918,11 @@ bool cMonster::IsUndead(void)
 AString cMonster::MobTypeToString(eMonsterType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (g_MobTypeNames[i].m_Type == a_MobType)
+		if (NameData.m_Type == a_MobType)
 		{
-			return g_MobTypeNames[i].m_lcName;
+			return NameData.m_lcName;
 		}
 	}
 
@@ -934,11 +937,11 @@ AString cMonster::MobTypeToString(eMonsterType a_MobType)
 AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (g_MobTypeNames[i].m_Type == a_MobType)
+		if (NameData.m_Type == a_MobType)
 		{
-			return g_MobTypeNames[i].m_VanillaName;
+			return NameData.m_VanillaName;
 		}
 	}
 
@@ -953,11 +956,11 @@ AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
 AString cMonster::MobTypeToVanillaNBT(eMonsterType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (g_MobTypeNames[i].m_Type == a_MobType)
+		if (NameData.m_Type == a_MobType)
 		{
-			return g_MobTypeNames[i].m_VanillaNameNBT;
+			return NameData.m_VanillaNameNBT;
 		}
 	}
 
@@ -974,29 +977,29 @@ eMonsterType cMonster::StringToMobType(const AString & a_Name)
 	AString lcName = StrToLower(a_Name);
 
 	// Search Cuberite name:
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (strcmp(g_MobTypeNames[i].m_lcName, lcName.c_str()) == 0)
+		if (strcmp(NameData.m_lcName, lcName.c_str()) == 0)
 		{
-			return g_MobTypeNames[i].m_Type;
+			return NameData.m_Type;
 		}
 	}
 
 	// Not found. Search Vanilla name:
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaName).c_str(), lcName.c_str()) == 0)
+		if (strcmp(StrToLower(NameData.m_VanillaName).c_str(), lcName.c_str()) == 0)
 		{
-			return g_MobTypeNames[i].m_Type;
+			return NameData.m_Type;
 		}
 	}
 
 	// Search in NBT name
-	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	for (const auto & NameData : g_MobTypeNames)
 	{
-		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaNameNBT).c_str(), lcName.c_str()) == 0)
+		if (strcmp(StrToLower(NameData.m_VanillaNameNBT).c_str(), lcName.c_str()) == 0)
 		{
-			return g_MobTypeNames[i].m_Type;
+			return NameData.m_Type;
 		}
 	}
 

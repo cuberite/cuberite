@@ -78,7 +78,7 @@ void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
 
-	mbedtls_sha1_finish(&m_Sha1, a_Output);
+	mbedtls_sha1_finish(&m_Sha1, a_Output.data());
 	m_DoesAcceptInput = false;
 }
 
@@ -88,8 +88,7 @@ void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 
 void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 {
-	Checksum Digest;
-	memcpy(Digest, a_Digest, sizeof(Digest));
+	Checksum Digest = a_Digest;
 
 	bool IsNegative = (Digest[0] >= 0x80);
 	if (IsNegative)
@@ -98,17 +97,17 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 		bool carry = true;  // Add one to the whole number
 		for (int i = 19; i >= 0; i--)
 		{
-			Digest[i] = ~Digest[i];
+			Digest[static_cast<size_t>(i)] = ~Digest[static_cast<size_t>(i)];
 			if (carry)
 			{
-				carry = (Digest[i] == 0xff);
-				Digest[i]++;
+				carry = (Digest[static_cast<size_t>(i)] == 0xff);
+				Digest[static_cast<size_t>(i)]++;
 			}
 		}
 	}
 	a_Out.clear();
 	a_Out.reserve(40);
-	for (int i = 0; i < 20; i++)
+	for (size_t i = 0; i < 20; i++)
 	{
 		AppendPrintf(a_Out, "%02x", Digest[i]);
 	}

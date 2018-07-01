@@ -289,28 +289,28 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	ASSERT(Self->m_SelfPtr != nullptr);
 
 	// Get the textual IP address and port number out of a_Addr:
-	char IPAddress[128];
+	std::array<char, 128> IPAddress;
 	UInt16 Port = 0;
 	switch (a_Addr->sa_family)
 	{
 		case AF_INET:
 		{
 			sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr);
-			evutil_inet_ntop(AF_INET, &(sin->sin_addr), IPAddress, ARRAYCOUNT(IPAddress));
+			evutil_inet_ntop(AF_INET, &(sin->sin_addr), IPAddress.data(), IPAddress.size());
 			Port = ntohs(sin->sin_port);
 			break;
 		}
 		case AF_INET6:
 		{
 			sockaddr_in6 * sin6 = reinterpret_cast<sockaddr_in6 *>(a_Addr);
-			evutil_inet_ntop(AF_INET6, &(sin6->sin6_addr), IPAddress, ARRAYCOUNT(IPAddress));
+			evutil_inet_ntop(AF_INET6, &(sin6->sin6_addr), IPAddress.data(), IPAddress.size());
 			Port = ntohs(sin6->sin6_port);
 			break;
 		}
 	}
 
 	// Call the OnIncomingConnection callback to get the link callbacks to use:
-	cTCPLink::cCallbacksPtr LinkCallbacks = Self->m_ListenCallbacks->OnIncomingConnection(IPAddress, Port);
+	cTCPLink::cCallbacksPtr LinkCallbacks = Self->m_ListenCallbacks->OnIncomingConnection(IPAddress.data(), Port);
 	if (LinkCallbacks == nullptr)
 	{
 		// Drop the connection:

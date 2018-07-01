@@ -213,10 +213,10 @@ public:
 		ASSERT(lowerSizeZ > 0);
 
 		// Generate the underlying data with half the resolution:
-		int lowerData[m_BufferSize];
-		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 		const size_t lowStepX = (lowerSizeX - 1) * 2;
-		int cache[m_BufferSize];
+		std::array<int, m_BufferSize> cache;
 
 		// Discreet-interpolate the values into twice the size:
 		for (size_t z = 0; z < lowerSizeZ - 1; ++z)
@@ -244,7 +244,7 @@ public:
 		// Copy from Cache into a_Values; take into account the even / odd offsets in a_Min:
 		for (size_t z = 0; z < a_SizeZ; ++z)
 		{
-			memcpy(a_Values + z * a_SizeX, cache + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));
+			memcpy(a_Values + z * a_SizeX, cache.data() + (z + (a_MinZ & 1)) * lowStepX + (a_MinX & 1), a_SizeX * sizeof(int));
 		}
 	}
 
@@ -277,8 +277,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Smooth - for each square check if the surroundings are the same, if so, expand them diagonally.
 		// Also get rid of single-pixel irregularities (A-B-A):
@@ -349,8 +349,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 1;
 		size_t lowerSizeZ = a_SizeZ + 1;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average - add all 4 "neighbors" and divide by 4:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -393,8 +393,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 4;
 		size_t lowerSizeZ = a_SizeZ + 4;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Calculate the weighted average of all 16 "neighbors":
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -443,8 +443,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 3;
 		size_t lowerSizeZ = a_SizeZ + 3;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Calculate the weighted average the neighbors:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -582,8 +582,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average random values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -639,8 +639,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerData[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+		std::array<int, m_BufferSize> lowerData;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData.data());
 
 		// Average random values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -690,56 +690,58 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Map for biome -> its beach:
-		static const int ToBeach[] =
+		static const std::array<int, 40> ToBeach =
 		{
-			/* biOcean            */ biOcean,
-			/* biPlains           */ biBeach,
-			/* biDesert           */ biBeach,
-			/* biExtremeHills     */ biStoneBeach,
-			/* biForest           */ biBeach,
-			/* biTaiga            */ biColdBeach,
-			/* biSwampland        */ biSwampland,
-			/* biRiver            */ biRiver,
-			/* biNether           */ biNether,
-			/* biEnd              */ biEnd,
-			/* biFrozenOcean      */ biColdBeach,
-			/* biFrozenRiver      */ biColdBeach,
-			/* biIcePlains        */ biColdBeach,
-			/* biIceMountains     */ biColdBeach,
-			/* biMushroomIsland   */ biMushroomShore,
-			/* biMushroomShore    */ biMushroomShore,
-			/* biBeach            */ biBeach,
-			/* biDesertHills      */ biBeach,
-			/* biForestHills      */ biBeach,
-			/* biTaigaHills       */ biColdBeach,
-			/* biExtremeHillsEdge */ biStoneBeach,
-			/* biJungle           */ biBeach,
-			/* biJungleHills      */ biBeach,
-			/* biJungleEdge       */ biBeach,
-			/* biDeepOcean        */ biOcean,
-			/* biStoneBeach       */ biStoneBeach,
-			/* biColdBeach        */ biColdBeach,
-			/* biBirchForest      */ biBeach,
-			/* biBirchForestHills */ biBeach,
-			/* biRoofedForest     */ biBeach,
-			/* biColdTaiga        */ biColdBeach,
-			/* biColdTaigaHills   */ biColdBeach,
-			/* biMegaTaiga        */ biStoneBeach,
-			/* biMegaTaigaHills   */ biStoneBeach,
-			/* biExtremeHillsPlus */ biStoneBeach,
-			/* biSavanna          */ biBeach,
-			/* biSavannaPlateau   */ biBeach,
-			/* biMesa             */ biMesa,
-			/* biMesaPlateauF     */ biMesa,
-			/* biMesaPlateau      */ biMesa,
+			{
+				/* biOcean            */ biOcean,
+				/* biPlains           */ biBeach,
+				/* biDesert           */ biBeach,
+				/* biExtremeHills     */ biStoneBeach,
+				/* biForest           */ biBeach,
+				/* biTaiga            */ biColdBeach,
+				/* biSwampland        */ biSwampland,
+				/* biRiver            */ biRiver,
+				/* biNether           */ biNether,
+				/* biEnd              */ biEnd,
+				/* biFrozenOcean      */ biColdBeach,
+				/* biFrozenRiver      */ biColdBeach,
+				/* biIcePlains        */ biColdBeach,
+				/* biIceMountains     */ biColdBeach,
+				/* biMushroomIsland   */ biMushroomShore,
+				/* biMushroomShore    */ biMushroomShore,
+				/* biBeach            */ biBeach,
+				/* biDesertHills      */ biBeach,
+				/* biForestHills      */ biBeach,
+				/* biTaigaHills       */ biColdBeach,
+				/* biExtremeHillsEdge */ biStoneBeach,
+				/* biJungle           */ biBeach,
+				/* biJungleHills      */ biBeach,
+				/* biJungleEdge       */ biBeach,
+				/* biDeepOcean        */ biOcean,
+				/* biStoneBeach       */ biStoneBeach,
+				/* biColdBeach        */ biColdBeach,
+				/* biBirchForest      */ biBeach,
+				/* biBirchForestHills */ biBeach,
+				/* biRoofedForest     */ biBeach,
+				/* biColdTaiga        */ biColdBeach,
+				/* biColdTaigaHills   */ biColdBeach,
+				/* biMegaTaiga        */ biStoneBeach,
+				/* biMegaTaigaHills   */ biStoneBeach,
+				/* biExtremeHillsPlus */ biStoneBeach,
+				/* biSavanna          */ biBeach,
+				/* biSavannaPlateau   */ biBeach,
+				/* biMesa             */ biMesa,
+				/* biMesaPlateauF     */ biMesa,
+				/* biMesaPlateau      */ biMesa,
+			}
 		};
 
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Add beaches between ocean and biomes:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -756,7 +758,7 @@ public:
 					if (IsBiomeOcean(above) || IsBiomeOcean(below) || IsBiomeOcean(left) || IsBiomeOcean(right))
 					{
 						// First convert the value to a regular biome (drop the M flag), then modulo by our biome count:
-						val = ToBeach[(val % 128) % ARRAYCOUNT(ToBeach)];
+						val = ToBeach[(val % 128) % ToBeach.size()];
 					}
 				}
 				a_Values[x + z * a_SizeX] = val;
@@ -840,8 +842,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Change the biomes on incompatible edges into an edge biome:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -935,74 +937,98 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
 	{
 		// Define the per-biome-group biomes:
-		static const int oceanBiomes[] =
+		static const std::array<int, 1> oceanBiomes =
 		{
-			biOcean,  // biDeepOcean,
+			{
+				biOcean,  // biDeepOcean,
+			}
 		};
 
 		// Same as oceanBiomes, there are no rare oceanic biomes (mushroom islands are handled separately)
-		static const int rareOceanBiomes[] =
+		static const std::array<int, 1> rareOceanBiomes =
 		{
-			biOcean,
+			{
+				biOcean,
+			}
 		};
 
-		static const int desertBiomes[] =
+		static const std::array<int, 9> desertBiomes =
 		{
-			biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
+			{
+				biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
+			}
 		};
 
-		static const int rareDesertBiomes[] =
+		static const std::array<int, 2> rareDesertBiomes =
 		{
-			biMesaPlateau, biMesaPlateauF,
+			{
+				biMesaPlateau, biMesaPlateauF,
+			}
 		};
 
-		static const int temperateBiomes[] =
+		static const std::array<int, 7> temperateBiomes =
 		{
-			biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
+			{
+				biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
+			}
 		};
 
-		static const int rareTemperateBiomes[] =
+		static const std::array<int, 1> rareTemperateBiomes =
 		{
-			biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
+			{
+				biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
+			}
 		};
 
-		static const int mountainBiomes[] =
+		static const std::array<int, 4> mountainBiomes =
 		{
-			biExtremeHills, biForest, biTaiga, biPlains,
+			{
+				biExtremeHills, biForest, biTaiga, biPlains,
+			}
 		};
 
-		static const int rareMountainBiomes[] =
+		static const std::array<int, 1> rareMountainBiomes =
 		{
-			biMegaTaiga,
+			{
+				biMegaTaiga,
+			}
 		};
 
-		static const int iceBiomes[] =
+		static const std::array<int, 5> iceBiomes =
 		{
-			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			{
+				biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			}
 		};
 
 		// Same as iceBiomes, there's no rare ice biome
-		static const int rareIceBiomes[] =
+		static const std::array<int, 5> rareIceBiomes =
 		{
-			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			{
+				biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
+			}
 		};
 
-		static const cBiomesInGroups biomesInGroups[] =
+		static const std::array<cBiomesInGroups, 5> biomesInGroups =
 		{
-			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(oceanBiomes)),     oceanBiomes},
-			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(desertBiomes)),    desertBiomes},
-			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(temperateBiomes)), temperateBiomes},
-			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(mountainBiomes)),  mountainBiomes},
-			/* bgIce */       { static_cast<int>(ARRAYCOUNT(iceBiomes)),       iceBiomes},
+			{
+				/* bgOcean */     { static_cast<int>(oceanBiomes.size()),     oceanBiomes.data()     },
+				/* bgDesert */    { static_cast<int>(desertBiomes.size()),    desertBiomes.data()    },
+				/* bgTemperate */ { static_cast<int>(temperateBiomes.size()), temperateBiomes.data() },
+				/* bgMountains */ { static_cast<int>(mountainBiomes.size()),  mountainBiomes.data()  },
+				/* bgIce */       { static_cast<int>(iceBiomes.size()),       iceBiomes.data()       },
+			}
 		};
 
-		static const cBiomesInGroups rareBiomesInGroups[] =
+		static const std::array<cBiomesInGroups, 5> rareBiomesInGroups =
 		{
-			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(rareOceanBiomes)),     rareOceanBiomes},
-			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(rareDesertBiomes)),    rareDesertBiomes},
-			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(rareTemperateBiomes)), rareTemperateBiomes},
-			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(rareMountainBiomes)),  rareMountainBiomes},
-			/* bgIce */       { static_cast<int>(ARRAYCOUNT(rareIceBiomes)),       rareIceBiomes},
+			{
+				/* bgOcean */     { static_cast<int>(rareOceanBiomes.size()),     rareOceanBiomes.data()     },
+				/* bgDesert */    { static_cast<int>(rareDesertBiomes.size()),    rareDesertBiomes.data()    },
+				/* bgTemperate */ { static_cast<int>(rareTemperateBiomes.size()), rareTemperateBiomes.data() },
+				/* bgMountains */ { static_cast<int>(rareMountainBiomes.size()),  rareMountainBiomes.data()  },
+				/* bgIce */       { static_cast<int>(rareIceBiomes.size()),       rareIceBiomes.data()       },
+			}
 		};
 
 		// Generate the underlying values, representing biome groups:
@@ -1017,8 +1043,8 @@ public:
 			{
 				int val = a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
-					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
-					biomesInGroups[static_cast<size_t>(val) % ARRAYCOUNT(biomesInGroups)];
+					rareBiomesInGroups[(val & (bgfRare - 1)) % rareBiomesInGroups.size()] :
+					biomesInGroups[static_cast<size_t>(val) % biomesInGroups.size()];
 				int rnd = (super::m_Noise.IntNoise2DInt(static_cast<int>(x) + a_MinX, static_cast<int>(z) + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
 			}
@@ -1126,8 +1152,8 @@ public:
 		// Generate the underlying data:
 		ASSERT(a_SizeX * a_SizeZ <= m_BufferSize);
 		m_Biomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int riverData[m_BufferSize];
-		m_Rivers->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, riverData);
+		std::array<int, m_BufferSize> riverData;
+		m_Rivers->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, riverData.data());
 
 		// Mix the values:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1191,8 +1217,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Detect the edges:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1249,8 +1275,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Add the mushroom islands:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1434,8 +1460,8 @@ public:
 	{
 		// Generate the base biomes and the alterations:
 		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int alterations[m_BufferSize];
-		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+		std::array<int, m_BufferSize> alterations;
+		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations.data());
 
 		// Change the biomes into their alternate versions:
 		size_t len = a_SizeX * a_SizeZ;
@@ -1500,8 +1526,8 @@ public:
 		size_t lowerSizeX = a_SizeX + 2;
 		size_t lowerSizeZ = a_SizeZ + 2;
 		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
-		int lowerValues[m_BufferSize];
-		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+		std::array<int, m_BufferSize> lowerValues;
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues.data());
 
 		// Convert incompatible edges into neutral biomes:
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -1658,8 +1684,8 @@ public:
 	{
 		// Generate the underlying biomes and the alterations:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
-		int alterations[m_BufferSize];
-		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+		std::array<int, m_BufferSize> alterations;
+		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations.data());
 
 		// Wherever alterations are nonzero, change into alternate biome, if available:
 		size_t len = a_SizeX * a_SizeZ;

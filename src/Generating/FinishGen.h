@@ -299,10 +299,10 @@ class cFinishGenSingleTopBlock :
 {
 public:
 	typedef std::vector<BLOCKTYPE> BlockList;
-	bool m_IsAllowedBelow[256];
+	std::array<bool, 256> m_IsAllowedBelow;
 
 	typedef std::vector<EMCSBiome> BiomeList;
-	bool m_IsBiomeAllowed[256];
+	std::array<bool, 256> m_IsBiomeAllowed;
 
 
 	cFinishGenSingleTopBlock(
@@ -314,27 +314,21 @@ public:
 		m_Amount(a_Amount)
 	{
 		// Initialize all the block types.
-		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
-		{
-			m_IsAllowedBelow[idx] = false;
-		}
+		m_IsAllowedBelow = {};
 
 		// Load the allowed blocks into m_IsAllowedBelow
-		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
+		for (auto AllowedBlock : a_AllowedBelow)
 		{
-			m_IsAllowedBelow[*itr] = true;
+			m_IsAllowedBelow[AllowedBlock] = true;
 		}
 
 		// Initialize all the biome types.
-		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
-		{
-			m_IsBiomeAllowed[idx] = false;
-		}
+		m_IsBiomeAllowed = {};
 
 		// Load the allowed biomes into m_IsBiomeAllowed
-		for (BiomeList::iterator itr = a_Biomes.begin(); itr != a_Biomes.end(); ++itr)
+		for (auto AllowedBiome : a_Biomes)
 		{
-			m_IsBiomeAllowed[*itr] = true;
+			m_IsBiomeAllowed[static_cast<size_t>(AllowedBiome)] = true;
 		}
 	}
 
@@ -351,7 +345,7 @@ protected:
 	/** Returns true if the given biome is a biome that is allowed. */
 	inline bool IsAllowedBiome(EMCSBiome a_Biome)
 	{
-		return m_IsBiomeAllowed[a_Biome];
+		return m_IsBiomeAllowed[static_cast<size_t>(a_Biome)];
 	}
 
 	/** Returns true if the given blocktype may be below m_BlockType */

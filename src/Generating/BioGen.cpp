@@ -20,10 +20,7 @@
 
 void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = m_Biome;
-	}
+	std::fill(begin(a_BiomeMap), end(a_BiomeMap), m_Biome);
 }
 
 
@@ -109,7 +106,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_BiomeMap, m_CacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
+		a_BiomeMap = m_CacheData[Idx].m_BiomeMap;
 
 		m_NumHits++;
 		m_TotalChain += i;
@@ -127,7 +124,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
+	m_CacheData[Idx].m_BiomeMap = a_BiomeMap;
 	m_CacheData[Idx].m_ChunkX = a_ChunkX;
 	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
 }
@@ -230,35 +227,33 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 	}
 
 	// There were no biomes, add default biomes:
-	static EMCSBiome Biomes[] =
+	static std::array<EMCSBiome, 21> Biomes =
 	{
-		biOcean,
-		biPlains,
-		biDesert,
-		biExtremeHills,
-		biForest,
-		biTaiga,
-		biSwampland,
-		biRiver,
-		biFrozenOcean,
-		biFrozenRiver,
-		biIcePlains,
-		biIceMountains,
-		biMushroomIsland,
-		biMushroomShore,
-		biBeach,
-		biDesertHills,
-		biForestHills,
-		biTaigaHills,
-		biExtremeHillsEdge,
-		biJungle,
-		biJungleHills,
+		{
+			biOcean,
+			biPlains,
+			biDesert,
+			biExtremeHills,
+			biForest,
+			biTaiga,
+			biSwampland,
+			biRiver,
+			biFrozenOcean,
+			biFrozenRiver,
+			biIcePlains,
+			biIceMountains,
+			biMushroomIsland,
+			biMushroomShore,
+			biBeach,
+			biDesertHills,
+			biForestHills,
+			biTaigaHills,
+			biExtremeHillsEdge,
+			biJungle,
+			biJungleHills,
+		}
 	} ;
-	m_Biomes.reserve(ARRAYCOUNT(Biomes));
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
-	{
-		m_Biomes.push_back(Biomes[i]);
-	}
+	m_Biomes.insert(end(m_Biomes), begin(Biomes), end(Biomes));
 	m_BiomesCount = static_cast<int>(m_Biomes.size());
 }
 
@@ -278,7 +273,7 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 		{
 			int Add = cChunkDef::Width * a_ChunkX + x;
 			size_t BiomeIdx = static_cast<size_t>((((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount);  // Need to add and modulo twice because of negative numbers
-			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[BiomeIdx];
+			a_BiomeMap[static_cast<size_t>(x + cChunkDef::Width * z)] = m_Biomes[BiomeIdx];
 		}
 	}
 }
@@ -347,11 +342,11 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 	int BaseX = cChunkDef::Width * a_ChunkX;
 
 	// Distortions for linear interpolation:
-	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
-	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortX;
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortZ;
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
-		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z]);
+		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)], DistortZ[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)]);
 	}
 
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
@@ -361,7 +356,7 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int VoronoiCellValue = m_Voronoi.GetValueAt(DistortX[x][z], DistortZ[x][z]) / 8;
+			int VoronoiCellValue = m_Voronoi.GetValueAt(DistortX[static_cast<size_t>(x)][static_cast<size_t>(z)], DistortZ[static_cast<size_t>(x)][static_cast<size_t>(z)]) / 8;
 			cChunkDef::SetBiome(a_BiomeMap, x, z, m_Biomes[static_cast<size_t>(VoronoiCellValue % m_BiomesCount)]);
 		}  // for x
 	}  // for z
@@ -453,12 +448,12 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	// Prepare a distortion lookup table, by distorting a 5x5 area and using that as 1:4 zoom (linear interpolate):
 	int BaseZ = cChunkDef::Width * a_ChunkZ;
 	int BaseX = cChunkDef::Width * a_ChunkX;
-	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
-	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortX;
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortZ;
 	int DistortSize = m_OceanCellSize / 2;
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
-		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z], DistortSize);
+		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)], DistortZ[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)], DistortSize);
 	}
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
@@ -468,16 +463,16 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	const int NEIGHBORHOOD_SIZE = 4;  // How many seeds in each direction to check
 	int CellX = BaseX / m_OceanCellSize;
 	int CellZ = BaseZ / m_OceanCellSize;
-	int SeedX[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
-	int SeedZ[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
-	EMCSBiome SeedV[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
-	for (int xc = 0; xc < 2 * NEIGHBORHOOD_SIZE + 1; xc++)
+	std::array<std::array<int, 2 * NEIGHBORHOOD_SIZE + 1>, 2 * NEIGHBORHOOD_SIZE + 1> SeedX;
+	std::array<std::array<int, 2 * NEIGHBORHOOD_SIZE + 1>, 2 * NEIGHBORHOOD_SIZE + 1> SeedZ;
+	std::array<std::array<EMCSBiome, 2 * NEIGHBORHOOD_SIZE + 1>, 2 * NEIGHBORHOOD_SIZE + 1> SeedV;
+	for (size_t xc = 0; xc < SeedX.size(); xc++)
 	{
-		int RealCellX = xc + CellX - NEIGHBORHOOD_SIZE;
+		int RealCellX = static_cast<int>(xc) + CellX - NEIGHBORHOOD_SIZE;
 		int CellBlockX = RealCellX * m_OceanCellSize;
-		for (int zc = 0; zc < 2 * NEIGHBORHOOD_SIZE + 1; zc++)
+		for (size_t zc = 0; zc < SeedX[0].size(); zc++)
 		{
-			int RealCellZ = zc + CellZ - NEIGHBORHOOD_SIZE;
+			int RealCellZ = static_cast<int>(zc) + CellZ - NEIGHBORHOOD_SIZE;
 			int CellBlockZ = RealCellZ * m_OceanCellSize;
 			int OffsetX = (m_Noise2.IntNoise3DInt(RealCellX, 16 * RealCellX + 32 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
 			int OffsetZ = (m_Noise4.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
@@ -487,7 +482,7 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 		}  // for z
 	}  // for x
 
-	for (int xc = 1; xc < 2 * NEIGHBORHOOD_SIZE; xc++) for (int zc = 1; zc < 2 * NEIGHBORHOOD_SIZE; zc++)
+	for (size_t xc = 1; xc < 2 * NEIGHBORHOOD_SIZE; xc++) for (size_t zc = 1; zc < 2 * NEIGHBORHOOD_SIZE; zc++)
 	{
 		if (
 			(SeedV[xc    ][zc]     == biOcean) &&
@@ -512,12 +507,12 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int AbsoluteZ = DistortZ[x][z];
-			int AbsoluteX = DistortX[x][z];
+			int AbsoluteZ = DistortZ[static_cast<size_t>(x)][static_cast<size_t>(z)];
+			int AbsoluteX = DistortX[static_cast<size_t>(x)][static_cast<size_t>(z)];
 			int MinDist = m_OceanCellSize * m_OceanCellSize * 16;  // There has to be a cell closer than this
 			EMCSBiome Biome = biPlains;
 			// Find the nearest cell seed:
-			for (int xs = 1; xs < 2 * NEIGHBORHOOD_SIZE; xs++) for (int zs = 1; zs < 2 * NEIGHBORHOOD_SIZE; zs++)
+			for (size_t xs = 1; xs < 2 * NEIGHBORHOOD_SIZE; xs++) for (size_t zs = 1; zs < 2 * NEIGHBORHOOD_SIZE; zs++)
 			{
 				int Dist = (SeedX[xs][zs] - AbsoluteX) * (SeedX[xs][zs] - AbsoluteX) + (SeedZ[xs][zs] - AbsoluteZ) * (SeedZ[xs][zs] - AbsoluteZ);
 				if (Dist >= MinDist)
@@ -626,19 +621,19 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 			double NoiseT = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			NoiseT += 0.5 * m_Noise2.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
 			NoiseT += 0.1 * m_Noise3.CubicNoise2D(8 * NoiseCoordX, 8 * NoiseCoordZ);
-			TemperatureMap[x + 17 * z] = NoiseT;
+			TemperatureMap[static_cast<size_t>(x + 17 * z)] = NoiseT;
 
 			double NoiseH = m_Noise4.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			NoiseH += 0.5 * m_Noise5.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
 			NoiseH += 0.1 * m_Noise6.CubicNoise2D(8 * NoiseCoordX, 8 * NoiseCoordZ);
-			HumidityMap[x + 17 * z] = NoiseH;
+			HumidityMap[static_cast<size_t>(x + 17 * z)] = NoiseH;
 		}  // for x
 	}  // for z
-	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(TemperatureMap);
-	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(HumidityMap);
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(TemperatureMap.data());
+	LinearUpscale2DArrayInPlace<17, 17, 8, 8>(HumidityMap.data());
 
 	// Re-map into integral values in [0 .. 255] range:
-	for (size_t idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
+	for (size_t idx = 0; idx < a_TemperatureMap.size(); idx++)
 	{
 		a_TemperatureMap[idx] = Clamp(static_cast<int>(128 + TemperatureMap[idx] * 128), 0, 255);
 		a_HumidityMap[idx]    = Clamp(static_cast<int>(128 + HumidityMap[idx]    * 128), 0, 255);
@@ -651,26 +646,28 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 
 void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap)
 {
-	static const EMCSBiome BiomeMap[] =
+	static const std::array<EMCSBiome, 256> BiomeMap =
 	{
-		//       0         1         2               3               4               5               6         7         8         9         10              11              12              13              14             15
-		/*  0 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
-		/*  1 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
-		/*  2 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
-		/*  3 */ biTundra, biTundra, biTundra,       biTundra,       biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
-		/*  4 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
-		/*  5 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
-		/*  6 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
-		/*  7 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
-		/*  8 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
-		/*  9 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
-		/* 10 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-		/* 11 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-		/* 12 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-		/* 13 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biJungleHills,  biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-		/* 14 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-		/* 15 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
-	} ;
+		{
+			//       0         1         2               3               4               5               6         7         8         9         10              11              12              13              14             15
+			/*  0 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
+			/*  1 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
+			/*  2 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
+			/*  3 */ biTundra, biTundra, biTundra,       biTundra,       biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
+			/*  4 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
+			/*  5 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
+			/*  6 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+			/*  7 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+			/*  8 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+			/*  9 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+			/* 10 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+			/* 11 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+			/* 12 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+			/* 13 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biJungleHills,  biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+			/* 14 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+			/* 15 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		}
+	};
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int idxZ = 17 * z;
@@ -681,10 +678,10 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 				// Already set before
 				continue;
 			}
-			int idx = idxZ + x;
+			size_t idx = static_cast<size_t>(idxZ + x);
 			int Temperature = a_TemperatureMap[idx] / 16;  // -> [0..15] range
 			int Humidity    = a_HumidityMap[idx]    / 16;  // -> [0..15] range
-			cChunkDef::SetBiome(a_BiomeMap, x, z, BiomeMap[Temperature + 16 * Humidity]);
+			cChunkDef::SetBiome(a_BiomeMap, x, z, BiomeMap[static_cast<size_t>(Temperature + 16 * Humidity)]);
 		}  // for x
 	}  // for z
 }
@@ -695,7 +692,7 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 
 void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap)
 {
-	int idx = 0;
+	size_t idx = 0;
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++, idx++)
@@ -757,8 +754,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 	int BaseX = cChunkDef::Width * a_ChunkX;
 
 	// Distortions for linear interpolation:
-	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
-	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortX;
+	std::array<std::array<int, cChunkDef::Width + 1>, cChunkDef::Width + 1> DistortZ;
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
 		float BlockX = static_cast<float>(BaseX + x * 4);
@@ -770,23 +767,23 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 		NoiseZ       += m_AmpZ2 * m_Noise5.CubicNoise2D(BlockX * m_FreqZ2, BlockZ * m_FreqZ2);
 		NoiseZ       += m_AmpZ3 * m_Noise6.CubicNoise2D(BlockX * m_FreqZ3, BlockZ * m_FreqZ3);
 
-		DistortX[4 * x][4 * z] = static_cast<int>(BlockX + NoiseX);
-		DistortZ[4 * x][4 * z] = static_cast<int>(BlockZ + NoiseZ);
+		DistortX[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)] = static_cast<int>(BlockX + NoiseX);
+		DistortZ[static_cast<size_t>(4 * x)][static_cast<size_t>(4 * z)] = static_cast<int>(BlockZ + NoiseZ);
 	}
 
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortZ[0][0]);
 
 	// Apply distortion to each block coord, then query the voronoi maps for biome group and biome index and choose biome based on that:
-	for (int z = 0; z < cChunkDef::Width; z++)
+	for (size_t z = 0; z < cChunkDef::Width; z++)
 	{
-		for (int x = 0; x < cChunkDef::Width; x++)
+		for (size_t x = 0; x < cChunkDef::Width; x++)
 		{
 			int SeedX, SeedZ, MinDist2;
 			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 7;
 			size_t BiomeIdx   = static_cast<size_t>(m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 11);
 			int MinDist1 = (DistortX[x][z] - SeedX) * (DistortX[x][z] - SeedX) + (DistortZ[x][z] - SeedZ) * (DistortZ[x][z] - SeedZ);
-			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 1 : 0));
+			cChunkDef::SetBiome(a_BiomeMap, static_cast<int>(x), static_cast<int>(z), SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 1 : 0));
 		}
 	}
 }
@@ -804,102 +801,119 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		EMCSBiome OuterBiome;
 	} ;
 
-	static BiomeLevels bgOcean[] =
+	static const std::array<BiomeLevels, 11> bgOcean =
 	{
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biOcean, },
-		{ biOcean, biDeepOcean, },
-		{ biOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biDeepOcean, biDeepOcean, },
-		{ biMushroomIsland, biMushroomShore, }
-	} ;
-	static BiomeLevels bgFrozen[] =
+		{
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biOcean, },
+			{ biOcean, biDeepOcean, },
+			{ biOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biDeepOcean, biDeepOcean, },
+			{ biMushroomIsland, biMushroomShore, }
+		}
+	};
+	static const std::array<BiomeLevels, 10> bgFrozen =
 	{
-		{ biIcePlains,         biIcePlains, },
-		{ biIceMountains,      biIceMountains, },
-		{ biFrozenOcean,       biFrozenRiver, },
-		{ biColdTaiga,         biColdTaiga, },
-		{ biColdTaigaHills,    biColdTaigaHills, },
-		{ biColdTaigaM,        biColdTaigaM, },
-		{ biIcePlainsSpikes,   biIcePlainsSpikes, },
-		{ biExtremeHills,      biExtremeHillsEdge, },
-		{ biExtremeHillsPlus,  biExtremeHillsEdge, },
-		{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
-	} ;
-	static BiomeLevels bgTemperate[] =
+		{
+			{ biIcePlains,         biIcePlains, },
+			{ biIceMountains,      biIceMountains, },
+			{ biFrozenOcean,       biFrozenRiver, },
+			{ biColdTaiga,         biColdTaiga, },
+			{ biColdTaigaHills,    biColdTaigaHills, },
+			{ biColdTaigaM,        biColdTaigaM, },
+			{ biIcePlainsSpikes,   biIcePlainsSpikes, },
+			{ biExtremeHills,      biExtremeHillsEdge, },
+			{ biExtremeHillsPlus,  biExtremeHillsEdge, },
+			{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
+		}
+	};
+	static const std::array<BiomeLevels, 13> bgTemperate =
 	{
-		{ biBirchForestHills,  biBirchForest, },
-		{ biBirchForest,       biBirchForest, },
-		{ biBirchForestHillsM, biBirchForestM, },
-		{ biBirchForestM,      biBirchForestM, },
-		{ biForest,            biForestHills, },
-		{ biFlowerForest,      biFlowerForest, },
-		{ biRoofedForest,      biForest, },
-		{ biRoofedForest,      biRoofedForest, },
-		{ biRoofedForestM,     biForest, },
-		{ biPlains,            biPlains, },
-		{ biSunflowerPlains,   biSunflowerPlains, },
-		{ biSwampland,         biSwampland, },
-		{ biSwamplandM,        biSwamplandM, },
-	} ;
-	static BiomeLevels bgWarm[] =
+		{
+			{ biBirchForestHills,  biBirchForest, },
+			{ biBirchForest,       biBirchForest, },
+			{ biBirchForestHillsM, biBirchForestM, },
+			{ biBirchForestM,      biBirchForestM, },
+			{ biForest,            biForestHills, },
+			{ biFlowerForest,      biFlowerForest, },
+			{ biRoofedForest,      biForest, },
+			{ biRoofedForest,      biRoofedForest, },
+			{ biRoofedForestM,     biForest, },
+			{ biPlains,            biPlains, },
+			{ biSunflowerPlains,   biSunflowerPlains, },
+			{ biSwampland,         biSwampland, },
+			{ biSwamplandM,        biSwamplandM, },
+		}
+	};
+	static const std::array<BiomeLevels, 6> bgWarm =
 	{
-		{ biDesertHills,    biDesert, },
-		{ biDesert,         biDesert, },
-		{ biDesertM,        biDesertM, },
-		{ biSavannaPlateau, biSavanna, },
-		{ biSavanna,        biSavanna, },
-		{ biSavannaM,       biSavannaM, },
-	} ;
-	static BiomeLevels bgMesa[] =
+		{
+			{ biDesertHills,    biDesert, },
+			{ biDesert,         biDesert, },
+			{ biDesertM,        biDesertM, },
+			{ biSavannaPlateau, biSavanna, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaM,       biSavannaM, },
+		}
+	};
+	static const std::array<BiomeLevels, 7> bgMesa =
 	{
-		{ biMesaPlateau,    biMesa, },
-		{ biMesaPlateauF,   biMesa, },
-		{ biMesaPlateauFM,  biMesa, },
-		{ biMesaPlateauM,   biMesa, },
-		{ biMesaBryce,      biMesaBryce, },
-		{ biSavanna,        biSavanna, },
-		{ biSavannaPlateau, biSavanna, },
-	} ;
-	static BiomeLevels bgConifers[] =
+		{
+			{ biMesaPlateau,    biMesa, },
+			{ biMesaPlateauF,   biMesa, },
+			{ biMesaPlateauFM,  biMesa, },
+			{ biMesaPlateauM,   biMesa, },
+			{ biMesaBryce,      biMesaBryce, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaPlateau, biSavanna, },
+		}
+	};
+	static const std::array<BiomeLevels, 5> bgConifers =
 	{
-		{ biTaiga,                biTaiga, },
-		{ biTaigaM,               biTaigaM, },
-		{ biMegaTaiga,            biMegaTaiga, },
-		{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
-		{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
-	} ;
-	static BiomeLevels bgDenseTrees[] =
+		{
+			{ biTaiga,                biTaiga, },
+			{ biTaigaM,               biTaigaM, },
+			{ biMegaTaiga,            biMegaTaiga, },
+			{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
+			{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
+		}
+	};
+	static const std::array<BiomeLevels, 3> bgDenseTrees =
 	{
-		{ biJungleHills, biJungle, },
-		{ biJungle, biJungleEdge, },
-		{ biJungleM, biJungleEdgeM, },
-	} ;
-	static struct
+		{
+			{ biJungleHills, biJungle, },
+			{ biJungle, biJungleEdge, },
+			{ biJungleM, biJungleEdgeM, },
+		}
+	};
+	struct BiomeGroup
 	{
-		BiomeLevels * Biomes;
+		const BiomeLevels * Biomes;
 		size_t        Count;
-	} BiomeGroups[] =
+	};
+	static const std::array<BiomeGroup, 12> BiomeGroups =
 	{
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgMesa,       ARRAYCOUNT(bgMesa), },
-		{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
-	} ;
-	size_t Group = static_cast<size_t>(a_BiomeGroup) % ARRAYCOUNT(BiomeGroups);
+		{
+			{ bgOcean.data(),      bgOcean.size()      },
+			{ bgOcean.data(),      bgOcean.size()      },
+			{ bgFrozen.data(),     bgFrozen.size()     },
+			{ bgFrozen.data(),     bgFrozen.size()     },
+			{ bgTemperate.data(),  bgTemperate.size()  },
+			{ bgTemperate.data(),  bgTemperate.size()  },
+			{ bgConifers.data(),   bgConifers.size()   },
+			{ bgConifers.data(),   bgConifers.size()   },
+			{ bgWarm.data(),       bgWarm.size()       },
+			{ bgWarm.data(),       bgWarm.size()       },
+			{ bgMesa.data(),       bgMesa.size()       },
+			{ bgDenseTrees.data(), bgDenseTrees.size() },
+		}
+	};
+	size_t Group = static_cast<size_t>(a_BiomeGroup) % BiomeGroups.size();
 	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;
 	return (a_DistLevel > 0) ? BiomeGroups[Group].Biomes[Index].InnerBiome : BiomeGroups[Group].Biomes[Index].OuterBiome;
 }
@@ -1021,7 +1035,7 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[x + cChunkDef::Width * z]));
+				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[static_cast<size_t>(x + cChunkDef::Width * z)]));
 			}
 		}
 	}
@@ -1119,13 +1133,13 @@ public:
 
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
 	{
-		int vals[16 * 16];
-		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, 16, 16, vals);
+		std::array<int, 16 * 16> vals;
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, 16, 16, vals.data());
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[x + cChunkDef::Width * z]));
+				cChunkDef::SetBiome(a_Biomes, x, z, static_cast<EMCSBiome>(vals[static_cast<size_t>(x + cChunkDef::Width * z)]));
 			}
 		}
 	}

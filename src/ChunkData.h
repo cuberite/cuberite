@@ -26,10 +26,10 @@ public:
 
 	struct sChunkSection
 	{
-		BLOCKTYPE  m_BlockTypes[SectionBlockCount];
-		NIBBLETYPE m_BlockMetas[SectionBlockCount / 2];
-		NIBBLETYPE m_BlockLight[SectionBlockCount / 2];
-		NIBBLETYPE m_BlockSkyLight[SectionBlockCount / 2];
+		std::array<BLOCKTYPE,  SectionBlockCount>     m_BlockTypes;
+		std::array<NIBBLETYPE, SectionBlockCount / 2> m_BlockMetas;
+		std::array<NIBBLETYPE, SectionBlockCount / 2> m_BlockLight;
+		std::array<NIBBLETYPE, SectionBlockCount / 2> m_BlockSkyLight;
 	};
 
 	cChunkData(cAllocationPool<sChunkSection> & a_Pool);
@@ -117,7 +117,7 @@ public:
 
 private:
 
-	sChunkSection * m_Sections[NumSections];
+	std::array<sChunkSection *, NumSections> m_Sections;
 
 	cAllocationPool<sChunkSection> & m_Pool;
 

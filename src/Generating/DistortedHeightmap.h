@@ -29,7 +29,7 @@ public:
 	cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen);
 
 protected:
-	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
+	typedef std::array<std::array<cChunkDef::BiomeMap, 3>, 3> BiomeNeighbors;
 
 	// Linear upscaling step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
 	static const int INTERPOL_X = 8;
@@ -51,7 +51,7 @@ protected:
 
 	int m_CurChunkX;
 	int m_CurChunkZ;
-	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
+	std::array<NOISE_DATATYPE, 17 * 257 * 17> m_DistortedHeightmap;
 
 	/** The bime generator to query for biomes. */
 	cBiomeGenPtr m_BiomeGen;
@@ -71,11 +71,11 @@ protected:
 		NOISE_DATATYPE m_DistortAmpX;
 		NOISE_DATATYPE m_DistortAmpZ;
 	} ;
-	static const sGenParam m_GenParam[256];
+	static const std::array<sGenParam, 256> m_GenParam;
 
 	// Distortion amplitudes for each direction, before linear upscaling
-	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];
-	NOISE_DATATYPE m_DistortAmpZ[DIM_X * DIM_Z];
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Z> m_DistortAmpX;
+	std::array<NOISE_DATATYPE, DIM_X * DIM_Z> m_DistortAmpZ;
 
 	/** True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen / CompoGen). */
 	bool m_IsInitialized;

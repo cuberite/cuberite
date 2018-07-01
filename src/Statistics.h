@@ -110,8 +110,6 @@ private:
 	AString m_Name;
 
 	eStatistic m_Depends;
-
-	static cStatInfo ms_Info[statCount];
 };
 
 

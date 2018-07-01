@@ -292,8 +292,8 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
 	ASSERT(m_Presence == cpPresent);
 
-	a_Callback.HeightMap(&m_HeightMap);
-	a_Callback.BiomeData(&m_BiomeMap);
+	a_Callback.HeightMap(m_HeightMap);
+	a_Callback.BiomeData(m_BiomeMap);
 
 	a_Callback.LightIsValid(m_IsLightValid);
 
@@ -319,15 +319,15 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	ASSERT(a_SetChunkData.IsHeightMapValid());
 	ASSERT(a_SetChunkData.AreBiomesValid());
 
-	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
-	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
+	m_BiomeMap = a_SetChunkData.GetBiomes();
+	m_HeightMap = a_SetChunkData.GetHeightMap();
 
-	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes());
-	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas());
+	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes().data());
+	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas().data());
 	if (a_SetChunkData.IsLightValid())
 	{
-		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight());
-		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight());
+		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight().data());
+		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight().data());
 		m_IsLightValid = true;
 	}
 	else
@@ -384,9 +384,9 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	m_ChunkData.SetBlockLight(a_BlockLight);
+	m_ChunkData.SetBlockLight(a_BlockLight.data());
 
-	m_ChunkData.SetSkyLight(a_SkyLight);
+	m_ChunkData.SetSkyLight(a_SkyLight.data());
 
 	m_IsLightValid = true;
 }
@@ -1422,7 +1422,7 @@ int cChunk::GetHeight(int a_X, int a_Z)
 
 	if ((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width))
 	{
-		return m_HeightMap[a_X + a_Z * Width];
+		return m_HeightMap[static_cast<size_t>(a_X + a_Z * Width)];
 	}
 	return 0;
 }
@@ -1542,7 +1542,7 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 				int index = MakeIndex( x, y, z);
 				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * Width] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[static_cast<size_t>(x + z * Width)] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y
@@ -1629,22 +1629,20 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 {
-	struct
+	static const std::array<Vector3i, 6> Coords =
 	{
-		int x, y, z;
-	}
-	Coords[] =
+		{
+			{ 1,  0,  0},
+			{-1,  0,  0},
+			{ 0,  1,  0},
+			{ 0, -1,  0},
+			{ 0,  0,  1},
+			{ 0,  0, -1},
+		}
+	};
+	for (const auto & Coord : Coords)
 	{
-		{ 1,  0,  0},
-		{-1,  0,  0},
-		{ 0,  1,  0},
-		{ 0, -1,  0},
-		{ 0,  0,  1},
-		{ 0,  0, -1},
-	} ;
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
-	{
-		UnboundedQueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
+		UnboundedQueueTickBlock(a_RelX + Coord.x, a_RelY + Coord.y, a_RelZ + Coord.z);
 	}  // for i - Coords[]
 }
 
@@ -1709,11 +1707,11 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	}
 
 	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * Width])
+	if (a_RelY >= m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * Width)])
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(a_RelY);
+			m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * Width)] = static_cast<HEIGHTTYPE>(a_RelY);
 		}
 		else
 		{
@@ -1721,7 +1719,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 			{
 				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * Width)] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y - column in m_BlockData

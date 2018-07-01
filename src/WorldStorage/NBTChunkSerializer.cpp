@@ -933,14 +933,14 @@ void cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 
 
 
-void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap * a_HeightMap)
+void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap & a_HeightMap)
 {
 	for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 	{
 		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
 		{
-			int Height = cChunkDef::GetHeight(*a_HeightMap, RelX, RelZ);
-			m_VanillaHeightMap[(RelZ << 4) | RelX] = Height;
+			int Height = cChunkDef::GetHeight(a_HeightMap, RelX, RelZ);
+			m_VanillaHeightMap[static_cast<size_t>((RelZ << 4) | RelX)] = Height;
 		}
 	}
 }
@@ -949,15 +949,15 @@ void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap * a_HeightMap)
 
 
 
-void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap & a_BiomeMap)
 {
-	memcpy(m_Biomes, a_BiomeMap, sizeof(m_Biomes));
-	for (size_t i = 0; i < ARRAYCOUNT(m_Biomes); i++)
+	m_Biomes = a_BiomeMap;
+	for (size_t i = 0; i < m_Biomes.size(); i++)
 	{
-		if ((*a_BiomeMap)[i] < 255)
+		if (a_BiomeMap[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_VanillaBiomes[i] = static_cast<Byte>((*a_BiomeMap)[i]);
+			m_VanillaBiomes[i] = static_cast<Byte>(a_BiomeMap[i]);
 		}
 		else
 		{

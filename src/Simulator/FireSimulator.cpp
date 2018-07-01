@@ -40,27 +40,31 @@
 	#pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
-static const Vector3i gCrossCoords[] =
+static const std::array<Vector3i, 4> g_CrossCoords =
 {
-	{ 1, 0,  0},
-	{-1, 0,  0},
-	{ 0, 0,  1},
-	{ 0, 0, -1},
-} ;
+	{
+		{ 1, 0,  0},
+		{-1, 0,  0},
+		{ 0, 0,  1},
+		{ 0, 0, -1},
+	}
+};
 
 
 
 
 
-static const Vector3i gNeighborCoords[] =
+static const std::array<Vector3i, 6> g_NeighborCoords =
 {
-	{ 1,  0,  0},
-	{-1,  0,  0},
-	{ 0,  1,  0},
-	{ 0, -1,  0},
-	{ 0,  0,  1},
-	{ 0,  0, -1},
-} ;
+	{
+		{ 1,  0,  0},
+		{-1,  0,  0},
+		{ 0,  1,  0},
+		{ 0, -1,  0},
+		{ 0,  0,  1},
+		{ 0,  0, -1},
+	}
+};
 
 #ifdef __clang__
 	#pragma clang diagnostic pop
@@ -121,7 +125,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
 		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
 
-		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
+		auto Raining = std::any_of(std::begin(g_CrossCoords), std::end(g_CrossCoords),
 			[this, AbsPos](Vector3i cc)
 			{
 				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
@@ -298,18 +302,18 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	for (const auto & Coord : g_CrossCoords)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
-		if (a_Chunk->UnboundedRelGetBlock(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockType, BlockMeta))
+		if (a_Chunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))
 		{
 			if (IsFuel(BlockType))
 			{
 				return static_cast<int>(m_BurnStepTimeFuel);
 			}
 		}
-	}  // for i - gCrossCoords[]
+	}
 
 	if (!IsBlockBelowSolid)
 	{
@@ -380,7 +384,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	for (auto & Coord : gNeighborCoords)
+	for (auto & Coord : g_NeighborCoords)
 	{
 		BLOCKTYPE  BlockType;
 		int X = a_RelX + Coord.x;
@@ -441,9 +445,9 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		return false;
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	for (const auto & Coord : g_NeighborCoords)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY + Coord.y, a_RelZ + Coord.z, BlockType, BlockMeta))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;
@@ -452,6 +456,6 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		{
 			return true;
 		}
-	}  // for i - Coords[]
+	}
 	return false;
 }

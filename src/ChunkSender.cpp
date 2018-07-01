@@ -257,7 +257,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		return;
 	}
-	cChunkDataSerializer Data(m_Data, m_BiomeMap, m_World.GetDimension());
+	cChunkDataSerializer Data(m_Data, m_BiomeMap.data(), m_World.GetDimension());
 
 	for (const auto client : a_Clients)
 	{
@@ -298,21 +298,21 @@ void cChunkSender::Entity(cEntity *)
 
 
 
-void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cChunkSender::BiomeData(const cChunkDef::BiomeMap & a_BiomeMap)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
+	for (size_t i = 0; i < m_BiomeMap.size(); i++)
 	{
-		if ((*a_BiomeMap)[i] < 255)
+		if (a_BiomeMap[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>(a_BiomeMap[i]);
 		}
 		else
 		{
 			// TODO: MCS-specific biome, need to map to some basic MC biome:
 			ASSERT(!"Unimplemented MCS-specific biome");
 		}
-	}  // for i - m_BiomeMap[]
+	}  // for i - m_BiomeMap
 }
 
 

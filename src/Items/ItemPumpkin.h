@@ -105,17 +105,19 @@ public:
 		}
 
 		// Check the two arm directions (X, Z) using a loop over two sets of offset vectors:
-		static const Vector3i ArmOffsets[] =
+		static const std::array<Vector3i, 2> ArmOffsets =
 		{
-			{1, 0, 0},
-			{0, 0, 1},
+			{
+				{1, 0, 0},
+				{0, 0, 1},
+			}
 		};
-		for (size_t i = 0; i < ARRAYCOUNT(ArmOffsets); i++)
+		for (const auto & Offset : ArmOffsets)
 		{
 			// If the arm blocks don't match, bail out of this loop repetition:
 			if (
-				(a_World.GetBlock(a_BlockX + ArmOffsets[i].x, a_BlockY - 1, a_BlockZ + ArmOffsets[i].z) != E_BLOCK_IRON_BLOCK) ||
-				(a_World.GetBlock(a_BlockX - ArmOffsets[i].x, a_BlockY - 1, a_BlockZ - ArmOffsets[i].z) != E_BLOCK_IRON_BLOCK)
+				(a_World.GetBlock(a_BlockX + Offset.x, a_BlockY - 1, a_BlockZ + Offset.z) != E_BLOCK_IRON_BLOCK) ||
+				(a_World.GetBlock(a_BlockX - Offset.x, a_BlockY - 1, a_BlockZ - Offset.z) != E_BLOCK_IRON_BLOCK)
 			)
 			{
 				continue;
@@ -126,8 +128,8 @@ public:
 			AirBlocks.emplace_back(a_BlockX,                   a_BlockY,     a_BlockZ,                   E_BLOCK_AIR, 0);  // Head
 			AirBlocks.emplace_back(a_BlockX,                   a_BlockY - 1, a_BlockZ,                   E_BLOCK_AIR, 0);  // Torso
 			AirBlocks.emplace_back(a_BlockX,                   a_BlockY - 2, a_BlockZ,                   E_BLOCK_AIR, 0);  // Legs
-			AirBlocks.emplace_back(a_BlockX + ArmOffsets[i].x, a_BlockY - 1, a_BlockZ + ArmOffsets[i].z, E_BLOCK_AIR, 0);  // Arm
-			AirBlocks.emplace_back(a_BlockX - ArmOffsets[i].x, a_BlockY - 1, a_BlockZ - ArmOffsets[i].z, E_BLOCK_AIR, 0);  // Arm
+			AirBlocks.emplace_back(a_BlockX + Offset.x, a_BlockY - 1, a_BlockZ + Offset.z, E_BLOCK_AIR, 0);  // Arm
+			AirBlocks.emplace_back(a_BlockX - Offset.x, a_BlockY - 1, a_BlockZ - Offset.z, E_BLOCK_AIR, 0);  // Arm
 			if (!a_Player.PlaceBlocks(AirBlocks))
 			{
 				return false;

@@ -36,22 +36,25 @@ public:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_SAND:
 			{
-				static const struct
+				struct XZ
 				{
 					int x, z;
-				} Coords[] =
+				};
+				static const std::array<XZ, 4> Coords =
 				{
-					{-1,  0},
-					{ 1,  0},
-					{ 0, -1},
-					{ 0,  1},
-				} ;
+					{
+						{-1,  0},
+						{ 1,  0},
+						{ 0, -1},
+						{ 0,  1},
+					}
+				};
 				a_RelY -= 1;
-				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+				for (const auto & Coord : Coords)
 				{
 					BLOCKTYPE BlockType;
 					NIBBLETYPE BlockMeta;
-					if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+					if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coord.x, a_RelY, a_RelZ + Coord.z, BlockType, BlockMeta))
 					{
 						// Too close to the edge, cannot simulate
 						return true;
@@ -60,7 +63,7 @@ public:
 					{
 						return true;
 					}
-				}  // for i - Coords[]
+				}
 				// Not directly neighboring a water block
 				return false;
 			}
