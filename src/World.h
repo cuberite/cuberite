@@ -142,6 +142,10 @@ public:
 	bool IsGameModeSpectator(void) const { return (m_GameMode == gmSpectator); }
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
+
+	/** Return if player mode force set to current world game mode when portal to this world */
+	bool IsForceGameModeOnEnterWorld(void) const { return m_bForceGameModeOnEnterWorld; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
@@ -953,6 +957,7 @@ private:
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
+	bool m_bForceGameModeOnEnterWorld;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
 	bool m_VillagersShouldHarvestCrops;

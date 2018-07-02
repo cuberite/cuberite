@@ -2031,7 +2031,10 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			}
 
 			// Update game mode
-			SetGameMode(a_World->GetGameMode());
+			if (a_World->IsForceGameModeOnEnterWorld())
+			{
+				SetGameMode(a_World->GetGameMode());
+			}
 		}
 
 		// Broadcast the player into the new world.

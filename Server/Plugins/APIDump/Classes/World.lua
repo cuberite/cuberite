@@ -2144,6 +2144,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
 			},
+			IsForceGameModeOnEnterWorld =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Return if player mode force set to current world game mode when portal to this world.",
+			},
 			IsGameModeAdventure =
 			{
 				Returns =
