@@ -152,7 +152,6 @@ cWorld::cWorld(
 	m_SkyDarkness(0),
 	m_GameMode(gmSurvival),
 	m_bEnabledPVP(false),
-	m_bForceGameModeOnEnterWorld(true),
 	m_IsDeepSnowEnabled(false),
 	m_ShouldLavaSpawnFire(true),
 	m_VillagersShouldHarvestCrops(true),
@@ -283,7 +282,6 @@ cWorld::cWorld(
 	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
 	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
 	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
-	m_bForceGameModeOnEnterWorld  = IniFile.GetValueSetB("Mechanics",     "ForceGameModeOnEnterWorld",   true);
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_MinNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalWidth",        2);
 	m_MaxNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalWidth",        21);

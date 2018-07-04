@@ -146,9 +146,6 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
 	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
 	void SetCapabilities();
 
@@ -179,7 +176,7 @@ public:
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
 	/** Returns the current effective gamemode (inherited gamemode is resolved before returning) */
-	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
+	eGameMode GetEffectiveGameMode(void) const;
 
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.

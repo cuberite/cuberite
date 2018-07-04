@@ -113,6 +113,9 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		// This is a new player. Set the player spawn point to the spawn point of the default world
 		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())), World);
 
+		SetWorld(World);	// Use default world
+		SetCapabilities();
+
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
 		);
@@ -1509,17 +1512,6 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 
 
-void cPlayer::LoginSetGameMode( eGameMode a_GameMode)
-{
-	m_GameMode = a_GameMode;
-
-	SetCapabilities();
-}
-
-
-
-
-
 void cPlayer::SetCapabilities()
 {
 	// Fly ability
@@ -1699,6 +1691,30 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 	return res * a_SpeedCoeff;
 }
 
+
+
+
+
+
+eGameMode cPlayer::GetEffectiveGameMode(void) const
+{
+	if (IsGameModeCreative())
+	{
+		return gmCreative;
+	}
+	else if (IsGameModeSurvival())
+	{
+		return gmSurvival;
+	}
+	else if (IsGameModeAdventure())
+	{
+		return gmAdventure;
+	}
+	else
+	{
+		return gmSpectator;
+	}
+}
 
 
 
@@ -2011,6 +2027,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// Stop all mobs from targeting this player
 		StopEveryoneFromTargetingMe();
 
+		// Deal with new world
+		SetWorld(a_World);
+
 		cClientHandle * ch = this->GetClientHandle();
 		if (ch != nullptr)
 		{
@@ -2020,7 +2039,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 				m_ClientHandle->SendRespawn(a_World->GetDimension());
 			}
 
-
 			// Update the view distance.
 			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
 
@@ -2029,20 +2047,15 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			{
 				ch->SendWeather(a_World->GetWeather());
 			}
-
-			// Update game mode
-			if (a_World->IsForceGameModeOnEnterWorld())
-			{
-				SetGameMode(a_World->GetGameMode());
-			}
 		}
 
 		// Broadcast the player into the new world.
+		a_World->BroadcastPlayerListAddPlayer(*this);
 		a_World->BroadcastSpawnEntity(*this);
 
 		// Queue add to new world and removal from the old one
 
-		SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+		// Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 		cChunk * ParentChunk = this->GetParentChunk();
 
 		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
