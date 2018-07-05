@@ -1214,8 +1214,7 @@ Vector3d cPlayer::GetEyePosition(void) const
 
 bool cPlayer::IsGameModeCreative(void) const
 {
-	return (m_GameMode == gmCreative) ||  // Either the player is explicitly in Creative
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeCreative());  // or they inherit from the world and the world is Creative
+	return (GetEffectiveGameMode() == gmCreative);
 }
 
 
@@ -1224,8 +1223,7 @@ bool cPlayer::IsGameModeCreative(void) const
 
 bool cPlayer::IsGameModeSurvival(void) const
 {
-	return (m_GameMode == gmSurvival) ||  // Either the player is explicitly in Survival
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSurvival());  // or they inherit from the world and the world is Survival
+	return (GetEffectiveGameMode() == gmSurvival);
 }
 
 
@@ -1234,8 +1232,7 @@ bool cPlayer::IsGameModeSurvival(void) const
 
 bool cPlayer::IsGameModeAdventure(void) const
 {
-	return (m_GameMode == gmAdventure) ||  // Either the player is explicitly in Adventure
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeAdventure());  // or they inherit from the world and the world is Adventure
+	return (GetEffectiveGameMode() == gmAdventure);
 }
 
 
@@ -1243,8 +1240,7 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 bool cPlayer::IsGameModeSpectator(void) const
 {
-	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Spectator
+	return (GetEffectiveGameMode() == gmSpectator);
 }
 
 
@@ -1698,21 +1694,14 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 eGameMode cPlayer::GetEffectiveGameMode(void) const
 {
-	if (IsGameModeCreative())
+	if (m_GameMode == gmNotSet)
 	{
-		return gmCreative;
-	}
-	else if (IsGameModeSurvival())
-	{
-		return gmSurvival;
-	}
-	else if (IsGameModeAdventure())
-	{
-		return gmAdventure;
+		// Inherit from world
+		return m_World->GetGameMode();
 	}
 	else
 	{
-		return gmSpectator;
+		return m_GameMode;
 	}
 }
 
@@ -2050,7 +2039,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		}
 
 		// Broadcast the player into the new world.
-		a_World->BroadcastPlayerListAddPlayer(*this);
 		a_World->BroadcastSpawnEntity(*this);
 
 		// Queue add to new world and removal from the old one
