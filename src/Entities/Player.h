@@ -176,7 +176,7 @@ public:
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
 	/** Returns the current effective gamemode (inherited gamemode is resolved before returning) */
-	eGameMode GetEffectiveGameMode(void) const;
+	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
 
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.

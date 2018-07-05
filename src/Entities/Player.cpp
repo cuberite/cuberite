@@ -1691,23 +1691,6 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-
-eGameMode cPlayer::GetEffectiveGameMode(void) const
-{
-	if (m_GameMode == gmNotSet)
-	{
-		// Inherit from world
-		return m_World->GetGameMode();
-	}
-	else
-	{
-		return m_GameMode;
-	}
-}
-
-
-
-
 void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
 	SetSpeed(a_Speed);
