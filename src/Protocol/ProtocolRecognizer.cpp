@@ -428,6 +428,17 @@ void cProtocolRecognizer::SendHealth(void)
 
 
 
+void cProtocolRecognizer::SendHeldItemChange(int itemIndex)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendHeldItemChange(itemIndex);
+}
+
+
+
+
+
+
 void cProtocolRecognizer::SendHideTitle(void)
 {
 	ASSERT(m_Protocol != nullptr);

@@ -636,6 +636,20 @@ void cProtocol_1_9_0::SendHealth(void)
 
 
 
+void cProtocol_1_9_0::SendHeldItemChange(int itemIndex)
+{
+	ASSERT((itemIndex >= 0) && (itemIndex <= 8));  // Valid check
+
+	cPacketizer Pkt(*this, GetPacketId(sendHeldItemChange));  // Held item change
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteBEInt8(static_cast<Byte>(Player->GetInventory().GetEquippedSlotNum()));
+}
+
+
+
+
+
+
 void cProtocol_1_9_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
