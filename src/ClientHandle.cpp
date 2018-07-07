@@ -376,8 +376,8 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		m_Self.reset();
 
 
-		 // New player use default world
-		 // Player who can load from disk, use loaded world
+		// New player use default world
+		// Player who can load from disk, use loaded world
 		if (m_Player->GetWorld() == nullptr)
 		{
 			World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
