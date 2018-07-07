@@ -2002,6 +2002,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// Deal with new world
 		SetWorld(a_World);
 
+		// Set capabilities based on new world
+		SetCapabilities();
+
 		cClientHandle * ch = this->GetClientHandle();
 		if (ch != nullptr)
 		{
