@@ -2988,3 +2988,43 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
+
+
+
+
+
+
+float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	if (IsGameModeSpectator())
+	{
+		// No impact from explosion
+		return 0;
+	}
+	else if (IsGameModeCreative())
+	{
+		if (IsOnGround())
+		{
+			return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+		}
+		else
+		{
+			// Flying player don't impact from explosion
+			return 0;
+		}
+	}
+	else
+	{
+		return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+	}
+}
+
+
+
+
+
+
+
+
+
+

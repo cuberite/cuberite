@@ -690,6 +690,33 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 
 
 
+
+float cEntity::GetEnchantmentBlastKnockbackReduce()
+{
+	uint8_t MaxLevel = 0;
+
+	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+
+	for (auto & Item : ArmorItems)
+	{
+		uint8_t Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		if (Level > MaxLevel)
+		{
+			// Get max blast protection
+			MaxLevel = Level;
+		}
+	}
+
+	// Max blast protect level is 4, each level provide 15% knock back reduction
+	MaxLevel = std::min<uint8_t>(MaxLevel, 4);
+	return MaxLevel * 0.15;
+}
+
+
+
+
+
+
 int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
@@ -2241,3 +2268,104 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 	m_LeashedMobs.remove(a_Monster);
 }
+
+
+
+
+
+double cEntity::GetOverlapLengthX(double a_Start, double a_End)
+{
+	double EntityStart = m_Position.x - (m_Width / 2);
+	double EntityEnd = m_Position.x + (m_Width / 2);
+
+	EntityStart = std::max(a_Start, EntityStart);
+	EntityEnd = std::min(a_End, EntityEnd);
+
+	if (EntityStart >= EntityEnd)
+	{
+		return 0;
+	}
+	else
+	{
+		return (EntityEnd - EntityStart);
+	}
+}
+
+
+
+
+
+
+double cEntity::GetOverlapLengthY(double a_Start, double a_End)
+{
+	double EntityStart = m_Position.y - (m_Height / 2);
+	double EntityEnd = m_Position.y + (m_Height / 2);
+
+	EntityStart = std::max(a_Start, EntityStart);
+	EntityEnd = std::min(a_End, EntityEnd);
+
+	if (EntityStart >= EntityEnd)
+	{
+		return 0;
+	}
+	else
+	{
+		return (EntityEnd - EntityStart);
+	}
+}
+
+
+
+
+
+double cEntity::GetOverlapLengthZ(double a_Start, double a_End)
+{
+	double EntityStart = m_Position.z - (m_Width / 2);
+	double EntityEnd = m_Position.z + (m_Width / 2);
+
+	EntityStart = std::max(a_Start, EntityStart);
+	EntityEnd = std::min(a_End, EntityEnd);
+
+	if (EntityStart >= EntityEnd)
+	{
+		return 0;
+	}
+	else
+	{
+		return (EntityEnd - EntityStart);
+	}
+}
+
+
+
+
+
+
+float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	double Start, End;
+
+	// Overlap x axis
+	Start = a_ExplosionPosition.x - a_ExlosionPower;
+	End = a_ExplosionPosition.x + a_ExlosionPower;
+
+	double OverlapX = GetOverlapLengthX(Start, End);
+
+	// Overlap y axis
+	Start = a_ExplosionPosition.y - a_ExlosionPower;
+	End = a_ExplosionPosition.y + a_ExlosionPower;
+
+	double OverlapY = GetOverlapLengthY(Start, End);
+
+	// Overlap z axis
+	Start = a_ExplosionPosition.z - a_ExlosionPower;
+	End = a_ExplosionPosition.z + a_ExlosionPower;
+
+	double OverlapZ = GetOverlapLengthZ(Start, End);
+
+	float Rate = (float)(OverlapX * OverlapY * OverlapZ / (m_Width * m_Width * m_Height));
+	return Rate;
+}
+
+
+
