@@ -693,13 +693,13 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 
 float cEntity::GetEnchantmentBlastKnockbackReduce()
 {
-	uint8_t MaxLevel = 0;
+	uint32_t MaxLevel = 0;
 
 	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 
 	for (auto & Item : ArmorItems)
 	{
-		uint8_t Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		uint32_t Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
 		if (Level > MaxLevel)
 		{
 			// Get max blast protection
@@ -708,8 +708,8 @@ float cEntity::GetEnchantmentBlastKnockbackReduce()
 	}
 
 	// Max blast protect level is 4, each level provide 15% knock back reduction
-	MaxLevel = std::min<uint8_t>(MaxLevel, 4);
-	return MaxLevel * 0.15;
+	MaxLevel = std::min<uint32_t>(MaxLevel, 4);
+	return static_cast<float>(MaxLevel * 0.15);
 }
 
 
@@ -2363,7 +2363,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 	double OverlapZ = GetOverlapLengthZ(Start, End);
 
-	float Rate = (float)(OverlapX * OverlapY * OverlapZ / (m_Width * m_Width * m_Height));
+	float Rate = static_cast<float>(OverlapX * OverlapY * OverlapZ / (m_Width * m_Width * m_Height));
 	return Rate;
 }
 
