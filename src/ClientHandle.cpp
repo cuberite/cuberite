@@ -2640,9 +2640,9 @@ void cClientHandle::SendHealth(void)
 
 
 
-void cClientHandle::SendHeldItemChange(int itemIndex)
+void cClientHandle::SendHeldItemChange(int a_ItemIndex)
 {
-	m_Protocol->SendHeldItemChange(itemIndex);
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
 
 
