@@ -598,7 +598,7 @@ void cProtocol_1_8_0::SendHeldItemChange(int a_ItemIndex)
 
 	cPacketizer Pkt(*this, 0x09);  // Held item change
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEInt8(static_cast<Byte>(Player->GetInventory().GetEquippedSlotNum()));
+	Pkt.WriteBEInt8(static_cast<Int8>(Player->GetInventory().GetEquippedSlotNum()));
 }
 
 
