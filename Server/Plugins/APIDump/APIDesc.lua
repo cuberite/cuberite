@@ -3328,6 +3328,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
 				},
+				GetOffHandEquipedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that the entity has equipped on off-hand. Returns an empty cItem if no item equipped or not applicable.",
+				},
 				GetGravity =
 				{
 					Returns =
