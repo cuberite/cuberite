@@ -117,6 +117,40 @@ public:
 		}
 	}
 
+	/** Returns true if the specified blocktype is one of the stairs handled by this handler */
+	static bool IsAnyStairType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_SANDSTONE_STAIRS) ||
+			(a_BlockType == E_BLOCK_BIRCH_WOOD_STAIRS) ||
+			(a_BlockType == E_BLOCK_QUARTZ_STAIRS) ||
+			(a_BlockType == E_BLOCK_JUNGLE_WOOD_STAIRS) ||
+			(a_BlockType == E_BLOCK_RED_SANDSTONE_STAIRS) ||
+			(a_BlockType == E_BLOCK_COBBLESTONE_STAIRS) ||
+			(a_BlockType == E_BLOCK_STONE_BRICK_STAIRS) ||
+			(a_BlockType == E_BLOCK_OAK_WOOD_STAIRS) ||
+			(a_BlockType == E_BLOCK_ACACIA_WOOD_STAIRS) ||
+			(a_BlockType == E_BLOCK_PURPUR_STAIRS) ||
+			(a_BlockType == E_BLOCK_DARK_OAK_WOOD_STAIRS) ||
+			(a_BlockType == E_BLOCK_BRICK_STAIRS) ||
+			(a_BlockType == E_BLOCK_NETHER_BRICK_STAIRS) ||
+			(a_BlockType == E_BLOCK_SPRUCE_WOOD_STAIRS)
+		);
+	}
+
+	/** Return if stairs is upside down */
+	static bool IsUpsideDown(NIBBLETYPE a_Meta)
+	{
+		if ((a_Meta & 0x4) != 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	/** EXCEPTION a.k.a. why is this removed:
 	This collision-detection is actually more accurate than the client, but since the client itself
 	sends inaccurate / sparse data, it's easier to just err on the side of the client and keep the

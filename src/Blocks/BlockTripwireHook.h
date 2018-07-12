@@ -23,8 +23,20 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = DirectionToMetadata(a_BlockFace);
+		BLOCKTYPE BlockIsOnType;
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
+		BlockIsOnType = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
+
+		if (CanBePlacedOn(BlockIsOnType, a_BlockFace))
+		{
+			a_BlockType = m_BlockType;
+			a_BlockMeta = DirectionToMetadata(a_BlockFace);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -71,11 +83,35 @@ public:
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, MetadataToDirection(Meta), true);
+		eBlockFace Face = MetadataToDirection(Meta);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+		return ((a_RelY > 0) && CanBePlacedOn(BlockIsOn, Face));
+	}
+
+	/** check if item can be placed on this type of block
+	@param a_BlockType : block type
+	@param a_BlockFace : created block face
+	@return : able to place or not */
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
+	{
+		// Can be place to side of any full solid opaque block
+		if ((a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
+		{
+			return false;
+		}
+
+		// Can be placed on any full solid opaque block
+		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

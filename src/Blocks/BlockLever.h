@@ -4,6 +4,7 @@
 #include "../Chunk.h"
 #include "MetaRotator.h"
 #include "BlockSlab.h"
+#include "BlockStairs.h"
 
 
 class cBlockLeverHandler :
@@ -47,8 +48,22 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockIsOnType, BlockIsOnMeta);
+
+		if (CanBePlacedOn(BlockIsOnType, BlockIsOnMeta, a_BlockFace))
+		{
+			a_BlockType = m_BlockType;
+			a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
 		return true;
 	}
 
@@ -101,24 +116,11 @@ public:
 			return false;
 		}
 
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOnType, BlockIsOnMeta);
 
-
-		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
-		{
-			return true;
-		}
-		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
-		{
-			// Check if the slab is turned up side down
-			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return CanBePlacedOn(BlockIsOnType, BlockIsOnMeta, Face);
 	}
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
@@ -159,6 +161,50 @@ public:
 	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
 	{
 		return ((a_BlockMeta & 0x8) == 0x8);
+	}
+
+	/** check if item can be placed on this type of block
+	@param a_BlockType : block type
+	@param a_BlockMeta : block meta data
+	@param a_BlockFace : created block face
+	@return : able to place or not */
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
+	{
+		// On the top of an upside-down slab
+		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		{
+			// Check if the slab is turned up side down
+			if ((cBlockSlabHandler::IsUpsideDown(a_BlockMeta)) && (a_BlockFace == BLOCK_FACE_TOP))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		// On the top of an upside-down stairs
+		if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		{
+			if ((cBlockStairsHandler::IsUpsideDown(a_BlockMeta)) && (a_BlockFace == BLOCK_FACE_TOP))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 } ;
 

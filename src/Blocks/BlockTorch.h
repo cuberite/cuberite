@@ -133,12 +133,15 @@ public:
 			}
 			default:
 			{
-				if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
+				if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
 				{
 					// Torches can be placed on all sides of full blocks except the bottom
 					return (a_BlockFace != BLOCK_FACE_YM);
 				}
-				return false;
+				else
+				{
+					return false;
+				}
 			}
 		}
 	}

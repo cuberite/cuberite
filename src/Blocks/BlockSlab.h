@@ -95,6 +95,19 @@ public:
 		);
 	}
 
+	/** Return if slab is upside down */
+	static bool IsUpsideDown(NIBBLETYPE a_Meta)
+	{
+		if ((a_Meta & 0x8) != 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
 		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))

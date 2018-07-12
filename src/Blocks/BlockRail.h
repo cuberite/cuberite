@@ -34,16 +34,31 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-		a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
-		return a_Player.GetWorld()->DoWithChunkAt(Pos,
-			[this, Pos, &a_ChunkInterface](cChunk & a_Chunk)
-			{
-				auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-				return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk);
-			}
-		);
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+
+		int OriginalX = a_BlockX;
+		int OriginalY = a_BlockY;
+		int OriginalZ = a_BlockZ;
+
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockIsOnType, BlockIsOnMeta);
+
+		/** A rail cannot be attached to the side or bottom of any block,
+		but attempting to make such an attachment may cause the rail
+		to attach to the top of a block under the destination space */
+		if (CanBePlacedOn(BlockIsOnType, BlockIsOnMeta))
+		{
+			a_BlockType = m_BlockType;
+			Vector3i Pos{ OriginalX, OriginalY, OriginalZ };
+			a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
@@ -98,7 +113,12 @@ public:
 		{
 			return false;
 		}
-		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
+
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
+
+		if (!CanBePlacedOn(BlockIsOnType, BlockIsOnMeta))
 		{
 			return false;
 		}
@@ -123,17 +143,69 @@ public:
 					{ 0, -1},  // north, ZM
 					{ 0,  1},  // south, ZP
 				} ;
-				BLOCKTYPE  BlockType;
-				NIBBLETYPE BlockMeta;
-				if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[Meta].x, a_RelY, a_RelZ + Coords[Meta].z, BlockType, BlockMeta))
+
+				if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[Meta].x, a_RelY - 1, a_RelZ + Coords[Meta].z, BlockIsOnType, BlockIsOnMeta))
 				{
 					// Too close to the edge, cannot simulate
 					return true;
 				}
-				return cBlockInfo::FullyOccupiesVoxel(BlockType);
+
+				return CanBePlacedOn(BlockIsOnType, BlockIsOnMeta);
 			}
 		}
 		return true;
+	}
+
+	/** check if item can be placed on this type of block
+	@param a_BlockType : block type
+	@param a_BlockMeta : block meta data
+	@return : able to place or not */
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		// Rail can only be placed on TOP of block
+
+		// Can be placed on a hopper
+		if (a_BlockType == E_BLOCK_HOPPER)
+		{
+			return true;
+		}
+
+		// Can be placed on upside down slab
+		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		{
+			// Check if the slab is turned up side down
+			if (cBlockSlabHandler::IsUpsideDown(a_BlockMeta))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		// Can be placed on upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		{
+			if (cBlockStairsHandler::IsUpsideDown(a_BlockMeta))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		// Can be placed on any full solid opaque block
+		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos)
