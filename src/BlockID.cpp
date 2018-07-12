@@ -388,12 +388,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtSuffocating:     return "dtSuffocation";
 		case dtExplosion:       return "dtExplosion";
 	}
-
-	// Unknown damage type:
-	ASSERT(!"Unknown DamageType");
-	#ifndef __clang__
-		return Printf("dtUnknown_%d", static_cast<int>(a_DamageType));
-	#endif
+	UNREACHABLE("Unsupported damage type");
 }
 
 

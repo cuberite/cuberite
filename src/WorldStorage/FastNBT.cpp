@@ -35,6 +35,35 @@ static const int MAX_LIST_ITEMS = 10000;
 ////////////////////////////////////////////////////////////////////////////////
 // cNBTParseErrorCategory:
 
+namespace
+{
+
+class cNBTParseErrorCategory final :
+	public std::error_category
+{
+	cNBTParseErrorCategory() = default;
+public:
+	/** Category name */
+	virtual const char * name() const NOEXCEPT override
+	{
+		return "NBT parse error";
+	}
+
+	/** Maps a parse error code to an error message */
+	virtual AString message(int a_Condition) const override;
+
+	/** Returns the canonical error category instance. */
+	static const cNBTParseErrorCategory & Get() NOEXCEPT
+	{
+		static cNBTParseErrorCategory Category;
+		return Category;
+	}
+};
+
+
+
+
+
 AString cNBTParseErrorCategory::message(int a_Condition) const
 {
 	switch (static_cast<eNBTParseError>(a_Condition))
@@ -91,22 +120,19 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 		{
 			return "Unknown tag";
 		}
-
-		#ifdef __clang__
-			#pragma clang diagnostic push
-			#pragma clang diagnostic ignored "-Wcovered-switch-default"
-			#pragma clang diagnostic ignored "-Wunreachable-code"
-		#endif
-
-		default:
-		{
-			return "<unrecognized error>";
-		}
-
-		#ifdef __clang__
-			#pragma clang diagnostic pop
-		#endif
 	}
+	UNREACHABLE("Unsupported nbt parse error");
+}
+
+}  // namespace (anonymous)
+
+
+
+
+
+std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
+{
+	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
 }
 
 
@@ -337,14 +363,12 @@ eNBTParseError cParsedNBT::ReadTag(void)
 			return eNBTParseError::npSuccess;
 		}
 
-		#if !defined(__clang__)
-		default:
-		#endif
 		case TAG_Min:
 		{
 			return eNBTParseError::npUnknownTag;
 		}
 	}  // switch (iType)
+	UNREACHABLE("Unsupported nbt tag type");
 }
 
 #undef CASE_SIMPLE_TAG

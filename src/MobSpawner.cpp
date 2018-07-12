@@ -45,75 +45,26 @@ bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 
 
 
-void cMobSpawner::addIfAllowed(eMonsterType toAdd, std::vector<eMonsterType> & toAddIn)
-{
-	std::set<eMonsterType>::iterator itr = m_AllowedTypes.find(toAdd);
-	if (itr != m_AllowedTypes.end())
-	{
-		toAddIn.push_back(toAdd);
-	}
-}
-
-
-
-
-
 eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 {
-	std::vector<eMonsterType> allowedMobs;
+	std::vector<eMonsterType> AllowedMobs;
 
-	if ((a_Biome == biMushroomIsland) || (a_Biome == biMushroomShore))
+	for (eMonsterType MobType : GetAllowedMobTypes(a_Biome))
 	{
-		addIfAllowed(mtMooshroom, allowedMobs);
-	}
-	else if (a_Biome == biNether)
-	{
-		addIfAllowed(mtGhast, allowedMobs);
-		addIfAllowed(mtZombiePigman, allowedMobs);
-		addIfAllowed(mtMagmaCube, allowedMobs);
-	}
-	else if (a_Biome == biEnd)
-	{
-		addIfAllowed(mtEnderman, allowedMobs);
-	}
-	else
-	{
-		addIfAllowed(mtBat, allowedMobs);
-		addIfAllowed(mtSpider, allowedMobs);
-		addIfAllowed(mtZombie, allowedMobs);
-		addIfAllowed(mtSkeleton, allowedMobs);
-		addIfAllowed(mtCreeper, allowedMobs);
-		addIfAllowed(mtSquid, allowedMobs);
-		addIfAllowed(mtGuardian, allowedMobs);
-
-		if ((a_Biome != biDesert) && (a_Biome != biBeach) && (a_Biome != biOcean))
+		auto itr = m_AllowedTypes.find(MobType);
+		if (itr != m_AllowedTypes.end())
 		{
-			addIfAllowed(mtSheep, allowedMobs);
-			addIfAllowed(mtPig, allowedMobs);
-			addIfAllowed(mtCow, allowedMobs);
-			addIfAllowed(mtChicken, allowedMobs);
-			addIfAllowed(mtEnderman, allowedMobs);
-			addIfAllowed(mtRabbit, allowedMobs);
-			addIfAllowed(mtSlime, allowedMobs);  // MG TODO : much more complicated rule
-
-			if ((a_Biome == biForest) || (a_Biome == biForestHills) || (a_Biome == biTaiga) || (a_Biome == biTaigaHills))
-			{
-				addIfAllowed(mtWolf, allowedMobs);
-			}
-			else if ((a_Biome == biJungle) || (a_Biome == biJungleHills))
-			{
-				addIfAllowed(mtOcelot, allowedMobs);
-			}
+			AllowedMobs.push_back(MobType);
 		}
 	}
 
 	// Pick a random mob from the options:
-	size_t allowedMobsSize = allowedMobs.size();
-	if (allowedMobsSize > 0)
+	if (AllowedMobs.empty())
 	{
-		return allowedMobs[GetRandomProvider().RandInt(allowedMobsSize - 1)];
+		return mtInvalidType;
 	}
-	return mtInvalidType;
+
+	return AllowedMobs[GetRandomProvider().RandInt(AllowedMobs.size() - 1)];
 }
 
 
@@ -157,7 +108,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	{
 		case mtGuardian:
 		{
-			return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
+			return IsBlockWater(TargetBlock) && IsBlockWater(BlockBelow) && (a_RelY >= 45) && (a_RelY <= 62);
 		}
 
 		case mtSquid:
@@ -301,12 +252,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				(TargetBlock == E_BLOCK_GRASS) &&
 				(BlockAbove == E_BLOCK_AIR) &&
 				(
-					(a_Biome == biTaiga) ||
-					(a_Biome == biTaigaHills) ||
-					(a_Biome == biForest) ||
-					(a_Biome == biForestHills) ||
 					(a_Biome == biColdTaiga) ||
 					(a_Biome == biColdTaigaHills) ||
+					(a_Biome == biColdTaigaM) ||
+					(a_Biome == biForest) ||
+					(a_Biome == biTaiga) ||
+					(a_Biome == biTaigaHills) ||
 					(a_Biome == biTaigaM) ||
 					(a_Biome == biMegaTaiga) ||
 					(a_Biome == biMegaTaigaHills)
@@ -334,6 +285,140 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 		}
 	}
 	return false;
+}
+
+
+
+
+
+std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
+{
+	std::set<eMonsterType> ListOfSpawnables;
+	// Check biomes first to get a list of animals
+	switch (a_Biome)
+	{
+		// Nether mobs and endermen only - no other mobs in the nether
+		case biNether:
+		{
+			ListOfSpawnables.insert(mtGhast);
+			ListOfSpawnables.insert(mtMagmaCube);
+			ListOfSpawnables.insert(mtZombiePigman);
+			ListOfSpawnables.insert(mtEnderman);
+			return ListOfSpawnables;
+		}
+
+		// Endermen only - no other mobs in the end
+		case biEnd:
+		{
+			ListOfSpawnables.insert(mtEnderman);
+			return ListOfSpawnables;
+		}
+
+		// Mooshroom only - no other mobs on mushroom islands
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			ListOfSpawnables.insert(mtMooshroom);
+			return ListOfSpawnables;
+		}
+
+		// Add Squid in ocean and river biomes
+		case biOcean:
+		case biFrozenOcean:
+		case biFrozenRiver:
+		case biRiver:
+		case biDeepOcean:
+		{
+			ListOfSpawnables.insert(mtGuardian);
+			break;
+		}
+
+		// Add ocelots in jungle biomes
+		case biJungle:
+		case biJungleHills:
+		case biJungleEdge:
+		case biJungleM:
+		case biJungleEdgeM:
+		{
+			ListOfSpawnables.insert(mtOcelot);
+			break;
+		}
+
+		// Add horses in plains-like biomes
+		case biPlains:
+		case biSunflowerPlains:
+		case biSavanna:
+		case biSavannaPlateau:
+		case biSavannaM:
+		case biSavannaPlateauM:
+		{
+			ListOfSpawnables.insert(mtHorse);
+			break;
+		}
+
+		// Add wolves in forest biomes
+		case biForest:
+		{
+			ListOfSpawnables.insert(mtWolf);
+			break;
+		}
+
+		// Add wolves and rabbits in all taiga biomes
+		case biColdTaiga:
+		case biColdTaigaM:
+		case biColdTaigaHills:
+		case biTaiga:
+		case biTaigaHills:
+		case biTaigaM:
+		case biMegaTaiga:
+		case biMegaTaigaHills:
+		{
+			ListOfSpawnables.insert(mtWolf);
+			ListOfSpawnables.insert(mtRabbit);
+			break;
+		}
+
+		// Add rabbits in desert and flower forest biomes
+		case biDesert:
+		case biDesertHills:
+		case biDesertM:
+		case biFlowerForest:
+		{
+			ListOfSpawnables.insert(mtRabbit);
+			break;
+		}
+
+		// Nothing special about this biome
+		default:
+		{
+			break;
+		}
+	}
+
+	if (
+		(a_Biome != biDesertHills) &&
+		(a_Biome != biDesert) &&
+		(a_Biome != biDesertM) &&
+		(a_Biome != biBeach) &&
+		(a_Biome != biOcean) &&
+		(a_Biome != biDeepOcean))
+	{
+		ListOfSpawnables.insert(mtSheep);
+		ListOfSpawnables.insert(mtPig);
+		ListOfSpawnables.insert(mtCow);
+		ListOfSpawnables.insert(mtChicken);
+		ListOfSpawnables.insert(mtEnderman);
+		ListOfSpawnables.insert(mtSlime);
+	}
+
+	ListOfSpawnables.insert(mtBat);
+	ListOfSpawnables.insert(mtSpider);
+	ListOfSpawnables.insert(mtZombie);
+	ListOfSpawnables.insert(mtSkeleton);
+	ListOfSpawnables.insert(mtCreeper);
+	ListOfSpawnables.insert(mtSquid);
+
+	return ListOfSpawnables;
 }
 
 

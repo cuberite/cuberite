@@ -410,7 +410,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer * Player = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
+		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
 
 		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
@@ -441,7 +441,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if (IsMob())
 			{
-				cMonster * Monster = reinterpret_cast<cMonster *>(this);
+				cMonster * Monster = static_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
 				{
 					case mtSkeleton:
@@ -460,7 +460,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if (IsMob())
 			{
-				cMonster * Monster = reinterpret_cast<cMonster *>(this);
+				cMonster * Monster = static_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
 				{
 					case mtSpider:
@@ -496,7 +496,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 			else if (IsMob() && !IsInWater())
 			{
-				cMonster * Monster = reinterpret_cast<cMonster *>(this);
+				cMonster * Monster = static_cast<cMonster *>(this);
 				switch (Monster->GetMobType())
 				{
 					case mtGhast:
@@ -640,10 +640,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 			return true;
 		}
 	}
-	ASSERT(!"Invalid damage type!");
-	#ifndef __clang__
-		return false;
-	#endif
+	UNREACHABLE("Unsupported damage type");
 }
 
 
@@ -874,7 +871,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Handle cactus damage or destruction:
 		if (
 			IsMob() || IsPickup() ||
-			(IsPlayer() && !((reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() || (reinterpret_cast<cPlayer *>(this))->IsGameModeSpectator()))
+			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
 		)
 		{
 			DetectCacti();
@@ -1352,7 +1349,7 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
-				if (IsPlayer() && !(reinterpret_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
+				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
 					m_PortalCooldownData.m_TicksDelayed++;
@@ -1375,7 +1372,7 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(reinterpret_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
+						(static_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					Vector3d TargetPos = GetPosition();
@@ -1404,10 +1401,10 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimNether)
 						{
-							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+							static_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
 						}
 
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
+						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					Vector3d TargetPos = GetPosition();
@@ -1444,7 +1441,7 @@ bool cEntity::DetectPortal()
 
 					if (IsPlayer())
 					{
-						cPlayer * Player = reinterpret_cast<cPlayer *>(this);
+						cPlayer * Player = static_cast<cPlayer *>(this);
 						if (Player->GetBedWorld() == DestinationWorld)
 						{
 							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
@@ -1477,9 +1474,9 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimEnd)
 						{
-							reinterpret_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+							static_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
 						}
-						reinterpret_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
+						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
@@ -1531,7 +1528,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
 
 	// Set position to the new position
-	SetPosition(a_NewPosition);
+	ResetPosition(a_NewPosition);
 
 	// Stop all mobs from targeting this entity
 	// Stop this entity from targeting other mobs
@@ -1707,7 +1704,7 @@ void cEntity::HandleAir(void)
 
 		if (RespirationLevel > 0)
 		{
-			reinterpret_cast<cPawn *>(this)->AddEntityEffect(cEntityEffect::effNightVision, 200, 5, 0);
+			static_cast<cPawn *>(this)->AddEntityEffect(cEntityEffect::effNightVision, 200, 5, 0);
 		}
 
 		if (m_AirLevel <= 0)
@@ -1743,6 +1740,16 @@ void cEntity::HandleAir(void)
 		}
 
 	}
+}
+
+
+
+
+
+void cEntity::ResetPosition(Vector3d a_NewPos)
+{
+	SetPosition(a_NewPos);
+	m_LastSentPosition = GetPosition();
 }
 
 
@@ -1840,7 +1847,7 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask the plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		ResetPosition({a_PosX, a_PosY, a_PosZ});
 		m_World->BroadcastTeleportEntity(*this);
 	}
 }

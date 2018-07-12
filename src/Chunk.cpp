@@ -539,7 +539,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if (entity->IsMob())
 		{
-			auto & Monster = reinterpret_cast<cMonster &>(*entity);
+			auto & Monster = static_cast<cMonster &>(*entity);
 			currentPosition = Monster.GetPosition();
 			for (const auto & PlayerPos : PlayerPositions)
 			{
@@ -1659,7 +1659,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	ASSERT(IsValid());
 
 	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
+	const BLOCKTYPE OldBlockMeta = m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
@@ -1677,7 +1677,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		MarkDirty();
 	}
 
-	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
+	m_ChunkData.SetBlock({ a_RelX, a_RelY, a_RelZ }, a_BlockType);
 
 	// Queue block to be sent only if ...
 	if (
@@ -1696,7 +1696,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 
-	m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
+	m_ChunkData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -1902,11 +1902,11 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 			MarkDirty();
 			if (Entity->IsPickup())
 			{
-				reinterpret_cast<cPickup *>(Entity.get())->CollectedBy(a_Player);
+				static_cast<cPickup &>(*Entity).CollectedBy(a_Player);
 			}
 			else
 			{
-				reinterpret_cast<cProjectileEntity *>(Entity.get())->CollectedBy(a_Player);
+				static_cast<cProjectileEntity &>(*Entity).CollectedBy(a_Player);
 			}
 		}
 		else if (SqrDist < 5 * 5)
@@ -2471,31 +2471,22 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
-BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
+void cChunk::GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);
+	a_BlockType = GetBlock(a_RelPos);
+	a_BlockMeta = GetMeta(a_RelPos);
 }
 
 
 
 
 
-void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+void cChunk::GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_BlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-{
-	a_BlockType  = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_Meta       = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
-	a_SkyLight   = m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ);
-	a_BlockLight = m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockType  = GetBlock(a_RelPos);
+	a_Meta       = m_ChunkData.GetMeta(a_RelPos);
+	a_SkyLight   = m_ChunkData.GetSkyLight(a_RelPos);
+	a_BlockLight = m_ChunkData.GetBlockLight(a_RelPos);
 }
 
 

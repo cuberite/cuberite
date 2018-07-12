@@ -24,12 +24,12 @@
 
 // fwd:
 struct event_base;
-class cTCPLinkImpl;
-typedef std::shared_ptr<cTCPLinkImpl> cTCPLinkImplPtr;
-typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
-class cServerHandleImpl;
-typedef std::shared_ptr<cServerHandleImpl> cServerHandleImplPtr;
-typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
+class cTCPLink;
+typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
+typedef std::vector<cTCPLinkPtr> cTCPLinkPtrs;
+class cServerHandle;
+typedef std::shared_ptr<cServerHandle> cServerHandlePtr;
+typedef std::vector<cServerHandlePtr> cServerHandlePtrs;
 
 
 
@@ -61,20 +61,20 @@ public:
 
 	/** Adds the specified link to m_Connections.
 	Used by the underlying link implementation when a new link is created. */
-	void AddLink(cTCPLinkImplPtr a_Link);
+	void AddLink(cTCPLinkPtr a_Link);
 
 	/** Removes the specified link from m_Connections.
 	Used by the underlying link implementation when the link is closed / errored. */
-	void RemoveLink(const cTCPLinkImpl * a_Link);
+	void RemoveLink(const cTCPLink * a_Link);
 
 	/** Adds the specified link to m_Servers.
 	Used by the underlying server handle implementation when a new listening server is created.
 	Only servers that succeed in listening are added. */
-	void AddServer(cServerHandleImplPtr a_Server);
+	void AddServer(cServerHandlePtr a_Server);
 
 	/** Removes the specified server from m_Servers.
 	Used by the underlying server handle implementation when the server is closed. */
-	void RemoveServer(const cServerHandleImpl * a_Server);
+	void RemoveServer(const cServerHandle * a_Server);
 
 protected:
 
@@ -82,10 +82,10 @@ protected:
 	event_base * m_EventBase;
 
 	/** Container for all client connections, including ones with pending-connect. */
-	cTCPLinkImplPtrs m_Connections;
+	cTCPLinkPtrs m_Connections;
 
 	/** Container for all servers that are currently active. */
-	cServerHandleImplPtrs m_Servers;
+	cServerHandlePtrs m_Servers;
 
 	/** Mutex protecting all containers against multithreaded access. */
 	cCriticalSection m_CS;
