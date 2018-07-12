@@ -642,6 +642,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_STONE_BRICKS                 ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_WOOL                         ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_HOPPER                       ].m_FullyOccupiesVoxel = true;
 
 
 	// Blocks that can be terraformed
