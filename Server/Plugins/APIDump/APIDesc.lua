@@ -222,6 +222,24 @@ return
 					},
 					Notes = "Returns how much light the specified block type consumes.",
 				},
+        IsFullSolidOpaqueBlock =
+        {
+          IsStatic = true,
+          Params =
+          {
+            {
+              Name = "BlockType",
+              Type = "number",
+            },
+          },
+          Returns =
+          {
+            {
+              Type = "boolean",
+            },
+          },
+          Notes = "Returns true if block is full, solid, opaque block.",
+        },
 				IsOneHitDig =
 				{
 					IsStatic = true,
