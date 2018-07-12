@@ -2331,7 +2331,7 @@ void cPlayer::UseEquippedItem(short a_Damage)
 		return;
 	}
 
-	UseItem(m_Inventory.GetEquippedSlotNum(), a_Damage);
+	UseItem(cInventory::invHotbarOffset + m_Inventory.GetEquippedSlotNum(), a_Damage);
 }
 
 
