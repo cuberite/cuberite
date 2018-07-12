@@ -71,6 +71,15 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		BLOCKTYPE Block;
+		NIBBLETYPE Meta;	
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
+		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, Block, Meta);
+		
+		if(!CanBePlacedOn(Block, Meta, a_BlockFace))
+		{
+			return false;
+		}
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
 		return true;
@@ -113,15 +122,36 @@ public:
 		}
 	}
 
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
+	{
+		switch(a_BlockType)
+		{
+			case E_BLOCK_HOPPER:
+			{
+				// buttons may be placed on top of hoppers, but only on top
+				return (a_BlockFace == BLOCK_FACE_YP);
+			}
+			default:
+				return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
+		}
+	}
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		BLOCKTYPE BlockInQuestion;
+		NIBBLETYPE BlockInQuestionMeta;
+		if(!a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockInQuestion, BlockInQuestionMeta))
+		{
+			return false;
+		}
 
-		return (a_RelY > 0) && (cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+		return (a_RelY > 0) && (cBlockInfo::FullyOccupiesVoxel(BlockInQuestion)) && 
+			CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face);
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
