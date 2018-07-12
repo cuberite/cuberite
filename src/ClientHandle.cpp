@@ -1188,7 +1188,14 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_SWAP_ITEM_IN_HAND:
 		{
-			// TODO: Not yet implemented
+
+			cItem EquippedItem = m_Player->GetEquippedItem();
+			cItem OffhandItem = m_Player->GetOffHandEquipedItem();
+
+			cInventory & Intentory = m_Player->GetInventory();
+			Intentory.SetShieldSlot(EquippedItem);
+			Intentory.SetHotbarSlot(Intentory.GetEquippedSlotNum(), OffhandItem);
+
 			return;
 		}
 
