@@ -57,14 +57,52 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
-
-		if (a_CursorY > 7)
+		/** Trapdoors will remain in place if their attachment block is moved, removed, or destroyed */
+		if (CanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
-			a_BlockMeta |= 0x8;
+			a_BlockType = m_BlockType;
+			a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
+
+			switch (a_BlockFace)
+			{
+				case BLOCK_FACE_BOTTOM:
+					a_BlockMeta |= 0x8;
+					break;
+				case BLOCK_FACE_NORTH:
+				case BLOCK_FACE_SOUTH:
+				case BLOCK_FACE_WEST:
+				case BLOCK_FACE_EAST:
+				{
+					if (a_CursorY > 7)
+					{
+						a_BlockMeta |= 0x8;
+					}
+				}
+				default:
+				{
+					break;
+				}
+			}
+			return true;
 		}
-		return true;
+		else
+		{
+			return false;
+		}
+	}
+
+	bool CanBePlacedAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+	{
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
+		if (a_BlockY < 0)
+		{
+			return false;
+		}
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		BLOCKTYPE BlockIsOn = a_ChunkInterface.GetBlock(Pos);
+
+		return cBlockInfo::IsSolid(BlockIsOn);
 	}
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
@@ -75,9 +113,9 @@ public:
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
+			case BLOCK_FACE_YM: return 0x1;
+			case BLOCK_FACE_YP: return 0x1;
 			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0;
@@ -100,18 +138,6 @@ public:
 				return BLOCK_FACE_NONE;
 			}
 		}
-	}
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
-
-		return ((a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

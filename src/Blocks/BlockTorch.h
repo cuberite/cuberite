@@ -24,27 +24,55 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		BLOCKTYPE Block;
-		NIBBLETYPE Meta;
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, Block, Meta);
-
-		if (!CanBePlacedOn(Block, Meta, a_BlockFace))  // Try to preserve original direction
+		if (!IsValidDirection(a_BlockFace))
 		{
-			// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
+			return false;
+		}
 
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);  // Reset to torch block
-			a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		a_BlockType = m_BlockType;
+		a_BlockMeta = DirectionToMetaData(a_BlockFace);
+		bool CheckResult = a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
+
+		if (CheckResult)
+		{
+			return true;
+		}
+		else
+		{
+			a_BlockFace = FindSuitableFace(a_Player.GetWorld(), a_BlockX, a_BlockY, a_BlockZ);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
 			if (a_BlockFace == BLOCK_FACE_NONE)
 			{
 				// No attachable face found - don't place the torch
 				return false;
 			}
+			else
+			{
+				a_BlockMeta = DirectionToMetaData(a_BlockFace);
+				return true;
+			}
 		}
+	}
 
-		a_BlockType = m_BlockType;
-		a_BlockMeta = DirectionToMetaData(a_BlockFace);
-		return true;
+	bool IsValidDirection(eBlockFace a_Direction)
+	{
+		switch (a_Direction)
+		{
+			case BLOCK_FACE_TOP:
+			case BLOCK_FACE_EAST:
+			case BLOCK_FACE_WEST:
+			case BLOCK_FACE_NORTH:
+			case BLOCK_FACE_SOUTH:
+				return true;
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	inline static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
@@ -85,9 +113,45 @@ public:
 		return BLOCK_FACE_TOP;
 	}
 
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
+	/** Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure */
+	eBlockFace FindSuitableFace(cWorld * World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		switch (a_BlockType)
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+
+		for (int i = BLOCK_FACE_YP; i <= BLOCK_FACE_XP; i++)  // Loop through all directions
+		{
+			eBlockFace Face = static_cast<eBlockFace>(i);
+
+			NIBBLETYPE BlockMeta = DirectionToMetaData(Face);
+
+			bool CheckResult = World->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+			{
+				auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+				cChunkInterface ChunkInterface(World->GetChunkMap());
+				return CanBeAt(ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, BlockMeta);
+			});
+
+			if (CheckResult)
+			{
+				return Face;
+			}
+		}
+		return BLOCK_FACE_NONE;
+	}
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
+	{
+		eBlockFace Face = MetaDataToDirection(a_BlockMeta);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
+
+		BLOCKTYPE BlockInQuestion;
+		NIBBLETYPE BlockInQuestionMeta;
+		if (!a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockInQuestion, BlockInQuestionMeta))
+		{
+			return false;
+		}
+
+		switch (BlockInQuestion)
 		{
 			case E_BLOCK_END_PORTAL_FRAME:
 			case E_BLOCK_SOULSAND:
@@ -107,13 +171,13 @@ public:
 			case E_BLOCK_COBBLESTONE_WALL:
 			{
 				// Torches can only be placed on top of these blocks
-				return (a_BlockFace == BLOCK_FACE_YP);
+				return (Face == BLOCK_FACE_YP);
 			}
 			case E_BLOCK_STONE_SLAB:
 			case E_BLOCK_WOODEN_SLAB:
 			{
 				// Toches can be placed on the top of these slabs only if the occupy the top half of the voxel
-				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
+				return ((Face == BLOCK_FACE_YP) && ((BlockInQuestionMeta & 0x08) == 0x08));
 			}
 			case E_BLOCK_OAK_WOOD_STAIRS:
 			case E_BLOCK_COBBLESTONE_STAIRS:
@@ -129,14 +193,14 @@ public:
 			case E_BLOCK_DARK_OAK_WOOD_STAIRS:
 			case E_BLOCK_RED_SANDSTONE_STAIRS:
 			{
-				return (a_BlockFace == BLOCK_FACE_TOP) && (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				return (Face == BLOCK_FACE_TOP) && (BlockInQuestionMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
 			}
 			default:
 			{
-				if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
+				if (cBlockInfo::IsFullSolidOpaqueBlock(BlockInQuestion))
 				{
 					// Torches can be placed on all sides of full blocks except the bottom
-					return (a_BlockFace != BLOCK_FACE_YM);
+					return (Face != BLOCK_FACE_YM);
 				}
 				else
 				{
@@ -144,45 +208,6 @@ public:
 				}
 			}
 		}
-	}
-
-	/** Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure */
-	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++)  // Loop through all directions
-		{
-			eBlockFace Face = static_cast<eBlockFace>(i);
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, true);
-			BLOCKTYPE BlockInQuestion;
-			NIBBLETYPE BlockInQuestionMeta;
-			a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockInQuestion, BlockInQuestionMeta);
-
-			if (CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face))
-			{
-				return Face;
-			}
-			else
-			{
-				// Reset coords in preparation for next iteration
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, false);
-			}
-		}
-		return BLOCK_FACE_NONE;
-	}
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		eBlockFace Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
-
-		BLOCKTYPE BlockInQuestion;
-		NIBBLETYPE BlockInQuestionMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockInQuestion, BlockInQuestionMeta))
-		{
-			return false;
-		}
-
-		return CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face);
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

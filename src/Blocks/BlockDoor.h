@@ -7,6 +7,7 @@
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
+#include "BlockStairs.h"
 
 
 
@@ -25,32 +26,6 @@ public:
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  override;
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  override;
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		// If clicking a bottom face, place the door one block lower:
-		if (a_BlockFace == BLOCK_FACE_BOTTOM)
-		{
-			a_BlockY--;
-		}
-
-		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ}))
-		)
-		{
-			return false;
-		}
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = PlayerYawToMetaData(a_Player.GetYaw());
-		return true;
-	}
 
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override;
 
@@ -110,31 +85,61 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		return ((a_RelY > 0) && CanBeOn(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ), a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ)));
-	}
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
 
-	/** Returns true if door can be placed on the specified block type. */
-	static bool CanBeOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
+
 		// Vanilla refuses to place doors on transparent blocks, except top-half slabs and other doors
 		// We need to keep the door compatible with itself, otherwise the top half drops while the bottom half stays
 
 		// Doors can be placed on upside-down slabs
-		if (cBlockSlabHandler::IsAnySlabType(a_BlockType) && ((a_BlockMeta & 0x08) != 0))
+		if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))
+		{
+			return (cBlockSlabHandler::IsUpsideDown(BlockIsOnMeta));
+		}
+
+		// Can be placed on upside-down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BlockIsOnType))
+		{
+			return (cBlockStairsHandler::IsUpsideDown(BlockIsOnMeta));
+		}
+
+		// Can be placed on slime block or hopper
+		if ((BlockIsOnType == E_BLOCK_SLIME_BLOCK) || (BlockIsOnType == E_BLOCK_HOPPER))
 		{
 			return true;
 		}
+
+		// Can be placed on downward-facing piston
+		if (BlockIsOnType == E_BLOCK_PISTON)
+		{
+			if ((BlockIsOnMeta & 0x1) != 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		// Doors can also be placed on other doors
-		else if (IsDoorBlockType(a_BlockType))
+		if (IsDoorBlockType(BlockIsOnType))
 		{
 			return true;
 		}
 		// Doors can not be placed on transparent blocks, but on any other block
 		else
 		{
-			return !cBlockInfo::IsTransparent(a_BlockType);
+			bool Result = cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
+			return Result;
 		}
 	}
 

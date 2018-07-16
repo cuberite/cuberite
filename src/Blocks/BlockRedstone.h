@@ -17,7 +17,7 @@ public:
 	{
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_RelY <= 0)
 		{
@@ -28,19 +28,31 @@ public:
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		/** Redstone dust can be placed on opaque blocks as well as glowstone,
+		upside-down slabs and upside-down stairs, and hoppers */
+		switch (BelowBlock)
 		{
-			return true;
-		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
-		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
+			case E_BLOCK_HOPPER:
+			case E_BLOCK_GLOWSTONE:
 				return true;
+			default:
+			{
+				// On the top of an upside-down slab
+				if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+				{
+					// Check if the slab is turned up side down
+					return (cBlockSlabHandler::IsUpsideDown(BelowBlockMeta));
+				}
+
+				// On the top of an upside-down stairs
+				if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
+				{
+					return (cBlockStairsHandler::IsUpsideDown(BelowBlockMeta));
+				}
+
+				return cBlockInfo::IsFullSolidOpaqueBlock(BelowBlock);
 			}
 		}
-		return false;
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

@@ -34,25 +34,21 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		BLOCKTYPE BlockIsOnType;
-		NIBBLETYPE BlockIsOnMeta;
-
-		int OriginalX = a_BlockX;
-		int OriginalY = a_BlockY;
-		int OriginalZ = a_BlockZ;
-
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockIsOnType, BlockIsOnMeta);
-
 		/** A rail cannot be attached to the side or bottom of any block,
 		but attempting to make such an attachment may cause the rail
 		to attach to the top of a block under the destination space */
-		if (CanBePlacedOn(BlockIsOnType, BlockIsOnMeta))
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		bool CheckResult = a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, 0);
+		});
+
+		if (CheckResult)
 		{
 			a_BlockType = m_BlockType;
-			Vector3i Pos{ OriginalX, OriginalY, OriginalZ };
 			a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
-
 			return true;
 		}
 		else
@@ -107,8 +103,10 @@ public:
 		super::ConvertToPickups(a_Pickups, 0);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
+		UNUSED(a_BlockMeta);
+
 		if (a_RelY <= 0)
 		{
 			return false;
@@ -174,38 +172,17 @@ public:
 		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
 		{
 			// Check if the slab is turned up side down
-			if (cBlockSlabHandler::IsUpsideDown(a_BlockMeta))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return cBlockSlabHandler::IsUpsideDown(a_BlockMeta);
 		}
 
 		// Can be placed on upside down stairs
 		if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
 		{
-			if (cBlockStairsHandler::IsUpsideDown(a_BlockMeta))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return cBlockStairsHandler::IsUpsideDown(a_BlockMeta);
 		}
 
 		// Can be placed on any full solid opaque block
-		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType);
 	}
 
 	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos)

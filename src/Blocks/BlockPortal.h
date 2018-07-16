@@ -50,7 +50,7 @@ public:
 		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, mtZombiePigman, false);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height - 1))
 		{

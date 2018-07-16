@@ -66,6 +66,11 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		if (a_BlockFace == BLOCK_FACE_BOTTOM)
+		{
+			return false;
+		}
+
 		if (a_BlockFace == BLOCK_FACE_TOP)
 		{
 			a_BlockMeta = cBlockSignPostHandler::RotationToMetaData(a_Player->GetYaw());

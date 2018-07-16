@@ -21,15 +21,17 @@ public:
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_RelY - 1 <= 0)
 		{
 			return false;
 		}
 
-		// TODO: check if the block is upside-down slab or upside-down stairs
-		BLOCKTYPE Block = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, Block, BlockMeta);
+
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:
@@ -45,7 +47,20 @@ public:
 			}
 			default:
 			{
-				return (!cBlockInfo::IsTransparent(Block));
+				// On the top of an upside-down slab
+				if (cBlockSlabHandler::IsAnySlabType(Block))
+				{
+					// Check if the slab is turned up side down
+					return (cBlockSlabHandler::IsUpsideDown(BlockMeta));
+				}
+
+				// On the top of an upside-down stairs
+				if (cBlockStairsHandler::IsAnyStairType(Block))
+				{
+					return (cBlockStairsHandler::IsUpsideDown(BlockMeta));
+				}
+
+				return cBlockInfo::IsFullSolidOpaqueBlock(Block);
 			}
 		}
 	}

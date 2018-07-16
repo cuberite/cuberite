@@ -22,22 +22,38 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_RelY <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-		switch (BelowBlock)
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
+		switch (BlockIsOnType)
 		{
 			case E_BLOCK_CLAY:
 			case E_BLOCK_HARDENED_CLAY:
 			case E_BLOCK_STAINED_CLAY:
 			case E_BLOCK_SAND:
+			case E_BLOCK_FLOWER_POT:
 			{
 				return true;
+			}
+			case E_BLOCK_DIRT:
+			{
+				// Can be placed on dirt or podzol
+				if ((BlockIsOnMeta == E_META_DIRT_NORMAL) || (BlockIsOnMeta == E_META_DIRT_PODZOL))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			default: return false;
 		}

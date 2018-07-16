@@ -377,8 +377,14 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
 	a_BlockType = m_BlockType;
 	a_BlockMeta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage & 0x0f);
-	return true;
+	Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+	return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+		return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+	});
 }
+
 
 
 
@@ -577,7 +583,8 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
+
+bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta)
 {
 	return true;
 }
@@ -648,7 +655,10 @@ cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a
 
 void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
-	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))
+	NIBBLETYPE BlockMeta;
+	a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, BlockMeta);
+
+	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk, BlockMeta))
 	{
 		if (DoesDropOnUnsuitable())
 		{

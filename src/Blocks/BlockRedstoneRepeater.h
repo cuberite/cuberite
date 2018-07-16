@@ -6,7 +6,7 @@
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
-
+#include "BlockStairs.h"
 
 
 class cBlockRedstoneRepeaterHandler :
@@ -27,6 +27,14 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
+
 		return true;
 	}
 
@@ -53,7 +61,7 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_RelY <= 0)
 		{
@@ -64,19 +72,28 @@ public:
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		/** A repeater can only be placed on top of opaque blocks (dirt, stone, etc., but not glass, leaves, etc.),
+		or on top of upside-down slabs, upside-down stairs, and hoppers. */
+
+		if (BelowBlock == E_BLOCK_HOPPER)
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+
+		// On the top of an upside-down slab
+		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
 			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
+			return (cBlockSlabHandler::IsUpsideDown(BelowBlockMeta));
 		}
-		return false;
+
+		// On the top of an upside-down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
+		{
+			return (cBlockStairsHandler::IsUpsideDown(BelowBlockMeta));
+		}
+
+		return cBlockInfo::IsFullSolidOpaqueBlock(BelowBlock);
 	}
 
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)

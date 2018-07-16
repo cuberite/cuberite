@@ -24,16 +24,19 @@ public:
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_RelY <= 0)
 		{
 			return false;
 		}
 
-		// TODO: Cannot be at too much daylight
+		/** Mushrooms could be placed on any solid, non-transparent, block
+		including pumpkins, workbenches, furnaces, and chests */
 
-		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
+		// TODO: Cannot be at too much daylight
+		BLOCKTYPE UnderType = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		switch (UnderType)
 		{
 			case E_BLOCK_GLASS:
 			case E_BLOCK_CACTUS:
@@ -41,11 +44,18 @@ public:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_AIR:
-			{
 				return false;
+			case E_BLOCK_PUMPKIN:
+			case E_BLOCK_WORKBENCH:
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_CHEST:
+				return true;
+			default:
+			{
+				return (cBlockInfo::IsSolid(UnderType) && (!cBlockInfo::IsTransparent(UnderType)));
 			}
 		}
-		return true;
+
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

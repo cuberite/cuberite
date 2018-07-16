@@ -30,25 +30,13 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (a_BlockFace != BLOCK_FACE_TOP)
-		{
-			// Only allow planting nether wart from the top side of the block
-			return false;
-		}
-
-		// Only allow placement on farmland
-		int X = a_BlockX;
-		int Y = a_BlockY;
-		int Z = a_BlockZ;
-		AddFaceDirection(X, Y, Z, a_BlockFace, true);
-		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_SOULSAND)
-		{
-			return false;
-		}
-
-		a_BlockMeta = 0;
-		a_BlockType = E_BLOCK_NETHER_WART;
-
-		return true;
+		cBlockHandler * BlockH = BlockHandler(E_BLOCK_NETHER_WART);
+		cChunkInterface ChunkInterface(a_World->GetChunkMap());
+		return BlockH->GetPlacementBlockTypeMeta(
+			ChunkInterface, *a_Player,
+			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
+			a_CursorX, a_CursorY, a_CursorZ,
+			a_BlockType, a_BlockMeta
+		);
 	}
 } ;

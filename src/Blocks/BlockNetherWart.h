@@ -18,6 +18,30 @@ public:
 	{
 	}
 
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
+	{
+		if (a_BlockFace != BLOCK_FACE_TOP)
+		{
+			// Only allow planting nether wart from the top side of the block
+			return false;
+		}
+
+		a_BlockType = m_BlockType;
+		a_BlockMeta = 0;
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
+	}
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
 		auto & rand = GetRandomProvider();
@@ -46,7 +70,7 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		// Needs to be placed on top of a Soulsand block:
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_SOULSAND));

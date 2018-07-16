@@ -39,12 +39,6 @@ public:
 			return false;
 		}
 
-		// The door needs a compatible block below it:
-		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ), a_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ)))
-		{
-			return false;
-		}
-
 		// Get the block type of the door to place:
 		BLOCKTYPE BlockType;
 		switch (m_ItemType)
@@ -63,6 +57,23 @@ public:
 			}
 		}
 
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::PlayerYawToMetaData(a_Player.GetYaw());
+		NIBBLETYPE UpperBlockMeta = 0x08;
+
+		cBlockHandler * BlockH = BlockHandler(BlockType);
+		bool CheckPlace = a_World.DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return BlockH->CanBeAt(ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, LowerBlockMeta);
+		});
+
+		if (!CheckPlace)
+		{
+			return false;
+		}
+
 		// Check the two blocks that will get replaced by the door:
 		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		BLOCKTYPE UpperBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
@@ -74,7 +85,6 @@ public:
 		}
 
 		// Get the coords of the neighboring blocks:
-		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::PlayerYawToMetaData(a_Player.GetYaw());
 		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();
@@ -84,7 +94,6 @@ public:
 		RightNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
 
 		// Decide whether the hinge is on the left (default) or on the right:
-		NIBBLETYPE UpperBlockMeta = 0x08;
 		BLOCKTYPE LeftNeighborBlock = a_World.GetBlock(LeftNeighborPos);
 		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
 		/*

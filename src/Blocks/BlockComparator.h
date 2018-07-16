@@ -4,7 +4,7 @@
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
 #include "MetaRotator.h"
-
+#include "BlockStairs.h"
 
 
 
@@ -43,9 +43,32 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+
+		BLOCKTYPE BlockIsOnType;
+		NIBBLETYPE BlockIsOnMeta;
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
+
+		// On the top of an upside-down slab
+		if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))
+		{
+			// Check if the slab is turned up side down
+			return (cBlockSlabHandler::IsUpsideDown(BlockIsOnMeta));
+		}
+
+		// On the top of an upside-down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BlockIsOnType))
+		{
+			return (cBlockStairsHandler::IsUpsideDown(BlockIsOnMeta));
+		}
+
+		bool Result = cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
+		return Result;
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -57,7 +80,16 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player.GetYaw());
-		return true;
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+
+		bool Result = a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
+
+		return Result;
 	}
 
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)

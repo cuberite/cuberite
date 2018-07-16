@@ -23,22 +23,36 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		BLOCKTYPE BlockIsOnType;
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		BlockIsOnType = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
-
-		if (CanBePlacedOn(BlockIsOnType, a_BlockFace))
-		{
-			a_BlockType = m_BlockType;
-			a_BlockMeta = DirectionToMetadata(a_BlockFace);
-			return true;
-		}
-		else
+		if (!IsValidDirection(a_BlockFace))
 		{
 			return false;
 		}
 
-		return true;
+		a_BlockType = m_BlockType;
+		a_BlockMeta = DirectionToMetadata(a_BlockFace);
+
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		{
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
+	}
+
+	bool IsValidDirection(eBlockFace a_Direction)
+	{
+		switch (a_Direction)
+		{
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
+				return true;
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	inline static NIBBLETYPE DirectionToMetadata(eBlockFace a_Direction)
@@ -78,40 +92,27 @@ public:
 		a_Pickups.push_back(cItem(E_BLOCK_TRIPWIRE_HOOK, 1, 0));
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
-		eBlockFace Face = MetadataToDirection(Meta);
+
+		eBlockFace Face = MetadataToDirection(a_BlockMeta);
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return ((a_RelY > 0) && CanBePlacedOn(BlockIsOn, Face));
-	}
+		if (a_RelY < 0)
+		{
+			return false;
+		}
 
-	/** check if item can be placed on this type of block
-	@param a_BlockType : block type
-	@param a_BlockFace : created block face
-	@return : able to place or not */
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
-	{
 		// Can be place to side of any full solid opaque block
-		if ((a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
+		if ((Face == BLOCK_FACE_BOTTOM) || (Face == BLOCK_FACE_TOP))
 		{
 			return false;
 		}
 
-		// Can be placed on any full solid opaque block
-		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOn);
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

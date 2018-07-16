@@ -48,23 +48,15 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		BLOCKTYPE BlockIsOnType;
-		NIBBLETYPE BlockIsOnMeta;
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockIsOnType, BlockIsOnMeta);
+		a_BlockType = m_BlockType;
+		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
 
-		if (CanBePlacedOn(BlockIsOnType, BlockIsOnMeta, a_BlockFace))
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
 		{
-			a_BlockType = m_BlockType;
-			a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-
-		return true;
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
 	}
 
 	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
@@ -103,11 +95,9 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-
-		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
+		eBlockFace Face = BlockMetaDataToBlockFace(a_BlockMeta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
@@ -120,7 +110,20 @@ public:
 		NIBBLETYPE BlockIsOnMeta;
 		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOnType, BlockIsOnMeta);
 
-		return CanBePlacedOn(BlockIsOnType, BlockIsOnMeta, Face);
+		// On the top of an upside-down slab
+		if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))
+		{
+			// Check if the slab is turned up side down
+			return ((cBlockSlabHandler::IsUpsideDown(BlockIsOnMeta)) && (Face == BLOCK_FACE_TOP));
+		}
+
+		// On the top of an upside-down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BlockIsOnType))
+		{
+			return ((cBlockStairsHandler::IsUpsideDown(BlockIsOnMeta)) && (Face == BLOCK_FACE_TOP));
+		}
+
+		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
 	}
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
@@ -161,50 +164,6 @@ public:
 	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
 	{
 		return ((a_BlockMeta & 0x8) == 0x8);
-	}
-
-	/** check if item can be placed on this type of block
-	@param a_BlockType : block type
-	@param a_BlockMeta : block meta data
-	@param a_BlockFace : created block face
-	@return : able to place or not */
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
-	{
-		// On the top of an upside-down slab
-		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
-		{
-			// Check if the slab is turned up side down
-			if ((cBlockSlabHandler::IsUpsideDown(a_BlockMeta)) && (a_BlockFace == BLOCK_FACE_TOP))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		// On the top of an upside-down stairs
-		if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
-		{
-			if ((cBlockStairsHandler::IsUpsideDown(a_BlockMeta)) && (a_BlockFace == BLOCK_FACE_TOP))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 } ;
 

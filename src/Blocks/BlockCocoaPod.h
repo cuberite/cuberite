@@ -16,9 +16,9 @@ public:
 	{
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+		eBlockFace BlockFace = MetaToBlockFace(a_BlockMeta);
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockFace, true);
 
 		BLOCKTYPE BlockType;

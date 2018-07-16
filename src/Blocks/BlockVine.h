@@ -22,20 +22,51 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
 		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockType, BlockMeta);
+		a_BlockType = m_BlockType;
 		if (BlockType == m_BlockType)
 		{
 			a_BlockMeta = BlockMeta | DirectionToMetaData(a_BlockFace);
+			return true;
 		}
 		else
 		{
-			a_BlockMeta = DirectionToMetaData(a_BlockFace);
+			if (!IsValidPlaceFace(a_BlockFace))
+			{
+				return false;
+			}
+
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
+			Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+			BLOCKTYPE BlockAttached = a_ChunkInterface.GetBlock(Pos);
+			if (IsBlockAttachable(BlockAttached))
+			{
+				a_BlockMeta = DirectionToMetaData(a_BlockFace);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		a_BlockType = m_BlockType;
-		return true;
+	}
+
+	bool IsValidPlaceFace(eBlockFace a_BlockFace)
+	{
+		switch (a_BlockFace)
+		{
+			case BLOCK_FACE_NORTH:
+			case BLOCK_FACE_SOUTH:
+			case BLOCK_FACE_WEST:
+			case BLOCK_FACE_EAST:
+				return true;
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override

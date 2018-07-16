@@ -71,20 +71,15 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		BLOCKTYPE BlockIsOnType;
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-		BlockIsOnType = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
+		a_BlockType = m_BlockType;
+		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
 
-		if (CanBePlacedOn(BlockIsOnType))
+		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
 		{
-			a_BlockType = m_BlockType;
-			a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
+		});
 	}
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
@@ -124,19 +119,15 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
-
-		eBlockFace buttonFace = BlockMetaDataToBlockFace(Meta);
+		eBlockFace buttonFace = BlockMetaDataToBlockFace(a_BlockMeta);
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, buttonFace, true);
 
 		BLOCKTYPE BlockIsOnType;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOnType);
 
-		// Block check face is same as button face
-		return (a_RelY > 0) && (CanBePlacedOn(BlockIsOnType));
+		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
@@ -149,21 +140,6 @@ public:
 	static bool IsButtonOn(NIBBLETYPE a_BlockMeta)
 	{
 		return ((a_BlockMeta & 0x8) == 0x8);
-	}
-
-	/** check if item can be placed on this type of block
-	@param a_BlockType : block type
-	@return : able to place or not */
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType)
-	{
-		if (cBlockInfo::IsFullSolidOpaqueBlock(a_BlockType))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
 	}
 } ;
 

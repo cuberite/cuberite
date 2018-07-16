@@ -24,16 +24,6 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		int BlockX = (a_Chunk.GetPosX() * cChunkDef::Width) + a_RelX;
-		int BlockZ = (a_Chunk.GetPosZ() * cChunkDef::Width) + a_RelZ;
-		GetBlockCoordsBehindTheSign(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ), BlockX, BlockZ);
-		BLOCKTYPE Type = a_ChunkInterface.GetBlock({BlockX, a_RelY, BlockZ});
-
-		return ((Type == E_BLOCK_WALLSIGN) || (Type == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(Type));
-	}
-
 	static void GetBlockCoordsBehindTheSign(NIBBLETYPE a_BlockMeta, int & a_BlockX, int & a_BlockZ)
 	{
 		switch (a_BlockMeta)
