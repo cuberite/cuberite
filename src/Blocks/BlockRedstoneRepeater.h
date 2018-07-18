@@ -28,13 +28,6 @@ public:
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
 
-		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-		return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
-		{
-			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
-		});
-
 		return true;
 	}
 

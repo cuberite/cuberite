@@ -29,15 +29,8 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		cBlockHandler * BlockH = BlockHandler(E_BLOCK_INACTIVE_COMPARATOR);
-		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		return BlockH->GetPlacementBlockTypeMeta(
-			ChunkInterface, *a_Player,
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-			a_CursorX, a_CursorY, a_CursorZ,
-			a_BlockType, a_BlockMeta
-		);
-
+		a_BlockType = E_BLOCK_INACTIVE_COMPARATOR;
+		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
 } ;

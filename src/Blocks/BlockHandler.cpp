@@ -377,12 +377,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
 	a_BlockType = m_BlockType;
 	a_BlockMeta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage & 0x0f);
-	Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-	return a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
-	{
-		auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-		return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
-	});
+	return true;
 }
 
 

@@ -434,6 +434,22 @@ bool cItemHandler::GetBlocksToPlace(
 	{
 		return false;
 	}
+
+	cBlockHandler * BlockH = BlockHandler(BlockType);
+	cChunkInterface ChunkInterface(a_World.GetChunkMap());
+	Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
+
+	bool ValidCheck = a_World.DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
+		return BlockH->CanBeAt(ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, BlockMeta);
+	});
+
+	if (!ValidCheck)
+	{
+		return false;
+	}
+
 	a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	return true;
 }
