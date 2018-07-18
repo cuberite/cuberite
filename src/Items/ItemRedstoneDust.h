@@ -29,7 +29,7 @@ public:
 	{
 		a_BlockType = E_BLOCK_REDSTONE_WIRE;
 		a_BlockMeta = 0;
-		return true;	
+		return true;
 	}
 } ;
 
