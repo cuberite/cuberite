@@ -183,11 +183,6 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		Direction.y = -1.0f;
 	}
 
-	if (Direction.HasNonZeroLength())
-	{
-		Direction.Normalize();
-	}
-
 	return Direction;
 }
 
