@@ -264,7 +264,7 @@ void cBeaconEntity::GiveEffects(void)
 void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cBeaconEntity &>(a_Src);
+	auto & src = static_cast<const cBeaconEntity &>(a_Src);
 	m_BeaconLevel = src.m_BeaconLevel;
 	m_Contents.CopyFrom(src.m_Contents);
 	m_IsActive = src.m_IsActive;

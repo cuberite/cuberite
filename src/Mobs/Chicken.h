@@ -27,7 +27,7 @@ public:
 		a_Items.Add(E_ITEM_SEEDS);
 	}
 
-	virtual void HandleFalling(void) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 private:
 

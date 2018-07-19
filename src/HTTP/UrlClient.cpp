@@ -54,12 +54,10 @@ public:
 		m_Callbacks->OnError(a_ErrorMessage);
 
 		// Terminate the request's TCP link:
-		auto link = m_Link;
-		if (link != nullptr)
+		if (auto link = m_Link.lock())
 		{
 			link->Close();
 		}
-		m_Self.reset();
 	}
 
 
@@ -76,7 +74,7 @@ public:
 		{
 			return nullptr;
 		}
-		cX509CertPtr cert;
+		cX509CertPtr cert = std::make_shared<cX509Cert>();
 		if (!cert->Parse(itr->second.data(), itr->second.size()))
 		{
 			LOGD("OwnCert failed to parse");
@@ -92,7 +90,7 @@ public:
 		{
 			return nullptr;
 		}
-		cCryptoKeyPtr key;
+		cCryptoKeyPtr key = std::make_shared<cCryptoKey>();
 		auto passItr = m_Options.find("OwnPrivKeyPassword");
 		auto pass = (passItr == m_Options.end()) ? AString() : passItr->second;
 		if (!key->ParsePrivate(itr->second.data(), itr->second.size(), pass))
@@ -126,15 +124,15 @@ protected:
 	/** Extra options to be used for the request. */
 	AStringMap m_Options;
 
-	/** SharedPtr to self, so that this object can keep itself alive for as long as it needs,
+	/** weak_ptr to self, so that this object can keep itself alive as needed by calling lock(),
 	and pass self as callbacks to cNetwork functions. */
-	std::shared_ptr<cUrlClientRequest> m_Self;
+	std::weak_ptr<cUrlClientRequest> m_Self;
 
 	/** The handler that "talks" the protocol specified in m_UrlScheme, handles all the sending and receiving. */
 	std::shared_ptr<cSchemeHandler> m_SchemeHandler;
 
 	/** The link handling the request. */
-	cTCPLinkPtr m_Link;
+	std::weak_ptr<cTCPLink> m_Link;
 
 	/** The number of redirect attempts that will still be followed.
 	If the response specifies a redirect and this is nonzero, the redirect is followed.
@@ -171,7 +169,6 @@ protected:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
 		m_Callbacks->OnError(Printf("Network error %d (%s)", a_ErrorCode, a_ErrorMsg.c_str()));
-		m_Self.reset();
 	}
 
 
@@ -332,8 +329,8 @@ public:
 	// cHTTPResponseParser::cCallbacks overrides:
 	virtual void OnError(const AString & a_ErrorDescription) override
 	{
-		m_ParentRequest.CallErrorCallback(a_ErrorDescription);
 		m_Link = nullptr;
+		m_ParentRequest.CallErrorCallback(a_ErrorDescription);
 	}
 
 
@@ -430,6 +427,8 @@ public:
 		else
 		{
 			m_ParentRequest.GetCallbacks().OnBodyFinished();
+			// Finished recieving data, shutdown the link
+			m_Link->Shutdown();
 		}
 	}
 
@@ -493,15 +492,21 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 		return;
 	}
 
+	// Keep ourself alive while the link drops ownership
+	auto Self = m_Self.lock();
+
 	// Do the actual redirect:
-	m_Link->Close();
+	if (auto Link = m_Link.lock())
+	{
+		Link->Close();
+	}
+
 	m_Url = a_RedirectUrl;
 	m_NumRemainingRedirects = m_NumRemainingRedirects - 1;
-	auto res = DoRequest(m_Self);
+	auto res = DoRequest(Self);
 	if (!res.first)
 	{
 		m_Callbacks->OnError(Printf("Redirection failed: %s", res.second.c_str()));
-		return;
 	}
 }
 
@@ -560,9 +565,6 @@ void cUrlClientRequest::OnRemoteClosed()
 	{
 		handler->OnRemoteClosed();
 	}
-
-	// Let ourselves be deleted
-	m_Self.reset();
 }
 
 
@@ -590,7 +592,8 @@ std::pair<bool, AString> cUrlClientRequest::DoRequest(std::shared_ptr<cUrlClient
 		return std::make_pair(false, Printf("Unknown Url scheme: %s", m_UrlScheme.c_str()));
 	}
 
-	if (!cNetwork::Connect(m_UrlHost, m_UrlPort, m_Self, m_Self))
+	// Connect and transfer ownership to the link
+	if (!cNetwork::Connect(m_UrlHost, m_UrlPort, a_Self, a_Self))
 	{
 		return std::make_pair(false, "Network connection failed");
 	}

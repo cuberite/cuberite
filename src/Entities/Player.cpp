@@ -934,17 +934,14 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
-void cPlayer::ApplyArmorDamage(int DamageBlocked)
+void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 {
-	short ArmorDamage = static_cast<short>(DamageBlocked / 4);
-	if (ArmorDamage == 0)
+	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
+
+	for (int i = 0; i < 4; i++)
 	{
-		ArmorDamage = 1;
+		UseItem(cInventory::invArmorOffset + i, ArmorDamage);
 	}
-	m_Inventory.DamageItem(cInventory::invArmorOffset + 0, ArmorDamage);
-	m_Inventory.DamageItem(cInventory::invArmorOffset + 1, ArmorDamage);
-	m_Inventory.DamageItem(cInventory::invArmorOffset + 2, ArmorDamage);
-	m_Inventory.DamageItem(cInventory::invArmorOffset + 3, ArmorDamage);
 }
 
 
@@ -968,7 +965,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer * Attacker = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
+		cPlayer * Attacker = static_cast<cPlayer *>(a_TDI.Attacker);
 
 		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
 		{
@@ -1060,36 +1057,31 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
-		AString DamageText;
-		switch (a_TDI.DamageType)
-		{
-			case dtRangedAttack: DamageText = "was shot"; break;
-			case dtLightning: DamageText = "was plasmified by lightining"; break;
-			case dtFalling: DamageText = GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard"; break;
-			case dtDrowning: DamageText = "drowned"; break;
-			case dtSuffocating: DamageText = GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block"; break;
-			case dtStarving: DamageText = "forgot the importance of food"; break;
-			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
-			case dtLavaContact: DamageText = "was melted by lava"; break;
-			case dtPoisoning: DamageText = "died from septicaemia"; break;
-			case dtWithering: DamageText = "is a husk of their former selves"; break;
-			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
-			case dtFireContact: DamageText = "burnt themselves to death"; break;
-			case dtInVoid: DamageText = "somehow fell out of the world"; break;
-			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
-			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
-			case dtAdmin: DamageText = "was administrator'd"; break;
-			case dtExplosion: DamageText = "blew up"; break;
-			case dtAttack: DamageText = "was attacked by thin air"; break;
-			#ifndef __clang__
-			default:
+		const AString DamageText = [&]
 			{
-				ASSERT(!"Unknown damage type");
-				DamageText = "died, somehow; we've no idea how though";
-				break;
-			}
-			#endif  // __clang__
-		}
+				switch (a_TDI.DamageType)
+				{
+					case dtRangedAttack:    return "was shot";
+					case dtLightning:       return "was plasmified by lightining";
+					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+					case dtDrowning:        return "drowned";
+					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+					case dtStarving:        return "forgot the importance of food";
+					case dtCactusContact:   return "was impaled on a cactus";
+					case dtLavaContact:     return "was melted by lava";
+					case dtPoisoning:       return "died from septicaemia";
+					case dtWithering:       return "is a husk of their former selves";
+					case dtOnFire:          return "forgot to stop, drop, and roll";
+					case dtFireContact:     return "burnt themselves to death";
+					case dtInVoid:          return "somehow fell out of the world";
+					case dtPotionOfHarming: return "was magicked to death";
+					case dtEnderPearl:      return "misused an ender pearl";
+					case dtAdmin:           return "was administrator'd";
+					case dtExplosion:       return "blew up";
+					case dtAttack:          return "was attacked by thin air";
+				}
+				UNREACHABLE("Unsupported damage type");
+			}();
 		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
@@ -1103,7 +1095,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
-		cPlayer * Killer = reinterpret_cast<cPlayer *>(a_TDI.Attacker);
+		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
 		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
@@ -1144,7 +1136,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 	}
 	else if (a_Victim->IsMob())
 	{
-		if (reinterpret_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(achKillMonster);
 		}
@@ -1612,7 +1604,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		SetPosition(a_PosX, a_PosY, a_PosZ);
+		ResetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
 		m_LastGroundHeight = a_PosY;
 		m_bIsTeleporting = true;
@@ -2001,7 +1993,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		VERIFY(!GetWorld()->RemovePlayer(*this, false));
 
 		// Set position to the new position
-		SetPosition(a_NewPosition);
+		ResetPosition(a_NewPosition);
 		FreezeInternal(a_NewPosition, false);
 
 		// Stop all mobs from targeting this player
@@ -2339,20 +2331,7 @@ void cPlayer::UseEquippedItem(short a_Damage)
 		return;
 	}
 
-	// If the item has an unbreaking enchantment, give it a chance of escaping damage:
-	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
-	cItem Item = GetEquippedItem();
-	int UnbreakingLevel = static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking));
-	double chance = 1 - (1.0 / (UnbreakingLevel + 1));
-	if (GetRandomProvider().RandBool(chance))
-	{
-		return;
-	}
-
-	if (GetInventory().DamageEquippedItem(a_Damage))
-	{
-		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-	}
+	UseItem(cInventory::invHotbarOffset + m_Inventory.GetEquippedSlotNum(), a_Damage);
 }
 
 
@@ -2368,6 +2347,33 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 	short Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
 
 	UseEquippedItem(Dmg);
+}
+
+
+
+
+
+void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
+{
+	const cItem & Item = m_Inventory.GetSlot(a_SlotNumber);
+	if (Item.IsEmpty())
+	{
+		return;
+	}
+
+	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
+	unsigned int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+	double chance = ItemCategory::IsArmor(Item.m_ItemType)
+		? (0.6 + (0.4 / (UnbreakingLevel + 1))) : (1.0 / (UnbreakingLevel + 1));
+
+	// When durability is reduced by multiple points
+	// Unbreaking is applied for each point of reduction.
+	std::binomial_distribution<short> Dist(a_Damage, chance);
+	short ReducedDamage = Dist(GetRandomProvider().Engine());
+	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
+	{
+		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	}
 }
 
 
@@ -2534,7 +2540,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
 			case cEntity::etMonster:
 			{
-				cMonster * Monster = reinterpret_cast<cMonster *>(m_AttachedTo);
+				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
 					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;

@@ -29,7 +29,7 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cMobSpawnerEntity &>(a_Src);
+	auto & src = static_cast<const cMobSpawnerEntity &>(a_Src);
 	m_Entity = src.m_Entity;
 	m_IsActive = src.m_IsActive;
 	m_SpawnDelay = src.m_SpawnDelay;

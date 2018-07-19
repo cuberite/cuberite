@@ -116,7 +116,7 @@ void cDropSpenserEntity::Activate(void)
 void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cDropSpenserEntity &>(a_Src);
+	auto & src = static_cast<const cDropSpenserEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_ShouldDropSpense = src.m_ShouldDropSpense;
 }

@@ -45,10 +45,7 @@ public:
 				return 0x0;
 			}
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
+		UNREACHABLE("Unsupported block face");
 	}
 
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
