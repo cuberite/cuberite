@@ -35,6 +35,7 @@ public:
 	{
 		a_Items.Add(E_ITEM_RAW_FISH);
 	}
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
 	// Get functions
 	bool     IsSitting     (void) const override { return m_IsSitting; }

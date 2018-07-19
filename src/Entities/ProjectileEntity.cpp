@@ -356,10 +356,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
 	}
-	ASSERT(!"Unhandled projectile entity kind!");
-	#ifndef __clang__
-		return "";
-	#endif
+	UNREACHABLE("Unsupported projectile kind");
 }
 
 

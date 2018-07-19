@@ -146,6 +146,9 @@ extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const 
 /** Concatenates the specified strings into a single string, separated by the specified separator. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 
+/** Converts a string into a float. Returns false if the conversion fails. */
+extern bool StringToFloat(const AString & a_String, float & a_Num);
+
 
 
 

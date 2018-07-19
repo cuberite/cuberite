@@ -71,6 +71,9 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
@@ -421,6 +424,10 @@ public:
 	/** Damage the player's equipped item by the amount of damage such an item
 	is damaged by when used for a_Action */
 	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
+
+	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseItem(int a_SlotNumber, short a_Damage = 1);
 
 	void SendHealth(void);
 

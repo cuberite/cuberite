@@ -109,7 +109,7 @@ int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 
-	return mbedtls_pk_parse_public_key(&m_Pk, reinterpret_cast<const unsigned char *>(a_Data), a_NumBytes);
+	return mbedtls_pk_parse_public_key(&m_Pk, static_cast<const unsigned char *>(a_Data), a_NumBytes);
 }
 
 
@@ -122,7 +122,7 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 	ASSERT(!IsValid());  // Cannot parse a second key
 	// mbedTLS requires that PEM-encoded data is passed including the terminating NUL byte,
 	// and DER-encoded data is decoded properly even with an extra trailing NUL byte, so we simply add one to everything:
-	AString keyData(reinterpret_cast<const char *>(a_Data), a_NumBytes);
+	AString keyData(static_cast<const char *>(a_Data), a_NumBytes);
 
 	if (a_Password.empty())
 	{

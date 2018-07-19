@@ -328,11 +328,13 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 			(*itr)->OnPlayerRemoved(a_Player);
 		}  // for itr - m_SlotAreas[]
 
-		m_OpenedBy.remove(&a_Player);
-
-		if ((m_WindowType != wtInventory) && m_OpenedBy.empty())
+		if (m_WindowType != wtInventory)
 		{
-			Destroy();
+			m_OpenedBy.remove(&a_Player);
+			if (m_OpenedBy.empty())
+			{
+				Destroy();
+			}
 		}
 	}
 	if (m_IsDestroyed)
