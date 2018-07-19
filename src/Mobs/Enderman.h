@@ -24,8 +24,8 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	bool IsScreaming(void) const {return m_bIsScreaming; }
-	BLOCKTYPE GetCarriedBlock(void) const {return CarriedBlock; }
-	NIBBLETYPE GetCarriedMeta(void) const {return CarriedMeta; }
+	BLOCKTYPE GetCarriedBlock(void) const {return m_CarriedBlock; }
+	NIBBLETYPE GetCarriedMeta(void) const {return m_CarriedMeta; }
 
 	/** Returns if the current sky light level is sufficient for the enderman to become aggravated */
 	bool CheckLight(void);
@@ -33,7 +33,7 @@ public:
 private:
 
 	bool m_bIsScreaming;
-	BLOCKTYPE CarriedBlock;
-	NIBBLETYPE CarriedMeta;
+	BLOCKTYPE m_CarriedBlock;
+	NIBBLETYPE m_CarriedMeta;
 
 } ;

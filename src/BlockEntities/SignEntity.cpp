@@ -26,7 +26,7 @@ cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Bl
 void cSignEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cSignEntity &>(a_Src);
+	auto & src = static_cast<const cSignEntity &>(a_Src);
 	for (size_t i = 0; i < ARRAYCOUNT(m_Line); ++i)
 	{
 		m_Line[i] = src.m_Line[i];

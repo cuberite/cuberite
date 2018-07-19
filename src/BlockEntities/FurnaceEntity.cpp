@@ -69,7 +69,7 @@ void cFurnaceEntity::Destroy()
 void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cFurnaceEntity &>(a_Src);
+	auto & src = static_cast<const cFurnaceEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_CurrentRecipe = src.m_CurrentRecipe;
 	m_FuelBurnTime = src.m_FuelBurnTime;

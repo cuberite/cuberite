@@ -50,7 +50,7 @@ cChestEntity::~cChestEntity()
 void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cChestEntity &>(a_Src);
+	auto & src = static_cast<const cChestEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 
 	// Reset the neighbor and player count, there's no sense in copying these:
