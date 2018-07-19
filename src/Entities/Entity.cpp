@@ -1048,7 +1048,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		};
 	AdjustSpeed(m_WaterSpeed.x, WaterDir.x);
-	AdjustSpeed(m_WaterSpeed.y, WaterDir.y);
 	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
 	NextSpeed += m_WaterSpeed;

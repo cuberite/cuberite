@@ -175,17 +175,12 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 
 	// Calculate the flow direction
 
-	Direction.x = LevelPoint[0] - LevelPoint[2];
-	Direction.z = LevelPoint[1] - LevelPoint[3];
+	Direction.x = (LevelPoint[0] - LevelPoint[2]) / 2.0f;
+	Direction.z = (LevelPoint[1] - LevelPoint[3]) / 2.0f;
 
 	if ((BlockMeta & 0x08) != 0)  // Test falling bit
 	{
 		Direction.y = -1.0f;
-	}
-
-	if (Direction.HasNonZeroLength())
-	{
-		Direction.Normalize();
 	}
 
 	return Direction;
