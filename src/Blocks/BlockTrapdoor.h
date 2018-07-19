@@ -77,6 +77,7 @@ public:
 					{
 						a_BlockMeta |= 0x8;
 					}
+					break;
 				}
 				default:
 				{

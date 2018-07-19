@@ -37,24 +37,10 @@ public:
 		/** A rail cannot be attached to the side or bottom of any block,
 		but attempting to make such an attachment may cause the rail
 		to attach to the top of a block under the destination space */
-
 		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-		bool CheckResult = a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
-		{
-			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, 0);
-		});
-
-		if (CheckResult)
-		{
-			a_BlockType = m_BlockType;
-			a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		a_BlockType = m_BlockType;
+		a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
+		return true;
 	}
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override

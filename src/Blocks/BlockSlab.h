@@ -98,14 +98,7 @@ public:
 	/** Return if slab is upside down */
 	static bool IsUpsideDown(NIBBLETYPE a_Meta)
 	{
-		if ((a_Meta & 0x8) != 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return ((a_Meta & 0x8) != 0);
 	}
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override

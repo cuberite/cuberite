@@ -141,14 +141,7 @@ public:
 	/** Return if stairs is upside down */
 	static bool IsUpsideDown(NIBBLETYPE a_Meta)
 	{
-		if ((a_Meta & 0x4) != 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return ((a_Meta & 0x4) != 0);
 	}
 
 	/** EXCEPTION a.k.a. why is this removed:
