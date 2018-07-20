@@ -425,6 +425,10 @@ public:
 	is damaged by when used for a_Action */
 	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
 
+	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseItem(int a_SlotNumber, short a_Damage = 1);
+
 	void SendHealth(void);
 
 	void SendExperience(void);
