@@ -334,7 +334,7 @@ public:
 	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
 	/** Returns explosion knock back reduction percent from blast protection level
-	@return : knock back reduce percent */
+	@return knock back reduce percent */
 	virtual float GetEnchantmentBlastKnockbackReduction();
 
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
