@@ -1820,9 +1820,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, ExplosionSizeInt);
 
 				// Exposure reduced by armor
-				EntityExposure = static_cast<float>(EntityExposure * (1.0 - a_Entity.GetEnchantmentBlastKnockbackReduce()));
+				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
 
-				double Impact = (1 - (Length / ExplosionSizeInt / 2)) * EntityExposure;
+				double Impact = (1 - ((Length / ExplosionSizeInt) / 2)) * EntityExposure;
 
 				DistanceFromExplosion.Normalize();
 				DistanceFromExplosion *= Impact;

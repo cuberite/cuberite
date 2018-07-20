@@ -14,7 +14,7 @@
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
-
+#include "../BoundingBox.h"
 
 
 
@@ -691,15 +691,15 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 
 
 
-float cEntity::GetEnchantmentBlastKnockbackReduce()
+float cEntity::GetEnchantmentBlastKnockbackReduction()
 {
-	uint32_t MaxLevel = 0;
+	UInt32 MaxLevel = 0;
 
 	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 
 	for (auto & Item : ArmorItems)
 	{
-		uint32_t Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		UInt32 Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
 		if (Level > MaxLevel)
 		{
 			// Get max blast protection
@@ -708,8 +708,8 @@ float cEntity::GetEnchantmentBlastKnockbackReduce()
 	}
 
 	// Max blast protect level is 4, each level provide 15% knock back reduction
-	MaxLevel = std::min<uint32_t>(MaxLevel, 4);
-	return static_cast<float>(MaxLevel * 0.15);
+	MaxLevel = std::min<UInt32>(MaxLevel, 4);
+	return MaxLevel * 0.15f;
 }
 
 
@@ -2273,98 +2273,32 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 
 
-double cEntity::GetOverlapLengthX(double a_Start, double a_End)
-{
-	double EntityStart = m_Position.x - (m_Width / 2);
-	double EntityEnd = m_Position.x + (m_Width / 2);
-
-	EntityStart = std::max(a_Start, EntityStart);
-	EntityEnd = std::min(a_End, EntityEnd);
-
-	if (EntityStart >= EntityEnd)
-	{
-		return 0;
-	}
-	else
-	{
-		return (EntityEnd - EntityStart);
-	}
-}
-
-
-
-
-
-
-double cEntity::GetOverlapLengthY(double a_Start, double a_End)
-{
-	double EntityStart = m_Position.y - (m_Height / 2);
-	double EntityEnd = m_Position.y + (m_Height / 2);
-
-	EntityStart = std::max(a_Start, EntityStart);
-	EntityEnd = std::min(a_End, EntityEnd);
-
-	if (EntityStart >= EntityEnd)
-	{
-		return 0;
-	}
-	else
-	{
-		return (EntityEnd - EntityStart);
-	}
-}
-
-
-
-
-
-double cEntity::GetOverlapLengthZ(double a_Start, double a_End)
-{
-	double EntityStart = m_Position.z - (m_Width / 2);
-	double EntityEnd = m_Position.z + (m_Width / 2);
-
-	EntityStart = std::max(a_Start, EntityStart);
-	EntityEnd = std::min(a_End, EntityEnd);
-
-	if (EntityStart >= EntityEnd)
-	{
-		return 0;
-	}
-	else
-	{
-		return (EntityEnd - EntityStart);
-	}
-}
-
-
-
-
-
 
 float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
 {
-	double Start, End;
+	double EntitySize = m_Width * m_Width * m_Height;
+	if (EntitySize == 0)
+	{
+		// Handle entity with zero size
+		return 0;
+	}
 
-	// Overlap x axis
-	Start = a_ExplosionPosition.x - a_ExlosionPower;
-	End = a_ExplosionPosition.x + a_ExlosionPower;
+	cBoundingBox EntityBox(GetPosition(), m_Width / 2, m_Height);
+	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
+	cBoundingBox IntersectionBox(EntityBox);
 
-	double OverlapX = GetOverlapLengthX(Start, End);
+	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
+	if (Overlap)
+	{
+		Vector3d Diff = IntersectionBox.GetMax() - IntersectionBox.GetMin();
+		double OverlapSize = Diff.x * Diff.y * Diff.z;
 
-	// Overlap y axis
-	Start = a_ExplosionPosition.y - a_ExlosionPower;
-	End = a_ExplosionPosition.y + a_ExlosionPower;
-
-	double OverlapY = GetOverlapLengthY(Start, End);
-
-	// Overlap z axis
-	Start = a_ExplosionPosition.z - a_ExlosionPower;
-	End = a_ExplosionPosition.z + a_ExlosionPower;
-
-	double OverlapZ = GetOverlapLengthZ(Start, End);
-
-	float Rate = static_cast<float>(OverlapX * OverlapY * OverlapZ / (m_Width * m_Width * m_Height));
-	return Rate;
+		return static_cast<float>(OverlapSize / EntitySize);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 

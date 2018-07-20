@@ -3007,27 +3007,15 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 
 float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
 {
-	if (IsGameModeSpectator())
+	if (
+		IsGameModeSpectator() ||
+		(IsGameModeCreative() && !IsOnGround())
+	)
 	{
-		// No impact from explosion
-		return 0;
+		return 0;  // No impact from explosion
 	}
-	else if (IsGameModeCreative())
-	{
-		if (IsOnGround())
-		{
-			return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
-		}
-		else
-		{
-			// Flying player don't impact from explosion
-			return 0;
-		}
-	}
-	else
-	{
-		return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
-	}
+
+	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
 }
 
 

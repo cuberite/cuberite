@@ -3231,7 +3231,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
 				},
-				GetEnchantmentBlastKnockbackReduce =
+				GetEnchantmentBlastKnockbackReduction =
 				{
 					Returns =
 					{
@@ -3239,7 +3239,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "number",
 						},
 					},
-					Notes = "Returns explosion knock back reduce percent from blast protection level.",
+					Notes = "Returns explosion knock back reduction percent from blast protection level.",
 				},
 				GetEnchantmentCoverAgainst =
 				{
