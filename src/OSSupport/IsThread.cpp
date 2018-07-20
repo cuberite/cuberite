@@ -60,8 +60,7 @@ cIsThread::cIsThread(const AString & a_ThreadName) :
 
 cIsThread::~cIsThread()
 {
-	m_ShouldTerminate = true;
-	Wait();
+	Stop();
 }
 
 
@@ -110,14 +109,9 @@ bool cIsThread::Start(void)
 
 void cIsThread::Stop(void)
 {
-	if (!m_Thread.joinable())
-	{
-		// The thread hasn't been started or has already been joined
-		return;
-	}
-
 	m_ShouldTerminate = true;
 	Wait();
+	m_ShouldTerminate = false;
 }
 
 
