@@ -504,9 +504,9 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cChunk::HasBlockEntityAt(Vector3i a_BlockPos)
 {
-	return (GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr);
+	return (GetBlockEntity(a_BlockPos) != nullptr);
 }
 
 
@@ -1433,48 +1433,32 @@ int cChunk::GetHeight(int a_X, int a_Z)
 
 void cChunk::CreateBlockEntities(void)
 {
-	for (int x = 0; x < Width; x++)
+	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
 	{
-		for (int z = 0; z < Width; z++)
+		const auto * Section = m_ChunkData.GetSection(SectionIdx);
+		if (Section == nullptr)
 		{
-			for (int y = 0; y < Height; y++)
+			continue;
+		}
+
+		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
+		{
+			auto BlockType = Section->m_BlockTypes[BlockIdx];
+			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
-				BLOCKTYPE BlockType = GetBlock(x, y, z);
-				switch (BlockType)
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				auto WorldPos = RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+
+				if (!HasBlockEntityAt(WorldPos))
 				{
-					case E_BLOCK_BEACON:
-					case E_BLOCK_BED:
-					case E_BLOCK_TRAPPED_CHEST:
-					case E_BLOCK_CHEST:
-					case E_BLOCK_COMMAND_BLOCK:
-					case E_BLOCK_DISPENSER:
-					case E_BLOCK_DROPPER:
-					case E_BLOCK_ENDER_CHEST:
-					case E_BLOCK_LIT_FURNACE:
-					case E_BLOCK_FURNACE:
-					case E_BLOCK_HOPPER:
-					case E_BLOCK_SIGN_POST:
-					case E_BLOCK_WALLSIGN:
-					case E_BLOCK_HEAD:
-					case E_BLOCK_NOTE_BLOCK:
-					case E_BLOCK_JUKEBOX:
-					case E_BLOCK_FLOWER_POT:
-					case E_BLOCK_MOB_SPAWNER:
-					case E_BLOCK_BREWING_STAND:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
-						{
-							AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-								BlockType, GetMeta(x, y, z),
-								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
-							));
-						}
-						break;
-					}
-				}  // switch (BlockType)
-			}  // for y
-		}  // for z
-	}  // for x
+					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
+						BlockType, GetMeta(RelPos), WorldPos.x, WorldPos.y, WorldPos.z, m_World
+					));
+				}
+			}
+		}
+	}
 }
 
 
@@ -1483,48 +1467,56 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::WakeUpSimulators(void)
 {
-	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
-	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
-	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
-	int BaseX = m_PosX * cChunkDef::Width;
-	int BaseZ = m_PosZ * cChunkDef::Width;
-	for (int x = 0; x < Width; x++)
+	auto * WaterSimulator = m_World->GetWaterSimulator();
+	auto * LavaSimulator  = m_World->GetLavaSimulator();
+	auto * RedstoneSimulator = m_World->GetRedstoneSimulator();
+
+	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
 	{
-		int BlockX = x + BaseX;
-		for (int z = 0; z < Width; z++)
+		const auto * Section = m_ChunkData.GetSection(SectionIdx);
+		if (Section == nullptr)
 		{
-			int BlockZ = z + BaseZ;
-			for (int y = GetHeight(x, z); y >= 0; y--)
+			continue;
+		}
+
+		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
+		{
+			auto BlockType = Section->m_BlockTypes[BlockIdx];
+
+			// Defer calculation until it's actually needed
+			auto WorldPos = [&]
 			{
-				BLOCKTYPE Block = GetBlock(x, y, z);
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				return RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+			};
 
-				// The redstone sim takes multiple blocks, use the inbuilt checker
-				if (RedstoneSimulator->IsAllowedBlock(Block))
+			// The redstone sim takes multiple blocks, use the inbuilt checker
+			if (RedstoneSimulator->IsAllowedBlock(BlockType))
+			{
+				RedstoneSimulator->AddBlock(WorldPos(), this);
+				continue;
+			}
+
+			switch (BlockType)
+			{
+				case E_BLOCK_WATER:
 				{
-					RedstoneSimulator->AddBlock({BlockX, y, BlockZ}, this);
-					continue;
+					WaterSimulator->AddBlock(WorldPos(), this);
+					break;
 				}
-
-				switch (Block)
+				case E_BLOCK_LAVA:
 				{
-					case E_BLOCK_WATER:
-					{
-						WaterSimulator->AddBlock({BlockX, y, BlockZ}, this);
-						break;
-					}
-					case E_BLOCK_LAVA:
-					{
-						LavaSimulator->AddBlock({BlockX, y, BlockZ}, this);
-						break;
-					}
-					default:
-					{
-						break;
-					}
-				}  // switch (BlockType)
-			}  // for y
-		}  // for z
-	}  // for x
+					LavaSimulator->AddBlock(WorldPos(), this);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}  // switch (BlockType)
+		}
+	}
 }
 
 

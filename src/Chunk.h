@@ -129,7 +129,7 @@ public:
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Returns true if there is a block entity at the coords specified */
-	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool HasBlockEntityAt(Vector3i a_BlockPos);
 
 	/** Sets or resets the internal flag that prevents chunk from being unloaded.
 	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
