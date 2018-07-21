@@ -2277,9 +2277,9 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
 {
 	double EntitySize = m_Width * m_Width * m_Height;
-	if (EntitySize == 0)
+	if (EntitySize <= 0)
 	{
-		// Handle entity with zero size
+		// Handle entity with invalid size
 		return 0;
 	}
 
