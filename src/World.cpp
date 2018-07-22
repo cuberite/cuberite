@@ -2271,12 +2271,32 @@ UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType,
 
 
 
-void cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split)
+UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
+	auto IDs = SpawnSplitExperienceOrbs(a_X, a_Y, a_Z, a_Reward, false);
+	if (IDs.empty())
+	{
+		return cEntity::INVALID_ID;
+	}
+	else
+	{
+		return IDs[0];
+	}
+}
+
+
+
+
+
+
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split)
+{
+	std::vector<UInt32> OrbsID;
+
 	if (a_Reward < 1)
 	{
 		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
-		return;
+		return OrbsID;
 	}
 
 	std::vector<int> Orbs;
@@ -2299,6 +2319,7 @@ void cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward
 
 	SpeedLimit *= 100;
 	auto & Random = GetRandomProvider();
+
 	for (auto Element : Orbs)
 	{
 		float SpeedX = Random.RandInt(-SpeedLimit, SpeedLimit) / 100.0f;
@@ -2307,8 +2328,14 @@ void cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward
 
 		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element, SpeedX, SpeedY, SpeedZ);
 		auto ExpOrbPtr = ExpOrb.get();
-		ExpOrbPtr->Initialize(std::move(ExpOrb), *this);
+		UInt32 Id = ExpOrbPtr->GetUniqueID();
+		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+		{
+			OrbsID.push_back(Id);
+		}
 	}
+
+	return OrbsID;
 }
 
 

@@ -1934,7 +1934,7 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	int Reward = m_Furnace->GetAndResetReward();
 	if (Reward > 0)
 	{
-		a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+		a_Player.GetWorld()->SpawnSplitExperienceOrbs(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
 	}
 
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */

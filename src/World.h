@@ -460,8 +460,13 @@ public:
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material);
 
-	/** Spawns an experience orb at the given location with the given reward, by default split into multiple experience orbs if possible */
-	virtual void SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split = true) override;
+	/** Spawns an experience orb at the given location with the given reward.
+	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+
+	/** Spawns an experience orb at the given location with the given reward, by default split into multiple experience orbs if possible,
+	Returns spawned experience orbs UniqueID */
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split = true);
 
 	// DEPRECATED, use the vector-parametered version instead.
 	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1)

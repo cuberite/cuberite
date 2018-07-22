@@ -61,7 +61,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		FindPlayer = true;
 		Vector3f a_PlayerPos(a_Player.GetPosition());
-		a_PlayerPos.y++;
+		a_PlayerPos.y += 0.8f;
 		Vector3f a_Distance(a_PlayerPos - GetPosition());
 		double Distance(a_Distance.Length());
 
@@ -77,12 +77,12 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		/** Experience orb will "float" or glide toward the player up to a distance of 6 blocks,
-		speeding up as they get nearer to the player, Speed range 6 - 10 m per second, accelerate 4 m per second^2 */
+		speeding up as they get nearer to the player, Speed range 6 - 10 m per second, accelerate 60 m per second^2 */
 		if (MoveToPlayer)  // Already flying to player
 		{
 			Vector3d SpeedDelta(a_Distance);
 			SpeedDelta.Normalize();
-			SpeedDelta *= 2;
+			SpeedDelta *= 3;
 
 			Vector3d CurrentSpeed = GetSpeed();
 
@@ -153,8 +153,8 @@ bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cExpOrb::Splite(int a_Reward, std::vector<int> & a_SplitReward)
 {
-	const static std::array<int, 11> BaseValue = {1, 3, 7, 17, 37, 73, 149, 307, 617, 1237, 2477};
-	int Index = BaseValue.size() - 1;  // Last one
+	const static std::array<int, 11> BaseValue = {{1, 3, 7, 17, 37, 73, 149, 307, 617, 1237, 2477}};
+	size_t Index = BaseValue.size() - 1;  // Last one
 
 	while (a_Reward > 0)
 	{
