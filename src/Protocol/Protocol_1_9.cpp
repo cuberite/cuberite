@@ -992,7 +992,7 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 		}
 	}
 
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 	Pkt.WriteBool(false);
 }
@@ -1023,7 +1023,7 @@ void cProtocol_1_9_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
 }
 
 

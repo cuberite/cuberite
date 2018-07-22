@@ -146,9 +146,6 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
 	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
 	void SetCapabilities();
 
