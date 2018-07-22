@@ -671,7 +671,7 @@ protected:
 
 	/** Set the entities position and last sent position.
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
-	void ResetPosition(Vector3d a_NewPos);
+	virtual void ResetPosition(Vector3d a_NewPos);
 
 private:
 

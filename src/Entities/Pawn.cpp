@@ -486,3 +486,13 @@ cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 	auto itr = m_EntityEffects.find(a_EffectType);
 	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;
 }
+
+
+
+
+
+void cPawn::ResetPosition(Vector3d a_NewPosition)
+{
+	super::ResetPosition(a_NewPosition);
+	m_LastGroundHeight = GetPosY();
+}
