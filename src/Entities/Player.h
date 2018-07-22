@@ -431,6 +431,9 @@ public:
 
 	void SendHealth(void);
 
+	// Send current active hotbar slot
+	void SendHotbarActiveSlot(void);
+
 	void SendExperience(void);
 
 	/** In UI windows, get the item that the player is dragging */

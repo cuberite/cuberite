@@ -417,6 +417,9 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		// Send experience
 		m_Player->SendExperience();
 
+		// Send hotbar active slot
+		m_Player->SendHotbarActiveSlot();
+
 		// Send player list items
 		SendPlayerListAddPlayer(*m_Player);
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
@@ -2629,6 +2632,15 @@ void cClientHandle::SendGameMode(eGameMode a_GameMode)
 void cClientHandle::SendHealth(void)
 {
 	m_Protocol->SendHealth();
+}
+
+
+
+
+
+void cClientHandle::SendHeldItemChange(int a_ItemIndex)
+{
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
 
 
