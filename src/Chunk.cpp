@@ -322,26 +322,15 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
 	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
 
-	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes());
-	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas());
-	if (a_SetChunkData.IsLightValid())
-	{
-		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight());
-		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight());
-		m_IsLightValid = true;
-	}
-	else
-	{
-		m_IsLightValid = false;
-	}
+	m_ChunkData.Assign(std::move(a_SetChunkData.GetChunkData()));
+	m_IsLightValid = a_SetChunkData.IsLightValid();
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (auto & KeyPair : m_BlockEntities)
 	{
 		delete KeyPair.second;
 	}
-	m_BlockEntities.clear();
-	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
+	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG

@@ -8,6 +8,17 @@
 #include "BlockEntities/BlockEntity.h"
 #include "Entities/Entity.h"
 
+namespace
+{
+struct sMemCallbacks:
+	cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
+{
+	virtual void OnStartUsingReserve() override {}
+	virtual void OnEndUsingReserve() override {}
+	virtual void OnOutOfReserve() override {}
+};
+}  // namespace (anonymous)
+
 
 
 
@@ -15,6 +26,8 @@
 cSetChunkData::cSetChunkData(int a_ChunkX, int a_ChunkZ, bool a_ShouldMarkDirty) :
 	m_ChunkX(a_ChunkX),
 	m_ChunkZ(a_ChunkZ),
+	m_Pool(cpp14::make_unique<sMemCallbacks>(), cChunkData::NumSections),
+	m_ChunkData(m_Pool),
 	m_IsLightValid(false),
 	m_IsHeightMapValid(false),
 	m_AreBiomesValid(false),
@@ -38,28 +51,22 @@ cSetChunkData::cSetChunkData(
 	cBlockEntities && a_BlockEntities,
 	bool a_ShouldMarkDirty
 ) :
-	m_ChunkX(a_ChunkX),
-	m_ChunkZ(a_ChunkZ),
-	m_ShouldMarkDirty(a_ShouldMarkDirty)
+	cSetChunkData(a_ChunkX, a_ChunkZ, a_ShouldMarkDirty)
 {
 	// Check the params' validity:
 	ASSERT(a_BlockTypes != nullptr);
 	ASSERT(a_BlockMetas != nullptr);
 
 	// Copy block types and metas:
-	memcpy(m_BlockTypes, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
-	memcpy(m_BlockMetas, a_BlockMetas, sizeof(cChunkDef::BlockNibbles));
+	m_ChunkData.SetBlockTypes(a_BlockTypes);
+	m_ChunkData.SetMetas(a_BlockMetas);
 
 	// Copy lights, if both given:
 	if ((a_BlockLight != nullptr) && (a_SkyLight != nullptr))
 	{
-		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
-		memcpy(m_SkyLight,   a_SkyLight,   sizeof(m_SkyLight));
+		m_ChunkData.SetBlockLight(a_BlockLight);
+		m_ChunkData.SetSkyLight(a_SkyLight);
 		m_IsLightValid = true;
-	}
-	else
-	{
-		m_IsLightValid = false;
 	}
 
 	// Copy the heightmap, if available:
@@ -68,20 +75,12 @@ cSetChunkData::cSetChunkData(
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 		m_IsHeightMapValid = true;
 	}
-	else
-	{
-		m_IsHeightMapValid = false;
-	}
 
 	// Copy biomes, if available:
 	if (a_Biomes != nullptr)
 	{
 		memcpy(m_Biomes, a_Biomes, sizeof(m_Biomes));
 		m_AreBiomesValid = true;
-	}
-	else
-	{
-		m_AreBiomesValid = false;
 	}
 
 	// Move entities and blockentities:
@@ -101,8 +100,7 @@ void cSetChunkData::CalculateHeightMap(void)
 		{
 			for (int y = cChunkDef::Height - 1; y > -1; y--)
 			{
-				int index = cChunkDef::MakeIndexNoCheck(x, y, z);
-				if (m_BlockTypes[index] != E_BLOCK_AIR)
+				if (m_ChunkData.GetBlock({x, y, z}) != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
 					break;
@@ -124,7 +122,7 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 	{
 		cBlockEntity * BlockEntity = itr->second;
 		BLOCKTYPE EntityBlockType = BlockEntity->GetBlockType();
-		BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes, BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ());
+		BLOCKTYPE WorldBlockType = m_ChunkData.GetBlock({BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ()});
 		if (EntityBlockType != WorldBlockType)
 		{
 			// Bad blocktype, remove the block entity:
