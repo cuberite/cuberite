@@ -230,7 +230,7 @@ public:
 
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x * FISH_SPEED_MULT, (FlyDirection.y + 1.0f) * FISH_SPEED_MULT, FlyDirection.z * FISH_SPEED_MULT);
-				a_World->SpawnExperienceOrb(a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), Random.RandInt(1, 6));
+				a_World->SpawnExperienceOrb(a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), Random.RandInt(1, 6), false);
 				a_Player->UseEquippedItem(1);
 				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
 			}

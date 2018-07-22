@@ -18,8 +18,8 @@ public:
 
 	CLASS_PROTODEF(cExpOrb)
 
-	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward);
-	cExpOrb(const Vector3d & a_Pos, int a_Reward);
+	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
+	cExpOrb(const Vector3d & a_Pos, int a_Reward, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
 
 	// Override functions
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -44,9 +44,14 @@ public:
 
 	// tolua_end
 
+	/** Split reward into small values */
+	static void Splite(int a_Reward, std::vector<int> & a_SplitReward);
+
 protected:
 	int m_Reward;
 
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
 	std::chrono::milliseconds m_Timer;
+
+	bool MoveToPlayer;
 } ;  // tolua_export

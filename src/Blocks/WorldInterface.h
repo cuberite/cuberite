@@ -48,9 +48,8 @@ public:
 	Returns the mob's UniqueID if recognized and spawned, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby) = 0;
 
-	/** Spawns an experience orb at the given location with the given reward.
-	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
-	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
+	/** Spawns an experience orb at the given location with the given reward, by default split into multiple experience orbs if possible */
+	virtual void SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split = true) = 0;
 
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;

@@ -712,13 +712,11 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
-
-	if (Closest != nullptr)
+	m_World->DoWithClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 	{
-		EventSeePlayer(Closest, a_Chunk);
-	}
+		EventSeePlayer(&a_Player, a_Chunk);
+		return true;
+	}, false);
 }
 
 

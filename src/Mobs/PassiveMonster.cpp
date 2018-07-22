@@ -123,7 +123,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				Baby->InheritFromParents(this, m_LovePartner);
 			}
 
-			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
+			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6), false);
 
 			m_LovePartner->ResetLoveMode();
 			ResetLoveMode();
@@ -136,16 +136,17 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		GetFollowedItems(FollowedItems);
 		if (FollowedItems.Size() > 0)
 		{
-			cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
-			if (a_Closest_Player != nullptr)
+			m_World->DoWithClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 			{
-				cItem EquippedItem = a_Closest_Player->GetEquippedItem();
+				cItem EquippedItem = a_Player.GetEquippedItem();
 				if (FollowedItems.ContainsType(EquippedItem))
 				{
-					Vector3d PlayerPos = a_Closest_Player->GetPosition();
+					Vector3d PlayerPos = a_Player.GetPosition();
 					MoveToPosition(PlayerPos);
 				}
-			}
+
+				return true;
+			});
 		}
 	}
 

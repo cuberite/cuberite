@@ -278,8 +278,8 @@ public:
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
-	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
+	/** Calls the callback for closest player for given position, return true if player was found and callback called, false if player not found. */
+	bool DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight = true, bool a_IgnoreSpectator = true);
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
@@ -460,9 +460,8 @@ public:
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material);
 
-	/** Spawns an experience orb at the given location with the given reward.
-	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
-	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+	/** Spawns an experience orb at the given location with the given reward, by default split into multiple experience orbs if possible */
+	virtual void SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split = true) override;
 
 	// DEPRECATED, use the vector-parametered version instead.
 	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1)

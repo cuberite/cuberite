@@ -268,10 +268,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (GetTarget() == nullptr)
 	{
-		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
-		if (a_Closest_Player != nullptr)
+		m_World->DoWithClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 		{
-			switch (a_Closest_Player->GetEquippedItem().m_ItemType)
+			switch (a_Player.GetEquippedItem().m_ItemType)
 			{
 				case E_ITEM_BONE:
 				case E_ITEM_RAW_BEEF:
@@ -288,12 +287,12 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 
-					m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
+					m_FinalDestination = a_Player.GetPosition();  // So that we will look at a player holding food
 
 					// Don't move to the player if the wolf is sitting.
 					if (!IsSitting())
 					{
-						MoveToPosition(a_Closest_Player->GetPosition());
+						MoveToPosition(a_Player.GetPosition());
 					}
 
 					break;
@@ -307,7 +306,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					}
 				}
 			}
-		}
+
+			return true;
+		});
 	}
 	else
 	{

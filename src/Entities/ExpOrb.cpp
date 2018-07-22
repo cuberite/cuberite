@@ -5,28 +5,33 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward, float a_SpeedX, float a_SpeedY, float a_SpeedZ)
 	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0)
+	, MoveToPlayer(false)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetGravity(0);
+	SetGravity(-16);
+	SetAirDrag(0.02f);
+	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
 
 
 
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
+cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward, float a_SpeedX, float a_SpeedY, float a_SpeedZ)
 	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetGravity(0);
+	SetGravity(-16);
+	SetAirDrag(0.02f);
+	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -47,33 +52,74 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	DetectCacti();
+	m_TicksAlive++;
 
-	// Check player proximity no more than twice per second
-	if ((m_TicksAlive % 10) == 0)
+	bool FindPlayer = false;
+
+	// Find closest player within 6.5 meter (slightly increase detect range to have same effect in client)
+	m_World->DoWithClosestPlayer(GetPosition(), 6.5, [&](cPlayer & a_Player) -> bool
 	{
-		cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5, false));
-		if ((a_ClosestPlayer != nullptr) && (!a_ClosestPlayer->IsGameModeSpectator()))
+		FindPlayer = true;
+		Vector3f a_PlayerPos(a_Player.GetPosition());
+		a_PlayerPos.y++;
+		Vector3f a_Distance(a_PlayerPos - GetPosition());
+		double Distance(a_Distance.Length());
+
+		if (Distance < 0.7f)
 		{
-			Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
-			a_PlayerPos.y++;
-			Vector3f a_Distance(a_PlayerPos - GetPosition());
-			double Distance(a_Distance.Length());
-			if (Distance < 0.5f)
-			{
-				LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
-				a_ClosestPlayer->DeltaExperience(m_Reward);
+			LOGD("Player %s picked up an ExpOrb. His reward is %i", a_Player.GetName().c_str(), m_Reward);
+			a_Player.DeltaExperience(m_Reward);
 
-				m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
-				Destroy(true);
-				return;
-			}
-			SetSpeedX((a_PlayerPos.x - GetPosition().x) * 2.0);
-			SetSpeedY((a_PlayerPos.y - GetPosition().y) * 2.0);
-			SetSpeedZ((a_PlayerPos.z - GetPosition().z) * 2.0);
+			Destroy(true);
+			return true;
 		}
+
+		/** Experience orb will "float" or glide toward the player up to a distance of 6 blocks,
+		speeding up as they get nearer to the player, Speed range 6 - 10 m per second, accelerate 4 m per second^2 */
+		if (MoveToPlayer)  // Already flying to player
+		{
+			Vector3d SpeedDelta(a_Distance);
+			SpeedDelta.Normalize();
+			SpeedDelta *= 2;
+
+			Vector3d CurrentSpeed = GetSpeed();
+
+			CurrentSpeed += SpeedDelta;
+
+			if (CurrentSpeed.Length() > 10)
+			{
+				CurrentSpeed.Normalize();
+				CurrentSpeed *= 10;
+			}
+
+			SetSpeed(CurrentSpeed);
+		}
+		else
+		{
+			// Start flying to player
+			MoveToPlayer = true;
+			m_Gravity = 0;
+			Vector3d Speed(a_Distance);
+			Speed.Normalize();
+			Speed *= 6;
+
+			SetSpeed(Speed);
+		}
+
+		return true;
+
+	}, false, true);  // Don't check line of sight, ignore spectator mode player
+
+	if (!FindPlayer)
+	{
+		MoveToPlayer = false;
+		m_Gravity = -16;
 	}
+
 	HandlePhysics(a_Dt, a_Chunk);
+	BroadcastMovementUpdate();
 
 	m_Timer += a_Dt;
 	if (m_Timer >= std::chrono::minutes(5))
@@ -81,6 +127,12 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Destroy(true);
 	}
 }
+
+
+
+
+
+
 
 bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
@@ -92,3 +144,28 @@ bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	return super::DoTakeDamage(a_TDI);
 }
+
+
+
+
+
+
+
+void cExpOrb::Splite(int a_Reward, std::vector<int> & a_SplitReward)
+{
+	const static std::array<int, 11> BaseValue = {1, 3, 7, 17, 37, 73, 149, 307, 617, 1237, 2477};
+	int Index = BaseValue.size() - 1;  // Last one
+
+	while (a_Reward > 0)
+	{
+		while (a_Reward < BaseValue[Index])
+		{
+			Index--;
+		}
+
+		a_Reward -= BaseValue[Index];
+		a_SplitReward.push_back(BaseValue[Index]);
+	}
+}
+
+
