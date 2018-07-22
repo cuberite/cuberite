@@ -273,11 +273,9 @@ cUUID cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// This is also consistent with the vanilla offline UUID scheme.
 
-	// First make the username lowercase:
-	AString lcUsername = StrToLower(a_Username);
-
-	return cUUID::GenerateVersion3(lcUsername);
+	return cUUID::GenerateVersion3("OfflinePlayer:" + a_Username);
 }
 
 
@@ -424,6 +422,9 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 
 		// Send experience
 		m_Player->SendExperience();
+
+		// Send hotbar active slot
+		m_Player->SendHotbarActiveSlot();
 
 		// Send player list items
 		SendPlayerListAddPlayer(*m_Player);
@@ -2636,6 +2637,15 @@ void cClientHandle::SendGameMode(eGameMode a_GameMode)
 void cClientHandle::SendHealth(void)
 {
 	m_Protocol->SendHealth();
+}
+
+
+
+
+
+void cClientHandle::SendHeldItemChange(int a_ItemIndex)
+{
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
 
 
