@@ -273,11 +273,9 @@ cUUID cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// This is also consistent with the vanilla offline UUID scheme.
 
-	// First make the username lowercase:
-	AString lcUsername = StrToLower(a_Username);
-
-	return cUUID::GenerateVersion3(lcUsername);
+	return cUUID::GenerateVersion3("OfflinePlayer:" + a_Username);
 }
 
 

@@ -1898,7 +1898,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					Notes = "Writes the area into World at the specified coords, returns true if successful. All present data types are written.",
 				},
 				{
 					Params =
@@ -1952,7 +1952,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					Notes = "Writes the area into World at the specified coords, returns true if successful. All present data types are written.",
 				},
 				{
 					Params =
