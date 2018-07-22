@@ -94,11 +94,23 @@ cSetChunkData::cSetChunkData(
 
 void cSetChunkData::CalculateHeightMap(void)
 {
+	// Find the heighest present section in the chunk
+	size_t MaxSection = 0;
+	for (size_t i = cChunkData::NumSections - 1; i != 0; --i)
+	{
+		if (m_ChunkData.GetSection(i) != nullptr)
+		{
+			MaxSection = i;
+			break;
+		}
+	}
+	const int MaxHeight = static_cast<int>(MaxSection + 1) * cChunkData::SectionHeight - 1;
+
 	for (int x = 0; x < cChunkDef::Width; x++)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (int y = cChunkDef::Height - 1; y > -1; y--)
+			for (int y = MaxHeight; y > -1; y--)
 			{
 				if (m_ChunkData.GetBlock({x, y, z}) != E_BLOCK_AIR)
 				{
