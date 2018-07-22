@@ -120,11 +120,27 @@ public:
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinBlockX, a_MinBlockY, a_MinBlockZ, GetDataTypes());
+	}
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes);
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinCoords.x, a_MinCoords.y, a_MinCoords.z, GetDataTypes());
+	}
 
 	// tolua_begin
 
