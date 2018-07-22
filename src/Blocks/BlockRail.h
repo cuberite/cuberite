@@ -689,6 +689,17 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
+
+	/** Returns true if the specified block type is one of the rail handled by this handler */
+	static bool IsAnyRailType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_ACTIVATOR_RAIL) ||
+			(a_BlockType == E_BLOCK_DETECTOR_RAIL) ||
+			(a_BlockType == E_BLOCK_POWERED_RAIL) ||
+			(a_BlockType == E_BLOCK_RAIL)
+		);
+	}
 } ;
 
 

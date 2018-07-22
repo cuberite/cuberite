@@ -185,6 +185,15 @@ public:
 		UNUSED(a_Meta);
 		return 13;
 	}
+
+	/** Returns true if the specified block type is one of the chest handled by this handler */
+	static bool IsAnyChestType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_CHEST) ||
+			(a_BlockType == E_BLOCK_TRAPPED_CHEST)
+		);
+	}
 } ;
 
 

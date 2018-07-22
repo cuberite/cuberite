@@ -110,6 +110,19 @@ public:
 			}
 		}
 	}
+
+	/** Returns true if the specified block type is one of the fence gate handled by this handler */
+	static bool IsAnyFenceGateType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_ACACIA_FENCE_GATE) ||
+			(a_BlockType == E_BLOCK_BIRCH_FENCE_GATE) ||
+			(a_BlockType == E_BLOCK_DARK_OAK_FENCE_GATE) ||
+			(a_BlockType == E_BLOCK_JUNGLE_FENCE_GATE) ||
+			(a_BlockType == E_BLOCK_OAK_FENCE_GATE) ||
+			(a_BlockType == E_BLOCK_SPRUCE_FENCE_GATE)
+		);
+	}
 } ;
 
 

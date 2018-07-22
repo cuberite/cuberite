@@ -81,6 +81,17 @@ public:
 			}
 		}
 	}
+
+	/** Returns true if the specified block type is one of the pressure plate handled by this handler */
+	static bool IsAnyPressurePlateType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE) ||
+			(a_BlockType == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) ||
+			(a_BlockType == E_BLOCK_STONE_PRESSURE_PLATE) ||
+			(a_BlockType == E_BLOCK_WOODEN_PRESSURE_PLATE)
+		);
+	}
 } ;
 
 

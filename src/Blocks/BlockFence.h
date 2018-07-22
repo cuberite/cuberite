@@ -132,6 +132,19 @@ public:
 		}
 	}
 
+	/** Returns true if the specified block type is one of the fences handled by this handler */
+	static bool IsAnyFenceType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_ACACIA_FENCE) ||
+			(a_BlockType == E_BLOCK_BIRCH_FENCE) ||
+			(a_BlockType == E_BLOCK_DARK_OAK_FENCE) ||
+			(a_BlockType == E_BLOCK_FENCE) ||
+			(a_BlockType == E_BLOCK_JUNGLE_FENCE) ||
+			(a_BlockType == E_BLOCK_NETHER_BRICK_FENCE) ||
+			(a_BlockType == E_BLOCK_SPRUCE_FENCE)
+		);
+	}
 };
 
 

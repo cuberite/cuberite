@@ -3,6 +3,11 @@
 
 #include "BlockHandler.h"
 #include "Chunk.h"
+#include "BlockFence.h"
+#include "BlockFenceGate.h"
+#include "BlockGlass.h"
+#include "BlockPressurePlate.h"
+
 
 
 
@@ -22,6 +27,63 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
+	}
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
+	{
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+
+		switch (Type)
+		{
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_WALLSIGN:
+			case E_BLOCK_NOTE_BLOCK:
+				return true;
+			default:
+			{
+				// any kind of fence
+				if (cBlockFenceHandler::IsAnyFenceType(Type))
+				{
+					return true;
+				}
+
+				// any kind of fence gate
+				if (cBlockFenceGateHandler::IsAnyFenceGateType(Type))
+				{
+					return true;
+				}
+
+				// any kind of glass
+				if (cBlockGlassHandler::IsAnyGlassType(Type))
+				{
+					return true;
+				}
+
+				// any kind of chest
+				if (cBlockChestHandler::IsAnyChestType(Type))
+				{
+					return true;
+				}
+
+				// any kind of slab
+				if (cBlockSlabHandler::IsAnySlabType(Type))
+				{
+					return true;
+				}
+
+				// any kind of pressure plate
+				if (cBlockPressurePlateHandler::IsAnyPressurePlateType(Type))
+				{
+					return true;
+				}
+
+				return cBlockInfo::IsSolid(Type);
+			}
+		}
 	}
 
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)

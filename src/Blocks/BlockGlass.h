@@ -25,6 +25,17 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
+
+	/** Returns true if the specified block type is one of the glass handled by this handler */
+	static bool IsAnyGlassType(BLOCKTYPE a_BlockType)
+	{
+		return (
+			(a_BlockType == E_BLOCK_GLASS) ||
+			(a_BlockType == E_BLOCK_GLASS_PANE) ||
+			(a_BlockType == E_BLOCK_STAINED_GLASS) ||
+			(a_BlockType == E_BLOCK_STAINED_GLASS_PANE)
+		);
+	}
 } ;
 
 
