@@ -270,10 +270,8 @@ cUUID cUUID::GenerateVersion3(const AString & a_Name)
 	// Insert version number
 	UUID.m_UUID[6] = (UUID.m_UUID[6] & 0x0f) | 0x30;
 
-	/* Insert variant number
-		Note that by using 1000 instead of 10xx we are losing 2 bits
-		but this is needed for compatibility with the old string uuid generator */
-	UUID.m_UUID[8] = (UUID.m_UUID[8] & 0x0f) | 0x80;
+	// Insert variant number
+	UUID.m_UUID[8] = (UUID.m_UUID[8] & 0x3f) | 0x80;
 
 	return UUID;
 }
