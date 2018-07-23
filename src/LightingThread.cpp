@@ -140,7 +140,7 @@ void cLightingThread::Stop(void)
 	m_ShouldTerminate = true;
 	m_evtItemAdded.Set();
 
-	Wait();
+	super::Stop();
 }
 
 
