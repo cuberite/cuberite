@@ -14,7 +14,7 @@
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
-
+#include "../BoundingBox.h"
 
 
 
@@ -685,6 +685,33 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 	int CappedEPF = std::min(20, TotalEPF);
 	return static_cast<int>(a_Damage * CappedEPF / 25.0);
 }
+
+
+
+
+
+
+float cEntity::GetEnchantmentBlastKnockbackReduction()
+{
+	UInt32 MaxLevel = 0;
+
+	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+
+	for (auto & Item : ArmorItems)
+	{
+		UInt32 Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		if (Level > MaxLevel)
+		{
+			// Get max blast protection
+			MaxLevel = Level;
+		}
+	}
+
+	// Max blast protect level is 4, each level provide 15% knock back reduction
+	MaxLevel = std::min<UInt32>(MaxLevel, 4);
+	return MaxLevel * 0.15f;
+}
+
 
 
 
@@ -2227,3 +2254,38 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 	m_LeashedMobs.remove(a_Monster);
 }
+
+
+
+
+
+
+float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	double EntitySize = m_Width * m_Width * m_Height;
+	if (EntitySize <= 0)
+	{
+		// Handle entity with invalid size
+		return 0;
+	}
+
+	cBoundingBox EntityBox(GetPosition(), m_Width / 2, m_Height);
+	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
+	cBoundingBox IntersectionBox(EntityBox);
+
+	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
+	if (Overlap)
+	{
+		Vector3d Diff = IntersectionBox.GetMax() - IntersectionBox.GetMin();
+		double OverlapSize = Diff.x * Diff.y * Diff.z;
+
+		return static_cast<float>(OverlapSize / EntitySize);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+

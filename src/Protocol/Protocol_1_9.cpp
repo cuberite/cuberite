@@ -636,6 +636,20 @@ void cProtocol_1_9_0::SendHealth(void)
 
 
 
+void cProtocol_1_9_0::SendHeldItemChange(int a_ItemIndex)
+{
+	ASSERT((a_ItemIndex >= 0) && (a_ItemIndex <= 8));  // Valid check
+
+	cPacketizer Pkt(*this, GetPacketId(sendHeldItemChange));  // Held item change
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteBEInt8(static_cast<Int8>(Player->GetInventory().GetEquippedSlotNum()));
+}
+
+
+
+
+
+
 void cProtocol_1_9_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -978,7 +992,7 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 		}
 	}
 
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 	Pkt.WriteBool(false);
 }
@@ -1009,7 +1023,7 @@ void cProtocol_1_9_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
 }
 
 

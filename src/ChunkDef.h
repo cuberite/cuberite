@@ -207,19 +207,19 @@ public:
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+	inline static Vector3i IndexToCoordinate(size_t index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+				static_cast<int>(index % cChunkDef::Width),                       // X
+				static_cast<int>(index / (cChunkDef::Width * cChunkDef::Width)),  // Y
+				static_cast<int>((index / cChunkDef::Width) % cChunkDef::Width)   // Z
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),  // X
-				index % cChunkDef::Height,                       // Y
-				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+				static_cast<int>(index / (cChunkDef::Height * cChunkDef::Width)),  // X
+				static_cast<int>(index % cChunkDef::Height),                       // Y
+				static_cast<int>((index / cChunkDef::Height) % cChunkDef::Width)   // Z
 			);
 		#endif
 	}

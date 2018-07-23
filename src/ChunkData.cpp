@@ -113,7 +113,7 @@ void cChunkData::Assign(cChunkData && a_Other)
 		return;
 	}
 
-	if (&m_Pool != &a_Other.m_Pool)
+	if (m_Pool != a_Other.m_Pool)
 	{
 		// Cannot transfer the memory, do a copy instead
 		const cChunkData & CopyOther = a_Other;
