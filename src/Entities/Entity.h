@@ -333,6 +333,10 @@ public:
 	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
 	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
+	/** Returns explosion knock back reduction percent from blast protection level
+	@return knock back reduce percent */
+	virtual float GetEnchantmentBlastKnockbackReduction();
+
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
 	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
 
@@ -545,6 +549,12 @@ public:
 	/** Returs whether the entity has any mob leashed to */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
+	/** a lightweight calculation approach to get explosion exposure rate
+	@param a_ExplosionPosition explosion position
+	@param a_ExlosionPower explosion power
+	@return exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
+
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
@@ -714,5 +724,4 @@ private:
 
 	/** List of leashed mobs to this entity */
 	cMonsterList m_LeashedMobs;
-
 } ;  // tolua_export

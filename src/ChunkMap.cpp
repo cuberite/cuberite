@@ -1814,10 +1814,21 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				a_Entity.TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / DistanceFromExplosion.Length()) * 6 * ExplosionSizeInt), 0);
 			}
 
-			// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()
-			DistanceFromExplosion.Normalize();
-			DistanceFromExplosion *= ExplosionSizeInt * ExplosionSizeInt;
-			a_Entity.AddSpeed(DistanceFromExplosion);
+			double Length = DistanceFromExplosion.Length();
+			if (Length <= ExplosionSizeInt)  // Entity is impacted by explosion
+			{
+				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, ExplosionSizeInt);
+
+				// Exposure reduced by armor
+				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
+
+				double Impact = (1 - ((Length / ExplosionSizeInt) / 2)) * EntityExposure;
+
+				DistanceFromExplosion.Normalize();
+				DistanceFromExplosion *= Impact;
+
+				a_Entity.AddSpeed(DistanceFromExplosion);
+			}
 
 			return false;
 		}
