@@ -1430,7 +1430,6 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	}
 
 	// TODO: Implement block hardiness
-	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
@@ -1445,19 +1444,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 				continue;
 			}
 
-			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
-			if (distance_explosion.SqrLength() < 4096.0)
-			{
-				double real_distance = std::max(0.004, distance_explosion.Length());
-				double power = a_ExplosionSize / real_distance;
-				if (power <= 1)
-				{
-					power = 0;
-				}
-				distance_explosion.Normalize();
-				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, distance_explosion);
-			}
+			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
 
