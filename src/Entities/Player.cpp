@@ -3069,3 +3069,31 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
+
+
+
+
+
+
+float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	if (
+		IsGameModeSpectator() ||
+		(IsGameModeCreative() && !IsOnGround())
+	)
+	{
+		return 0;  // No impact from explosion
+	}
+
+	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+}
+
+
+
+
+
+
+
+
+
+
