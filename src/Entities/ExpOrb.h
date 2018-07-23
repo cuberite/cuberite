@@ -18,8 +18,8 @@ public:
 
 	CLASS_PROTODEF(cExpOrb)
 
-	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
-	cExpOrb(const Vector3d & a_Pos, int a_Reward, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
+	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward);
+	cExpOrb(const Vector3d & a_Pos, int a_Reward);
 
 	// Override functions
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

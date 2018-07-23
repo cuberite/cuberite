@@ -2304,17 +2304,18 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 
 	for (auto Element : Orbs)
 	{
-		float SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
-		float SpeedY = Random.RandReal(0.5);
-		float SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
-
-		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element, SpeedX, SpeedY, SpeedZ);
+		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element);
 		auto ExpOrbPtr = ExpOrb.get();
 		UInt32 Id = ExpOrbPtr->GetUniqueID();
 		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
 		{
 			OrbsID.push_back(Id);
 		}
+
+		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
+		double SpeedY = Random.RandReal(0.5);
+		double SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
+		ExpOrbPtr->SetSpeed(SpeedX, SpeedY, SpeedZ);
 	}
 
 	return OrbsID;

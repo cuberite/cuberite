@@ -5,7 +5,7 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward, float a_SpeedX, float a_SpeedY, float a_SpeedZ)
+cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0)
@@ -15,14 +15,13 @@ cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward, float a_Speed
 	SetHealth(5);
 	SetGravity(-16);
 	SetAirDrag(0.02f);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
 
 
 
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward, float a_SpeedX, float a_SpeedY, float a_SpeedZ)
+cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
 	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0)
@@ -31,7 +30,6 @@ cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward, float a_SpeedX, float a_S
 	SetHealth(5);
 	SetGravity(-16);
 	SetAirDrag(0.02f);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
