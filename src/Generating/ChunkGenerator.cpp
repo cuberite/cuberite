@@ -98,7 +98,7 @@ void cChunkGenerator::Stop(void)
 	m_ShouldTerminate = true;
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
-	Wait();
+	super::Stop();
 
 	delete m_Generator;
 	m_Generator = nullptr;
