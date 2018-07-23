@@ -3,11 +3,9 @@
 
 // Declares the cSetChunkData class used for sending loaded / generated chunk data into cWorld
 
-
-
-
-
 #pragma once
+
+#include "ChunkData.h"
 
 
 
@@ -51,17 +49,8 @@ public:
 	int GetChunkX(void) const { return m_ChunkX; }
 	int GetChunkZ(void) const { return m_ChunkZ; }
 
-	/** Returns the internal storage of the block types, read-only. */
-	const cChunkDef::BlockTypes & GetBlockTypes(void) const { return m_BlockTypes; }
-
-	/** Returns the internal storage of the block types, read-only. */
-	const cChunkDef::BlockNibbles & GetBlockMetas(void) const { return m_BlockMetas; }
-
-	/** Returns the internal storage of the block light, read-only. */
-	const cChunkDef::BlockNibbles & GetBlockLight(void) const { return m_BlockLight; }
-
-	/** Returns the internal storage of the block types, read-only. */
-	const cChunkDef::BlockNibbles & GetSkyLight(void) const { return m_SkyLight; }
+	/** Returns the internal storage of block types, metas and lighting. */
+	cChunkData & GetChunkData(void) { return m_ChunkData; }
 
 	/** Returns the internal storage for heightmap, read-only. */
 	const cChunkDef::HeightMap & GetHeightMap(void) const { return m_HeightMap; }
@@ -101,10 +90,8 @@ protected:
 	int m_ChunkX;
 	int m_ChunkZ;
 
-	cChunkDef::BlockTypes m_BlockTypes;
-	cChunkDef::BlockNibbles m_BlockMetas;
-	cChunkDef::BlockNibbles m_BlockLight;
-	cChunkDef::BlockNibbles m_SkyLight;
+	cListAllocationPool<cChunkData::sChunkSection> m_Pool;
+	cChunkData m_ChunkData;
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap m_Biomes;
 	cEntityList m_Entities;
