@@ -3367,7 +3367,7 @@ bool cWorld::DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerList
 		if (
 			a_CheckLineOfSight &&
 			!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, cLineBlockTracer::losAirWater)
-			)
+		)
 		{
 			continue;
 		}
