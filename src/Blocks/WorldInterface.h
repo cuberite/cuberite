@@ -52,9 +52,9 @@ public:
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
 
-	/** Spawns an experience orb at the given location with the given reward, by default split into multiple experience orbs if possible,
+	/** Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible,
 	Returns spawned experience orbs UniqueID */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split = true) = 0;
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
 
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;

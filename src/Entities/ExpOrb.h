@@ -45,7 +45,7 @@ public:
 	// tolua_end
 
 	/** Split reward into small values */
-	static void Splite(int a_Reward, std::vector<int> & a_SplitReward);
+	static void Split(int a_Reward, std::vector<int> & a_SplitReward);
 
 protected:
 	int m_Reward;

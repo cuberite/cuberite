@@ -2273,15 +2273,19 @@ UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType,
 
 UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
-	auto IDs = SpawnSplitExperienceOrbs(a_X, a_Y, a_Z, a_Reward, false);
-	if (IDs.empty())
+	if (a_Reward < 1)
+	{
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return cEntity::INVALID_ID;
+	}
+
+	auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, a_Reward);
+	auto ExpOrbPtr = ExpOrb.get();
+	if (!ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	else
-	{
-		return IDs[0];
-	}
+	return ExpOrbPtr->GetUniqueID();
 }
 
 
@@ -2289,7 +2293,7 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 
 
-std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward, bool a_Split)
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	std::vector<UInt32> OrbsID;
 
@@ -2300,31 +2304,22 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 	}
 
 	std::vector<int> Orbs;
-
-	if (a_Split)
-	{
-		cExpOrb::Splite(a_Reward, Orbs);
-	}
-	else
-	{
-		Orbs.push_back(a_Reward);
-	}
-
+	cExpOrb::Split(a_Reward, Orbs);
+	
 	// Check generate number to decide speed limit (distribute range)
-	int SpeedLimit = (Orbs.size() / 2) + 5;
+	float SpeedLimit = (Orbs.size() / 2) + 5;
 	if (SpeedLimit > 10)
 	{
 		SpeedLimit = 10;
 	}
 
-	SpeedLimit *= 100;
 	auto & Random = GetRandomProvider();
 
 	for (auto Element : Orbs)
 	{
-		float SpeedX = Random.RandInt(-SpeedLimit, SpeedLimit) / 100.0f;
-		float SpeedY = Random.RandInt(50) / 100.0f;
-		float SpeedZ = Random.RandInt(-SpeedLimit, SpeedLimit) / 100.0f;
+		float SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
+		float SpeedY = Random.RandReal(0.5);
+		float SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
 
 		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element, SpeedX, SpeedY, SpeedZ);
 		auto ExpOrbPtr = ExpOrb.get();
@@ -3342,66 +3337,53 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 
 bool cWorld::DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
 {
-	cBoundingBox Box(a_Pos, a_SightLimit * 2);
-	cPlayer * Player = nullptr;
-	double MinimalLength;
 
-	m_ChunkMap->ForEachEntityInBox(Box, [&](cEntity & a_Entity) -> bool
+	double ClosestDistance = a_SightLimit;
+	cPlayer * ClosestPlayer = nullptr;
+
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if (a_Entity.IsPlayer())
+		if (!(*itr)->IsTicking())
 		{
-			Vector3d Distance = a_Entity.GetPosition() - a_Pos;
-			double Length = Distance.Length();
-			bool Match = false;
-			if (Player == nullptr)  // First match
-			{
-				Match = true;
-			}
-			else
-			{
-				if (MinimalLength > Length)
-				{
-					Match = true;
-				}
-			}
-
-			if (Match)
-			{
-				cPlayer * PlayerTemp = static_cast<cPlayer *>(&a_Entity);
-
-				// Spectator check
-				if (a_IgnoreSpectator)
-				{
-					if (PlayerTemp->IsGameModeSpectator())
-					{
-						return false;  // Skip
-					}
-				}
-
-				if (a_CheckLineOfSight)
-				{
-					if (!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, a_Entity.GetPosition(), cLineBlockTracer::losAirWater))
-					{
-						return false;  // Skip
-					}
-				}
-
-				MinimalLength = Length;
-				Player = PlayerTemp;  // Save closest player so far
-			}
+			continue;
 		}
 
-		return false;
-	});
+		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		{
+			continue;
+		}
 
-	if (Player == nullptr)
+		Vector3f Pos = (*itr)->GetPosition();
+		double Distance = (Pos - a_Pos).Length();
+
+		// If the player is too far, skip them:
+		if (Distance > ClosestDistance)
+		{
+			continue;
+		}
+
+		// Check LineOfSight, if requested:
+		if (
+			a_CheckLineOfSight &&
+			!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, cLineBlockTracer::losAirWater)
+			)
+		{
+			continue;
+		}
+
+		ClosestDistance = Distance;
+		ClosestPlayer = *itr;
+	}
+
+	if (ClosestPlayer)
 	{
-		return false;  // Player not found
+		a_Callback(*ClosestPlayer);
+		return true;
 	}
 	else
 	{
-		a_Callback(*Player);
-		return true;
+		return false;
 	}
 }
 
