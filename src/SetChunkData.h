@@ -53,7 +53,7 @@ public:
 	cChunkData & GetChunkData(void) { return m_ChunkData; }
 
 	/** Returns the internal storage for heightmap, read-only. */
-	cChunkDef::HeightMap & GetHeightMap(void) { return m_HeightMap; }
+	const cChunkDef::HeightMap & GetHeightMap(void) const { return m_HeightMap; }
 
 	/** Returns the internal storage for biomes, read-write. */
 	cChunkDef::BiomeMap & GetBiomes(void) { return m_Biomes; }
