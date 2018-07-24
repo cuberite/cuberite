@@ -214,15 +214,6 @@ void cEntity::SetParentChunk(cChunk * a_Chunk)
 
 
 
-cChunk * cEntity::GetParentChunk() const
-{
-	return m_ParentChunk;
-}
-
-
-
-
-
 void cEntity::Destroy(bool a_ShouldBroadcast)
 {
 	SetIsTicking(false);

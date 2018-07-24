@@ -535,7 +535,8 @@ public:
 	void SetParentChunk(cChunk * a_Chunk);
 
 	/** Returns the chunk responsible for ticking this entity. */
-	cChunk * GetParentChunk() const;
+	cChunk * GetParentChunk() { return m_ParentChunk; }
+	const cChunk * GetParentChunk() const { return m_ParentChunk; }
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
