@@ -38,6 +38,7 @@ namespace
 
 
 	/** Calls the function object a_Func for every client loading the chunk at the given chunk coords
+	The callback is called only for clients that are being sent the chunk at that position.
 	\param a_ChunkCoords Coords of the chunk to query for clients
 	\param a_World World that the chunk is in
 	\param a_Exclude Client for which a_Func should not be called
@@ -62,7 +63,8 @@ namespace
 
 
 
-	/** Calls the function object a_Func for every client loading a given block position
+	/** Calls the function object a_Func for every client loading a given block position.
+	The callback is called only for clients that are being sent the chunk that contains the block position.
 	\param a_WorldPos Coordinates of the block to query for clients
 	\param a_World World that the block is in
 	\param a_Exclude Client for which a_Func should not be called
@@ -75,7 +77,8 @@ namespace
 
 
 
-	/** Calls the function object a_Func for every client loading a given entity
+	/** Calls the function object a_Func for every client loading a given entity.
+	The callback is called only for clients that are being sent the chunk which owns the entity.
 	\param a_Entity Entity to query for clients
 	\param a_World World that the block is in
 	\param a_Exclude Client for which a_Func should not be called
