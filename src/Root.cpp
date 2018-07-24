@@ -36,7 +36,6 @@
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 #include "IniFile.h"
-#include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
@@ -755,6 +754,8 @@ void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 
 
 
+
+
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	for (const auto & itr : m_WorldsByName)
@@ -762,6 +763,21 @@ void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClien
 		itr.second->BroadcastPlayerListAddPlayer(a_Player);
 	}  // for itr - m_WorldsByName[]
 }
+
+
+
+
+
+void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	for (const auto & itr : m_WorldsByName)
+	{
+		itr.second->BroadcastPlayerListRemovePlayer(a_Player);
+	}  // for itr - m_WorldsByName[]
+}
+
+
+
 
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
@@ -783,6 +799,8 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 		itr->second->BroadcastChat(a_Message);
 	}  // for itr - m_WorldsByName[]
 }
+
+
 
 
 

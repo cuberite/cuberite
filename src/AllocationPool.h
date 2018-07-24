@@ -32,6 +32,25 @@ public:
 
 	/** Frees the pointer passed in a_ptr, invalidating it */
 	virtual void Free(T * a_ptr) = 0;
+
+	/** Two pools compare equal if memory allocated by one can be freed by the other */
+	bool IsEqual(const cAllocationPool & a_Other) const NOEXCEPT
+	{
+		return ((this == &a_Other) || DoIsEqual(a_Other) || a_Other.DoIsEqual(*this));
+	}
+
+	friend bool operator == (const cAllocationPool & a_Lhs, const cAllocationPool & a_Rhs)
+	{
+		return a_Lhs.IsEqual(a_Rhs);
+	}
+
+	friend bool operator != (const cAllocationPool & a_Lhs, const cAllocationPool & a_Rhs)
+	{
+		return !a_Lhs.IsEqual(a_Rhs);
+	}
+
+private:
+	virtual bool DoIsEqual(const cAllocationPool & a_Other) const NOEXCEPT = 0;
 };
 
 
@@ -40,16 +59,17 @@ public:
 
 /** Allocates memory storing unused elements in a linked list. Keeps at least NumElementsInReserve
 elements in the list unless malloc fails so that the program has a reserve to handle OOM. */
-template <class T, size_t NumElementsInReserve>
+template <class T>
 class cListAllocationPool:
 	public cAllocationPool<T>
 {
 public:
 
-	cListAllocationPool(std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks):
+	cListAllocationPool(std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks, size_t a_NumElementsInReserve):
+		m_NumElementsInReserve(a_NumElementsInReserve),
 		m_Callbacks(std::move(a_Callbacks))
 	{
-		for (size_t i = 0; i < NumElementsInReserve; i++)
+		for (size_t i = 0; i < m_NumElementsInReserve; i++)
 		{
 			void * space = malloc(sizeof(T));
 			if (space == nullptr)
@@ -74,7 +94,7 @@ public:
 
 	virtual T * Allocate() override
 	{
-		if (m_FreeList.size() <= NumElementsInReserve)
+		if (m_FreeList.size() <= m_NumElementsInReserve)
 		{
 			void * space = malloc(sizeof(T));
 			if (space != nullptr)
@@ -93,7 +113,7 @@ public:
 					#pragma pop_macro("new")
 				#endif
 			}
-			else if (m_FreeList.size() == NumElementsInReserve)
+			else if (m_FreeList.size() == m_NumElementsInReserve)
 			{
 				m_Callbacks->OnStartUsingReserve();
 			}
@@ -134,15 +154,22 @@ public:
 		// placement destruct.
 		a_ptr->~T();
 		m_FreeList.push_front(a_ptr);
-		if (m_FreeList.size() == NumElementsInReserve)
+		if (m_FreeList.size() == m_NumElementsInReserve)
 		{
 			m_Callbacks->OnEndUsingReserve();
 		}
 	}
 
 private:
+	/** The minimum number of elements to keep in the free list before malloc fails */
+	size_t m_NumElementsInReserve;
 	std::list<void *> m_FreeList;
 	std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
+
+	virtual bool DoIsEqual(const cAllocationPool<T> & a_Other) const NOEXCEPT override
+	{
+		return (dynamic_cast<const cListAllocationPool<T>*>(&a_Other) != nullptr);
+	}
 };
 
 

@@ -75,8 +75,8 @@ protected:
 cEnderman::cEnderman(void) :
 	super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", 0.5, 2.9),
 	m_bIsScreaming(false),
-	CarriedBlock(E_BLOCK_AIR),
-	CarriedMeta(0)
+	m_CarriedBlock(E_BLOCK_AIR),
+	m_CarriedMeta(0)
 {
 }
 

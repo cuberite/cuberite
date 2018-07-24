@@ -147,6 +147,11 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 			}
 		}
+	}
+
+	// Check water at the top of floater otherwise it floats into the air above the water
+	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, FloorC(GetPosY() + GetHeight()), POSZ_TOINT)))
+	{
 		SetSpeedY(0.7);
 	}
 
