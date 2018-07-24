@@ -4,7 +4,6 @@
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
-#include "Broadcaster.h"
 #include "UI/HorseWindow.h"
 
 
@@ -90,7 +89,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+			m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			m_bIsTame = true;
 		}
 	}
