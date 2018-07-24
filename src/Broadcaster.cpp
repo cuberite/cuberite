@@ -113,7 +113,7 @@ void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte
 
 
 
-void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude)
 {
 	ForClientsLoadingPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -295,7 +295,7 @@ void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude)
 {
 	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -308,7 +308,7 @@ void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<char> a_Re
 
 
 
-void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude)
 {
 	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -321,7 +321,7 @@ void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<char> 
 
 
 
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude)
 {
 	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -346,7 +346,7 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude)
 {
 	ForClientsLoadingEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{

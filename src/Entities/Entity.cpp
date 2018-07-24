@@ -1923,12 +1923,12 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 					// Difference within Byte limitations, use a relative move packet
 					if (m_bDirtyOrientation)
 					{
-						m_World->BroadcastEntityRelMoveLook(*this, Vector3<char>(Diff), a_Exclude);
+						m_World->BroadcastEntityRelMoveLook(*this, Vector3<Int8>(Diff), a_Exclude);
 						m_bDirtyOrientation = false;
 					}
 					else
 					{
-						m_World->BroadcastEntityRelMove(*this, Vector3<char>(Diff), a_Exclude);
+						m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
 					}
 					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
 					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position

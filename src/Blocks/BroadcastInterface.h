@@ -22,7 +22,7 @@ public:
 	// (Please keep these alpha-sorted)
 	virtual void BroadcastAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastBlockBreakAnimation        (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastBlockBreakAnimation        (UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBlockEntity                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastChat                       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom) = 0;
 	virtual void BroadcastChatInfo                   (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
@@ -40,11 +40,11 @@ public:
 	virtual void BroadcastEntityHeadLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastEntityRelMove              (const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, Vector3<char> a_RelMove, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastEntityStatus               (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastEntityRelMove              (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastEntityStatus               (const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) = 0;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) = 0;
