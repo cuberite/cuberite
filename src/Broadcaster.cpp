@@ -16,6 +16,11 @@
 
 namespace
 {
+
+	/** Calls the function object a_Func for every active client in the world
+	\param a_World World the clients are in
+	\param a_Exclude Client for which a_Func should not be called
+	\param a_Func Function to be called with each non-excluded client */
 	template <typename Func>
 	void ForClientsInWorld(cWorld & a_World, const cClientHandle * a_Exclude, Func a_Func)
 	{
@@ -32,7 +37,11 @@ namespace
 	}
 
 
-
+	/** Calls the function object a_Func for every client loading the chunk at the given chunk coords
+	\param a_ChunkCoords Coords of the chunk to query for clients
+	\param a_World World that the chunk is in
+	\param a_Exclude Client for which a_Func should not be called
+	\param a_Func Function to be called with each non-excluded client */
 	template <typename Func>
 	void ForClientsLoadingChunk(const cChunkCoords a_ChunkCoords, cWorld & a_World, const cClientHandle * a_Exclude, Func a_Func)
 	{
@@ -53,6 +62,11 @@ namespace
 
 
 
+	/** Calls the function object a_Func for every client loading a given block position
+	\param a_WorldPos Coordinates of the block to query for clients
+	\param a_World World that the block is in
+	\param a_Exclude Client for which a_Func should not be called
+	\param a_Func Function to be called with each non-excluded client */
 	template <typename Func>
 	void ForClientsLoadingPos(const Vector3i a_WorldPos, cWorld & a_World, const cClientHandle * a_Exclude, Func a_Func)
 	{
@@ -61,6 +75,11 @@ namespace
 
 
 
+	/** Calls the function object a_Func for every client loading a given entity
+	\param a_Entity Entity to query for clients
+	\param a_World World that the block is in
+	\param a_Exclude Client for which a_Func should not be called
+	\param a_Func Function to be called with each non-excluded client */
 	template <typename Func>
 	void ForClientsLoadingEntity(const cEntity & a_Entity, cWorld & a_World, const cClientHandle * a_Exclude, Func a_Func)
 	{
