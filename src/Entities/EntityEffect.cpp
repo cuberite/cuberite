@@ -217,11 +217,7 @@ std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(cEntityEffect::
 		case cEntityEffect::effWeakness:       return cpp14::make_unique<cEntityEffectWeakness      >(a_Duration, a_Intensity, a_DistanceModifier);
 		case cEntityEffect::effWither:         return cpp14::make_unique<cEntityEffectWither        >(a_Duration, a_Intensity, a_DistanceModifier);
 	}
-
-	ASSERT(!"Unhandled entity effect type!");
-	#ifndef __clang__
-		return {};
-	#endif
+	UNREACHABLE("Unsupported entity effect");
 }
 
 
@@ -245,12 +241,12 @@ void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = reinterpret_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = reinterpret_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.2 * m_Intensity);
@@ -265,12 +261,12 @@ void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = reinterpret_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster*>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = reinterpret_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.2 * m_Intensity);
@@ -332,7 +328,7 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 	// Base amount = 6, doubles for every increase in intensity
 	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
 
-	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
+	if (a_Target.IsMob() && static_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 		return;
@@ -352,7 +348,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 	// Base amount = 6, doubles for every increase in intensity
 	int amount = static_cast<int>(6 * (1 << m_Intensity) * m_DistanceModifier);
 
-	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
+	if (a_Target.IsMob() && static_cast<cMonster &>(a_Target).IsUndead())
 	{
 		a_Target.Heal(amount);
 		return;
@@ -371,7 +367,7 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
 
-	if (a_Target.IsMob() && reinterpret_cast<cMonster &>(a_Target).IsUndead())
+	if (a_Target.IsMob() && static_cast<cMonster &>(a_Target).IsUndead())
 	{
 		return;
 	}
@@ -400,7 +396,7 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 
 	if (a_Target.IsPlayer())
 	{
-		cPlayer & Target = reinterpret_cast<cPlayer &>(a_Target);
+		cPlayer & Target = static_cast<cPlayer &>(a_Target);
 		Target.AddFoodExhaustion(0.025 * (static_cast<double>(GetIntensity()) + 1.0));  // 0.5 per second = 0.025 per tick
 	}
 }
@@ -452,7 +448,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 
 	if (a_Target.IsMob())
 	{
-		cMonster & Target = reinterpret_cast<cMonster &>(a_Target);
+		cMonster & Target = static_cast<cMonster &>(a_Target);
 
 		// Doesn't effect undead mobs, spiders
 		if (
@@ -509,7 +505,7 @@ void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 {
 	if (a_Target.IsPlayer())
 	{
-		cPlayer & Target = reinterpret_cast<cPlayer &>(a_Target);
+		cPlayer & Target = static_cast<cPlayer &>(a_Target);
 		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }

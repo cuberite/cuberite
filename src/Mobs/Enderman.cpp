@@ -75,8 +75,8 @@ protected:
 cEnderman::cEnderman(void) :
 	super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", 0.5, 2.9),
 	m_bIsScreaming(false),
-	CarriedBlock(E_BLOCK_AIR),
-	CarriedMeta(0)
+	m_CarriedBlock(E_BLOCK_AIR),
+	m_CarriedMeta(0)
 {
 }
 
@@ -193,10 +193,10 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	// Take damage when touching water, drowning damage seems to be most appropriate
+	// Take damage when wet, drowning damage seems to be most appropriate
 	if (
 		cChunkDef::IsValidHeight(POSY_TOINT) &&
-		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsSwimming())
+		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
 	)
 	{
 		EventLosePlayer();

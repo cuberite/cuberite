@@ -509,11 +509,7 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 			return Random.RandInt(m_MinThunderStormTicks, m_MaxThunderStormTicks);
 		}
 	}
-
-	#ifndef __clang__
-		ASSERT(!"Unknown weather");
-		return -1;
-	#endif
+	UNREACHABLE("Unsupported weather");
 }
 
 
@@ -699,7 +695,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	{
 		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
 
-		LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+		LOGINFO("World \"%s\": Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 		return;
 	}
 
@@ -733,14 +729,14 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				LOGINFO("Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+				LOGINFO("World \"%s\":Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 				return;
 			}
 		}
 	}
 
 	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	LOGWARNING("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+	LOGWARNING("World \"%s\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
 }
 
 
@@ -868,19 +864,17 @@ eWeather cWorld::ChooseNewWeather()
 	switch (m_Weather)
 	{
 		case eWeather_Sunny:
-		case eWeather_ThunderStorm: return eWeather_Rain;
-
+		case eWeather_ThunderStorm:
+		{
+			return eWeather_Rain;
+		}
 		case eWeather_Rain:
 		{
 			// 1 / 8 chance of turning into a thunderstorm
 			return GetRandomProvider().RandBool(0.125) ? eWeather_ThunderStorm : eWeather_Sunny;
 		}
 	}
-
-	#ifndef __clang__
-		ASSERT(!"Unknown weather");
-		return eWeather_Sunny;
-	#endif
+	UNREACHABLE("Unsupported weather");
 }
 
 
@@ -1222,7 +1216,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 				else
 				{
 					auto & Wolf = static_cast<cWolf &>(Monster);
-					if (Wolf.IsAngry())
+					if (!Wolf.IsAngry() && !Wolf.IsTame())
 					{
 						Monster.Destroy(true);
 					}
@@ -1453,7 +1447,6 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	}
 
 	// TODO: Implement block hardiness
-	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
@@ -1468,19 +1461,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 				continue;
 			}
 
-			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
-			if (distance_explosion.SqrLength() < 4096.0)
-			{
-				double real_distance = std::max(0.004, distance_explosion.Length());
-				double power = a_ExplosionSize / real_distance;
-				if (power <= 1)
-				{
-					power = 0;
-				}
-				distance_explosion.Normalize();
-				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, distance_explosion);
-			}
+			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
 

@@ -156,7 +156,7 @@ bool cPawn::IsInvisible() const
 
 void cPawn::HandleAir(void)
 {
-	if (IsSubmerged() && HasEntityEffect(cEntityEffect::effWaterBreathing))
+	if (IsHeadInWater() && HasEntityEffect(cEntityEffect::effWaterBreathing))
 	{
 		// Prevent the oxygen from decreasing
 		return;
@@ -489,3 +489,10 @@ cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 
 
 
+
+
+void cPawn::ResetPosition(Vector3d a_NewPosition)
+{
+	super::ResetPosition(a_NewPosition);
+	m_LastGroundHeight = GetPosY();
+}

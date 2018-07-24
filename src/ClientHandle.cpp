@@ -127,20 +127,13 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			if (!m_Username.empty())
-			{
-				// Send the Offline PlayerList packet:
-				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
-			}
 			m_Player->DestroyNoScheduling(true);
 		}
+		// Send the Offline PlayerList packet:
+		cRoot::Get()->BroadcastPlayerListsRemovePlayer(*m_Player);
+
 		m_PlayerPtr.reset();
 		m_Player = nullptr;
-	}
-
-	if (!m_HasSentDC)
-	{
-		SendDisconnect("Server shut down? Kthnxbai");
 	}
 
 	m_Protocol.reset();
@@ -280,11 +273,9 @@ cUUID cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// This is also consistent with the vanilla offline UUID scheme.
 
-	// First make the username lowercase:
-	AString lcUsername = StrToLower(a_Username);
-
-	return cUUID::GenerateVersion3(lcUsername);
+	return cUUID::GenerateVersion3("OfflinePlayer:" + a_Username);
 }
 
 
@@ -382,16 +373,22 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		InvalidateCachedSentChunk();
 		m_Self.reset();
 
-		World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-			m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
-		}
 
-		if (m_Player->GetGameMode() == eGameMode_NotSet)
+		// New player use default world
+		// Player who can load from disk, use loaded world
+		if (m_Player->GetWorld() == nullptr)
 		{
-			m_Player->LoginSetGameMode(World->GetGameMode());
+			World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
+			if (World == nullptr)
+			{
+				World = cRoot::Get()->GetDefaultWorld();
+				m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
+			}
+			m_Player->SetWorld(World);
+		}
+		else
+		{
+			World = m_Player->GetWorld();
 		}
 
 		m_Player->SetIP (m_IPString);
@@ -426,12 +423,14 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		// Send experience
 		m_Player->SendExperience();
 
+		// Send hotbar active slot
+		m_Player->SendHotbarActiveSlot();
+
 		// Send player list items
 		SendPlayerListAddPlayer(*m_Player);
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
-		m_Player->SetWorld(World);
 		m_State = csAuthenticated;
 	}
 
@@ -789,7 +788,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		return;
 	}
 
-	cEnchantingWindow * Window = reinterpret_cast<cEnchantingWindow *>(m_Player->GetWindow());
+	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
 	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
@@ -966,7 +965,7 @@ void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEf
 	{
 		return;
 	}
-	cBeaconWindow * BeaconWindow = reinterpret_cast<cBeaconWindow *>(Window);
+	cBeaconWindow * BeaconWindow = static_cast<cBeaconWindow *>(Window);
 
 	if (Window->GetSlot(*m_Player, 0)->IsEmpty())
 	{
@@ -1051,7 +1050,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 
 	if (a_ItemName.length() <= 30)
 	{
-		reinterpret_cast<cAnvilWindow *>(m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
+		static_cast<cAnvilWindow *>(m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
 	}
 }
 
@@ -1195,7 +1194,14 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_SWAP_ITEM_IN_HAND:
 		{
-			// TODO: Not yet implemented
+
+			cItem EquippedItem = m_Player->GetEquippedItem();
+			cItem OffhandItem = m_Player->GetOffHandEquipedItem();
+
+			cInventory & Intentory = m_Player->GetInventory();
+			Intentory.SetShieldSlot(EquippedItem);
+			Intentory.SetHotbarSlot(Intentory.GetEquippedSlotNum(), OffhandItem);
+
 			return;
 		}
 
@@ -1431,7 +1437,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	bool Success = false;
-	if (IsWithinReach && !m_Player->IsFrozen())
+	if (
+		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
+		IsWithinReach && !m_Player->IsFrozen()
+	)
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
@@ -1470,11 +1479,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 				return;
 			}
-			if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-			{
-				// place a block
-				Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-			}
+			// place a block
+			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 		}
 		else
 		{
@@ -1751,6 +1757,11 @@ void cClientHandle::HandleUseItem(eHand a_Hand)
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_Hand, ItemToFullString(HeldItem).c_str());
+
+	if (PlgMgr->CallHookPlayerRightClick(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
+	{
+		return;  // Plugin denied click action
+	}
 
 	// Use item in main / off hand
 	// TODO: do we need to sync the current inventory with client if it fails?
@@ -2045,13 +2056,6 @@ void cClientHandle::Tick(float a_Dt)
 
 	ProcessProtocolInOut();
 
-	m_TicksSinceLastPacket += 1;
-	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
-	{
-		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-		return;
-	}
-
 	// If player has been kicked, terminate the connection:
 	if (m_State == csKicked)
 	{
@@ -2065,6 +2069,13 @@ void cClientHandle::Tick(float a_Dt)
 			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 		);
 		Destroy();
+		return;
+	}
+
+	m_TicksSinceLastPacket += 1;
+	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
+	{
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		return;
 	}
 
@@ -2626,6 +2637,15 @@ void cClientHandle::SendGameMode(eGameMode a_GameMode)
 void cClientHandle::SendHealth(void)
 {
 	m_Protocol->SendHealth();
+}
+
+
+
+
+
+void cClientHandle::SendHeldItemChange(int a_ItemIndex)
+{
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
 
 

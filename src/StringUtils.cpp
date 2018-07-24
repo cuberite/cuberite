@@ -638,7 +638,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		size_t k = std::min(a_Size - i, a_BytesPerLine);
 		for (size_t j = 0; j < k; j++)
 		{
-			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
+			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
 			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
 			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
@@ -1051,3 +1051,15 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 	}
 	return res;
 }
+
+bool StringToFloat(const AString & a_String, float & a_Num)
+{
+	char *err;
+	a_Num = strtof(a_String.c_str(), &err);
+	if (*err != 0)
+	{
+		return false;
+	}
+	return true;
+}
+

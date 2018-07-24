@@ -274,6 +274,7 @@ int cStructGenTrees::GetNumTrees(
 				return 0;
 			}
 		}
+		UNREACHABLE("Unsupported biome");
 	};
 
 	int NumTrees = 0;

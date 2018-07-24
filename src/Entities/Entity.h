@@ -333,6 +333,10 @@ public:
 	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
 	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
+	/** Returns explosion knock back reduction percent from blast protection level
+	@return knock back reduce percent */
+	virtual float GetEnchantmentBlastKnockbackReduction();
+
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
 	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
 
@@ -350,6 +354,9 @@ public:
 
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
+
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const { return cItem(); }
 
 	/** Applies damage to the armor after the armor blocked the given amount */
 	virtual void ApplyArmorDamage(int DamageBlocked);
@@ -481,11 +488,17 @@ public:
 	virtual bool IsRclking  (void) const {return false; }
 	virtual bool IsInvisible(void) const { return false; }
 
-	/** Returns whether the player is swimming or not */
-	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+	/** Returns true if any part of the entity is in a fire block */
+	virtual bool IsInFire(void) const { return m_IsInFire; }
 
-	/** Return whether the player is under water or not */
-	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+	/** Returns true if any part of the entity is in a lava block */
+	virtual bool IsInLava(void) const { return m_IsInLava; }
+
+	/** Returns true if any part of the entity is in a water block */
+	virtual bool IsInWater(void) const { return m_IsInWater; }
+
+	/** Returns true if any part of the entity is in a water block */
+	virtual bool IsHeadInWater(void) const { return m_IsHeadInWater; }
 
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
@@ -535,6 +548,12 @@ public:
 
 	/** Returs whether the entity has any mob leashed to */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
+
+	/** a lightweight calculation approach to get explosion exposure rate
+	@param a_ExplosionPosition explosion position
+	@param a_ExlosionPower explosion power
+	@return exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
 protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
@@ -619,8 +638,17 @@ protected:
 	/** Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void. */
 	int m_TicksSinceLastVoidDamage;
 
-	/** If an entity is currently swimming in or submerged under water */
-	bool m_IsSwimming, m_IsSubmerged;
+	/** If any part of the entity is in a fire block */
+	bool m_IsInFire;
+
+	/** If any part of the entity is in a lava block */
+	bool m_IsInLava;
+
+	/** If any part of the entity is in a water block */
+	bool m_IsInWater;
+
+	/** If the entity's head is in a water block */
+	bool m_IsHeadInWater;
 
 	/** Air level of a mobile */
 	int m_AirLevel;
@@ -647,8 +675,13 @@ protected:
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);
 
-	/** Called once per tick to set IsSwimming and IsSubmerged */
+	/** Called once per tick to set m_IsInFire, m_IsInLava, m_IsInWater and
+	m_IsHeadInWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
+
+	/** Set the entities position and last sent position.
+	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
+	virtual void ResetPosition(Vector3d a_NewPos);
 
 private:
 
@@ -691,9 +724,4 @@ private:
 
 	/** List of leashed mobs to this entity */
 	cMonsterList m_LeashedMobs;
-
 } ;  // tolua_export
-
-
-
-

@@ -67,8 +67,6 @@ public:
 
 	};
 
-	bool Start();
-
 	void Stop(void);
 
 	/** Queues a chunk to be sent to a specific client */

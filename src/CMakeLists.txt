@@ -117,6 +117,7 @@ SET (HDRS
 	Inventory.h
 	Item.h
 	ItemGrid.h
+	LazyArray.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h

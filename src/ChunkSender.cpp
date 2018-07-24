@@ -79,21 +79,11 @@ cChunkSender::~cChunkSender()
 
 
 
-bool cChunkSender::Start()
-{
-	m_ShouldTerminate = false;
-	return super::Start();
-}
-
-
-
-
-
 void cChunkSender::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_evtQueue.Set();
-	Wait();
+	super::Stop();
 }
 
 

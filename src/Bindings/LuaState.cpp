@@ -305,7 +305,7 @@ void cLuaState::cTrackedRef::Invalidate(void)
 	if (!m_Ref.IsValid())
 	{
 		LOGD("%s: Inconsistent callback at %p, has a CS but an invalid Ref. This should not happen",
-			__FUNCTION__, reinterpret_cast<void *>(this)
+			__FUNCTION__, static_cast<void *>(this)
 		);
 		return;
 	}
@@ -994,6 +994,7 @@ void cLuaState::Push(cEntity * a_Entity)
 						return "cEntity";
 					}
 				}  // switch (EntityType)
+				UNREACHABLE("Unsupported entity type");
 			}();
 		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
 	}
@@ -2390,7 +2391,7 @@ void cLuaState::TrackRef(cTrackedRef & a_Ref)
 	auto canonState = QueryCanonLuaState();
 	if (canonState == nullptr)
 	{
-		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, static_cast<void *>(m_LuaState));
 		return;
 	}
 
@@ -2409,7 +2410,7 @@ void cLuaState::UntrackRef(cTrackedRef & a_Ref)
 	auto canonState = QueryCanonLuaState();
 	if (canonState == nullptr)
 	{
-		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, static_cast<void *>(m_LuaState));
 		return;
 	}
 

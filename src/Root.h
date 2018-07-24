@@ -154,8 +154,11 @@ public:
 	/** Send playerlist of all worlds to player */
 	void SendPlayerLists(cPlayer * a_DestPlayer);
 
-	/** Broadcast Player through all worlds */
+	/** Broadcast playerlist addition through all worlds */
 	void BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
+
+	/** Broadcast playerlist removal through all worlds */
+	void BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 
 	// tolua_begin
 

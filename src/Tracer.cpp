@@ -75,78 +75,78 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	ASSERT(a_Direction.HasNonZeroLength());
 
 	// calculate the direction of the ray (linear algebra)
-	dir = a_Direction;
+	m_Dir = a_Direction;
 
 	// decide which direction to start walking in
-	step.x = SigNum(dir.x);
-	step.y = SigNum(dir.y);
-	step.z = SigNum(dir.z);
+	m_Step.x = SigNum(m_Dir.x);
+	m_Step.y = SigNum(m_Dir.y);
+	m_Step.z = SigNum(m_Dir.z);
 
 
 	// normalize the direction vector
-	dir.Normalize();
+	m_Dir.Normalize();
 
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
 	// same but y-direction
-	if (dir.x != 0.f)
+	if (m_Dir.x != 0.f)
 	{
-		tDelta.x = 1 / std::abs(dir.x);
+		m_tDelta.x = 1 / std::abs(m_Dir.x);
 	}
 	else
 	{
-		tDelta.x = 0;
+		m_tDelta.x = 0;
 	}
-	if (dir.y != 0.f)
+	if (m_Dir.y != 0.f)
 	{
-		tDelta.y = 1 / std::abs(dir.y);
-	}
-	else
-	{
-		tDelta.y = 0;
-	}
-	if (dir.z != 0.f)
-	{
-		tDelta.z = 1 / std::abs(dir.z);
+		m_tDelta.y = 1 / std::abs(m_Dir.y);
 	}
 	else
 	{
-		tDelta.z = 0;
+		m_tDelta.y = 0;
+	}
+	if (m_Dir.z != 0.f)
+	{
+		m_tDelta.z = 1 / std::abs(m_Dir.z);
+	}
+	else
+	{
+		m_tDelta.z = 0;
 	}
 
 
 	// start voxel coordinates
-	pos.x = static_cast<int>(floorf(a_Start.x));
-	pos.y = static_cast<int>(floorf(a_Start.y));
-	pos.z = static_cast<int>(floorf(a_Start.z));
+	m_Pos.x = static_cast<int>(floorf(a_Start.x));
+	m_Pos.y = static_cast<int>(floorf(a_Start.y));
+	m_Pos.z = static_cast<int>(floorf(a_Start.z));
 
 	// calculate distance to first intersection in the voxel we start from
-	if (dir.x < 0)
+	if (m_Dir.x < 0)
 	{
-		tMax.x = (static_cast<float>(pos.x) - a_Start.x) / dir.x;
+		m_tMax.x = (static_cast<float>(m_Pos.x) - a_Start.x) / m_Dir.x;
 	}
 	else
 	{
-		tMax.x = (static_cast<float>(pos.x + 1) - a_Start.x) / dir.x;  // TODO: Possible division by zero
+		m_tMax.x = (static_cast<float>(m_Pos.x + 1) - a_Start.x) / m_Dir.x;  // TODO: Possible division by zero
 	}
 
-	if (dir.y < 0)
+	if (m_Dir.y < 0)
 	{
-		tMax.y = (static_cast<float>(pos.y) - a_Start.y) / dir.y;
+		m_tMax.y = (static_cast<float>(m_Pos.y) - a_Start.y) / m_Dir.y;
 	}
 	else
 	{
-		tMax.y = (static_cast<float>(pos.y + 1) - a_Start.y) / dir.y;  // TODO: Possible division by zero
+		m_tMax.y = (static_cast<float>(m_Pos.y + 1) - a_Start.y) / m_Dir.y;  // TODO: Possible division by zero
 	}
 
-	if (dir.z < 0)
+	if (m_Dir.z < 0)
 	{
-		tMax.z = (static_cast<float>(pos.z) - a_Start.z) / dir.z;
+		m_tMax.z = (static_cast<float>(m_Pos.z) - a_Start.z) / m_Dir.z;
 	}
 	else
 	{
-		tMax.z = (static_cast<float>(pos.z + 1) - a_Start.z) / dir.z;  // TODO: Possible division by zero
+		m_tMax.z = (static_cast<float>(m_Pos.z + 1) - a_Start.z) / m_Dir.z;  // TODO: Possible division by zero
 	}
 }
 
@@ -169,21 +169,21 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 
 	SetValues(a_Start, a_Direction);
 
-	Vector3f End = a_Start + (dir * static_cast<float>(a_Distance));
+	Vector3f End = a_Start + (m_Dir * static_cast<float>(a_Distance));
 
 	if (End.y < 0)
 	{
-		float dist = -a_Start.y / dir.y;  // No division by 0 possible
-		End = a_Start + (dir * dist);
+		float dist = -a_Start.y / m_Dir.y;  // No division by 0 possible
+		End = a_Start + (m_Dir * dist);
 	}
 
 	// end voxel coordinates
-	end1.x = static_cast<int>(floorf(End.x));
-	end1.y = static_cast<int>(floorf(End.y));
-	end1.z = static_cast<int>(floorf(End.z));
+	m_End1.x = static_cast<int>(floorf(End.x));
+	m_End1.y = static_cast<int>(floorf(End.y));
+	m_End1.z = static_cast<int>(floorf(End.z));
 
 	// check if first is occupied
-	if (pos.Equals(end1))
+	if (m_Pos.Equals(m_End1))
 	{
 		return false;
 	}
@@ -194,54 +194,54 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	while (Iterations < a_Distance)
 	{
 		Iterations++;
-		if ((tMax.x < tMax.y) && (tMax.x < tMax.z))
+		if ((m_tMax.x < m_tMax.y) && (m_tMax.x < m_tMax.z))
 		{
-			tMax.x += tDelta.x;
-			pos.x += step.x;
+			m_tMax.x += m_tDelta.x;
+			m_Pos.x += m_Step.x;
 		}
-		else if (tMax.y < tMax.z)
+		else if (m_tMax.y < m_tMax.z)
 		{
-			tMax.y += tDelta.y;
-			pos.y += step.y;
+			m_tMax.y += m_tDelta.y;
+			m_Pos.y += m_Step.y;
 		}
 		else
 		{
-			tMax.z += tDelta.z;
-			pos.z += step.z;
+			m_tMax.z += m_tDelta.z;
+			m_Pos.z += m_Step.z;
 		}
 
-		if (step.x > 0.0f)
+		if (m_Step.x > 0.0f)
 		{
-			if (pos.x >= end1.x)
+			if (m_Pos.x >= m_End1.x)
 			{
 				reachedX = true;
 			}
 		}
-		else if (pos.x <= end1.x)
+		else if (m_Pos.x <= m_End1.x)
 		{
 			reachedX = true;
 		}
 
-		if (step.y > 0.0f)
+		if (m_Step.y > 0.0f)
 		{
-			if (pos.y >= end1.y)
+			if (m_Pos.y >= m_End1.y)
 			{
 				reachedY = true;
 			}
 		}
-		else if (pos.y <= end1.y)
+		else if (m_Pos.y <= m_End1.y)
 		{
 			reachedY = true;
 		}
 
-		if (step.z > 0.0f)
+		if (m_Step.z > 0.0f)
 		{
-			if (pos.z >= end1.z)
+			if (m_Pos.z >= m_End1.z)
 			{
 				reachedZ = true;
 			}
 		}
-		else if (pos.z <= end1.z)
+		else if (m_Pos.z <= m_End1.z)
 		{
 			reachedZ = true;
 		}
@@ -251,17 +251,17 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return false;
 		}
 
-		if ((pos.y < 0) || (pos.y >= cChunkDef::Height))
+		if ((m_Pos.y < 0) || (m_Pos.y >= cChunkDef::Height))
 		{
 			return false;
 		}
-		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
+		BLOCKTYPE BlockID = m_World->GetBlock(m_Pos);
 		// Block is counted as a collision if we are not doing a line of sight and it is solid,
 		// or if the block is not air and not water. That way mobs can still see underwater.
 		if ((!a_LineOfSight && cBlockInfo::IsSolid(BlockID)) || (a_LineOfSight && (BlockID != E_BLOCK_AIR) && !IsBlockWater(BlockID)))
 		{
-			BlockHitPosition = pos;
-			int Normal = GetHitNormal(a_Start, End, pos);
+			BlockHitPosition = m_Pos;
+			int Normal = GetHitNormal(a_Start, End, m_Pos);
 			if (Normal > 0)
 			{
 				HitNormal = m_NormalTable()[static_cast<size_t>(Normal - 1)];
@@ -346,7 +346,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 
 
 
-int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Vector3i & a_BlockPos)
+int cTracer::GetHitNormal(const Vector3f & a_Start, const Vector3f & a_End, const Vector3i & a_BlockPos)
 {
 	Vector3i SmallBlockPos = a_BlockPos;
 	BLOCKTYPE BlockID = static_cast<BLOCKTYPE>(m_World->GetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z));
@@ -359,19 +359,19 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	Vector3f BlockPos;
 	BlockPos = Vector3f(SmallBlockPos);
 
-	Vector3f Look = (end - start);
+	Vector3f Look = (a_End - a_Start);
 	Look.Normalize();
 
 	float dot = Look.Dot(Vector3f(-1, 0, 0));  // first face normal is x -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.x, start.y, end.x, end.y, BlockPos.x, BlockPos.y, BlockPos.x, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.x, a_Start.y, a_End.x, a_End.y, BlockPos.x, BlockPos.y, BlockPos.x, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.x, start.z, end.x, end.z, BlockPos.x, BlockPos.z, BlockPos.x, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.x, a_Start.z, a_End.x, a_End.z, BlockPos.x, BlockPos.z, BlockPos.x, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos, Vector3f(-1, 0, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(-1, 0, 0));
 				return 1;
 			}
 		}
@@ -379,13 +379,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	dot = Look.Dot(Vector3f(0, 0, -1));  // second face normal is z -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.z, start.y, end.z, end.y, BlockPos.z, BlockPos.y, BlockPos.z, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.z, a_Start.y, a_End.z, a_End.y, BlockPos.z, BlockPos.y, BlockPos.z, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.z, start.x, end.z, end.x, BlockPos.z, BlockPos.x, BlockPos.z, BlockPos.x + 1);
+			Lines = LinesCross(a_Start.z, a_Start.x, a_End.z, a_End.x, BlockPos.z, BlockPos.x, BlockPos.z, BlockPos.x + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos, Vector3f(0, 0, -1));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(0, 0, -1));
 				return 2;
 			}
 		}
@@ -393,13 +393,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	dot = Look.Dot(Vector3f(1, 0, 0));  // third face normal is x 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.x, start.y, end.x, end.y, BlockPos.x + 1, BlockPos.y, BlockPos.x + 1, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.x, a_Start.y, a_End.x, a_End.y, BlockPos.x + 1, BlockPos.y, BlockPos.x + 1, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.x, start.z, end.x, end.z, BlockPos.x + 1, BlockPos.z, BlockPos.x + 1, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.x, a_Start.z, a_End.x, a_End.z, BlockPos.x + 1, BlockPos.z, BlockPos.x + 1, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos + Vector3f(1, 0, 0), Vector3f(1, 0, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(1, 0, 0), Vector3f(1, 0, 0));
 				return 3;
 			}
 		}
@@ -407,13 +407,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	dot = Look.Dot(Vector3f(0, 0, 1));  // fourth face normal is z 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.z, start.y, end.z, end.y, BlockPos.z + 1, BlockPos.y, BlockPos.z + 1, BlockPos.y + 1);
+		int Lines = LinesCross(a_Start.z, a_Start.y, a_End.z, a_End.y, BlockPos.z + 1, BlockPos.y, BlockPos.z + 1, BlockPos.y + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.z, start.x, end.z, end.x, BlockPos.z + 1, BlockPos.x, BlockPos.z + 1, BlockPos.x + 1);
+			Lines = LinesCross(a_Start.z, a_Start.x, a_End.z, a_End.x, BlockPos.z + 1, BlockPos.x, BlockPos.z + 1, BlockPos.x + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos + Vector3f(0, 0, 1), Vector3f(0, 0, 1));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(0, 0, 1), Vector3f(0, 0, 1));
 				return 4;
 			}
 		}
@@ -421,13 +421,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	dot = Look.Dot(Vector3f(0, 1, 0));  // fifth face normal is y 1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.y, start.x, end.y, end.x, BlockPos.y + 1, BlockPos.x, BlockPos.y + 1, BlockPos.x + 1);
+		int Lines = LinesCross(a_Start.y, a_Start.x, a_End.y, a_End.x, BlockPos.y + 1, BlockPos.x, BlockPos.y + 1, BlockPos.x + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.y, start.z, end.y, end.z, BlockPos.y + 1, BlockPos.z, BlockPos.y + 1, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.y, a_Start.z, a_End.y, a_End.z, BlockPos.y + 1, BlockPos.z, BlockPos.y + 1, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos + Vector3f(0, 1, 0), Vector3f(0, 1, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos + Vector3f(0, 1, 0), Vector3f(0, 1, 0));
 				return 5;
 			}
 		}
@@ -435,13 +435,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	dot = Look.Dot(Vector3f(0, -1, 0));  // sixth face normal is y -1
 	if (dot < 0)
 	{
-		int Lines = LinesCross(start.y, start.x, end.y, end.x, BlockPos.y, BlockPos.x, BlockPos.y, BlockPos.x + 1);
+		int Lines = LinesCross(a_Start.y, a_Start.x, a_End.y, a_End.x, BlockPos.y, BlockPos.x, BlockPos.y, BlockPos.x + 1);
 		if (Lines == 1)
 		{
-			Lines = LinesCross(start.y, start.z, end.y, end.z, BlockPos.y, BlockPos.z, BlockPos.y, BlockPos.z + 1);
+			Lines = LinesCross(a_Start.y, a_Start.z, a_End.y, a_End.z, BlockPos.y, BlockPos.z, BlockPos.y, BlockPos.z + 1);
 			if (Lines == 1)
 			{
-				intersect3D_SegmentPlane(start, end, BlockPos, Vector3f(0, -1, 0));
+				intersect3D_SegmentPlane(a_Start, a_End, BlockPos, Vector3f(0, -1, 0));
 				return 6;
 			}
 		}
