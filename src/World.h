@@ -142,6 +142,7 @@ public:
 	bool IsGameModeSpectator(void) const { return (m_GameMode == gmSpectator); }
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }

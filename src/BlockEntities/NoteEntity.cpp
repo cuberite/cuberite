@@ -23,7 +23,7 @@ cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Bl
 void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cNoteEntity &>(a_Src);
+	auto & src = static_cast<const cNoteEntity &>(a_Src);
 	m_Pitch = src.m_Pitch;
 }
 

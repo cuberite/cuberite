@@ -700,20 +700,23 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 
 	// Check and get the overloaded params:
 	Vector3i coords;
-	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
+	int dataTypes = 0;
 	auto dataTypesIdx = readVector3iOverloadParams(L, 3, coords, "coords");
-	L.GetStackValues(dataTypesIdx, dataTypes);
+	auto HasDataTypes = L.GetStackValues(dataTypesIdx, dataTypes);
 
 	// Check the dataType parameter validity:
-	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
+	if (HasDataTypes)
 	{
-		return L.ApiParamError("Invalid datatype combination (%d).", dataTypes);
-	}
-	if ((self->GetDataTypes() & dataTypes) != dataTypes)
-	{
-		return L.ApiParamError("Requesting datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
-			self->GetDataTypes(), dataTypes
-		);
+		if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
+		{
+			return L.ApiParamError("Invalid datatype combination (%d).", dataTypes);
+		}
+		if ((self->GetDataTypes() & dataTypes) != dataTypes)
+		{
+			return L.ApiParamError("Requesting datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+				self->GetDataTypes(), dataTypes
+			);
+		}
 	}
 
 	// Check and adjust the coord params:
@@ -735,7 +738,14 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	}
 
 	// Do the actual write:
-	L.Push(self->Write(*world, coords, dataTypes));
+	if (HasDataTypes)
+	{
+		L.Push(self->Write(*world, coords, dataTypes));
+	}
+	else
+	{
+		L.Push(self->Write(*world, coords));
+	}
 	return 1;
 }
 

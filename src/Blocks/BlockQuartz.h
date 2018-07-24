@@ -63,10 +63,7 @@ public:
 				return a_QuartzMeta;  // No idea, give a special meta (all sides the same)
 			}
 		}
-		#if !defined(__clang__)
-			ASSERT(!"Unknown BLOCK_FACE");
-			return 0;
-		#endif
+		UNREACHABLE("Unsupported block face");
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

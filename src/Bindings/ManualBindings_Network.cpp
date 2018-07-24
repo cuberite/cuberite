@@ -848,7 +848,7 @@ public:
 
 	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
 	{
-		m_Callbacks->CallTableFnWithSelf("OnBodyData", AString(reinterpret_cast<const char *>(a_Data), a_Size));
+		m_Callbacks->CallTableFnWithSelf("OnBodyData", AString(static_cast<const char *>(a_Data), a_Size));
 	}
 
 
@@ -907,7 +907,7 @@ public:
 
 	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
 	{
-		m_ResponseBody.append(reinterpret_cast<const char *>(a_Data), a_Size);
+		m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
 	}
 
 

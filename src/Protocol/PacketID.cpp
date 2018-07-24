@@ -41,6 +41,7 @@ UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 		case sendExplosion:             return 0x1c;
 		case sendGameMode:              return 0x1e;
 		case sendHealth:                return 0x3e;
+		case sendHeldItemChange:        return 0x37;
 		case sendInventorySlot:         return 0x16;
 		case sendJoinGame:              return 0x23;
 		case sendKeepAlive:             return 0x1f;
@@ -79,11 +80,7 @@ UInt32 cProtocol_1_9_0::GetPacketId(eOutgoingPackets a_Packet)
 		case sendWindowOpen:            return 0x13;
 		case sendWindowProperty:        return 0x15;
 	}
-	ASSERT(!"Retrieving packet ID for unknown packet type");
-	#ifndef __clang__
-		LOGWARNING("Retrieving packet ID for unknown packet type %d!", a_Packet);
-		return 0;
-	#endif
+	UNREACHABLE("Unsupported outgoing packet type");
 }
 
 
@@ -128,6 +125,7 @@ UInt32 cProtocol_1_12::GetPacketId(eOutgoingPackets a_Packet)
 		case sendEntityVelocity:      return 0x3d;
 		case sendExperience:          return 0x3f;
 		case sendHealth:              return 0x40;
+		case sendHeldItemChange:      return 0x39;
 		case sendLeashEntity:         return 0x3c;
 		case sendPlayerMaxSpeed:      return 0x4d;
 		case sendRemoveEntityEffect:  return 0x32;
@@ -165,6 +163,7 @@ UInt32 cProtocol_1_12_1::GetPacketId(eOutgoingPackets a_Packet)
 		case sendEntityVelocity:      return 0x3e;
 		case sendExperience:          return 0x40;
 		case sendHealth:              return 0x41;
+		case sendHeldItemChange:      return 0x3a;
 		case sendLeashEntity:         return 0x3d;
 		case sendPlayerList:          return 0x2e;
 		case sendPlayerAbilities:     return 0x2c;
