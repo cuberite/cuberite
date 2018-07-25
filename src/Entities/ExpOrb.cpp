@@ -132,7 +132,7 @@ std::vector<int> cExpOrb::Split(int a_Reward)
 
 	std::vector<int> Rewards;
 	size_t Index = BaseValue.size() - 1;  // Last one
-	
+
 	while (a_Reward > 0)
 	{
 		while (a_Reward < BaseValue[Index])
