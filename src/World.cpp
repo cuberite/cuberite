@@ -2290,8 +2290,7 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 		return OrbsID;
 	}
 
-	std::vector<int> Orbs;
-	cExpOrb::Split(a_Reward, Orbs);
+	std::vector<int> Orbs = cExpOrb::Split(a_Reward);
 
 	// Check generate number to decide speed limit (distribute range)
 	float SpeedLimit = (Orbs.size() / 2) + 5;
@@ -2301,7 +2300,6 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 	}
 
 	auto & Random = GetRandomProvider();
-
 	for (auto Element : Orbs)
 	{
 		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element);
@@ -3323,10 +3321,9 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 
 
 
-bool cWorld::DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
+bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
 {
-
-	double ClosestDistance = a_SightLimit;
+	double ClosestDistance = a_RangeLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
 	cCSLock Lock(m_CSPlayers);
@@ -3366,8 +3363,7 @@ bool cWorld::DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerList
 
 	if (ClosestPlayer)
 	{
-		a_Callback(*ClosestPlayer);
-		return true;
+		return a_Callback(*ClosestPlayer);
 	}
 	else
 	{

@@ -136,7 +136,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		GetFollowedItems(FollowedItems);
 		if (FollowedItems.Size() > 0)
 		{
-			m_World->DoWithClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
+			m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 			{
 				cItem EquippedItem = a_Player.GetEquippedItem();
 				if (FollowedItems.ContainsType(EquippedItem))

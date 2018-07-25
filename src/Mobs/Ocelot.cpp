@@ -39,7 +39,7 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_CheckPlayerTickCount == 23)
 		{
-			m_World->DoWithClosestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
+			m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
 			{
 				cItems Items;
 				GetBreedingItems(Items);

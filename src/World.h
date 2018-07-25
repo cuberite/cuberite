@@ -279,8 +279,8 @@ public:
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
-	/** Calls the callback for closest player for given position, return true if player was found and callback called, false if player not found. */
-	bool DoWithClosestPlayer(Vector3d a_Pos, float a_SightLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight = true, bool a_IgnoreSpectator = true);
+	/** Calls the callback for nearest player for given position, Returns false if player not found, otherwise returns the same value as the callback */
+	bool DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight = true, bool a_IgnoreSpectator = true);
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<

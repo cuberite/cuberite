@@ -87,7 +87,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	BLOCKTYPE TargetBlock = a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
 
 	bool PlayerExist = false;
-	a_Chunk->GetWorld()->DoWithClosestPlayer(a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ), 24, [&](cPlayer & a_Player) -> bool
+	a_Chunk->GetWorld()->DoWithNearestPlayer(a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ), 24, [&](cPlayer & a_Player) -> bool
 	{
 		PlayerExist = true;
 		return true;

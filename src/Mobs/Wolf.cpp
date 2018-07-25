@@ -268,7 +268,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (GetTarget() == nullptr)
 	{
-		m_World->DoWithClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
+		m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 		{
 			switch (a_Player.GetEquippedItem().m_ItemType)
 			{
