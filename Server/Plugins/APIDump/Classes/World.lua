@@ -433,7 +433,7 @@ return
 					},
 					{
 						Name = "SourcePos",
-						Type = "Vector"
+						Type = "Vector3i"
 					},
 					{
 						Name = "EffectData",
