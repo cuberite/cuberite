@@ -465,9 +465,13 @@ public:
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
 
+	// tolua_end
+
 	/** Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible,
 	Returns spawned experience orbs UniqueID */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;  // TODO: Exported in ManualBindings.cpp
+
+	// tolua_begin
 
 	// DEPRECATED, use the vector-parametered version instead.
 	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1)
