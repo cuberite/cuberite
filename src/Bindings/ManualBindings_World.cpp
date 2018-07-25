@@ -254,6 +254,50 @@ static int tolua_cWorld_DoWithPlayerByUUID(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 5) ||
+		!L.CheckParamFunction(6) ||
+		// Params 7 and 8 are optional bools, no check for those
+		!L.CheckParamEnd(9)
+		)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	cWorld * Self;
+	double PosX, PosY, PosZ, RangeLimit;
+	cLuaState::cRef FnRef;
+	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
+	L.GetStackValues(1, Self, PosX, PosY, PosZ, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
+
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #5");
+	}
+
+	// Call the function:
+	bool res = Self->DoWithNearestPlayer(Vector3d(PosX, PosY, PosZ), RangeLimit, [&](cPlayer & a_Player)
+	{
+		bool ret = false;
+		L.Call(FnRef, &a_Player, cLuaState::Return, ret);
+		return ret;
+	}, CheckLineOfSight, IgnoreSpectators);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 {
 	// Exported manually, because tolua doesn't support converting functions to functor types.
@@ -686,6 +730,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFlowerPotAt",          DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",            DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithMobHeadAt",            DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithNearestPlayer",        tolua_cWorld_DoWithNearestPlayer);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",          DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithPlayer",               DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",         tolua_cWorld_DoWithPlayerByUUID);
