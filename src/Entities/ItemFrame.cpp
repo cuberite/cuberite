@@ -52,7 +52,6 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 
 
-
 void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 {
 	if (m_Item.IsEmpty())

@@ -11,7 +11,6 @@
 
 
 
-
 enum
 {
 	PROGRESSBAR_FUEL = 0,
@@ -277,7 +276,6 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		default: ASSERT(!"Invalid furnace slot update!"); break;
 	}
 }
-
 
 
 

@@ -56,7 +56,6 @@ public:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkSender:
 
@@ -122,8 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 
 
 
-
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -275,6 +273,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
 	m_BlockEntities.push_back(a_Entity->GetPos());
 }
+
 
 
 

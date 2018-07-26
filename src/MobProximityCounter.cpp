@@ -36,6 +36,10 @@ void cMobProximityCounter::CollectMob(cEntity & a_Monster, cChunk & a_Chunk, dou
 
 }
 
+
+
+
+
 void cMobProximityCounter::convertMaps()
 {
 	for (tMonsterToDistance::const_iterator itr = m_MonsterToDistance.begin(); itr != m_MonsterToDistance.end(); ++itr)
@@ -43,6 +47,10 @@ void cMobProximityCounter::convertMaps()
 		m_DistanceToMonster.insert(tDistanceToMonster::value_type(itr->second.m_Distance, sMonsterAndChunk(*itr->first, *itr->second.m_Chunk)));
 	}
 }
+
+
+
+
 
 cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDistances(double a_DistanceMin, double a_DistanceMax)
 {

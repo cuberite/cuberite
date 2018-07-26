@@ -85,7 +85,6 @@ SET (HDRS
 	BlockInfo.h
 	BlockTracer.h
 	BrewingRecipes.h
-	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h
 	BuildInfo.h.cmake
@@ -136,6 +135,7 @@ SET (HDRS
 	MobSpawner.h
 	MonsterConfig.h
 	NetherPortalScanner.h
+	OpaqueWorld.h
 	OverridesSettingsRepository.h
 	ProbabDistrib.h
 	RankManager.h

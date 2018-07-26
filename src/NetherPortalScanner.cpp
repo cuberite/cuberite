@@ -9,7 +9,6 @@
 
 
 
-
 const double cNetherPortalScanner::OutOffset = 2;
 const double cNetherPortalScanner::AcrossOffset = 0.5;
 

@@ -100,6 +100,12 @@ private:
 
 	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
+	/** Piston extension block action */
+	static const Byte PistonExtendAction = 0U;
+
+	/** Piston retraction block action */
+	static const Byte PistonRetractAction = 1U;
+
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
 	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
 

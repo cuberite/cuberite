@@ -12,7 +12,6 @@
 
 
 
-
 /** Chunk data callback that takes the chunk data and puts them into cLightingThread's m_BlockTypes[] / m_HeightMap[]: */
 class cReader :
 	public cChunkDataCallback
@@ -226,7 +225,6 @@ void cLightingThread::Execute(void)
 		delete Item;
 	}
 }
-
 
 
 

@@ -38,7 +38,6 @@ const int MAX_PER_QUERY = 100;
 
 
 
-
 /** Returns the CA certificates that should be trusted for Mojang-related connections. */
 static cX509CertPtr GetCACerts(void)
 {

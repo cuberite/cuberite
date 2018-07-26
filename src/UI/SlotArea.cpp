@@ -587,7 +587,6 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-
 void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	// Update the recipe after setting the slot, if the slot is not the result slot:
@@ -610,6 +609,7 @@ void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player,
 	UNUSED(a_KeepEmptySlots);
 	UNUSED(a_BackFill);
 }
+
 
 
 
@@ -753,6 +753,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
+
 
 
 
@@ -1002,6 +1003,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	NIBBLETYPE BlockMeta;
 	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
 
+	const Vector3i BlockPos{PosX, PosY, PosZ};
 	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
@@ -1012,18 +1014,18 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		{
 			// Anvil will break
 			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
 			a_Player.CloseWindow(false);
 		}
 		else
 		{
 			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
 		}
 	}
 	else
 	{
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
 	}
 }
 
@@ -1221,6 +1223,7 @@ cSlotAreaBeacon::~cSlotAreaBeacon()
 {
 	m_Beacon->GetContents().RemoveListener(*this);
 }
+
 
 
 
@@ -2189,6 +2192,9 @@ void cSlotAreaBrewingstand::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	m_ParentWindow.BroadcastWholeWindow();
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

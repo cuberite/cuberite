@@ -91,7 +91,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				if ((Meta & 0x8) == 0x8)
 				{
 					// Is pillow
-					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockX, a_BlockY, a_BlockZ);
+					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, { a_BlockX, a_BlockY, a_BlockZ });
 				}
 				else
 				{
@@ -101,7 +101,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					PillowDirection = MetaDataToDirection(Meta & 0x3);
 					if (a_ChunkInterface.GetBlock(Coords + PillowDirection) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
-						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);
+						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, Vector3i{ a_BlockX, a_BlockY, a_BlockZ } + PillowDirection);
 					}
 				}
 

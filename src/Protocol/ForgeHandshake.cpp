@@ -181,6 +181,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 
 
+
 void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
 	if (a_Size == 2)
@@ -197,6 +198,7 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a
 		SetError(Printf("Received unexpected length of ClientHello: %zu", a_Size));
 	}
 }
+
 
 
 
@@ -244,6 +246,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 	m_Client->SendPluginMessage("FML|HS", ServerModList);
 }
+
 
 
 
