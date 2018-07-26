@@ -912,6 +912,39 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "If there is a mob head at the specified coords, calls the CallbackFunction with the {{cMobHeadEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMobHeadEntity|MobHeadEntity}})</pre> The function returns false if there is no mob head, or if there is, it returns the bool value that the callback has returned.",
 			},
+			DoWithNearestPlayer =
+			{
+				Params =
+				{
+					{
+						Name = "Position",
+						Type = "Vector3d",
+					},
+					{
+						Name = "RangeLimit",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+					{
+						Name = "CheckLineOfSight",
+						Type = "boolean",
+					},
+					{
+						Name = "IgnoreSpectator",
+						Type = "boolean",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "If there is players within given range of some position, calls the CallbackFunction with the {{cPlayer}} parameter representing the nearest player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+			},
 			DoWithNoteBlockAt =
 			{
 				Params =

@@ -2290,19 +2290,19 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 		return OrbsID;
 	}
 
-	std::vector<int> Orbs = cExpOrb::Split(a_Reward);
+	std::vector<int> Rewards = cExpOrb::Split(a_Reward);
 
 	// Check generate number to decide speed limit (distribute range)
-	float SpeedLimit = (Orbs.size() / 2) + 5;
+	float SpeedLimit = (Rewards.size() / 2) + 5;
 	if (SpeedLimit > 10)
 	{
 		SpeedLimit = 10;
 	}
 
 	auto & Random = GetRandomProvider();
-	for (auto Element : Orbs)
+	for (auto Reward : Rewards)
 	{
-		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Element);
+		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Reward);
 		auto ExpOrbPtr = ExpOrb.get();
 		UInt32 Id = ExpOrbPtr->GetUniqueID();
 		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
@@ -3315,7 +3315,6 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 	}
 	return false;
 }
-
 
 
 

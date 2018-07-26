@@ -107,8 +107,6 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-
-
 bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtCactusContact)
@@ -119,8 +117,6 @@ bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	return super::DoTakeDamage(a_TDI);
 }
-
-
 
 
 

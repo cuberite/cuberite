@@ -271,10 +271,11 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 
 	// Get parameters:
 	cWorld * Self;
-	double PosX, PosY, PosZ, RangeLimit;
+	Vector3d * Position;
+	double RangeLimit;
 	cLuaState::cRef FnRef;
 	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
-	L.GetStackValues(1, Self, PosX, PosY, PosZ, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
+	L.GetStackValues(1, Self, Position, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
 
 	if (!FnRef.IsValid())
 	{
@@ -282,7 +283,7 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->DoWithNearestPlayer(Vector3d(PosX, PosY, PosZ), RangeLimit, [&](cPlayer & a_Player)
+	bool res = Self->DoWithNearestPlayer(*Position, RangeLimit, [&](cPlayer & a_Player)
 	{
 		bool ret = false;
 		L.Call(FnRef, &a_Player, cLuaState::Return, ret);

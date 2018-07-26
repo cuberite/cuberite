@@ -4048,7 +4048,6 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 
 
 
-
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
