@@ -469,7 +469,7 @@ public:
 
 	/** Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible,
 	Returns spawned experience orbs UniqueID */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;  // TODO: Exported in ManualBindings.cpp
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;
 
 	// tolua_begin
 

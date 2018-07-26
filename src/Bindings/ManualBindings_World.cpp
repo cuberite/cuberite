@@ -665,6 +665,38 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	cWorld* self = nullptr;
+	double X = 0;
+	double Y = 0;
+	double Z = 0;
+	int Reward = 0;
+	L.GetStackValues(1, self, X, Y, Z, Reward);
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
+		return 0;
+	}
+
+	// Execute and push result:
+	L.Push(self->SpawnExperienceOrb(X, Y, Z, Reward));
+	return 1;
+}
+
+
+
+
 
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
@@ -751,6 +783,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "QueueTask",                  tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",               tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",               tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",   tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",               tolua_cWorld_TryGetHeight);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);

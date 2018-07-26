@@ -3417,6 +3417,36 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created. (DEPRECATED, use vector-parametered version)",
 				},
 			},
+			SpawnSplitExperienceOrbs =
+			{
+				Params =
+				{
+					{
+						Name = "X",
+						Type = "number",
+					},
+					{
+						Name = "Y",
+						Type = "number",
+					},
+					{
+						Name = "Z",
+						Type = "number",
+					},
+					{
+						Name = "Reward",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "EntityID",
+						Type = "table",
+					},
+				},
+				Notes = "Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible, Returns spawned experience orbs UniqueID",
+			},
 			TryGetHeight =
 			{
 				Params =
