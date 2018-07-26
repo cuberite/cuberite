@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PassiveMonster.h"
+#include "AI/BehaviorTree.h"
 
 
 
@@ -25,6 +26,11 @@ public:
 		a_Items.Add(E_ITEM_WHEAT);
 	}
 
+	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+private:
+	std::unique_ptr<BehaviorTree::cTask> m_BehaviorTree;
+	cBlackboard m_Blackboard;
 } ;
 
 
