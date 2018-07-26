@@ -677,7 +677,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 		return 0;
 	}
 
-	cWorld* self = nullptr;
+	cWorld * self = nullptr;
 	double X = 0;
 	double Y = 0;
 	double Z = 0;
