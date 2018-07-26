@@ -104,14 +104,12 @@ int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 
 
 
-
 int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 
 	return mbedtls_pk_parse_public_key(&m_Pk, static_cast<const unsigned char *>(a_Data), a_NumBytes);
 }
-
 
 
 

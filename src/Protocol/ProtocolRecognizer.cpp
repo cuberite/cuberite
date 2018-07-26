@@ -191,6 +191,7 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
+
 void cProtocolRecognizer::SendCameraSetTo(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -284,6 +285,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 		Pkt.WriteString(Message);
 	}
 }
+
 
 
 
@@ -433,7 +435,6 @@ void cProtocolRecognizer::SendHeldItemChange(int a_ItemIndex)
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
-
 
 
 

@@ -124,6 +124,7 @@ void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID)
 
 
 
+
 EMCSBiome cChunkDesc::GetBiome(int a_RelX, int a_RelZ)
 {
 	return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ);
@@ -264,6 +265,7 @@ bool cChunkDesc::IsUsingDefaultFinish(void) const
 {
 	return m_bUseDefaultFinish;
 }
+
 
 
 

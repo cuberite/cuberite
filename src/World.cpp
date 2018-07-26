@@ -1272,6 +1272,7 @@ void cWorld::TickQueuedTasks(void)
 
 
 
+
 void cWorld::TickClients(float a_Dt)
 {
 	cClientHandlePtrs RemoveClients;
@@ -2338,6 +2339,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 
 
+
 UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
@@ -3264,18 +3266,6 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 
 
 
-/*
-unsigned int cWorld::GetNumPlayers(void)
-{
-	cCSLock Lock(m_CSPlayers);
-	return m_Players.size();
-}
-*/
-
-
-
-
-
 size_t cWorld::GetNumChunks(void) const
 {
 	return m_ChunkMap->GetNumChunks();
@@ -3379,6 +3369,7 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 
 	return SpawnMobFinalize(std::move(Monster));
 }
+
 
 
 
@@ -3606,7 +3597,6 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 	return res;
 }
-
 
 
 

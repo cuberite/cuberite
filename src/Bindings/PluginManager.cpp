@@ -479,6 +479,7 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
+
 bool cPluginManager::CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_World)
 {
 	return GenericCallHook(HOOK_ENTITY_CHANGING_WORLD, [&](cPlugin * a_Plugin)
@@ -491,6 +492,7 @@ bool cPluginManager::CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_
 
 
 
+
 bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
 {
 	return GenericCallHook(HOOK_ENTITY_CHANGED_WORLD, [&](cPlugin * a_Plugin)
@@ -499,6 +501,7 @@ bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_W
 		}
 	);
 }
+
 
 
 
@@ -639,6 +642,7 @@ bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVe
 		}
 	);
 }
+
 
 
 
@@ -1068,6 +1072,7 @@ bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 
 
 
+
 bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	return GenericCallHook(HOOK_SPAWNED_MONSTER, [&](cPlugin * a_Plugin)
@@ -1076,6 +1081,7 @@ bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monst
 		}
 	);
 }
+
 
 
 

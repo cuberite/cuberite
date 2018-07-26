@@ -11,13 +11,6 @@
 
 
 
-
-
-
-
-
-
-
 cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_IsDestroyed(false),
@@ -160,7 +153,6 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
@@ -202,7 +194,6 @@ void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value
 		Window->SetProperty(a_ProgressbarID, a_Value);
 	}
 }
-
 
 
 

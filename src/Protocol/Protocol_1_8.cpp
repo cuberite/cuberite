@@ -710,6 +710,7 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 
 
+
 void cProtocol_1_8_0::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
@@ -1550,6 +1551,7 @@ void cProtocol_1_8_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+
 void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -2056,6 +2058,7 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		m_CommLogFile.Flush();
 	}
 }
+
 
 
 

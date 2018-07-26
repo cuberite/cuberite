@@ -44,7 +44,6 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a
 
 
 
-
 void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 {
 	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))

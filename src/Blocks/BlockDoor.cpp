@@ -149,6 +149,8 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 
 
 
+
+
 NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
 	/*
@@ -178,6 +180,8 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 	// Not Facing North or South; No change.
 	return a_Meta;
 }
+
+
 
 
 

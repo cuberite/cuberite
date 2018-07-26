@@ -283,7 +283,6 @@ protected:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cDungeonRoomsFinisher:
 
@@ -303,7 +302,6 @@ cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainShapeGenPtr a_ShapeGen, int
 		std::swap(m_MinHalfSize, m_MaxHalfSize);
 	}
 }
-
 
 
 

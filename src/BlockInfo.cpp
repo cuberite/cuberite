@@ -11,6 +11,9 @@ void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 }
 
 
+
+
+
 cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
 	cBlockInfoArray & Info = *this;

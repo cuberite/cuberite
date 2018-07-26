@@ -1079,7 +1079,6 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
 /** Sets the target. */
 void cMonster::SetTarget (cPawn * a_NewTarget)
 {
@@ -1343,6 +1342,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 		StartBurning(100);
 	}
 }
+
 
 
 

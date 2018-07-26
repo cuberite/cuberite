@@ -709,7 +709,6 @@ bool cItemHandler::IsPlaceable(void)
 
 
 
-
 bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 {
 	UNUSED(a_ItemType);
@@ -835,10 +834,6 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo(const cItem * a_Item)
 	UNUSED(a_Item);
 	return FoodInfo(0, 0);
 }
-
-
-
-
 
 
 

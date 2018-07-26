@@ -56,7 +56,6 @@ public:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkSender:
 
@@ -117,7 +116,6 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 	}
 	m_evtQueue.Set();
 }
-
 
 
 
@@ -275,6 +273,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
 	m_BlockEntities.push_back(a_Entity->GetPos());
 }
+
 
 
 

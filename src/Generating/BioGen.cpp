@@ -382,6 +382,7 @@ void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 
+
 void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ)
 {
 	double NoiseX = m_Noise.CubicNoise3D(static_cast<float>(a_BlockX / m_CellSize), static_cast<float>(a_BlockZ / m_CellSize), 1000);
