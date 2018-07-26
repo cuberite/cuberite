@@ -645,7 +645,6 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 
 
 
-
 bool cByteBuffer::WriteBool(bool a_Value)
 {
 	CHECK_THREAD

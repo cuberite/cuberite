@@ -50,10 +50,8 @@ extern "C"
 
 
 
-
 const cLuaState::cRet cLuaState::Return = {};
 const cLuaState::cNil cLuaState::Nil = {};
-
 
 
 
@@ -131,6 +129,7 @@ void cLuaStateTracker::Add(cLuaState & a_LuaState)
 	cCSLock Lock(Instance.m_CSLuaStates);
 	Instance.m_LuaStates.push_back(&a_LuaState);
 }
+
 
 
 

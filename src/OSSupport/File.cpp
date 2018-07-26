@@ -213,7 +213,6 @@ long cFile::Seek (int iPosition)
 
 
 
-
 long cFile::Tell (void) const
 {
 	ASSERT(IsOpen());

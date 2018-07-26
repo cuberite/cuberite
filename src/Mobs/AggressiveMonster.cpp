@@ -36,7 +36,6 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
-
 void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	if (!a_Player->CanMobsTarget())

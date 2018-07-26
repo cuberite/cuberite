@@ -51,7 +51,6 @@ static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(
 
 
 
-
 int cClientHandle::s_ClientCount = 0;
 
 
@@ -2705,6 +2704,7 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
+
 void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	m_Protocol->SendPaintingSpawn(a_Painting);
@@ -3088,6 +3088,7 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+
 void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
@@ -3116,6 +3117,7 @@ void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Blo
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
+
 
 
 

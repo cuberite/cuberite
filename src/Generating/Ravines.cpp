@@ -99,7 +99,6 @@ cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_GridX, in
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 

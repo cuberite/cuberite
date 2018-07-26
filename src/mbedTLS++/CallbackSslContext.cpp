@@ -10,7 +10,6 @@
 
 
 
-
 cCallbackSslContext::cCallbackSslContext(void) :
 	m_Callbacks(nullptr)
 {

@@ -93,6 +93,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
+
 AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -185,6 +186,7 @@ AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimeter)
 
 
 
+
 AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -201,6 +203,7 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -346,6 +349,7 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
+
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -356,6 +360,7 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 	}
 	return a_UTF8;
 }
+
 
 
 
@@ -605,7 +610,6 @@ are equivalent to the following loop:
 ////////////////////////////////////////////////////////////////////////////////
 // End of Unicode, Inc.'s code / information
 ////////////////////////////////////////////////////////////////////////////////
-
 
 
 
@@ -1051,6 +1055,10 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 	}
 	return res;
 }
+
+
+
+
 
 bool StringToFloat(const AString & a_String, float & a_Num)
 {

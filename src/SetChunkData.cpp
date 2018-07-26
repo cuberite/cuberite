@@ -127,7 +127,6 @@ void cSetChunkData::CalculateHeightMap(void)
 
 
 
-
 void cSetChunkData::RemoveInvalidBlockEntities(void)
 {
 	for (cBlockEntities::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
