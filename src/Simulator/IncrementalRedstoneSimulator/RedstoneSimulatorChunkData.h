@@ -60,7 +60,6 @@ public:
 
 	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;
-	std::unordered_map<Vector3i, bool, VectorHasher<int>> m_UpdateOncePositions;
 
 private:
 
