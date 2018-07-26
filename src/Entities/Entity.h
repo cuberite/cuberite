@@ -535,7 +535,8 @@ public:
 	void SetParentChunk(cChunk * a_Chunk);
 
 	/** Returns the chunk responsible for ticking this entity. */
-	cChunk * GetParentChunk();
+	cChunk * GetParentChunk() { return m_ParentChunk; }
+	const cChunk * GetParentChunk() const { return m_ParentChunk; }
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
@@ -681,7 +682,7 @@ protected:
 
 	/** Set the entities position and last sent position.
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
-	void ResetPosition(Vector3d a_NewPos);
+	virtual void ResetPosition(Vector3d a_NewPos);
 
 private:
 

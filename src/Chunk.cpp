@@ -322,26 +322,15 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
 	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
 
-	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes());
-	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas());
-	if (a_SetChunkData.IsLightValid())
-	{
-		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight());
-		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight());
-		m_IsLightValid = true;
-	}
-	else
-	{
-		m_IsLightValid = false;
-	}
+	m_ChunkData.Assign(std::move(a_SetChunkData.GetChunkData()));
+	m_IsLightValid = a_SetChunkData.IsLightValid();
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (auto & KeyPair : m_BlockEntities)
 	{
 		delete KeyPair.second;
 	}
-	m_BlockEntities.clear();
-	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
+	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
@@ -495,7 +484,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			auto clone = be->Clone(posX, posY, posZ);
 			clone->SetWorld(m_World);
 			AddBlockEntityClean(clone);
-			BroadcastBlockEntity({posX, posY, posZ});
+			m_World->BroadcastBlockEntity({posX, posY, posZ});
 		}
 	}
 }
@@ -504,9 +493,9 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cChunk::HasBlockEntityAt(Vector3i a_BlockPos)
 {
-	return (GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ) != nullptr);
+	return (GetBlockEntity(a_BlockPos) != nullptr);
 }
 
 
@@ -1433,48 +1422,32 @@ int cChunk::GetHeight(int a_X, int a_Z)
 
 void cChunk::CreateBlockEntities(void)
 {
-	for (int x = 0; x < Width; x++)
+	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
 	{
-		for (int z = 0; z < Width; z++)
+		const auto * Section = m_ChunkData.GetSection(SectionIdx);
+		if (Section == nullptr)
 		{
-			for (int y = 0; y < Height; y++)
+			continue;
+		}
+
+		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
+		{
+			auto BlockType = Section->m_BlockTypes[BlockIdx];
+			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
-				BLOCKTYPE BlockType = GetBlock(x, y, z);
-				switch (BlockType)
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				auto WorldPos = RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+
+				if (!HasBlockEntityAt(WorldPos))
 				{
-					case E_BLOCK_BEACON:
-					case E_BLOCK_BED:
-					case E_BLOCK_TRAPPED_CHEST:
-					case E_BLOCK_CHEST:
-					case E_BLOCK_COMMAND_BLOCK:
-					case E_BLOCK_DISPENSER:
-					case E_BLOCK_DROPPER:
-					case E_BLOCK_ENDER_CHEST:
-					case E_BLOCK_LIT_FURNACE:
-					case E_BLOCK_FURNACE:
-					case E_BLOCK_HOPPER:
-					case E_BLOCK_SIGN_POST:
-					case E_BLOCK_WALLSIGN:
-					case E_BLOCK_HEAD:
-					case E_BLOCK_NOTE_BLOCK:
-					case E_BLOCK_JUKEBOX:
-					case E_BLOCK_FLOWER_POT:
-					case E_BLOCK_MOB_SPAWNER:
-					case E_BLOCK_BREWING_STAND:
-					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
-						{
-							AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-								BlockType, GetMeta(x, y, z),
-								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
-							));
-						}
-						break;
-					}
-				}  // switch (BlockType)
-			}  // for y
-		}  // for z
-	}  // for x
+					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
+						BlockType, GetMeta(RelPos), WorldPos.x, WorldPos.y, WorldPos.z, m_World
+					));
+				}
+			}
+		}
+	}
 }
 
 
@@ -1483,48 +1456,56 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::WakeUpSimulators(void)
 {
-	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
-	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
-	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
-	int BaseX = m_PosX * cChunkDef::Width;
-	int BaseZ = m_PosZ * cChunkDef::Width;
-	for (int x = 0; x < Width; x++)
+	auto * WaterSimulator = m_World->GetWaterSimulator();
+	auto * LavaSimulator  = m_World->GetLavaSimulator();
+	auto * RedstoneSimulator = m_World->GetRedstoneSimulator();
+
+	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
 	{
-		int BlockX = x + BaseX;
-		for (int z = 0; z < Width; z++)
+		const auto * Section = m_ChunkData.GetSection(SectionIdx);
+		if (Section == nullptr)
 		{
-			int BlockZ = z + BaseZ;
-			for (int y = GetHeight(x, z); y >= 0; y--)
+			continue;
+		}
+
+		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
+		{
+			auto BlockType = Section->m_BlockTypes[BlockIdx];
+
+			// Defer calculation until it's actually needed
+			auto WorldPos = [&]
 			{
-				BLOCKTYPE Block = GetBlock(x, y, z);
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				return RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+			};
 
-				// The redstone sim takes multiple blocks, use the inbuilt checker
-				if (RedstoneSimulator->IsAllowedBlock(Block))
+			// The redstone sim takes multiple blocks, use the inbuilt checker
+			if (RedstoneSimulator->IsAllowedBlock(BlockType))
+			{
+				RedstoneSimulator->AddBlock(WorldPos(), this);
+				continue;
+			}
+
+			switch (BlockType)
+			{
+				case E_BLOCK_WATER:
 				{
-					RedstoneSimulator->AddBlock({BlockX, y, BlockZ}, this);
-					continue;
+					WaterSimulator->AddBlock(WorldPos(), this);
+					break;
 				}
-
-				switch (Block)
+				case E_BLOCK_LAVA:
 				{
-					case E_BLOCK_WATER:
-					{
-						WaterSimulator->AddBlock({BlockX, y, BlockZ}, this);
-						break;
-					}
-					case E_BLOCK_LAVA:
-					{
-						LavaSimulator->AddBlock({BlockX, y, BlockZ}, this);
-						break;
-					}
-					default:
-					{
-						break;
-					}
-				}  // switch (BlockType)
-			}  // for y
-		}  // for z
-	}  // for x
+					LavaSimulator->AddBlock(WorldPos(), this);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}  // switch (BlockType)
+		}
+	}
 }
 
 
@@ -2649,406 +2630,6 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 	a_RelX = AbsX - DstChunkX * Width;
 	a_RelZ = AbsZ - DstChunkZ * Width;
 	return ToReturn;
-}
-
-
-
-
-
-void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
-{
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->SendAttachEntity(a_Entity, a_Vehicle);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-void cChunk::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
-{
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->SendLeashEntity(a_Entity, a_EntityLeashedTo);
-	}
-}
-
-
-
-
-void cChunk::BroadcastUnleashEntity(const cEntity & a_Entity)
-{
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->SendUnleashEntity(a_Entity);
-	}
-}
-
-
-
-
-
-void cChunk::BroadcastBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Byte1, a_Byte2, a_BlockType);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Stage);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	// We can operate on entity pointers, we're inside the ChunkMap's CS lock which guards the list
-	cBlockEntity * Entity = GetBlockEntity(a_BlockPos);
-	if (Entity == nullptr)
-	{
-		return;
-	}
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		Entity->SendTo(*(*itr));
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendCollectEntity(a_Entity, a_Player, a_Count);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendDestroyEntity(a_Entity);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
-{
-	for (auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->SendDetachEntity(a_Entity, a_PreviousVehicle);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityHeadLook(a_Entity);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityLook(a_Entity);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityMetadata(a_Entity);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityStatus(a_Entity, a_Status);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityVelocity(a_Entity);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendEntityAnimation(a_Entity, a_Animation);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendRemoveEntityEffect(a_Entity, a_EffectID);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		a_Entity.SpawnOn(*(*itr));
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		if (*itr == a_Exclude)
-		{
-			continue;
-		}
-		(*itr)->SendThunderbolt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
-	}  // for itr - LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	for (auto itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
-	{
-		(*itr)->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
-	}  // for itr - LoadedByClient[]
 }
 
 
