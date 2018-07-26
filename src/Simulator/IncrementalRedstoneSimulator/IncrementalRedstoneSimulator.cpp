@@ -52,7 +52,6 @@ const cRedstoneHandler * cIncrementalRedstoneSimulator::GetComponentHandler(BLOC
 
 
 
-
 std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)

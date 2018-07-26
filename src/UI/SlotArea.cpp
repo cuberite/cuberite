@@ -587,7 +587,6 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-
 void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	// Update the recipe after setting the slot, if the slot is not the result slot:
@@ -610,6 +609,7 @@ void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player,
 	UNUSED(a_KeepEmptySlots);
 	UNUSED(a_BackFill);
 }
+
 
 
 
@@ -753,6 +753,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
+
 
 
 
@@ -1222,6 +1223,7 @@ cSlotAreaBeacon::~cSlotAreaBeacon()
 {
 	m_Beacon->GetContents().RemoveListener(*this);
 }
+
 
 
 
@@ -2190,6 +2192,9 @@ void cSlotAreaBrewingstand::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	m_ParentWindow.BroadcastWholeWindow();
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

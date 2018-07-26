@@ -182,6 +182,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 
 
 
+
 void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.

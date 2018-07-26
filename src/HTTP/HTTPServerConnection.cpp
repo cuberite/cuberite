@@ -142,7 +142,6 @@ void cHTTPServerConnection::OnRemoteClosed(void)
 
 
 
-
 void cHTTPServerConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
 	OnRemoteClosed();

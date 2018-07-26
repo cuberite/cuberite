@@ -50,7 +50,6 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 
 
 
-
 bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData)
 {
 	// Uncompress the data:
@@ -100,7 +99,6 @@ bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockAre
 	}
 	return true;
 }
-
 
 
 

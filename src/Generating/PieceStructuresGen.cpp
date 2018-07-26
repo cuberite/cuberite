@@ -14,7 +14,6 @@
 
 
 
-
 class cPieceStructuresGen::cGen:
 	public cGridStructGen
 {
@@ -114,7 +113,6 @@ protected:
 	/** Maximum depth of the generated piece tree. */
 	int m_MaxDepth;
 };
-
 
 
 

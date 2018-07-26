@@ -21,7 +21,6 @@ typedef std::map<AString, AString> AStringMap;
 
 
 
-
 /** Output the formatted text into the string.
 Returns a_Dst. */
 extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);

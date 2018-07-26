@@ -365,6 +365,7 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
+
 void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
@@ -412,7 +413,6 @@ void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, const Vecto
 		}
 	);
 }
-
 
 
 

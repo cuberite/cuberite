@@ -575,6 +575,7 @@ void cChunkData::SetBlockTypes(const BLOCKTYPE * a_Src)
 
 
 
+
 void cChunkData::SetMetas(const NIBBLETYPE * a_Src)
 {
 	ASSERT(a_Src != nullptr);
@@ -639,6 +640,7 @@ void cChunkData::SetBlockLight(const NIBBLETYPE * a_Src)
 		memset(m_Sections[i]->m_BlockSkyLight, 0xff, sizeof(m_Sections[i]->m_BlockSkyLight));
 	}  // for i - m_Sections[]
 }
+
 
 
 

@@ -306,12 +306,16 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callbac
 }
 
 
+
+
+
 bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
 	return DoWithChunk(ChunkX, ChunkZ, a_Callback);
 }
+
 
 
 
@@ -1678,6 +1682,7 @@ bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurna
 
 
 
+
 bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
 {
 	int ChunkX, ChunkZ;
@@ -1691,6 +1696,7 @@ bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNot
 	}
 	return Chunk->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
+
 
 
 
@@ -2134,6 +2140,7 @@ void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+
 void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	cCSLock Lock(m_CSChunks);
@@ -2148,7 +2155,6 @@ void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 		}
 	}
 }
-
 
 
 
@@ -2308,7 +2314,6 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 		Chunk->SetAlwaysTicked(a_AlwaysTicked);
 	}
 }
-
 
 
 
