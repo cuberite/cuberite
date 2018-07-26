@@ -106,7 +106,6 @@ protected:
 
 
 
-
 class cStructGenDirectOverhangs :
 	public cFinishGen
 {

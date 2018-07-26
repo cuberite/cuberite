@@ -75,7 +75,6 @@ Since only the header is actually in the memory, this number can be high, but st
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
@@ -472,6 +471,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	m_World->QueueSetChunkData(std::move(SetChunkData));
 	return true;
 }
+
 
 
 
@@ -2077,6 +2077,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	// Store the new arrow in the entities list:
 	a_Entities.emplace_back(std::move(Arrow));
 }
+
 
 
 

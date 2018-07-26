@@ -5,7 +5,6 @@
 
 
 
-
 class cRedstoneLampHandler : public cRedstoneHandler
 {
 public:

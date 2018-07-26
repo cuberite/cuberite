@@ -511,6 +511,7 @@ void cChunk::Stay(bool a_Stay)
 
 
 
+
 void cChunk::CollectMobCensus(cMobCensus & toFill)
 {
 	toFill.CollectSpawnableChunk(*this);
@@ -537,6 +538,7 @@ void cChunk::CollectMobCensus(cMobCensus & toFill)
 		}
 	}  // for itr - m_Entitites[]
 }
+
 
 
 
@@ -2291,6 +2293,7 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 
 
+
 bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBeaconEntity,
@@ -2301,12 +2304,14 @@ bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCal
 
 
 
+
 bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBedEntity,
 		E_BLOCK_BED
 	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
+
 
 
 
@@ -2474,7 +2479,6 @@ void cChunk::GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE
 
 
 
-
 bool cChunk::GetChunkAndRelByAbsolute(const Vector3d & a_Position, cChunk ** a_Chunk, Vector3i & a_Rel)
 {
 	return GetChunkAndRelByAbsolute(Vector3i(FloorC(a_Position.x), FloorC(a_Position.y), FloorC(a_Position.z)), a_Chunk, a_Rel);
@@ -2497,6 +2501,9 @@ bool cChunk::GetChunkAndRelByAbsolute(const Vector3i & a_Position, cChunk ** a_C
 	a_Rel.z = a_Position.z - (*a_Chunk)->GetPosZ() * cChunkDef::Width;
 	return true;
 }
+
+
+
 
 
 cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)

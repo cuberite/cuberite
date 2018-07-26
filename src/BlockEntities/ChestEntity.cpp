@@ -31,6 +31,7 @@ cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_
 
 
 
+
 cChestEntity::~cChestEntity()
 {
 	if (m_Neighbour != nullptr)

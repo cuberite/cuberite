@@ -235,7 +235,6 @@ void cTCPLinkImpl::Close(void)
 
 
 
-
 AString cTCPLinkImpl::StartTLSClient(
 	cX509CertPtr a_OwnCert,
 	cCryptoKeyPtr a_OwnPrivKey

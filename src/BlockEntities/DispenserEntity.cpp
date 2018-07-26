@@ -290,6 +290,8 @@ UInt32 cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY
 
 
 
+
+
 Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 {
 	switch (a_Meta & E_META_DROPSPENSER_FACING_MASK)

@@ -46,7 +46,6 @@ class cNullCommandOutputCallback :
 
 
 
-
 /** Accumulates all command output into a string. */
 class cStringAccumCommandOutputCallback:
 	public cCommandOutputCallback

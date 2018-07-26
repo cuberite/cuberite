@@ -20,6 +20,7 @@ bool cOverridesSettingsRepository::KeyExists(const AString a_keyName) const
 
 
 
+
 bool cOverridesSettingsRepository::HasValue(const AString & a_KeyName, const AString & a_ValueName) const
 {
 	return m_Overrides->HasValue(a_KeyName, a_ValueName) || m_Main->HasValue(a_KeyName, a_ValueName);
@@ -257,6 +258,8 @@ bool cOverridesSettingsRepository::DeleteValue(const AString & a_KeyName, const 
 		return m_Main->DeleteValue(a_KeyName, a_ValueName);
 	}
 }
+
+
 
 
 

@@ -29,7 +29,6 @@ cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 
 
-
 bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
 	// Nothing to do

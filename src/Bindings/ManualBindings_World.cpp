@@ -620,7 +620,6 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 
 
 
-
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
 	/* Exported manually, because tolua would require the out-only param a_Height to be used when calling

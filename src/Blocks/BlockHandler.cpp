@@ -91,7 +91,6 @@
 
 
 
-
 /*
 // Tests the meta rotation and mirroring.
 // Note that the cMetaRotator needs to have its assert paths disabled for this test to work!
@@ -573,6 +572,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
 }
+
 
 
 

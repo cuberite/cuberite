@@ -40,6 +40,7 @@ void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
+
 bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
