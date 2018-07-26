@@ -51,6 +51,7 @@ static bool GetStackVectorOr3Numbers(cLuaState & L, int a_Index, Vector3<T> & a_
 
 
 
+
 static int tolua_cWorld_BroadcastBlockAction(lua_State * tolua_S)
 {
 	/* Function signature:
@@ -124,7 +125,6 @@ static int tolua_cWorld_BroadcastSoundEffect(lua_State * tolua_S)
 
 	if (VolumeIndex != 4)  // Not the vector overload
 	{
-
 		L.LogStackTrace();
 		LOGWARN("BroadcastSoundEffect with 3 position arguments is deprecated, use vector-parametered version instead.");
 	}
