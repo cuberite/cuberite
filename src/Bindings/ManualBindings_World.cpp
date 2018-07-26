@@ -124,7 +124,6 @@ static int tolua_cWorld_BroadcastSoundEffect(lua_State * tolua_S)
 
 	if (VolumeIndex != 4)  // Not the vector overload
 	{
-
 		L.LogStackTrace();
 		LOGWARN("BroadcastSoundEffect with 3 position arguments is deprecated, use vector-parametered version instead.");
 	}
