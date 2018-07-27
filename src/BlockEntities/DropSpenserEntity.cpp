@@ -96,7 +96,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = static_cast<int>(SmokeDirection::SOUTH); break;
 		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = static_cast<int>(SmokeDirection::NORTH); break;
 	}
-	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, m_PosX, m_PosY, m_PosZ, SmokeDir);
+	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPos(), SmokeDir);
 	m_World->BroadcastSoundEffect("block.dispenser.dispense", Vector3d(m_PosX, m_PosY, m_PosZ), 1.0f, 1.0f);
 }
 

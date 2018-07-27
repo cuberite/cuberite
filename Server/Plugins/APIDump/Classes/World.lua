@@ -293,6 +293,38 @@ return
 						IsOptional = true,
 					},
 				},
+				Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}. <b>OBSOLETE</b>, use the vector-based overload instead",
+			},
+			BroadcastParticleEffect =
+			{
+				Params =
+				{
+					{
+						Name = "ParticleName",
+						Type = "string",
+					},
+					{
+						Name = "SourcePos",
+						Type = "Vector3f"
+					},
+					{
+						Name = "Offset",
+						Type = "Vector3f",
+					},
+					{
+						Name = "ParticleData",
+						Type = "number",
+					},
+					{
+						Name = "ParticleAmount",
+						Type = "number",
+					},
+					{
+						Name = "ExcludeClient",
+						Type = "cClientHandle",
+						IsOptional = true,
+					},
+				},
 				Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}",
 			},
 			BroadcastSoundEffect =
@@ -378,6 +410,30 @@ return
 					{
 						Name = "Z",
 						Type = "number",
+					},
+					{
+						Name = "EffectData",
+						Type = "string",
+					},
+					{
+						Name = "ExcludeClient",
+						Type = "cClientHandle",
+						IsOptional = true,
+					},
+				},
+				Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient. <b>OBSOLETE</b>, use the vector overload instead",
+			},
+			BroadcastSoundParticleEffect =
+			{
+				Params =
+				{
+					{
+						Name = "EffectID",
+						Type = "number",
+					},
+					{
+						Name = "SourcePos",
+						Type = "Vector3i"
 					},
 					{
 						Name = "EffectData",

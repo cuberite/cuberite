@@ -148,7 +148,6 @@ void cEnchantments::SetLevel(int a_EnchantmentID, unsigned int a_Level)
 
 
 
-
 void cEnchantments::Clear(void)
 {
 	m_Enchantments.clear();

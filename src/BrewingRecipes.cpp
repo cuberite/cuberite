@@ -11,9 +11,6 @@
 
 
 
-
-
-
 cBrewingRecipes::cBrewingRecipes()
 {
 	ReloadRecipes();
@@ -192,7 +189,6 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	}
 	return nullptr;
 }
-
 
 
 

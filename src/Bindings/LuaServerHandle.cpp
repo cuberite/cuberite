@@ -22,7 +22,6 @@ cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_C
 
 
 
-
 cLuaServerHandle::~cLuaServerHandle()
 {
 	// If the server handle is still open, close it explicitly:

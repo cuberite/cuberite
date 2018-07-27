@@ -260,6 +260,7 @@ void cServer::UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVer
 
 
 
+
 AStringMap & cServer::RegisteredForgeMods(const UInt32 a_Protocol)
 {
 	auto it = m_ForgeModsByVersion.find(a_Protocol);
@@ -277,10 +278,12 @@ AStringMap & cServer::RegisteredForgeMods(const UInt32 a_Protocol)
 
 
 
+
 const AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 {
 	return RegisteredForgeMods(a_Protocol);
 }
+
 
 
 

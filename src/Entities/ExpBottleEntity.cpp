@@ -49,7 +49,7 @@ void cExpBottleEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 void cExpBottleEntity::Break(Vector3d a_HitPos)
 {
 	// Spawn an experience orb with a reward between 3 and 11.
-	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SPLASH_POTION, POSX_TOINT, POSY_TOINT, POSZ_TOINT, 0);
-	m_World->SpawnSplitExperienceOrbs(GetPosX(), GetPosY(), GetPosZ(), GetRandomProvider().RandInt(3, 11));
+	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SPLASH_POTION, GetPosition().Floor(), 0);
+	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), GetRandomProvider().RandInt(3, 11));
 	Destroy();
 }

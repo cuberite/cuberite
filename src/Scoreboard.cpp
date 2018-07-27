@@ -249,6 +249,7 @@ void cTeam::Reset(void)
 
 
 
+
 void cTeam::SetDisplayName(const AString & a_Name)
 {
 	m_DisplayName = a_Name;

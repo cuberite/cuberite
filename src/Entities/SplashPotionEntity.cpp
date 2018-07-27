@@ -92,9 +92,7 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 
 	m_World->BroadcastSoundParticleEffect(
 		EffectID::PARTICLE_SPLASH_POTION,
-		FloorC(a_HitPos.x),
-		FloorC(a_HitPos.y),
-		FloorC(a_HitPos.z),
+		a_HitPos.Floor(),
 		m_PotionColor
 	);
 }

@@ -185,11 +185,13 @@ void cEntity::WrapHeadYaw(void)
 
 
 
+
 void cEntity::WrapRotation(void)
 {
 	m_Rot.x = NormalizeAngleDegrees(m_Rot.x);
 	m_Rot.y = NormalizeAngleDegrees(m_Rot.y);
 }
+
 
 
 
@@ -259,7 +261,6 @@ void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
 
 	Destroyed();
 }
-
 
 
 
@@ -590,6 +591,7 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
+
 void cEntity::ApplyArmorDamage(int DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
@@ -681,7 +683,6 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 
 
 
-
 float cEntity::GetEnchantmentBlastKnockbackReduction()
 {
 	UInt32 MaxLevel = 0;
@@ -702,7 +703,6 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 	MaxLevel = std::min<UInt32>(MaxLevel, 4);
 	return MaxLevel * 0.15f;
 }
-
 
 
 
@@ -1323,6 +1323,7 @@ void cEntity::DetectCacti(void)
 
 
 
+
 void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 	m_NewWorld = a_World;
@@ -1331,6 +1332,7 @@ void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool
 	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
 	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
 }
+
 
 
 
@@ -1961,6 +1963,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 
 
 
+
 cEntity * cEntity::GetAttached()
 {
 	return m_AttachedTo;
@@ -2107,6 +2110,7 @@ void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 
 
+
 void cEntity::SetSpeedX(double a_SpeedX)
 {
 	SetSpeed(a_SpeedX, m_Speed.y, m_Speed.z);
@@ -2115,10 +2119,12 @@ void cEntity::SetSpeedX(double a_SpeedX)
 
 
 
+
 void cEntity::SetSpeedY(double a_SpeedY)
 {
 	SetSpeed(m_Speed.x, a_SpeedY, m_Speed.z);
 }
+
 
 
 
@@ -2136,6 +2142,7 @@ void cEntity::SetWidth(double a_Width)
 {
 	m_Width = a_Width;
 }
+
 
 
 
@@ -2248,6 +2255,7 @@ void cEntity::AddLeashedMob(cMonster * a_Monster)
 
 
 
+
 void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 {
 	ASSERT(a_Monster->GetLeashedTo() == this);
@@ -2257,7 +2265,6 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 	m_LeashedMobs.remove(a_Monster);
 }
-
 
 
 

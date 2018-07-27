@@ -88,6 +88,10 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 	);
 }
 
+
+
+
+
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
@@ -382,6 +386,8 @@ void cWolf::TickFollowPlayer()
 		}
 	}
 }
+
+
 
 
 

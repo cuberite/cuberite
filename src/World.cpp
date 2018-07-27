@@ -1272,6 +1272,7 @@ void cWorld::TickQueuedTasks(void)
 
 
 
+
 void cWorld::TickClients(float a_Dt)
 {
 	cClientHandlePtrs RemoveClients;
@@ -1729,12 +1730,13 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
+bool cWorld::GrowRipePlant(const int a_BlockX, const int a_BlockY, const int a_BlockZ, bool a_IsByBonemeal)
 {
 	auto & random = GetRandomProvider();
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	const Vector3i BlockPos{a_BlockX, a_BlockY, a_BlockZ};
 	switch (BlockType)
 	{
 		case E_BLOCK_BEETROOTS:
@@ -1753,7 +1755,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1773,7 +1775,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1788,7 +1790,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			++GrowState;
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1808,7 +1810,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1843,7 +1845,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1863,7 +1865,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1898,7 +1900,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1929,7 +1931,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1969,7 +1971,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					}
 				}  // switch (random spawn block type)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, 0);
+				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, {a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ}, 0);
 			}  // for i - 50 times
 			return true;
 		}
@@ -1984,7 +1986,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1998,7 +2000,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -2012,7 +2014,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -2039,7 +2041,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 
 			// spawn flower item
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			cItems FlowerItem;
 			FlowerItem.Add(E_BLOCK_BIG_FLOWER, 1, BlockMeta);
 			SpawnItemPickups(FlowerItem, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
@@ -2378,6 +2380,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 	}
 	return BoatPtr->GetUniqueID();
 }
+
 
 
 
@@ -3141,7 +3144,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	if (a_Open != IsOpen)
 	{
 		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		return true;
 	}
 	return false;
@@ -3322,18 +3325,6 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 
 
 
-/*
-unsigned int cWorld::GetNumPlayers(void)
-{
-	cCSLock Lock(m_CSPlayers);
-	return m_Players.size();
-}
-*/
-
-
-
-
-
 size_t cWorld::GetNumChunks(void) const
 {
 	return m_ChunkMap->GetNumChunks();
@@ -3437,6 +3428,7 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 
 	return SpawnMobFinalize(std::move(Monster));
 }
+
 
 
 
@@ -3664,7 +3656,6 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 	return res;
 }
-
 
 
 
