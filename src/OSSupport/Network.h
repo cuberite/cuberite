@@ -29,7 +29,6 @@ typedef std::shared_ptr<cX509Cert> cX509CertPtr;
 
 
 
-
 /** Interface that provides the methods available on a single TCP connection. */
 class cTCPLink
 {

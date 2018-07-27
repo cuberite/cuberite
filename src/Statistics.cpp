@@ -80,7 +80,6 @@ cStatInfo cStatInfo::ms_Info[statCount] =
 
 
 
-
 cStatInfo::cStatInfo()
 	: m_Type(statInvalid)
 	, m_Depends(statInvalid)

@@ -759,6 +759,8 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
 
+	/** get player explosion exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.

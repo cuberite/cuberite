@@ -20,7 +20,6 @@ cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, double a_X,
 
 
 
-
 void cPainting::SpawnOn(cClientHandle & a_Client)
 {
 	super::SpawnOn(a_Client);

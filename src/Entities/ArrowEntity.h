@@ -15,7 +15,6 @@
 
 
 
-
 // tolua_begin
 
 class cArrowEntity :

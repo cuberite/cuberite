@@ -178,11 +178,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
-						Chunk->BroadcastSoundParticleEffect(
+						m_World->BroadcastSoundParticleEffect(
 							EffectID::PARTICLE_MOBSPAWN,
-							static_cast<int>(PosX * 8.0),
-							static_cast<int>(RelY * 8.0),
-							static_cast<int>(PosZ * 8.0),
+							Vector3d(PosX, RelY, PosZ).Floor(),
 							0
 						);
 						NearbyEntities++;

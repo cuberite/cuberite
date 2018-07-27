@@ -97,6 +97,7 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
+
 void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 {
 	if (GetTarget() != nullptr)

@@ -2454,6 +2454,7 @@ static int tolua_cClientHandle_IsUUIDOnline(lua_State * tolua_S)
 
 
 
+
 static int tolua_cMobHeadEntity_SetOwner(lua_State * tolua_S)
 {
 	// Check params:
@@ -3488,7 +3489,6 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	}
 	return 1;
 }
-
 
 
 

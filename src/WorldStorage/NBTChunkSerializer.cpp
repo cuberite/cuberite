@@ -883,6 +883,10 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 	m_Writer.EndCompound();
 }
 
+
+
+
+
 void cNBTChunkSerializer::AddLeashKnotEntity(cLeashKnot * a_LeashKnot)
 {
 	m_Writer.BeginCompound("");
@@ -890,6 +894,9 @@ void cNBTChunkSerializer::AddLeashKnotEntity(cLeashKnot * a_LeashKnot)
 		AddHangingEntity(a_LeashKnot);
 	m_Writer.EndCompound();
 }
+
+
+
 
 
 void cNBTChunkSerializer::AddPaintingEntity(cPainting * a_Painting)

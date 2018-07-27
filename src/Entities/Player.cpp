@@ -984,6 +984,7 @@ void cPlayer::SetFlying(bool a_IsFlying)
 
 
 
+
 void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 {
 	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
@@ -1247,6 +1248,7 @@ double cPlayer::GetEyeHeight(void) const
 
 
 
+
 Vector3d cPlayer::GetEyePosition(void) const
 {
 	return Vector3d( GetPosX(), m_Stance, GetPosZ());
@@ -1278,6 +1280,7 @@ bool cPlayer::IsGameModeAdventure(void) const
 {
 	return (GetEffectiveGameMode() == gmAdventure);
 }
+
 
 
 
@@ -1650,7 +1653,6 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	{
 		ResetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
-		m_LastGroundHeight = a_PosY;
 		m_bIsTeleporting = true;
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
@@ -2980,6 +2982,7 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 
 
 
+
 float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
 {
 	if (a_Meta >= 8)
@@ -3069,3 +3072,30 @@ float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
 	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
 	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
 }
+
+
+
+
+
+float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	if (
+		IsGameModeSpectator() ||
+		(IsGameModeCreative() && !IsOnGround())
+	)
+	{
+		return 0;  // No impact from explosion
+	}
+
+	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+}
+
+
+
+
+
+
+
+
+
+

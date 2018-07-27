@@ -629,17 +629,6 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	if (
@@ -2272,7 +2261,6 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-
 void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
@@ -2959,6 +2947,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 		}  // for y
 	}
 }
+
 
 
 

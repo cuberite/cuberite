@@ -14,7 +14,7 @@
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
-
+#include "../BoundingBox.h"
 
 
 
@@ -185,11 +185,13 @@ void cEntity::WrapHeadYaw(void)
 
 
 
+
 void cEntity::WrapRotation(void)
 {
 	m_Rot.x = NormalizeAngleDegrees(m_Rot.x);
 	m_Rot.y = NormalizeAngleDegrees(m_Rot.y);
 }
+
 
 
 
@@ -208,15 +210,6 @@ void cEntity::WrapSpeed(void)
 void cEntity::SetParentChunk(cChunk * a_Chunk)
 {
 	m_ParentChunk = a_Chunk;
-}
-
-
-
-
-
-cChunk * cEntity::GetParentChunk()
-{
-	return m_ParentChunk;
 }
 
 
@@ -268,7 +261,6 @@ void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
 
 	Destroyed();
 }
-
 
 
 
@@ -599,6 +591,7 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 
 
 
+
 void cEntity::ApplyArmorDamage(int DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
@@ -684,6 +677,31 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 	}
 	int CappedEPF = std::min(20, TotalEPF);
 	return static_cast<int>(a_Damage * CappedEPF / 25.0);
+}
+
+
+
+
+
+float cEntity::GetEnchantmentBlastKnockbackReduction()
+{
+	UInt32 MaxLevel = 0;
+
+	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+
+	for (auto & Item : ArmorItems)
+	{
+		UInt32 Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		if (Level > MaxLevel)
+		{
+			// Get max blast protection
+			MaxLevel = Level;
+		}
+	}
+
+	// Max blast protect level is 4, each level provide 15% knock back reduction
+	MaxLevel = std::min<UInt32>(MaxLevel, 4);
+	return MaxLevel * 0.15f;
 }
 
 
@@ -1305,6 +1323,7 @@ void cEntity::DetectCacti(void)
 
 
 
+
 void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 	m_NewWorld = a_World;
@@ -1313,6 +1332,7 @@ void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool
 	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
 	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
 }
+
 
 
 
@@ -1896,23 +1916,21 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		if (!m_bHasSentNoSpeed || IsPlayer())
 		{
 			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-			int DiffX = FloorC(GetPosX() * 32.0) - FloorC(m_LastSentPosition.x * 32.0);
-			int DiffY = FloorC(GetPosY() * 32.0) - FloorC(m_LastSentPosition.y * 32.0);
-			int DiffZ = FloorC(GetPosZ() * 32.0) - FloorC(m_LastSentPosition.z * 32.0);
+			Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
 
-			if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
+			if (Diff.HasNonZeroLength())  // Have we moved?
 			{
-				if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+				if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
 				{
 					// Difference within Byte limitations, use a relative move packet
 					if (m_bDirtyOrientation)
 					{
-						m_World->BroadcastEntityRelMoveLook(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_World->BroadcastEntityRelMoveLook(*this, Vector3<Int8>(Diff), a_Exclude);
 						m_bDirtyOrientation = false;
 					}
 					else
 					{
-						m_World->BroadcastEntityRelMove(*this, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ), a_Exclude);
+						m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
 					}
 					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
 					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
@@ -1941,6 +1959,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		}
 	}
 }
+
 
 
 
@@ -2091,6 +2110,7 @@ void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 
 
+
 void cEntity::SetSpeedX(double a_SpeedX)
 {
 	SetSpeed(a_SpeedX, m_Speed.y, m_Speed.z);
@@ -2099,10 +2119,12 @@ void cEntity::SetSpeedX(double a_SpeedX)
 
 
 
+
 void cEntity::SetSpeedY(double a_SpeedY)
 {
 	SetSpeed(m_Speed.x, a_SpeedY, m_Speed.z);
 }
+
 
 
 
@@ -2120,6 +2142,7 @@ void cEntity::SetWidth(double a_Width)
 {
 	m_Width = a_Width;
 }
+
 
 
 
@@ -2232,6 +2255,7 @@ void cEntity::AddLeashedMob(cMonster * a_Monster)
 
 
 
+
 void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 {
 	ASSERT(a_Monster->GetLeashedTo() == this);
@@ -2241,3 +2265,37 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 	m_LeashedMobs.remove(a_Monster);
 }
+
+
+
+
+
+float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+{
+	double EntitySize = m_Width * m_Width * m_Height;
+	if (EntitySize <= 0)
+	{
+		// Handle entity with invalid size
+		return 0;
+	}
+
+	cBoundingBox EntityBox(GetPosition(), m_Width / 2, m_Height);
+	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
+	cBoundingBox IntersectionBox(EntityBox);
+
+	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
+	if (Overlap)
+	{
+		Vector3d Diff = IntersectionBox.GetMax() - IntersectionBox.GetMin();
+		double OverlapSize = Diff.x * Diff.y * Diff.z;
+
+		return static_cast<float>(OverlapSize / EntitySize);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+
