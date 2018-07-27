@@ -44,11 +44,6 @@ local g_IgnoredFiles =
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
 	"Bindings/LuaState_Implementation.cpp",
-	"LeakFinder.cpp",
-	"LeakFinder.h",
-	"MersenneTwister.h",
-	"StackWalker.cpp",
-	"StackWalker.h",
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
@@ -241,6 +236,9 @@ local function ProcessFile(a_FileName)
 	local lineCounter = 1
 	local lastIndentLevel = 0
 	local isLastLineControl = false
+	local lastNonEmptyLine = 0
+	local isAfterFunction = false
+	local isSourceFile = a_FileName:match("%.cpp")
 	all = all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
@@ -295,6 +293,26 @@ local function ProcessFile(a_FileName)
 				lineWithSpace:find("^%s+else\n") or
 				lineWithSpace:find("^%s+else  //") or
 				lineWithSpace:find("^%s+do %b()")
+
+
+			-- Check that exactly 5 empty lines are left beteen functions and no more than 5 elsewhere
+			if not(a_Line:find("^\n")) then
+				local numEmptyLines = (lineCounter - lastNonEmptyLine) - 1
+
+				local isStartOfFunction = (
+					isAfterFunction and
+					a_Line:find("^[%s%w]")
+				)
+
+				if (isSourceFile and isStartOfFunction and (numEmptyLines ~= 5)) then
+					ReportViolation(a_FileName, lineCounter - 1, 1, 1, "Leave exactly 5 empty lines between functions (found " .. numEmptyLines ..")")
+				elseif (numEmptyLines > 5) then
+					ReportViolation(a_FileName, lineCounter - 1, 1, 1, "Leave at most 5 consecutive empty lines (found " .. numEmptyLines .. ")")
+				end
+
+				lastNonEmptyLine = lineCounter
+				isAfterFunction = (a_Line == "}\n")
+			end
 
 			lineCounter = lineCounter + 1
 		end

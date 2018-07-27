@@ -190,6 +190,7 @@ bool IsBiomeVeryCold(EMCSBiome a_Biome)
 
 
 
+
 bool IsBiomeCold(EMCSBiome a_Biome)
 {
 	switch (a_Biome)

@@ -89,7 +89,6 @@ void cCuboid::Move(int a_OfsX, int a_OfsY, int a_OfsZ)
 
 
 
-
 void cCuboid::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
 {
 	if (p1.x < p2.x)

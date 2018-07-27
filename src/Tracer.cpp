@@ -304,6 +304,7 @@ static int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2
 
 
 
+
 // intersect3D_SegmentPlane(): intersect a segment and a plane
 //    Input:  a_Ray = a segment, and a_Plane = a plane = {Point V0; Vector n;}
 //    Output: *I0 = the intersect point (when it exists)

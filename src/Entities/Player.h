@@ -146,9 +146,6 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
 	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
 	void SetCapabilities();
 
@@ -430,6 +427,9 @@ public:
 	void UseItem(int a_SlotNumber, short a_Damage = 1);
 
 	void SendHealth(void);
+
+	// Send current active hotbar slot
+	void SendHotbarActiveSlot(void);
 
 	void SendExperience(void);
 
@@ -759,6 +759,8 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
 
+	/** get player explosion exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.

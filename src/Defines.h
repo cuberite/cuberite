@@ -12,7 +12,6 @@ typedef std::vector<int> cSlotNums;
 
 
 
-
 // tolua_begin
 
 /** Experience Orb setup */

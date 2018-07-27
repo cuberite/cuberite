@@ -51,7 +51,6 @@ static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(
 
 
 
-
 int cClientHandle::s_ClientCount = 0;
 
 
@@ -273,11 +272,9 @@ cUUID cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// Online UUIDs are always version 4 (random)
 	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// This is also consistent with the vanilla offline UUID scheme.
 
-	// First make the username lowercase:
-	AString lcUsername = StrToLower(a_Username);
-
-	return cUUID::GenerateVersion3(lcUsername);
+	return cUUID::GenerateVersion3("OfflinePlayer:" + a_Username);
 }
 
 
@@ -375,16 +372,22 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		InvalidateCachedSentChunk();
 		m_Self.reset();
 
-		World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
-		if (World == nullptr)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-			m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
-		}
 
-		if (m_Player->GetGameMode() == eGameMode_NotSet)
+		// New player use default world
+		// Player who can load from disk, use loaded world
+		if (m_Player->GetWorld() == nullptr)
 		{
-			m_Player->LoginSetGameMode(World->GetGameMode());
+			World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
+			if (World == nullptr)
+			{
+				World = cRoot::Get()->GetDefaultWorld();
+				m_Player->SetPosition(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ());
+			}
+			m_Player->SetWorld(World);
+		}
+		else
+		{
+			World = m_Player->GetWorld();
 		}
 
 		m_Player->SetIP (m_IPString);
@@ -419,12 +422,14 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		// Send experience
 		m_Player->SendExperience();
 
+		// Send hotbar active slot
+		m_Player->SendHotbarActiveSlot();
+
 		// Send player list items
 		SendPlayerListAddPlayer(*m_Player);
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
-		m_Player->SetWorld(World);
 		m_State = csAuthenticated;
 	}
 
@@ -1356,7 +1361,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ);
-	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
+	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, {a_BlockX, a_BlockY, a_BlockZ}, a_OldBlock, this);
 	// This call would remove the water, placed from the ice block handler
 	if (!((a_OldBlock == E_BLOCK_ICE) && (ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}) == E_BLOCK_WATER)))
 	{
@@ -2637,6 +2642,15 @@ void cClientHandle::SendHealth(void)
 
 
 
+void cClientHandle::SendHeldItemChange(int a_ItemIndex)
+{
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
+}
+
+
+
+
+
 void cClientHandle::SendHideTitle(void)
 {
 	m_Protocol->SendHideTitle();
@@ -2686,6 +2700,7 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);
 }
+
 
 
 
@@ -3073,6 +3088,7 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+
 void cClientHandle::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
@@ -3101,6 +3117,7 @@ void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Blo
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
+
 
 
 

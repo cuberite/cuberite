@@ -410,10 +410,10 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 
 void cEntityEffectInvisibility::BroadcastMetadata(cPawn & a_Target)
 {
-	auto ParentChunk = a_Target.GetParentChunk();
-	if (ParentChunk != nullptr)
+	auto World = a_Target.GetWorld();
+	if (World != nullptr)
 	{
-		ParentChunk->BroadcastEntityMetadata(a_Target);
+		World->BroadcastEntityMetadata(a_Target);
 	}
 }
 

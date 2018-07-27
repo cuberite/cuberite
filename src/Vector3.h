@@ -362,7 +362,6 @@ public:
 
 
 
-
 template <> inline Vector3<int> Vector3<int>::Floor(void) const
 {
 	return *this;

@@ -27,7 +27,6 @@ class cSslConfig;
 
 
 
-
 class cHTTPServer
 {
 public:

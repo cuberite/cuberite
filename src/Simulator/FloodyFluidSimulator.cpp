@@ -145,6 +145,7 @@ void cFloodyFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, i
 
 
 
+
 bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_MyMeta)
 {
 	// If we have a section above, check if there's fluid above this block that would feed it:
@@ -258,7 +259,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect(
+			m_World.BroadcastSoundEffect(
 				"block.lava.extinguish",
 				Vector3d(BlockX, a_RelY, BlockZ),
 				0.5f,
@@ -278,7 +279,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect(
+			m_World.BroadcastSoundEffect(
 				"block.lava.extinguish",
 				Vector3d(BlockX, a_RelY, BlockZ),
 				0.5f,
