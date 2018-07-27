@@ -383,7 +383,6 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 
 
 
-
 void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
