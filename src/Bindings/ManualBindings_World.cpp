@@ -469,7 +469,7 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamSelf("cWorld") ||
-		!L.CheckParamNumber(2, 5) ||
+		!L.CheckParamUserType(2, "Vector3<double>") ||
 		!L.CheckParamFunction(6) ||
 		// Params 7 and 8 are optional bools, no check for those
 		!L.CheckParamEnd(9)
