@@ -2298,7 +2298,6 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 
 
-
 std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	std::vector<UInt32> OrbsID;
