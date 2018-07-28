@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "Defines.h"
-#include "Scoreboard.h"
+#include "../Defines.h"
+#include "../Scoreboard.h"
 
 // fwd:
 class cClientHandle;

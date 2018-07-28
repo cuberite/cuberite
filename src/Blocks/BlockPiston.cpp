@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "BlockInServerPluginInterface.h"
+#include "../BlockInServerPluginInterface.h"
 #include "ChunkInterface.h"
 
 

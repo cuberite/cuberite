@@ -18,7 +18,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
-#include "Bindings/PluginManager.h"
+#include "../Bindings/PluginManager.h"
 
 
 

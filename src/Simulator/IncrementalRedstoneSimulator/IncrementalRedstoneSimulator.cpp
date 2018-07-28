@@ -3,7 +3,7 @@
 #include "Globals.h"
 
 #include "IncrementalRedstoneSimulator.h"
-#include "Chunk.h"
+#include "../../Chunk.h"
 
 #include "CommandBlockHandler.h"
 #include "DoorHandler.h"

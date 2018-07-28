@@ -54,8 +54,8 @@
 #include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
-#include "Server.h"
-#include "BoundingBox.h"
+#include "../Server.h"
+#include "../BoundingBox.h"
 
 
 

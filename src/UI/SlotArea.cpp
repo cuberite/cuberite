@@ -21,7 +21,7 @@
 #include "../BlockArea.h"
 #include "../EffectID.h"
 #include "../ClientHandle.h"
-#include "Mobs/Horse.h"
+#include "../Mobs/Horse.h"
 
 
 

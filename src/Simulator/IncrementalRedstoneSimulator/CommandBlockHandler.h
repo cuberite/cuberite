@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "BlockEntities/CommandBlockEntity.h"
+#include "../../BlockEntities/CommandBlockEntity.h"
 
 
 

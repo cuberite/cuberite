@@ -11,7 +11,7 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"

@@ -5,7 +5,7 @@
 #include "BlockBed.h"
 
 #include "BroadcastInterface.h"
-#include "Entities/Player.h"
+#include "../Entities/Player.h"
 #include "../World.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"

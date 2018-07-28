@@ -5,10 +5,10 @@
 
 #include "Globals.h"
 
-#include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
 #include "../StringCompression.h"
+#include "../OSSupport/GZipFile.h"
 
 
 

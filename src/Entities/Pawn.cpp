@@ -5,9 +5,9 @@
 #include "Player.h"
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
-#include "EffectID.h"
+#include "../EffectID.h"
 #include "../Mobs/Monster.h"
 
 
