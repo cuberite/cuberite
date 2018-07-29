@@ -28,8 +28,8 @@ public:
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		/** Redstone dust can be placed on opaque blocks as well as glowstone,
-		upside-down slabs and upside-down stairs, and hoppers */
+		// Redstone dust can be placed on opaque blocks as well as glowstone,
+		// upside-down slabs and upside-down stairs, and hoppers
 		switch (BelowBlock)
 		{
 			case E_BLOCK_HOPPER:

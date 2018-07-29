@@ -41,46 +41,20 @@ public:
 			case E_BLOCK_SIGN_POST:
 			case E_BLOCK_WALLSIGN:
 			case E_BLOCK_NOTE_BLOCK:
+			{
 				return true;
+			}
 			default:
 			{
-				// any kind of fence
-				if (cBlockFenceHandler::IsAnyFenceType(Type))
-				{
-					return true;
-				}
-
-				// any kind of fence gate
-				if (cBlockFenceGateHandler::IsAnyFenceGateType(Type))
-				{
-					return true;
-				}
-
-				// any kind of glass
-				if (cBlockGlassHandler::IsAnyGlassType(Type))
-				{
-					return true;
-				}
-
-				// any kind of chest
-				if (cBlockChestHandler::IsAnyChestType(Type))
-				{
-					return true;
-				}
-
-				// any kind of slab
-				if (cBlockSlabHandler::IsAnySlabType(Type))
-				{
-					return true;
-				}
-
-				// any kind of pressure plate
-				if (cBlockPressurePlateHandler::IsAnyPressurePlateType(Type))
-				{
-					return true;
-				}
-
-				return cBlockInfo::IsSolid(Type);
+				return (
+					cBlockFenceHandler::IsAnyFenceType(Type) ||
+					cBlockFenceGateHandler::IsAnyFenceGateType(Type) ||
+					cBlockGlassHandler::IsAnyGlassType(Type) ||
+					cBlockChestHandler::IsAnyChestType(Type) ||
+					cBlockSlabHandler::IsAnySlabType(Type) ||
+					cBlockPressurePlateHandler::IsAnyPressurePlateType(Type) ||
+					cBlockInfo::IsSolid(Type)
+				);
 			}
 		}
 	}

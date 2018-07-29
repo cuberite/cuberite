@@ -120,14 +120,7 @@ public:
 		// Can be placed on downward-facing piston
 		if (BlockIsOnType == E_BLOCK_PISTON)
 		{
-			if ((BlockIsOnMeta & 0x1) != 0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return ((BlockIsOnMeta & 0x1) != 0);
 		}
 
 		// Doors can also be placed on other doors
@@ -135,12 +128,9 @@ public:
 		{
 			return true;
 		}
+
 		// Doors can not be placed on transparent blocks, but on any other block
-		else
-		{
-			bool Result = cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
-			return Result;
-		}
+		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
 	}
 
 	static bool CanReplaceBlock(BLOCKTYPE a_BlockType)

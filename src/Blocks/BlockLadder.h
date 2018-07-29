@@ -73,7 +73,9 @@ public:
 			case BLOCK_FACE_ZP:
 			case BLOCK_FACE_XM:
 			case BLOCK_FACE_XP:
+			{
 				return true;
+			}
 			default:
 			{
 				return false;
@@ -156,7 +158,9 @@ public:
 			case E_BLOCK_ICE:
 			case E_BLOCK_GLOWSTONE:
 			case E_BLOCK_SEA_LANTERN:
+			{
 				return false;
+			}
 			default:
 			{
 				if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))

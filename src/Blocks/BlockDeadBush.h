@@ -46,16 +46,12 @@ public:
 			case E_BLOCK_DIRT:
 			{
 				// Can be placed on dirt or podzol
-				if ((BlockIsOnMeta == E_META_DIRT_NORMAL) || (BlockIsOnMeta == E_META_DIRT_PODZOL))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return ((BlockIsOnMeta == E_META_DIRT_NORMAL) || (BlockIsOnMeta == E_META_DIRT_PODZOL));
 			}
-			default: return false;
+			default:
+			{
+				return false;
+			}
 		}
 	}
 

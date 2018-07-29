@@ -61,7 +61,9 @@ public:
 			case BLOCK_FACE_SOUTH:
 			case BLOCK_FACE_WEST:
 			case BLOCK_FACE_EAST:
+			{
 				return true;
+			}
 			default:
 			{
 				return false;

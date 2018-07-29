@@ -42,7 +42,9 @@ public:
 			case BLOCK_FACE_XP:
 			case BLOCK_FACE_ZM:
 			case BLOCK_FACE_ZP:
+			{
 				return true;
+			}
 			default:
 			{
 				return false;

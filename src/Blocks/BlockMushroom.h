@@ -44,12 +44,16 @@ public:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_NEW_LEAVES:
 			case E_BLOCK_AIR:
+			{
 				return false;
+			}
 			case E_BLOCK_PUMPKIN:
 			case E_BLOCK_WORKBENCH:
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_CHEST:
+			{
 				return true;
+			}
 			default:
 			{
 				return (cBlockInfo::IsSolid(UnderType) && (!cBlockInfo::IsTransparent(UnderType)));

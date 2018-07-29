@@ -57,7 +57,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		/** Trapdoors will remain in place if their attachment block is moved, removed, or destroyed */
+		// Trapdoors will remain in place if their attachment block is moved, removed, or destroyed
 		if (CanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
 			a_BlockType = m_BlockType;
@@ -66,8 +66,10 @@ public:
 			switch (a_BlockFace)
 			{
 				case BLOCK_FACE_BOTTOM:
+				{
 					a_BlockMeta |= 0x8;
 					break;
+				}
 				case BLOCK_FACE_NORTH:
 				case BLOCK_FACE_SOUTH:
 				case BLOCK_FACE_WEST:

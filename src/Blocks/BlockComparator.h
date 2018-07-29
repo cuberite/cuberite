@@ -54,21 +54,22 @@ public:
 		NIBBLETYPE BlockIsOnMeta;
 		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
 
-		// On the top of an upside-down slab
+		if (BlockIsOnType == E_BLOCK_TNT)
+		{
+			return false;
+		}
+
 		if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))
 		{
-			// Check if the slab is turned up side down
 			return (cBlockSlabHandler::IsUpsideDown(BlockIsOnMeta));
 		}
 
-		// On the top of an upside-down stairs
 		if (cBlockStairsHandler::IsAnyStairType(BlockIsOnType))
 		{
 			return (cBlockStairsHandler::IsUpsideDown(BlockIsOnMeta));
 		}
 
-		bool Result = cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
-		return Result;
+		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -81,15 +82,7 @@ public:
 		a_BlockType = m_BlockType;
 		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player.GetYaw());
 
-		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-
-		bool Result = a_Player.GetWorld()->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
-		{
-			auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-			return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk, a_BlockMeta);
-		});
-
-		return Result;
+		return true;
 	}
 
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)

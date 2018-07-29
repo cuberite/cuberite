@@ -34,9 +34,6 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		/** A rail cannot be attached to the side or bottom of any block,
-		but attempting to make such an attachment may cause the rail
-		to attach to the top of a block under the destination space */
 		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
 		a_BlockType = m_BlockType;
 		a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
@@ -146,8 +143,6 @@ public:
 	@return : able to place or not */
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		// Rail can only be placed on TOP of block
-
 		// Can be placed on a hopper
 		if (a_BlockType == E_BLOCK_HOPPER)
 		{

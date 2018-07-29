@@ -65,9 +65,8 @@ public:
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		/** A repeater can only be placed on top of opaque blocks (dirt, stone, etc., but not glass, leaves, etc.),
-		or on top of upside-down slabs, upside-down stairs, and hoppers. */
-
+		// A repeater can only be placed on top of opaque blocks (dirt, stone, etc., but not glass, leaves, etc.),
+		// or on top of upside-down slabs, upside-down stairs, and hoppers.
 		if (BelowBlock == E_BLOCK_HOPPER)
 		{
 			return true;
