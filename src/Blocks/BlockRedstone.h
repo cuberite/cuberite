@@ -34,7 +34,13 @@ public:
 		{
 			case E_BLOCK_HOPPER:
 			case E_BLOCK_GLOWSTONE:
+			{
 				return true;
+			}
+			case E_BLOCK_TNT:
+			{
+				return false;
+			}
 			default:
 			{
 				// On the top of an upside-down slab

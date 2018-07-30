@@ -72,6 +72,11 @@ public:
 			return true;
 		}
 
+		if (BelowBlock == E_BLOCK_TNT)
+		{
+			return false;
+		}
+
 		// On the top of an upside-down slab
 		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
