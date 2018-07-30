@@ -3511,16 +3511,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Params =
 				{
 					{
-						Name = "X",
-						Type = "number",
-					},
-					{
-						Name = "Y",
-						Type = "number",
-					},
-					{
-						Name = "Z",
-						Type = "number",
+						Name = "Position",
+						Type = "Vector3d",
 					},
 					{
 						Name = "Reward",

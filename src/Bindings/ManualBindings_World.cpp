@@ -470,9 +470,10 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	if (
 		!L.CheckParamSelf("cWorld") ||
 		!L.CheckParamUserType(2, "Vector3<double>") ||
-		!L.CheckParamFunction(6) ||
-		// Params 7 and 8 are optional bools, no check for those
-		!L.CheckParamEnd(9)
+		!L.CheckParamNumber(3) ||
+		!L.CheckParamFunction(4) ||
+		// Params 5 and 6 are optional bools, no check for those
+		!L.CheckParamEnd(7)
 		)
 	{
 		return 0;
@@ -880,19 +881,18 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamSelf("cWorld") ||
-		!L.CheckParamNumber(2, 5) ||
-		!L.CheckParamEnd(6)
+		!L.CheckParamUserType(2, "Vector3<double>") ||
+		!L.CheckParamNumber(3) ||
+		!L.CheckParamEnd(4)
 	)
 	{
 		return 0;
 	}
 
 	cWorld * self = nullptr;
-	double X = 0;
-	double Y = 0;
-	double Z = 0;
-	int Reward = 0;
-	L.GetStackValues(1, self, X, Y, Z, Reward);
+	Vector3d * Position;
+	int Reward;
+	L.GetStackValues(1, self, Position, Reward);
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
@@ -900,7 +900,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 	}
 
 	// Execute and push result:
-	L.Push(self->SpawnExperienceOrb(X, Y, Z, Reward));
+	L.Push(self->SpawnExperienceOrb(Position->x, Position->y, Position->z, Reward));
 	return 1;
 }
 
