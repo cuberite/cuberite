@@ -489,7 +489,7 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 
 	if (!FnRef.IsValid())
 	{
-		return L.ApiParamError("Expected a valid callback function for parameter #5");
+		return L.ApiParamError("Expected a valid callback function for parameter #3");
 	}
 
 	// Call the function:
