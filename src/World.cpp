@@ -3653,19 +3653,6 @@ void cWorld::AddQueuedPlayers(void)
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSClients)
 
-	// Stream chunks to all eligible clients:
-	for (auto & AwaitingPlayer : AddedPlayerPtrs)
-	{
-		auto & Player = AwaitingPlayer.first;
-		cClientHandle * Client = Player->GetClientHandle();
-		if (Client != nullptr)
-		{
-			Client->SendPlayerMoveLook();
-			Client->SendHealth();
-			Client->SendWholeInventory(*Player->GetWindow());
-		}
-	}  // for itr - PlayersToAdd[]
-
 	// Call EntityChangedWorld callback on all eligible clients
 	for (auto & AwaitingPlayer : AddedPlayerPtrs)
 	{
