@@ -248,7 +248,7 @@ protected:
 	eHand HandIntToEnum(Int32 a_Hand);
 
 	/** Writes the item data into a packet. */
-	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
