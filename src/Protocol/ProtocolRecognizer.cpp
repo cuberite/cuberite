@@ -12,6 +12,7 @@
 #include "Protocol_1_10.h"
 #include "Protocol_1_11.h"
 #include "Protocol_1_12.h"
+#include "Protocol_1_13.h"
 #include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -1148,6 +1149,11 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_12_2:
 		{
 			m_Protocol = new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_13:
+		{
+			m_Protocol = new cProtocol_1_13(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		default:
