@@ -86,14 +86,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	auto & Random = GetRandomProvider();
 	BLOCKTYPE TargetBlock = a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
 
-	bool PlayerExist = false;
-	a_Chunk->GetWorld()->DoWithNearestPlayer(a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ), 24, [&](cPlayer & a_Player) -> bool
-	{
-		PlayerExist = true;
-		return true;
-	});
-
-	if (PlayerExist)  // Too close to a player, bail out
+	// If too close to any player, don't spawn anything
+	auto WorldPos = a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
+	static const double RangeLimit = 24;
+	if (a_Chunk->GetWorld()->DoWithNearestPlayer(WorldPos, RangeLimit, [](cPlayer & a_Player) -> bool
+		{
+			return true;
+		})
+	)
 	{
 		return false;
 	}

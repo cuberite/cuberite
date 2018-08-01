@@ -44,7 +44,7 @@ public:
 
 	// tolua_end
 
-	/** Split reward into small values */
+	/** Split reward into small values according to regular Minecraft rules */
 	static std::vector<int> Split(int a_Reward);
 
 protected:

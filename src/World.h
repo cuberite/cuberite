@@ -467,8 +467,8 @@ public:
 
 	// tolua_end
 
-	/** Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible,
-	Returns spawned experience orbs UniqueID */
+	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
+	Returns an vector of UniqueID of all the orbs. */
 	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;  // Exported in ManualBindings_World.cpp
 
 	// tolua_begin

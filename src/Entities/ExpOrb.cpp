@@ -52,7 +52,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	m_TicksAlive++;
 
 	// Find closest player within 6.5 meter (slightly increase detect range to have same effect in client)
-	bool FindPlayer = m_World->DoWithNearestPlayer(GetPosition(), 6.5, [&](cPlayer & a_Player) -> bool
+	bool FoundPlayer = m_World->DoWithNearestPlayer(GetPosition(), 6.5, [&](cPlayer & a_Player) -> bool
 	{
 		Vector3f a_PlayerPos(a_Player.GetPosition());
 		a_PlayerPos.y += 0.8f;
@@ -88,7 +88,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return true;
 	}, false, true);  // Don't check line of sight, ignore spectator mode player
 
-	if (!FindPlayer)
+	if (!FoundPlayer)
 	{
 		m_Gravity = -16;
 	}

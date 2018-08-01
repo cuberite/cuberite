@@ -999,7 +999,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "If there is players within given range of some position, calls the CallbackFunction with the {{cPlayer}} parameter representing the nearest player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+				Notes = "Calls the specified callback function with the {{cPlayer|player}} nearest to the specified position as its parameter, if they are still within the range limit. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
 			},
 			DoWithNoteBlockAt =
 			{
@@ -3526,7 +3526,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "table",
 					},
 				},
-				Notes = "Spawns an experience orb at the given location with the given reward, split into multiple experience orbs if possible, Returns spawned experience orbs UniqueID",
+				Notes = "Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules. Returns an array-table of UniqueID of all the orbs.",
 			},
 			TryGetHeight =
 			{
