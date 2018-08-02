@@ -47,12 +47,11 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_CheckPlayerTickCount == 23)
 		{
-			cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), 10, true);
-			if (a_Closest_Player != nullptr)
+			m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
 			{
 				cItems Items;
 				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Closest_Player->GetEquippedItem().m_ItemType))
+				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
 				{
 					if (!IsBegging())
 					{
@@ -60,7 +59,7 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 
-					MoveToPosition(a_Closest_Player->GetPosition());
+					MoveToPosition(a_Player.GetPosition());
 				}
 				else
 				{
@@ -70,8 +69,9 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 				}
-			}
 
+				return true;
+			}, true);
 			m_CheckPlayerTickCount = 0;
 		}
 		else
