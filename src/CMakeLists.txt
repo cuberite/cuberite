@@ -5,6 +5,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/mbedtls/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/lua/src")
 
 set(FOLDERS
 	OSSupport HTTP Items Blocks Protocol Generating mbedTLS++ Bindings

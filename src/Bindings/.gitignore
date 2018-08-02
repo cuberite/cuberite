@@ -3,3 +3,4 @@ lua51.dll
 LuaState_Declaration.inc
 LuaState_Implementation.cpp
 LuaState_Typedefs.inc
+SolInterop.h

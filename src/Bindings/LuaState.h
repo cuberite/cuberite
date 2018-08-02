@@ -30,18 +30,12 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 #pragma once
 
-extern "C"
-{
-	#include "lua/src/lauxlib.h"
-}
-
-
 #include <functional>
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
 #include "PluginManager.h"
-#include "LuaState_Typedefs.inc"
+#include "SolInterop.h"
 
 // fwd:
 class cLuaServerHandle;
@@ -611,10 +605,8 @@ public:
 	// Push a const value onto the stack (keep alpha-sorted):
 	// Note that these functions will make a copy of the actual value, because Lua doesn't have the concept
 	// of "const", and there would be lifetime management problems if they didn't.
-	void Push(const AString & a_String);
 	void Push(const AStringMap & a_Dictionary);
 	void Push(const AStringVector & a_Vector);
-	void Push(const char * a_Value);
 	void Push(const cItem & a_Item);
 	void Push(const cNil & a_Nil);
 	void Push(const cRef & a_Ref);
@@ -627,11 +619,13 @@ public:
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
-	void Push(double a_Value);
-	void Push(int a_Value);
-	void Push(long a_Value);
-	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
+
+	template <typename T>
+	void Push(const T & a_Value)
+	{
+		sol::stack::push(m_LuaState, a_Value);
+	}
 
 	/** Pops the specified number of values off the top of the Lua stack. */
 	void Pop(int a_NumValuesToPop = 1);
@@ -642,7 +636,6 @@ public:
 	bool GetStackValue(int a_StackPos, AString & a_Value);
 	bool GetStackValue(int a_StackPos, AStringMap & a_Value);
 	bool GetStackValue(int a_StackPos, AStringVector & a_Value);
-	bool GetStackValue(int a_StackPos, bool & a_Value);
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback);
@@ -656,31 +649,21 @@ public:
 	bool GetStackValue(int a_StackPos, cTrackedRef & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref);
-	bool GetStackValue(int a_StackPos, double & a_Value);
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);
-	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 
-	// template to catch all of the various c++ integral types without overload conflicts
-	template <class T>
-	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
+	// template to catch all of the various c++ types handled by sol2
+	template <typename T>
+	bool GetStackValue(int a_StackPos, T & a_Value)
 	{
-		UNUSED(unused);
-		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
+		sol::optional<T> Val = sol::stack::check_get<T>(m_LuaState, a_StackPos);
+		if (!Val)
 		{
 			return false;
 		}
-		lua_Number Val = lua_tonumber(m_LuaState, a_StackPos);
-		if (Val > std::numeric_limits<T>::max())
-		{
-			return false;
-		}
-		if (Val < std::numeric_limits<T>::min())
-		{
-			return false;
-		}
-		a_ReturnedVal = static_cast<T>(Val);
+
+		a_Value = Val.value();
 		return true;
 	}
 
@@ -732,9 +715,6 @@ public:
 		// Get the named global:
 		return GetNamedValue(a_Name, a_Value);
 	}
-
-	// Include the auto-generated Push and GetStackValue() functions:
-	#include "LuaState_Declaration.inc"
 
 	/** Call the specified Lua function.
 	Returns true if call succeeded, false if there was an error.

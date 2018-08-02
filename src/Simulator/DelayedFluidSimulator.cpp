@@ -44,7 +44,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 // cDelayedFluidSimulatorChunkData:
 
 cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay) :
-	m_Slots(new cSlot[a_TickDelay])
+	m_Slots(new cSlot[static_cast<size_t>(a_TickDelay)])
 {
 }
 

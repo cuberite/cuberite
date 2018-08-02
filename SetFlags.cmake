@@ -32,6 +32,9 @@ endmacro()
 
 
 macro(set_flags)
+	set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_EXTENTIONS OFF)
+
 	# Add coverage processing, if requested:
 	if (NOT MSVC)
 
@@ -74,11 +77,6 @@ macro(set_flags)
 			)
 		endif()
 
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
-
 		#on os x clang adds pthread for us but we need to add it for gcc
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
@@ -87,11 +85,6 @@ macro(set_flags)
 			add_flags_cxx("-pthread")
 		endif()
 	elseif (ANDROID)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-		
 		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
@@ -106,11 +99,6 @@ macro(set_flags)
 				OUTPUT_VARIABLE GCC_VERSION
 			)
 		endif()
-
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")
@@ -307,20 +295,3 @@ macro(set_exe_flags)
 	endif()
 
 endmacro()
-
-#	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#		foreach(FILENAME ${ARGN})
-#			message("downgrade_warnings for ${FILENAME}")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-prototypes -Wno-error=deprecated")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=old-style-cast  -Wno-error=switch-enum -Wno-error=switch")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal -Wno-error=global-constructors")
-
-#			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
-#				# flags that are not present in 3.0
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=covered-switch-default ")
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-error=extra-semi")
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations")
-#			endif()
-#		endforeach()
-#	endif()

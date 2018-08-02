@@ -63,3 +63,6 @@
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt.git
 	ignore = dirty
+[submodule "lib/sol2"]
+	path = lib/sol2
+	url = https://github.com/ThePHD/sol2.git
