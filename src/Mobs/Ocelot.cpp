@@ -11,6 +11,15 @@
 
 
 
+// TODO: Ocelots should have a chance of spawning with two kittens
+/*
+	if (!IsBaby() && GetRandomProvider().RandBool(1.0 / 7.0))
+	{
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
+	}
+*/
+
 cOcelot::cOcelot(void) :
 	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", 0.6, 0.8),
 	m_IsSitting(false),
@@ -179,20 +188,6 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 		SetIsSitting(!IsSitting());
 	}
 	m_World->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cOcelot::SpawnOn(cClientHandle & a_ClientHandle)
-{
-	super::SpawnOn(a_ClientHandle);
-	if (!IsBaby() && GetRandomProvider().RandBool(1.0 / 7.0))
-	{
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
-	}
 }
 
 
