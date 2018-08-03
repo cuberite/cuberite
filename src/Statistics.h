@@ -84,7 +84,6 @@ enum eStatistic
 
 
 
-
 /** Class used to store and query statistic-related information. */
 class cStatInfo
 {

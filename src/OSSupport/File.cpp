@@ -213,7 +213,6 @@ long cFile::Seek (int iPosition)
 
 
 
-
 long cFile::Tell (void) const
 {
 	ASSERT(IsOpen());
@@ -285,7 +284,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
 	a_Contents.assign(DataSize, '\0');
-	return Read(reinterpret_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
+	return Read(static_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
 }
 
 

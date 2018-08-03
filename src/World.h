@@ -49,7 +49,6 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
 class cSetChunkData;
-class cBroadcaster;
 class cDeadlockDetect;
 class cUUID;
 
@@ -63,14 +62,14 @@ typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 
 
-// tolua_begin
-class cWorld :
+class cWorld  // tolua_export
+	final:
 	public cForEachChunkProvider,
 	public cWorldInterface,
 	public cBroadcastInterface
+// tolua_begin
 {
 public:
-
 	// tolua_end
 
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
@@ -142,6 +141,7 @@ public:
 	bool IsGameModeSpectator(void) const { return (m_GameMode == gmSpectator); }
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
@@ -159,57 +159,58 @@ public:
 	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
+	// Implemented in Broadcaster.cpp
 	// (Please keep these alpha-sorted)
-	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle);
-	void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
+	virtual void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
+	virtual void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
 	// tolua_begin
-	void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom);
-	void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtInformation); }
-	void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
-	void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtSuccess); }
-	void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtWarning); }
-	void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtFailure); }
-	void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) { BroadcastChat(a_Message, a_Exclude, mtDeath); }
-	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr);
+	virtual void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom) override;
+	virtual void BroadcastChatInfo   (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtInformation); }
+	virtual void BroadcastChatFailure(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	virtual void BroadcastChatSuccess(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtSuccess); }
+	virtual void BroadcastChatWarning(const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtWarning); }
+	virtual void BroadcastChatFatal  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtFailure); }
+	virtual void BroadcastChatDeath  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) override { BroadcastChat(a_Message, a_Exclude, mtDeath); }
+	virtual void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr) override;
 	// tolua_end
 
-	void BroadcastCollectEntity              (const cEntity & a_Pickup, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
-	void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityHeadLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityStatus               (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	virtual void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
-	void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
-	void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
-	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
-	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	virtual void BroadcastSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
-	void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr);
-	void BroadcastUnleashEntity              (const cEntity & a_Entity);
-	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr);
+	virtual void BroadcastCollectEntity              (const cEntity & a_Pickup, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
+	virtual void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityHeadLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityRelMove              (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityStatus               (const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
+	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
+	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
+	virtual void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastUnleashEntity              (const cEntity & a_Entity) override;
+	virtual void BroadcastUseBed                     (const cEntity & a_Entity, Vector3i a_BlockPos) override;
+	virtual void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr) override;
 
 	virtual cBroadcastInterface & GetBroadcastManager(void) override
 	{
@@ -278,8 +279,8 @@ public:
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
 	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
-	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
+	/** Calls the callback for nearest player for given position, Returns false if player not found, otherwise returns the same value as the callback */
+	bool DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight = true, bool a_IgnoreSpectator = true);
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
@@ -463,6 +464,14 @@ public:
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+
+	// tolua_end
+
+	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
+	Returns an vector of UniqueID of all the orbs. */
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;  // Exported in ManualBindings_World.cpp
+
+	// tolua_begin
 
 	// DEPRECATED, use the vector-parametered version instead.
 	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1)
@@ -853,8 +862,6 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
-
-	cBroadcaster GetBroadcaster();
 
 private:
 

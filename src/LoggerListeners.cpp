@@ -145,6 +145,7 @@
 		{
 			// Whatever the console default is
 			printf("\x1b[0m");
+			fflush(stdout);
 		}
 	};
 

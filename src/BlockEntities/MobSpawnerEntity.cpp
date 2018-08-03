@@ -29,7 +29,7 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cMobSpawnerEntity &>(a_Src);
+	auto & src = static_cast<const cMobSpawnerEntity &>(a_Src);
 	m_Entity = src.m_Entity;
 	m_IsActive = src.m_IsActive;
 	m_SpawnDelay = src.m_SpawnDelay;
@@ -178,11 +178,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
-						Chunk->BroadcastSoundParticleEffect(
+						m_World->BroadcastSoundParticleEffect(
 							EffectID::PARTICLE_MOBSPAWN,
-							static_cast<int>(PosX * 8.0),
-							static_cast<int>(RelY * 8.0),
-							static_cast<int>(PosZ * 8.0),
+							Vector3d(PosX, RelY, PosZ).Floor(),
 							0
 						);
 						NearbyEntities++;

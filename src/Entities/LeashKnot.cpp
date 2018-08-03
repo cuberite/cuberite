@@ -80,7 +80,6 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 
 
 
-
 void cLeashKnot::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
@@ -111,6 +110,7 @@ void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnObject(*this, 77, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }
+
 
 
 

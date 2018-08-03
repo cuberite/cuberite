@@ -3231,6 +3231,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
 				},
+				GetEnchantmentBlastKnockbackReduction =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns explosion knock back reduction percent from blast protection level.",
+				},
 				GetEnchantmentCoverAgainst =
 				{
 					Params =
@@ -3316,6 +3326,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
+				},
+				GetOffHandEquipedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that the entity has equipped on off-hand. Returns an empty cItem if no item equipped or not applicable.",
 				},
 				GetGravity =
 				{

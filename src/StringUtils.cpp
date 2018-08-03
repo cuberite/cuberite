@@ -93,6 +93,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
+
 AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -185,6 +186,7 @@ AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimeter)
 
 
 
+
 AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -201,6 +203,7 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -346,6 +349,7 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
+
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -356,6 +360,7 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 	}
 	return a_UTF8;
 }
+
 
 
 
@@ -610,7 +615,6 @@ are equivalent to the following loop:
 
 
 
-
 #define HEX(x) static_cast<char>((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
 
 /**
@@ -638,7 +642,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		size_t k = std::min(a_Size - i, a_BytesPerLine);
 		for (size_t j = 0; j < k; j++)
 		{
-			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
+			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
 			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
 			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
@@ -1051,6 +1055,10 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 	}
 	return res;
 }
+
+
+
+
 
 bool StringToFloat(const AString & a_String, float & a_Num)
 {

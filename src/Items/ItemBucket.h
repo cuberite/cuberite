@@ -140,7 +140,7 @@ public:
 			return false;
 		}
 
-		if (a_Player->GetGameMode() != gmCreative)
+		if (!a_Player->IsGameModeCreative())
 		{
 			// Remove fluid bucket, add empty bucket:
 			if (!a_Player->GetInventory().RemoveOneEquippedItem())

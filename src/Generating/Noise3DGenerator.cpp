@@ -783,6 +783,7 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 
 
 
+
 void cBiomalNoise3DComposable::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkX, a_ChunkZ);

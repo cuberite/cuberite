@@ -50,9 +50,9 @@
 	#include <stdlib.h>
 #endif
 
-#include "Broadcaster.h"
 #include "SpawnPrepare.h"
 #include "FastRandom.h"
+#include "OpaqueWorld.h"
 
 
 
@@ -61,6 +61,23 @@ const int TIME_NIGHT_START   = 13187;
 const int TIME_NIGHT_END     = 22812;
 const int TIME_SUNRISE       = 23999;
 const int TIME_SPAWN_DIVISOR =   148;
+
+
+
+
+
+namespace World
+{
+	// Implement conversion functions from OpaqueWorld.h
+	cBroadcastInterface * GetBroadcastInterface(cWorld * a_World) { return a_World; }
+	cForEachChunkProvider * GetFECProvider     (cWorld * a_World) { return a_World; }
+	cWorldInterface * GetWorldInterface        (cWorld * a_World) { return a_World; }
+
+	cChunkInterface GetChunkInterface(cWorld & a_World)
+	{
+		return { a_World.GetChunkMap() };
+	}
+}
 
 
 
@@ -1255,6 +1272,7 @@ void cWorld::TickQueuedTasks(void)
 
 
 
+
 void cWorld::TickClients(float a_Dt)
 {
 	cClientHandlePtrs RemoveClients;
@@ -1430,7 +1448,6 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	}
 
 	// TODO: Implement block hardiness
-	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
@@ -1445,19 +1462,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 				continue;
 			}
 
-			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
-			if (distance_explosion.SqrLength() < 4096.0)
-			{
-				double real_distance = std::max(0.004, distance_explosion.Length());
-				double power = a_ExplosionSize / real_distance;
-				if (power <= 1)
-				{
-					power = 0;
-				}
-				distance_explosion.Normalize();
-				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, distance_explosion);
-			}
+			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
 
@@ -1725,12 +1730,13 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
+bool cWorld::GrowRipePlant(const int a_BlockX, const int a_BlockY, const int a_BlockZ, bool a_IsByBonemeal)
 {
 	auto & random = GetRandomProvider();
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	const Vector3i BlockPos{a_BlockX, a_BlockY, a_BlockZ};
 	switch (BlockType)
 	{
 		case E_BLOCK_BEETROOTS:
@@ -1749,7 +1755,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1769,7 +1775,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1784,7 +1790,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			++GrowState;
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1804,7 +1810,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1839,7 +1845,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1859,7 +1865,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
 			}
 			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1894,7 +1900,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1925,7 +1931,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1965,7 +1971,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					}
 				}  // switch (random spawn block type)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, 0);
+				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, {a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ}, 0);
 			}  // for i - 50 times
 			return true;
 		}
@@ -1980,7 +1986,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -1994,7 +2000,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -2008,7 +2014,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			{
 				return false;
 			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			return true;
 		}
 
@@ -2035,7 +2041,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 
 			// spawn flower item
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
+			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
 			cItems FlowerItem;
 			FlowerItem.Add(E_BLOCK_BIG_FLOWER, 1, BlockMeta);
 			SpawnItemPickups(FlowerItem, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
@@ -2292,6 +2298,49 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 
 
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
+{
+	std::vector<UInt32> OrbsID;
+
+	if (a_Reward < 1)
+	{
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return OrbsID;
+	}
+
+	std::vector<int> Rewards = cExpOrb::Split(a_Reward);
+
+	// Check generate number to decide speed limit (distribute range)
+	float SpeedLimit = (Rewards.size() / 2) + 5;
+	if (SpeedLimit > 10)
+	{
+		SpeedLimit = 10;
+	}
+
+	auto & Random = GetRandomProvider();
+	for (auto Reward : Rewards)
+	{
+		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Reward);
+		auto ExpOrbPtr = ExpOrb.get();
+		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
+		double SpeedY = Random.RandReal(0.5);
+		double SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
+		ExpOrbPtr->SetSpeed(SpeedX, SpeedY, SpeedZ);
+
+		UInt32 Id = ExpOrbPtr->GetUniqueID();
+		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+		{
+			OrbsID.push_back(Id);
+		}
+	}
+
+	return OrbsID;
+}
+
+
+
+
+
 UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	std::unique_ptr<cMinecart> Minecart;
@@ -2330,6 +2379,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 	}
 	return BoatPtr->GetUniqueID();
 }
+
 
 
 
@@ -2416,485 +2466,6 @@ int cWorld::GetHeight(int a_X, int a_Z)
 bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 {
 	return m_ChunkMap->TryGetHeight(a_BlockX, a_BlockZ, a_Height);
-}
-
-
-
-
-
-void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
-{
-	m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastBlockAction(a_BlockPos, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	LOG("BroadcastBlockAction with integer position is deprecated, use vector-parametered version instead.");
-	m_ChunkMap->BroadcastBlockAction({a_BlockX, a_BlockY, a_BlockZ}, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockPos, a_Stage, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastBlockEntity(a_BlockPos, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendChat(a_Message, a_ChatPrefix);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendChat(a_Message);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Count, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
-{
-	m_ChunkMap->BroadcastDetachEntity(a_Entity, a_PreviousVehicle);
-}
-
-
-
-
-
-void cWorld::BroadcastLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo)
-{
-	m_ChunkMap->BroadcastLeashEntity(a_Entity, a_EntityLeashedTo);
-}
-
-
-
-
-
-void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
-{
-	m_ChunkMap->BroadcastUnleashEntity(a_Entity);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityHeadLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityMetadata(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityVelocity(a_Entity, a_Exclude);
-}
-
-
-
-
-void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityAnimation(a_Entity, a_Animation, a_Exclude);
-}
-
-
-
-
-
-
-void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendPlayerListAddPlayer(a_Player);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn())
-		{
-			continue;
-		}
-		ch->SendPlayerListRemovePlayer(a_Player);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendPlayerListUpdateGameMode(a_Player);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendPlayerListUpdatePing(a_Player);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastRemoveEntityEffect(a_Entity, a_EffectID, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendDisplayObjective(a_Objective, a_Display);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
-{
-	LOG("BroadcastSoundEffect with double position arguments is deprecated, use vector-parametered version instead.");
-	BroadcastSoundEffect(a_SoundName, {a_X, a_Y, a_Z}, a_Volume, a_Pitch, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastSpawnEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendTeleportEntity(a_Entity);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastThunderbolt(a_BlockPos, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendTimeUpdate(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(), std::chrono::duration_cast<cTickTimeLong>(m_TimeOfDay).count(), m_IsDaylightCycleEnabled);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	m_ChunkMap->BroadcastUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
-void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendWeather(a_Weather);
-	}
 }
 
 
@@ -3289,9 +2860,9 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 
 
 
-cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
 {
-	double ClosestDistance = a_SightLimit;
+	double ClosestDistance = a_RangeLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
 	cCSLock Lock(m_CSPlayers);
@@ -3301,6 +2872,12 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 		{
 			continue;
 		}
+
+		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		{
+			continue;
+		}
+
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
@@ -3322,7 +2899,15 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 		ClosestDistance = Distance;
 		ClosestPlayer = *itr;
 	}
-	return ClosestPlayer;
+
+	if (ClosestPlayer)
+	{
+		return a_Callback(*ClosestPlayer);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -3558,7 +3143,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	if (a_Open != IsOpen)
 	{
 		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		return true;
 	}
 	return false;
@@ -3739,18 +3324,6 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 
 
 
-/*
-unsigned int cWorld::GetNumPlayers(void)
-{
-	cCSLock Lock(m_CSPlayers);
-	return m_Players.size();
-}
-*/
-
-
-
-
-
 size_t cWorld::GetNumChunks(void) const
 {
 	return m_ChunkMap->GetNumChunks();
@@ -3854,6 +3427,7 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 
 	return SpawnMobFinalize(std::move(Monster));
 }
+
 
 
 
@@ -4086,7 +3660,6 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 
 
 
-
 void cWorld::AddQueuedPlayers(void)
 {
 	ASSERT(m_TickThread.IsCurrentThread());
@@ -4240,11 +3813,4 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 	cPluginManager::Get()->CallHookChunkGenerated(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
-}
-
-
-
-cBroadcaster cWorld::GetBroadcaster()
-{
-	return cBroadcaster(this);
 }

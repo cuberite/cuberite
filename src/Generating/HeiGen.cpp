@@ -295,7 +295,6 @@ bool cHeiGenMultiCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int 
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenClassic:
 

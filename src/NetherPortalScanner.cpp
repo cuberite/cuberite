@@ -9,6 +9,13 @@
 
 
 
+const double cNetherPortalScanner::OutOffset = 2;
+const double cNetherPortalScanner::AcrossOffset = 0.5;
+
+
+
+
+
 cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
 	m_Entity(a_MovingEntity),
 	m_World(a_DestinationWorld),

@@ -8,11 +8,6 @@
 
 
 
-
-
-
-
-
 cMooshroom::cMooshroom(void) :
 	super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
 {

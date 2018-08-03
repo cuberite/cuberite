@@ -5,7 +5,6 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
-#include "Broadcaster.h"
 
 
 
@@ -88,6 +87,10 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 		}
 	);
 }
+
+
+
+
 
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
@@ -183,13 +186,13 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetIsTame(true);
 				SetOwner(a_Player.GetName(), a_Player.GetUUID());
 				m_World->BroadcastEntityStatus(*this, esWolfTamed);
-				m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			}
 			else
 			{
 				// Taming failed
 				m_World->BroadcastEntityStatus(*this, esWolfTaming);
-				m_World->GetBroadcaster().BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 			}
 		}
 	}
@@ -268,10 +271,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (GetTarget() == nullptr)
 	{
-		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
-		if (a_Closest_Player != nullptr)
+		m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 		{
-			switch (a_Closest_Player->GetEquippedItem().m_ItemType)
+			switch (a_Player.GetEquippedItem().m_ItemType)
 			{
 				case E_ITEM_BONE:
 				case E_ITEM_RAW_BEEF:
@@ -288,12 +290,12 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 
-					m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
+					m_FinalDestination = a_Player.GetPosition();  // So that we will look at a player holding food
 
 					// Don't move to the player if the wolf is sitting.
 					if (!IsSitting())
 					{
-						MoveToPosition(a_Closest_Player->GetPosition());
+						MoveToPosition(a_Player.GetPosition());
 					}
 
 					break;
@@ -307,7 +309,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					}
 				}
 			}
-		}
+
+			return true;
+		});
 	}
 	else
 	{
@@ -382,6 +386,8 @@ void cWolf::TickFollowPlayer()
 		}
 	}
 }
+
+
 
 
 

@@ -660,7 +660,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	if ((a_TDI.Attacker != nullptr) && (!IsBaby()))
 	{
-		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+		m_World->SpawnSplitExperienceOrbs(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
 	m_DestroyTimer = std::chrono::milliseconds(0);
 }
@@ -712,13 +712,11 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
-
-	if (Closest != nullptr)
+	m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 	{
-		EventSeePlayer(Closest, a_Chunk);
-	}
+		EventSeePlayer(&a_Player, a_Chunk);
+		return true;
+	}, false);
 }
 
 
@@ -1079,7 +1077,6 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
 /** Sets the target. */
 void cMonster::SetTarget (cPawn * a_NewTarget)
 {
@@ -1343,6 +1340,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 		StartBurning(100);
 	}
 }
+
 
 
 

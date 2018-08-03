@@ -36,7 +36,6 @@
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 #include "IniFile.h"
-#include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
