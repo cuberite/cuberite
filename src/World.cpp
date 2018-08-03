@@ -2298,6 +2298,49 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 
 
 
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
+{
+	std::vector<UInt32> OrbsID;
+
+	if (a_Reward < 1)
+	{
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return OrbsID;
+	}
+
+	std::vector<int> Rewards = cExpOrb::Split(a_Reward);
+
+	// Check generate number to decide speed limit (distribute range)
+	float SpeedLimit = (Rewards.size() / 2) + 5;
+	if (SpeedLimit > 10)
+	{
+		SpeedLimit = 10;
+	}
+
+	auto & Random = GetRandomProvider();
+	for (auto Reward : Rewards)
+	{
+		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Reward);
+		auto ExpOrbPtr = ExpOrb.get();
+		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
+		double SpeedY = Random.RandReal(0.5);
+		double SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
+		ExpOrbPtr->SetSpeed(SpeedX, SpeedY, SpeedZ);
+
+		UInt32 Id = ExpOrbPtr->GetUniqueID();
+		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+		{
+			OrbsID.push_back(Id);
+		}
+	}
+
+	return OrbsID;
+}
+
+
+
+
+
 UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	std::unique_ptr<cMinecart> Minecart;
@@ -2817,9 +2860,9 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 
 
 
-cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
 {
-	double ClosestDistance = a_SightLimit;
+	double ClosestDistance = a_RangeLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
 	cCSLock Lock(m_CSPlayers);
@@ -2829,6 +2872,12 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 		{
 			continue;
 		}
+
+		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		{
+			continue;
+		}
+
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
@@ -2850,7 +2899,15 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 		ClosestDistance = Distance;
 		ClosestPlayer = *itr;
 	}
-	return ClosestPlayer;
+
+	if (ClosestPlayer)
+	{
+		return a_Callback(*ClosestPlayer);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 

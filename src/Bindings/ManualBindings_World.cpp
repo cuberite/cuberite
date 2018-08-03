@@ -463,6 +463,52 @@ static int tolua_cWorld_DoWithPlayerByUUID(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamUserType(2, "Vector3<double>") ||
+		!L.CheckParamNumber(3) ||
+		!L.CheckParamFunction(4) ||
+		// Params 5 and 6 are optional bools, no check for those
+		!L.CheckParamEnd(7)
+		)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	cWorld * Self;
+	Vector3d * Position;
+	double RangeLimit;
+	cLuaState::cRef FnRef;
+	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
+	L.GetStackValues(1, Self, Position, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
+
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #3");
+	}
+
+	// Call the function:
+	bool res = Self->DoWithNearestPlayer(*Position, RangeLimit, [&](cPlayer & a_Player)
+	{
+		bool ret = false;
+		L.Call(FnRef, &a_Player, cLuaState::Return, ret);
+		return ret;
+	}, CheckLineOfSight, IgnoreSpectators);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 {
 	// Exported manually, because tolua doesn't support converting functions to functor types.
@@ -830,6 +876,38 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamUserType(2, "Vector3<double>") ||
+		!L.CheckParamNumber(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	cWorld * self = nullptr;
+	Vector3d * Position;
+	int Reward;
+	L.GetStackValues(1, self, Position, Reward);
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
+		return 0;
+	}
+
+	// Execute and push result:
+	L.Push(self->SpawnExperienceOrb(Position->x, Position->y, Position->z, Reward));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
 	/* Exported manually, because tolua would require the out-only param a_Height to be used when calling
@@ -897,6 +975,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithNearestPlayer",          tolua_cWorld_DoWithNearestPlayer);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",           tolua_cWorld_DoWithPlayerByUUID);
@@ -917,6 +996,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
