@@ -5,6 +5,7 @@ src/Bindings/docs
 src/Bindings/Bindings.cpp
 src/Bindings/Bindings.h
 doxy
+dev-docs
 Server
 Install
 build
