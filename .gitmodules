@@ -65,4 +65,4 @@
 	ignore = dirty
 [submodule "lib/sol2"]
 	path = lib/sol2
-	url = https://github.com/ThePHD/sol2.git
+	url = https://github.com/ThePhD/sol2.git

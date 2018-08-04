@@ -18,8 +18,17 @@ matrix:
         - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
     # Default clang
     - compiler: clang
+      # Newer gcc needed for libstdc++
+      addons: &gcc5
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - gcc-5
       env: *Release
     - compiler: clang
+      addons: *gcc5
       env: *Debug
     # clang 3.6
     - compiler: clang
@@ -41,13 +50,7 @@ matrix:
       env: *Debug
     # gcc 5
     - compiler: gcc
-      addons: &gcc5
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - gcc-5
+      addons: *gcc5
       before_install:
         - CC=gcc-5;CXX=g++-5
       env: *Release
