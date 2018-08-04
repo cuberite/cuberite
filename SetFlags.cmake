@@ -45,7 +45,7 @@ endmacro()
 
 macro(set_flags)
 	set(CMAKE_CXX_STANDARD 14)
-	set(CMAKE_CXX_EXTENTIONS OFF)
+	set(CMAKE_CXX_EXTENSIONS OFF)
 
 	# Add coverage processing, if requested:
 	if (NOT MSVC)
