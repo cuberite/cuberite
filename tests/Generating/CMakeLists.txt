@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.1)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
