@@ -11,6 +11,8 @@
 #include "PluginLua.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 
+#include "../BlockEntities/BlockEntity.h"
+
 
 
 

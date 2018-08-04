@@ -267,6 +267,7 @@ add_subdirectory(lib/fmt)
 # sol2 configuration
 add_definitions(-DSOL_CHECK_ARGUMENTS=1)     # perform argument checking
 add_definitions(-DSOL_STRINGS_ARE_NUMBERS=1) # allow coercion from string to numeric types
+add_definitions(-DSOL_ENABLE_INTEROP=1)      # required to work with tolua++ usertypes
 include_directories(SYSTEM "${CMAKE_CURRENT_LIST_DIR}/lib/sol2/single/sol")
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:

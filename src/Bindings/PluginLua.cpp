@@ -12,11 +12,25 @@
 #endif
 
 #include "PluginLua.h"
+#include "../ClientHandle.h"
 #include "../CommandOutput.h"
+#include "../CraftingRecipes.h"
 #include "PluginManager.h"
 #include "../Item.h"
 #include "../Root.h"
 #include "../WebAdmin.h"
+#include "../World.h"
+
+#include "../Entities/GhastFireballEntity.h"
+#include "../Entities/Player.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/TNTEntity.h"
+#include "../Entities/WitherSkullEntity.h"
+
+#include "../BlockEntities/BrewingstandEntity.h"
+#include "../BlockEntities/HopperEntity.h"
+
+#include "../Generating/ChunkDesc.h"
 
 extern "C"
 {
