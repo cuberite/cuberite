@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.0.2)
 enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/lua/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_definitions(-DTEST_GLOBALS=1)
@@ -70,8 +71,7 @@ set (SHARED_HDRS
 
 set (STUBS
 	Stubs.cpp
-	LuaState_Typedefs.inc
-	LuaState_Declaration.inc
+	SolInterop.h
 	Bindings.h
 )
 
