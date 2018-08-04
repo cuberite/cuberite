@@ -3,7 +3,7 @@ jobs:
   checkout_cuberite:
     working_directory: ~/cuberite
     docker: &cube_docker
-    - image: peterbell10/cuberite-circleci:0.0.3
+    - image: cuberite/docker-build-image:circle-ci
     steps:
     - checkout
     - run: git submodule update --init
