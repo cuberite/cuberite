@@ -42,6 +42,7 @@ class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
 class cDeadlockDetect;
+class cUUID;
 
 
 
