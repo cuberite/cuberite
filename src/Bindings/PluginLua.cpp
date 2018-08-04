@@ -99,7 +99,7 @@ bool cPluginLua::Load(void)
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);
 		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
-		lua_pushstring(m_LuaState, GetName().c_str());
+		m_LuaState.Push(GetName());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
