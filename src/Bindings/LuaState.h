@@ -657,13 +657,12 @@ public:
 	template <typename T>
 	bool GetStackValue(int a_StackPos, T & a_Value)
 	{
-		sol::optional<T> Val = sol::stack::check_get<T>(m_LuaState, a_StackPos);
-		if (!Val)
+		if (!sol::stack::check<T>(m_LuaState, a_StackPos))
 		{
 			return false;
 		}
 
-		a_Value = Val.value();
+		a_Value = sol::stack::get<T>(m_LuaState, a_StackPos);
 		return true;
 	}
 
