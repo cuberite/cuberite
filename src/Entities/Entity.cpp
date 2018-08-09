@@ -88,12 +88,12 @@ cEntity::~cEntity()
 
 	/*
 	// DEBUG:
-	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
+	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",
 		m_UniqueID,
-		m_Pos.x, m_Pos.y, m_Pos.z,
-		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
-		this
-		);
+		m_Pos,
+		GetChunkX(), GetChunkZ(),
+		static_cast<void *>(this)
+	);
 	*/
 
 	if (m_AttachedTo != nullptr)
@@ -146,8 +146,8 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	/*
 	// DEBUG:
-	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
-		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
+	FLOGD("Initializing entity #{0} ({1}) at {2:.02f}",
+		m_UniqueID, GetClass(), m_Pos
 	);
 	*/
 
@@ -992,8 +992,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		/*
 		// DEBUG:
-		LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
-			m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
+		FLOGD("Entity #{0} ({1}) is inside a block at {{2}}",
+			m_UniqueID, GetClass(), Vector3i{BlockX, BlockY, BlockZ}
 		);
 		*/
 	}
