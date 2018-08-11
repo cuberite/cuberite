@@ -474,7 +474,7 @@ bool cFile::CreateFolderRecursive(const AString & a_FolderPath)
 
 	// Go through each path element and create the folder:
 	auto len = a_FolderPath.length();
-	auto PathSep = GetPathSeparator()[0];
+	auto PathSep = '/';
 	for (decltype(len) i = 0; i < len; i++)
 	{
 		if (a_FolderPath[i] == PathSep)
