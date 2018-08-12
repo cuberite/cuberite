@@ -968,6 +968,39 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "If there is a mob head at the specified coords, calls the CallbackFunction with the {{cMobHeadEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMobHeadEntity|MobHeadEntity}})</pre> The function returns false if there is no mob head, or if there is, it returns the bool value that the callback has returned.",
 			},
+			DoWithNearestPlayer =
+			{
+				Params =
+				{
+					{
+						Name = "Position",
+						Type = "Vector3d",
+					},
+					{
+						Name = "RangeLimit",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+					{
+						Name = "CheckLineOfSight",
+						Type = "boolean",
+					},
+					{
+						Name = "IgnoreSpectator",
+						Type = "boolean",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Calls the specified callback function with the {{cPlayer|player}} nearest to the specified position as its parameter, if they are still within the range limit. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+			},
 			DoWithNoteBlockAt =
 			{
 				Params =
@@ -3472,6 +3505,28 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 					Notes = "Spawns a {{cTNTEntity|primed TNT entity}} at the specified coords, with the given fuse ticks. The entity gets a random speed multiplied by the InitialVelocityCoeff, 1 being the default value. Returns the EntityID of the new spawned primed tnt, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no primed tnt was created. (DEPRECATED, use vector-parametered version)",
 				},
+			},
+			SpawnSplitExperienceOrbs =
+			{
+				Params =
+				{
+					{
+						Name = "Position",
+						Type = "Vector3d",
+					},
+					{
+						Name = "Reward",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "EntityID",
+						Type = "table",
+					},
+				},
+				Notes = "Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules. Returns an array-table of UniqueID of all the orbs.",
 			},
 			TryGetHeight =
 			{

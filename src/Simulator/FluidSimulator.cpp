@@ -128,100 +128,61 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 
 
 
-// TODO Not working very well yet :s
-Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
+Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 {
 	if (!cChunkDef::IsValidHeight(a_Y))
 	{
-		return NONE;
-	}
-	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
-	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
-	{
-		return NONE;
+		return {};
 	}
 
-	/*
-	Disabled because of causing problems and being useless atm
-	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);  // If there is nothing or fluid below it -> dominating flow is down :D
-	if ((BlockBelow == E_BLOCK_AIR) || IsAllowedBlock(BlockBelow))
+	if (!IsAllowedBlock(m_World.GetBlock(a_X, a_Y, a_Z)))  // No Fluid -> No Flowing direction :D
 	{
-		return Y_MINUS;
-	}
-	*/
-
-	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
-	int X = 0, Z = 0;  // Lowest Pos will be stored here
-
-	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
-	{
-		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
+		return {};
 	}
 
-	std::vector< Vector3i * > Points;
-
-	Points.reserve(4);  // Already allocate 4 places :D
-
-	// add blocks around the checking pos
-	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
-	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
-	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
-	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
-
-	for (auto itr = Points.cbegin(), end = Points.cend(); itr != end; ++itr)
-	{
-		Vector3i * Pos = (*itr);
-		auto PosBlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
-		if (IsAllowedBlock(PosBlockID))
+	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta) -> NIBBLETYPE
 		{
-			NIBBLETYPE Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			// Falling water blocks are always full height (0)
+			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
+		};
 
-			if (Meta > LowestPoint)
-			{
-				LowestPoint = Meta;
-				X = Pos->x;
-				Z = Pos->z;
-			}
-		}
-		else if (PosBlockID == E_BLOCK_AIR)
+	auto BlockMeta = m_World.GetBlockMeta(a_X, a_Y, a_Z);
+	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
+	NIBBLETYPE LevelPoint[4];
+
+	// blocks around the checking pos
+	Vector3i Points[]
+	{
+		{ a_X + 1, a_Y, a_Z },
+		{ a_X, a_Y, a_Z + 1 },
+		{ a_X - 1, a_Y, a_Z },
+		{ a_X, a_Y, a_Z - 1 }
+	};
+
+	for (size_t i = 0; i < ARRAYCOUNT(LevelPoint); i++)
+	{
+		if (IsAllowedBlock(m_World.GetBlock(Points[i])))
 		{
-			LowestPoint = 9;  // This always dominates
-			X = Pos->x;
-			Z = Pos->z;
-
+			LevelPoint[i] = HeightFromMeta(m_World.GetBlockMeta(Points[i]));
 		}
-		delete Pos;
-		Pos = nullptr;
+		else
+		{
+			LevelPoint[i] = CentralPoint;
+		}
 	}
 
-	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
+	Vector3f Direction;
+
+	// Calculate the flow direction
+
+	Direction.x = (LevelPoint[0] - LevelPoint[2]) / 2.0f;
+	Direction.z = (LevelPoint[1] - LevelPoint[3]) / 2.0f;
+
+	if ((BlockMeta & 0x08) != 0)  // Test falling bit
 	{
-		return NONE;
+		Direction.y = -1.0f;
 	}
 
-	if (a_X - X > 0)
-	{
-		return X_MINUS;
-	}
-
-	if (a_X - X < 0)
-	{
-		return X_PLUS;
-	}
-
-	if (a_Z - Z > 0)
-	{
-		return Z_MINUS;
-	}
-
-	if (a_Z - Z < 0)
-	{
-		return Z_PLUS;
-	}
-
-	return NONE;
+	return Direction;
 }
-
-
-
 

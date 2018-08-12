@@ -1047,51 +1047,23 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
-	switch (WaterDir)
-	{
-		case X_PLUS:
+	auto AdjustSpeed = [](double & a_WaterSpeed, float a_WaterDir)
 		{
-			m_WaterSpeed.x = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case X_MINUS:
-		{
-			m_WaterSpeed.x = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_PLUS:
-		{
-			m_WaterSpeed.z = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_MINUS:
-		{
-			m_WaterSpeed.z = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
-	if (fabs(m_WaterSpeed.x) < 0.05)
-	{
-		m_WaterSpeed.x = 0;
-	}
-
-	if (fabs(m_WaterSpeed.z) < 0.05)
-	{
-		m_WaterSpeed.z = 0;
-	}
+			if (std::abs(a_WaterDir) > (0.05f / 0.4f))
+			{
+				a_WaterSpeed = 0.4 * a_WaterDir;
+			}
+			else if (std::abs(a_WaterSpeed) < 0.05)
+			{
+				a_WaterSpeed = 0.0;
+			}
+		};
+	AdjustSpeed(m_WaterSpeed.x, WaterDir.x);
+	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
 	NextSpeed += m_WaterSpeed;
 
@@ -1104,35 +1076,49 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
 		if (isHit)
 		{
-			// Set our position to where the block was hit, minus a bit:
-			// TODO: The real entity's m_Width should be taken into account here
-			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
-			if (HitBlockFace == BLOCK_FACE_YP)
-			{
-				// We hit the ground, adjust the position to the top of the block:
-				m_bOnGround = true;
-				NextPos.y = HitBlockCoords.y + 1;
-			}
+			// Set our position to where the block was hit:
+			NextPos = HitCoords;
 
-			// Avoid movement in the direction of the blockface that has been hit:
+			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
+			double HalfWidth = GetWidth() / 2.0;
 			switch (HitBlockFace)
 			{
 				case BLOCK_FACE_XM:
+				{
+					NextSpeed.x = 0;
+					NextPos.x -= HalfWidth;
+					break;
+				}
 				case BLOCK_FACE_XP:
 				{
 					NextSpeed.x = 0;
+					NextPos.x += HalfWidth;
 					break;
 				}
 				case BLOCK_FACE_YM:
+				{
+					NextSpeed.y = 0;
+					NextPos.y -= GetHeight();
+					break;
+				}
 				case BLOCK_FACE_YP:
 				{
 					NextSpeed.y = 0;
+					// We hit the ground, adjust the position to the top of the block:
+					m_bOnGround = true;
+					NextPos.y = HitBlockCoords.y + 1;
 					break;
 				}
 				case BLOCK_FACE_ZM:
+				{
+					NextSpeed.z = 0;
+					NextPos.z -= HalfWidth;
+					break;
+				}
 				case BLOCK_FACE_ZP:
 				{
 					NextSpeed.z = 0;
+					NextPos.z += HalfWidth;
 					break;
 				}
 				default:

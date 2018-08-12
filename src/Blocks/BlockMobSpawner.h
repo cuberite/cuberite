@@ -46,6 +46,6 @@ public:
 
 		auto & Random = GetRandomProvider();
 		int Reward = 15 + Random.RandInt(14) + Random.RandInt(14);
-		a_WorldInterface.SpawnExperienceOrb(static_cast<double>(a_BlockX), static_cast<double>(a_BlockY + 1), static_cast<double>(a_BlockZ), Reward);
+		a_WorldInterface.SpawnSplitExperienceOrbs(static_cast<double>(a_BlockX), static_cast<double>(a_BlockY + 1), static_cast<double>(a_BlockZ), Reward);
 	}
 } ;
