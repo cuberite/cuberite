@@ -1485,7 +1485,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally
-		if (DraggingItem.m_ItemType != E_BLOCK_LAPIS_ORE)
+		if (DraggingItem.m_ItemType != E_ITEM_DYE && DraggingItem.m_ItemDamage == E_META_DYE_BLUE)
 		{
 			// Don't slot if it's not lapis
 			return;
