@@ -1485,9 +1485,13 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally
-		if (DraggingItem.m_ItemType != E_ITEM_DYE && DraggingItem.m_ItemDamage == E_META_DYE_BLUE)
+		if ((DraggingItem.m_ItemType != E_ITEM_DYE) || (DraggingItem.m_ItemDamage != E_META_DYE_BLUE))
 		{
 			// Don't slot if it's not lapis
+			if (bAsync)
+			{
+				m_ParentWindow.BroadcastWholeWindow();
+			}
 			return;
 		}
 		return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
