@@ -425,6 +425,8 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		// Send hotbar active slot
 		m_Player->SendHotbarActiveSlot();
 
+		SendPlayerAbilities();
+
 		// Send player list items
 		SendPlayerListAddPlayer(*m_Player);
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
@@ -2725,7 +2727,10 @@ void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animati
 
 void cClientHandle::SendPlayerAbilities()
 {
-	m_Protocol->SendPlayerAbilities();
+	if (m_Player != nullptr)
+	{
+		m_Protocol->SendPlayerAbilities();
+	}
 }
 
 
