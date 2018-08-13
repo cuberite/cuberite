@@ -1482,7 +1482,17 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();
-
+	if (a_SlotNum == 1)
+	{
+		// Lapis slot can have a full stack handle it normally
+		if (DraggingItem.m_ItemType != E_BLOCK_LAPIS_ORE)
+		{
+			// Don't slot if it's not lapis
+			return;
+		}
+		return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	}
+	// Slot 0 is where the item to enhance goes.
 	if (DraggingItem.IsEmpty())
 	{
 		// DraggingItem is empty -> Switch draggingitem and slot
