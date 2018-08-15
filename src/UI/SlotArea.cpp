@@ -1485,7 +1485,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally, also check for empty hand
-		if ((DraggingItem.m_ItemType <= 0) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
+		if ((DraggingItem.IsEmpty()) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
 		{
 			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 		}
