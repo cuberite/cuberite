@@ -3,20 +3,6 @@
 
 #include "NBTDef.h"
 
-#include <unordered_map>
-
-#if (!defined(_MSC_VER) || (_MSC_VER >= 1900))
-	#define HAS_REFERENCE_QUALIFIERS 1
-#else
-	#define HAS_REFERENCE_QUALIFIERS 0
-#endif
-
-#if HAS_REFERENCE_QUALIFIERS
-	#define LVALUE_REF_QUALIFIER &
-#else
-	#define LVALUE_REF_QUALIFIER
-#endif
-
 #pragma push_macro("new")
 #undef new
 
@@ -27,26 +13,54 @@ namespace TreeNBT
 class cCompound;
 class cList;
 class cTag;
-template <typename T> class cArray;
 
+/** Type contained by an empty cTag. */
+class cEmptyTag {};
+
+
+/** cArray represents NBT's TAG_ByteArray and TAG_IntArray. */
+template <typename T>
+class cArray:
+	public std::vector<T>
+{
+	static_assert(
+		std::is_same<T, Int8>::value ||
+		std::is_same<T, Int32>::value,
+		"NBT array doesn't exist for this type, are you looking for cList?"
+	);
+};
+
+
+
+/** Calls the given macro with each TAG name and the associated type */
+#define FOR_EACH_NBT_TAG(MACRO_NAME) \
+	MACRO_NAME(TAG_End,       cEmptyTag) \
+	MACRO_NAME(TAG_Byte,      Int8) \
+	MACRO_NAME(TAG_Short,     Int16) \
+	MACRO_NAME(TAG_Int,       Int32) \
+	MACRO_NAME(TAG_Long,      Int64) \
+	MACRO_NAME(TAG_Float,     float) \
+	MACRO_NAME(TAG_Double,    double) \
+	MACRO_NAME(TAG_String,    AString) \
+	MACRO_NAME(TAG_List,      cList) \
+	MACRO_NAME(TAG_Compound,  cCompound) \
+	MACRO_NAME(TAG_ByteArray, cArray<Int8>) \
+	MACRO_NAME(TAG_IntArray,  cArray<Int32>)
 
 
 namespace Detail
 {
 
-template <eTagType TagID> struct TypeFromTagId;
-template <> struct TypeFromTagId<TAG_End>       { using type = void; };
-template <> struct TypeFromTagId<TAG_Byte>      { using type = Int8; };
-template <> struct TypeFromTagId<TAG_Short>     { using type = Int16; };
-template <> struct TypeFromTagId<TAG_Int>       { using type = Int32; };
-template <> struct TypeFromTagId<TAG_Long>      { using type = Int64; };
-template <> struct TypeFromTagId<TAG_Float>     { using type = float; };
-template <> struct TypeFromTagId<TAG_Double>    { using type = double; };
-template <> struct TypeFromTagId<TAG_String>    { using type = AString; };
-template <> struct TypeFromTagId<TAG_List>      { using type = cList; };
-template <> struct TypeFromTagId<TAG_Compound>  { using type = cCompound; };
-template <> struct TypeFromTagId<TAG_ByteArray> { using type = cArray<Int8>; };
-template <> struct TypeFromTagId<TAG_IntArray>  { using type = cArray<Int32>; };
+template <eTagType TagID> struct sTypeFromTagId  {};
+
+#define CREATE_TYPE_MAPPING(TAG_ID, TYPE) \
+	template <> struct sTypeFromTagId<TAG_ID> { using type = TYPE; };
+FOR_EACH_NBT_TAG(CREATE_TYPE_MAPPING)
+#undef CREATE_MAPPING_STRUCTS
+
+template <eTagType TagId>
+using TypeFromTagId = typename sTypeFromTagId<TagId>::type;
+
 
 // Reimplementation of std::aligned_union
 
@@ -74,52 +88,88 @@ struct aligned_union:
 	>
 {
 };
+using TagStorage = typename aligned_union<1,
+		cEmptyTag,     // TAG_End
+		Int8,          // TAG_Byte
+		Int16,         // TAG_Short
+		Int32,         // TAG_Int
+		Int64,         // TAG_Long
+		float,         // TAG_Float
+		double,        // TAG_Double
+		AString,       // TAG_String
+		// cCompound and cList must be pointers as they are incomplete types
+		cCompound *,   // TAG_Compound
+		cList *,       // TAG_List
+		cArray<Int8>,  // TAG_ByteArray
+		cArray<Int32>  // TAG_IntArray
+	>::type;
+
+/** Get a member from cTag::cPayload storage */
+template <typename T>
+struct PayloadGetter
+{
+	static_assert(std::is_same<typename std::decay<T>::type, T>::value, "Getter should not be cv-qualified");
+	static T & Get(TagStorage & a_TagStorage)
+	{
+		return reinterpret_cast<T &>(a_TagStorage);
+	}
+
+	static const T & Get(const TagStorage & a_TagStorage)
+	{
+		return reinterpret_cast<const T &>(a_TagStorage);
+	}
+};
+
+template <>
+struct PayloadGetter<cCompound>
+{
+	static cCompound & Get(TagStorage & a_TagStorage)
+	{
+		return *reinterpret_cast<cCompound *&>(a_TagStorage);
+	}
+
+	static const cCompound & Get(const TagStorage & a_TagStorage)
+	{
+		using PtrToConst = const cCompound *;
+		return *reinterpret_cast<const PtrToConst &>(a_TagStorage);
+	}
+};
+
+template <>
+struct PayloadGetter<cList>
+{
+	static cList & Get(TagStorage & a_TagStorage)
+	{
+		return *reinterpret_cast<cList *&>(a_TagStorage);
+	}
+
+	static const cList & Get(const TagStorage & a_TagStorage)
+	{
+		using PtrToConst = const cList *;
+		return *reinterpret_cast<const PtrToConst &>(a_TagStorage);
+	}
+};
 
 }  // namespace Detail
 
 
 
-/** cArray represents NBT's TAG_ByteArray and TAG_IntArray. */
-template <typename T>
-class cArray:
-	public std::vector<T>
-{
-	static_assert(
-		std::is_same<T, Int8>::value ||
-		std::is_same<T, Int32>::value,
-		"NBT array doesn't exist for this type, are you looking for cNBTList?"
-	);
-};
-
-
-
-
-
-/** Type used when visiting an empty tag. */
-class cEmptyTag {};
 
 
 class cTag
 {
-	// Note that as TAG_End is abused as the representation of an empty tag
+	// Note that as TAG_End is used to represent a defaulted tag
 public:
 
 	~cTag() { Destroy(); }
 
-	cTag():                      m_TagId{TAG_End},       m_Payload(cEmptyTag{}) {}
-	cTag(Int8 a_Value):          m_TagId{TAG_Byte},      m_Payload(a_Value) {}
-	cTag(Int16 a_Value):         m_TagId{TAG_Short},     m_Payload(a_Value) {}
-	cTag(Int32 a_Value):         m_TagId{TAG_Int},       m_Payload(a_Value) {}
-	cTag(Int64 a_Value):         m_TagId{TAG_Long},      m_Payload(a_Value) {}
-	cTag(float a_Value):         m_TagId{TAG_Float},     m_Payload(a_Value) {}
-	cTag(double a_Value):        m_TagId{TAG_Double},    m_Payload(a_Value) {}
-	cTag(AString a_Value):       m_TagId{TAG_String},    m_Payload(std::move(a_Value)) {}
-	cTag(cArray<Int8> a_Value):  m_TagId{TAG_ByteArray}, m_Payload(std::move(a_Value)) {}
-	cTag(cArray<Int32> a_Value): m_TagId{TAG_IntArray},  m_Payload(std::move(a_Value)) {}
+	#define DECLARE_CONSTRUCTOR(TAG_ID, TYPE) \
+		cTag(TYPE a_Value);
+	FOR_EACH_NBT_TAG(DECLARE_CONSTRUCTOR)
+	#undef DECLARE_CONSTRUCTOR
 
+	cTag(): cTag(cEmptyTag{}) {}
 	cTag(const char * a_String): cTag(AString(a_String)) {}
-	cTag(cCompound a_Value);
-	cTag(cList a_Value);
 
 	cTag(const cTag & a_Copy);
 	cTag(cTag && a_Move);
@@ -127,212 +177,29 @@ public:
 	cTag & operator = (cTag && a_Move);
 
 	template <typename F>
-	void Visit(F && a_Visitor) const LVALUE_REF_QUALIFIER
+	void Visit(F && a_Visitor) const
 	{
 		switch (m_TagId)
 		{
-			case TAG_Byte:
-			{
-				a_Visitor(m_Payload.As<Int8>());
-				return;
-			}
-			case TAG_Short:
-			{
-				a_Visitor(m_Payload.As<Int16>());
-				return;
-			}
-			case TAG_Int:
-			{
-				a_Visitor(m_Payload.As<Int32>());
-				return;
-			}
-			case TAG_Long:
-			{
-				a_Visitor(m_Payload.As<Int64>());
-				return;
-			}
-			case TAG_Float:
-			{
-				a_Visitor(m_Payload.As<float>());
-				return;
-			}
-			case TAG_Double:
-			{
-				a_Visitor(m_Payload.As<double>());
-				return;
-			}
-			case TAG_ByteArray:
-			{
-				a_Visitor(m_Payload.As<cArray<Int8>>());
-				return;
-			}
-			case TAG_String:
-			{
-				a_Visitor(m_Payload.As<AString>());
-				return;
-			}
-			case TAG_List:
-			{
-				a_Visitor(*m_Payload.As<const cList *>());
-				return;
-			}
-			case TAG_Compound:
-			{
-				a_Visitor(*m_Payload.As<const cCompound *>());
-				return;
-			}
-			case TAG_IntArray:
-			{
-				a_Visitor(m_Payload.As<cArray<Int32>>());
-				return;
-			}
-			case TAG_End:
-			{
-				const cEmptyTag Empty{};
-				a_Visitor(Empty);
-				return;
-			}
+			#define VISIT_TAG(TAG_ID, TYPE) \
+				case TAG_ID: a_Visitor(m_Payload.As<TYPE>()); return;
+			FOR_EACH_NBT_TAG(VISIT_TAG)
+			#undef VISIT_TAG
 		}
 	}
 
 	template <typename F>
-	void Visit(F && a_Visitor) LVALUE_REF_QUALIFIER
+	void Visit(F && a_Visitor)
 	{
 		switch (m_TagId)
 		{
-			case TAG_Byte:
-			{
-				a_Visitor(m_Payload.As<Int8>());
-				return;
-			}
-			case TAG_Short:
-			{
-				a_Visitor(m_Payload.As<Int16>());
-				return;
-			}
-			case TAG_Int:
-			{
-				a_Visitor(m_Payload.As<Int32>());
-				return;
-			}
-			case TAG_Long:
-			{
-				a_Visitor(m_Payload.As<Int64>());
-				return;
-			}
-			case TAG_Float:
-			{
-				a_Visitor(m_Payload.As<float>());
-				return;
-			}
-			case TAG_Double:
-			{
-				a_Visitor(m_Payload.As<double>());
-				return;
-			}
-			case TAG_ByteArray:
-			{
-				a_Visitor(m_Payload.As<cArray<Int8>>());
-				return;
-			}
-			case TAG_String:
-			{
-				a_Visitor(m_Payload.As<AString>());
-				return;
-			}
-			case TAG_List:
-			{
-				a_Visitor(*m_Payload.As<cList *>());
-				return;
-			}
-			case TAG_Compound:
-			{
-				a_Visitor(*m_Payload.As<cCompound *>());
-				return;
-			}
-			case TAG_IntArray:
-			{
-				a_Visitor(m_Payload.As<cArray<Int32>>());
-				return;
-			}
-			case TAG_End:
-			{
-				cEmptyTag Empty{};
-				a_Visitor(Empty);
-				return;
-			}
+			#define VISIT_TAG(TAG_ID, TYPE) \
+				case TAG_ID: a_Visitor(m_Payload.As<TYPE>()); return;
+			FOR_EACH_NBT_TAG(VISIT_TAG)
+			#undef VISIT_TAG
 		}
 	}
 
-	#if HAS_REFERENCE_QUALIFIERS
-		template <typename F>
-		void Visit(F && a_Visitor) &&
-		{
-			switch (m_TagId)
-			{
-				case TAG_Byte:
-				{
-					a_Visitor(std::move(m_Payload.As<Int8>()));
-					return;
-				}
-				case TAG_Short:
-				{
-					a_Visitor(std::move(m_Payload.As<Int16>()));
-					return;
-				}
-				case TAG_Int:
-				{
-					a_Visitor(std::move(m_Payload.As<Int32>()));
-					return;
-				}
-				case TAG_Long:
-				{
-					a_Visitor(std::move(m_Payload.As<Int64>()));
-					return;
-				}
-				case TAG_Float:
-				{
-					a_Visitor(std::move(m_Payload.As<float>()));
-					return;
-				}
-				case TAG_Double:
-				{
-					a_Visitor(std::move(m_Payload.As<double>()));
-					return;
-				}
-				case TAG_ByteArray:
-				{
-					a_Visitor(std::move(m_Payload.As<cArray<Int8>>()));
-					return;
-				}
-				case TAG_String:
-				{
-					a_Visitor(std::move(m_Payload.As<AString>()));
-					return;
-				}
-				case TAG_List:
-				{
-					a_Visitor(std::move(*m_Payload.As<cList *>()));
-					return;
-				}
-				case TAG_Compound:
-				{
-					a_Visitor(std::move(*m_Payload.As<cCompound *>()));
-					return;
-				}
-				case TAG_IntArray:
-				{
-					a_Visitor(std::move(m_Payload.As<cArray<Int32>>()));
-					return;
-				}
-				case TAG_End:
-				{
-					a_Visitor(cEmptyTag{});
-					return;
-				}
-			}
-		}
-	#endif  // HAS_REFERENCE_QUALIFIERS
 
 	eTagType TypeId() const
 	{
@@ -341,24 +208,18 @@ public:
 
 	template <eTagType TagId>
 	auto GetAs() const
-		-> const typename Detail::TypeFromTagId<TagId>::type *
+		-> const Detail::TypeFromTagId<TagId> *
 	{
 		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
-		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		sValueGetter<const ValueType> Getter;
-		Visit(Getter);
-		return Getter.m_Result;
+		return (m_TagId == TagId) ? &m_Payload.As<Detail::TypeFromTagId<TagId>>() : nullptr;
 	}
 
 	template <eTagType TagId>
 	auto GetAs()
-		-> typename Detail::TypeFromTagId<TagId>::type *
+		-> Detail::TypeFromTagId<TagId> *
 	{
 		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
-		using ValueType = typename Detail::TypeFromTagId<TagId>::type;
-		sValueGetter<ValueType> Getter;
-		Visit(Getter);
-		return Getter.m_Result;
+		return (m_TagId == TagId) ? &m_Payload.As<Detail::TypeFromTagId<TagId>>() : nullptr;
 	}
 
 	bool IsEmpty() const
@@ -370,143 +231,90 @@ public:
 private:
 
 	/** Union that holds the actual tag value. */
-	union uPayload
+	class cPayload
 	{
-		using Storage = Detail::aligned_union<1,
-			Int8,          // TAG_Byte
-			Int16,         // TAG_Short
-			Int32,         // TAG_Int
-			Int64,         // TAG_Long
-			float,         // TAG_Float
-			double,        // TAG_Double
-			AString,       // TAG_String
-			cCompound *,   // TAG_Compound
-			cList *,       // TAG_List
-			cArray<Int8>,  // TAG_ByteArray
-			cArray<Int32>  // TAG_IntArray
-		>::type;
-
-		Storage m_Storage;
+	public:
 
 		template <typename T>
-		T & As() LVALUE_REF_QUALIFIER
-		{
-			return reinterpret_cast<T &>(m_Storage);
-		}
-
-		template <typename T>
-		const T & As() const LVALUE_REF_QUALIFIER
-		{
-			return reinterpret_cast<const T &>(m_Storage);
-		}
-
-		#if HAS_REFERENCE_QUALIFIERS
-			template <typename T>
-			T && As() &&
-			{
-				using RValue = T && ;
-				return reinterpret_cast<RValue>(m_Storage);
-			}
-		#endif  // HAS_REFERENCE_QUALIFIERS
-
-
-		template <typename T>
-		uPayload(T && a_Value)
+		cPayload(T && a_Value)
 		{
 			Construct(std::forward<T>(a_Value));
 		}
 
-		// Even trivial constructors are given functions so
-		// that templates can rely on overloading.
-
-		void Construct(cEmptyTag) {}
-
-		void Construct(Int8   a_Byte)   { new(&m_Storage) Int8{a_Byte};     }
-		void Construct(Int16  a_Short)  { new(&m_Storage) Int16{a_Short};   }
-		void Construct(Int32  a_Int)    { new(&m_Storage) Int32{a_Int};     }
-		void Construct(Int64  a_Long)   { new(&m_Storage) Int64{a_Long};    }
-		void Construct(float  a_Float)  { new(&m_Storage) float{a_Float};   }
-		void Construct(double a_Double) { new(&m_Storage) double{a_Double}; }
-
-		void Construct(const AString & a_String);
-		void Construct(const cCompound & a_Compound);
-		void Construct(const cList & a_List);
-		void Construct(const cArray<Int8> & a_ByteArray);
-		void Construct(const cArray<Int32> & a_IntArray);
-
-		void Construct(AString && a_String);
-		void Construct(cCompound && a_Compound);
-		void Construct(cList && a_List);
-		void Construct(cArray<Int8> && a_ByteArray);
-		void Construct(cArray<Int32> && a_IntArray);
-
-		void Assign(cEmptyTag) {}
-		void Assign(Int8   a_Byte)   { As<Int8>()   = a_Byte;   }
-		void Assign(Int16  a_Short)  { As<Int16>()  = a_Short;  }
-		void Assign(Int32  a_Int)    { As<Int32>()  = a_Int;    }
-		void Assign(Int64  a_Long)   { As<Int64>()  = a_Long;   }
-		void Assign(float  a_Float)  { As<float>()  = a_Float;  }
-		void Assign(double a_Double) { As<double>() = a_Double; }
-
-		void Assign(AString && a_String);
-		void Assign(cCompound && a_Compound);
-		void Assign(cList && a_List);
-		void Assign(cArray<Int8> && a_ByteArray);
-		void Assign(cArray<Int32> && a_IntArray);
-
-		void Assign(const AString & a_String);
-		void Assign(const cCompound & a_Compound);
-		void Assign(const cList & a_List);
-		void Assign(const cArray<Int8> & a_ByteArray);
-		void Assign(const cArray<Int32> & a_IntArray);
-
-		~uPayload() {}  // Members are destoyed by cTag
-
-	};
-
-
-	/** Visitors to construct the payload from a value. */
-	struct sConstructor
-	{
-		uPayload & Payload;
 		template <typename T>
-		void operator () (T && a_Value)
-		{
-			Payload.Construct(std::forward<T>(a_Value));
-		}
-	};
+		void Construct(T a_Value) { new (&m_Storage) T{std::move(a_Value)}; }
 
-	/** Visitors to assign to the payload from a value. */
-	struct sAssigner
-	{
-		uPayload & Payload;
+		void Construct(cCompound a_Compound);
+		void Construct(cList a_List);
+
 		template <typename T>
-		void operator () (T && a_Value)
+		T & As()
 		{
-			Payload.Assign(std::forward<T>(a_Value));
+			return Detail::PayloadGetter<T>::Get(m_Storage);
 		}
+
+		template <typename T>
+		const T & As() const
+		{
+			return Detail::PayloadGetter<T>::Get(m_Storage);
+		}
+
+		~cPayload() {}  // Members are destoyed by cTag
+
+	private:
+
+
+		/** Storage for the contained value */
+		Detail::TagStorage m_Storage;
 	};
 
-	/** Implementation of GetAs. */
-	template <typename ValueType>
-	struct sValueGetter
+	/** Visitor that copy constructs a new payload from the value. */
+	struct sCopyConstructor
 	{
-		ValueType * m_Result = nullptr;
-
-		// Called for values matching the tag id
-		void operator () (ValueType & a_Value)
+		cPayload & Payload;
+		template <typename T>
+		void operator () (const T & a_Value)
 		{
-			m_Result = &a_Value;
+			Payload.Construct(a_Value);
 		}
-
-		// Called for non-matches
-		template <typename T> void operator () (const T &) {}
 	};
 
+	/** Visitor that move construct a new payload from the value. */
+	struct sMoveConstructor
+	{
+		cPayload & Payload;
+		template <typename T>
+		void operator () (T & a_Value)
+		{
+			Payload.Construct(std::move(a_Value));
+		}
+	};
+
+	/** Visitor that copies the value into an existing payload */
+	struct sCopyAssigner
+	{
+		cPayload & Payload;
+		template <typename T>
+		void operator () (const T & a_Value)
+		{
+			Payload.As<T>() = a_Value;
+		}
+	};
+
+	/** Virtor that moves the value into an existing payload */
+	struct sMoveAssigner
+	{
+		cPayload & Payload;
+		template <typename T>
+		void operator () (T & a_Value)
+		{
+			Payload.As<T>() = std::move(a_Value);
+		}
+	};
 
 	// TAG_End is used to signal the valueless state
 	eTagType m_TagId;
-	uPayload m_Payload;
+	cPayload m_Payload;
 
 	void Destroy();
 };
@@ -584,25 +392,15 @@ public:
 
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) LVALUE_REF_QUALIFIER
+	void Visit(iterator a_Pos, Func a_Visitor)
 	{
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
 	}
 
-	#if HAS_REFERENCE_QUALIFIERS
-		/** Visit the element of the list at the given position. */
-		template <typename Func>
-		void Visit(iterator a_Pos, Func a_Visitor) &&
-		{
-			auto Idx = std::distance(begin(), a_Pos);
-			std::move(m_Tags[Idx]).Visit(std::move(a_Visitor));
-		}
-	#endif
-
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) const LVALUE_REF_QUALIFIER
+	void Visit(iterator a_Pos, Func a_Visitor) const
 	{
 		auto Idx = std::distance(begin(), a_Pos);
 		m_Tags[Idx].Visit(std::move(a_Visitor));
@@ -692,78 +490,17 @@ private:
 /** cCompound represents NBT's TAG_Compound.
 A compound tag is simply an associative container of name-tag pairs.
 As such it provides most of the assiciative container interface. */
-class cCompound
+
+class cCompound:
+	public std::map<AString, cTag>
 {
-	using cTagMap = std::unordered_map<AString, cTag>;
+	using Super = std::map<AString, cTag>;
 public:
-
-	using key_type        = cTagMap::key_type;
-	using mapped_type     = cTagMap::mapped_type;
-	using value_type      = cTagMap::value_type;
-	using size_type       = cTagMap::size_type;
-	using difference_type = cTagMap::difference_type;
-	using pointer         = cTagMap::pointer;
-	using const_pointer   = cTagMap::const_pointer;
-	using reference       = cTagMap::reference;
-	using const_reference = cTagMap::const_reference;
-	using iterator        = cTagMap::iterator;
-	using const_iterator  = cTagMap::const_iterator;
-
 	cCompound() = default;
 	cCompound(std::initializer_list<value_type> a_Init):
-		m_Tags(a_Init)
+		Super(a_Init)
 	{
 	}
-
-	cTag & operator [] (const AString & a_Name)
-	{
-		return m_Tags[a_Name];
-	}
-
-	iterator begin() { return m_Tags.begin(); }
-	const_iterator cbegin() const { return m_Tags.cbegin(); }
-	const_iterator begin() const { return m_Tags.cbegin(); }
-
-	iterator end() { return m_Tags.end(); }
-	const_iterator cend() const { return m_Tags.cend(); }
-	const_iterator end() const { return m_Tags.cend(); }
-
-	bool empty() const { return m_Tags.empty(); }
-	size_type size() const { return m_Tags.size(); }
-	void clear() { m_Tags.clear(); }
-
-	std::pair<iterator, bool> insert(value_type && a_Value)
-	{
-		return m_Tags.insert(std::move(a_Value));
-	}
-
-	std::pair<iterator, bool> insert(const value_type & a_Value)
-	{
-		return m_Tags.insert(a_Value);
-	}
-
-	size_type erase(const AString & a_Name) { return m_Tags.erase(a_Name); }
-	iterator erase(iterator a_Pos) { return m_Tags.erase(a_Pos); }
-	iterator erase(iterator a_First, iterator a_Last)
-	{
-		return m_Tags.erase(a_First, a_Last);
-	}
-
-	void swap(cCompound & a_Other) NOEXCEPT
-	{
-		m_Tags.swap(a_Other.m_Tags);
-	}
-
-	friend void swap(cCompound & a_Lhs, cCompound & a_Rhs) NOEXCEPT
-	{
-		a_Lhs.swap(a_Rhs);
-	}
-
-	iterator find(const AString & a_Name) { return m_Tags.find(a_Name); }
-	const_iterator find(const AString & a_Name) const { return m_Tags.find(a_Name); }
-
-private:
-	cTagMap m_Tags;
 };
 
 
@@ -771,9 +508,12 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // TreeNBT::cTag:
 
-inline cTag::cTag(cCompound a_Value): m_TagId{TAG_Compound}, m_Payload(std::move(a_Value)) {}
-inline cTag::cTag(cList a_Value):     m_TagId{TAG_List},     m_Payload(std::move(a_Value)) {}
+#define DEFINE_CONSTRUCTOR(TAG_ID, TYPE) \
+	inline cTag::cTag(TYPE a_Value): m_TagId{TAG_ID}, m_Payload(std::move(a_Value)) {}
+FOR_EACH_NBT_TAG(DEFINE_CONSTRUCTOR)
+#undef DEFINE_CONSTRUCTOR
 
+#undef FOR_EACH_NBT_TAG
 
 }  // namespace TreeNBT
 

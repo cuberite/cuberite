@@ -1,9 +1,7 @@
 
 #include "Globals.h"
 
-#include "WorldStorage/TreeNBT.h"
-
-#include <unordered_map>
+#include "TreeNBT.h"
 
 
 namespace
@@ -26,8 +24,6 @@ struct sDestroyer
 	{
 		delete &a_Compound;
 	}
-
-	void operator () (TreeNBT::cEmptyTag &) {}
 };
 
 }  // namespace (anonymous)
@@ -37,71 +33,22 @@ struct sDestroyer
 namespace TreeNBT
 {
 
-#pragma push_macro("new")
-#undef new
-
 ////////////////////////////////////////////////////////////////////////////////
-// TreeNBT::cTag::uPayload:
+// TreeNBT::cTag::cPayload:
 
-void cTag::uPayload::Construct(const AString & a_String)
+void cTag::cPayload::Construct(cCompound a_Compound)
 {
-	new(&m_Storage) AString(a_String);
-}
-void cTag::uPayload::Construct(const cCompound & a_Compound)
-{
-	auto Compound = new cCompound(a_Compound);
-	new(&m_Storage) (cCompound*)(Compound);
-}
-void cTag::uPayload::Construct(const cList & a_List)
-{
-	auto List = new cList(a_List);
-	new(&m_Storage) (cList*)(List);
-}
-void cTag::uPayload::Construct(const cArray<Int8> & a_ByteArray)
-{
-	new(&m_Storage) cArray<Int8>(a_ByteArray);
-}
-void cTag::uPayload::Construct(const cArray<Int32> & a_IntArray)
-{
-	new(&m_Storage) cArray<Int32>(a_IntArray);
+	Construct(new cCompound(std::move(a_Compound)));
 }
 
-void cTag::uPayload::Construct(AString && a_String)
-{
-	new(&m_Storage) AString(std::move(a_String));
-}
-void cTag::uPayload::Construct(cCompound && a_Compound)
-{
-	auto Compound = new cCompound(std::move(a_Compound));
-	new(&m_Storage) (cCompound *)(Compound);
-}
-void cTag::uPayload::Construct(cList && a_List)
-{
-	auto List = new cList(std::move(a_List));
-	new(&m_Storage) (cList *)(List);
-}
-void cTag::uPayload::Construct(cArray<Int8> && a_ByteArray)
-{
-	new(&m_Storage) cArray<Int8>(std::move(a_ByteArray));
-}
-void cTag::uPayload::Construct(cArray<Int32> && a_IntArray)
-{
-	new(&m_Storage) cArray<Int32>(std::move(a_IntArray));
-}
 
-void cTag::uPayload::Assign(AString && a_String)         { As<AString>()       = std::move(a_String);    }
-void cTag::uPayload::Assign(cCompound && a_Compound)     { *As<cCompound *>()  = std::move(a_Compound);  }
-void cTag::uPayload::Assign(cList && a_List)             { *As<cList *>()      = std::move(a_List);      }
-void cTag::uPayload::Assign(cArray<Int8> && a_ByteArray) { As<cArray<Int8>>()  = std::move(a_ByteArray); }
-void cTag::uPayload::Assign(cArray<Int32> && a_IntArray) { As<cArray<Int32>>() = std::move(a_IntArray);  }
 
-void cTag::uPayload::Assign(const AString & a_String)         { As<AString>()       = a_String;    }
-void cTag::uPayload::Assign(const cCompound & a_Compound)     { *As<cCompound *>()  = a_Compound;  }
-void cTag::uPayload::Assign(const cList & a_List)             { *As<cList *>()      = a_List;      }
-void cTag::uPayload::Assign(const cArray<Int8> & a_ByteArray) { As<cArray<Int8>>()  = a_ByteArray; }
-void cTag::uPayload::Assign(const cArray<Int32> & a_IntArray) { As<cArray<Int32>>() = a_IntArray;  }
 
-#pragma pop_macro("new")
+
+void cTag::cPayload::Construct(cList a_List)
+{
+	Construct(new cList(std::move(a_List)));
+}
 
 
 
@@ -121,9 +68,9 @@ void cTag::Destroy()
 
 cTag::cTag(const cTag & a_CopyFrom):
 	m_TagId{a_CopyFrom.m_TagId},
-	m_Payload{Int8{0}}
+	m_Payload{cEmptyTag{}}
 {
-	a_CopyFrom.Visit(sConstructor{m_Payload});
+	a_CopyFrom.Visit(sCopyConstructor{m_Payload});
 }
 
 
@@ -132,9 +79,9 @@ cTag::cTag(const cTag & a_CopyFrom):
 
 cTag::cTag(cTag && a_MoveFrom):
 	m_TagId{a_MoveFrom.m_TagId},
-	m_Payload{Int8{0}}
+	m_Payload{cEmptyTag{}}
 {
-	std::move(a_MoveFrom).Visit(sConstructor{m_Payload});
+	a_MoveFrom.Visit(sMoveConstructor{m_Payload});
 }
 
 
@@ -151,24 +98,24 @@ cTag & cTag::operator = (const cTag & a_CopyFrom)
 
 		try
 		{
-			a_CopyFrom.Visit(sConstructor{m_Payload});
+			a_CopyFrom.Visit(sCopyConstructor{m_Payload});
 		}
 		catch (...)
 		{
 			// We just deleted the old value but the new value failed to construct
 			// Tag as empty to avoid double deletion
 			m_TagId = TAG_End;
+			m_Payload.Construct(cEmptyTag{});
 			throw;
 		}
 	}
 	else
 	{
 		// Copy assign same type
-		a_CopyFrom.Visit(sAssigner{m_Payload});
+		a_CopyFrom.Visit(sCopyAssigner{m_Payload});
 	}
 	return *this;
 }
-
 
 
 
@@ -184,20 +131,21 @@ cTag & cTag::operator = (cTag && a_MoveFrom)
 
 		try
 		{
-			std::move(a_MoveFrom).Visit(sConstructor{m_Payload});
+			a_MoveFrom.Visit(sMoveConstructor{m_Payload});
 		}
 		catch (...)
 		{
 			// We just deleted the old value but the new value failed to construct
 			// Tag as empty to avoid double deletion
 			m_TagId = TAG_End;
+			m_Payload.Construct(cEmptyTag{});
 			throw;
 		}
 	}
 	else
 	{
 		// Move assign same type
-		std::move(a_MoveFrom).Visit(sAssigner{m_Payload});
+		a_MoveFrom.Visit(sMoveAssigner{m_Payload});
 	}
 	return *this;
 }
