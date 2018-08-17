@@ -263,7 +263,6 @@ private:
 
 	private:
 
-
 		/** Storage for the contained value */
 		Detail::TagStorage m_Storage;
 	};
@@ -392,31 +391,22 @@ public:
 
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor)
+	void Visit(iterator a_Pos, Func && a_Visitor)
 	{
-		auto Idx = std::distance(begin(), a_Pos);
-		m_Tags[Idx].Visit(std::move(a_Visitor));
+		MutableIterator(a_Pos)->Visit(std::forward<Func>(a_Visitor));
 	}
 
 	/** Visit the element of the list at the given position. */
 	template <typename Func>
-	void Visit(iterator a_Pos, Func a_Visitor) const
+	void Visit(const_iterator a_Pos, Func && a_Visitor) const
 	{
-		auto Idx = std::distance(begin(), a_Pos);
-		m_Tags[Idx].Visit(std::move(a_Visitor));
+		a_Pos->Visit(std::forward<Func>(a_Visitor));
 	}
 
 	/** Type of the current elements or TAG_End if empty. */
 	eTagType TypeId() const
 	{
-		if (m_Tags.empty())
-		{
-			return TAG_End;
-		}
-		else
-		{
-			return m_Tags[0].TypeId();
-		}
+		return m_Tags.empty() ? TAG_End : m_Tags[0].TypeId();
 	}
 
 	// Standard STL style interface
@@ -442,7 +432,6 @@ public:
 	{
 		return m_Tags.erase(MutableIterator(a_First), MutableIterator(a_Last));
 	}
-
 
 	size_type size() const { return m_Tags.size(); }
 	bool empty() const { return m_Tags.empty(); }
@@ -474,8 +463,7 @@ private:
 		);
 	}
 
-	/** Get a mutable iterator from a const_iterator.
-	Needed to workaround missing const_iterator overloads for insert and erase. */
+	/** Make a mutable iterator from a const_iterator. */
 	std::vector<cTag>::iterator MutableIterator(const_iterator a_Itr)
 	{
 		auto Idx = std::distance(cbegin(), a_Itr);
