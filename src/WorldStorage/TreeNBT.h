@@ -1,6 +1,28 @@
 
 #pragma once
 
+/** Declares classes to represent the full NBT tree structure dynamically.
+For (de)serialization purposes, cFastNBT and cParsedNBT are much more efficient but
+these don't allow both reading and modifying NBT at the same time.
+
+The structure consists of 4 main classes:
+
+	* `cCompound` associates multiple NBT tags (`cTag`s) of any kind with a name.
+	As in the file format, it is recommended that all uses of TreeNBT begin with a
+	`cCompound` at top level.
+
+	* `cTag` is a tagged union of the NBT tag types, including `cCompound` which may contain
+	more `cTag`s recursively.
+
+	* `cList` holds multiple tags of the same type, without associating them with a name.
+	There are no restrictions as to what tags a list can hold.
+
+	* `cArray` also holds multiple tags of the same type without associating a name.
+	However, unlike `cList`, `cArray` it templated on the type that it stores.
+	Furthermore, it may only contain `Int8` for "ByteArray" or `Int32` for "IntArray".
+*/
+
+
 #include "NBTDef.h"
 
 #pragma push_macro("new")
