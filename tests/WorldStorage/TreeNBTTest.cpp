@@ -19,22 +19,9 @@ const char * StrConst()
 	}
 }
 
-template <typename T>
-const char * StrRefQual()
-{
-	if (!std::is_reference<T>::value)
-	{
-		return "";
-	}
-	else if (std::is_rvalue_reference<T>::value)
-	{
-		return " &&";
-	}
-	else
-	{
-		return " &";
-	}
-}
+
+
+
 
 template <typename Expected>
 struct sVisitExpect
@@ -45,13 +32,16 @@ struct sVisitExpect
 	void operator () (Arg &&)
 	{
 		using Unexpected = Arg &&;
-		FLOGERROR("Expected {0}{1}{2}, got {3}{4}{5}",
-			StrConst<Expected>(),   typeid(Expected).name(),   StrRefQual<Expected>(),
-			StrConst<Unexpected>(), typeid(Unexpected).name(), StrRefQual<Unexpected>()
+		FLOGERROR("Expected {0}{1}, got {2}{3}",
+			StrConst<Expected>(),   typeid(Expected).name(),
+			StrConst<Unexpected>(), typeid(Unexpected).name()
 		);
 		assert_test(!"Visit called with unexpected type");
 	}
 };
+
+
+
 
 
 void GetAsExpect(TreeNBT::cTag & a_Tag, eTagType Expected)
@@ -71,6 +61,9 @@ void GetAsExpect(TreeNBT::cTag & a_Tag, eTagType Expected)
 }
 
 
+
+
+
 template <eTagType ExpectedTypeId, typename ExpectedVisitType>
 void AssertHoldsType(TreeNBT::cTag & a_Tag)
 {
@@ -78,13 +71,13 @@ void AssertHoldsType(TreeNBT::cTag & a_Tag)
 	assert_test(a_Tag.TypeId() == ExpectedTypeId);
 	GetAsExpect(a_Tag, ExpectedTypeId);
 	a_Tag.Visit(sVisitExpect<ExpectedVisitType &>{});
-	using RVal = ExpectedVisitType &&;
-	std::move(a_Tag).Visit(sVisitExpect<RVal>{});
 
 	const auto & ConstTag = a_Tag;
 	ConstTag.Visit(sVisitExpect<const ExpectedVisitType &>{});
 
 }
+
+
 
 
 
@@ -142,6 +135,8 @@ void TestTagCreation()
 		AssertHoldsType<TAG_IntArray, TreeNBT::cArray<Int32>>(IntArrayTag);
 	}
 }
+
+
 
 
 
