@@ -2,26 +2,26 @@
 #pragma once
 
 /** Declares classes to represent the full NBT tree structure dynamically.
-For (de)serialization purposes, cFastNBT and cParsedNBT are much more efficient but
-these don't allow both reading and modifying NBT at the same time.
 
-The structure consists of 4 main classes:
+For (de)serialization purposes, cFastNBT and cParsedNBT are much more efficient
+but these don't allow both reading and modifying NBT at the same time.
 
-	* `cCompound` associates multiple NBT tags (`cTag`s) of any kind with a name.
-	As in the file format, it is recommended that all uses of TreeNBT begin with a
+The structure consists of 3 main classes:
+
+	* `cCompound` is a map from string to NBT tag (`cTag`) that gives the tag
+	its name. As in the file format, all uses of TreeNBT begin with a
 	`cCompound` at top level.
 
-	* `cTag` is a tagged union of the NBT tag types, including `cCompound` which may contain
-	more `cTag`s recursively.
+	* `cTag` is a tagged union of all NBT tag types, including `cCompound` which
+	may contain more `cTag`s recursively.
 
-	* `cList` holds multiple tags of the same type, without associating them with a name.
-	There are no restrictions as to what tags a list can hold.
+	* `cList` holds multiple tags of the same type, without associating them
+	with a name. There are no restrictions as to what tags a list can hold.
 
-	* `cArray` also holds multiple tags of the same type without associating a name.
-	However, unlike `cList`, `cArray` it templated on the type that it stores.
-	Furthermore, it may only contain `Int8` for "ByteArray" or `Int32` for "IntArray".
+There is also the `cByteArray` and `cIntArray` which correspond to the similarly
+named NBT types (TAG_ByteArray and TAG_IntArray). These are simply aliases to
+the appropriate vector type.
 */
-
 
 #include "NBTDef.h"
 
@@ -32,27 +32,18 @@ namespace TreeNBT
 {
 
 // fwd:
-class cCompound;
 class cList;
 class cTag;
 
+/** cCompound represents NBT's TAG_Compound.
+A compound tag is just a map that associates a tag with a name. */
+using cCompound = std::map<AString, cTag>;
+
+using cByteArray = std::vector<Int8>;
+using cIntArray = std::vector<Int32>;
+
 /** Type contained by an empty cTag. */
 class cEmptyTag {};
-
-
-/** cArray represents NBT's TAG_ByteArray and TAG_IntArray. */
-template <typename T>
-class cArray:
-	public std::vector<T>
-{
-	static_assert(
-		std::is_same<T, Int8>::value ||
-		std::is_same<T, Int32>::value,
-		"NBT array doesn't exist for this type, are you looking for cList?"
-	);
-};
-
-
 
 /** Calls the given macro with each TAG name and the associated type */
 #define FOR_EACH_NBT_TAG(MACRO_NAME) \
@@ -66,8 +57,8 @@ class cArray:
 	MACRO_NAME(TAG_String,    AString) \
 	MACRO_NAME(TAG_List,      cList) \
 	MACRO_NAME(TAG_Compound,  cCompound) \
-	MACRO_NAME(TAG_ByteArray, cArray<Int8>) \
-	MACRO_NAME(TAG_IntArray,  cArray<Int32>)
+	MACRO_NAME(TAG_ByteArray, cByteArray) \
+	MACRO_NAME(TAG_IntArray,  cIntArray)
 
 
 namespace Detail
@@ -78,7 +69,7 @@ template <eTagType TagID> struct sTypeFromTagId  {};
 #define CREATE_TYPE_MAPPING(TAG_ID, TYPE) \
 	template <> struct sTypeFromTagId<TAG_ID> { using type = TYPE; };
 FOR_EACH_NBT_TAG(CREATE_TYPE_MAPPING)
-#undef CREATE_MAPPING_STRUCTS
+#undef CREATE_TYPE_MAPPING
 
 template <eTagType TagId>
 using TypeFromTagId = typename sTypeFromTagId<TagId>::type;
@@ -90,9 +81,7 @@ template <size_t... Values> struct Maximum;
 
 template <size_t N1, size_t N2, size_t... Tail>
 struct Maximum<N1, N2, Tail...>:
-	std::integral_constant<size_t,
-		(N1 > N2) ? Maximum<N1, Tail...>::value : Maximum<N2, Tail...>::value
-	>
+	Maximum<(N1 > N2) ? N1 : N2, Tail...>
 {
 };
 
@@ -110,6 +99,7 @@ struct aligned_union:
 	>
 {
 };
+
 using TagStorage = aligned_union<1,
 		cEmptyTag,     // TAG_End
 		Int8,          // TAG_Byte
@@ -122,8 +112,8 @@ using TagStorage = aligned_union<1,
 		// cCompound and cList must be pointers as they are incomplete types
 		cCompound *,   // TAG_Compound
 		cList *,       // TAG_List
-		cArray<Int8>,  // TAG_ByteArray
-		cArray<Int32>  // TAG_IntArray
+		cByteArray,    // TAG_ByteArray
+		cIntArray      // TAG_IntArray
 	>::type;
 
 /** Get a member from cTag::cPayload storage */
@@ -229,18 +219,14 @@ public:
 	}
 
 	template <eTagType TagId>
-	auto GetAs() const
-		-> const Detail::TypeFromTagId<TagId> *
+	const Detail::TypeFromTagId<TagId> * GetAs() const
 	{
-		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		return (m_TagId == TagId) ? &m_Payload.As<Detail::TypeFromTagId<TagId>>() : nullptr;
 	}
 
 	template <eTagType TagId>
-	auto GetAs()
-		-> Detail::TypeFromTagId<TagId> *
+	Detail::TypeFromTagId<TagId> * GetAs()
 	{
-		static_assert(TagId != TAG_End, "Trying to GetAs invalid tag type");
 		return (m_TagId == TagId) ? &m_Payload.As<Detail::TypeFromTagId<TagId>>() : nullptr;
 	}
 
@@ -347,19 +333,20 @@ To maintain this property, the individual elements can't be modified directly.
 Instead, elements must be modified via the `Visit` function. */
 class cList
 {
+	using cTagArray = std::vector<cTag>;
 public:
-	using value_type             = std::vector<cTag>::value_type;
-	using size_type              = std::vector<cTag>::size_type;
-	using difference_type        = std::vector<cTag>::difference_type;
+	using value_type      = cTagArray::value_type;
+	using size_type       = cTagArray::size_type;
+	using difference_type = cTagArray::difference_type;
+	using const_reference = cTagArray::const_reference;
+	using const_pointer   = cTagArray::const_pointer;
+	using const_iterator  = cTagArray::const_iterator;
 
 	// No modifiable references can be handed out in order to maintain
 	// the invariant that all tags are of the same type
-	using reference              = std::vector<cTag>::const_reference;
-	using const_reference        = std::vector<cTag>::const_reference;
-	using pointer                = std::vector<cTag>::const_pointer;
-	using const_pointer          = std::vector<cTag>::const_pointer;
-	using iterator               = std::vector<cTag>::const_iterator;
-	using const_iterator         = std::vector<cTag>::const_iterator;
+	using reference = const_reference;
+	using pointer   = const_pointer;
+	using iterator  = const_iterator;
 
 	/** Try to insert a new tag at the given position.
 	Returns false if the tag is of the wrong type and cannot be inserted. */
@@ -473,7 +460,7 @@ public:
 	}
 
 private:
-	std::vector<cTag> m_Tags;
+	cTagArray m_Tags;
 
 	/** Can the given tag type be added to the list? */
 	bool IsTagCompatible(eTagType a_Type) const
@@ -486,7 +473,7 @@ private:
 	}
 
 	/** Make a mutable iterator from a const_iterator. */
-	std::vector<cTag>::iterator MutableIterator(const_iterator a_Itr)
+	cTagArray::iterator MutableIterator(const_iterator a_Itr)
 	{
 		auto Idx = std::distance(cbegin(), a_Itr);
 		return m_Tags.begin() + Idx;
@@ -494,24 +481,6 @@ private:
 };
 
 
-
-
-
-/** cCompound represents NBT's TAG_Compound.
-A compound tag is simply an associative container of name-tag pairs.
-As such it provides most of the assiciative container interface. */
-
-class cCompound:
-	public std::map<AString, cTag>
-{
-	using Super = std::map<AString, cTag>;
-public:
-	cCompound() = default;
-	cCompound(std::initializer_list<value_type> a_Init):
-		Super(a_Init)
-	{
-	}
-};
 
 
 

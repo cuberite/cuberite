@@ -112,8 +112,8 @@ void TestTagCreation()
 		AssertHoldsType<TAG_Double, double>(DoubleTag);
 	}
 	{
-		TreeNBT::cTag ByteArrayTag = TreeNBT::cArray<Int8>{};
-		AssertHoldsType<TAG_ByteArray, TreeNBT::cArray<Int8>>(ByteArrayTag);
+		TreeNBT::cTag ByteArrayTag = TreeNBT::cByteArray{};
+		AssertHoldsType<TAG_ByteArray, TreeNBT::cByteArray>(ByteArrayTag);
 	}
 	{
 		TreeNBT::cTag StringTag = AString{};
@@ -131,8 +131,8 @@ void TestTagCreation()
 		AssertHoldsType<TAG_Compound, TreeNBT::cCompound>(CompoundTag);
 	}
 	{
-		TreeNBT::cTag IntArrayTag = TreeNBT::cArray<Int32>{};
-		AssertHoldsType<TAG_IntArray, TreeNBT::cArray<Int32>>(IntArrayTag);
+		TreeNBT::cTag IntArrayTag = TreeNBT::cIntArray{};
+		AssertHoldsType<TAG_IntArray, TreeNBT::cIntArray>(IntArrayTag);
 	}
 }
 
