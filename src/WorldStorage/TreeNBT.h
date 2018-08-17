@@ -242,7 +242,7 @@ private:
 		}
 
 		template <typename T>
-		void Construct(T a_Value) { new (&m_Storage) T{std::move(a_Value)}; }
+		void Construct(T a_Value) { new (&m_Storage) T(std::move(a_Value)); }
 
 		void Construct(cCompound a_Compound);
 		void Construct(cList a_List);
