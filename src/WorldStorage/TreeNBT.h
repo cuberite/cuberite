@@ -109,8 +109,8 @@ using TagStorage = aligned_union<1,
 		float,         // TAG_Float
 		double,        // TAG_Double
 		AString,       // TAG_String
-		// cCompound and cList must be pointers as they are incomplete types
-		cCompound *,   // TAG_Compound
+		cCompound,     // TAG_Compound
+		// cList must be a pointer as it is still an incomplete type
 		cList *,       // TAG_List
 		cByteArray,    // TAG_ByteArray
 		cIntArray      // TAG_IntArray
@@ -129,21 +129,6 @@ struct PayloadGetter
 	static const T & Get(const TagStorage & a_TagStorage)
 	{
 		return reinterpret_cast<const T &>(a_TagStorage);
-	}
-};
-
-template <>
-struct PayloadGetter<cCompound>
-{
-	static cCompound & Get(TagStorage & a_TagStorage)
-	{
-		return *reinterpret_cast<cCompound *&>(a_TagStorage);
-	}
-
-	static const cCompound & Get(const TagStorage & a_TagStorage)
-	{
-		using PtrToConst = const cCompound *;
-		return *reinterpret_cast<const PtrToConst &>(a_TagStorage);
 	}
 };
 
@@ -168,6 +153,7 @@ struct PayloadGetter<cList>
 
 
 
+/** A tagged union of all NBT tag types */
 class cTag
 {
 	// Note that as TAG_End is used to represent a defaulted tag
@@ -252,7 +238,6 @@ private:
 		template <typename T>
 		void Construct(T a_Value) { new (&m_Storage) T(std::move(a_Value)); }
 
-		void Construct(cCompound a_Compound);
 		void Construct(cList a_List);
 
 		template <typename T>

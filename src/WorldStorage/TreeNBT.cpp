@@ -15,10 +15,6 @@ struct sDestroyer
 		a_Value.~T();
 	}
 
-	void operator () (TreeNBT::cCompound & a_Compound)
-	{
-		delete &a_Compound;
-	}
 
 	void operator () (TreeNBT::cList & a_Compound)
 	{
@@ -35,15 +31,6 @@ namespace TreeNBT
 
 ////////////////////////////////////////////////////////////////////////////////
 // TreeNBT::cTag::cPayload:
-
-void cTag::cPayload::Construct(cCompound a_Compound)
-{
-	Construct(new cCompound(std::move(a_Compound)));
-}
-
-
-
-
 
 void cTag::cPayload::Construct(cList a_List)
 {
