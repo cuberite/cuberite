@@ -88,7 +88,7 @@ struct aligned_union:
 	>
 {
 };
-using TagStorage = typename aligned_union<1,
+using TagStorage = aligned_union<1,
 		cEmptyTag,     // TAG_End
 		Int8,          // TAG_Byte
 		Int16,         // TAG_Short
