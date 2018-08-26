@@ -193,7 +193,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 
 	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
 	cEntityEffect * Effect = Res.first->second.get();
 	Effect->OnActivate(*this);
 }
