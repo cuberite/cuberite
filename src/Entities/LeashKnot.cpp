@@ -2,10 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "LeashKnot.h"
-#include "ClientHandle.h"
 #include "Player.h"
-#include "Mobs/Monster.h"
-#include "BoundingBox.h"
+#include "../Mobs/Monster.h"
+#include "../BoundingBox.h"
+#include "../ClientHandle.h"
 
 // Ticks to wait in Tick function to optimize calculations
 #define TICK_STEP 10

@@ -2,11 +2,11 @@
 #include "Globals.h"
 
 #include "ChunkGenerator.h"
-#include "../IniFile.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
-#include "FastRandom.h"
+#include "../IniFile.h"
+#include "../FastRandom.h"
 
 
 

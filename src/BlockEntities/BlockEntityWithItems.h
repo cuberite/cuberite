@@ -12,7 +12,7 @@
 #include "BlockEntity.h"
 #include "../ItemGrid.h"
 #include "../UI/WindowOwner.h"
-#include "World.h"
+#include "../World.h"
 
 
 

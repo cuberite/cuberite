@@ -7,7 +7,7 @@
 #include "PieceStructuresGen.h"
 #include "PrefabStructure.h"
 #include "PieceGeneratorBFSTree.h"
-#include "IniFile.h"
+#include "../IniFile.h"
 #include "../Stopwatch.h"
 
 

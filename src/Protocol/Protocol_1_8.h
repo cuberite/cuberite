@@ -16,21 +16,8 @@ Declares the 1.8 protocol classes:
 #include "Protocol.h"
 #include "../ByteBuffer.h"
 
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
-
-#include "mbedTLS++/AesCfb128Decryptor.h"
-#include "mbedTLS++/AesCfb128Encryptor.h"
+#include "../mbedTLS++/AesCfb128Decryptor.h"
+#include "../mbedTLS++/AesCfb128Encryptor.h"
 
 
 

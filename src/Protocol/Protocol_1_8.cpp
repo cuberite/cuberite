@@ -11,7 +11,7 @@ Implements the 1.8 protocol classes:
 #include "json/json.h"
 #include "Protocol_1_8.h"
 #include "ChunkDataSerializer.h"
-#include "mbedTLS++/Sha1Checksum.h"
+#include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
@@ -46,7 +46,7 @@ Implements the 1.8 protocol classes:
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
-#include "Bindings/PluginManager.h"
+#include "../Bindings/PluginManager.h"
 
 
 

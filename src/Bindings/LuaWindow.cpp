@@ -7,9 +7,9 @@
 #include "../Entities/Player.h"
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
-#include "Root.h"
 #include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
-#include "ClientHandle.h"
+#include "../Root.h"
+#include "../ClientHandle.h"
 
 
 

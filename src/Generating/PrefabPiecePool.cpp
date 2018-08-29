@@ -5,9 +5,9 @@
 
 #include "Globals.h"
 #include "PrefabPiecePool.h"
-#include "../Bindings/LuaState.h"
-#include "WorldStorage/SchematicFileSerializer.h"
 #include "VerticalStrategy.h"
+#include "../Bindings/LuaState.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
 
 

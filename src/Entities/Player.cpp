@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 #include "Player.h"
-#include "Mobs/Wolf.h"
-#include "Mobs/Horse.h"
+#include "../Mobs/Wolf.h"
+#include "../Mobs/Horse.h"
 #include "../BoundingBox.h"
 #include "../ChatColor.h"
 #include "../Server.h"

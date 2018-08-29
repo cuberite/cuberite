@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
+#include "Player.h"
 #include "../World.h"
 #include "../Root.h"
 #include "../Matrix4.h"
@@ -10,8 +11,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
 #include "../LineBlockTracer.h"
-#include "Player.h"
-#include "Items/ItemHandler.h"
+#include "../Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"

@@ -4,8 +4,8 @@
 #include "BlockHandler.h"
 #include "../BoundingBox.h"
 #include "../EffectID.h"
-#include "Entities/LeashKnot.h"
-#include "BoundingBox.h"
+#include "../Entities/LeashKnot.h"
+#include "../BoundingBox.h"
 #include "../Mobs/PassiveMonster.h"
 
 

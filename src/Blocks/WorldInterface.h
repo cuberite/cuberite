@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "FunctionRef.h"
+#include "../FunctionRef.h"
 #include "../Mobs/MonsterTypes.h"
 
 class cBedEntity;
@@ -13,6 +13,7 @@ class cPlayer;
 using cBedCallback         = cFunctionRef<bool(cBedEntity   &)>;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 using cPlayerListCallback  = cFunctionRef<bool(cPlayer      &)>;
+using cEntityCallback      = cFunctionRef<bool(cEntity      &)>;
 
 
 

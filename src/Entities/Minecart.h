@@ -10,7 +10,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "World.h"
+#include "../World.h"
 #include "../UI/WindowOwner.h"
 
 

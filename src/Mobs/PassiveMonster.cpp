@@ -4,7 +4,7 @@
 #include "PassiveMonster.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 #include "../Items/ItemSpawnEgg.h"
 
 

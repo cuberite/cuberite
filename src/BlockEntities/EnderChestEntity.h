@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "UI/WindowOwner.h"
+#include "../UI/WindowOwner.h"
 
 
 

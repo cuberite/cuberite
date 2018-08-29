@@ -39,7 +39,7 @@ Implements the 1.10 protocol classes:
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
-#include "Bindings/PluginManager.h"
+#include "../Bindings/PluginManager.h"
 
 
 
