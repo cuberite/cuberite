@@ -4,8 +4,7 @@ set -e
 
 FIXES_FILE="tidy-fixes.yaml"
 REGEX="/cuberite/src/\.?[^\.]"
-# TODO: Add -quiet when Circle CI is updated to 2.0 with a newer version of Ubuntu
-ARGS="-header-filter $REGEX -export-fixes $FIXES_FILE "$@" $REGEX"
+ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE "$@" $REGEX"
 
 mkdir -p tidy-build
 cd tidy-build

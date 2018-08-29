@@ -10,3 +10,52 @@ td, th
 	border: 1px inset
 }
 
+
+// Copied over from Server/Plugins/APIDump/main.css to make the pages look like the API docs:
+
+html
+{
+	background-color: #C0C0C0;
+}
+
+
+pre
+{
+	border: 1px solid #ccc;
+	background-color: #eee;
+	-moz-tab-size:    2;
+	-o-tab-size:      2;
+	-webkit-tab-size: 2;
+	-ms-tab-size:     2;
+	tab-size:         2;
+}
+
+body
+{
+	min-width: 400px;
+	max-width: 1200px;
+	width: 95%;
+	margin: 10px auto;
+	background-color: white;
+	border: 4px #FF8C00 solid;
+	border-radius: 20px;
+	font-family: Calibri, Trebuchet MS;
+}
+
+header
+{
+	text-align: center;
+	font-family: Segoe UI Light, Helvetica;
+}
+
+footer
+{
+	text-align: center;
+	font-family: Segoe UI Light, Helvetica;
+}
+
+#content, #timestamp
+{
+	padding: 0px 25px 25px 25px;
+}
+

@@ -121,7 +121,7 @@ public:
 
 		if (Reward != 0)
 		{
-			a_WorldInterface.SpawnExperienceOrb(a_BlockX, a_BlockY, a_BlockZ, Reward);
+			a_WorldInterface.SpawnSplitExperienceOrbs(a_BlockX, a_BlockY, a_BlockZ, Reward);
 		}
 	}
 } ;

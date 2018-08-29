@@ -1482,7 +1482,21 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();
+	if (a_SlotNum == 1)
+	{
+		// Lapis slot can have a full stack handle it normally, also check for empty hand
+		if ((DraggingItem.IsEmpty()) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
+		{
+			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		}
 
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
+	}
+	// Slot 0 is where the item to enhance goes.
 	if (DraggingItem.IsEmpty())
 	{
 		// DraggingItem is empty -> Switch draggingitem and slot
@@ -1521,6 +1535,28 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
 {
+	if ((a_ItemStack.m_ItemType == E_ITEM_DYE) && (a_ItemStack.m_ItemDamage == E_META_DYE_BLUE))
+	{
+		// It's lapis, put it in the lapis spot.
+		const cItem * Slot = GetSlot(1, a_Player);
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			return;
+		}
+		NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
+		if (a_Apply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(1, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		// Return so we don't put overflow into the enchantment slot
+		return;
+	}
 	const cItem * Slot = GetSlot(0, a_Player);
 	if (!Slot->IsEmpty())
 	{
@@ -1937,7 +1973,7 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	int Reward = m_Furnace->GetAndResetReward();
 	if (Reward > 0)
 	{
-		a_Player.GetWorld()->SpawnExperienceOrb(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+		a_Player.GetWorld()->SpawnSplitExperienceOrbs(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
 	}
 
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
