@@ -137,7 +137,7 @@ public:
 	void ResetAttackCooldown();
 
 	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }  // tolua_export
-	const bool BurnsInDaylight() { return m_BurnsInDaylight; }  // tolua_export
+	bool BurnsInDaylight() const { return m_BurnsInDaylight; }  // tolua_export
 
 	double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
