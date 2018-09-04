@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "This script generates the certificate and private key for the https webadmin"
 echo "Note that the generated certificate is self-signed, and therefore not trusted by browsers"

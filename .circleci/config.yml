@@ -28,6 +28,13 @@ jobs:
     - attach_workspace: { at: ~/ }
     - run: ./clang-tidy.sh -j 2
 
+  shellcheck:
+    working_directory: ~/cuberite
+    docker: *cube_docker
+    steps:
+    - attach_workspace: { at: ~/ }
+    - run: ./shellcheck.sh
+
 workflows:
   version: 2
   checks:
@@ -37,5 +44,8 @@ workflows:
         requires:
         - checkout_cuberite
     - clang-tidy:
+        requires:
+        - checkout_cuberite
+    - shellcheck:
         requires:
         - checkout_cuberite

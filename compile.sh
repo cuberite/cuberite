@@ -83,7 +83,7 @@ errorInput ()
 	echo
 	echoInt "-----------------"
 	echo "Unrecognized user input"
-	echo "$@"
+	echo "$1"
 	exit 5
 }
 
@@ -101,7 +101,7 @@ errorOther ()
 
 echoInt () # echo only if interactive mode.
 {
-	if [ $STATE_INTERACTIVE -eq 1 ]; then
+	if [ "$STATE_INTERACTIVE" -eq 1 ]; then
 		echo "$1"
 	fi
 }
@@ -228,13 +228,13 @@ doDependencyCheck()
 	# Depdendency check.
 	checkPackages ()
 	{
-		echo "$PROGRAMS" | while read line; do
-			EXE_NAME=`echo "$line" | cut -f 1 -d " "`
-			PACKAGE_NAME=`echo "$line" | cut -f 2 -d " "`
-			command -v $EXE_NAME > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
+		echo "$PROGRAMS" | while read -r line; do
+			EXE_NAME=$(echo "$line" | cut -f 1 -d " ")
+			PACKAGE_NAME=$(echo "$line" | cut -f 2 -d " ")
+			command -v "$EXE_NAME" > /dev/null 2> /dev/null || printf %s " $PACKAGE_NAME"
 		done
 	}
-	MISSING_PACKAGES="$MISSING_PACKAGES`checkPackages`"
+	MISSING_PACKAGES="$MISSING_PACKAGES$(checkPackages)"
 	missingDepsExit ()
 	{
 		if [ "$1" != "" ]; then
@@ -251,7 +251,7 @@ doDependencyCheck()
 		echoInt
 		echoInt "-----------------"
 		echoErr "You have missing compilation dependencies:"
-		echoErr $MISSING_PACKAGES
+		echoErr "$MISSING_PACKAGES"
 		echoErr
 
 		# apt-get guide.
@@ -305,7 +305,7 @@ You can choose between 3 branches:
 
 
 printf %s "Choose the branch (s/t/d): "
-read CHOICE_BRANCH
+read -r CHOICE_BRANCH
 case $CHOICE_BRANCH in
 	s|S)
 		errorOther "We don't have a stable branch yet, please use testing, sorry."
@@ -317,7 +317,7 @@ case $CHOICE_BRANCH in
 		CHOICE_BRANCH="master"
 		;;
 	*)
-		errorInput
+		errorInput "$@"
 		;;
 esac
 
@@ -342,7 +342,7 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 	"
 
 	printf %s "Choose compile mode: (r/d) (Default: \"$DEFAULT_BUILDTYPE\"): "
-	read CHOICE_BUILDTYPE
+	read -r CHOICE_BUILDTYPE
 	case $CHOICE_BUILDTYPE in
 		d|D)
 			CHOICE_BUILDTYPE="Debug"
@@ -364,18 +364,18 @@ fi
 
 numberOfThreads()
 {
-	KERNEL=`uname -s`
+	KERNEL=$(uname -s)
 
 	if [ "$KERNEL" = "Linux" ] || [ "$KERNEL" = "Darwin" ]; then
-		echo `getconf _NPROCESSORS_ONLN`
+		getconf _NPROCESSORS_ONLN
 	elif [ "$KERNEL" = "FreeBSD" ]; then
-		echo `getconf NPROCESSORS_ONLN`
+		getconf NPROCESSORS_ONLN
 	else
 		echo "unknown"
 	fi
 }
 
-CPU_THREAD_COUNT=`numberOfThreads`
+CPU_THREAD_COUNT=$(numberOfThreads)
 
 if [ $STATE_INTERACTIVE -eq 1 ]; then
 	echo ""
@@ -392,13 +392,13 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 	echo "If you have enough RAM, it is wise to choose your CPU's thread count. "
 	echo "Otherwise choose lower. Old Raspberry Pis should choose 1. If in doubt, choose 1."
 	printf %s "Please enter the number of compilation threads to use (Default: $DEFAULT_THREADS): "
-	read CHOICE_THREADS
+	read -r CHOICE_THREADS
 fi
 
 if [ -z "$CHOICE_THREADS" ] 2> /dev/null; then
 	CHOICE_THREADS="$DEFAULT_THREADS"
 elif [ "$CHOICE_THREADS" = "AUTO" ] 2> /dev/null; then
-	if [ $CPU_THREAD_COUNT = "unknown" ]; then
+	if [ "$CPU_THREAD_COUNT" = "unknown" ]; then
 		CHOICE_THREADS="$DEFAULT_THREADS"
 		echo "WARNING: could not detect number of threads. Using the default ($DEFAULT_THREADS) ." >&2
 	else
@@ -443,8 +443,8 @@ if [ $STATE_INTERACTIVE -eq 1 ]; then
 	echo "After pressing ENTER, the script will connect to $UPSTREAM_LINK"
 	echo "to check for updates and/or fetch code. It will then compile your program."
 	echo "If you compiled before, make sure you're in the proper directory and that \"Previous compilation\" is detected."
-	printf $s "Press ENTER to continue... "
-	read dummy
+	printf "Press ENTER to continue... "
+	read -r dummy
 fi
 
 
