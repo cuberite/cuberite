@@ -55,9 +55,9 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			Pos.y = itr->y;
 			Pos.z = itr->z + BaseZ;
 			/*
-			LOGD(
-				"Creating a falling block at {%d, %d, %d} of type %s, block below: %s",
-				Pos.x, Pos.y, Pos.z, ItemTypeToString(BlockType).c_str(), ItemTypeToString(BlockBelow).c_str()
+			FLOGD(
+				"Creating a falling block at {0} of type {1}, block below: {2}",
+				Pos, ItemTypeToString(BlockType), ItemTypeToString(BlockBelow)
 			);
 			*/
 

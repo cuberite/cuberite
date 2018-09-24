@@ -727,10 +727,10 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 			{
 				TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
 			}
-			LOGINFO("WorldLoader(%s): Block entity mismatch: block type %s (%d), type \"%s\", at {%d, %d, %d}; the entity will be lost.",
-				m_World->GetName().c_str(),
-				ItemTypeToString(a_BlockType).c_str(), a_BlockType, TypeName.c_str(),
-				a_BlockX, a_BlockY, a_BlockZ
+			LOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
+				m_World->GetName(),
+				ItemTypeToString(a_BlockType), a_BlockType, TypeName,
+				Vector3i{a_BlockX, a_BlockY, a_BlockZ}
 			);
 			return nullptr;
 		}
@@ -937,10 +937,10 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 		expectedTypes.append(et);
 		expectedTypes.push_back('\"');
 	}
-	LOGWARNING("Block entity type mismatch: exp %s, got \"%s\". The block entity at {%d, %d, %d} will lose all its properties.",
+	LOGWARNING("Block entity type mismatch: exp {0}, got \"{1}\". The block entity at {2} will lose all its properties.",
 		expectedTypes.c_str() + 2,  // Skip the first ", " that is extra in the string
-		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))).c_str(),
-		a_BlockX, a_BlockY, a_BlockZ
+		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))),
+		Vector3i{a_BlockX, a_BlockY, a_BlockZ}
 	);
 	return false;
 }

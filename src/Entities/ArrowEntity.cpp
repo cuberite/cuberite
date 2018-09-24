@@ -25,9 +25,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	SetAirDrag(0.2f);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
-	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
-		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetYaw(), GetPitch()
+	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
+		m_UniqueID, GetSpeed(), GetYaw(), GetPitch()
 	);
 }
 

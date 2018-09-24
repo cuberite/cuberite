@@ -275,7 +275,7 @@ void cNetherPortalScanner::OnDisabled(void)
 	if (!m_FoundPortal)
 	{
 		// Build a new nether portal.
-		LOGD("Building nether portal at {%d, %d, %d}", m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z);
+		FLOGD("Building nether portal at {0}", m_PortalLoc);
 		BuildNetherPortal(m_PortalLoc, m_Dir, m_BuildPlatform);
 		m_PortalLoc.x += 1;
 		m_PortalLoc.y += 2;
@@ -295,7 +295,7 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
-	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
+	FLOGD("Placing player at {0}", Position);
 	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
 	delete this;
 }
