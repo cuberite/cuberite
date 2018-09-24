@@ -8771,6 +8771,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+                                BurnsInDaylight =
+                                {
+                                        Returns =
+                                        {
+                                                {
+                                                        Type = "boolean",
+                                                },
+                                        },
+                                        Notes = "Returns whether the mob burns in daylight.",
+                                },
 				CanBeLeashed =
 				{
 					Returns =
@@ -8989,6 +8999,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the age of the monster",
+				},
+				SetBurnsInDaylight =
+				{
+					Params =
+					{
+						{
+							Name = "BurnsInDaylight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick",
 				},
 				SetCanBeLeashed =
 				{
