@@ -335,15 +335,6 @@ cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-bool cLuaState::GetStackValue(int, cUUID *&)
-{
-	return false;
-}
-
-
-
-
-
 bool cUUID::FromString(const AString &)
 {
 	return true;

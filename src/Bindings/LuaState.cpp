@@ -6,11 +6,7 @@
 #include "Globals.h"
 #include "LuaState.h"
 
-extern "C"
-{
-	#include "lua/src/lualib.h"
-}
-
+#include <lua.hpp>
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "Bindings.h"
@@ -825,17 +821,6 @@ bool cLuaState::PushFunction(const cRef & a_TableRef, const char * a_FnName)
 
 
 
-void cLuaState::Push(const AString & a_String)
-{
-	ASSERT(IsValid());
-
-	lua_pushlstring(m_LuaState, a_String.data(), a_String.size());
-}
-
-
-
-
-
 void cLuaState::Push(const AStringMap & a_Dictionary)
 {
 	ASSERT(IsValid());
@@ -866,17 +851,6 @@ void cLuaState::Push(const AStringVector & a_Vector)
 		tolua_pushstring(m_LuaState, itr->c_str());
 		lua_rawseti(m_LuaState, newTable, index);
 	}
-}
-
-
-
-
-
-void cLuaState::Push(const char * a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushstring(m_LuaState, a_Value);
 }
 
 
@@ -1036,50 +1010,6 @@ void cLuaState::Push(cLuaUDPEndpoint * a_UDPEndpoint)
 
 
 
-void cLuaState::Push(double a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, a_Value);
-}
-
-
-
-
-
-void cLuaState::Push(int a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, a_Value);
-}
-
-
-
-
-
-void cLuaState::Push(long a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value));
-}
-
-
-
-
-
-void cLuaState::Push(UInt32 a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, a_Value);
-}
-
-
-
-
-
 void cLuaState::Push(std::chrono::milliseconds a_Value)
 {
 	ASSERT(IsValid());
@@ -1174,16 +1104,6 @@ bool cLuaState::GetStackValue(int a_StackPos, AStringVector & a_Value)
 		}
 	);
 	return isValid;
-}
-
-
-
-
-
-bool cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
-{
-	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
-	return true;
 }
 
 
@@ -1345,20 +1265,6 @@ bool cLuaState::GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref)
 
 
 
-bool cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
-{
-	if (lua_isnumber(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
 bool cLuaState::GetStackValue(int a_StackPos, eBlockFace & a_ReturnedVal)
 {
 	if (!lua_isnumber(m_LuaState, a_StackPos))
@@ -1387,20 +1293,6 @@ bool cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 		static_cast<int>(wSunny), static_cast<int>(wThunderstorm))
 	);
 	return true;
-}
-
-
-
-
-
-bool cLuaState::GetStackValue(int a_StackPos, float & a_ReturnedVal)
-{
-	if (lua_isnumber(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
-		return true;
-	}
-	return false;
 }
 
 

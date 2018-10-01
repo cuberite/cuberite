@@ -176,12 +176,15 @@ local function OutputLuaStateHelpers(a_Package)
 		end
 	)
 
-	-- Output the typedefs:
+
 	do
-		local f = assert(io.open("LuaState_Typedefs.inc", "w"))
-		f:write("\n// LuaState_Typedefs.inc\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n")
-		f:write("// Provides a forward declaration and a typedef for a pointer to each class exported to the Lua API.\n")
-		f:write("\n\n\n\n\n")
+		local f = assert(io.open("SolInterop.h", "w"))
+		f:write('\n// SolInterop.h\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n')
+		f:write('// Provides specialisations for sol2\'s stack API which allow it to interoperate with tolua++ usertypes.\n\n')
+		f:write('#pragma push_macro("new")\n#undef new\n#include <sol.hpp>\n#pragma pop_macro("new")\n\n#include "tolua++.h"\n')
+		f:write('\n\n\n\n')
+
+		-- write forward declarations
 		for _, item in ipairs(types) do
 			if not(item.name:match(".*<.*")) then  -- Skip templates altogether
 				-- Classes start with a "c", everything else is a struct:
@@ -190,80 +193,78 @@ local function OutputLuaStateHelpers(a_Package)
 				else
 					f:write("struct " .. item.name .. ";\n")
 				end
-			end
+			end	
 		end
-		f:write("\n\n\n\n\n")
-		for _, item in ipairs(types) do
-			f:write("typedef " .. item.name .. " * Ptr" .. item.lname .. ";\n")
-			f:write("typedef const " .. item.name .. " * ConstPtr" .. item.lname .. ";\n")
-		end
-		f:write("\n\n\n\n\n")
-		f:close()
-	end
+		f:write('\n\n\n')
 
-	-- Output the Push() and GetStackValue() function declarations:
-	do
-		local f = assert(io.open("LuaState_Declaration.inc", "w"))
-		f:write("\n// LuaState_Declaration.inc\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n")
-		f:write("// Implements a Push() and GetStackValue() function for each class exported to the Lua API.\n")
-		f:write("// This file expects to be included form inside the cLuaState class definition\n")
-		f:write("\n\n\n\n\n")
+		-- write type descriptions
+		f:write('namespace Detail\n{\n')
+		f:write('template <typename T> struct TypeDesc {};\n')
+		f:write('template <typename T> using Void = void;\n')
+		f:write('template <typename T> using EnableIfBoundByToLua = Void<typename TypeDesc<T>::IsBoundByToLua>;\n\n')
+
+		f:write('/** Push a new tolua usertype onto the stack */\n')
+		f:write('template <typename T>\n')
+		f:write('struct ToLuaPusher\n')
+		f:write('{\n')
+		f:write('\tstatic int push(lua_State * a_L, const T & a_Value)\n')
+		f:write('\t{\n')
+		f:write('\t\ttolua_pushusertype_and_takeownership(a_L, new T(a_Value), ::Detail::TypeDesc<T>::desc());\n')
+		f:write('\t\treturn 1;\n')
+		f:write('\t}\n')
+		f:write('};\n\n')
+
+		f:write('/** Push an existing tolua usertype onto the stack */\n')
+		f:write('template <typename T>\n')
+		f:write('struct ToLuaPusher<T*>\n')
+		f:write('{\n')
+		f:write('\tstatic int push(lua_State * a_L, T * a_Value)\n')
+		f:write('\t{\n')
+		f:write('\t\ttolua_pushusertype(a_L, a_Value, ::Detail::TypeDesc<T>::desc());\n')
+		f:write('\t\treturn 1;\n')
+		f:write('\t}\n')
+		f:write('};\n\n')
+
+		for _, item in ipairs(types) do
+			f:write('\n')
+			f:write('template <>\nstruct TypeDesc<'..item.name..'>\n{\n')
+			f:write('\tstatic const char * desc() { return "'..item.name..'"; }\n')
+			f:write('\tusing IsBoundByToLua = std::true_type;\n')
+			f:write('};\n')
+		end
+		f:write('}  // namespace Detail\n')
+		f:write('\n\n\n\n\n')
+
+		f:write('namespace sol\n')
+		f:write('{\n')
+		f:write('namespace stack\n')
+		f:write('{\n')
+
+		-- write custom checker that uses tolua_isusertype
+		f:write('template <typename T>\n')
+		f:write('struct userdata_checker<extensible<T>, ::Detail::EnableIfBoundByToLua<T>>\n')
+		f:write('{\n')
+		f:write('\ttemplate <typename Handler>\n')
+		f:write('\tstatic bool check(lua_State * a_L, int a_StackPos, type, Handler &&, record & a_Tracker)\n')
+		f:write('\t{\n')
+		f:write('\t\ta_Tracker.use(1);\n')
+		f:write('\t\ttolua_Error err;\n')
+		f:write('\t\treturn tolua_isusertype(a_L, a_StackPos, ::Detail::TypeDesc<T>::desc(), false, &err);\n')
+		f:write('\t}\n')
+		f:write('};\n\n\n')
+
+		-- write custom push implementations using tolua_pushusertype
+		f:write('// Note that the value push is a template to delay instantiation until the type is complete\n')
 		for _, item in ipairs(types) do
 			if not(g_HasCustomPushImplementation[item.name]) then
-				f:write("void Push(" .. item.name .. " * a_Value);\n")
+				f:write('template <> struct pusher<'..item.name..'*>: ::Detail::ToLuaPusher<'..item.name..'*> {};\n')
+				f:write('template <typename C> struct pusher<'..item.name..', C>: ::Detail::ToLuaPusher<'..item.name..'> {};\n')
 			end
 		end
-		for _, item in ipairs(types) do
-			f:write("bool GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal);\n")
-			f:write("bool GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal);\n")
-		end
-		f:write("\n\n\n\n\n")
-		f:close()
-	end
 
-	-- Output the Push() and GetStackValue() function implementations:
-	do
-		local f = assert(io.open("LuaState_Implementation.cpp", "w"))
-		f:write("\n// LuaState_Implementation.cpp\n\n// This file is generated along with the Lua bindings by ToLua. Do not edit manually, do not commit to repo.\n")
-		f:write("// Implements a Push() and GetStackValue() function for each class exported to the Lua API.\n")
-		f:write("// This file expects to be compiled as a separate translation unit\n")
-		f:write("\n\n\n\n\n")
-		f:write("#include \"Globals.h\"\n#include \"LuaState.h\"\n#include \"tolua++/include/tolua++.h\"\n")
-		f:write("\n\n\n\n\n")
-		for _, item in ipairs(types) do
-			if not(g_HasCustomPushImplementation[item.name]) then
-				f:write("void cLuaState::Push(" .. item.name .. " * a_Value)\n{\n\tASSERT(IsValid());\n")
-				f:write("\ttolua_pushusertype(m_LuaState, a_Value, \"" .. item.name .. "\");\n");
-				f:write("}\n\n\n\n\n\n")
-			end
-		end
-		for _, item in ipairs(types) do
-			f:write("bool cLuaState::GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
-			f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
-			f:write("\t\ta_ReturnedVal = nullptr;\n")
-			f:write("\t\treturn false;\n\t}\n")
-			f:write("\ttolua_Error err;\n")
-			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"" .. item.name .. "\", false, &err))\n")
-			f:write("\t{\n")
-			f:write("\t\ta_ReturnedVal = *(static_cast<" .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
-			f:write("\t\treturn true;\n");
-			f:write("\t}\n")
-			f:write("\treturn false;\n")
-			f:write("}\n\n\n\n\n\n")
+		f:write('}\n')
+		f:write('}  // namespace sol::stack\n')
 
-			f:write("bool cLuaState::GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
-			f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
-			f:write("\t\ta_ReturnedVal = nullptr;\n")
-			f:write("\t\treturn false;\n\t}\n")
-			f:write("\ttolua_Error err;\n")
-			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"const " .. item.name .. "\", false, &err))\n")
-			f:write("\t{\n")
-			f:write("\t\ta_ReturnedVal = *(static_cast<const " .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
-			f:write("\t\treturn true;\n");
-			f:write("\t}\n")
-			f:write("\treturn false;\n")
-			f:write("}\n\n\n\n\n\n")
-		end
 		f:close()
 	end
 end

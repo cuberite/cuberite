@@ -13,7 +13,7 @@
 
 
 
-cmake_minimum_required (VERSION 2.8.7)
+cmake_minimum_required (VERSION 3.1)
 
 if (POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
@@ -236,6 +236,9 @@ endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/luaproxy/CMakeLists.txt)
 	message(FATAL_ERROR "luaproxy is missing in folder lib/luaproxy. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
+if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/sol2/CMakeLists.txt)
+	message(FATAL_ERROR "sol2 is missing in folder lib/sol2. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/sqlite/CMakeLists.txt)
 	message(FATAL_ERROR "sqlite is missing in folder lib/sqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
@@ -261,6 +264,11 @@ add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/libevent/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/fmt)
 
+# sol2 configuration
+add_definitions(-DSOL_CHECK_ARGUMENTS=1)     # perform argument checking
+add_definitions(-DSOL_STRINGS_ARE_NUMBERS=1) # allow coercion from string to numeric types
+add_definitions(-DSOL_ENABLE_INTEROP=1)      # required to work with tolua++ usertypes
+include_directories(SYSTEM "${CMAKE_CURRENT_LIST_DIR}/lib/sol2/single/sol")
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:
 get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)

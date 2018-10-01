@@ -7,7 +7,6 @@ SET (SRCS
 	LuaNameLookup.cpp
 	LuaServerHandle.cpp
 	LuaState.cpp
-	LuaState_Implementation.cpp
 	LuaTCPLink.cpp
 	LuaUDPEndpoint.cpp
 	LuaWindow.cpp
@@ -30,8 +29,6 @@ SET (HDRS
 	LuaNameLookup.h
 	LuaServerHandle.h
 	LuaState.h
-	LuaState_Declaration.inc
-	LuaState_Typedefs.inc
 	LuaTCPLink.h
 	LuaUDPEndpoint.h
 	LuaWindow.h
@@ -39,6 +36,7 @@ SET (HDRS
 	Plugin.h
 	PluginLua.h
 	PluginManager.h
+	SolInterop.h
 	tolua++.h
 )
 
@@ -46,9 +44,7 @@ SET (HDRS
 set (BINDING_OUTPUTS
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings.h
-	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Declaration.inc
-	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Implementation.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Typedefs.inc
+	${CMAKE_CURRENT_SOURCE_DIR}/SolInterop.h
 )
 
 set(BINDING_DEPENDENCIES

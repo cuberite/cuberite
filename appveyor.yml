@@ -6,7 +6,7 @@ before_build:
 - echo %TIME%
 - git submodule update --init
 - echo %TIME%
-- cmake -G "Visual Studio 12" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+- cmake -G "Visual Studio 14" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
 - echo %TIME%
 
 build:

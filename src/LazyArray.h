@@ -83,7 +83,7 @@ public:
 	{
 		if (m_Array == nullptr)
 		{
-			m_Array.reset(new T[m_Size]);
+			m_Array.reset(new T[static_cast<size_t>(m_Size)]);
 		}
 		return m_Array.get();
 	}

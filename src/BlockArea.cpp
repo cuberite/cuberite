@@ -2093,11 +2093,12 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	NIBBLEARRAY NewLight;
 	NIBBLEARRAY NewSkyLight;
 	cBlockEntitiesPtr NewBlockEntities;
+	auto NumBlocks = static_cast<size_t>(a_SizeX * a_SizeY * a_SizeZ);
 
 	// Try to allocate the new storage
 	if ((a_DataTypes & baTypes) != 0)
 	{
-		NewBlocks.reset(new BLOCKTYPE[a_SizeX * a_SizeY * a_SizeZ]);
+		NewBlocks.reset(new BLOCKTYPE[NumBlocks]);
 		if (NewBlocks == nullptr)
 		{
 			return false;
@@ -2105,7 +2106,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	}
 	if ((a_DataTypes & baMetas) != 0)
 	{
-		NewMetas.reset(new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ]);
+		NewMetas.reset(new NIBBLETYPE[NumBlocks]);
 		if (NewMetas == nullptr)
 		{
 			return false;
@@ -2113,7 +2114,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	}
 	if ((a_DataTypes & baLight) != 0)
 	{
-		NewLight.reset(new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ]);
+		NewLight.reset(new NIBBLETYPE[NumBlocks]);
 		if (NewLight == nullptr)
 		{
 			return false;
@@ -2121,7 +2122,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	}
 	if ((a_DataTypes & baSkyLight) != 0)
 	{
-		NewSkyLight.reset(new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ]);
+		NewSkyLight.reset(new NIBBLETYPE[NumBlocks]);
 		if (NewSkyLight == nullptr)
 		{
 			return false;
@@ -2266,7 +2267,7 @@ void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	BLOCKARRAY NewBlockTypes{ new BLOCKTYPE[NewSizeX * NewSizeY * NewSizeZ] };
+	BLOCKARRAY NewBlockTypes{ new BLOCKTYPE[static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ)] };
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -2291,7 +2292,7 @@ void cBlockArea::CropNibbles(NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	NIBBLEARRAY NewNibbles{ new NIBBLETYPE[NewSizeX * NewSizeY * NewSizeZ] };
+	NIBBLEARRAY NewNibbles{ new NIBBLETYPE[static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ)] };
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{

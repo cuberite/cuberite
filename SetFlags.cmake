@@ -20,6 +20,18 @@ macro(add_flags_cxx FLAGS)
 	set(CMAKE_C_FLAGS            "${CMAKE_C_FLAGS}   ${FLAGS}")
 endmacro()
 
+include(CheckCXXCompilerFlag)
+
+function(try_add_flag_cxx FLAG)
+	# Only add the flag if the compiler supports it
+	string(REPLACE "-" "_" FLAG_ID ${FLAG})
+	check_cxx_compiler_flag(${FLAG} HAS_${FLAG_ID})
+	if (HAS_${FLAG_ID})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAG}" PARENT_SCOPE)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAG}" PARENT_SCOPE)
+	endif()
+endfunction()
+
 
 #this is a hack because we can't use cmake 2.8.10 because of travis
 macro(get_clang_version)
@@ -32,6 +44,9 @@ endmacro()
 
 
 macro(set_flags)
+	set(CMAKE_CXX_STANDARD 14)
+	set(CMAKE_CXX_EXTENSIONS OFF)
+
 	# Add coverage processing, if requested:
 	if (NOT MSVC)
 
@@ -74,11 +89,6 @@ macro(set_flags)
 			)
 		endif()
 
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
-
 		#on os x clang adds pthread for us but we need to add it for gcc
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
@@ -87,11 +97,6 @@ macro(set_flags)
 			add_flags_cxx("-pthread")
 		endif()
 	elseif (ANDROID)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-		
 		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
@@ -106,11 +111,6 @@ macro(set_flags)
 				OUTPUT_VARIABLE GCC_VERSION
 			)
 		endif()
-
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")
@@ -271,56 +271,20 @@ macro(set_exe_flags)
 			add_flags_cxx("-Weverything -Werror -Wno-c++98-compat-pedantic -Wno-string-conversion")
 			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded -Wno-weak-vtables")
 			add_flags_cxx("-Wno-switch-enum")  # This is a pretty useless warning, we've already got -Wswitch which is what we need
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
-				# flags that are not present in 3.0
-				add_flags_cxx("-Wno-implicit-fallthrough")
-			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.1)
-				# flags introduced in 3.2
-				add_flags_cxx("-Wno-documentation")
-			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
-				include(CheckCXXCompilerFlag)
-				check_cxx_compiler_flag(-Wno-reserved-id-macro HAS_NO_RESERVED_ID_MACRO)
-				check_cxx_compiler_flag(-Wno-documentation-unknown-command HAS_NO_DOCUMENTATION_UNKNOWN)
-				if (HAS_NO_RESERVED_ID_MACRO)
-					# Use this flag to ignore error for a reserved macro problem in sqlite 3
-					add_flags_cxx("-Wno-reserved-id-macro")
-				endif()
-				if (HAS_NO_DOCUMENTATION_UNKNOWN)
-					# Ignore another problem in sqlite
-					add_flags_cxx("-Wno-documentation-unknown-command")
-				endif()
-			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.5)
-				add_flags_cxx("-Wno-error=disabled-macro-expansion")
-			endif()
-			if ("${CLANG_VERSION}" VERSION_GREATER 3.7)
-				check_cxx_compiler_flag(-Wno-double-promotion HAS_NO_DOUBLE_PROMOTION)
-				if (HAS_NO_DOUBLE_PROMOTION)
-					add_flags_cxx("-Wno-double-promotion")
-				endif()
-			endif()
 			add_flags_cxx("-Wno-error=unused-command-line-argument")
-			add_flags_cxx("-Wno-documentation-unknown-command")
+
+			# flags that are not always present
+
+			try_add_flag_cxx(-Wno-implicit-fallthrough)
+			# flags introduced in 3.2
+			try_add_flag_cxx(-Wno-documentation)
+			# Use this flag to ignore error for a reserved macro problem in sqlite 3
+			try_add_flag_cxx(-Wno-reserved-id-macro)
+			# Ignore another problem in sqlite
+			try_add_flag_cxx(-Wno-documentation-unknown-command)
+			try_add_flag_cxx(-Wno-disabled-macro-expansion)
+			try_add_flag_cxx(-Wno-double-promotion)
 		endif()
 	endif()
 
 endmacro()
-
-#	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#		foreach(FILENAME ${ARGN})
-#			message("downgrade_warnings for ${FILENAME}")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=sign-conversion -Wno-error=conversion")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-prototypes -Wno-error=deprecated")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=shadow -Wno-error=old-style-cast  -Wno-error=switch-enum -Wno-error=switch")
-#			set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=float-equal -Wno-error=global-constructors")
-
-#			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
-#				# flags that are not present in 3.0
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=covered-switch-default ")
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-error=extra-semi")
-#				set_source_files_properties(${FILENAME} PROPERTIES COMPILE_FLAGS "-Wno-error=missing-variable-declarations")
-#			endif()
-#		endforeach()
-#	endif()

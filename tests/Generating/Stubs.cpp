@@ -110,6 +110,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 
 
+
 cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 {
 }
@@ -329,15 +330,6 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return nullptr;
-}
-
-
-
-
-
-bool cLuaState::GetStackValue(int, cUUID *&)
-{
-	return false;
 }
 
 

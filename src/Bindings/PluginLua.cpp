@@ -12,16 +12,25 @@
 #endif
 
 #include "PluginLua.h"
+#include "../ClientHandle.h"
 #include "../CommandOutput.h"
+#include "../CraftingRecipes.h"
 #include "PluginManager.h"
 #include "../Item.h"
 #include "../Root.h"
 #include "../WebAdmin.h"
+#include "../World.h"
 
-extern "C"
-{
-	#include "lua/src/lauxlib.h"
-}
+#include "../Entities/GhastFireballEntity.h"
+#include "../Entities/Player.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/TNTEntity.h"
+#include "../Entities/WitherSkullEntity.h"
+
+#include "../BlockEntities/BrewingstandEntity.h"
+#include "../BlockEntities/HopperEntity.h"
+
+#include "../Generating/ChunkDesc.h"
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
@@ -90,7 +99,7 @@ bool cPluginLua::Load(void)
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);
 		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
-		lua_pushstring(m_LuaState, GetName().c_str());
+		m_LuaState.Push(GetName());
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
