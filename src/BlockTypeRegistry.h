@@ -40,7 +40,7 @@ public:
 
 
 	/** Retrieves the value associated with the specified hint for this specific BlockTypeName and BlockState.
-	Queries callbacks first, then hints if a callback doesn't exist.
+	Queries hint callbacks first, then static hints if a callback doesn't exist.
 	Returns an empty string if hint not found at all. */
 	AString hintValue(
 		const AString & aHintName,
@@ -51,6 +51,15 @@ public:
 	const AString & pluginName() const { return mPluginName; }
 	const AString & blockTypeName() const { return mBlockTypeName; }
 	std::shared_ptr<cBlockHandler> handler() const { return mHandler; }
+
+	/** Sets (creates or updates) a static hint.
+	Hints provided by callbacks are unaffected by this - callbacks are "higher priority", they overwrite anything set here.
+	Logs an info message if the hint is already provided by a hint callback. */
+	void setHint(const AString & aHintKey, const AString & aHintValue);
+
+	/** Removes a hint.
+	Silently ignored if the hint hasn't been previously set. */
+	void removeHint(const AString & aHintKey);
 
 
 private:
@@ -64,10 +73,12 @@ private:
 	/** The callbacks to call for various interaction. */
 	std::shared_ptr<cBlockHandler> mHandler;
 
-	/** Optional hints for any subsystem to use, such as "IsSnowable" -> "1". */
+	/** Optional static hints for any subsystem to use, such as "IsSnowable" -> "1".
+	Hint callbacks are of higher priority than mHints - if a hint is provided by a mHintCallback, its value in mHints is ignored. */
 	std::map<AString, AString> mHints;
 
-	/** The callbacks for dynamic evaluation of hints, such as "LightValue" -> function(BlockTypeName, BlockState). */
+	/** The callbacks for dynamic evaluation of hints, such as "LightValue" -> function(BlockTypeName, BlockState).
+	Hint callbacks are of higher priority than mHints - if a hint is provided by a mHintCallback, its value in mHints is ignored. */
 	std::map<AString, HintCallback> mHintCallbacks;
 };
 
@@ -86,6 +97,7 @@ class BlockTypeRegistry
 public:
 	// fwd:
 	class AlreadyRegisteredException;
+	class NotRegisteredException;
 
 
 	/** Creates an empty new instance of the block type registry */
@@ -108,6 +120,22 @@ public:
 
 	/** Removes all registrations done by the specified plugin. */
 	void removeAllByPlugin(const AString & aPluginName);
+
+	/** Sets (adds or overwrites) a single Hint value for a BlockType.
+	Throws NotRegisteredException if the BlockTypeName is not registered. */
+	void setBlockTypeHint(
+		const AString & aBlockTypeName,
+		const AString & aHintKey,
+		const AString & aHintValue
+	);
+
+	/** Removes a previously registered single Hint value for a BlockType.
+	Throws NotRegisteredException if the BlockTypeName is not registered.
+	Silently ignored if the Hint hasn't been previously set. */
+	void removeBlockTypeHint(
+		const AString & aBlockTypeName,
+		const AString & aHintKey
+	);
 
 
 private:
@@ -155,4 +183,32 @@ private:
 		std::shared_ptr<BlockInfo> aPreviousRegistration,
 		std::shared_ptr<BlockInfo> aNewRegistration
 	);
+};
+
+
+
+
+
+/** The exception thrown from BlockTypeRegistry::setBlockTypeHint() if the block type has not been registered before. */
+class BlockTypeRegistry::NotRegisteredException: public std::runtime_error
+{
+	using Super = std::runtime_error;
+
+public:
+
+	/** Creates a new instance of the exception that provides info on both the original registration and the newly attempted
+	registration that caused the failure. */
+	NotRegisteredException(
+		const AString & aBlockTypeName,
+		const AString & aHintKey,
+		const AString & aHintValue
+	);
+
+	// Simple getters:
+	const AString & blockTypeName() const { return mBlockTypeName; }
+
+
+private:
+
+	const AString mBlockTypeName;
 };

@@ -56,6 +56,33 @@ AString BlockInfo::hintValue(
 
 
 
+void BlockInfo::setHint(const AString & aHintKey, const AString & aHintValue)
+{
+	mHints[aHintKey] = aHintValue;
+
+	// Warn if the hint is already provided by a callback (aHintValue will be ignored when evaluating the hint):
+	auto itrC = mHintCallbacks.find(aHintKey);
+	if (itrC != mHintCallbacks.end())
+	{
+		LOGINFO("Setting a static hint %s for block type %s, but there's already a callback for that hint. The static hint will be ignored.",
+			aHintKey.c_str(), mBlockTypeName.c_str()
+		);
+	}
+}
+
+
+
+
+
+void BlockInfo::removeHint(const AString & aHintKey)
+{
+	mHints.erase(aHintKey);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // BlockTypeRegistry:
 
@@ -123,6 +150,43 @@ void BlockTypeRegistry::removeAllByPlugin(const AString & aPluginName)
 
 
 
+void BlockTypeRegistry::setBlockTypeHint(
+	const AString & aBlockTypeName,
+	const AString & aHintKey,
+	const AString & aHintValue
+)
+{
+	cCSLock lock(mCSRegistry);
+	auto blockInfo = mRegistry.find(aBlockTypeName);
+	if (blockInfo == mRegistry.end())
+	{
+		throw NotRegisteredException(aBlockTypeName, aHintKey, aHintValue);
+	}
+	blockInfo->second->setHint(aHintKey, aHintValue);
+}
+
+
+
+
+
+void BlockTypeRegistry::removeBlockTypeHint(
+	const AString & aBlockTypeName,
+	const AString & aHintKey
+)
+{
+	cCSLock lock(mCSRegistry);
+	auto blockInfo = mRegistry.find(aBlockTypeName);
+	if (blockInfo == mRegistry.end())
+	{
+		return;
+	}
+	blockInfo->second->removeHint(aHintKey);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // BlockTypeRegistry::AlreadyRegisteredException:
 
@@ -150,4 +214,25 @@ AString BlockTypeRegistry::AlreadyRegisteredException::message(
 		aNewRegistration->pluginName().c_str(),
 		aPreviousRegistration->pluginName().c_str()
 	);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// BlockTypeRegistry::NotRegisteredException:
+
+BlockTypeRegistry::NotRegisteredException::NotRegisteredException(
+	const AString & aBlockTypeName,
+	const AString & aHintKey,
+	const AString & aHintValue
+):
+	Super(Printf(
+		"Attempting to set a hint of nonexistent BlockTypeName.\n\tBlockTypeName = %s\n\tHintKey = %s\n\tHintValue = %s",
+		aBlockTypeName.c_str(),
+		aHintKey.c_str(),
+		aHintValue.c_str()
+	))
+{
 }
