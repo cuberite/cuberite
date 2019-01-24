@@ -64,6 +64,42 @@ static void testSimpleReg()
 
 
 
+/** Tests setting and removing a BlockType hint. */
+static void testHintSetRemove()
+{
+	LOGD("Testing hint addition and removal...");
+
+	// Register the block type:
+	BlockTypeRegistry reg;
+	AString blockTypeName("test:block1");
+	AString pluginName("testPlugin");
+	AString hint1("testHint1");
+	AString hint1Value("value1");
+	AString hint2("testHint2");
+	AString hint2Value("value2");
+	std::shared_ptr<cBlockHandler> handler(new cBlockHandler(0x12345678));
+	std::map<AString, AString> hints = {{hint1, hint1Value}};
+	std::map<AString, BlockInfo::HintCallback> hintCallbacks;
+	reg.registerBlockType(pluginName, blockTypeName, handler, hints, hintCallbacks);
+
+	// Modify the hints:
+	auto blockInfo = reg.blockInfo(blockTypeName);
+	reg.setBlockTypeHint(blockTypeName, hint2, hint2Value);
+	TEST_EQUAL(blockInfo->hintValue(hint2, BlockState()), hint2Value);  // Was created successfully
+	reg.setBlockTypeHint(blockTypeName, hint1, "testValue2");
+	TEST_EQUAL(blockInfo->hintValue(hint1, BlockState()), "testValue2");  // Was updated successfully
+	reg.removeBlockTypeHint(blockTypeName, hint2);
+	TEST_EQUAL(blockInfo->hintValue(hint2, BlockState()), "");  // Was removed successfully
+
+	// Test the error reporting:
+	TEST_THROWS(reg.setBlockTypeHint("nonexistent", "hint", "value"), BlockTypeRegistry::NotRegisteredException);
+	reg.removeBlockTypeHint(blockTypeName, "nonexistent");  // Should fail silently
+}
+
+
+
+
+
 /** Tests that the plugin-based information is used correctly for registration.
 Registers two different block types with two different plugins, then tries to re-register them from a different plugin.
 Finally removes the registration through removeAllByPlugin() and checks its success. */
@@ -190,6 +226,7 @@ static void testThreadLocking()
 static void testBlockTypeRegistry()
 {
 	testSimpleReg();
+	testHintSetRemove();
 	testPlugins();
 	testHintCallbacks();
 	testThreadLocking();
