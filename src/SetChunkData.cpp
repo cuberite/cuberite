@@ -26,7 +26,7 @@ struct sMemCallbacks:
 cSetChunkData::cSetChunkData(int a_ChunkX, int a_ChunkZ, bool a_ShouldMarkDirty) :
 	m_ChunkX(a_ChunkX),
 	m_ChunkZ(a_ChunkZ),
-	m_Pool(cpp14::make_unique<sMemCallbacks>(), cChunkData::NumSections),
+	m_Pool(cpp14::make_unique<sMemCallbacks>(), 0u, cChunkData::NumSections),
 	m_ChunkData(m_Pool),
 	m_IsLightValid(false),
 	m_IsHeightMapValid(false),
