@@ -39,7 +39,7 @@ cChunkMap::cChunkMap(cWorld * a_World) :
 	m_World(a_World),
 	m_Pool(
 		cpp14::make_unique<cListAllocationPool<cChunkData::sChunkSection>>(
-			cpp14::make_unique<cStarvationCallbacks>(), 1600u
+			cpp14::make_unique<cStarvationCallbacks>(), 1600u, 5000u
 		)
 	)
 {
