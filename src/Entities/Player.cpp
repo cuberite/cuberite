@@ -386,8 +386,8 @@ void cPlayer::TickFreezeCode()
 				{
 					// If we find a position with enough space for the player
 					if (
-						(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
-						(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY, Rel.z)) &&
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z))
 					)
 					{
 						// If the found position is not the same as the original
@@ -2071,6 +2071,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 		// Broadcast the player into the new world.
 		a_World->BroadcastSpawnEntity(*this);
+
+		// Prevent the player from teleporting back immediately, in case the destination is a portal
+		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 		// Queue add to new world and removal from the old one
 
