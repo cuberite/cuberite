@@ -208,7 +208,7 @@ bool cChestEntity::IsBlocked()
 	return (
 		(GetPosY() < cChunkDef::Height - 1) &&
 		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			cBlockInfo::FullyOccupiesVoxel(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
 			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
 		)
 	);
