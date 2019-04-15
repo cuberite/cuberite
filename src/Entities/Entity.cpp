@@ -1546,9 +1546,6 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	// Take note of old chunk coords
 	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
 
-	// Prevent the entity from teleporting back immediately, in case the destination is a portal
-	m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
 	// Set position to the new position
 	ResetPosition(a_NewPosition);
 
