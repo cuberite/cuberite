@@ -154,7 +154,16 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 				UUID.FromString(Params[2]);
 				m_Client->SetUUID(UUID);
 
-				m_Client->SetProperties(Params[3]);
+                Json::Value root;
+                Json::Reader reader;
+                if (!reader.parse(Params[3], root)) {
+                    LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+                } else {
+                    m_Client->SetProperties(root);
+                    LOGD("ipstring: %s", Params[1]);
+                    LOGD("uuid: %s", Params[2]);
+                    LOGD("properties: count=%d,json=%s", root.size(), Params[3]);
+                }
 			}
 			else
 			{
@@ -973,11 +982,14 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteString(a_Player.GetPlayerListName());
+    LOGD("Sending player tab list for \"%s\"...", a_Player.GetPlayerListName());
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt32(Properties.size());
 	for (auto & Node : Properties)
 	{
+		LOGD("name: %s", Node.get("name", "").asString());
+		LOGD("value: %s", Node.get("value", "").asString());
 		Pkt.WriteString(Node.get("name", "").asString());
 		Pkt.WriteString(Node.get("value", "").asString());
 		AString Signature = Node.get("signature", "").asString();
