@@ -60,6 +60,12 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	if (m_ActionCountDown > -1)
 	{
 		m_ActionCountDown--;
@@ -210,4 +216,3 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 	}
 	return false;
 }
-

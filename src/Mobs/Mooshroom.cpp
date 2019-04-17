@@ -39,6 +39,11 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cMooshroom::OnRightClicked(cPlayer & a_Player)
 {
+	if (m_IsStatic)
+	{
+		// Can't act with static mob
+		return;
+	}
 	switch (a_Player.GetEquippedItem().m_ItemType)
 	{
 		case E_ITEM_BUCKET:

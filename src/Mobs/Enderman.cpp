@@ -194,6 +194,12 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	// Take damage when wet, drowning damage seems to be most appropriate
 	if (
 		cChunkDef::IsValidHeight(POSY_TOINT) &&

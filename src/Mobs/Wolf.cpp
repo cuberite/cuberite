@@ -166,6 +166,11 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	const int EquippedItemType = EquippedItem.m_ItemType;
 
@@ -250,7 +255,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 
 void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (!IsAngry())
+	if (!IsAngry() && !m_IsStatic)
 	{
 		cMonster::Tick(a_Dt, a_Chunk);
 		if (m_NotificationCooldown > 0)
@@ -266,6 +271,11 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
+		return;
+	}
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
 		return;
 	}
 
@@ -398,5 +408,3 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		cMonster::InStateIdle(a_Dt, a_Chunk);
 	}
 }
-
-

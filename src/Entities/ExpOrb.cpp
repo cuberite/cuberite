@@ -48,6 +48,11 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	DetectCacti();
 	m_TicksAlive++;
 
@@ -109,6 +114,11 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return false;
+	}
 	if (a_TDI.DamageType == dtCactusContact)
 	{
 		Destroy(true);
@@ -142,5 +152,3 @@ std::vector<int> cExpOrb::Split(int a_Reward)
 
 	return Rewards;
 }
-
-

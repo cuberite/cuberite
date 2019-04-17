@@ -124,83 +124,86 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	ASSERT(IsTicking());
 
-	int PosY = POSY_TOINT;
-	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
+	if (!IsStatic())
 	{
-		// Outside the world, just process normal falling physics
-		super::HandlePhysics(a_Dt, a_Chunk);
-		BroadcastMovementUpdate();
-		return;
-	}
+		int PosY = POSY_TOINT;
+		if ((PosY <= 0) || (PosY >= cChunkDef::Height))
+		{
+			// Outside the world, just process normal falling physics
+			super::HandlePhysics(a_Dt, a_Chunk);
+			BroadcastMovementUpdate();
+			return;
+		}
 
-	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-	if (Chunk == nullptr)
-	{
-		// Inside an unloaded chunk, bail out all processing
-		return;
-	}
+		int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
+		int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
+		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
+		if (Chunk == nullptr)
+		{
+			// Inside an unloaded chunk, bail out all processing
+			return;
+		}
 
-	BLOCKTYPE InsideType;
-	NIBBLETYPE InsideMeta;
-	Chunk->GetBlockTypeMeta(RelPosX, PosY, RelPosZ, InsideType, InsideMeta);
+		BLOCKTYPE InsideType;
+		NIBBLETYPE InsideMeta;
+		Chunk->GetBlockTypeMeta(RelPosX, PosY, RelPosZ, InsideType, InsideMeta);
 
-	if (!IsBlockRail(InsideType))
-	{
-		// When a descending minecart hits a flat rail, it goes through the ground; check for this
-		Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);
+		if (!IsBlockRail(InsideType))
+		{
+			// When a descending minecart hits a flat rail, it goes through the ground; check for this
+			Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);
+			if (IsBlockRail(InsideType))
+			{
+				// Push cart upwards
+				AddPosY(1);
+			}
+		}
+
+		bool WasDetectorRail = false;
 		if (IsBlockRail(InsideType))
 		{
-			// Push cart upwards
-			AddPosY(1);
-		}
-	}
+			if (InsideType == E_BLOCK_RAIL)
+			{
+				SnapToRail(InsideMeta);
+			}
+			else
+			{
+				SnapToRail(InsideMeta & 0x07);
+			}
 
-	bool WasDetectorRail = false;
-	if (IsBlockRail(InsideType))
-	{
-		if (InsideType == E_BLOCK_RAIL)
-		{
-			SnapToRail(InsideMeta);
+			switch (InsideType)
+			{
+				case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
+				case E_BLOCK_ACTIVATOR_RAIL: break;
+				case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
+				case E_BLOCK_DETECTOR_RAIL:
+				{
+					HandleDetectorRailPhysics(InsideMeta, a_Dt);
+					WasDetectorRail = true;
+					break;
+				}
+				default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
+			}
+
+			AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
 		}
 		else
 		{
-			SnapToRail(InsideMeta & 0x07);
+			// Not on rail, default physics
+			SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
+			super::HandlePhysics(a_Dt, *Chunk);
 		}
 
-		switch (InsideType)
+		if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 		{
-			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
-			case E_BLOCK_ACTIVATOR_RAIL: break;
-			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
-			case E_BLOCK_DETECTOR_RAIL:
-			{
-				HandleDetectorRailPhysics(InsideMeta, a_Dt);
-				WasDetectorRail = true;
-				break;
-			}
-			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
+			m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+			m_bIsOnDetectorRail = false;
 		}
-
-		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
-	}
-	else
-	{
-		// Not on rail, default physics
-		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
-		super::HandlePhysics(a_Dt, *Chunk);
-	}
-
-	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
-	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-		m_bIsOnDetectorRail = false;
-	}
-	else if (WasDetectorRail)
-	{
-		m_bIsOnDetectorRail = true;
-		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
+		else if (WasDetectorRail)
+		{
+			m_bIsOnDetectorRail = true;
+			m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
+		}
 	}
 
 	// Broadcast positioning changes to client
@@ -1178,6 +1181,11 @@ cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const c
 void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
+
+	if (m_IsStatic)
+	{
+		return;
+	}
 
 	if (m_Attachee != nullptr)
 	{

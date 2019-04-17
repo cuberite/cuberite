@@ -41,6 +41,11 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
+	if (m_IsStatic)
+	{
+		// Static entity haven't physics
+		return false;
+	}
 	m_LastDamage = 10;
 	if (!super::DoTakeDamage(TDI))
 	{
@@ -72,6 +77,12 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 void cBoat::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
+
+	if (m_IsStatic)
+	{
+		// Static entity haven't physics
+		return;
+	}
 
 	if (m_Attachee != nullptr)
 	{
@@ -109,6 +120,11 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	BroadcastMovementUpdate();
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	SetSpeed(GetSpeed() * 0.97);  // Slowly decrease the speed
 
@@ -265,7 +281,3 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 	}
 	UNREACHABLE("Unsupported boat material");
 }
-
-
-
-

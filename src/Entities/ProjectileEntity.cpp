@@ -378,6 +378,11 @@ void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	if (m_IsInGround)
 	{
 		// Already-grounded projectiles don't move at all
@@ -462,7 +467,3 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
-
-
-

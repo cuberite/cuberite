@@ -266,6 +266,9 @@ public:
 	If this returns false, you must stop using the cEntity pointer you have. */
 	bool IsTicking(void) const;
 
+	/** Returns true if the entity was defined as static by a plugin. */
+	bool IsStatic(void) const;
+
 	/** Destroys the entity and schedules it for memory freeing; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
 	virtual void Destroy(bool a_ShouldBroadcast = true);
 
@@ -457,6 +460,8 @@ public:
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 
+	// tolua_begin
+
 	/** Gets entity (vehicle) attached to this entity */
 	cEntity * GetAttached();
 
@@ -468,6 +473,8 @@ public:
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	// tolua_end
 
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();
@@ -514,6 +521,9 @@ public:
 
 	/** Returns whether the entity is on ground or not */
 	virtual bool IsOnGround(void) const { return m_bOnGround; }
+
+	/** Set the entity to a statuc one. Only used by plugins. */
+	void SetStatic(bool a_IsStatic);
 
 	// tolua_end
 
@@ -620,6 +630,9 @@ protected:
 	bool m_WorldChangeSendRespawn;
 	cWorld * m_NewWorld;
 	Vector3d m_NewWorldPosition;
+
+	/** Whether the entity is static or not. Plugin only. */
+	bool m_IsStatic;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;

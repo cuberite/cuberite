@@ -33,6 +33,12 @@ void cFireChargeEntity::Explode(Vector3i a_Block)
 
 void cFireChargeEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	Destroy();
 	Explode(a_HitPos.Floor());
 }
@@ -44,6 +50,12 @@ void cFireChargeEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 void cFireChargeEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	super::OnHitEntity(a_EntityHit, a_HitPos);
+
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	Destroy();
 	Explode(a_HitPos.Floor());

@@ -46,6 +46,12 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	if (m_bIsSaddled)
 	{
 		if (m_Attachee != nullptr)
@@ -125,7 +131,3 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 	return true;
 }
-
-
-
-

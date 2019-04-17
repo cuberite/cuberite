@@ -30,6 +30,12 @@ void cGhastFireballEntity::Explode(Vector3i a_Block)
 
 void cGhastFireballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	Destroy();
 	Explode(a_HitPos.Floor());
 }
@@ -40,6 +46,12 @@ void cGhastFireballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFa
 
 void cGhastFireballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	Destroy();
 	Explode(a_HitPos.Floor());
 }

@@ -21,6 +21,11 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X
 
 void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	// TODO: Tweak a_HitPos based on block face.
 	TeleportCreator(a_HitPos);
 
@@ -33,6 +38,11 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_Hi
 
 void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	int TotalDamage = 0;
 	// TODO: If entity is Ender Crystal, destroy it
 
@@ -48,7 +58,7 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitP
 
 void cThrownEnderPearlEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_DestroyTimer > 0)
+	if (m_DestroyTimer > 0 && !m_IsStatic)
 	{
 		m_DestroyTimer--;
 		if (m_DestroyTimer == 0)

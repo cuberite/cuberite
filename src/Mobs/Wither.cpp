@@ -64,20 +64,23 @@ void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_WitherInvulnerableTicks > 0)
+	if (!m_IsStatic)
 	{
-		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
-
-		if (NewTicks == 0)
+		if (m_WitherInvulnerableTicks > 0)
 		{
-			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
-		}
+			unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
 
-		m_WitherInvulnerableTicks = NewTicks;
+			if (NewTicks == 0)
+			{
+				m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
+			}
 
-		if ((NewTicks % 10) == 0)
-		{
-			Heal(10);
+			m_WitherInvulnerableTicks = NewTicks;
+
+			if ((NewTicks % 10) == 0)
+			{
+				Heal(10);
+			}
 		}
 	}
 
@@ -115,7 +118,3 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 		}
 	);
 }
-
-
-
-

@@ -48,6 +48,11 @@ void cExpBottleEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 void cExpBottleEntity::Break(Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	// Spawn an experience orb with a reward between 3 and 11.
 	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SPLASH_POTION, GetPosition().Floor(), 0);
 	m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), GetRandomProvider().RandInt(3, 11));

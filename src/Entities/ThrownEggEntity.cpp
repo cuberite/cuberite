@@ -31,6 +31,11 @@ void cThrownEggEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	int TotalDamage = 0;
 	// If entity is an Ender Dragon or Ender Crystal, it is damaged.
 	if (
@@ -53,7 +58,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_DestroyTimer > 0)
+	if (m_DestroyTimer > 0 && !m_IsStatic)
 	{
 		m_DestroyTimer--;
 		if (m_DestroyTimer == 0)
@@ -87,7 +92,3 @@ void cThrownEggEntity::TrySpawnChicken(Vector3d a_HitPos)
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
 	}
 }
-
-
-
-

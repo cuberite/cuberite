@@ -59,6 +59,11 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 
 bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return false;
+	}
 	switch (m_PickupState)
 	{
 		case psNoPickup:             return false;
@@ -74,6 +79,11 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	Vector3d Hit = a_HitPos;
 	Hit += GetSpeed().NormalizeCopy() / 100000;  // Make arrow sink into block a bit so it lodges (TODO: investigate how to stop them going so far so that they become black clientside)
 
@@ -100,6 +110,11 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	super::OnHitEntity(a_EntityHit, a_HitPos);
 
 	int Damage = static_cast<int>(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
@@ -167,6 +182,12 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	m_Timer += a_Dt;
 
 	if (m_bIsCollected)

@@ -24,6 +24,12 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	if (!m_Item.IsEmpty())
 	{
 		// Item not empty, rotate, clipping values to zero to three inclusive
@@ -98,7 +104,3 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }
-
-
-
-

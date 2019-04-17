@@ -44,6 +44,11 @@ cSplashPotionEntity::cSplashPotionEntity(
 
 void cSplashPotionEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	Splash(a_HitPos);
 	m_DestroyTimer = 2;
 }
@@ -54,6 +59,11 @@ void cSplashPotionEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFac
 
 void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
 	Splash(a_HitPos);
 	m_DestroyTimer = 5;
@@ -106,7 +116,3 @@ void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
 	a_Client.SendSpawnObject(*this, 73, m_PotionColor, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
 }
-
-
-
-

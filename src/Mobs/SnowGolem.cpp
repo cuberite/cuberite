@@ -35,6 +35,13 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
+
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	if (IsBiomeNoDownfall(m_World->GetBiomeAt(POSX_TOINT, POSZ_TOINT)))
 	{
 		TakeDamage(*this);

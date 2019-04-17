@@ -88,115 +88,118 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_EMState == ESCAPING)
+	if (!m_IsStatic)
 	{
-		CheckEventLostPlayer();
-	}
-
-	// if we have a partner, mate
-	if (m_LovePartner != nullptr)
-	{
-
-		if (m_MatingTimer > 0)
+		if (m_EMState == ESCAPING)
 		{
-			// If we should still mate, keep bumping into them until baby is made
-			Vector3d Pos = m_LovePartner->GetPosition();
-			MoveToPosition(Pos);
+			CheckEventLostPlayer();
+		}
+
+		// if we have a partner, mate
+		if (m_LovePartner != nullptr)
+		{
+
+			if (m_MatingTimer > 0)
+			{
+				// If we should still mate, keep bumping into them until baby is made
+				Vector3d Pos = m_LovePartner->GetPosition();
+				MoveToPosition(Pos);
+			}
+			else
+			{
+				// Mating finished. Spawn baby
+				Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
+				UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
+
+				cPassiveMonster * Baby = nullptr;
+
+				m_World->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
+					{
+						Baby = static_cast<cPassiveMonster *>(&a_Entity);
+						return true;
+					}
+				);
+
+				if (Baby != nullptr)
+				{
+					Baby->InheritFromParents(this, m_LovePartner);
+				}
+
+				m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
+
+				m_LovePartner->ResetLoveMode();
+				ResetLoveMode();
+			}
 		}
 		else
 		{
-			// Mating finished. Spawn baby
-			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
-			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
-
-			cPassiveMonster * Baby = nullptr;
-
-			m_World->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
-				{
-					Baby = static_cast<cPassiveMonster *>(&a_Entity);
-					return true;
-				}
-			);
-
-			if (Baby != nullptr)
+			// We have no partner, so we just chase the player if they have our breeding item
+			cItems FollowedItems;
+			GetFollowedItems(FollowedItems);
+			if (FollowedItems.Size() > 0)
 			{
-				Baby->InheritFromParents(this, m_LovePartner);
+				m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
+				{
+					cItem EquippedItem = a_Player.GetEquippedItem();
+					if (FollowedItems.ContainsType(EquippedItem))
+					{
+						Vector3d PlayerPos = a_Player.GetPosition();
+						MoveToPosition(PlayerPos);
+					}
+
+					return true;
+				});
+			}
+		}
+
+		// If we are in love mode but we have no partner, search for a partner neabry
+		if (m_LoveTimer > 0)
+		{
+			if (m_LovePartner == nullptr)
+			{
+				m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
+					{
+						// If the entity is not a monster, don't breed with it
+						// Also, do not self-breed
+						if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+						{
+							return false;
+						}
+
+						auto & Me = static_cast<cPassiveMonster&>(*this);
+						auto & PotentialPartner = static_cast<cPassiveMonster&>(a_Entity);
+
+						// If the potential partner is not of the same species, don't breed with it
+						if (PotentialPartner.GetMobType() != Me.GetMobType())
+						{
+							return false;
+						}
+
+						// If the potential partner is not in love
+						// Or they already have a mate, do not breed with them
+						if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
+						{
+							return false;
+						}
+
+						// All conditions met, let's breed!
+						PotentialPartner.EngageLoveMode(&Me);
+						Me.EngageLoveMode(&PotentialPartner);
+						return true;
+					}
+				);
 			}
 
-			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
-
-			m_LovePartner->ResetLoveMode();
-			ResetLoveMode();
+			m_LoveTimer--;
 		}
-	}
-	else
-	{
-		// We have no partner, so we just chase the player if they have our breeding item
-		cItems FollowedItems;
-		GetFollowedItems(FollowedItems);
-		if (FollowedItems.Size() > 0)
+		if (m_MatingTimer > 0)
 		{
-			m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
-			{
-				cItem EquippedItem = a_Player.GetEquippedItem();
-				if (FollowedItems.ContainsType(EquippedItem))
-				{
-					Vector3d PlayerPos = a_Player.GetPosition();
-					MoveToPosition(PlayerPos);
-				}
-
-				return true;
-			});
+			m_MatingTimer--;
 		}
-	}
-
-	// If we are in love mode but we have no partner, search for a partner neabry
-	if (m_LoveTimer > 0)
-	{
-		if (m_LovePartner == nullptr)
+		if (m_LoveCooldown > 0)
 		{
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
-				{
-					// If the entity is not a monster, don't breed with it
-					// Also, do not self-breed
-					if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
-					{
-						return false;
-					}
-
-					auto & Me = static_cast<cPassiveMonster&>(*this);
-					auto & PotentialPartner = static_cast<cPassiveMonster&>(a_Entity);
-
-					// If the potential partner is not of the same species, don't breed with it
-					if (PotentialPartner.GetMobType() != Me.GetMobType())
-					{
-						return false;
-					}
-
-					// If the potential partner is not in love
-					// Or they already have a mate, do not breed with them
-					if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
-					{
-						return false;
-					}
-
-					// All conditions met, let's breed!
-					PotentialPartner.EngageLoveMode(&Me);
-					Me.EngageLoveMode(&PotentialPartner);
-					return true;
-				}
-			);
+			m_LoveCooldown--;
 		}
-
-		m_LoveTimer--;
-	}
-	if (m_MatingTimer > 0)
-	{
-		m_MatingTimer--;
-	}
-	if (m_LoveCooldown > 0)
-	{
-		m_LoveCooldown--;
 	}
 }
 
@@ -207,6 +210,12 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
+
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 
@@ -242,6 +251,3 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 }
-
-
-

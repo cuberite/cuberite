@@ -131,6 +131,11 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	BroadcastMovementUpdate();  // Notify clients of position
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	m_Timer += a_Dt;
 
@@ -195,6 +200,12 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return false;
+	}
+
 	if (a_TDI.DamageType == dtCactusContact)
 	{
 		Destroy(true);

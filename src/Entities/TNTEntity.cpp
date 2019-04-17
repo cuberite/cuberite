@@ -52,6 +52,11 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	BroadcastMovementUpdate();
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	m_FuseTicks -= 1;
 	if (m_FuseTicks <= 0)
@@ -59,7 +64,3 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Explode();
 	}
 }
-
-
-
-

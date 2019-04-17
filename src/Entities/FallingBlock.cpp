@@ -37,6 +37,12 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	int BlockX = POSX_TOINT;
 	int BlockY = static_cast<int>(GetPosY() - 0.5);
 	int BlockZ = POSZ_TOINT;
@@ -104,7 +110,3 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 }
-
-
-
-

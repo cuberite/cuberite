@@ -43,50 +43,53 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (!IsTame() && !IsBaby())
+	if (!m_IsStatic)
 	{
-		if (m_CheckPlayerTickCount == 23)
+		if (!IsTame() && !IsBaby())
 		{
-			m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
+			if (m_CheckPlayerTickCount == 23)
 			{
-				cItems Items;
-				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+				m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
 				{
-					if (!IsBegging())
+					cItems Items;
+					GetBreedingItems(Items);
+					if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
 					{
-						SetIsBegging(true);
-						m_World->BroadcastEntityMetadata(*this);
+						if (!IsBegging())
+						{
+							SetIsBegging(true);
+							m_World->BroadcastEntityMetadata(*this);
+						}
+
+						MoveToPosition(a_Player.GetPosition());
+					}
+					else
+					{
+						if (IsBegging())
+						{
+							SetIsBegging(false);
+							m_World->BroadcastEntityMetadata(*this);
+						}
 					}
 
-					MoveToPosition(a_Player.GetPosition());
-				}
-				else
-				{
-					if (IsBegging())
-					{
-						SetIsBegging(false);
-						m_World->BroadcastEntityMetadata(*this);
-					}
-				}
-
-				return true;
-			}, true);
-			m_CheckPlayerTickCount = 0;
+					return true;
+				}, true);
+				m_CheckPlayerTickCount = 0;
+			}
+			else
+			{
+				m_CheckPlayerTickCount++;
+			}
 		}
-		else
+
+		if (IsTame() && !IsSitting())
 		{
-			m_CheckPlayerTickCount++;
+			TickFollowPlayer();
 		}
-	}
-
-	if (IsTame() && !IsSitting())
-	{
-		TickFollowPlayer();
-	}
-	else if (IsSitting())
-	{
-		StopMovingToPosition();
+		else if (IsSitting())
+		{
+			StopMovingToPosition();
+		}
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
@@ -139,53 +142,56 @@ void cOcelot::TickFollowPlayer()
 
 void cOcelot::OnRightClicked(cPlayer & a_Player)
 {
-	if (!IsTame())
+	if (!m_IsStatic)
 	{
-		if (
-			IsBegging() &&
-			((a_Player.GetPosition() - GetPosition()).Length() <= 3)
-		)
+		if (!IsTame())
 		{
-			cItems Items;
-			GetBreedingItems(Items);
-			if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+			if (
+				IsBegging() &&
+				((a_Player.GetPosition() - GetPosition()).Length() <= 3)
+			)
 			{
-				if (!a_Player.IsGameModeCreative())
+				cItems Items;
+				GetBreedingItems(Items);
+				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
 				{
-					a_Player.GetInventory().RemoveOneEquippedItem();
-				}
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
 
-				auto & Random = GetRandomProvider();
+					auto & Random = GetRandomProvider();
 
-				if (Random.RandBool(1.0 / 3.0))
-				{
-					// Taming succeeded
-					SetIsBegging(false);
+					if (Random.RandBool(1.0 / 3.0))
+					{
+						// Taming succeeded
+						SetIsBegging(false);
 
-					SetMaxHealth(20);
-					SetIsTame(true);
-					SetOwner(a_Player.GetName(), a_Player.GetUUID());
-					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
-					m_World->BroadcastEntityStatus(*this, esWolfTamed);
-					m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
-				}
-				else
-				{
-					// Taming failed
-					m_World->BroadcastEntityStatus(*this, esWolfTaming);
-					m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+						SetMaxHealth(20);
+						SetIsTame(true);
+						SetOwner(a_Player.GetName(), a_Player.GetUUID());
+						SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
+						m_World->BroadcastEntityStatus(*this, esWolfTamed);
+						m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					}
+					else
+					{
+						// Taming failed
+						m_World->BroadcastEntityStatus(*this, esWolfTaming);
+						m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					}
 				}
 			}
+			else
+			{
+				super::OnRightClicked(a_Player);
+			}
 		}
-		else
+		else if (a_Player.GetUUID() == m_OwnerUUID)
 		{
 			super::OnRightClicked(a_Player);
+			SetIsSitting(!IsSitting());
 		}
-	}
-	else if (a_Player.GetUUID() == m_OwnerUUID)
-	{
-		super::OnRightClicked(a_Player);
-		SetIsSitting(!IsSitting());
 	}
 	m_World->BroadcastEntityMetadata(*this);
 }

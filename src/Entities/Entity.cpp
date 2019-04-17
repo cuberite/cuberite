@@ -62,6 +62,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
 	m_IsTicking(false),
+	m_IsStatic(false),
 	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
@@ -383,6 +384,11 @@ void cEntity::SetPitchFromSpeed(void)
 
 bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	if (m_IsStatic)
+	{
+		return false;
+	}
+
 	if (m_Health <= 0)
 	{
 		// Can't take damage if already dead
@@ -915,6 +921,12 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	if (m_IsStatic)
+	{
+		// Static entity haven't physics
+		return;
+	}
+
 	int BlockX = POSX_TOINT;
 	int BlockY = POSY_TOINT;
 	int BlockZ = POSZ_TOINT;
@@ -1695,6 +1707,20 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 
 
 
+void cEntity::SetStatic(bool a_IsStatic)
+{
+	m_IsStatic = a_IsStatic;
+	if (a_IsStatic)
+	{
+		SetSpeed(0, 0, 0);
+		ResetPosition(m_Position);
+	}
+}
+
+
+
+
+
 void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
 	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
@@ -2204,6 +2230,15 @@ bool cEntity::IsTicking(void) const
 	return m_IsTicking;
 }
 
+
+
+
+
+bool cEntity::IsStatic(void) const
+{
+	return m_IsStatic;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
 Vector3d cEntity::GetLookVector(void) const
@@ -2282,6 +2317,3 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;
 	}
 }
-
-
-

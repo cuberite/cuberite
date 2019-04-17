@@ -41,6 +41,12 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	if (m_IsStatic)
+	{
+		// Can't act with static entity
+		return;
+	}
+
 	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
 	if (HeldItem == E_ITEM_BUCKET)
 	{

@@ -20,6 +20,11 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, do
 
 void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	m_DestroyTimer = 2;
 }
 
@@ -30,6 +35,11 @@ void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitF
 void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	super::OnHitEntity(a_EntityHit, a_HitPos);
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	int TotalDamage = 0;
 	if (a_EntityHit.IsMob())
@@ -52,7 +62,7 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos
 
 void cThrownSnowballEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_DestroyTimer > 0)
+	if (m_DestroyTimer > 0 && !m_IsStatic)
 	{
 		m_DestroyTimer--;
 		if (m_DestroyTimer == 0)
@@ -66,7 +76,3 @@ void cThrownSnowballEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chun
 		super::Tick(a_Dt, a_Chunk);
 	}
 }
-
-
-
-

@@ -60,6 +60,12 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	if (m_EMState == CHASING)
 	{
 		CheckEventLostPlayer();

@@ -28,6 +28,12 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	if (IsBaby())
 	{
 		return;  // Babies don't lay eggs

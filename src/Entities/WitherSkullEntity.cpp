@@ -26,6 +26,11 @@ cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, double a_X, double a
 
 void cWitherSkullEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	// TODO: Explode
 	// TODO: Apply wither effect to entities nearby
 	Destroy();
@@ -37,6 +42,11 @@ void cWitherSkullEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace
 
 void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
 
@@ -45,7 +55,3 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 	Destroy(true);
 }
-
-
-
-

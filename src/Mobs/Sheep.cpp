@@ -61,6 +61,12 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
 	{
@@ -97,6 +103,13 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
+
+	if (m_IsStatic)
+	{
+		// Static mob does nothing
+		return;
+	}
+
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT - 1;
 	int PosZ = POSZ_TOINT;

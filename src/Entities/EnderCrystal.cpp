@@ -42,6 +42,11 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
 
@@ -50,7 +55,3 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT,     POSZ_TOINT, E_BLOCK_BEDROCK, 0);
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT + 1, POSZ_TOINT, E_BLOCK_FIRE,    0);
 }
-
-
-
-

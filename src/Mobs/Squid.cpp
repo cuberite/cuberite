@@ -36,45 +36,48 @@ void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	m_PathfinderActivated = false;  // Disable Pathfinding until it's fixed. TODO
 
-	// We must first process current location, and only then tick, otherwise we risk processing a location in a chunk
-	// that is not where the entity currently resides (FS #411)
-	Vector3d Pos = GetPosition();
-
-	// TODO: Not a real behavior, but cool :D
-	int RelY = FloorC(Pos.y);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	if (!m_IsStatic)
 	{
-		return;
-	}
+		// We must first process current location, and only then tick, otherwise we risk processing a location in a chunk
+		// that is not where the entity currently resides (FS #411)
+		Vector3d Pos = GetPosition();
 
-	if (!IsHeadInWater())
-	{
-		if (m_AirLevel <= 0)
+		// TODO: Not a real behavior, but cool :D
+		int RelY = FloorC(Pos.y);
+		if ((RelY < 0) || (RelY >= cChunkDef::Height))
 		{
-			// Runs the air tick timer to check whether the squid should be damaged
-			if (m_AirTickTimer <= 0)
+			return;
+		}
+
+		if (!IsHeadInWater())
+		{
+			if (m_AirLevel <= 0)
 			{
-				// Damage squid
-				TakeDamage(dtSuffocating, nullptr, 1, 1, 0);
-				// Reset timer
-				m_AirTickTimer = DROWNING_TICKS;
+				// Runs the air tick timer to check whether the squid should be damaged
+				if (m_AirTickTimer <= 0)
+				{
+					// Damage squid
+					TakeDamage(dtSuffocating, nullptr, 1, 1, 0);
+					// Reset timer
+					m_AirTickTimer = DROWNING_TICKS;
+				}
+				else
+				{
+					m_AirTickTimer--;
+				}
 			}
 			else
 			{
-				m_AirTickTimer--;
+				// Reduce air supply
+				m_AirLevel--;
 			}
 		}
 		else
 		{
-			// Reduce air supply
-			m_AirLevel--;
+			// Set the air back to maximum
+			m_AirLevel = MAX_AIR_LEVEL;
+			m_AirTickTimer = DROWNING_TICKS;
 		}
-	}
-	else
-	{
-		// Set the air back to maximum
-		m_AirLevel = MAX_AIR_LEVEL;
-		m_AirTickTimer = DROWNING_TICKS;
 	}
 
 	super::Tick(a_Dt, a_Chunk);

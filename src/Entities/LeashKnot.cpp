@@ -29,6 +29,12 @@ void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
+
 	TiePlayersLeashedMobs(a_Player, true);
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
@@ -117,6 +123,11 @@ void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
+	if (m_IsStatic)
+	{
+		// Nothing can happend to static entity
+		return;
+	}
 	m_TicksAlive++;
 
 	if ((m_TicksAlive % TICK_STEP) != 0)
@@ -156,7 +167,3 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vecto
 
 	return LeashKnot;
 }
-
-
-
-

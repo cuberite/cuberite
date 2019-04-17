@@ -271,120 +271,124 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	GET_AND_VERIFY_CURRENT_CHUNK(Chunk, POSX_TOINT, POSZ_TOINT);
 
 	ASSERT((GetTarget() == nullptr) || (GetTarget()->IsPawn() && (GetTarget()->GetWorld() == GetWorld())));
-	if (m_AttackCoolDownTicksLeft > 0)
-	{
-		m_AttackCoolDownTicksLeft -= 1;
-	}
 
-	if (m_Health <= 0)
+	if (!m_IsStatic)  // Static mob does nothing
 	{
-		// The mob is dead, but we're still animating the "puff" they leave when they die
-		m_DestroyTimer += a_Dt;
-		if (m_DestroyTimer > std::chrono::seconds(1))
+		if (m_AttackCoolDownTicksLeft > 0)
 		{
-			Destroy(true);
+			m_AttackCoolDownTicksLeft -= 1;
 		}
-		return;
-	}
 
-	if (m_TicksSinceLastDamaged < 100)
-	{
-		++m_TicksSinceLastDamaged;
-	}
-	if ((GetTarget() != nullptr))
-	{
-		ASSERT(GetTarget()->IsTicking());
-
-		if (GetTarget()->IsPlayer())
+		if (m_Health <= 0)
 		{
-			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
+			// The mob is dead, but we're still animating the "puff" they leave when they die
+			m_DestroyTimer += a_Dt;
+			if (m_DestroyTimer > std::chrono::seconds(1))
 			{
-				SetTarget(nullptr);
-				m_EMState = IDLE;
+				Destroy(true);
+			}
+			return;
+		}
+
+		if (m_TicksSinceLastDamaged < 100)
+		{
+			++m_TicksSinceLastDamaged;
+		}
+		if ((GetTarget() != nullptr))
+		{
+			ASSERT(GetTarget()->IsTicking());
+
+			if (GetTarget()->IsPlayer())
+			{
+				if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
+				{
+					SetTarget(nullptr);
+					m_EMState = IDLE;
+				}
 			}
 		}
-	}
 
-	// Process the undead burning in daylight.
-	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
+		// Process the undead burning in daylight.
+		HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 
-	bool a_IsFollowingPath = false;
-	if (m_PathfinderActivated)
-	{
-		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
+		bool a_IsFollowingPath = false;
+		if (m_PathfinderActivated)
 		{
-			StopMovingToPosition();  // Simply sets m_PathfinderActivated to false.
-		}
-		else
-		{
-			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
-			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, m_EMState == IDLE ? true : false))
+			if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 			{
-				case ePathFinderStatus::PATH_FOUND:
+				StopMovingToPosition();  // Simply sets m_PathfinderActivated to false.
+			}
+			else
+			{
+				// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
+				switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, m_EMState == IDLE ? true : false))
 				{
-					/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
-					1. I am idle
-					2. I was not hurt by a player recently.
-					Then STOP. */
-					if (
-						m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
-						WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
-						!WouldBurnAt(GetPosition(), *Chunk)
-					)
+					case ePathFinderStatus::PATH_FOUND:
 					{
-						// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
+						/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
+						1. I am idle
+						2. I was not hurt by a player recently.
+						Then STOP. */
+						if (
+							m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
+							WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
+							!WouldBurnAt(GetPosition(), *Chunk)
+						)
+						{
+							// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
+							StopMovingToPosition();
+						}
+						else
+						{
+							a_IsFollowingPath = true;  // Used for proper body / head orientation only.
+							MoveToWayPoint(*Chunk);
+						}
+						break;
+					}
+					case ePathFinderStatus::PATH_NOT_FOUND:
+					{
 						StopMovingToPosition();
+						break;
 					}
-					else
+					default:
 					{
-						a_IsFollowingPath = true;  // Used for proper body / head orientation only.
-						MoveToWayPoint(*Chunk);
-					}
-					break;
-				}
-				case ePathFinderStatus::PATH_NOT_FOUND:
-				{
-					StopMovingToPosition();
-					break;
-				}
-				default:
-				{
 
+					}
 				}
 			}
 		}
+
+		SetPitchAndYawFromDestination(a_IsFollowingPath);
+
+		switch (m_EMState)
+		{
+			case IDLE:
+			{
+				// If enemy passive we ignore checks for player visibility.
+				InStateIdle(a_Dt, a_Chunk);
+				break;
+			}
+			case CHASING:
+			{
+				// If we do not see a player anymore skip chasing action.
+				InStateChasing(a_Dt, a_Chunk);
+				break;
+			}
+			case ESCAPING:
+			{
+				InStateEscaping(a_Dt, a_Chunk);
+				break;
+			}
+			case ATTACKING: break;
+		}  // switch (m_EMState)
+
+		// Leash calculations
+		CalcLeashActions(a_Dt);
 	}
-
-	SetPitchAndYawFromDestination(a_IsFollowingPath);
-
-	switch (m_EMState)
-	{
-		case IDLE:
-		{
-			// If enemy passive we ignore checks for player visibility.
-			InStateIdle(a_Dt, a_Chunk);
-			break;
-		}
-		case CHASING:
-		{
-			// If we do not see a player anymore skip chasing action.
-			InStateChasing(a_Dt, a_Chunk);
-			break;
-		}
-		case ESCAPING:
-		{
-			InStateEscaping(a_Dt, a_Chunk);
-			break;
-		}
-		case ATTACKING: break;
-	}  // switch (m_EMState)
-
-	// Leash calculations
-	CalcLeashActions(a_Dt);
 
 	BroadcastMovementUpdate();
 
-	if (m_AgingTimer > 0)
+	if (m_AgingTimer > 0 && !m_IsStatic)  // Static mob does nothing
 	{
 		m_AgingTimer--;
 		if ((m_AgingTimer <= 0) && IsBaby())
@@ -672,6 +676,12 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 void cMonster::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
+
+	if (m_IsStatic)
+	{
+		// Can't act with static mob
+		return;
+	}
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
