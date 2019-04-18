@@ -88,6 +88,7 @@ public:
 		etFloater,
 		etItemFrame,
 		etPainting,
+		etArmorStand,
 		etLeashKnot,
 
 		// Common variations
@@ -180,6 +181,7 @@ public:
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
 	bool IsLeashKnot   (void) const { return (m_EntityType == etLeashKnot);    }
 	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
+	bool IsArmorStand  (void) const { return (m_EntityType == etArmorStand);	 }
 
 	/** Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true) */
 	virtual bool IsA(const char * a_ClassName) const;

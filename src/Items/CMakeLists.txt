@@ -5,6 +5,7 @@ SET (SRCS
 
 SET (HDRS
 	ItemArmor.h
+	ItemArmorStand.h
 	ItemBed.h
 	ItemBigFlower.h
 	ItemBoat.h
