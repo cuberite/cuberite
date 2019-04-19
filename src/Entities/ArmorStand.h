@@ -22,6 +22,12 @@ public:
 
 	// tolua_begin
 
+	/** Returns true if the armor stand is invisible. */
+	virtual bool IsInvisible() const override;
+
+	/** Set whatever the armorstand is visible */
+	void SetVisible(bool a_IsVisible);
+
 	/** Returns true if the armor stand has a custom name. */
 	bool HasCustomName(void) const { return !m_CustomName.empty(); }
 
@@ -99,6 +105,7 @@ private:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 
+	bool m_IsVisible;
 	AString m_CustomName;
 	bool m_CustomNameAlwaysVisible;
 

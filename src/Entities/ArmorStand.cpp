@@ -212,6 +212,28 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, el
 
 
 
+void cArmorStand::SetVisible(bool a_IsVisible)
+{
+	m_IsVisible = a_IsVisible;
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+bool cArmorStand::IsInvisible() const
+{
+	return !m_IsVisible;
+}
+
+
+
+
+
 void cArmorStand::SetCustomName(const AString & a_CustomName)
 {
 	m_CustomName = a_CustomName;

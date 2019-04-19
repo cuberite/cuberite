@@ -895,6 +895,7 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 		m_Writer.AddShort("Size", a_ArmorStand->GetSize());
 		m_Writer.AddByte("Arms", a_ArmorStand->HasArms() ? 1 : 0);
 		m_Writer.AddByte("Plate", a_ArmorStand->HasBasePlate() ? 1 : 0);
+		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
 		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());
 		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
 		m_Writer.BeginList("HeadRotation", TAG_Double);

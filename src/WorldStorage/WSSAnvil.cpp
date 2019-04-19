@@ -2060,6 +2060,13 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		ArmorStand->SetHasBasePlate(HasPlate);
 	}
 
+	int IsInvisibleIdx = a_NBT.FindChildByName(a_TagIdx, "Invisible");
+	if ((IsInvisibleIdx > 0) && (a_NBT.GetType(IsInvisibleIdx) == TAG_Byte))
+	{
+		bool IsInvisible = ((a_NBT.GetByte(IsInvisibleIdx) == 1) ? true : false);
+		ArmorStand->SetVisible(!IsInvisible);
+	}
+
 
 	/**
 		Rotations
