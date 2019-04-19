@@ -2151,26 +2151,12 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		{
 			switch (SlotNum)
 			{
-				case 0:
-					ArmorStand->SetEquippedWeapon(Item);
-					break;
-				case 1:
-					ArmorStand->SetEquippedBoots(Item);
-					break;
-				case 2:
-					ArmorStand->SetEquippedLeggings(Item);
-					break;
-				case 3:
-					ArmorStand->SetEquippedChestplate(Item);
-					break;
-				case 4:
-					ArmorStand->SetEquippedHelmet(Item);
-					break;
-				case 5:
-					ArmorStand->SetOffHandEquipedItem(Item);
-					break;
-				default:  // Nothing to do
-
+				case 0: ArmorStand->SetEquippedWeapon(Item); break;
+				case 1: ArmorStand->SetEquippedBoots(Item); break;
+				case 2: ArmorStand->SetEquippedLeggings(Item); break;
+				case 3: ArmorStand->SetEquippedChestplate(Item); break;
+				case 4: ArmorStand->SetEquippedHelmet(Item); break;
+				case 5: ArmorStand->SetOffHandEquipedItem(Item); break;
 			}
 		}
 	}
