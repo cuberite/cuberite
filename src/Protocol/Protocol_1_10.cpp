@@ -558,6 +558,83 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etArmorStand:
+		{
+			auto & ArmorStand = static_cast<const cArmorStand &>(a_Entity);
+
+			if (ArmorStand.HasCustomName())
+			{
+				a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+				a_Pkt.WriteString(ArmorStand.GetCustomName()); // Must be set as alwaysVisible to be visible (idk why)
+
+				a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);  // Custom name always visible
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+				a_Pkt.WriteBool(ArmorStand.IsCustomNameAlwaysVisible());
+			}
+
+			Int8 Flags = 0;
+			if (ArmorStand.IsSmall())
+			{
+				Flags |= 0x01;
+			}
+			if (ArmorStand.HasArms())
+			{
+				Flags |= 0x04;
+			}
+			if (!ArmorStand.HasBasePlate())
+			{
+				Flags |= 0x08;
+			}
+			if (ArmorStand.IsMarker())
+			{
+				Flags |= 0x10;
+			}
+			a_Pkt.WriteBEUInt8(ARMOR_STAND_STATUS);  // Index
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
+			a_Pkt.WriteBEInt8(Flags);
+
+			if(!ArmorStand.IsInvisible()) // It will probably don't change anything if it's invisible because the CustomName will probably don't be different. So save a lot of packets.
+			{
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().z);
+
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_BODY_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().z);
+
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_ARM_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().z);
+
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_ARM_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().z);
+
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_LEG_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().z);
+
+				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_LEG_ROTATION);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().x);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().y);
+				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().z);
+			}
+			break;
+		}  // case etArmorStand
+
 		default:
 		{
 			break;

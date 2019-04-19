@@ -450,8 +450,13 @@ void cProtocol_1_9_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 
 	cPacketizer Pkt(*this, GetPacketId(sendEntityEquipment));  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// Needs to be adjusted due to the insertion of offhand at slot 1
-	if (a_SlotNum > 0)
+	// See https://wiki.vg/Protocol#Entity_Equipment
+	// TODO: Enable player left hand. Currently only user by armor stand.
+	if(a_SlotNum == 5) // Left hand
+	{
+		a_SlotNum = 1;
+	}
+	else if (a_SlotNum > 0)
 	{
 		a_SlotNum++;
 	}
