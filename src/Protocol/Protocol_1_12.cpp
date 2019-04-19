@@ -619,9 +619,9 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			{
 				a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-				a_Pkt.WriteString(ArmorStand.GetCustomName()); // Must be set as alwaysVisible to be visible (idk why)
+				a_Pkt.WriteString(ArmorStand.GetCustomName());  // Must be set as alwaysVisible to be visible (idk why)
 
-				a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);  // Custom name always visible
+				a_Pkt.WriteBEUInt8(ENTITY_CUSTOM_NAME_VISIBLE);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 				a_Pkt.WriteBool(ArmorStand.IsCustomNameAlwaysVisible());
 			}
@@ -647,7 +647,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 			a_Pkt.WriteBEInt8(Flags);
 
-			if(!ArmorStand.IsInvisible()) // It will probably don't change anything if it's invisible because the CustomName will probably don't be different. So save a lot of packets.
+			if (!ArmorStand.IsInvisible())  // It will probably don't change anything if it's invisible because the CustomName will probably don't be different. So save a lot of packets.
 			{
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);

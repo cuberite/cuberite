@@ -11,7 +11,7 @@
 
 
 
-cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size) :
+cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size):
 	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.25*a_Size, 0.9875*a_Size),  // a_Size = 0 : Marker ;  a_Size = 1 : Small ;  a_Size = 0 : Normal
 	m_CustomName(""),
 	m_CustomNameAlwaysVisible(false),
@@ -19,7 +19,7 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size) :
 	m_HasArms(false),
 	m_HasBasePlate(true),
 	m_HeadRotation(0.0, 0.0, 0.0),
-	m_BodyRotation(0.0, 0.0, 0.0) ,
+	m_BodyRotation(0.0, 0.0, 0.0),
 	m_LeftArmRotation(-10.0, 0.0, -10.0),
 	m_RightArmRotation(-15.0, 0.0, 10.0),
 	m_LeftLegRotation(-1.0, 0.0, -1.0),
@@ -49,7 +49,7 @@ void cArmorStand::SpawnOn(cClientHandle & a_ClientHandle)  // Should got any rot
 	a_ClientHandle.SendEntityEquipment(*this, 2, GetEquippedLeggings());
 	a_ClientHandle.SendEntityEquipment(*this, 3, GetEquippedChestplate());
 	a_ClientHandle.SendEntityEquipment(*this, 4, GetEquippedHelmet());
-	a_ClientHandle.SendEntityEquipment(*this, 5, GetOffHandEquipedItem()); // For compatibility issues, left hand was added at the end and not at the ID 1 like wants the protocol since 1.9
+	a_ClientHandle.SendEntityEquipment(*this, 5, GetOffHandEquipedItem());  // For compatibility issues, left hand was added at the end and not at the ID 1 like wants the protocol since 1.9
 }
 
 
@@ -72,38 +72,38 @@ void cArmorStand::KilledBy(TakeDamageInfo & a_TDI)
 {
 	// TODO: Replace harm by shaking effect when hurt
 
-	if (IsMarker()) //  Disallow interaction with marker
+	if (IsMarker())  // Disallow interaction with marker
 	{
 		return;
 	}
 
 	cItems Pickup;
-	if(!m_LeftHand.IsEmpty())
+	if (!m_LeftHand.IsEmpty())
 	{
 		Pickup.push_back(m_LeftHand);
 		SetOffHandEquipedItem(cItem());
 	}
-	else if(!m_RightHand.IsEmpty())
+	else if (!m_RightHand.IsEmpty())
 	{
 		Pickup.push_back(m_RightHand);
 		SetEquippedWeapon(cItem());
 	}
-	else if(!m_Helmet.IsEmpty())
+	else if (!m_Helmet.IsEmpty())
 	{
 		Pickup.push_back(m_Helmet);
 		SetEquippedHelmet(cItem());
 	}
-	else if(!m_ChestPlate.IsEmpty())
+	else if (!m_ChestPlate.IsEmpty())
 	{
 		Pickup.push_back(m_ChestPlate);
 		SetEquippedChestplate(cItem());
 	}
-	else if(!m_Leggings.IsEmpty())
+	else if (!m_Leggings.IsEmpty())
 	{
 		Pickup.push_back(m_Leggings);
 		SetEquippedLeggings(cItem());
 	}
-	else if(!m_Boots.IsEmpty())
+	else if (!m_Boots.IsEmpty())
 	{
 		Pickup.push_back(m_Boots);
 		SetEquippedBoots(cItem());
@@ -131,7 +131,7 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, el
 {
 	super::OnRightClicked(a_Player);
 
-	if (IsMarker()) //  Disallow interaction with marker
+	if (IsMarker())  // Disallow interaction with marker
 	{
 		return;
 	}
@@ -142,30 +142,42 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, el
 	}
 	short ItemType = a_Player.GetEquippedItem().m_ItemType;
 
-	if (ItemType == E_ITEM_NAME_TAG && !a_Player.GetEquippedItem().m_CustomName.empty())  // Add a name to the armor stand
+	if ((ItemType == E_ITEM_NAME_TAG) && !a_Player.GetEquippedItem().m_CustomName.empty())  // Add a name to the armor stand
 	{
 		SetCustomName(a_Player.GetEquippedItem().m_CustomName);
 	}
-	else if (ItemCategory::IsArmor(ItemType)) // OR find the best place for the item on the armor stand
+	else if (ItemCategory::IsArmor(ItemType))  // OR find the best place for the item on the armor stand
 	{
 		if (ItemCategory::IsHelmet(ItemType))
 		{
-			if (!GetEquippedHelmet().IsEmpty()) { return; }
+			if (!GetEquippedHelmet().IsEmpty())  // That way, we don't remove the item from the player
+			{
+				return;
+			}
 			SetEquippedHelmet(a_Player.GetEquippedItem());
 		}
 		else if (ItemCategory::IsChestPlate(ItemType))
 		{
-			if (!GetEquippedChestplate().IsEmpty()) { return; }
+			if (!GetEquippedChestplate().IsEmpty())
+			{
+				return;
+			}
 			SetEquippedChestplate(a_Player.GetEquippedItem());
 		}
 		else if (ItemCategory::IsLeggings(ItemType))
 		{
-			if (!GetEquippedLeggings().IsEmpty()) { return; }
+			if (!GetEquippedLeggings().IsEmpty())
+			{
+				return;
+			}
 			SetEquippedLeggings(a_Player.GetEquippedItem());
 		}
 		else if (ItemCategory::IsBoots(ItemType))
 		{
-			if (GetEquippedLeggings().IsEmpty()) { return; }
+			if (GetEquippedLeggings().IsEmpty())
+			{
+				return;
+			}
 			SetEquippedBoots(a_Player.GetEquippedItem());
 		}
 		else if (ItemCategory::IsTool(ItemType) && GetEquippedWeapon().IsEmpty())
@@ -195,7 +207,6 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, el
 		a_Player.GetInventory().RemoveOneEquippedItem();
 	}
 }
-
 
 
 
@@ -371,7 +382,7 @@ void cArmorStand::SetOffHandEquipedItem(const cItem & a_LeftHand)
 	m_LeftHand = a_LeftHand;
 	if (m_World != nullptr)
 	{
-		m_World->BroadcastEntityEquipment(*this, 5, a_LeftHand); //  See above (In SpawnOn) about the slot ID
+		m_World->BroadcastEntityEquipment(*this, 5, a_LeftHand);  // See above (In SpawnOn) about the slot ID
 	}
 }
 

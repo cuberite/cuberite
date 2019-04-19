@@ -887,6 +887,7 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 
 
 
+
 void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 {
 	m_Writer.BeginCompound("");

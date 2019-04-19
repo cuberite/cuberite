@@ -115,7 +115,7 @@ private:
 	cItem m_LeftHand;
 	cItem m_RightHand;
 	cItem m_Helmet;
-	cItem	m_ChestPlate;
+	cItem m_ChestPlate;
 	cItem m_Leggings;
 	cItem m_Boots;
 

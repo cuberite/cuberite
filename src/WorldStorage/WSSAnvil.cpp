@@ -2149,7 +2149,8 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		cItem Item;
 		if (LoadItemFromNBT(Item, a_NBT, Child))
 		{
-			switch (SlotNum) {
+			switch (SlotNum)
+			{
 				case 0:
 					ArmorStand->SetEquippedWeapon(Item);
 					break;
@@ -2168,9 +2169,8 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 				case 5:
 					ArmorStand->SetOffHandEquipedItem(Item);
 					break;
-				default:
-					// Nothing to do
-					break;
+				default:  // Nothing to do
+
 			}
 		}
 	}
