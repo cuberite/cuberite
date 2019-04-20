@@ -532,6 +532,9 @@ public:
 	/** Called when the specified player right-clicks this entity */
 	virtual void OnRightClicked(cPlayer & a_Player) {}
 
+	/** Called when the specified player interact at specific coords of this entity. Depend of entity and mostly used by ArmorStand */
+	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_UsedMainHand) {}
+
 	/** Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy(). */
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr)
 	{

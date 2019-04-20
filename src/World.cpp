@@ -1964,7 +1964,7 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 
 
 
-UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size)
+UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw)
 {
 	auto ArmorStand = std::make_unique<cArmorStand>(a_Pos, a_Yaw);
 	auto ArmorStandPtr = ArmorStand.get();

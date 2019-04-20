@@ -1092,9 +1092,8 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
-			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
-
-			// TODO: Do anything
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), Hand == 0);
 			break;
 		}
 		default:

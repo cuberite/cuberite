@@ -1111,48 +1111,74 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_ArmorStand, "ArmorStand");
-			mWriter.AddShort("Size", a_ArmorStand->GetSize());
-			mWriter.AddByte("Arms", a_ArmorStand->HasArms() ? 1 : 0);
-			mWriter.AddByte("Plate", a_ArmorStand->HasBasePlate() ? 1 : 0);
+			mWriter.AddByte("Small", a_ArmorStand->IsSizeSmall() ? 1 : 0);
+			mWriter.AddByte("NoGravity", a_ArmorStand->HasGravity() ? 0 : 1);
+			mWriter.AddByte("Marker", a_ArmorStand->IsMarker() ? 1 : 0);
+			mWriter.AddByte("ShowArms", a_ArmorStand->HasArms() ? 1 : 0);
+			mWriter.AddByte("NoBasePlate", a_ArmorStand->HasBasePlate() ? 0 : 1);
 			mWriter.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
 			mWriter.AddString("CustomName", a_ArmorStand->GetCustomName());
 			mWriter.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
-			mWriter.BeginList("HeadRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().z);
-			mWriter.EndList();
-			mWriter.BeginList("BodyRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().z);
-			mWriter.EndList();
-			mWriter.BeginList("LeftArmRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().z);
-			mWriter.EndList();
-			mWriter.BeginList("RightArmRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().z);
-			mWriter.EndList();
-			mWriter.BeginList("LeftLegRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().z);
-			mWriter.EndList();
-			mWriter.BeginList("RightLegRotation", TAG_Double);
-				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().x);
-				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
-				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
-			mWriter.EndList();
-			AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
-			AddItem(a_ArmorStand->GetEquippedBoots(), 1);
-			AddItem(a_ArmorStand->GetEquippedLeggings(), 2);
-			AddItem(a_ArmorStand->GetEquippedChestplate(), 3);
-			AddItem(a_ArmorStand->GetEquippedHelmet(), 4);
-			AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
+			mWriter.BeginCompound("Pose");
+				mWriter.BeginList("Body", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetBodyRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetBodyRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetBodyRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("LeftArm", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftArmRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftArmRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftArmRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("RightArm", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetRightArmRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetRightArmRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetRightArmRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("LeftLeg", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftLegRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftLegRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetLeftLegRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("RightLeg", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("Head", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().z);
+				mWriter.EndList();
+			mWriter.EndCompound();
+			mWriter.BeginCompound("ArmorItems");
+				if (!a_ArmorStand->GetEquippedBoots().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedBoots(), 0);
+				}
+				if (!a_ArmorStand->GetEquippedLeggings().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedLeggings(), 1);
+				}
+				if (!a_ArmorStand->GetEquippedChestplate().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedChestplate(), 2);
+				}
+				if (!a_ArmorStand->GetEquippedHelmet().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedHelmet(), 3);
+				}
+			mWriter.EndCompound();
+			mWriter.BeginCompound("HandItems");
+				if (!a_ArmorStand->GetEquippedWeapon().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
+				}
+				if (!a_ArmorStand->GetOffHandEquipedItem().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
+				}
+			mWriter.EndCompound();
 		mWriter.EndCompound();
 	}
 

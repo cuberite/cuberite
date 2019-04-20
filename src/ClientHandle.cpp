@@ -1666,12 +1666,12 @@ void cClientHandle::HandleUpdateSign(
 
 
 
-void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
+void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_UsedMainHand)
 {
 	// TODO: Let plugins interfere via a hook
 
 	// If the player is a spectator, let him spectate
-	if (m_Player->IsGameModeSpectator() && a_IsLeftClick)
+	if (m_Player->IsGameModeSpectator() && a_UsedMainHand)
 	{
 		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
@@ -1682,7 +1682,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	}
 
 	// If it is a right click, call the entity's OnRightClicked() handler:
-	if (!a_IsLeftClick)
+	if (!a_UsedMainHand)
 	{
 		cWorld * World = m_Player->GetWorld();
 		World->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
@@ -1729,6 +1729,28 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 				m_Player->NotifyNearbyWolves(static_cast<cPawn*>(&a_Entity), true);
 			}
 			return true;
+		}
+	);
+}
+
+
+
+
+
+void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_TargetPos, bool a_UsedMainHand)
+{
+	// If it is a right click, call the entity's OnRightClicked() handler:
+	cWorld * World = m_Player->GetWorld();
+	World->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
+		{
+			if (
+				!cPluginManager::Get()->CallHookPlayerClickingAtEntity(*m_Player, a_Entity, a_TargetPos) &&
+				!m_Player->IsGameModeSpectator()  // Spectators cannot interact with every entity
+			)
+			{
+				a_Entity.OnClickedAt(*m_Player, a_TargetPos, a_UsedMainHand);
+			}
+			return false;
 		}
 	);
 }

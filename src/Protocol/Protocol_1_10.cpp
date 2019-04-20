@@ -570,8 +570,8 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				a_Pkt.WriteBool(ArmorStand.IsCustomNameAlwaysVisible());
 			}
 
-			Int8 Flags = 0;
-			if (ArmorStand.IsSmall())
+			Flags = 0;  // Armor stand has its own flags
+			if (ArmorStand.IsSizeSmall())
 			{
 				Flags |= 0x01;
 			}
@@ -591,43 +591,43 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 			a_Pkt.WriteBEInt8(Flags);
 
-			if (!ArmorStand.IsInvisible())  // It will probably don't change anything if it's invisible because the CustomName will probably don't be different. So save a lot of packets.
+			if (!ArmorStand.IsMarker())  // No point sending orientation if it's a marker (Marker type is ponctual like a floating particle). However invisible armor stand keep armor visible according to orientations.
 			{
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetHeadRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_BODY_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetBodyRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_ARM_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftArmRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_ARM_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightArmRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_LEG_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetLeftLegRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_LEG_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().x);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().y);
-				a_Pkt.WriteBEFloat(ArmorStand.GetRightLegRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().z));
 			}
 			break;
 		}  // case etArmorStand

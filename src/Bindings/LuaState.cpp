@@ -971,6 +971,7 @@ void cLuaState::Push(cEntity * a_Entity)
 			{
 				switch (a_Entity->GetEntityType())
 				{
+					case cEntity::etArmorStand:   return "cArmorStand";
 					case cEntity::etBoat:         return "cBoat";
 					case cEntity::etExpOrb:       return "cExpOrb";
 					case cEntity::etFallingBlock: return "cFallingBlock";
@@ -2651,7 +2652,3 @@ void cLuaState::cRef::UnRef(void)
 	m_LuaState = nullptr;
 	m_Ref = LUA_REFNIL;
 }
-
-
-
-

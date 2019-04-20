@@ -481,9 +481,9 @@ public:
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material);
 
-	/** Spawns an armor stand at the given coordinates.
+	/** Spawns an armor stand at the given coordinates, with the given orientation in degrees from Z+, going clockwise.
 	Returns the UniqueID of the spawned armor stand, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size = 2);
+	UInt32 SpawnArmorStand(Vector3d a_Pos, double a_Yaw);
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */

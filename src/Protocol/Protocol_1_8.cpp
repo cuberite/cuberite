@@ -540,7 +540,12 @@ void cProtocol_1_8_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktEntityEquipment);
+	if (a_SlotNum == 5)  // Left Hand. Cancel packet because left hand doesn't exists before 1.9
+	{
+		return;
+	}
+
+	cPacketizer Pkt(*this, pktEntityEquipment);  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt16(a_SlotNum);
 	WriteItem(Pkt, a_Item);
@@ -2705,8 +2710,7 @@ void cProtocol_1_8_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
-
-			// TODO: Do anything
+			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), true);  // Assume that's the main hand
 			break;
 		}
 		default:
