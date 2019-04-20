@@ -159,9 +159,6 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 				else
 				{
 					m_Client->SetProperties(root);
-					LOGD("ipstring: %s", Params[1]);
-					LOGD("uuid: %s", Params[2]);
-					LOGD("properties: count=%d, json=%s", root.size(), Params[3]);
 				}
 			}
 			else
