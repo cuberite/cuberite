@@ -109,6 +109,7 @@ set(BINDING_DEPENDENCIES
 	../Entities/Pawn.h
 	../Entities/Player.h
 	../Entities/Painting.h
+	../Entities/ArmorStand.h
 	../Entities/Pickup.h
 	../Entities/ProjectileEntity.h
 	../Entities/SplashPotionEntity.h
