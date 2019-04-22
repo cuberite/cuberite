@@ -978,7 +978,6 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteString(a_Player.GetPlayerListName());
-	LOGD("Sending player tab list for \"%s\"...", a_Player.GetPlayerListName());
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt32(Properties.size());
