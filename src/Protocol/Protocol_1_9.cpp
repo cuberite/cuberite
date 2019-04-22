@@ -983,8 +983,6 @@ void cProtocol_1_9_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(Properties.size());
 	for (auto & Node : Properties)
 	{
-		LOGD("name: %s", Node.get("name", "").asString());
-		LOGD("value: %s", Node.get("value", "").asString());
 		Pkt.WriteString(Node.get("name", "").asString());
 		Pkt.WriteString(Node.get("value", "").asString());
 		AString Signature = Node.get("signature", "").asString();
