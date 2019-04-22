@@ -9,7 +9,7 @@
 
 
 
-const double cNetherPortalScanner::OutOffset = 2;
+const double cNetherPortalScanner::OutOffset = 0.5;
 const double cNetherPortalScanner::AcrossOffset = 0.5;
 
 
@@ -278,7 +278,7 @@ void cNetherPortalScanner::OnDisabled(void)
 		FLOGD("Building nether portal at {0}", m_PortalLoc);
 		BuildNetherPortal(m_PortalLoc, m_Dir, m_BuildPlatform);
 		m_PortalLoc.x += 1;
-		m_PortalLoc.y += 2;
+		m_PortalLoc.y += 1;
 		m_PortalLoc.z += 1;
 	}
 
