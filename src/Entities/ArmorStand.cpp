@@ -18,6 +18,7 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size):
 	m_Size(a_Size),
 	m_HasArms(false),
 	m_HasBasePlate(true),
+	m_IsVisible(true),
 	m_HeadRotation(0.0, 0.0, 0.0),
 	m_BodyRotation(0.0, 0.0, 0.0),
 	m_LeftArmRotation(-10.0, 0.0, -10.0),
@@ -129,17 +130,15 @@ void cArmorStand::KilledBy(TakeDamageInfo & a_TDI)
 
 void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, else the callback is not called, IDK Why ...
 {
-	super::OnRightClicked(a_Player);
-
-	if (IsMarker())  // Disallow interaction with marker
-	{
-		return;
-	}
-
-	if (a_Player.GetEquippedItem().IsEmpty())
-	{
-		return;
-	}
+	// if (IsMarker())  // Disallow interaction with marker
+	// {
+	// 	return;
+	// }
+	//
+	// if (a_Player.GetEquippedItem().IsEmpty())
+	// {
+	// 	return;
+	// }
 	short ItemType = a_Player.GetEquippedItem().m_ItemType;
 
 	if ((ItemType == E_ITEM_NAME_TAG) && !a_Player.GetEquippedItem().m_CustomName.empty())  // Add a name to the armor stand

@@ -96,7 +96,7 @@ public:
 
 	// tolua_end
 
-private:
+protected:
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
