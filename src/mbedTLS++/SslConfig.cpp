@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 
-#include "mbedTLS++/SslConfig.h"
+#include "SslConfig.h"
 #include "EntropyContext.h"
 #include "CtrDrbgContext.h"
 #include "CryptoKey.h"

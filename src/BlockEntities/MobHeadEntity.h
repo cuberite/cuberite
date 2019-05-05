@@ -9,8 +9,8 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "Defines.h"
-#include "UUID.h"
+#include "../Defines.h"
+#include "../UUID.h"
 
 
 

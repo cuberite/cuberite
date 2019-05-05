@@ -18,7 +18,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
-#include "Bindings/PluginManager.h"
+#include "../Bindings/PluginManager.h"
 
 
 
@@ -191,6 +191,7 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 
 
+
 void cProtocolRecognizer::SendCameraSetTo(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -288,6 +289,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 
 
 
+
 void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -298,7 +300,7 @@ void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocolRecognizer::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+void cProtocolRecognizer::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
@@ -422,6 +424,16 @@ void cProtocolRecognizer::SendHealth(void)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendHealth();
+}
+
+
+
+
+
+void cProtocolRecognizer::SendHeldItemChange(int a_ItemIndex)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
 
 
@@ -1240,7 +1252,3 @@ void cProtocolRecognizer::HandlePacketStatusPing()
 	cPacketizer Pkt(*this, 0x01);  // Pong packet
 	Pkt.WriteBEInt64(Timestamp);
 }
-
-
-
-

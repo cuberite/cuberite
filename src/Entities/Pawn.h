@@ -77,6 +77,8 @@ protected:
 	double m_LastGroundHeight;
 	bool m_bTouchGround;
 
+	virtual void ResetPosition(Vector3d a_NewPosition) override;
+
 private:
 
 	/** A list of all monsters that are targeting this pawn. */

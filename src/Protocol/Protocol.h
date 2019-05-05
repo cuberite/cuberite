@@ -89,6 +89,7 @@ public:
 		sendExplosion,
 		sendGameMode,
 		sendHealth,
+		sendHeldItemChange,
 		sendInventorySlot,
 		sendJoinGame,
 		sendKeepAlive,
@@ -147,7 +148,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) = 0;
+	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) = 0;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityLook                 (const cEntity & a_Entity) = 0;
@@ -160,6 +161,7 @@ public:
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
+	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
@@ -247,8 +249,3 @@ protected:
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 } ;
-
-
-
-
-

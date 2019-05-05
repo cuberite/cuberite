@@ -8,8 +8,6 @@
 
 
 
-
-
 cCow::cCow(void) :
 	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
 {

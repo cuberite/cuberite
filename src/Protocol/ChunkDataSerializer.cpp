@@ -8,9 +8,9 @@
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
-#include "ByteBuffer.h"
 #include "Protocol_1_8.h"
 #include "Protocol_1_9.h"
+#include "../ByteBuffer.h"
 
 
 

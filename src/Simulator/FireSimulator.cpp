@@ -5,7 +5,7 @@
 #include "../World.h"
 #include "../Defines.h"
 #include "../Chunk.h"
-#include "Root.h"
+#include "../Root.h"
 #include "../Bindings/PluginManager.h"
 
 
@@ -14,9 +14,9 @@
 
 // Easy switch for turning on debugging logging:
 #if 0
-	#define FIRE_LOG LOGD
+	#define FIRE_FLOG FLOGD
 #else
-	#define FIRE_LOG(...)
+	#define FIRE_FLOG(...)
 #endif
 
 
@@ -111,9 +111,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		if (!IsAllowedBlock(BlockType))
 		{
 			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
-			FIRE_LOG("FS: Removing block {%d, %d, %d}",
-				AbsPos.x, AbsPos.y, AbsPos.z
-			);
+			FIRE_FLOG("FS: Removing block {0}", AbsPos);
 			itr = Data.erase(itr);
 			continue;
 		}
@@ -148,16 +146,16 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		}
 
 		/*
-		FIRE_LOG("FS: Fire at {%d, %d, %d} is stepping",
-			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+		FIRE_FLOG("FS: Fire at {0} is stepping",
+			a_Chunk->PositionToWorldPosition(itr->x, itr->y, itr->z)
 		);
 		*/
 		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
 			// The fire burnt out completely
-			FIRE_LOG("FS: Fire at {%d, %d, %d} burnt out, removing the fire block",
-				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block",
+				a_Chunk->PositionToWorldPosition({itr->x, itr->y, itr->z})
 			);
 			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
 			RemoveFuelNeighbors(a_Chunk, x, y, z);
@@ -272,7 +270,7 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 		}
 	}  // for itr - ChunkData[]
 
-	FIRE_LOG("FS: Adding block {%d, %d, %d}", a_Block.x, a_Block.y, a_Block.z);
+	FIRE_FLOG("FS: Adding block {0}", a_Block);
 	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ, 100));
 }
 
@@ -352,8 +350,8 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 				// Start the fire in the neighbor {x, y, z}
 				/*
-				FIRE_LOG("FS: Trying to start fire at {%d, %d, %d}.",
-					x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
+				FIRE_LOG("FS: Trying to start fire at {0}.",
+					a_Chunk->PositionToWorldPosition(x, y, z)
 				);
 				*/
 				if (CanStartFireInBlock(a_Chunk, x, y, z))
@@ -366,7 +364,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 						return;
 					}
 
-					FIRE_LOG("FS: Starting new fire at {%d, %d, %d}.", a_PosX, y, a_PosZ);
+					FIRE_FLOG("FS: Starting new fire at {0}.", Vector3i{a_PosX, y, a_PosZ});
 					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
 				}
 			}  // for y

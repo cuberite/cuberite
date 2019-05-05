@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Defines.h"
+#include "../Defines.h"
 #include "PluginManager.h"
 
 

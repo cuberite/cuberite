@@ -11,7 +11,6 @@
 
 
 
-
 enum
 {
 	PROGRESSBAR_FUEL = 0,
@@ -32,6 +31,7 @@ cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
 	m_TimeBurned(0),
+	m_RewardCounter(0),
 	m_IsLoading(false)
 {
 	m_Contents.AddListener(*this);
@@ -68,7 +68,7 @@ void cFurnaceEntity::Destroy()
 void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cFurnaceEntity &>(a_Src);
+	auto & src = static_cast<const cFurnaceEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_CurrentRecipe = src.m_CurrentRecipe;
 	m_FuelBurnTime = src.m_FuelBurnTime;
@@ -173,6 +173,23 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 
 
+int cFurnaceEntity::GetAndResetReward(void)
+{
+	int Reward = FloorC(m_RewardCounter);
+	float Remainder = m_RewardCounter - static_cast<float>(Reward);
+	// Remainder is used as the percent chance of getting an extra xp point
+	if (GetRandomProvider().RandBool(Remainder))
+	{
+		Reward++;
+	}
+	m_RewardCounter = 0.0;
+	return Reward;
+}
+
+
+
+
+
 void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
@@ -189,6 +206,7 @@ void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
 void cFurnaceEntity::FinishOne()
 {
 	m_TimeCooked = 0;
+	m_RewardCounter += m_CurrentRecipe->Reward;
 
 	if (m_Contents.GetSlot(fsOutput).IsEmpty())
 	{
@@ -258,7 +276,6 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		default: ASSERT(!"Invalid furnace slot update!"); break;
 	}
 }
-
 
 
 

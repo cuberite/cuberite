@@ -9,8 +9,8 @@
 #include "SQLiteCpp/Statement.h"
 #include "../IniFile.h"
 #include "json/json.h"
-#include "mbedTLS++/BlockingSslClientSocket.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/BlockingSslClientSocket.h"
+#include "../mbedTLS++/SslConfig.h"
 #include "../RankManager.h"
 #include "../OSSupport/IsThread.h"
 #include "../Root.h"
@@ -33,7 +33,6 @@ const int MAX_PER_QUERY = 100;
 #define DEFAULT_NAME_TO_UUID_ADDRESS    "/profiles/minecraft"
 #define DEFAULT_UUID_TO_PROFILE_SERVER  "sessionserver.mojang.com"
 #define DEFAULT_UUID_TO_PROFILE_ADDRESS "/session/minecraft/profile/%UUID%?unsigned=false"
-
 
 
 

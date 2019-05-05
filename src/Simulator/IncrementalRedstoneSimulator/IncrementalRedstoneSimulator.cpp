@@ -3,7 +3,7 @@
 #include "Globals.h"
 
 #include "IncrementalRedstoneSimulator.h"
-#include "Chunk.h"
+#include "../../Chunk.h"
 
 #include "CommandBlockHandler.h"
 #include "DoorHandler.h"
@@ -47,7 +47,6 @@ const cRedstoneHandler * cIncrementalRedstoneSimulator::GetComponentHandler(BLOC
 	static sComponents Components;
 	return Components[a_BlockType].get();
 }
-
 
 
 

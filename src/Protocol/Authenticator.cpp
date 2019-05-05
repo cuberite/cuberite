@@ -11,7 +11,7 @@
 #include "../IniFile.h"
 #include "json/json.h"
 
-#include "mbedTLS++/BlockingSslClientSocket.h"
+#include "../mbedTLS++/BlockingSslClientSocket.h"
 
 
 
@@ -77,7 +77,6 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 {
 	ReadSettings(a_Settings);
-	m_ShouldTerminate = false;
 	super::Start();
 }
 
@@ -89,7 +88,7 @@ void cAuthenticator::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_QueueNonempty.Set();
-	Wait();
+	super::Stop();
 }
 
 

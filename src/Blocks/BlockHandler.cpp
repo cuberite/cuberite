@@ -92,7 +92,6 @@
 
 
 
-
 /*
 // Tests the meta rotation and mirroring.
 // Note that the cMetaRotator needs to have its assert paths disabled for this test to work!
@@ -528,6 +527,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 				{
 					// Need to access the bed entity to get the color for the item damage
 					ConvertToPickups(a_WorldInterface, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
+					break;
 				}
 				case E_BLOCK_ENDER_CHEST:
 				{
@@ -575,6 +575,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
 }
+
 
 
 

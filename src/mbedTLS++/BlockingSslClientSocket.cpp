@@ -161,7 +161,6 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 
 
 
-
 void cBlockingSslClientSocket::SetExpectedPeerName(AString a_ExpectedPeerName)
 {
 	ASSERT(!m_IsConnected);  // Must be called before connect
@@ -208,7 +207,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 	}
 
 	// Keep sending the data until all of it is sent:
-	const char * Data = reinterpret_cast<const char *>(a_Data);
+	const char * Data = static_cast<const char *>(a_Data);
 	size_t NumBytes = a_NumBytes;
 	for (;;)
 	{
@@ -231,7 +230,6 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		}
 	}
 }
-
 
 
 

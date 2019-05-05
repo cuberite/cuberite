@@ -284,7 +284,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self)
 {
 	// Cast to true self:
-	cServerHandleImpl * Self = reinterpret_cast<cServerHandleImpl *>(a_Self);
+	cServerHandleImpl * Self = static_cast<cServerHandleImpl *>(a_Self);
 	ASSERT(Self != nullptr);
 	ASSERT(Self->m_SelfPtr != nullptr);
 

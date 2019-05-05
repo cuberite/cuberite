@@ -20,7 +20,6 @@ cProbabDistrib::cProbabDistrib(int a_MaxValue) :
 
 
 
-
 void cProbabDistrib::SetPoints(const cProbabDistrib::cPoints & a_Points)
 {
 	ASSERT(!a_Points.empty());

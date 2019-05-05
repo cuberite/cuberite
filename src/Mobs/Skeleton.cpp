@@ -4,7 +4,7 @@
 #include "Skeleton.h"
 #include "../World.h"
 #include "../Entities/ArrowEntity.h"
-#include "ClientHandle.h"
+#include "../ClientHandle.h"
 
 
 
@@ -13,7 +13,6 @@ cSkeleton::cSkeleton(bool IsWither) :
 	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
 	m_bIsWither(IsWither)
 {
-	SetBurnsInDaylight(true);
 }
 
 

@@ -12,11 +12,8 @@ class cBlockPistonHandler;
 
 
 
-
 template<BLOCKTYPE T>
 class GetHandlerCompileTime;
-
-
 
 
 
@@ -33,14 +30,12 @@ public:
 
 
 
-
 template<>
 class GetHandlerCompileTime<E_BLOCK_LEVER>
 {
 public:
 	typedef cBlockLeverHandler type;
 };
-
 
 
 
@@ -57,7 +52,6 @@ public:
 
 
 
-
 template<>
 class GetHandlerCompileTime<E_BLOCK_TRIPWIRE_HOOK>
 {
@@ -69,14 +63,12 @@ public:
 
 
 
-
 template<>
 class GetHandlerCompileTime<E_BLOCK_WOODEN_DOOR>
 {
 public:
 	typedef cBlockDoorHandler type;
 };
-
 
 
 

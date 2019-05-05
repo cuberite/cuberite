@@ -3231,6 +3231,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
 				},
+				GetEnchantmentBlastKnockbackReduction =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns explosion knock back reduction percent from blast protection level.",
+				},
 				GetEnchantmentCoverAgainst =
 				{
 					Params =
@@ -3316,6 +3326,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
+				},
+				GetOffHandEquipedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that the entity has equipped on off-hand. Returns an empty cItem if no item equipped or not applicable.",
 				},
 				GetGravity =
 				{
@@ -8751,6 +8771,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+                                BurnsInDaylight =
+                                {
+                                        Returns =
+                                        {
+                                                {
+                                                        Type = "boolean",
+                                                },
+                                        },
+                                        Notes = "Returns whether the mob burns in daylight.",
+                                },
 				CanBeLeashed =
 				{
 					Returns =
@@ -8969,6 +8999,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the age of the monster",
+				},
+				SetBurnsInDaylight =
+				{
+					Params =
+					{
+						{
+							Name = "BurnsInDaylight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick",
 				},
 				SetCanBeLeashed =
 				{

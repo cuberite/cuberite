@@ -85,7 +85,6 @@ SET (HDRS
 	BlockInfo.h
 	BlockTracer.h
 	BrewingRecipes.h
-	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h
 	BuildInfo.h.cmake
@@ -136,6 +135,7 @@ SET (HDRS
 	MobSpawner.h
 	MonsterConfig.h
 	NetherPortalScanner.h
+	OpaqueWorld.h
 	OverridesSettingsRepository.h
 	ProbabDistrib.h
 	RankManager.h
@@ -159,7 +159,10 @@ SET (HDRS
 	XMLParser.h
 )
 
-include_directories(".")
+file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
+	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/Globals.h\"\n")
+
+include_directories("${CMAKE_BINARY_DIR}/include")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
@@ -244,8 +247,6 @@ else ()
 
 	includefolder("Resources")
 	source_group("" FILES ${SOURCE})
-
-	include_directories("${PROJECT_SOURCE_DIR}")
 
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(

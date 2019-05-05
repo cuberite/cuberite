@@ -11,6 +11,9 @@ void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 }
 
 
+
+
+
 cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
 	cBlockInfoArray & Info = *this;
@@ -478,9 +481,11 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 	// Nonsolid blocks:
 	Info[E_BLOCK_ACTIVATOR_RAIL               ].m_IsSolid = false;
+	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_IsSolid = false;
 	Info[E_BLOCK_AIR                          ].m_IsSolid = false;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_IsSolid = false;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_IsSolid = false;
+	Info[E_BLOCK_CARPET                       ].m_IsSolid = false;
 	Info[E_BLOCK_CARROTS                      ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_FLOWER                ].m_IsSolid = false;
 	Info[E_BLOCK_CHORUS_PLANT                 ].m_IsSolid = false;
@@ -495,6 +500,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_FIRE                         ].m_IsSolid = false;
 	Info[E_BLOCK_FLOWER                       ].m_IsSolid = false;
 	Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
+	Info[E_BLOCK_INACTIVE_COMPARATOR          ].m_IsSolid = false;
+	Info[E_BLOCK_LADDER                       ].m_IsSolid = false;
 	Info[E_BLOCK_LAVA                         ].m_IsSolid = false;
 	Info[E_BLOCK_LEVER                        ].m_IsSolid = false;
 	Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
@@ -504,6 +511,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POWERED_RAIL                 ].m_IsSolid = false;
 	Info[E_BLOCK_RAIL                         ].m_IsSolid = false;
 	Info[E_BLOCK_RED_MUSHROOM                 ].m_IsSolid = false;
+	Info[E_BLOCK_REDSTONE_REPEATER_OFF        ].m_IsSolid = false;
+	Info[E_BLOCK_REDSTONE_REPEATER_ON         ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_OFF           ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_TORCH_ON            ].m_IsSolid = false;
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_IsSolid = false;
@@ -519,6 +528,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_TALL_GRASS                   ].m_IsSolid = false;
 	Info[E_BLOCK_TORCH                        ].m_IsSolid = false;
 	Info[E_BLOCK_TRIPWIRE                     ].m_IsSolid = false;
+	Info[E_BLOCK_TRIPWIRE_HOOK                ].m_IsSolid = false;
 	Info[E_BLOCK_VINES                        ].m_IsSolid = false;
 	Info[E_BLOCK_WALL_BANNER                  ].m_IsSolid = false;
 	Info[E_BLOCK_WALLSIGN                     ].m_IsSolid = false;
@@ -549,6 +559,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_COAL_ORE                     ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_COBBLESTONE                  ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_COMMAND_BLOCK                ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_CONCRETE                     ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_CONCRETE_POWDER              ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_CRAFTING_TABLE               ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_DIAMOND_BLOCK                ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_DIAMOND_ORE                  ].m_FullyOccupiesVoxel = true;
@@ -567,6 +579,21 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_GLOWSTONE                    ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GOLD_BLOCK                   ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GOLD_ORE                     ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_WHITE_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_ORANGE_GLAZED_TERRACOTTA     ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_MAGENTA_GLAZED_TERRACOTTA    ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_YELLOW_GLAZED_TERRACOTTA     ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_LIME_GLAZED_TERRACOTTA       ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_PINK_GLAZED_TERRACOTTA       ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_GRAY_GLAZED_TERRACOTTA       ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_CYAN_GLAZED_TERRACOTTA       ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_PURPLE_GLAZED_TERRACOTTA     ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_BLUE_GLAZED_TERRACOTTA       ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_BROWN_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_GREEN_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_BLACK_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GRASS                        ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GRAVEL                       ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_HARDENED_CLAY                ].m_FullyOccupiesVoxel = true;
@@ -901,6 +928,24 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_GREEN_SHULKER_BOX            ].m_Hardness = 0.2f;
 	Info[E_BLOCK_RED_SHULKER_BOX              ].m_Hardness = 0.2f;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_Hardness = 0.2f;
+	Info[E_BLOCK_WHITE_GLAZED_TERRACOTTA      ].m_Hardness = 1.4f;
+	Info[E_BLOCK_ORANGE_GLAZED_TERRACOTTA     ].m_Hardness = 1.4f;
+	Info[E_BLOCK_MAGENTA_GLAZED_TERRACOTTA    ].m_Hardness = 1.4f;
+	Info[E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA ].m_Hardness = 1.4f;
+	Info[E_BLOCK_YELLOW_GLAZED_TERRACOTTA     ].m_Hardness = 1.4f;
+	Info[E_BLOCK_LIME_GLAZED_TERRACOTTA       ].m_Hardness = 1.4f;
+	Info[E_BLOCK_PINK_GLAZED_TERRACOTTA       ].m_Hardness = 1.4f;
+	Info[E_BLOCK_GRAY_GLAZED_TERRACOTTA       ].m_Hardness = 1.4f;
+	Info[E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA ].m_Hardness = 1.4f;
+	Info[E_BLOCK_CYAN_GLAZED_TERRACOTTA       ].m_Hardness = 1.4f;
+	Info[E_BLOCK_PURPLE_GLAZED_TERRACOTTA     ].m_Hardness = 1.4f;
+	Info[E_BLOCK_BLUE_GLAZED_TERRACOTTA       ].m_Hardness = 1.4f;
+	Info[E_BLOCK_BROWN_GLAZED_TERRACOTTA      ].m_Hardness = 1.4f;
+	Info[E_BLOCK_GREEN_GLAZED_TERRACOTTA      ].m_Hardness = 1.4f;
+	Info[E_BLOCK_RED_GLAZED_TERRACOTTA        ].m_Hardness = 1.4f;
+	Info[E_BLOCK_BLACK_GLAZED_TERRACOTTA      ].m_Hardness = 1.4f;
+	Info[E_BLOCK_CONCRETE                     ].m_Hardness = 1.8f;
+	Info[E_BLOCK_CONCRETE_POWDER              ].m_Hardness = 0.5f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
 
 	for (size_t i = 0; i < Info.size(); ++i)

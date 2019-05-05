@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "Blocks/BlockRedstoneRepeater.h"
+#include "../../Blocks/BlockRedstoneRepeater.h"
 
 
 

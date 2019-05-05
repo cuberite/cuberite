@@ -629,17 +629,6 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	if (
@@ -1200,7 +1189,7 @@ void cBlockArea::MirrorXY(void)
 	int MaxZ = m_Size.z - 1;
 	for (int y = 0; y < m_Size.y; y++)
 	{
-		for (int z = 0; z <= HalfZ; z++)
+		for (int z = 0; z < HalfZ; z++)
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
@@ -1255,7 +1244,7 @@ void cBlockArea::MirrorXZ(void)
 	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfY = m_Size.y / 2;
 	int MaxY = m_Size.y - 1;
-	for (int y = 0; y <= HalfY; y++)
+	for (int y = 0; y < HalfY; y++)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
@@ -1316,7 +1305,7 @@ void cBlockArea::MirrorYZ(void)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
-			for (int x = 0; x <= HalfX; x++)
+			for (int x = 0; x < HalfX; x++)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
@@ -2272,7 +2261,6 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-
 void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
@@ -2959,6 +2947,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 		}  // for y
 	}
 }
+
 
 
 

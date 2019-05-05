@@ -21,7 +21,6 @@ typedef std::map<AString, AString> AStringMap;
 
 
 
-
 /** Output the formatted text into the string.
 Returns a_Dst. */
 extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
@@ -145,6 +144,9 @@ extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const 
 
 /** Concatenates the specified strings into a single string, separated by the specified separator. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
+
+/** Converts a string into a float. Returns false if the conversion fails. */
+extern bool StringToFloat(const AString & a_String, float & a_Num);
 
 
 

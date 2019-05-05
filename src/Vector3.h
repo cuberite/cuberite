@@ -350,6 +350,22 @@ public:
 		z = -z;
 	}
 
+	// tolua_end
+
+	/** Allows formatting a Vector<T> using the same format specifiers as for T
+	e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
+	template <typename ArgFormatter>
+	friend void format_arg(fmt::BasicFormatter<char, ArgFormatter> & a_Formatter, const char *& a_FormatStr, Vector3 a_Vec)
+	{
+		std::array<T, 3> Data{{a_Vec.x, a_Vec.y, a_Vec.z}};
+
+		a_Formatter.writer() << '{';
+		fmt::format_arg(a_Formatter, a_FormatStr, fmt::join(Data.cbegin(), Data.cend(), ", "));
+		a_Formatter.writer() << '}';
+	}
+
+	// tolua_begin
+
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 
@@ -357,7 +373,6 @@ public:
 	static const double NO_INTERSECTION;
 };
 // tolua_end
-
 
 
 

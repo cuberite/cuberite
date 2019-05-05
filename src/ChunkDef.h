@@ -71,6 +71,33 @@ public:
 
 
 
+/** Non-owning view of a chunk's client handles. */
+class cChunkClientHandles
+{
+public:
+	using const_iterator = std::vector<cClientHandle *>::const_iterator;
+	using iterator = const_iterator;
+
+	explicit cChunkClientHandles(const std::vector<cClientHandle *> & a_Container):
+		m_Begin(a_Container.cbegin()),
+		m_End(a_Container.cend())
+	{
+	}
+
+	const_iterator begin()  const { return m_Begin; }
+	const_iterator cbegin() const { return m_Begin; }
+
+	const_iterator end()  const { return m_End; }
+	const_iterator cend() const { return m_End; }
+
+private:
+	const_iterator m_Begin, m_End;
+};
+
+
+
+
+
 /** Constants used throughout the code, useful typedefs and utility functions */
 class cChunkDef
 {
@@ -190,7 +217,7 @@ public:
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
-		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
+		FLOGERROR("cChunkDef::MakeIndex(): coords out of range: {0}; returning fake index 0", Vector3i{x, y, z});
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
 		return 0;
 	}
@@ -207,19 +234,19 @@ public:
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+	inline static Vector3i IndexToCoordinate(size_t index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+				static_cast<int>(index % cChunkDef::Width),                       // X
+				static_cast<int>(index / (cChunkDef::Width * cChunkDef::Width)),  // Y
+				static_cast<int>((index / cChunkDef::Width) % cChunkDef::Width)   // Z
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),  // X
-				index % cChunkDef::Height,                       // Y
-				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+				static_cast<int>(index / (cChunkDef::Height * cChunkDef::Width)),  // X
+				static_cast<int>(index % cChunkDef::Height),                       // Y
+				static_cast<int>((index / cChunkDef::Height) % cChunkDef::Width)   // Z
 			);
 		#endif
 	}

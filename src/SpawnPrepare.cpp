@@ -48,8 +48,6 @@ cSpawnPrepare::cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChu
 
 
 
-
-
 void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance)
 {
 

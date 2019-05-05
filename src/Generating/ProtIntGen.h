@@ -106,7 +106,6 @@ protected:
 
 
 
-
 /** Generates a 2D array of random integers in the specified range [0 .. Range). */
 class cProtIntGenChoice :
 	public cProtIntGenWithNoise
@@ -136,7 +135,6 @@ public:
 protected:
 	int m_Range;
 };
-
 
 
 
@@ -1361,7 +1359,6 @@ protected:
 
 	Underlying m_Underlying;
 };
-
 
 
 

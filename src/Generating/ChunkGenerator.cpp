@@ -2,11 +2,11 @@
 #include "Globals.h"
 
 #include "ChunkGenerator.h"
-#include "../IniFile.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
-#include "FastRandom.h"
+#include "../IniFile.h"
+#include "../FastRandom.h"
 
 
 
@@ -98,7 +98,7 @@ void cChunkGenerator::Stop(void)
 	m_ShouldTerminate = true;
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
-	Wait();
+	super::Stop();
 
 	delete m_Generator;
 	m_Generator = nullptr;
@@ -278,6 +278,7 @@ void cChunkGenerator::Execute(void)
 		NumChunksGenerated++;
 	}  // while (!bStop)
 }
+
 
 
 

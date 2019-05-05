@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "BlockInServerPluginInterface.h"
+#include "../BlockInServerPluginInterface.h"
 #include "ChunkInterface.h"
 
 
@@ -214,36 +214,58 @@ bool cBlockPistonHandler::CanPushBlock(
 
 void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 {
-	BLOCKTYPE pistonBlock;
-	NIBBLETYPE pistonMeta;
-	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
-
-	if (IsExtended(pistonMeta))
 	{
-		// Already extended, bail out
-		return;
+		// Broadcast block action first. Will do nothing if piston cannot in fact push
+
+		BLOCKTYPE pistonBlock;
+		NIBBLETYPE pistonMeta;
+		a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+		a_World.BroadcastBlockAction(a_BlockPos, PistonExtendAction, pistonMeta, pistonBlock);
 	}
 
-	Vector3i pushDir = MetadataToOffset(pistonMeta);
+	// Client expects the server to "play" the animation before setting the final blocks
+	// However, we don't confuse animation with the underlying state of the world, so emulate by delaying 1 tick
+	// (Probably why vanilla has so many dupe glitches with sand and pistons lolol)
 
-	Vector3iSet blocksPushed;
-	if (!CanPushBlock(a_BlockPos + pushDir, a_World, true, blocksPushed, pushDir))
-	{
-		// Can't push anything, bail out
-		return;
-	}
+	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+		{
+			BLOCKTYPE pistonBlock;
+			NIBBLETYPE pistonMeta;
+			World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
 
-	a_World.BroadcastBlockAction(a_BlockPos, 0, pistonMeta, pistonBlock);
-	a_World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
+			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+			{
+				// Ensure we operate on a piston to avoid spurious behaviour
+				// Note that the scheduled task may result in the block type of a_BlockPos changing
+				return;
+			}
 
-	PushBlocks(blocksPushed, a_World, pushDir);
+			if (IsExtended(pistonMeta))
+			{
+				// Already extended, bail out
+				return;
+			}
 
-	// Set the extension and the piston base correctly
-	Vector3i extensionPos = a_BlockPos + pushDir;
-	a_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta | 0x8);
-	a_World.SetBlock(
-		extensionPos.x, extensionPos.y, extensionPos.z,
-		E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)
+			Vector3i pushDir = MetadataToOffset(pistonMeta);
+			Vector3iSet blocksPushed;
+			if (!CanPushBlock(a_BlockPos + pushDir, World, true, blocksPushed, pushDir))
+			{
+				// Can't push anything, bail out
+				return;
+			}
+			PushBlocks(blocksPushed, World, pushDir);
+
+			// Set the extension and the piston base correctly
+			Vector3i extensionPos = a_BlockPos + pushDir;
+			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta | 0x8);
+			World.SetBlock(
+				extensionPos.x, extensionPos.y, extensionPos.z,
+				E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)
+			);
+
+			// Play sound effect only if extended successfully
+			World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
+		}
 	);
 }
 
@@ -253,52 +275,70 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 {
-	BLOCKTYPE pistonBlock;
-	NIBBLETYPE pistonMeta;
-	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
-
-	if (!IsExtended(pistonMeta))
 	{
-		// Already retracted, bail out
-		return;
+		BLOCKTYPE pistonBlock;
+		NIBBLETYPE pistonMeta;
+		a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock);
 	}
 
-	Vector3i pushDir = MetadataToOffset(pistonMeta);
+	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+		{
+			BLOCKTYPE pistonBlock;
+			NIBBLETYPE pistonMeta;
+			World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
 
-	// Check the extension:
-	Vector3i extensionPos = a_BlockPos + pushDir;
-	if (a_World.GetBlock(extensionPos) != E_BLOCK_PISTON_EXTENSION)
-	{
-		LOGD("%s: Piston without an extension - still extending, or just in an invalid state?", __FUNCTION__);
-		return;
-	}
+			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+			{
+				// Ensure we operate on a piston to avoid spurious behaviour
+				// Note that the scheduled task may result in the block type of a_BlockPos changing
+				return;
+			}
 
-	// Remove Extension
-	a_World.SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
+			if (!IsExtended(pistonMeta))
+			{
+				// Already retracted, bail out
+				return;
+			}
 
-	a_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
-	a_World.BroadcastBlockAction(a_BlockPos, 1, pistonMeta & ~(8), pistonBlock);
-	a_World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
+			Vector3i pushDir = MetadataToOffset(pistonMeta);
 
-	if (!IsSticky(pistonBlock))
-	{
-		// No need for block pulling, bail out
-		return;
-	}
+			// Check the extension:
+			Vector3i extensionPos = a_BlockPos + pushDir;
+			if (World.GetBlock(extensionPos) != E_BLOCK_PISTON_EXTENSION)
+			{
+				LOGD("%s: Piston without an extension - still extending, or just in an invalid state?", __FUNCTION__);
+				return;
+			}
 
-	// Get the block to pull
-	a_BlockPos += pushDir * 2;
-	// Try to "push" the pulling block in the opposite direction
-	pushDir *= -1;
+			// Remove extension, update base state
+			World.SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
+			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
 
-	Vector3iSet pushedBlocks;
-	if (!CanPushBlock(a_BlockPos, a_World, false, pushedBlocks, pushDir))
-	{
-		// Not pushable, bail out
-		return;
-	}
+			// (Retraction is always successful, but play in the task for consistency)
+			World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
 
-	PushBlocks(pushedBlocks, a_World, pushDir);
+			if (!IsSticky(pistonBlock))
+			{
+				// No need for block pulling, bail out
+				return;
+			}
+
+			// Get the block to pull
+			Vector3i AdjustedPosition = a_BlockPos + pushDir * 2;
+			// Try to "push" the pulling block in the opposite direction
+			pushDir *= -1;
+
+			Vector3iSet pushedBlocks;
+			if (!CanPushBlock(AdjustedPosition, World, false, pushedBlocks, pushDir))
+			{
+				// Not pushable, bail out
+				return;
+			}
+
+			PushBlocks(pushedBlocks, World, pushDir);
+		}
+	);
 }
 
 

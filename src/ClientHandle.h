@@ -161,7 +161,7 @@ public:  // tolua_export
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
-	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
+	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
@@ -176,6 +176,7 @@ public:  // tolua_export
 	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
+	void SendHeldItemChange             (int a_ItemIndex);
 	void SendHideTitle                  (void);   // tolua_export
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);

@@ -137,6 +137,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 
 
 
+
 void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const
 {
 	// Draw the basic image:

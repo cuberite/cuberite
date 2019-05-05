@@ -49,7 +49,6 @@ public:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cSha1Checksum:
 
@@ -121,7 +120,6 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 		a_Out.insert(0, "-");
 	}
 }
-
 
 
 
