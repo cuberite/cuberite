@@ -387,8 +387,8 @@ void cPlayer::TickFreezeCode()
 				{
 					// If we find a position with enough space for the player
 					if (
-						(Chunk->GetBlock(Rel.x, NewY, Rel.z) == E_BLOCK_AIR) &&
-						(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z) == E_BLOCK_AIR)
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY, Rel.z)) &&
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z))
 					)
 					{
 						// If the found position is not the same as the original
