@@ -626,7 +626,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				a_Pkt.WriteBool(ArmorStand.IsCustomNameAlwaysVisible());
 			}
 
-			Int8 Flags = 0;
+			Flags = 0;  // Armor stand has its own flags
 			if (ArmorStand.IsSmall())
 			{
 				Flags |= 0x01;
