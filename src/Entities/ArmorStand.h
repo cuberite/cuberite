@@ -45,7 +45,7 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
-	/** Returns true if the armor stand is a normal sized one. */
+	/** Returns the size depending of the armor stand type. 0: marker, 1: small, 2: normal */
 	short GetSize(void) const { return m_Size; }
 	void SetSize(short a_Size);
 
@@ -99,15 +99,17 @@ public:
 protected:
 
 	// cEntity overrides:
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 
 	bool m_IsVisible;
 	AString m_CustomName;
 	bool m_CustomNameAlwaysVisible;
+	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
 	short m_Size;
 	bool m_HasArms;

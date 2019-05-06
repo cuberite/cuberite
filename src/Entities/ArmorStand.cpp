@@ -12,9 +12,10 @@
 
 
 cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size):
-	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.25*a_Size, 0.9875*a_Size),  // a_Size = 0 : Marker ;  a_Size = 1 : Small ;  a_Size = 0 : Normal
+	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.5*a_Size, 0.9875*a_Size),  // a_Size = 0 : Marker ;  a_Size = 1 : Small ;  a_Size = 0 : Normal
 	m_CustomName(""),
 	m_CustomNameAlwaysVisible(false),
+	m_TicksSinceLastDamaged(100),
 	m_Size(a_Size),
 	m_HasArms(false),
 	m_HasBasePlate(true),
@@ -32,9 +33,186 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size):
 	m_Leggings(cItem()),
 	m_Boots(cItem())
 {
-	SetYaw(a_Yaw);
 	SetMaxHealth(1);
 	SetHealth(1);
+	SetYaw(a_Yaw);
+}
+
+
+
+
+
+void cArmorStand::OnRightClicked(cPlayer & a_Player)
+{
+	if (IsMarker() || a_Player.GetEquippedItem().IsEmpty())  // Disallow interaction with marker and prevent acting if no item
+	{
+		return;
+	}
+
+	short ItemType = a_Player.GetEquippedItem().m_ItemType;
+
+	if ((ItemType == E_ITEM_NAME_TAG) && !a_Player.GetEquippedItem().m_CustomName.empty())  // Add a name to the armor stand
+	{
+		SetCustomName(a_Player.GetEquippedItem().m_CustomName);
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+	}
+}
+
+
+
+
+
+void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick)
+{
+	if (IsMarker() || a_Player.GetEquippedItem().IsEmpty())  // Disallow interaction with marker and prevent acting if no item
+	{
+		return;
+	}
+
+	if (a_IsLeftClick)
+	{
+		short ItemType = a_Player.GetEquippedItem().m_ItemType;
+
+		if (ItemCategory::IsArmor(ItemType))  // OR find the best place for the item on the armor stand
+		{
+			if (ItemCategory::IsHelmet(ItemType))
+			{
+				if (!GetEquippedHelmet().IsEmpty())  // That way, we don't remove the item from the player
+				{
+					return;
+				}
+				SetEquippedHelmet(a_Player.GetEquippedItem());
+			}
+			else if (ItemCategory::IsChestPlate(ItemType))
+			{
+				if (!GetEquippedChestplate().IsEmpty())
+				{
+					return;
+				}
+				SetEquippedChestplate(a_Player.GetEquippedItem());
+			}
+			else if (ItemCategory::IsLeggings(ItemType))
+			{
+				if (!GetEquippedLeggings().IsEmpty())
+				{
+					return;
+				}
+				SetEquippedLeggings(a_Player.GetEquippedItem());
+			}
+			else if (ItemCategory::IsBoots(ItemType))
+			{
+				if (GetEquippedLeggings().IsEmpty())
+				{
+					return;
+				}
+				SetEquippedBoots(a_Player.GetEquippedItem());
+			}
+			else if (ItemCategory::IsTool(ItemType) && HasArms() && GetEquippedWeapon().IsEmpty())
+			{
+				SetEquippedWeapon(a_Player.GetEquippedItem());
+			}
+			else if (GetOffHandEquipedItem().IsEmpty() && HasArms())
+			{
+				SetOffHandEquipedItem(a_Player.GetEquippedItem());
+			}
+			else  // No place on the armor
+			{
+				return;  // Don't stole the item from the player if we haven't used it
+			}
+		}
+		else if (GetOffHandEquipedItem().IsEmpty() && HasArms())
+		{
+			SetOffHandEquipedItem(a_Player.GetEquippedItem());
+		}
+		else  // No place on the armor
+		{
+			return;  // Don't stole the item from the player if we haven't used it
+		}
+
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+	}
+}
+
+
+
+
+
+void cArmorStand::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	// I don't know how and why but by default the client considere it as no gravity, so disable gravity on the server unless it fixed totally and configurable
+	// Gravity for such entity is not really important
+	if (m_TicksSinceLastDamaged < 100)
+	{
+		++m_TicksSinceLastDamaged;
+	}
+}
+
+
+
+
+
+bool cArmorStand::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (IsMarker())  // Disallow interaction with marker
+	{
+		return false;
+	}
+
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
+	{
+		Destroy();
+		SetInvulnerableTicks(0);
+		return false;
+	}
+	m_World->BroadcastEntityMetadata(*this);
+
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
+	{
+		if (a_TDI.Attacker->IsPlayer() && (m_TicksSinceLastDamaged >= 10))  // Needs two hit in 0.5s to destroy
+		{
+			GetWorld()->BroadcastEntityStatus(*this, esArmorStandHit);
+			m_TicksSinceLastDamaged = 0;
+		}
+		else
+		{
+			Destroy();
+
+			cItems Pickup;
+			if (!m_LeftHand.IsEmpty())
+			{
+				Pickup.push_back(m_LeftHand);
+			}
+			if (!m_RightHand.IsEmpty())
+			{
+				Pickup.push_back(m_RightHand);
+			}
+			if (!m_Helmet.IsEmpty())
+			{
+				Pickup.push_back(m_Helmet);
+			}
+			if (!m_ChestPlate.IsEmpty())
+			{
+				Pickup.push_back(m_ChestPlate);
+			}
+			if (!m_Leggings.IsEmpty())
+			{
+				Pickup.push_back(m_Leggings);
+			}
+			if (!m_Boots.IsEmpty())
+			{
+				Pickup.push_back(m_Boots);
+			}
+			Pickup.push_back(cItem(E_ITEM_ARMOR_STAND));
+			GetWorld()->SpawnItemPickups(Pickup, GetPosX(), GetPosY() + (GetHeight() / 2), GetPosZ());
+		}
+	}
+	return false;
 }
 
 
@@ -51,160 +229,6 @@ void cArmorStand::SpawnOn(cClientHandle & a_ClientHandle)  // Should got any rot
 	a_ClientHandle.SendEntityEquipment(*this, 3, GetEquippedChestplate());
 	a_ClientHandle.SendEntityEquipment(*this, 4, GetEquippedHelmet());
 	a_ClientHandle.SendEntityEquipment(*this, 5, GetOffHandEquipedItem());  // For compatibility issues, left hand was added at the end and not at the ID 1 like wants the protocol since 1.9
-}
-
-
-
-
-
-void cArmorStand::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-	UNUSED(a_Dt);
-	UNUSED(a_Chunk);
-	// I don't know how and why but by default the client considere it as no gravity, so disable gravity on the server unless it fixed totally and configurable
-	// Gravity for such entity is not really important
-}
-
-
-
-
-
-void cArmorStand::KilledBy(TakeDamageInfo & a_TDI)
-{
-	// TODO: Replace harm by shaking effect when hurt
-
-	if (IsMarker())  // Disallow interaction with marker
-	{
-		return;
-	}
-
-	cItems Pickup;
-	if (!m_LeftHand.IsEmpty())
-	{
-		Pickup.push_back(m_LeftHand);
-		SetOffHandEquipedItem(cItem());
-	}
-	else if (!m_RightHand.IsEmpty())
-	{
-		Pickup.push_back(m_RightHand);
-		SetEquippedWeapon(cItem());
-	}
-	else if (!m_Helmet.IsEmpty())
-	{
-		Pickup.push_back(m_Helmet);
-		SetEquippedHelmet(cItem());
-	}
-	else if (!m_ChestPlate.IsEmpty())
-	{
-		Pickup.push_back(m_ChestPlate);
-		SetEquippedChestplate(cItem());
-	}
-	else if (!m_Leggings.IsEmpty())
-	{
-		Pickup.push_back(m_Leggings);
-		SetEquippedLeggings(cItem());
-	}
-	else if (!m_Boots.IsEmpty())
-	{
-		Pickup.push_back(m_Boots);
-		SetEquippedBoots(cItem());
-	}
-	else
-	{
-		super::KilledBy(a_TDI);
-		Pickup.push_back(cItem(E_ITEM_ARMOR_STAND));
-		Destroy();
-	}
-	GetWorld()->SpawnItemPickups(Pickup, GetPosX(), GetPosY() + 1, GetPosZ());
-	if (IsTicking())
-	{
-		SetHealth(GetMaxHealth());
-		SetInvulnerableTicks(0);
-		GetWorld()->BroadcastEntityMetadata(*this);
-	}
-}
-
-
-
-
-
-void cArmorStand::OnRightClicked(cPlayer & a_Player)  // Only works for tags, else the callback is not called, IDK Why ...
-{
-	// if (IsMarker())  // Disallow interaction with marker
-	// {
-	// 	return;
-	// }
-	//
-	// if (a_Player.GetEquippedItem().IsEmpty())
-	// {
-	// 	return;
-	// }
-	short ItemType = a_Player.GetEquippedItem().m_ItemType;
-
-	if ((ItemType == E_ITEM_NAME_TAG) && !a_Player.GetEquippedItem().m_CustomName.empty())  // Add a name to the armor stand
-	{
-		SetCustomName(a_Player.GetEquippedItem().m_CustomName);
-	}
-	else if (ItemCategory::IsArmor(ItemType))  // OR find the best place for the item on the armor stand
-	{
-		if (ItemCategory::IsHelmet(ItemType))
-		{
-			if (!GetEquippedHelmet().IsEmpty())  // That way, we don't remove the item from the player
-			{
-				return;
-			}
-			SetEquippedHelmet(a_Player.GetEquippedItem());
-		}
-		else if (ItemCategory::IsChestPlate(ItemType))
-		{
-			if (!GetEquippedChestplate().IsEmpty())
-			{
-				return;
-			}
-			SetEquippedChestplate(a_Player.GetEquippedItem());
-		}
-		else if (ItemCategory::IsLeggings(ItemType))
-		{
-			if (!GetEquippedLeggings().IsEmpty())
-			{
-				return;
-			}
-			SetEquippedLeggings(a_Player.GetEquippedItem());
-		}
-		else if (ItemCategory::IsBoots(ItemType))
-		{
-			if (GetEquippedLeggings().IsEmpty())
-			{
-				return;
-			}
-			SetEquippedBoots(a_Player.GetEquippedItem());
-		}
-		else if (ItemCategory::IsTool(ItemType) && GetEquippedWeapon().IsEmpty())
-		{
-			SetEquippedWeapon(a_Player.GetEquippedItem());
-		}
-		else if (GetOffHandEquipedItem().IsEmpty())
-		{
-			SetOffHandEquipedItem(a_Player.GetEquippedItem());
-		}
-		else  // No place on the armor
-		{
-			return;  // Don't stole the item from the player if we haven't used it
-		}
-	}
-	else if (GetOffHandEquipedItem().IsEmpty())
-	{
-		SetOffHandEquipedItem(a_Player.GetEquippedItem());
-	}
-	else  // No place on the armor
-	{
-		return;  // Don't stole the item from the player if we haven't used it
-	}
-
-	if (!a_Player.IsGameModeCreative())
-	{
-		a_Player.GetInventory().RemoveOneEquippedItem();
-	}
 }
 
 
