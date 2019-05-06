@@ -9697,28 +9697,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
-				GetSize =
-				{
-					Returns =
-					{
-						{
-							Name = "Size",
-							Type = "number",
-						},
-					},
-					Notes = "Returns the size depending of the armor stand type. 0: marker, 1: small, 2: normal",
-				},
-				SetSize =
-				{
-					Params =
-					{
-						{
-							Name = "Size",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the size defining the armor stand type. 0: marker, 1: small, 2: normal",
-				},
 				IsNormal =
 				{
 					Returns =
@@ -9739,6 +9717,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the armor stand is a small one.",
 				},
+				SetSmall =
+				{
+					Params =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets if the armor stand is a small one.",
+				},
 				IsMarker =
 				{
 					Returns =
@@ -9748,6 +9736,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the armor stand is a marker (null size).",
+				},
+				SetMarker =
+				{
+					Params =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets if the armor stand is a marker.",
 				},
 				HasArms =
 				{
