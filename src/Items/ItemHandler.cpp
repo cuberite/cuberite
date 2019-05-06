@@ -10,6 +10,7 @@
 // Handlers:
 #include "ItemAnvil.h"
 #include "ItemArmor.h"
+#include "ItemArmorStand.h"
 #include "ItemAxe.h"
 #include "ItemBanner.h"
 #include "ItemBed.h"
@@ -184,6 +185,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_WOODEN_BUTTON:        return new cItemButtonHandler(a_ItemType);
 		case E_BLOCK_WOODEN_SLAB:          return new cItemSlabHandler(a_ItemType);
 		case E_BLOCK_WOOL:                 return new cItemClothHandler(a_ItemType);
+		case E_ITEM_ARMOR_STAND:           return new cItemArmorStandHandler(a_ItemType);
 		case E_ITEM_BANNER:                return new cItemBannerHandler(a_ItemType);
 		case E_ITEM_BED:                   return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING:   return new cItemBottleOEnchantingHandler();

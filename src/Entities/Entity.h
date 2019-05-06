@@ -101,6 +101,7 @@ public:
 		etFloater,
 		etItemFrame,
 		etPainting,
+		etArmorStand,
 		etLeashKnot,
 
 		// Common variations
@@ -165,6 +166,7 @@ public:
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
 	bool IsLeashKnot   (void) const { return (m_EntityType == etLeashKnot);    }
 	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
+	bool IsArmorStand  (void) const { return (m_EntityType == etArmorStand);	 }
 
 	/** Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true) */
 	virtual bool IsA(const char * a_ClassName) const;
@@ -415,7 +417,7 @@ public:
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity() */
-	virtual void SpawnOn(cClientHandle & a_Client) = 0;
+	virtual void SpawnOn(cClientHandle & a_Client);
 
 	// tolua_begin
 
@@ -455,11 +457,24 @@ public:
 	/** Attaches to the specified entity; detaches from any previous one first */
 	virtual void AttachTo(cEntity * a_AttachTo);
 
+	/** Returns true if this entity is attached to the specified entity */
+	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	// tolua_begin
+
 	/** Detaches from the currently attached entity, if any */
 	virtual void Detach(void);
 
+	/** Gets entity (vehicle) attached to this entity */
+	UInt32 GetAttachedID();
+
+	/** Attaches to the specified entity; detaches from any previous one first */
+	virtual bool AttachToID(UInt32 a_UniqueID);
+
 	/** Returns true if this entity is attached to the specified entity */
-	bool IsAttachedTo(const cEntity * a_Entity) const;
+	bool IsAttachedToID(UInt32 a_UniqueID) const;
+
+	// tolua_end
 
 	/** Returns whether the entity's orientation has been set manually.
 	Primarily inteded for protocol use. */

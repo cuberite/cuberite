@@ -155,7 +155,3 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vecto
 
 	return LeashKnot;
 }
-
-
-
-

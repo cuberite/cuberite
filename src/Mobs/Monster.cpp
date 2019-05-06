@@ -165,6 +165,7 @@ void cMonster::OnRemoveFromWorld(cWorld & a_World)
 
 void cMonster::SpawnOn(cClientHandle & a_Client)
 {
+	Super::SpawnOn(a_Client);
 	a_Client.SendSpawnMob(*this);
 
 	if (IsLeashed())

@@ -1964,6 +1964,21 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 
 
 
+UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size)
+{
+	auto ArmorStand = std::make_unique<cArmorStand>(a_Pos, a_Yaw);
+	auto ArmorStandPtr = ArmorStand.get();
+	if (!ArmorStandPtr->Initialize(std::move(ArmorStand), *this))
+	{
+		return cEntity::INVALID_ID;
+	}
+	return ArmorStandPtr->GetUniqueID();
+}
+
+
+
+
+
 UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
 	auto Boat = std::make_unique<cBoat>(a_Pos, a_Material);

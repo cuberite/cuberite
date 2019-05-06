@@ -63,6 +63,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);  // Boat colour
 }

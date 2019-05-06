@@ -22,6 +22,7 @@ cTNTEntity::cTNTEntity(Vector3d a_Pos, unsigned a_FuseTicks) :
 
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnEntity(*this);
 	m_bDirtyOrientation = false;  // TODO: why?
 	m_bDirtyHead = false;
@@ -68,7 +69,3 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Explode();
 	}
 }
-
-
-
-

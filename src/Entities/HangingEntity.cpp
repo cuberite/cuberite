@@ -23,9 +23,6 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, Ve
 
 void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
+	Super::SpawnOn(a_ClientHandle);
 	SetYaw(GetProtocolFacing() * 90);
 }
-
-
-
-

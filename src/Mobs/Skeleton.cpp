@@ -68,7 +68,3 @@ void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
 }
-
-
-
-

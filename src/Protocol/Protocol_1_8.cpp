@@ -3914,6 +3914,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 
 	switch (a_Entity.GetEntityType())
 	{
+		case Type::etArmorStand: return 78;
 		case Type::etEnderCrystal: return 51;
 		case Type::etPickup: return 2;
 		case Type::etFallingBlock: return 70;

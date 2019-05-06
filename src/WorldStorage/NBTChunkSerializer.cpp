@@ -46,6 +46,7 @@
 #include "../Entities/ItemFrame.h"
 #include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
+#include "../Entities/ArmorStand.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
 
@@ -161,6 +162,7 @@ public:
 
 		switch (a_Entity->GetEntityType())
 		{
+			case cEntity::etArmorStand:   AddArmorStandEntity  (static_cast<cArmorStand *>      (a_Entity)); break;
 			case cEntity::etBoat:         AddBoatEntity        (static_cast<cBoat *>            (a_Entity)); break;
 			case cEntity::etEnderCrystal: AddEnderCrystalEntity(static_cast<cEnderCrystal *>    (a_Entity)); break;
 			case cEntity::etFallingBlock: AddFallingBlockEntity(static_cast<cFallingBlock *>    (a_Entity)); break;
@@ -1098,6 +1100,59 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_TNT, "PrimedTnt");
 			mWriter.AddByte("Fuse", static_cast<unsigned char>(a_TNT->GetFuseTicks()));
+		mWriter.EndCompound();
+	}
+
+
+
+
+
+	void AddArmorStandEntity(cArmorStand * a_ArmorStand)
+	{
+		mWriter.BeginCompound("");
+			AddBasicEntity(a_ArmorStand, "ArmorStand");
+			mWriter.AddShort("Size", a_ArmorStand->GetSize());
+			mWriter.AddByte("Arms", a_ArmorStand->HasArms() ? 1 : 0);
+			mWriter.AddByte("Plate", a_ArmorStand->HasBasePlate() ? 1 : 0);
+			mWriter.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
+			mWriter.AddString("CustomName", a_ArmorStand->GetCustomName());
+			mWriter.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
+			mWriter.BeginList("HeadRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetHeadRotation().z);
+			mWriter.EndList();
+			mWriter.BeginList("BodyRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetBodyRotation().z);
+			mWriter.EndList();
+			mWriter.BeginList("LeftArmRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftArmRotation().z);
+			mWriter.EndList();
+			mWriter.BeginList("RightArmRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetRightArmRotation().z);
+			mWriter.EndList();
+			mWriter.BeginList("LeftLegRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetLeftLegRotation().z);
+			mWriter.EndList();
+			mWriter.BeginList("RightLegRotation", TAG_Double);
+				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().x);
+				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
+				mWriter.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
+			mWriter.EndList();
+			AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
+			AddItem(a_ArmorStand->GetEquippedBoots(), 1);
+			AddItem(a_ArmorStand->GetEquippedLeggings(), 2);
+			AddItem(a_ArmorStand->GetEquippedChestplate(), 3);
+			AddItem(a_ArmorStand->GetEquippedHelmet(), 4);
+			AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
 		mWriter.EndCompound();
 	}
 

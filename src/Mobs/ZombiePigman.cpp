@@ -58,7 +58,3 @@ void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 		// TODO: In vanilla, if one player angers ZPs, do they attack any nearby player, or only that one attacker?
 	}
 }
-
-
-
-
