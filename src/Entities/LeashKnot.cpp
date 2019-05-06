@@ -106,9 +106,9 @@ void cLeashKnot::GetDrops(cItems & a_Items, cEntity * a_Killer)
 
 void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnObject(*this, 77, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
+	super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -156,7 +156,3 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vecto
 
 	return LeashKnot;
 }
-
-
-
-

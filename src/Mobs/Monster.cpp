@@ -171,6 +171,8 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 	{
 		a_Client.SendLeashEntity(*this, *this->GetLeashedTo());
 	}
+
+	super::SpawnOn(a_Client);
 }
 
 

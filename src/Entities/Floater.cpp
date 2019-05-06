@@ -92,6 +92,7 @@ cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 
 void cFloater::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnObject(*this, 90, static_cast<int>(m_PlayerID), 0, 0);
+	super::SpawnOn(a_Client);
 }
 
 

@@ -429,7 +429,7 @@ public:
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity() */
-	virtual void SpawnOn(cClientHandle & a_Client) = 0;
+	virtual void SpawnOn(cClientHandle & a_Client);
 
 	// tolua_begin
 

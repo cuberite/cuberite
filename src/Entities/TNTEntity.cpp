@@ -25,6 +25,7 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnObject(*this, 50, 1, 0, 0);  // 50 means TNT
 	m_bDirtyOrientation = false;
 	m_bDirtyHead = false;
+	super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -59,7 +60,3 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Explode();
 	}
 }
-
-
-
-
