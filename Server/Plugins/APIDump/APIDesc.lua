@@ -4443,6 +4443,10 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				{
 					Notes = "Special value of an entity ID, indicating a failure. Used primarily in functions that create entities when the entity cannot be created.",
 				},
+				etArmorStand =
+				{
+					Notes = "The entity is a {{cArmorStand}}",
+				},
 				etBoat =
 				{
 					Notes = "The entity is a {{cBoat}}",
@@ -9609,6 +9613,447 @@ a_Player:OpenWindow(Window);
 						}
 					},
 					Notes = "Returns the block meta of the falling block.",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cArmorStand =
+		{
+			Desc = [[
+				This class represents an armor stand. This entity can be spawned by using {{cWorld#SpawnArmorStand|cWorld:SpawnArmorStand}}.
+			]],
+			Functions =
+			{
+				IsInvisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is invisible",
+				},
+				SetVisible =
+				{
+					Params =
+					{
+						{
+							Name = "IsVisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the player visibility to other players",
+				},
+				HasCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player has a custom name.",
+				},
+				GetCustomName =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				SetCustomName =
+				{
+					Params =
+					{
+						{
+							Name = "CustomName",
+							Type = "string",
+						},
+					},
+					Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string.",
+				},
+				SetCustomNameAlwaysVisible =
+				{
+					Params =
+					{
+						{
+							Name = "IsCustomNameAlwaysVisible",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
+				},
+				IsCustomNameAlwaysVisible =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
+				},
+				GetSize =
+				{
+					Returns =
+					{
+						{
+							Name = "Size",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the size depending of the armor stand type. 0: marker, 1: small, 2: normal",
+				},
+				SetSize =
+				{
+					Params =
+					{
+						{
+							Name = "Size",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the size defining the armor stand type. 0: marker, 1: small, 2: normal",
+				},
+				IsNormal =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand is a normal sized one.",
+				},
+				IsSmall =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand is a small one.",
+				},
+				IsMarker =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand is a marker (null size).",
+				},
+				HasArms =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand has arms.",
+				},
+				SetHasArms =
+				{
+					Params =
+					{
+						{
+							Name = "HasArms",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whatever armor stand has arms.",
+				},
+				HasBasePlate =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand has base platform.",
+				},
+				SetHasBasePlate =
+				{
+					Params =
+					{
+						{
+							Name = "HasBasePlate",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whatever armor stand has base platform.",
+				},
+				GetHeadRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the head's rotation.",
+				},
+				GetBodyRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the body's rotation.",
+				},
+				GetLeftArmRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the left arm's rotation.",
+				},
+				GetRightArmRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the right arm's rotation.",
+				},
+				GetLeftLegRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the left leg's rotation.",
+				},
+				GetRightLegRotation =
+				{
+					Returns =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Returns the right leg's rotation.",
+				},
+				SetHeadRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the head's rotation.",
+				},
+				SetBodyRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the body's rotation.",
+				},
+				SetLeftArmRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the left arm's rotation.",
+				},
+				SetRightArmRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the right arm's rotation.",
+				},
+				SetLeftLegRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the left leg's rotation.",
+				},
+				SetRightLegRotation =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "Vector3d",
+						},
+					},
+					Notes = "Sets the right leg's rotation.",
+				},
+				GetEquippedWeapon =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped weapon (right hand).",
+				},
+				GetOffHandEquipedItem =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped off hand item (left hand).",
+				},
+				GetEquippedHelmet =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped helmet.",
+				},
+				GetEquippedChestplate =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped chestplate.",
+				},
+				GetEquippedLeggings =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped leggings.",
+				},
+				GetEquippedBoots =
+				{
+					Returns =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns equipped boots.",
+				},
+				SetEquippedWeapon =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped weapon (right hand).",
+				},
+				SetOffHandEquipedItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped off hand item (left hand).",
+				},
+				SetEquippedHelmet =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped helmet.",
+				},
+				SetEquippedChestplate =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped chestplate.",
+				},
+				SetEquippedLeggings =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped leggings.",
+				},
+				SetEquippedBoots =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets equipped boots.",
 				},
 			},
 			Inherits = "cEntity",
