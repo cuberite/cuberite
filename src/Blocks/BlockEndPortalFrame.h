@@ -92,16 +92,6 @@ public:
 
 
 
-	enum EndPortalReturns
-	{
-		E_VALID_PORTAL_FRAME = 0,
-		E_INVALID_PORTAL_FRAME = 1,
-		E_NOT_PORTAL_FRAME = 2,
-	};
-
-
-
-
 	/** Returns false if portal cannot be made, true if portal was made. */
 	bool FindAndSetPortal(Vector3i a_FirstFrame, NIBBLETYPE a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
@@ -117,8 +107,7 @@ public:
 		- If dimensions are valid, create the portal.
 		*/
 
-		// Make sure this is going clockwise.
-		ASSERT(E_META_END_PORTAL_FRAME_ZP - E_META_END_PORTAL_FRAME_XP == 1);
+		static_assert((E_META_END_PORTAL_FRAME_ZM - E_META_END_PORTAL_FRAME_XM) == 1, "Should be going clockwise");
 
 		const int MIN_PORTAL_WIDTH = 3;
 		const int MAX_PORTAL_WIDTH = 4;
@@ -140,98 +129,65 @@ public:
 		};
 
 
-		int Turns = 0;
-		int Proper = 1;  // The first portal frame was already checked.
-		Vector3i Former = a_FirstFrame;
-		Vector3i Corner;  // The first and third corners.
-		int Width[4] = {1, 1, 1, 1};
+		int EdgesComplete = -1;  // We start search _before_ finding the first edge
+		Vector3i NorthWestCorner;
+		int EdgeWidth[4] = { 1, 1, 1, 1 };
+		NIBBLETYPE CurrentDirection = a_Direction;
+		Vector3i CurrentPos = a_FirstFrame;
 
-		while (Turns <= 4)
+		// Scan clockwise until we have seen all 4 edges
+		while (EdgesComplete < 4)
 		{
-			Vector3i Target;
-			BLOCKTYPE TargetBlockType;
-			NIBBLETYPE TargetBlockMeta;
-
-			// Since we start on the first wall, get the corner, then cover each wall, we're effectively scanning 5 walls.
-			if (Proper > (MAX_PORTAL_WIDTH * 5))
+			// Check if we are at a corner
+			Vector3i NextPos = CurrentPos + LeftForward[CurrentDirection];
+			if (IsPortalFrame(a_ChunkInterface.GetBlock(NextPos)))
 			{
-				return false;
-			}
-
-			// (a_Direction + Turns) % 4 is the direction the former block is facing.
-			Target = Former + LeftForward[(a_Direction + Turns) % 4];
-			if (!a_ChunkInterface.GetBlockTypeMeta(Target, TargetBlockType, TargetBlockMeta))
-			{
-				// If the block couldn't be read, fail.
-				return false;
-			}
-
-			// (a_Direction + Turns + 1) % 4 is the direction the corner block should face.
-			if (IsValidFrame(TargetBlockType, TargetBlockMeta, (a_Direction + Turns + 1) % 4))
-			{
-
-				// When the former portal frame faces positive X, this corner will be XM, ZM.
-				if ((a_Direction + Turns) % 4 == E_META_END_PORTAL_FRAME_XP)
+				// We have found the corner, move clockwise to next edge
+				if (CurrentDirection == E_META_END_PORTAL_FRAME_XP)
 				{
-					// Remember the NW (XM, ZM) Corner
+					// We are on the NW (XM, ZM) Corner
 					// Relative to the previous frame, the portal should appear to the right of this portal frame.
-					Corner = Target - Left[(a_Direction + Turns) % 4];
+					NorthWestCorner = NextPos - Left[CurrentDirection];
 				}
-				Former = Target;
-				Turns++;
-				Proper++;
-				continue;
-			}
-			else if (IsPortalFrame(TargetBlockType))
-			{
-				// The Portal Frame existed, but was either missing the eye, or was facing the wrong direction.
-				return false;
+
+				if (EdgesComplete == -1)
+				{
+					// Reset current width, we will revisit it last
+					EdgeWidth[CurrentDirection] = 1;
+				}
+
+				// Rotate 90 degrees clockwise
+				CurrentDirection = (CurrentDirection + 1) % 4;
+				EdgesComplete++;
 			}
 			else
 			{
+				// We are not at a corner, keep walking the edge
+				NextPos = CurrentPos + Left[CurrentDirection];
 
-				// Corner is not a portal block, check the left edge.
-				Target = Former + Left[(a_Direction + Turns) % 4];
-				if (!a_ChunkInterface.GetBlockTypeMeta(Target, TargetBlockType, TargetBlockMeta))
+				EdgeWidth[CurrentDirection]++;
+				if (EdgeWidth[CurrentDirection] > MAX_PORTAL_WIDTH)
 				{
-					// If the block couldn't be read, fail.
-					return false;
-				}
-
-				// The edge should face the same direction, (a_Direction + Turns) % 4.
-				if (IsValidFrame(TargetBlockType, TargetBlockMeta, (a_Direction + Turns) % 4))
-				{
-
-					// After the first turn, start tracking length of frame edges (width of portal).
-					if (Turns >= 1)
-					{
-						// X width stored at 0 and 2, Z width at 1 and 3.
-						Width[(a_Direction + Turns) % 4]++;
-
-						if (Width[(a_Direction + Turns) % 4] > MAX_PORTAL_WIDTH)
-						{
-							// Don't build a portal that is too long.
-							return false;
-						}
-					}
-					Former = Target;
-					Proper++;
-					continue;
-				}
-				else
-				{
-					// Neither the edge nor the corner were valid portal blocks.
+					// Don't build a portal that is too long.
 					return false;
 				}
 			}
+
+			if (!IsValidFrameAtPos(a_ChunkInterface, NextPos, CurrentDirection))
+			{
+				// Neither the edge nor the corner are valid portal blocks.
+				return false;
+			}
+
+			CurrentPos = NextPos;
 		}
 
-		if ((Width[0] != Width[2]) || (Width[1] != Width[3]))
+		if ((EdgeWidth[0] != EdgeWidth[2]) || (EdgeWidth[1] != EdgeWidth[3]))
 		{
 			// Mismatched Portal Dimensions.
 			return false;
 		}
-		if ((Width[0] < MIN_PORTAL_WIDTH) || (Width[1] < MIN_PORTAL_WIDTH))
+		if ((EdgeWidth[0] < MIN_PORTAL_WIDTH) || (EdgeWidth[1] < MIN_PORTAL_WIDTH))
 		{
 			// Portal too small.
 			return false;
@@ -239,11 +195,11 @@ public:
 
 		// LOG("NW corner (low corner) %d %d %d", Corner.x, Corner.y, Corner.z);
 		// LOG("%d by %d", Width[0], Width[1]);
-		for (int i = 0; i < Width[0]; i++)
+		for (int i = 0; i < EdgeWidth[0]; i++)
 		{
-			for (int j = 0; j < Width[1]; j++)
+			for (int j = 0; j < EdgeWidth[1]; j++)
 			{
-				a_ChunkInterface.SetBlock(Corner.x + i, Corner.y, Corner.z + j, E_BLOCK_END_PORTAL, 0);
+				a_ChunkInterface.SetBlock(NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j, E_BLOCK_END_PORTAL, 0);
 				// TODO: Create block entity so portal doesn't become invisible on relog.
 			}
 		}
@@ -255,10 +211,15 @@ public:
 
 
 	/** Return true if this block is a portal frame, has an eye, and is facing the correct direction. */
-	bool IsValidFrame(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_ShouldFace)
+	bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, NIBBLETYPE a_ShouldFace)
 	{
-		return ((a_BlockType == E_BLOCK_END_PORTAL_FRAME)
-			&& (a_BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+
+		return (
+			a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta) &&
+			(BlockType == E_BLOCK_END_PORTAL_FRAME) &&
+			(BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
 		);
 	}
 
