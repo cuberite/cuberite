@@ -3654,6 +3654,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself",
 				},
+				IsArmorStand =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is a {{cArmorStand|armor stand}}.",
+				},
 				IsBoat =
 				{
 					Returns =
