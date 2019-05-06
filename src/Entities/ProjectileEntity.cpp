@@ -451,6 +451,7 @@ void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 	// Default spawning - use the projectile kind to spawn an object:
 	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
+	super::SpawnOn(a_Client);
 }
 
 
@@ -462,7 +463,3 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
-
-
-

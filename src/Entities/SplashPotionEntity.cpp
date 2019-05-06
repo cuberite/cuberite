@@ -105,8 +105,5 @@ void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnObject(*this, 73, m_PotionColor, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
+	super::SpawnOn(a_Client);
 }
-
-
-
-

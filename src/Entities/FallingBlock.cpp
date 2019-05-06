@@ -27,6 +27,7 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnFallingBlock(*this);
+	super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -104,7 +105,3 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 }
-
-
-
-

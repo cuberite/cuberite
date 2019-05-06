@@ -116,6 +116,7 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 void cPickup::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendPickupSpawn(*this);
+	super::SpawnOn(a_Client);
 }
 
 

@@ -114,6 +114,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnVehicle(*this, 10, static_cast<char>(m_Payload));  // 10 = Minecarts
 	a_ClientHandle.SendEntityMetadata(*this);
+	super::SpawnOn(a_ClientHandle);
 }
 
 

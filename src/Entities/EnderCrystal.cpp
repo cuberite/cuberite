@@ -23,6 +23,7 @@ cEnderCrystal::cEnderCrystal(double a_X, double a_Y, double a_Z)
 void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnObject(*this, 51, 0, static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
+	super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -50,7 +51,3 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT,     POSZ_TOINT, E_BLOCK_BEDROCK, 0);
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT + 1, POSZ_TOINT, E_BLOCK_FIRE,    0);
 }
-
-
-
-

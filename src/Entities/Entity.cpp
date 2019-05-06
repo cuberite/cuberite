@@ -177,6 +177,18 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 
 
+void cEntity::SpawnOn(cClientHandle & a_Client)
+{
+	if (m_AttachedTo != nullptr)
+	{
+		m_World->BroadcastAttachEntity(*this, *m_AttachedTo);
+	}
+}
+
+
+
+
+
 void cEntity::WrapHeadYaw(void)
 {
 	m_HeadYaw = NormalizeAngleDegrees(m_HeadYaw);
