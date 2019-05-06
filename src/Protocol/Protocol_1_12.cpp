@@ -651,39 +651,39 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			{
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetHeadRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetHeadRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetHeadRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetHeadRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_BODY_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetBodyRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetBodyRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetBodyRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetBodyRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_ARM_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftArmRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftArmRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftArmRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftArmRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_ARM_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightArmRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightArmRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightArmRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightArmRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_LEFT_LEG_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftLegRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftLegRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetLeftLegRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetLeftLegRotation().z));
 
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_RIGHT_LEG_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightLegRotation().x);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightLegRotation().y);
-				a_Pkt.WriteBEFloat((float)ArmorStand.GetRightLegRotation().z);
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().x));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().y));
+				a_Pkt.WriteBEFloat(static_cast<float>(ArmorStand.GetRightLegRotation().z));
 			}
 			break;
 		}  // case etArmorStand
