@@ -2139,33 +2139,31 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 	// Idea : Rewrite armor stand with item grid (https://github.com/cuberite/cuberite/issues/2361)
 
-	int NumSlots = 6;
-	for (int Child = 0; Child < NumSlots; Child++)
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items >= 0) && (a_NBT.GetType(Items) == TAG_List))
 	{
-		int SlotTag = a_NBT.FindChildByName(Child, "Slot");
-		if ((SlotTag < 0) || (a_NBT.GetType(SlotTag) != TAG_Byte))
+		for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 		{
-			continue;
-		}
-		int SlotNum = static_cast<int>(a_NBT.GetByte(SlotTag));
-		if ((SlotNum < 0) || (SlotNum > NumSlots))
-		{
-			// SlotNum outside of the range
-			continue;
-		}
-		cItem Item;
-		if (LoadItemFromNBT(Item, a_NBT, Child))
-		{
-			switch (SlotNum)
+			int Slot = a_NBT.FindChildByName(Child, "Slot");
+			if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
 			{
-				case 0: ArmorStand->SetEquippedWeapon(Item); break;
-				case 1: ArmorStand->SetEquippedBoots(Item); break;
-				case 2: ArmorStand->SetEquippedLeggings(Item); break;
-				case 3: ArmorStand->SetEquippedChestplate(Item); break;
-				case 4: ArmorStand->SetEquippedHelmet(Item); break;
-				case 5: ArmorStand->SetOffHandEquipedItem(Item); break;
+				continue;
 			}
-		}
+			cItem Item;
+			if (LoadItemFromNBT(Item, a_NBT, Child))
+			{
+				int SlotNum = a_NBT.GetByte(Slot);
+				switch (SlotNum)
+				{
+					case 0: ArmorStand->SetEquippedWeapon(Item); break;
+					case 1: ArmorStand->SetEquippedBoots(Item); break;
+					case 2: ArmorStand->SetEquippedLeggings(Item); break;
+					case 3: ArmorStand->SetEquippedChestplate(Item); break;
+					case 4: ArmorStand->SetEquippedHelmet(Item); break;
+					case 5: ArmorStand->SetOffHandEquipedItem(Item); break;
+				}
+			}
+		}  // for itr - ItemDefs[]
 	}
 
 	a_Entities.emplace_back(std::move(ArmorStand));

@@ -928,12 +928,33 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 			m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
 			m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
 		m_Writer.EndList();
-		AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
-		AddItem(a_ArmorStand->GetEquippedBoots(), 1);
-		AddItem(a_ArmorStand->GetEquippedLeggings(), 2);
-		AddItem(a_ArmorStand->GetEquippedChestplate(), 3);
-		AddItem(a_ArmorStand->GetEquippedHelmet(), 4);
-		AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
+		m_Writer.BeginList("Items", TAG_Compound);
+			if (!a_ArmorStand->GetEquippedWeapon().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
+			}
+			if (!a_ArmorStand->GetEquippedBoots().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedBoots(), 1);
+			}
+			if (!a_ArmorStand->GetEquippedLeggings().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedLeggings(), 2);
+			}
+			if (!a_ArmorStand->GetEquippedChestplate().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedChestplate(), 3);
+			}
+			if (!a_ArmorStand->GetEquippedHelmet().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedHelmet(), 4);
+			}
+			if (!a_ArmorStand->GetOffHandEquipedItem().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
+			}
+		m_Writer.EndList();
+
 	m_Writer.EndCompound();
 }
 
