@@ -2369,9 +2369,9 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
-UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size)
+UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw)
 {
-	auto ArmorStand = cpp14::make_unique<cArmorStand>(a_Pos, a_Yaw, a_Size);
+	auto ArmorStand = cpp14::make_unique<cArmorStand>(a_Pos, a_Yaw);
 	auto ArmorStandPtr = ArmorStand.get();
 	if (!ArmorStandPtr->Initialize(std::move(ArmorStand), *this))
 	{
