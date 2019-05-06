@@ -892,7 +892,8 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ArmorStand, "ArmorStand");
-		m_Writer.AddShort("Size", a_ArmorStand->GetSize());
+		m_Writer.AddByte("Small", a_ArmorStand->IsSmall() ? 1 : 0);
+		m_Writer.AddByte("Marker", a_ArmorStand->IsMarker() ? 1 : 0);
 		m_Writer.AddByte("Arms", a_ArmorStand->HasArms() ? 1 : 0);
 		m_Writer.AddByte("Plate", a_ArmorStand->HasBasePlate() ? 1 : 0);
 		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);

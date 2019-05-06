@@ -11,12 +11,13 @@
 
 
 
-cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size):
-	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.5*a_Size, 0.9875*a_Size),  // a_Size = 0 : Marker ;  a_Size = 1 : Small ;  a_Size = 0 : Normal
+cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
+	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.5, 0.9875),
 	m_CustomName(""),
 	m_CustomNameAlwaysVisible(false),
 	m_TicksSinceLastDamaged(100),
-	m_Size(a_Size),
+	m_IsSmall(false),
+	m_IsMarker(false),
 	m_HasArms(false),
 	m_HasBasePlate(true),
 	m_IsVisible(true),
@@ -290,11 +291,44 @@ void cArmorStand::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 
 
 
-void cArmorStand::SetSize(short a_Size)
+void cArmorStand::SetNormal()
 {
-	SetHeight(0.9875*a_Size);
-	SetWidth(0.25*a_Size);
-	m_Size = a_Size;
+	SetHeight(0.9875);
+	SetWidth(0.25);
+	m_IsSmall = false;
+	m_IsMarker = false;
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cArmorStand::SetSmall()
+{
+	SetHeight(0.9875/2);
+	SetWidth(0.25/2);
+	m_IsSmall = true;
+	m_IsMarker = false;
+	if (m_World != nullptr)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cArmorStand::SetMarker()
+{
+	SetHeight(0);
+	SetWidth(0);
+	m_IsSmall = false;
+	m_IsMarker = true;
 	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);

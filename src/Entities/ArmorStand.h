@@ -17,7 +17,7 @@ class cArmorStand :
 public:
 	CLASS_PROTODEF(cArmorStand)
 
-	cArmorStand(Vector3d a_Pos, double a_Yaw, short a_Size);
+	cArmorStand(Vector3d a_Pos, double a_Yaw);
 
 
 	// tolua_begin
@@ -45,18 +45,23 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
-	/** Returns the size depending of the armor stand type. 0: marker, 1: small, 2: normal */
-	short GetSize(void) const { return m_Size; }
-	void SetSize(short a_Size);
-
 	/** Returns true if the armor stand is a normal sized one. */
-	bool IsNormal(void) const { return m_Size == 2; }
+	bool IsNormal(void) const { return !m_IsSmall && !m_IsMarker; }
 
 	/** Returns true if the armor stand is a small one. */
-	bool IsSmall(void) const { return m_Size == 1; }
+	bool IsSmall(void) const { return m_IsSmall && !m_IsMarker; }
 
 	/** Returns true if the armor stand is a marker (null size). */
-	bool IsMarker(void) const { return m_Size == 0; }
+	bool IsMarker(void) const { return m_IsMarker; }
+
+	/** Sets if the armor stand is a normal sized one. */
+	void SetNormal(void);
+
+	/** Sets if the armor stand is a small one. */
+	void SetSmall(void);
+
+	/** Sets if the armor stand is a marker (null size). */
+	void SetMarker(void);
 
 	/** Returns true if the armor stand have amrs. */
 	bool HasArms(void) const { return m_HasArms; }
@@ -111,7 +116,8 @@ protected:
 	bool m_CustomNameAlwaysVisible;
 	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
-	short m_Size;
+	bool m_IsSmall;
+	bool m_IsMarker;
 	bool m_HasArms;
 	bool m_HasBasePlate;
 	Vector3d m_HeadRotation;

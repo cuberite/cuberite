@@ -2016,7 +2016,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cArmorStand> ArmorStand = cpp14::make_unique<cArmorStand>(Vector3d(), 0.0, 2);
+	std::unique_ptr<cArmorStand> ArmorStand = cpp14::make_unique<cArmorStand>(Vector3d(), 0.0);
 	if (!LoadEntityBaseFromNBT(*ArmorStand.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2040,10 +2040,24 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		ArmorStand->SetCustomNameAlwaysVisible(CustomNameVisible);
 	}
 
-	int Size = a_NBT.FindChildByName(a_TagIdx, "Size");
-	if ((Size >= 0) && (a_NBT.GetType(Size) == TAG_Short))
+	int IsSmallIdx = a_NBT.FindChildByName(a_TagIdx, "Small");
+	if ((IsSmallIdx > 0) && (a_NBT.GetType(IsSmallIdx) == TAG_Byte))
 	{
-		ArmorStand->SetSize(a_NBT.GetShort(Size));
+		bool IsSmall = ((a_NBT.GetByte(IsSmallIdx) == 1) ? true : false);
+		if (IsSmall)
+		{
+			ArmorStand->SetSmall();
+		}
+	}
+
+	int IsMarkerIdx = a_NBT.FindChildByName(a_TagIdx, "Marker");
+	if ((IsMarkerIdx > 0) && (a_NBT.GetType(IsMarkerIdx) == TAG_Byte))
+	{
+		bool IsMarker = ((a_NBT.GetByte(IsMarkerIdx) == 1) ? true : false);
+		if (IsMarker)
+		{
+			ArmorStand->SetMarker();
+		}
 	}
 
 	int HasArmsIdx = a_NBT.FindChildByName(a_TagIdx, "Arms");
