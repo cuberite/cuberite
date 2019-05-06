@@ -134,6 +134,9 @@ public:
 		esFireworkExploding      = 17,
 		// Passive mob is in "love mode"
 		esMobInLove              = 18,
+
+		// Armor stand "hit sound, and resets a hit cooldown.". Shaking effect
+		esArmorStandHit          = 32,
 	} ;
 
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
@@ -521,6 +524,9 @@ public:
 
 	/** Called when the specified player right-clicks this entity */
 	virtual void OnRightClicked(cPlayer & a_Player) {}
+
+	/** Called when the specified player interact at specific coords of this entity. Depend of entity and mostly used by ArmorStand */
+	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick) {}
 
 	/** Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy(). */
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr)
