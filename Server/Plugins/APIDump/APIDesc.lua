@@ -9707,6 +9707,10 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the armor stand is a normal sized one.",
 				},
+				SetNormal =
+				{
+					Notes = "Sets the armor stand as a normal sized one.",
+				},
 				IsSmall =
 				{
 					Returns =
@@ -9719,13 +9723,7 @@ a_Player:OpenWindow(Window);
 				},
 				SetSmall =
 				{
-					Params =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets if the armor stand is a small one.",
+					Notes = "Sets the armor stand as a small one.",
 				},
 				IsMarker =
 				{
@@ -9739,13 +9737,7 @@ a_Player:OpenWindow(Window);
 				},
 				SetMarker =
 				{
-					Params =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets if the armor stand is a marker.",
+					Notes = "Sets the armor stand as a marker.",
 				},
 				HasArms =
 				{
