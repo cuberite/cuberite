@@ -721,6 +721,15 @@ bool cPluginLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Ent
 
 
 
+bool cPluginLua::OnPlayerClickingAtEntity(cPlayer & a_Player, cEntity & a_Entity, const Vector3f & a_TargetPos)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CLICKING_AT_ENTITY, &a_Player, &a_Entity, &a_TargetPos);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_SHOOTING, &a_Player);
@@ -1080,6 +1089,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
+		case cPluginManager::HOOK_PLAYER_CLICKING_AT_ENTITY:    return "OnPlayerClickingAtEntity";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
 		case cPluginManager::HOOK_PLAYER_SPAWNED:               return "OnPlayerSpawned";
 		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:          return "OnPlayerTossingItem";
@@ -1172,7 +1182,3 @@ void cPluginLua::ClearWebTabs(void)
 		webAdmin->RemoveAllPluginWebTabs(m_Name);
 	}
 }
-
-
-
-

@@ -119,6 +119,7 @@ public:
 		HOOK_PLAYER_PLACING_BLOCK,
 		HOOK_PLAYER_RIGHT_CLICK,
 		HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
+		HOOK_PLAYER_CLICKING_AT_ENTITY,
 		HOOK_PLAYER_SHOOTING,
 		HOOK_PLAYER_SPAWNED,
 		HOOK_ENTITY_TELEPORT,
@@ -267,6 +268,7 @@ public:
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
+	bool CallHookPlayerClickingAtEntity   (cPlayer & a_Player, cEntity & a_Entity, const Vector3f & a_TargetPos);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
 	bool CallHookPlayerSpawned            (cPlayer & a_Player);
 	bool CallHookPlayerTossingItem        (cPlayer & a_Player);
@@ -451,7 +453,3 @@ private:
 	template <typename HookFunction>
 	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
 } ;  // tolua_export
-
-
-
-

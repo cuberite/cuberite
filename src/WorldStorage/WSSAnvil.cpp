@@ -52,6 +52,7 @@
 #include "../Entities/ItemFrame.h"
 #include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
+#include "../Entities/ArmorStand.h"
 
 #include "../Protocol/MojangAPI.h"
 #include "../Server.h"
@@ -1542,6 +1543,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:item",                &cWSSAnvil::LoadPickupFromNBT },
 		{ "Painting",                      &cWSSAnvil::LoadPaintingFromNBT },
 		{ "minecraft:painting",            &cWSSAnvil::LoadPaintingFromNBT },
+		{ "ArmorStand",                    &cWSSAnvil::LoadArmorStandFromNBT },
+		{ "minecraft:armor_stand",         &cWSSAnvil::LoadArmorStandFromNBT },
 		{ "PrimedTnt",                     &cWSSAnvil::LoadTNTFromNBT },
 		{ "minecraft:tnt",                 &cWSSAnvil::LoadTNTFromNBT },
 		{ "XPOrb",                         &cWSSAnvil::LoadExpOrbFromNBT },
@@ -2005,6 +2008,189 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 	LoadHangingFromNBT(*Painting.get(), a_NBT, a_TagIdx);
 	a_Entities.emplace_back(std::move(Painting));
+}
+
+
+
+
+
+void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::unique_ptr<cArmorStand> ArmorStand = cpp14::make_unique<cArmorStand>(Vector3d(), 0.0);
+	if (!LoadEntityBaseFromNBT(*ArmorStand.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+
+	/**
+		Basic properties
+	*/
+
+	int CustomNameTag = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CustomNameTag > 0) && (a_NBT.GetType(CustomNameTag) == TAG_String))
+	{
+		ArmorStand->SetCustomName(a_NBT.GetString(CustomNameTag));
+	}
+
+	int CustomNameVisibleTag = a_NBT.FindChildByName(a_TagIdx, "CustomNameVisible");
+	if ((CustomNameVisibleTag > 0) && (a_NBT.GetType(CustomNameVisibleTag) == TAG_Byte))
+	{
+		bool CustomNameVisible = (a_NBT.GetByte(CustomNameVisibleTag) == 1);
+		ArmorStand->SetCustomNameAlwaysVisible(CustomNameVisible);
+	}
+
+	int HasGravityIdx = a_NBT.FindChildByName(a_TagIdx, "Gravity");
+	if ((HasGravityIdx > 0) && (a_NBT.GetType(HasGravityIdx) == TAG_Byte))
+	{
+		bool HasGravity = ((a_NBT.GetByte(HasGravityIdx) == 1) ? true : false);
+		if (!HasGravity)
+		{
+			ArmorStand->SetGravity(0.0f);
+		}
+	}
+
+	int IsSmallIdx = a_NBT.FindChildByName(a_TagIdx, "Small");
+	if ((IsSmallIdx > 0) && (a_NBT.GetType(IsSmallIdx) == TAG_Byte))
+	{
+		bool IsSmall = ((a_NBT.GetByte(IsSmallIdx) == 1) ? true : false);
+		if (IsSmall)
+		{
+			ArmorStand->SetSmall();
+		}
+	}
+
+	int IsMarkerIdx = a_NBT.FindChildByName(a_TagIdx, "Marker");
+	if ((IsMarkerIdx > 0) && (a_NBT.GetType(IsMarkerIdx) == TAG_Byte))
+	{
+		bool IsMarker = ((a_NBT.GetByte(IsMarkerIdx) == 1) ? true : false);
+		if (IsMarker)
+		{
+			ArmorStand->SetMarker();
+		}
+	}
+
+	int HasArmsIdx = a_NBT.FindChildByName(a_TagIdx, "Arms");
+	if ((HasArmsIdx > 0) && (a_NBT.GetType(HasArmsIdx) == TAG_Byte))
+	{
+		bool HasArms = ((a_NBT.GetByte(HasArmsIdx) == 1) ? true : false);
+		ArmorStand->SetHasArms(HasArms);
+	}
+
+	int HasPlateIdx = a_NBT.FindChildByName(a_TagIdx, "Plate");
+	if ((HasPlateIdx > 0) && (a_NBT.GetType(HasPlateIdx) == TAG_Byte))
+	{
+		bool HasPlate = ((a_NBT.GetByte(HasPlateIdx) == 1) ? true : false);
+		ArmorStand->SetHasBasePlate(HasPlate);
+	}
+
+	int IsInvisibleIdx = a_NBT.FindChildByName(a_TagIdx, "Invisible");
+	if ((IsInvisibleIdx > 0) && (a_NBT.GetType(IsInvisibleIdx) == TAG_Byte))
+	{
+		bool IsInvisible = ((a_NBT.GetByte(IsInvisibleIdx) == 1) ? true : false);
+		ArmorStand->SetVisible(!IsInvisible);
+	}
+
+
+	/**
+		Rotations
+	*/
+
+	double HeadRotation[3];
+	if (!LoadDoublesListFromNBT(HeadRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "HeadRotation")))
+	{
+		// Provide default HeadRotation:
+		HeadRotation[0] = 0;
+		HeadRotation[1] = 0;
+		HeadRotation[2] = 0;
+	}
+	ArmorStand->SetHeadRotation(Vector3d(HeadRotation[0], HeadRotation[1], HeadRotation[2]));
+
+	double BodyRotation[3];
+	if (!LoadDoublesListFromNBT(BodyRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "BodyRotation")))
+	{
+		// Provide default BodyRotation:
+		BodyRotation[0] = 0;
+		BodyRotation[1] = 0;
+		BodyRotation[2] = 0;
+	}
+	ArmorStand->SetBodyRotation(Vector3d(BodyRotation[0], BodyRotation[1], BodyRotation[2]));
+
+	double LeftArmRotation[3];
+	if (!LoadDoublesListFromNBT(LeftArmRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "LeftArmRotation")))
+	{
+		// Provide default LeftArmRotation:
+		LeftArmRotation[0] = 0;
+		LeftArmRotation[1] = 0;
+		LeftArmRotation[2] = 0;
+	}
+	ArmorStand->SetLeftArmRotation(Vector3d(LeftArmRotation[0], LeftArmRotation[1], LeftArmRotation[2]));
+
+	double RightArmRotation[3];
+	if (!LoadDoublesListFromNBT(RightArmRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "RightArmRotation")))
+	{
+		// Provide default RightArmRotation:
+		RightArmRotation[0] = 0;
+		RightArmRotation[1] = 0;
+		RightArmRotation[2] = 0;
+	}
+	ArmorStand->SetRightArmRotation(Vector3d(RightArmRotation[0], RightArmRotation[1], RightArmRotation[2]));
+
+	double LeftLegRotation[3];
+	if (!LoadDoublesListFromNBT(LeftLegRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "LeftLegRotation")))
+	{
+		// Provide default LeftLegRotation:
+		LeftLegRotation[0] = 0;
+		LeftLegRotation[1] = 0;
+		LeftLegRotation[2] = 0;
+	}
+	ArmorStand->SetLeftLegRotation(Vector3d(LeftLegRotation[0], LeftLegRotation[1], LeftLegRotation[2]));
+
+	double RightLegRotation[3];
+	if (!LoadDoublesListFromNBT(RightLegRotation, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "RightLegRotation")))
+	{
+		// Provide default RightLegRotation:
+		RightLegRotation[0] = 0;
+		RightLegRotation[1] = 0;
+		RightLegRotation[2] = 0;
+	}
+	ArmorStand->SetRightLegRotation(Vector3d(RightLegRotation[0], RightLegRotation[1], RightLegRotation[2]));
+
+
+	/**
+		Armor
+	*/
+
+	// Idea : Rewrite armor stand with item grid (https://github.com/cuberite/cuberite/issues/2361)
+
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items >= 0) && (a_NBT.GetType(Items) == TAG_List))
+	{
+		for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
+		{
+			int Slot = a_NBT.FindChildByName(Child, "Slot");
+			if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
+			{
+				continue;
+			}
+			cItem Item;
+			if (LoadItemFromNBT(Item, a_NBT, Child))
+			{
+				int SlotNum = a_NBT.GetByte(Slot);
+				switch (SlotNum)
+				{
+					case 0: ArmorStand->SetEquippedWeapon(Item); break;
+					case 1: ArmorStand->SetEquippedBoots(Item); break;
+					case 2: ArmorStand->SetEquippedLeggings(Item); break;
+					case 3: ArmorStand->SetEquippedChestplate(Item); break;
+					case 4: ArmorStand->SetEquippedHelmet(Item); break;
+					case 5: ArmorStand->SetOffHandEquipedItem(Item); break;
+				}
+			}
+		}  // for itr - ItemDefs[]
+	}
+
+	a_Entities.emplace_back(std::move(ArmorStand));
 }
 
 
@@ -3632,7 +3818,3 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 	}  // for i - m_Header[]
 	return MaxLocation >> 8;
 }
-
-
-
-

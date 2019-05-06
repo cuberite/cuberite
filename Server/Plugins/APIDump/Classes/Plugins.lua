@@ -864,6 +864,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when the client sends the UseEntity packet.",
 			},
+			HOOK_PLAYER_CLICKING_AT_ENTITY =
+			{
+				Notes = "Called when the client sends the UseEntityAt packet.",
+			},
 			HOOK_PLAYER_SHOOTING =
 			{
 				Notes = "Called when the player releases the mouse button to fire their bow.",

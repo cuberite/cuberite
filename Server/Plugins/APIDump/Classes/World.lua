@@ -3119,6 +3119,30 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether coloured chat prefixes are prepended to chat messages or the entire message is simply coloured.",
 			},
+			SpawnArmorStand =
+			{
+				{
+					Params =
+					{
+						{
+							Name = "Position",
+							Type = "Vector3d",
+						},
+						{
+							Name = "Yaw",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Desc = "Spawns an armor stand at the given coordinates. Returns the UniqueID of the spawned armor stand, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} on failure.",
+				},
+			},
 			SpawnBoat =
 			{
 				{
