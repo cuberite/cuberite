@@ -2369,6 +2369,21 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 
 
+UInt32 cWorld::SpawnArmorStand(Vector3d a_Pos, double a_Yaw)
+{
+	auto ArmorStand = cpp14::make_unique<cArmorStand>(a_Pos, a_Yaw);
+	auto ArmorStandPtr = ArmorStand.get();
+	if (!ArmorStandPtr->Initialize(std::move(ArmorStand), *this))
+	{
+		return cEntity::INVALID_ID;
+	}
+	return ArmorStandPtr->GetUniqueID();
+}
+
+
+
+
+
 UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
 	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);

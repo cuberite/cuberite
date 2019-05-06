@@ -182,6 +182,7 @@ protected:
 	void LoadItemFrameFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadLeashKnotFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPaintingFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadArmorStandFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	void LoadOldMinecartFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMinecartRFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -266,7 +267,3 @@ protected:
 	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
 	virtual const AString GetName(void) const override {return "anvil"; }
 } ;
-
-
-
-

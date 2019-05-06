@@ -24,15 +24,12 @@ Implements the 1.9 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
-#include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../Statistics.h"
 
 #include "../WorldStorage/FastNBT.h"
-#include "../WorldStorage/EnchantmentSerializer.h"
 
-#include "../Entities/Boat.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -47,7 +44,6 @@ Implements the 1.9 protocol classes:
 #include "../Items/ItemSpawnEgg.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
-#include "../UI/Window.h"
 #include "../UI/HorseWindow.h"
 
 #include "../BlockEntities/BeaconEntity.h"
@@ -154,7 +150,16 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 				UUID.FromString(Params[2]);
 				m_Client->SetUUID(UUID);
 
-				m_Client->SetProperties(Params[3]);
+				Json::Value root;
+				Json::Reader reader;
+				if (!reader.parse(Params[3], root))
+				{
+					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+				}
+				else
+				{
+					m_Client->SetProperties(root);
+				}
 			}
 			else
 			{
@@ -450,8 +455,13 @@ void cProtocol_1_9_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 
 	cPacketizer Pkt(*this, GetPacketId(sendEntityEquipment));  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// Needs to be adjusted due to the insertion of offhand at slot 1
-	if (a_SlotNum > 0)
+	// See https://wiki.vg/Protocol#Entity_Equipment
+	// TODO: Enable player left hand. Currently only user by armor stand.
+	if (a_SlotNum == 5)  // Left hand
+	{
+		a_SlotNum = 1;
+	}
+	else if (a_SlotNum > 0)
 	{
 		a_SlotNum++;
 	}
@@ -2783,8 +2793,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
-
-			// TODO: Do anything
+			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), Hand == MAIN_HAND);
 			break;
 		}
 		default:

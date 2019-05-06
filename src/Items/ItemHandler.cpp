@@ -9,6 +9,7 @@
 
 // Handlers:
 #include "ItemArmor.h"
+#include "ItemArmorStand.h"
 #include "ItemBed.h"
 #include "ItemBigFlower.h"
 #include "ItemBoat.h"
@@ -151,6 +152,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
+		case E_ITEM_ARMOR_STAND:         return new cItemAmorStandHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
 

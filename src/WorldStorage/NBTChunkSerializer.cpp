@@ -40,6 +40,7 @@
 #include "../Entities/ItemFrame.h"
 #include "../Entities/LeashKnot.h"
 #include "../Entities/Painting.h"
+#include "../Entities/ArmorStand.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
 
@@ -629,7 +630,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				const cHorse *Horse = static_cast<const cHorse *>(a_Monster);
 				m_Writer.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);
 				m_Writer.AddByte("EatingHaystack", Horse->IsEating()? 1 : 0);
-				m_Writer.AddByte("Tame",           Horse->IsTame()? 1: 0);
+				m_Writer.AddByte("Tame",           Horse->IsTame()? 1 : 0);
 				m_Writer.AddInt ("Type",           Horse->GetHorseType());
 				m_Writer.AddInt ("Color",          Horse->GetHorseColor());
 				m_Writer.AddInt ("Style",          Horse->GetHorseStyle());
@@ -887,6 +888,82 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 
 
 
+void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_ArmorStand, "ArmorStand");
+		m_Writer.AddByte("Small", a_ArmorStand->IsSmall() ? 1 : 0);
+		m_Writer.AddByte("Gravity", a_ArmorStand->HasGravity() ? 1 : 0);
+		m_Writer.AddByte("Marker", a_ArmorStand->IsMarker() ? 1 : 0);
+		m_Writer.AddByte("Arms", a_ArmorStand->HasArms() ? 1 : 0);
+		m_Writer.AddByte("Plate", a_ArmorStand->HasBasePlate() ? 1 : 0);
+		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
+		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());
+		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
+		m_Writer.BeginList("HeadRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("BodyRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("LeftArmRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("RightArmRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("LeftLegRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("RightLegRotation", TAG_Double);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().x);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
+			m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
+		m_Writer.EndList();
+		m_Writer.BeginList("Items", TAG_Compound);
+			if (!a_ArmorStand->GetEquippedWeapon().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedWeapon(), 0);
+			}
+			if (!a_ArmorStand->GetEquippedBoots().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedBoots(), 1);
+			}
+			if (!a_ArmorStand->GetEquippedLeggings().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedLeggings(), 2);
+			}
+			if (!a_ArmorStand->GetEquippedChestplate().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedChestplate(), 3);
+			}
+			if (!a_ArmorStand->GetEquippedHelmet().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetEquippedHelmet(), 4);
+			}
+			if (!a_ArmorStand->GetOffHandEquipedItem().IsEmpty())
+			{
+				AddItem(a_ArmorStand->GetOffHandEquipedItem(), 5);
+			}
+		m_Writer.EndList();
+
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddLeashKnotEntity(cLeashKnot * a_LeashKnot)
 {
 	m_Writer.BeginCompound("");
@@ -1012,6 +1089,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etItemFrame:    AddItemFrameEntity   (static_cast<cItemFrame *>       (a_Entity)); break;
 		case cEntity::etLeashKnot:    AddLeashKnotEntity   (static_cast<cLeashKnot *>       (a_Entity)); break;
 		case cEntity::etPainting:     AddPaintingEntity    (static_cast<cPainting *>        (a_Entity)); break;
+		case cEntity::etArmorStand:   AddArmorStandEntity  (static_cast<cArmorStand *>      (a_Entity)); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		case cEntity::etFloater: return;  // Floaters aren't saved either
 		default:
@@ -1072,7 +1150,3 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	}
 	m_HasHadBlockEntity = true;
 }
-
-
-
-

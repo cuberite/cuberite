@@ -17,6 +17,7 @@
 #include "Mobs/Monster.h"
 #include "Entities/ProjectileEntity.h"
 #include "Entities/Boat.h"
+#include "Entities/ArmorStand.h"
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
 #include "MapManager.h"
@@ -460,6 +461,10 @@ public:
 	/** Spawns a boat at the given coordinates.
 	Returns the UniqueID of the spawned boat, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material);
+
+	/** Spawns an armor stand at the given coordinates.
+	Returns the UniqueID of the spawned armor stand, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnArmorStand(Vector3d a_Pos, double a_Yaw);
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */

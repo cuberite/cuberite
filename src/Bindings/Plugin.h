@@ -86,6 +86,7 @@ public:
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) = 0;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) = 0;
+	virtual bool OnPlayerClickingAtEntity   (cPlayer & a_Player, cEntity & a_Entity, const Vector3f & a_TargetPos) = 0;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerSpawned            (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerTossingItem        (cPlayer & a_Player) = 0;
@@ -157,7 +158,3 @@ protected:
 	/** Sets m_LoadError to the specified string and m_Status to psError. */
 	void SetLoadError(const AString & a_LoadError);
 };  // tolua_export
-
-
-
-

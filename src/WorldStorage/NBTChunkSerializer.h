@@ -49,6 +49,7 @@ class cHangingEntity;
 class cItemFrame;
 class cLeashKnot;
 class cPainting;
+class cArmorStand;
 
 
 
@@ -123,6 +124,7 @@ protected:
 	void AddItemFrameEntity   (cItemFrame * a_ItemFrame);
 	void AddLeashKnotEntity   (cLeashKnot * a_LeashKnot);
 	void AddPaintingEntity    (cPainting * a_Painting);
+	void AddArmorStandEntity  (cArmorStand * a_ArmorStand);
 
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart);
 
@@ -133,7 +135,3 @@ protected:
 	virtual void Entity(cEntity * a_Entity) override;
 	virtual void BlockEntity(cBlockEntity * a_Entity) override;
 } ;  // class cNBTChunkSerializer
-
-
-
-

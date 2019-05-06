@@ -868,6 +868,19 @@ bool cPluginManager::CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEnti
 
 
 
+bool cPluginManager::CallHookPlayerClickingAtEntity(cPlayer & a_Player, cEntity & a_Entity, const Vector3f & a_TargetPos)
+{
+	return GenericCallHook(HOOK_PLAYER_CLICKING_AT_ENTITY, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerClickingAtEntity(a_Player, a_Entity, a_TargetPos);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerShooting(cPlayer & a_Player)
 {
 	return GenericCallHook(HOOK_PLAYER_SHOOTING, [&](cPlugin * a_Plugin)
@@ -1734,7 +1747,3 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 
 	return res;
 }
-
-
-
-

@@ -1,5 +1,6 @@
 
 SET (SRCS
+	ArmorStand.cpp
 	ArrowEntity.cpp
 	Boat.cpp
 	EnderCrystal.cpp
@@ -29,6 +30,7 @@ SET (SRCS
 	WitherSkullEntity.cpp)
 
 SET (HDRS
+	ArmorStand.h
 	ArrowEntity.h
 	Boat.h
 	EnderCrystal.h
