@@ -13,6 +13,7 @@
 
 cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.5, 0.9875),
+	m_IsVisible(true),
 	m_CustomName(""),
 	m_CustomNameAlwaysVisible(false),
 	m_TicksSinceLastDamaged(100),
@@ -20,7 +21,6 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	m_IsMarker(false),
 	m_HasArms(false),
 	m_HasBasePlate(true),
-	m_IsVisible(true),
 	m_HeadRotation(0.0, 0.0, 0.0),
 	m_BodyRotation(0.0, 0.0, 0.0),
 	m_LeftArmRotation(-10.0, 0.0, -10.0),
