@@ -3611,6 +3611,43 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP.",
 				},
+				GetAttachedID =
+				{
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the EntityID of an entity that this entity is attached to. Returns -1 if not attached to any mob.",
+				},
+				AttachToID =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Attach this entity to the entity defined by its ID. Returns true if it finish correctly attached.",
+				},
+				IsAttachedToID =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Return whatever is this entity is attached to the entity passed by its ID.",
+				},
+				Detach =
+				{
+					Notes = "Detach this entity from other entity.",
+				},
 				HandleSpeedFromAttachee =
 				{
 					Params =
