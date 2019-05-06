@@ -250,6 +250,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
 	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
 	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
+	// a_Client.SendEntityEquipment(*this, 5, m_Inventory.GetOffHandEquipedItem());  // Use number 5 for compatibility issues - Not activated since left hand is not now managed !
 }
 
 
@@ -3088,13 +3089,3 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
 }
-
-
-
-
-
-
-
-
-
-
