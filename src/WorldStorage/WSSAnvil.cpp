@@ -2040,6 +2040,16 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		ArmorStand->SetCustomNameAlwaysVisible(CustomNameVisible);
 	}
 
+	int HasGravityIdx = a_NBT.FindChildByName(a_TagIdx, "Gravity");
+	if ((HasGravityIdx > 0) && (a_NBT.GetType(HasGravityIdx) == TAG_Byte))
+	{
+		bool HasGravity = ((a_NBT.GetByte(HasGravityIdx) == 1) ? true : false);
+		if (!HasGravity)
+		{
+			ArmorStand->SetGravity(0.0f);
+		}
+	}
+
 	int IsSmallIdx = a_NBT.FindChildByName(a_TagIdx, "Small");
 	if ((IsSmallIdx > 0) && (a_NBT.GetType(IsSmallIdx) == TAG_Byte))
 	{

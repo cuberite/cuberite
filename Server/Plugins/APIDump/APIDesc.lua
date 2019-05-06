@@ -9697,6 +9697,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
 				},
+				HasGravity =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the armor stand has gravity.",
+				},
 				IsNormal =
 				{
 					Returns =

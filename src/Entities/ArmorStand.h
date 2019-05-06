@@ -45,6 +45,9 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
+	/** Returns true if the armor stand has gravity. */
+	bool HasGravity(void) const { return (m_Gravity < 0.0f) || (m_Gravity > 0.0f); }
+
 	/** Returns true if the armor stand is a normal sized one. */
 	bool IsNormal(void) const { return !m_IsSmall && !m_IsMarker; }
 

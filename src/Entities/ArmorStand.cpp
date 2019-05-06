@@ -37,6 +37,8 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	SetMaxHealth(1);
 	SetHealth(1);
 	SetYaw(a_Yaw);
+	SetGravity(-16.0f);
+	SetAirDrag(0.02f);
 }
 
 
@@ -148,10 +150,18 @@ void cArmorStand::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// I don't know how and why but by default the client considere it as no gravity, so disable gravity on the server unless it fixed totally and configurable
 	// Gravity for such entity is not really important
+	super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
 	if (m_TicksSinceLastDamaged < 100)
 	{
 		++m_TicksSinceLastDamaged;
 	}
+	HandlePhysics(a_Dt, a_Chunk);
+	BroadcastMovementUpdate();
 }
 
 
