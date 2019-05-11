@@ -51,11 +51,9 @@ public:
 		};
 		struct sSeed
 		{
-			sSeed(int x, int y, int z, int d)
+			sSeed(Vector3i pos, int d)
 			{
-				m_Pos.x = x;
-				m_Pos.y = y;
-				m_Pos.z = z;
+				m_Pos = pos;
 				m_Depth = d;
 			}
 			Vector3i m_Pos;
@@ -75,12 +73,12 @@ public:
 				std::queue<sSeed> Seeds;
 				int count = 0;
 				const int maxDepth = 7;
-				Seeds.emplace(a_Rel.x - 1, a_Rel.y, a_Rel.z, maxDepth - 1);
-				Seeds.emplace(a_Rel.x + 1, a_Rel.y, a_Rel.z, maxDepth - 1);
-				Seeds.emplace(a_Rel.x, a_Rel.y - 1, a_Rel.z, maxDepth - 1);
-				Seeds.emplace(a_Rel.x, a_Rel.y + 1, a_Rel.z, maxDepth - 1);
-				Seeds.emplace(a_Rel.x, a_Rel.y, a_Rel.z - 1, maxDepth - 1);
-				Seeds.emplace(a_Rel.x, a_Rel.y, a_Rel.z + 1, maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[0], maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[1], maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[2], maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[3], maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[4], maxDepth - 1);
+				Seeds.emplace(a_Rel + WaterCheck[5], maxDepth - 1);
 
 				while (!Seeds.empty() && count < 65)
 				{
@@ -92,12 +90,12 @@ public:
 						DryUp(checkRel, a_Chunk);
 						if (seed.m_Depth > 0)
 						{
-							Seeds.emplace(checkRel.x - 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
-							Seeds.emplace(checkRel.x + 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
-							Seeds.emplace(checkRel.x, checkRel.y - 1, checkRel.z, seed.m_Depth - 1);
-							Seeds.emplace(checkRel.x, checkRel.y + 1, checkRel.z, seed.m_Depth - 1);
-							Seeds.emplace(checkRel.x, checkRel.y, checkRel.z - 1, seed.m_Depth - 1);
-							Seeds.emplace(checkRel.x, checkRel.y, checkRel.z + 1, seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[0], seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[1], seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[2], seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[3], seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[4], seed.m_Depth - 1);
+							Seeds.emplace(checkRel + WaterCheck[5], seed.m_Depth - 1);
 						}
 					}
 					Seeds.pop();
