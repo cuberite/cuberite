@@ -49,49 +49,68 @@ public:
 				{ 0,-1,  0},
 			}
 		};
+		struct sSeed
+		{
+			sSeed(int x, int y, int z, int d)
+			{
+				m_Pos.x = x;
+				m_Pos.y = y;
+				m_Pos.z = z;
+				m_Depth = d;
+			}
+			Vector3i m_Pos;
+			int m_Depth;
+		};
 		BLOCKTYPE TargetBlock;
 		NIBBLETYPE TargetMeta;
 		a_Chunk.GetBlockTypeMeta(a_Rel.x, a_Rel.y, a_Rel.z, TargetBlock, TargetMeta);
-		if (TargetMeta == E_META_SPONGE_DRY){
-		bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
-			{
-				BLOCKTYPE NeighborType;
-				return (
-					a_Chunk.UnboundedRelGetBlockType(a_Rel.x + a_Offset.x, a_Rel.y + a_Offset.y, a_Rel.z + a_Offset.z, NeighborType)
-					&& IsBlockWater(NeighborType)
-				);
-			}
-		);
-
-		if (ShouldSoak)
+		if (TargetMeta == E_META_SPONGE_DRY)
 		{
-			// TODO: Keep track of depth, don't go more than 7 blocks away
-			std::queue<Vector3i> CheckQueue;
-			int count = 0;
-			CheckQueue.emplace(a_Rel.x - 1, a_Rel.y, a_Rel.z);
-			CheckQueue.emplace(a_Rel.x + 1, a_Rel.y, a_Rel.z);
-			CheckQueue.emplace(a_Rel.x, a_Rel.y - 1, a_Rel.z);
-			CheckQueue.emplace(a_Rel.x, a_Rel.y + 1, a_Rel.z);
-			CheckQueue.emplace(a_Rel.x, a_Rel.y, a_Rel.z - 1);
-			CheckQueue.emplace(a_Rel.x, a_Rel.y, a_Rel.z + 1);
-
-			while (!CheckQueue.empty() && count < 65) {
-				Vector3i checkRel = CheckQueue.front();
-				if(IsWet(checkRel, a_Chunk)){
-					count++;
-					DryUp(checkRel, a_Chunk);
-					CheckQueue.emplace(checkRel.x - 1, checkRel.y, checkRel.z);
-					CheckQueue.emplace(checkRel.x + 1, checkRel.y, checkRel.z);
-					CheckQueue.emplace(checkRel.x, checkRel.y - 1, checkRel.z);
-					CheckQueue.emplace(checkRel.x, checkRel.y + 1, checkRel.z);
-					CheckQueue.emplace(checkRel.x, checkRel.y, checkRel.z - 1);
-					CheckQueue.emplace(checkRel.x, checkRel.y, checkRel.z + 1);
+			bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
+				{
+					BLOCKTYPE NeighborType;
+					return (
+						a_Chunk.UnboundedRelGetBlockType(a_Rel.x + a_Offset.x, a_Rel.y + a_Offset.y, a_Rel.z + a_Offset.z, NeighborType)
+						&& IsBlockWater(NeighborType)
+					);
 				}
-				CheckQueue.pop();
+			);
+
+			if (ShouldSoak)
+			{
+				std::queue<sSeed> Seeds;
+				int count = 0;
+				const int maxDepth = 7;
+				Seeds.emplace(a_Rel.x - 1, a_Rel.y, a_Rel.z, maxDepth - 1);
+				Seeds.emplace(a_Rel.x + 1, a_Rel.y, a_Rel.z, maxDepth - 1);
+				Seeds.emplace(a_Rel.x, a_Rel.y - 1, a_Rel.z, maxDepth - 1);
+				Seeds.emplace(a_Rel.x, a_Rel.y + 1, a_Rel.z, maxDepth - 1);
+				Seeds.emplace(a_Rel.x, a_Rel.y, a_Rel.z - 1, maxDepth - 1);
+				Seeds.emplace(a_Rel.x, a_Rel.y, a_Rel.z + 1, maxDepth - 1);
+
+				while (!Seeds.empty() && count < 65)
+				{
+					sSeed seed = Seeds.front();
+					Vector3i checkRel = seed.m_Pos;
+					if(IsWet(checkRel, a_Chunk))
+					{
+						count++;
+						DryUp(checkRel, a_Chunk);
+						if(seed.m_Depth > 0)
+						{
+							Seeds.emplace(checkRel.x - 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
+							Seeds.emplace(checkRel.x + 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
+							Seeds.emplace(checkRel.x, checkRel.y - 1, checkRel.z, seed.m_Depth - 1);
+							Seeds.emplace(checkRel.x, checkRel.y + 1, checkRel.z, seed.m_Depth - 1);
+							Seeds.emplace(checkRel.x, checkRel.y, checkRel.z - 1, seed.m_Depth - 1);
+							Seeds.emplace(checkRel.x, checkRel.y, checkRel.z + 1, seed.m_Depth - 1);
+						}
+					}
+					Seeds.pop();
+				}
+				a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_SPONGE, E_META_SPONGE_WET);
+				return true;
 			}
-			a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_SPONGE, E_META_SPONGE_WET);
-			return true;
-		}
 		}
 		return false;
 	}
@@ -113,7 +132,3 @@ public:
 		return 18;
 	}
 };
-
-
-
-
