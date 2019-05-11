@@ -67,24 +67,24 @@ public:
 			// TODO: Keep track of depth, don't go more than 7 blocks away
 			std::queue<Vector3i> CheckQueue;
 			int count = 0;
-			CheckQueue.push(Vector3i(a_Rel.x - 1, a_Rel.y, a_Rel.z));
-			CheckQueue.push(Vector3i(a_Rel.x + 1, a_Rel.y, a_Rel.z));
-			CheckQueue.push(Vector3i(a_Rel.x, a_Rel.y - 1, a_Rel.z));
-			CheckQueue.push(Vector3i(a_Rel.x, a_Rel.y + 1, a_Rel.z));
-			CheckQueue.push(Vector3i(a_Rel.x, a_Rel.y, a_Rel.z - 1));
-			CheckQueue.push(Vector3i(a_Rel.x, a_Rel.y, a_Rel.z + 1));
+			CheckQueue.emplace(a_Rel.x - 1, a_Rel.y, a_Rel.z);
+			CheckQueue.emplace(a_Rel.x + 1, a_Rel.y, a_Rel.z);
+			CheckQueue.emplace(a_Rel.x, a_Rel.y - 1, a_Rel.z);
+			CheckQueue.emplace(a_Rel.x, a_Rel.y + 1, a_Rel.z);
+			CheckQueue.emplace(a_Rel.x, a_Rel.y, a_Rel.z - 1);
+			CheckQueue.emplace(a_Rel.x, a_Rel.y, a_Rel.z + 1);
 
 			while (!CheckQueue.empty() && count < 65) {
 				Vector3i checkRel = CheckQueue.front();
 				if(IsWet(checkRel, a_Chunk)){
 					count++;
 					DryUp(checkRel, a_Chunk);
-					CheckQueue.push(Vector3i(checkRel.x - 1, checkRel.y, checkRel.z));
-					CheckQueue.push(Vector3i(checkRel.x + 1, checkRel.y, checkRel.z));
-					CheckQueue.push(Vector3i(checkRel.x, checkRel.y - 1, checkRel.z));
-					CheckQueue.push(Vector3i(checkRel.x, checkRel.y + 1, checkRel.z));
-					CheckQueue.push(Vector3i(checkRel.x, checkRel.y, checkRel.z - 1));
-					CheckQueue.push(Vector3i(checkRel.x, checkRel.y, checkRel.z + 1));
+					CheckQueue.emplace(checkRel.x - 1, checkRel.y, checkRel.z);
+					CheckQueue.emplace(checkRel.x + 1, checkRel.y, checkRel.z);
+					CheckQueue.emplace(checkRel.x, checkRel.y - 1, checkRel.z);
+					CheckQueue.emplace(checkRel.x, checkRel.y + 1, checkRel.z);
+					CheckQueue.emplace(checkRel.x, checkRel.y, checkRel.z - 1);
+					CheckQueue.emplace(checkRel.x, checkRel.y, checkRel.z + 1);
 				}
 				CheckQueue.pop();
 			}
