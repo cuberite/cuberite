@@ -41,12 +41,12 @@ public:
 		static const std::array<Vector3i, 6> WaterCheck
 		{
 			{
-				{ 1, 0,  0},
-				{-1, 0,  0},
-				{ 0, 0,  1},
-				{ 0, 0, -1},
-				{ 0, 1,  0},
-				{ 0,-1,  0},
+				{ 1,  0,  0},
+				{-1,  0,  0},
+				{ 0,  0,  1},
+				{ 0,  0, -1},
+				{ 0,  1,  0},
+				{ 0, -1,  0},
 			}
 		};
 		struct sSeed
@@ -92,11 +92,11 @@ public:
 				{
 					sSeed seed = Seeds.front();
 					Vector3i checkRel = seed.m_Pos;
-					if(IsWet(checkRel, a_Chunk))
+					if (IsWet(checkRel, a_Chunk))
 					{
 						count++;
 						DryUp(checkRel, a_Chunk);
-						if(seed.m_Depth > 0)
+						if (seed.m_Depth > 0)
 						{
 							Seeds.emplace(checkRel.x - 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
 							Seeds.emplace(checkRel.x + 1, checkRel.y, checkRel.z, seed.m_Depth - 1);
@@ -123,7 +123,7 @@ public:
 	bool IsWet(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		BLOCKTYPE Type;
-		return ( a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type) );
+		return(a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
