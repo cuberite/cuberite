@@ -111,7 +111,7 @@ public:
 
 	void DryUp(Vector3i a_Rel, cChunk & a_Chunk)
 	{
-		a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_AIR, 0);
+		a_Chunk.UnboundedRelSetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_AIR, 0);
 	}
 
 	static bool IsWet(Vector3i a_Rel, cChunk & a_Chunk)
