@@ -38,7 +38,7 @@ public:
 		Returns TRUE if the block was changed. */
 	bool GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
-		static const std::array<Vector3i, 5> WaterCheck
+		static const std::array<Vector3i, 6> WaterCheck
 		{
 			{
 				{ 1, 0,  0},
@@ -46,6 +46,7 @@ public:
 				{ 0, 0,  1},
 				{ 0, 0, -1},
 				{ 0, 1,  0},
+				{ 0,-1,  0},
 			}
 		};
 		BLOCKTYPE TargetBlock;
