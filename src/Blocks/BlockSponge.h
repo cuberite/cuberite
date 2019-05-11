@@ -61,9 +61,7 @@ public:
 			Vector3i m_Pos;
 			int m_Depth;
 		};
-		BLOCKTYPE TargetBlock;
-		NIBBLETYPE TargetMeta;
-		a_Chunk.GetBlockTypeMeta(a_Rel.x, a_Rel.y, a_Rel.z, TargetBlock, TargetMeta);
+		NIBBLETYPE TargetMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
 		if (TargetMeta == E_META_SPONGE_DRY)
 		{
 			bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
