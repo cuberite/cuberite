@@ -16542,6 +16542,14 @@ end
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
 				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				}
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
+				}
 				esBed =
 				{
 					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",
