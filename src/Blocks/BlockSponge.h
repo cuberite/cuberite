@@ -66,11 +66,7 @@ public:
 		{
 			bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
 				{
-					BLOCKTYPE NeighborType;
-					return (
-						a_Chunk.UnboundedRelGetBlockType(a_Rel.x + a_Offset.x, a_Rel.y + a_Offset.y, a_Rel.z + a_Offset.z, NeighborType)
-						&& IsBlockWater(NeighborType)
-					);
+					return IsWet(a_Rel + a_Offset, a_Chunk);
 				}
 			);
 
@@ -118,7 +114,7 @@ public:
 		a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_AIR, 0);
 	}
 
-	bool IsWet(Vector3i a_Rel, cChunk & a_Chunk)
+	static bool IsWet(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		BLOCKTYPE Type;
 		return(a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
