@@ -60,51 +60,50 @@ public:
 			int m_Depth;
 		};
 		NIBBLETYPE TargetMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
-		if (TargetMeta == E_META_SPONGE_DRY)
+		if (TargetMeta != E_META_SPONGE_DRY)
 		{
-			bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
-				{
-					return IsWet(a_Rel + a_Offset, a_Chunk);
-				}
-			);
-
-			if (ShouldSoak)
-			{
-				std::queue<sSeed> Seeds;
-				int count = 0;
-				const int maxDepth = 7;
-				Seeds.emplace(a_Rel + WaterCheck[0], maxDepth - 1);
-				Seeds.emplace(a_Rel + WaterCheck[1], maxDepth - 1);
-				Seeds.emplace(a_Rel + WaterCheck[2], maxDepth - 1);
-				Seeds.emplace(a_Rel + WaterCheck[3], maxDepth - 1);
-				Seeds.emplace(a_Rel + WaterCheck[4], maxDepth - 1);
-				Seeds.emplace(a_Rel + WaterCheck[5], maxDepth - 1);
-
-				while (!Seeds.empty() && count < 65)
-				{
-					sSeed seed = Seeds.front();
-					Vector3i checkRel = seed.m_Pos;
-					if (IsWet(checkRel, a_Chunk))
-					{
-						count++;
-						DryUp(checkRel, a_Chunk);
-						if (seed.m_Depth > 0)
-						{
-							Seeds.emplace(checkRel + WaterCheck[0], seed.m_Depth - 1);
-							Seeds.emplace(checkRel + WaterCheck[1], seed.m_Depth - 1);
-							Seeds.emplace(checkRel + WaterCheck[2], seed.m_Depth - 1);
-							Seeds.emplace(checkRel + WaterCheck[3], seed.m_Depth - 1);
-							Seeds.emplace(checkRel + WaterCheck[4], seed.m_Depth - 1);
-							Seeds.emplace(checkRel + WaterCheck[5], seed.m_Depth - 1);
-						}
-					}
-					Seeds.pop();
-				}
-				a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_SPONGE, E_META_SPONGE_WET);
-				return true;
-			}
+			return false;
 		}
-		return false;
+
+		bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
+			{
+				return IsWet(a_Rel + a_Offset, a_Chunk);
+			}
+		);
+
+		if (! ShouldSoak)
+		{
+			return false;
+		}
+
+		std::queue<sSeed> Seeds;
+		int count = 0;
+		const int maxDepth = 7;
+		for(unsigned int i = 0; i<6; i++)
+		{
+			Seeds.emplace(a_Rel + WaterCheck[i], maxDepth - 1);
+		}
+
+		while (!Seeds.empty() && count < 65)
+		{
+			sSeed seed = Seeds.front();
+			Vector3i checkRel = seed.m_Pos;
+			if (IsWet(checkRel, a_Chunk))
+			{
+				count++;
+				DryUp(checkRel, a_Chunk);
+				if (seed.m_Depth > 0)
+				{
+					for(unsigned int i = 0; i < 6; i++)
+					{
+						Seeds.emplace(checkRel + WaterCheck[i], seed.m_Depth - 1);
+					}
+				}
+			}
+			Seeds.pop();
+		}
+		a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_SPONGE, E_META_SPONGE_WET);
+		return true;
 	}
 
 	void DryUp(Vector3i a_Rel, cChunk & a_Chunk)
