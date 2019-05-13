@@ -79,7 +79,7 @@ public:
 		std::queue<sSeed> Seeds;
 		int count = 0;
 		const int maxDepth = 7;
-		for(unsigned int i = 0; i<6; i++)
+		for (unsigned int i = 0; i < 6; i++)
 		{
 			Seeds.emplace(a_Rel + WaterCheck[i], maxDepth - 1);
 		}
@@ -94,7 +94,7 @@ public:
 				DryUp(checkRel, a_Chunk);
 				if (seed.m_Depth > 0)
 				{
-					for(unsigned int i = 0; i < 6; i++)
+					for (unsigned int i = 0; i < 6; i++)
 					{
 						Seeds.emplace(checkRel + WaterCheck[i], seed.m_Depth - 1);
 					}
