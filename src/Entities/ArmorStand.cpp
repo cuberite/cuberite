@@ -148,8 +148,6 @@ void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_I
 
 void cArmorStand::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// I don't know how and why but by default the client considere it as no gravity, so disable gravity on the server unless it fixed totally and configurable
-	// Gravity for such entity is not really important
 	super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
