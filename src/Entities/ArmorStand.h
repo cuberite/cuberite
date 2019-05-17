@@ -55,7 +55,7 @@ public:
 	bool IsSmall(void) const { return m_IsSmall; }
 
 	/** Returns true if the armor stand is a marker (null size). */
-	bool IsMarker(void) const { return m_IsMarker; }
+	bool IsMarker(bool a_IsMarker) const { return m_IsMarker; }
 
 	/** Sets if the armor stand is a normal sized one. */
 	void SetNormal(void);
