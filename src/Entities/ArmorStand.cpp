@@ -349,7 +349,7 @@ void cArmorStand::SetIsMarker(bool a_IsMarker)
 		}
 		else
 		{
-			SetNormal()
+			SetNormal();
 		}
 	}
 }
