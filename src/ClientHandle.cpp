@@ -1742,7 +1742,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 
 
 
-void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_TargetPos, bool a_IsLeftClick)
+void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_TargetPos, eHand a_Hand)
 {
 	// TODO: Let plugins interfere via a hook
 	// TODO: Take care of TargetPos position
@@ -1758,7 +1758,7 @@ void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_Target
 			{
 				return false;
 			}
-			a_Entity.OnClickedAt(*m_Player, a_TargetPos, a_IsLeftClick);
+			a_Entity.OnClickedAt(*m_Player, a_TargetPos, a_Hand);
 			return false;
 		}
 	);

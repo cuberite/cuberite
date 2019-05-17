@@ -68,14 +68,14 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick)
+void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, eHand a_Hand)
 {
 	if (IsMarker() || a_Player.GetEquippedItem().IsEmpty())  // Disallow interaction with marker and prevent acting if no item
 	{
 		return;
 	}
 
-	if (a_IsLeftClick)
+	if (a_Hand == eHand::hMain)
 	{
 		short ItemType = a_Player.GetEquippedItem().m_ItemType;
 

@@ -108,7 +108,7 @@ protected:
 
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick) override;
+	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, eHand a_Hand) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;

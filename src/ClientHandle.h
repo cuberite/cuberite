@@ -369,7 +369,7 @@ public:  // tolua_export
 	);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
-	void HandleUseEntityAt      (UInt32 a_TargetEntityID, Vector3f a_TargetPos, bool a_IsLeftClick);
+	void HandleUseEntityAt      (UInt32 a_TargetEntityID, Vector3f a_TargetPos, eHand a_Hand);
 	void HandleUseItem          (eHand a_Hand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
