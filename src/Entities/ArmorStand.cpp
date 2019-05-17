@@ -306,7 +306,6 @@ void cArmorStand::SetNormal()
 	SetHeight(0.9875);
 	SetWidth(0.25);
 	m_IsSmall = false;
-	m_IsMarker = false;
 	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
@@ -322,7 +321,6 @@ void cArmorStand::SetSmall()
 	SetHeight(0.9875/2);
 	SetWidth(0.25/2);
 	m_IsSmall = true;
-	m_IsMarker = false;
 	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
@@ -333,15 +331,28 @@ void cArmorStand::SetSmall()
 
 
 
-void cArmorStand::SetMarker()
+void cArmorStand::SetMarker(bool a_IsMarker)
 {
-	SetHeight(0);
-	SetWidth(0);
-	m_IsSmall = false;
-	m_IsMarker = true;
-	if (m_World != nullptr)
+	m_IsMarker = a_IsMarker;
+	if (a_IsMarker)  // By default set size of marker to null
 	{
-		m_World->BroadcastEntityMetadata(*this);
+		SetHeight(0);
+		SetWidth(0);
+		if (m_World != nullptr)
+		{
+			m_World->BroadcastEntityMetadata(*this);
+		}
+	}
+	else  // Else, do recalculation of size
+	{
+		if (m_IsSmall)
+		{
+			SetSmall();
+		}
+		else
+		{
+			SetNormal()
+		}
 	}
 }
 

@@ -49,10 +49,10 @@ public:
 	bool HasGravity(void) const { return (m_Gravity < 0.0f) || (m_Gravity > 0.0f); }
 
 	/** Returns true if the armor stand is a normal sized one. */
-	bool IsNormal(void) const { return !m_IsSmall && !m_IsMarker; }
+	bool IsNormal(void) const { return !m_IsSmall; }
 
 	/** Returns true if the armor stand is a small one. */
-	bool IsSmall(void) const { return m_IsSmall && !m_IsMarker; }
+	bool IsSmall(void) const { return m_IsSmall; }
 
 	/** Returns true if the armor stand is a marker (null size). */
 	bool IsMarker(void) const { return m_IsMarker; }
