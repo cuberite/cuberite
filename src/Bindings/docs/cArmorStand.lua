@@ -498,6 +498,22 @@ return
 					},
 				},
 			},
+			SetIsMarker =
+			{
+				{
+					Params =
+					{
+						{
+							Type = "bool",
+							Name = "a_IsMarker",
+						},
+					},
+					Returns =
+					{
+					},
+					Desc = "Sets wathever the armor stand is a marker (null size by default).",
+				},
+			},
 			SetLeftArmRotation =
 			{
 				{
@@ -526,18 +542,6 @@ return
 					Returns =
 					{
 					},
-				},
-			},
-			SetMarker =
-			{
-				{
-					Params =
-					{
-					},
-					Returns =
-					{
-					},
-					Desc = "Sets if the armor stand is a marker (null size).",
 				},
 			},
 			SetNormal =
