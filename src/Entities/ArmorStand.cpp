@@ -329,7 +329,7 @@ void cArmorStand::SetSmall()
 
 
 
-void cArmorStand::SetMarker(bool a_IsMarker)
+void cArmorStand::(bool a_IsMarker)
 {
 	m_IsMarker = a_IsMarker;
 	if (a_IsMarker)  // By default set size of marker to null
