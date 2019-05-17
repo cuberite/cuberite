@@ -107,7 +107,7 @@ void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, eHand a_
 			}
 			else if (ItemCategory::IsBoots(ItemType))
 			{
-				if (GetEquippedLeggings().IsEmpty())
+				if (GetEquippedBoots().IsEmpty())
 				{
 					return;
 				}
