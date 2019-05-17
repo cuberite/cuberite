@@ -2066,7 +2066,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		bool IsMarker = ((a_NBT.GetByte(IsMarkerIdx) == 1) ? true : false);
 		if (IsMarker)
 		{
-			ArmorStand->SetMarker(true);
+			ArmorStand->SetIsMarker(true);
 		}
 	}
 

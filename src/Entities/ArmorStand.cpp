@@ -27,12 +27,12 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	m_RightArmRotation(-15.0, 0.0, 10.0),
 	m_LeftLegRotation(-1.0, 0.0, -1.0),
 	m_RightLegRotation(1.0, 0.0, 1.0),
-	m_LeftHand(cItem()),
-	m_RightHand(cItem()),
-	m_Helmet(cItem()),
-	m_ChestPlate(cItem()),
-	m_Leggings(cItem()),
-	m_Boots(cItem())
+	m_LeftHand(E_BLOCK_AIR),
+	m_RightHand(E_BLOCK_AIR),
+	m_Helmet(E_BLOCK_AIR),
+	m_ChestPlate(E_BLOCK_AIR),
+	m_Leggings(E_BLOCK_AIR),
+	m_Boots(E_BLOCK_AIR)
 {
 	SetMaxHealth(1);
 	SetHealth(1);
@@ -329,7 +329,7 @@ void cArmorStand::SetSmall()
 
 
 
-void cArmorStand::(bool a_IsMarker)
+void cArmorStand::SetIsMarker(bool a_IsMarker)
 {
 	m_IsMarker = a_IsMarker;
 	if (a_IsMarker)  // By default set size of marker to null
