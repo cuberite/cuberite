@@ -323,7 +323,7 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return NewHandle;
+	return std::move(NewHandle);
 }
 
 
