@@ -9753,11 +9753,18 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the armor stand is a marker (null size).",
+					Notes = "Returns true if the armor stand is a marker (with null size by default).",
 				},
-				SetMarker =
+				SetIsMarker =
 				{
-					Notes = "Sets the armor stand as a marker.",
+					Params =
+					{
+						{
+							Name = "IsMarker",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets wathever the armor stand is a marker (null size by default).",
 				},
 				HasArms =
 				{
