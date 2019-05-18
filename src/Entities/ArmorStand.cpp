@@ -26,13 +26,7 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	m_LeftArmRotation(-10.0, 0.0, -10.0),
 	m_RightArmRotation(-15.0, 0.0, 10.0),
 	m_LeftLegRotation(-1.0, 0.0, -1.0),
-	m_RightLegRotation(1.0, 0.0, 1.0),
-	m_LeftHand(E_BLOCK_AIR),
-	m_RightHand(E_BLOCK_AIR),
-	m_Helmet(E_BLOCK_AIR),
-	m_ChestPlate(E_BLOCK_AIR),
-	m_Leggings(E_BLOCK_AIR),
-	m_Boots(E_BLOCK_AIR)
+	m_RightLegRotation(1.0, 0.0, 1.0)
 {
 	SetMaxHealth(1);
 	SetHealth(1);
