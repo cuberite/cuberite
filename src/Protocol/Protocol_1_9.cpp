@@ -2792,7 +2792,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
-			HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);  // Testing the changement ... Must verify if it's UInt32 or Int32
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), HandIntToEnum(Hand));
 			break;
 		}
