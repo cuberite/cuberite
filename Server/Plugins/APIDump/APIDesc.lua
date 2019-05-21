@@ -9653,7 +9653,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the player visibility to other players",
+					Notes = "Sets the visibility to other players",
 				},
 				HasCustomName =
 				{
