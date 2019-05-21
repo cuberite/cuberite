@@ -9684,7 +9684,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string.",
+					Notes = "Sets the custom name of the armor stand. To disable the custom name, simply set an empty string. Custom name stay invisible unless IsCustomNameAlwaysVisible is set to true.",
 				},
 				SetCustomNameAlwaysVisible =
 				{
@@ -9695,7 +9695,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
+					Notes = "Sets the custom name visiblity of the armor stand. If it's false, you don't see the name at all. If it's true, you always see the custom name.",
 				},
 				IsCustomNameAlwaysVisible =
 				{
@@ -9705,7 +9705,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
+					Notes = "Is the custom name of the armor stand always visible? If not, you don't see the name at all.",
 				},
 				HasGravity =
 				{
@@ -9753,7 +9753,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the armor stand is a marker (with null size by default).",
+					Notes = "Returns true if the armor stand is a marker (does not interact).",
 				},
 				SetIsMarker =
 				{
@@ -9795,7 +9795,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the armor stand has base platform.",
+					Notes = "Returns true if the armor stand has a base platform.",
 				},
 				SetHasBasePlate =
 				{
@@ -9806,7 +9806,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets whatever armor stand has base platform.",
+					Notes = "Sets whether the armor stand has a base platform.",
 				},
 				GetHeadRotation =
 				{

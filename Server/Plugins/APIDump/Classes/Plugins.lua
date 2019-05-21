@@ -866,7 +866,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			HOOK_PLAYER_CLICKING_AT_ENTITY =
 			{
-				Notes = "Called when the client sends the UseEntityAt packet.",
+				Notes = "Called when the client sends the UseEntity packet with target coordinates.",
 			},
 			HOOK_PLAYER_SHOOTING =
 			{
