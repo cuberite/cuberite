@@ -3662,7 +3662,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is a {{cArmorStand|armor stand}}.",
+					Notes = "Returns true if the entity is an {{cArmorStand|armor stand}}.",
 				},
 				IsBoat =
 				{
