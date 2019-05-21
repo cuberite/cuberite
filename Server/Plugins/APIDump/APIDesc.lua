@@ -4455,7 +4455,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etArmorStand =
 				{
-					Notes = "The entity is a {{cArmorStand}}",
+					Notes = "The entity is an {{cArmorStand}}",
 				},
 				etBoat =
 				{
