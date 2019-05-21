@@ -9673,7 +9673,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+					Notes = "Returns the custom name of this armor stand. If the player hasn't a custom name, it will return an empty string.",
 				},
 				SetCustomName =
 				{
