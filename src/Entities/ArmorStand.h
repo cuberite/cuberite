@@ -63,7 +63,7 @@ public:
 	/** Sets if the armor stand is a small one. */
 	void SetSmall(void);
 
-	/** Sets whether the armor stand is a marker (null size by default). */
+	/** Sets whether the armor stand is a marker (does not interact). */
 	void SetIsMarker(bool a_IsMarker);
 
 	/** Returns true if the armor stand have amrs. */
