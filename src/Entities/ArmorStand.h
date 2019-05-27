@@ -70,7 +70,7 @@ public:
 	bool HasArms(void) const { return m_HasArms; }
 	void SetHasArms(bool a_HasArms);
 
-	/** Returns true if the armor stand have a base platform. */
+	/** Returns true if the armor stand has a base platform. */
 	bool HasBasePlate(void) const { return m_HasBasePlate; }
 	void SetHasBasePlate(bool a_HasBasePlate);
 
