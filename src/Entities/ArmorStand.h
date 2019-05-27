@@ -25,7 +25,7 @@ public:
 	/** Returns true if the armor stand is invisible. */
 	virtual bool IsInvisible() const override;
 
-	/** Set whatever the armorstand is visible */
+	/** Set whether the armor stand is visible */
 	void SetVisible(bool a_IsVisible);
 
 	/** Returns true if the armor stand has a custom name. */
@@ -63,7 +63,7 @@ public:
 	/** Sets if the armor stand is a small one. */
 	void SetSmall(void);
 
-	/** Sets wathever the armor stand is a marker (null size by default). */
+	/** Sets whether the armor stand is a marker (null size by default). */
 	void SetIsMarker(bool a_IsMarker);
 
 	/** Returns true if the armor stand have amrs. */
