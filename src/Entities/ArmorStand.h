@@ -66,7 +66,7 @@ public:
 	/** Sets whether the armor stand is a marker (does not interact). */
 	void SetIsMarker(bool a_IsMarker);
 
-	/** Returns true if the armor stand have amrs. */
+	/** Returns true if the armor stand has amrs. */
 	bool HasArms(void) const { return m_HasArms; }
 	void SetHasArms(bool a_HasArms);
 

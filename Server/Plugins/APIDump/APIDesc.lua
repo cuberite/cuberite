@@ -9785,7 +9785,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets whatever armor stand has arms.",
+					Notes = "Sets whether armor stand has arms.",
 				},
 				HasBasePlate =
 				{
