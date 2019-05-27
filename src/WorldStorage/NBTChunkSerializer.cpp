@@ -901,11 +901,6 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());  // Vanilla compilant
 		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));  // Vanilla compilant
 		m_Writer.BeginList("Pose", TAG_Compound);  // Vanilla compilant
-			m_Writer.BeginList("Head", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().z);
-			m_Writer.EndList();
 			m_Writer.BeginList("Body", TAG_Double);
 				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().x);
 				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().y);
@@ -930,6 +925,11 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().x);
 				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
 				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
+			m_Writer.EndList();
+			m_Writer.BeginList("Head", TAG_Double);
+				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().x);
+				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().y);
+				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().z);
 			m_Writer.EndList();
 		m_Writer.EndList();
 		m_Writer.BeginList("ArmorItems", TAG_Compound);
