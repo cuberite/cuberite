@@ -892,15 +892,15 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ArmorStand, "ArmorStand");
-		m_Writer.AddByte("Small", a_ArmorStand->IsSmall() ? 1 : 0);  // Vanilla compilant
-		m_Writer.AddByte("NoGravity", a_ArmorStand->HasGravity() ? 0 : 1);  // Vanilla compilant
-		m_Writer.AddByte("Marker", a_ArmorStand->IsMarker() ? 1 : 0);  // Vanilla compilant
-		m_Writer.AddByte("ShowArms", a_ArmorStand->HasArms() ? 1 : 0);  // Vanilla compilant
-		m_Writer.AddByte("NoBasePlate", a_ArmorStand->HasBasePlate() ? 0 : 1);  // Vanilla compilant
-		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);  // Vanilla compilant
-		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());  // Vanilla compilant
-		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));  // Vanilla compilant
-		m_Writer.BeginList("Pose", TAG_Compound);  // Vanilla compilant
+		m_Writer.AddByte("Small", a_ArmorStand->IsSmall() ? 1 : 0);
+		m_Writer.AddByte("NoGravity", a_ArmorStand->HasGravity() ? 0 : 1);
+		m_Writer.AddByte("Marker", a_ArmorStand->IsMarker() ? 1 : 0);
+		m_Writer.AddByte("ShowArms", a_ArmorStand->HasArms() ? 1 : 0);
+		m_Writer.AddByte("NoBasePlate", a_ArmorStand->HasBasePlate() ? 0 : 1);
+		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
+		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());
+		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
+		m_Writer.BeginList("Pose", TAG_Compound);
 			m_Writer.BeginList("Body", TAG_Double);
 				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().x);
 				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().y);
