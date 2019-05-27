@@ -457,7 +457,7 @@ void cProtocol_1_9_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// See https://wiki.vg/Protocol#Entity_Equipment
 	// TODO: Enable player left hand. Currently only user by armor stand.
-	if (a_SlotNum == 5)  // Left hand
+	if (a_SlotNum == 5)  // Left Hand. For compatibility issues, left hand was added at the end and not at the ID 1 like wants the protocol since 1.9
 	{
 		a_SlotNum = 1;
 	}
