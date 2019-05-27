@@ -9764,7 +9764,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets wathever the armor stand is a marker (null size by default).",
+					Notes = "Sets wathever the armor stand is a marker (does not interact).",
 				},
 				HasArms =
 				{
