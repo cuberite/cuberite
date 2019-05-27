@@ -46,7 +46,7 @@ public:
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
 	/** Returns true if the armor stand has gravity. */
-	bool HasGravity(void) const { return (m_Gravity < 0.0f) || (m_Gravity > 0.0f); }
+	bool HasGravity(void) const { return (std::abs(m_Gravity) > FLT_EPSILON); }
 
 	/** Returns true if the armor stand is a normal sized one. */
 	bool IsNormal(void) const { return !m_IsSmall; }
