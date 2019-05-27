@@ -74,19 +74,19 @@ public:
 	bool HasBasePlate(void) const { return m_HasBasePlate; }
 	void SetHasBasePlate(bool a_HasBasePlate);
 
-	Vector3d GetHeadRotation(void) const { return m_HeadRotation; }
-	Vector3d GetBodyRotation(void) const { return m_BodyRotation; }
-	Vector3d GetLeftArmRotation(void) const { return m_LeftArmRotation; }
-	Vector3d GetRightArmRotation(void) const { return m_RightArmRotation; }
-	Vector3d GetLeftLegRotation(void) const { return m_LeftLegRotation; }
-	Vector3d GetRightLegRotation(void) const { return m_RightLegRotation; }
+	Vector3f GetHeadRotation(void) const { return m_HeadRotation; }
+	Vector3f GetBodyRotation(void) const { return m_BodyRotation; }
+	Vector3f GetLeftArmRotation(void) const { return m_LeftArmRotation; }
+	Vector3f GetRightArmRotation(void) const { return m_RightArmRotation; }
+	Vector3f GetLeftLegRotation(void) const { return m_LeftLegRotation; }
+	Vector3f GetRightLegRotation(void) const { return m_RightLegRotation; }
 
-	void SetHeadRotation(Vector3d a_HeadRotation);
-	void SetBodyRotation(Vector3d a_BodyRotation);
-	void SetLeftArmRotation(Vector3d a_LeftArmRotation);
-	void SetRightArmRotation(Vector3d a_RightArmRotation);
-	void SetLeftLegRotation(Vector3d a_LeftLegRotation);
-	void SetRightLegRotation(Vector3d a_RightLegRotation);
+	void SetHeadRotation(Vector3f a_HeadRotation);
+	void SetBodyRotation(Vector3f a_BodyRotation);
+	void SetLeftArmRotation(Vector3f a_LeftArmRotation);
+	void SetRightArmRotation(Vector3f a_RightArmRotation);
+	void SetLeftLegRotation(Vector3f a_LeftLegRotation);
+	void SetRightLegRotation(Vector3f a_RightLegRotation);
 
 	virtual cItem GetEquippedWeapon(void) const override { return m_RightHand; }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_LeftHand; }
@@ -123,12 +123,12 @@ protected:
 	bool m_IsMarker;
 	bool m_HasArms;
 	bool m_HasBasePlate;
-	Vector3d m_HeadRotation;
-	Vector3d m_BodyRotation;
-	Vector3d m_LeftArmRotation;
-	Vector3d m_RightArmRotation;
-	Vector3d m_LeftLegRotation;
-	Vector3d m_RightLegRotation;
+	Vector3f m_HeadRotation;
+	Vector3f m_BodyRotation;
+	Vector3f m_LeftArmRotation;
+	Vector3f m_RightArmRotation;
+	Vector3f m_LeftLegRotation;
+	Vector3f m_RightLegRotation;
 
 	cItem m_LeftHand;
 	cItem m_RightHand;

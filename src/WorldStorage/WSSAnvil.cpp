@@ -2093,81 +2093,71 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 
 	/**
-		Rotations
+		Rotations aka Poses
 	*/
 
-	int Rotations = a_NBT.FindChildByName(a_TagIdx, "Rotations");
-	if ((Rotations >= 0) && (a_NBT.GetType(Rotations) == TAG_List))
+	int PosesIdx = a_NBT.FindChildByName(a_TagIdx, "Pose");
+	if ((PosesIdx >= 0) && (a_NBT.GetType(PosesIdx) == TAG_Compound))
 	{
-		for (int Child = a_NBT.GetFirstChild(Rotations); Child != -1; Child = a_NBT.GetNextSibling(Child))
+		int Body = a_NBT.FindChildByName(PosesIdx, "Body");
+		if ((Body >= 0) && (a_NBT.GetType(Body) == TAG_List))
 		{
-			int Body = a_NBT.FindChildByName(Child, "Body");
-			if ((Body >= 0) && (a_NBT.GetType(Body) == TAG_Double))
+			float BodyRotation[3];
+			if (LoadFloatsListFromNBT(BodyRotation, 3, a_NBT, Body))
 			{
-				double BodyRotation[3];
-				if (LoadDoublesListFromNBT(BodyRotation, 3, a_NBT, Body))
-				{
-					ArmorStand->SetBodyRotation(Vector3d(BodyRotation[0], BodyRotation[1], BodyRotation[2]));
-				}
-				continue;
+				ArmorStand->SetBodyRotation(Vector3f(BodyRotation[0], BodyRotation[1], BodyRotation[2]));
 			}
+		}
 
-			int LeftArm = a_NBT.FindChildByName(Child, "LeftArm");
-			if ((LeftArm >= 0) && (a_NBT.GetType(LeftArm) == TAG_Double))
+		int LeftArm = a_NBT.FindChildByName(PosesIdx, "LeftArm");
+		if ((LeftArm >= 0) && (a_NBT.GetType(LeftArm) == TAG_List))
+		{
+			float LeftArmRotation[3];
+			if (LoadFloatsListFromNBT(LeftArmRotation, 3, a_NBT, LeftArm))
 			{
-				double LeftArmRotation[3];
-				if (LoadDoublesListFromNBT(LeftArmRotation, 3, a_NBT, LeftArm))
-				{
-					ArmorStand->SetLeftArmRotation(Vector3d(LeftArmRotation[0], LeftArmRotation[1], LeftArmRotation[2]));
-				}
-				continue;
+				ArmorStand->SetLeftArmRotation(Vector3f(LeftArmRotation[0], LeftArmRotation[1], LeftArmRotation[2]));
 			}
+		}
 
-			int RightArm = a_NBT.FindChildByName(Child, "RightArm");
-			if ((RightArm >= 0) && (a_NBT.GetType(RightArm) == TAG_Double))
+		int RightArm = a_NBT.FindChildByName(PosesIdx, "RightArm");
+		if ((RightArm >= 0) && (a_NBT.GetType(RightArm) == TAG_List))
+		{
+			float RightArmRotation[3];
+			if (LoadFloatsListFromNBT(RightArmRotation, 3, a_NBT, RightArm))
 			{
-				double RightArmRotation[3];
-				if (LoadDoublesListFromNBT(RightArmRotation, 3, a_NBT, RightArm))
-				{
-					ArmorStand->SetRightArmRotation(Vector3d(RightArmRotation[0], RightArmRotation[1], RightArmRotation[2]));
-				}
-				continue;
+				ArmorStand->SetRightArmRotation(Vector3f(RightArmRotation[0], RightArmRotation[1], RightArmRotation[2]));
 			}
+		}
 
-			int LeftLeg = a_NBT.FindChildByName(Child, "LeftLeg");
-			if ((LeftLeg >= 0) && (a_NBT.GetType(LeftLeg) == TAG_Double))
+		int LeftLeg = a_NBT.FindChildByName(PosesIdx, "LeftLeg");
+		if ((LeftLeg >= 0) && (a_NBT.GetType(LeftLeg) == TAG_List))
+		{
+			float LeftLegRotation[3];
+			if (LoadFloatsListFromNBT(LeftLegRotation, 3, a_NBT, LeftLeg))
 			{
-				double LeftLegRotation[3];
-				if (LoadDoublesListFromNBT(LeftLegRotation, 3, a_NBT, LeftLeg))
-				{
-					ArmorStand->SetLeftLegRotation(Vector3d(LeftLegRotation[0], LeftLegRotation[1], LeftLegRotation[2]));
-				}
-				continue;
+				ArmorStand->SetLeftLegRotation(Vector3f(LeftLegRotation[0], LeftLegRotation[1], LeftLegRotation[2]));
 			}
+		}
 
-			int RightLeg = a_NBT.FindChildByName(Child, "RightLeg");
-			if ((RightLeg >= 0) && (a_NBT.GetType(RightLeg) == TAG_Double))
+		int RightLeg = a_NBT.FindChildByName(PosesIdx, "RightLeg");
+		if ((RightLeg >= 0) && (a_NBT.GetType(RightLeg) == TAG_List))
+		{
+			float RightLegRotation[3];
+			if (LoadFloatsListFromNBT(RightLegRotation, 3, a_NBT, RightLeg))
 			{
-				double RightLegRotation[3];
-				if (LoadDoublesListFromNBT(RightLegRotation, 3, a_NBT, RightLeg))
-				{
-					ArmorStand->SetRightLegRotation(Vector3d(RightLegRotation[0], RightLegRotation[1], RightLegRotation[2]));
-				}
-				continue;
+				ArmorStand->SetRightLegRotation(Vector3f(RightLegRotation[0], RightLegRotation[1], RightLegRotation[2]));
 			}
+		}
 
-			int Head = a_NBT.FindChildByName(Child, "Head");
-			if ((Head >= 0) && (a_NBT.GetType(Head) == TAG_Double))
+		int Head = a_NBT.FindChildByName(PosesIdx, "Head");
+		if ((Head >= 0) && (a_NBT.GetType(Head) == TAG_List))
+		{
+			float HeadRotation[3];
+			if (LoadFloatsListFromNBT(HeadRotation, 3, a_NBT, Head))
 			{
-				double HeadRotation[3];
-				if (LoadDoublesListFromNBT(HeadRotation, 3, a_NBT, Head))
-				{
-					ArmorStand->SetHeadRotation(Vector3d(HeadRotation[0], HeadRotation[1], HeadRotation[2]));
-				}
-				continue;
+				ArmorStand->SetHeadRotation(Vector3f(HeadRotation[0], HeadRotation[1], HeadRotation[2]));
 			}
-
-		}  // for itr - ItemDefs[]
+		}
 	}
 
 

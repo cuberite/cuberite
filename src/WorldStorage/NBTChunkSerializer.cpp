@@ -900,38 +900,38 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 		m_Writer.AddByte("Invisible", a_ArmorStand->IsInvisible() ? 1 : 0);
 		m_Writer.AddString("CustomName", a_ArmorStand->GetCustomName());
 		m_Writer.AddByte("CustomNameVisible", static_cast<Byte>(a_ArmorStand->IsCustomNameAlwaysVisible()));
-		m_Writer.BeginList("Pose", TAG_Compound);
-			m_Writer.BeginList("Body", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetBodyRotation().z);
+		m_Writer.BeginCompound("Pose");
+			m_Writer.BeginList("Body", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetBodyRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetBodyRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetBodyRotation().z);
 			m_Writer.EndList();
-			m_Writer.BeginList("LeftArm", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftArmRotation().z);
+			m_Writer.BeginList("LeftArm", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftArmRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftArmRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftArmRotation().z);
 			m_Writer.EndList();
-			m_Writer.BeginList("RightArm", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightArmRotation().z);
+			m_Writer.BeginList("RightArm", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightArmRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightArmRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightArmRotation().z);
 			m_Writer.EndList();
-			m_Writer.BeginList("LeftLeg", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetLeftLegRotation().z);
+			m_Writer.BeginList("LeftLeg", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftLegRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftLegRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetLeftLegRotation().z);
 			m_Writer.EndList();
-			m_Writer.BeginList("RightLeg", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetRightLegRotation().z);
+			m_Writer.BeginList("RightLeg", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightLegRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightLegRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetRightLegRotation().z);
 			m_Writer.EndList();
-			m_Writer.BeginList("Head", TAG_Double);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().x);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().y);
-				m_Writer.AddDouble("", a_ArmorStand->GetHeadRotation().z);
+			m_Writer.BeginList("Head", TAG_Float);
+				m_Writer.AddFloat("", a_ArmorStand->GetHeadRotation().x);
+				m_Writer.AddFloat("", a_ArmorStand->GetHeadRotation().y);
+				m_Writer.AddFloat("", a_ArmorStand->GetHeadRotation().z);
 			m_Writer.EndList();
-		m_Writer.EndList();
+		m_Writer.EndCompound();
 		m_Writer.BeginList("ArmorItems", TAG_Compound);
 			if (!a_ArmorStand->GetEquippedBoots().IsEmpty())
 			{
@@ -960,7 +960,6 @@ void cNBTChunkSerializer::AddArmorStandEntity(cArmorStand * a_ArmorStand)
 				AddItem(a_ArmorStand->GetOffHandEquipedItem(), 1);
 			}
 		m_Writer.EndList();
-
 	m_Writer.EndCompound();
 }
 

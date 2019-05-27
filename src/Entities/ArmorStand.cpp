@@ -378,7 +378,7 @@ void cArmorStand::SetHasBasePlate(bool a_HasBasePlate)
 
 
 
-void cArmorStand::SetHeadRotation(Vector3d a_HeadRotation)
+void cArmorStand::SetHeadRotation(Vector3f a_HeadRotation)
 {
 	m_HeadRotation = a_HeadRotation;
 	if (m_World != nullptr)
@@ -391,7 +391,7 @@ void cArmorStand::SetHeadRotation(Vector3d a_HeadRotation)
 
 
 
-void cArmorStand::SetBodyRotation(Vector3d a_BodyRotation)
+void cArmorStand::SetBodyRotation(Vector3f a_BodyRotation)
 {
 	m_BodyRotation = a_BodyRotation;
 	if (m_World != nullptr)
@@ -404,7 +404,7 @@ void cArmorStand::SetBodyRotation(Vector3d a_BodyRotation)
 
 
 
-void cArmorStand::SetLeftArmRotation(Vector3d a_LeftArmRotation)
+void cArmorStand::SetLeftArmRotation(Vector3f a_LeftArmRotation)
 {
 	m_LeftArmRotation = a_LeftArmRotation;
 	if (m_World != nullptr)
@@ -417,7 +417,7 @@ void cArmorStand::SetLeftArmRotation(Vector3d a_LeftArmRotation)
 
 
 
-void cArmorStand::SetRightArmRotation(Vector3d a_RightArmRotation)
+void cArmorStand::SetRightArmRotation(Vector3f a_RightArmRotation)
 {
 	m_RightArmRotation = a_RightArmRotation;
 	if (m_World != nullptr)
@@ -430,7 +430,7 @@ void cArmorStand::SetRightArmRotation(Vector3d a_RightArmRotation)
 
 
 
-void cArmorStand::SetLeftLegRotation(Vector3d a_LeftLegRotation)
+void cArmorStand::SetLeftLegRotation(Vector3f a_LeftLegRotation)
 {
 	m_LeftLegRotation = a_LeftLegRotation;
 	if (m_World != nullptr)
@@ -443,7 +443,7 @@ void cArmorStand::SetLeftLegRotation(Vector3d a_LeftLegRotation)
 
 
 
-void cArmorStand::SetRightLegRotation(Vector3d a_RightLegRotation)
+void cArmorStand::SetRightLegRotation(Vector3f a_RightLegRotation)
 {
 	m_RightLegRotation = a_RightLegRotation;
 	if (m_World != nullptr)
