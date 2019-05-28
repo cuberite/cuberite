@@ -411,6 +411,10 @@ void cProtocol_1_8_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	if (a_SlotNum == 5)  // Left Hand. Cancel packet because left hand doesn't exists before 1.9
+	{
+		return;
+	}
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEInt16(a_SlotNum);
