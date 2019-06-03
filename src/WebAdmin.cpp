@@ -376,13 +376,13 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	}
 
 	// Remove all ".." strings:
-	ReplaceString(FileURL, "..", "");
+	// ReplaceString(FileURL, "..", "");
 
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
-	AString ContentType;
+	AString ContentType = "text/html";
 	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
-	if (cFile::IsFile(Path))
+	if (FileURL.find("../") == AString::npos && cFile::IsFile(Path))
 	{
 		cFile File(Path, cFile::fmRead);
 		AString FileContent;
@@ -395,10 +395,10 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 				ContentType = GetContentTypeFromFileExt(Path.substr(LastPointPosition + 1));
 			}
 		}
-	}
-	if (ContentType.empty())
-	{
-		ContentType = "application/unknown";
+        if (ContentType.empty())
+        {
+            ContentType = "application/unknown";
+        }
 	}
 
 	// Send the response:
