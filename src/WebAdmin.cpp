@@ -375,8 +375,8 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 		}
 	}
 
-	// Remove all "../" strings:
-	ReplaceString(FileURL, "../", "");
+	// Remove all ".." strings:
+	ReplaceString(FileURL, "..", "");
 
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
