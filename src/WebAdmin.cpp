@@ -380,7 +380,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	AString ContentType = "text/html";
 	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
 
-    // Return 404 if the file is not found, or the URL contains '../' (for security reasons)
+	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
 	if (FileURL.find("../") == AString::npos && cFile::IsFile(Path))
 	{
 		cFile File(Path, cFile::fmRead);
@@ -394,10 +394,10 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 				ContentType = GetContentTypeFromFileExt(Path.substr(LastPointPosition + 1));
 			}
 		}
-        if (ContentType.empty())
-        {
-            ContentType = "application/unknown";
-        }
+		if (ContentType.empty())
+		{
+			ContentType = "application/unknown";
+		}
 	}
 
 	// Send the response:
