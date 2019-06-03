@@ -381,7 +381,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
 
 	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
-	if (FileURL.find("../") == AString::npos && cFile::IsFile(Path))
+	if ((FileURL.find("../") == AString::npos) && cFile::IsFile(Path))
 	{
 		cFile File(Path, cFile::fmRead);
 		AString FileContent;
