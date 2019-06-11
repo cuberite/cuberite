@@ -45,7 +45,7 @@ void cBrewingRecipes::ReloadRecipes(void)
 			ParsingLine.erase(FirstCommentSymbol);
 		}
 
-		if (std::all_of(ParsingLine.cbegin(), ParsingLine.cend(), isspace))
+		if (IsOnlyWhitespace(ParsingLine))
 		{
 			// Ignore empty and whitespace only lines
 			continue;

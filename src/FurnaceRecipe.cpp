@@ -76,7 +76,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 			ParsingLine.erase(ParsingLine.begin() + static_cast<const long>(FirstCommentSymbol), ParsingLine.end());
 		}
 
-		if (std::all_of(ParsingLine.cbegin(), ParsingLine.cend(), isspace))
+		if (IsOnlyWhitespace(ParsingLine))
 		{
 			// Ignore empty and whitespace only lines
 			continue;

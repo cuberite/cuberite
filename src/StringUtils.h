@@ -148,6 +148,9 @@ extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 /** Converts a string into a float. Returns false if the conversion fails. */
 extern bool StringToFloat(const AString & a_String, float & a_Num);
 
+/** Returns true if only whitespace characters are present in the string */
+bool IsOnlyWhitespace(const AString & a_String);
+
 
 
 
