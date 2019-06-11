@@ -24,15 +24,12 @@ Implements the 1.9 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
-#include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../Statistics.h"
 
 #include "../WorldStorage/FastNBT.h"
-#include "../WorldStorage/EnchantmentSerializer.h"
 
-#include "../Entities/Boat.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -47,7 +44,6 @@ Implements the 1.9 protocol classes:
 #include "../Items/ItemSpawnEgg.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
-#include "../UI/Window.h"
 #include "../UI/HorseWindow.h"
 
 #include "../BlockEntities/BeaconEntity.h"
@@ -154,7 +150,16 @@ cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_Ser
 				UUID.FromString(Params[2]);
 				m_Client->SetUUID(UUID);
 
-				m_Client->SetProperties(Params[3]);
+				Json::Value root;
+				Json::Reader reader;
+				if (!reader.parse(Params[3], root))
+				{
+					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+				}
+				else
+				{
+					m_Client->SetProperties(root);
+				}
 			}
 			else
 			{
