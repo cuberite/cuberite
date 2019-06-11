@@ -1071,3 +1071,11 @@ bool StringToFloat(const AString & a_String, float & a_Num)
 	return true;
 }
 
+
+
+
+
+bool IsOnlyWhitespace(const AString & a_String)
+{
+	return std::all_of(a_String.cbegin(), a_String.cend(), isspace);
+}
