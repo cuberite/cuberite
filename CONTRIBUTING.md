@@ -84,7 +84,12 @@ The following rules are not strictly enforced, but if you follow them, you will 
  - Focus on one thing only. Each PR should avoid making unrelated changes - those makes the history more difficult to understand later on, and they make the review a headache.
  - Feel free to rebase, amend or otherwise manipulate the commits in the PR (of course, as long as you're the only one working on the PR). We mostly squash-merge PRs, so your internal commit structure will not be important in the end.
  - If the PR is about one change, but it makes sense to keep the change broken into several commits, make sure each such commit is compilable, encapsulated, and possibly add a note to the PR description so that we consider this.
-	
+
+Issue triage [![Open Source Helpers](https://www.codetriage.com/cuberite/cuberite/badges/users.svg)](https://www.codetriage.com/cuberite/cuberite)
+------------------
+
+You can contribute by triaging issues which may include reproducing bug reports or asking for vital information, such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to cuberite on CodeTriage](https://www.codetriage.com/cuberite/cuberite).
+
 Copyright
 ---------
 
