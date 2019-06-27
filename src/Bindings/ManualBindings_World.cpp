@@ -974,6 +974,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithEntityByID",             DoWithID< cWorld, cEntity,             &cWorld::DoWithEntityByID>);
 			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithHopperAt",               DoWithXYZ<cWorld, cHopperEntity,       &cWorld::DoWithHopperAt>);
 			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
 			tolua_function(tolua_S, "DoWithNearestPlayer",          tolua_cWorld_DoWithNearestPlayer);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
