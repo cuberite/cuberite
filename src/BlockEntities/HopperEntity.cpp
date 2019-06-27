@@ -20,9 +20,19 @@
 cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
-	m_LastMoveItemsOutTick(0)
+	m_LastMoveItemsOutTick(0),
+	m_Locked(false)
 {
 	ASSERT(a_BlockType == E_BLOCK_HOPPER);
+}
+
+
+
+
+
+void cHopperEntity::SetLocked(bool a_Value)
+{
+	m_Locked = a_Value;
 }
 
 
@@ -71,9 +81,12 @@ bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 
 	bool isDirty = false;
-	isDirty = MoveItemsIn  (a_Chunk, CurrentTick) || isDirty;
-	isDirty = MovePickupsIn(a_Chunk, CurrentTick) || isDirty;
-	isDirty = MoveItemsOut (a_Chunk, CurrentTick) || isDirty;
+	if (!m_Locked)
+	{
+		isDirty = MoveItemsIn  (a_Chunk, CurrentTick) || isDirty;
+		isDirty = MovePickupsIn(a_Chunk, CurrentTick) || isDirty;
+		isDirty = MoveItemsOut (a_Chunk, CurrentTick) || isDirty;
+	}
 	return isDirty;
 }
 
