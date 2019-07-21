@@ -898,7 +898,8 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
 		return 0;
 	}
-	if (Position == nullptr) {
+	if (Position == nullptr)
+	{
 		tolua_error(tolua_S, "Error in function 'SpawnSplitExperienceOrbs' arg #2. Value must not be nil.", nullptr);
 		return 0;
 	}
