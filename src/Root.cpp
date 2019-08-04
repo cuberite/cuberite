@@ -61,6 +61,7 @@ cRoot::cRoot(void) :
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
 {
+	Temporary::RegisterAllBlockHandlers(m_BlockTypeRegistry);
 	s_Root = this;
 	m_InputThreadRunFlag.clear();
 }

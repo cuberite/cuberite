@@ -172,7 +172,8 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	E_BLOCK_ACTIVATOR_RAIL = 157,
 
 	E_BLOCK_DROPPER = 158,
-	E_BLOCK_STAINED_CLAY = 159,
+	E_BLOCK_STAINED_CLAY = 159,  // Synonym to terracotta
+	E_BLOCK_TERRACOTTA = 159,  // Synonym to stained clay
 	E_BLOCK_STAINED_GLASS_PANE = 160,
 	E_BLOCK_NEW_LEAVES = 161,  // Acacia and Dark Oak IDs in Minecraft 1.7.x
 	E_BLOCK_NEW_LOG = 162,
@@ -273,6 +274,8 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
 	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
+
+	E_BLOCK_UNFINISHED = 254,  // Special type used as a placeholder, signifying that the block lacks implementation
 
 	// Synonym or ID compatibility
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
