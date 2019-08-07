@@ -57,7 +57,7 @@ struct TakeDamageInfo
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
 	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
 	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
 	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
