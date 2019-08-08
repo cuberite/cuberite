@@ -3992,8 +3992,7 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 		self->Assign(*pt1, *pt2);
 		return 0;
 	}
-	tolua_error(tolua_S, "invalid parameter to 'cCuboid:Assign', expected a (cCuboid) or a (Vector3i, Vector3i).", nullptr);
-	return 0;
+	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
 }
 
 
@@ -4041,8 +4040,7 @@ static int tolua_cCuboid_IsInside(lua_State * tolua_S)
 			return 1;
 		}
 	}
-	tolua_error(tolua_S, "invalid parameter to 'cCuboid:IsInside', expected a (Vector3i) or (Vector3d).", nullptr);
-	return 0;
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3i or a Vector3d.");
 }
 
 
@@ -4074,8 +4072,7 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 	Vector3i * offset = nullptr;
 	if (!L.GetStackValue(2, offset) || (offset == nullptr))
 	{
-		tolua_error(tolua_S, "invalid parameter to 'cCuboid:Move', expected a Vector3i.", nullptr);
-		return 0;
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3i.");
 	}
 	self->Move(*offset);
 	return 0;
