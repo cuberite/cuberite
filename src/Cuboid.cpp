@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
 
-void cCuboid::Assign(const Vector3i & a_Point1, const Vector3i & a_Point2)
+void cCuboid::Assign(Vector3i a_Point1, Vector3i a_Point2)
 {
 	p1 = a_Point1;
 	p2 = a_Point2;
@@ -71,7 +71,7 @@ bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 
 
 
-void cCuboid::Move(const Vector3i & a_Offset)
+void cCuboid::Move(Vector3i a_Offset)
 {
 	p1.Move(a_Offset);
 	p2.Move(a_Offset);

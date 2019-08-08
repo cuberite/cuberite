@@ -13,7 +13,7 @@ public:
 	Vector3i p1, p2;
 
 	cCuboid(void) {}
-	cCuboid(const Vector3i & a_p1, const Vector3i & a_p2) : p1(a_p1), p2(a_p2) {}
+	cCuboid(Vector3i a_p1, Vector3i a_p2) : p1(a_p1), p2(a_p2) {}
 	cCuboid(int a_X1, int a_Y1, int a_Z1) : p1(a_X1, a_Y1, a_Z1), p2(a_X1, a_Y1, a_Z1) {}
 
 	#ifdef TOLUA_EXPOSITION  // tolua isn't aware of implicitly generated copy constructors
@@ -23,7 +23,7 @@ public:
 	// tolua_end
 	// Exported in ManualBindings.cpp to support the old deprecated coord-based overload.
 
-	void Assign(const Vector3i & a_Point1, const Vector3i & a_Point2);
+	void Assign(Vector3i a_Point1, Vector3i a_Point2);
 	void Assign(const cCuboid & a_SrcCuboid) { *this = a_SrcCuboid; }
 
 	// tolua_begin
@@ -85,7 +85,7 @@ public:
 
 	/** Moves the cuboid by the specified offset.
 	Exported in ManualBindings to support the old deprecated coord-based overload. */
-	void Move(const Vector3i & a_Offset);
+	void Move(Vector3i a_Offset);
 
 	// tolua_begin
 
