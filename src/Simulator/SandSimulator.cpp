@@ -55,9 +55,9 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			Pos.y = itr->y;
 			Pos.z = itr->z + BaseZ;
 			/*
-			LOGD(
-				"Creating a falling block at {%d, %d, %d} of type %s, block below: %s",
-				Pos.x, Pos.y, Pos.z, ItemTypeToString(BlockType).c_str(), ItemTypeToString(BlockBelow).c_str()
+			FLOGD(
+				"Creating a falling block at {0} of type {1}, block below: {2}",
+				Pos, ItemTypeToString(BlockType), ItemTypeToString(BlockBelow)
 			);
 			*/
 
@@ -276,7 +276,7 @@ void cSandSimulator::FinishFalling(
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
 		if (a_FallingBlockType == E_BLOCK_ANVIL)
 		{
-			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, a_BlockX, a_BlockY, a_BlockZ, 0);
+			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		}
 		return;
 	}
@@ -318,6 +318,11 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 		else if (!CanContinueFallThrough(BlockType))
 		{
 			BlockY = y + 1;
+		}
+		else if ((FallingBlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockType))
+		{
+			FallingBlockType = E_BLOCK_CONCRETE;
+			BlockY = y;
 		}
 		else
 		{

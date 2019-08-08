@@ -5,6 +5,7 @@
 #include "../Inventory.h"
 #include "../Defines.h"
 #include "../World.h"
+#include "../Items/ItemHandler.h"
 
 #include "../Statistics.h"
 
@@ -69,6 +70,9 @@ public:
 
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
 
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
@@ -141,9 +145,6 @@ public:
 	bool IsClimbing(void) const;
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
-
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
 
 	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
 	void SetCapabilities();
@@ -413,9 +414,22 @@ public:
 	If the player is not riding a horse or if the horse is untamed, does nothing. */
 	void OpenHorseInventory();
 
-	void UseEquippedItem(int a_Amount = 1);
+	/** Damage the player's equipped item by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseEquippedItem(short a_Damage = 1);
+
+	/** Damage the player's equipped item by the amount of damage such an item
+	is damaged by when used for a_Action */
+	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
+
+	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseItem(int a_SlotNumber, short a_Damage = 1);
 
 	void SendHealth(void);
+
+	// Send current active hotbar slot
+	void SendHotbarActiveSlot(void);
 
 	void SendExperience(void);
 
@@ -745,6 +759,8 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
 
+	/** get player explosion exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.

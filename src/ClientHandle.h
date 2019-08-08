@@ -161,7 +161,7 @@ public:  // tolua_export
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
-	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
+	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
@@ -176,6 +176,7 @@ public:  // tolua_export
 	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
+	void SendHeldItemChange             (int a_ItemIndex);
 	void SendHideTitle                  (void);   // tolua_export
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
@@ -356,7 +357,7 @@ public:  // tolua_export
 
 	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
 	void HandleSteerVehicle     (float Forward, float Sideways);
@@ -368,6 +369,7 @@ public:  // tolua_export
 	);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
+	void HandleUseItem          (eHand a_Hand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 

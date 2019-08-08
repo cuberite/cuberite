@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "FunctionRef.h"
+#include "../FunctionRef.h"
 #include "../Mobs/MonsterTypes.h"
 
 class cBedEntity;
@@ -13,6 +13,7 @@ class cPlayer;
 using cBedCallback         = cFunctionRef<bool(cBedEntity   &)>;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 using cPlayerListCallback  = cFunctionRef<bool(cPlayer      &)>;
+using cEntityCallback      = cFunctionRef<bool(cEntity      &)>;
 
 
 
@@ -52,6 +53,10 @@ public:
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
 	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
 
+	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
+	Returns an vector of UniqueID of all the orbs. */
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
+
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
 
@@ -65,7 +70,7 @@ public:
 
 	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 
-	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Returns or sets the minumim or maximum netherportal width */

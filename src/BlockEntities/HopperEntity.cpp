@@ -56,7 +56,7 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cHopperEntity &>(a_Src);
+	auto & src = static_cast<const cHopperEntity &>(a_Src);
 	m_LastMoveItemsInTick = src.m_LastMoveItemsInTick;
 	m_LastMoveItemsOutTick = src.m_LastMoveItemsOutTick;
 }
@@ -334,7 +334,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 			cBlockEntityWithItems * BlockEntity = static_cast<cBlockEntityWithItems *>(DestChunk->GetBlockEntity(OutX, OutY, OutZ));
 			if (BlockEntity == nullptr)
 			{
-				LOGWARNING("%s: A block entity was not found where expected at {%d, %d, %d}", __FUNCTION__, OutX, OutY, OutZ);
+				FLOGWARNING("{0}: A block entity was not found where expected at {1}", __FUNCTION__, Vector3i{OutX, OutY, OutZ});
 				return false;
 			}
 			res = MoveItemsToGrid(*BlockEntity);
@@ -360,7 +360,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 	cChestEntity * MainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
 	if (MainChest == nullptr)
 	{
-		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
+		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, GetPos() + Vector3i{0, 1, 0});
 		return false;
 	}
 	if (MoveItemsFromGrid(*MainChest))
@@ -401,7 +401,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		cChestEntity * SideChest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z));
 		if (SideChest == nullptr)
 		{
-			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
+			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, GetPos() + Vector3i{Coords[i].x, 1, Coords[i].z});
 		}
 		else
 		{
@@ -426,7 +426,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	cFurnaceEntity * Furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
 	if (Furnace == nullptr)
 	{
-		LOGWARNING("%s: A furnace entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
+		FLOGWARNING("{0}: A furnace entity was not found where expected, at {1}", __FUNCTION__, GetPos() + Vector3i{0, 1, 0});
 		return false;
 	}
 
@@ -527,7 +527,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 	cChestEntity * ConnectedChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ));
 	if (ConnectedChest == nullptr)
 	{
-		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, a_BlockX, a_BlockY, a_BlockZ);
+		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, Vector3i{a_BlockX, a_BlockY, a_BlockZ});
 		return false;
 	}
 	if (MoveItemsToGrid(*ConnectedChest))
@@ -570,7 +570,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		cChestEntity * Chest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z));
 		if (Chest == nullptr)
 		{
-			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z, x, z);
+			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, Vector3i{a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z}, x, z);
 			continue;
 		}
 		if (MoveItemsToGrid(*Chest))

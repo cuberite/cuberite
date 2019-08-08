@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	BioGen.cpp
@@ -76,5 +73,5 @@ endif()
 
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})
-	target_link_libraries(Generating OSSupport Blocks Bindings)
+	target_link_libraries(Generating fmt::fmt OSSupport Blocks Bindings)
 endif()

@@ -48,10 +48,7 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 			return -1;
 		}
 	}
-	#if !defined(__clang__)
-		ASSERT(!"Unknown mob family");
-		return -1;
-	#endif
+	UNREACHABLE("Unsupported mob family");
 }
 
 

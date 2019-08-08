@@ -2,8 +2,8 @@
 #include "Globals.h"
 
 #include "EnchantmentSerializer.h"
-#include "Enchantments.h"
 #include "FastNBT.h"
+#include "../Enchantments.h"
 
 void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName)
 {

@@ -17,6 +17,7 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
@@ -84,8 +85,8 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	BlockTypeRegistry.h
 	BrewingRecipes.h
-	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h
 	BuildInfo.h.cmake
@@ -118,12 +119,14 @@ SET (HDRS
 	Inventory.h
 	Item.h
 	ItemGrid.h
+	LazyArray.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
 	Logger.h
 	LoggerListeners.h
+	LoggerSimple.h
 	Map.h
 	MapManager.h
 	Matrix4.h
@@ -134,6 +137,7 @@ SET (HDRS
 	MobSpawner.h
 	MonsterConfig.h
 	NetherPortalScanner.h
+	OpaqueWorld.h
 	OverridesSettingsRepository.h
 	ProbabDistrib.h
 	RankManager.h
@@ -157,7 +161,10 @@ SET (HDRS
 	XMLParser.h
 )
 
-include_directories(".")
+file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
+	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/Globals.h\"\n")
+
+include_directories("${CMAKE_BINARY_DIR}/include")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
@@ -242,8 +249,6 @@ else ()
 
 	includefolder("Resources")
 	source_group("" FILES ${SOURCE})
-
-	include_directories("${PROJECT_SOURCE_DIR}")
 
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(
@@ -359,7 +364,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")

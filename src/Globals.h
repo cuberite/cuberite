@@ -38,13 +38,6 @@
 
 	#define OBSOLETE __declspec(deprecated)
 
-	#define FORMATSTRING(formatIndex, va_argsIndex)
-
-	// MSVC has its own custom version of zu format
-	#define SIZE_T_FMT "%Iu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
-	#define SIZE_T_FMT_HEX "%Ix"
-
 	#define NORETURN __declspec(noreturn)
 	#if (_MSC_VER < 1900)  // noexcept support was added in VS 2015
 		#define NOEXCEPT  throw()
@@ -86,27 +79,6 @@
 	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
-
-	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
-
-	#if defined(_WIN32)
-		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
-		// We need direct size formats:
-		#if defined(_WIN64)
-			#define SIZE_T_FMT "%I64u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "I64u"
-			#define SIZE_T_FMT_HEX "%I64x"
-		#else
-			#define SIZE_T_FMT "%u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "u"
-			#define SIZE_T_FMT_HEX "%x"
-		#endif
-	#else
-		// We're compiling on Linux, so we can use libc's size_t printf format:
-		#define SIZE_T_FMT "%zu"
-		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-		#define SIZE_T_FMT_HEX "%zx"
-	#endif
 
 	#define NORETURN __attribute((__noreturn__))
 	#define NOEXCEPT  noexcept
@@ -263,6 +235,7 @@ template class SizeChecker<UInt8,  1>;
 
 
 // Common headers (part 1, without macros):
+#include "fmt/format.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
@@ -271,73 +244,39 @@ template class SizeChecker<UInt8,  1>;
 
 #ifndef TEST_GLOBALS
 
-	// These functions are defined in Logger.cpp, but are declared here to avoid including all of logger.h
-	extern void LOG       (const char * a_Format, ...) FORMATSTRING(1, 2);
-	extern void LOGINFO   (const char * a_Format, ...) FORMATSTRING(1, 2);
-	extern void LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
-	extern void LOGERROR  (const char * a_Format, ...) FORMATSTRING(1, 2);
-
-	// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
-	#ifdef _DEBUG
-		#define LOGD LOG
-	#else
-		#define LOGD(...)
-	#endif  // _DEBUG
-
-	#define LOGWARN LOGWARNING
+	#include "LoggerSimple.h"
 
 #else
+	#include "fmt/printf.h"
+
 	// Logging functions
-	void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
-
-	void inline LOGERROR(const char * a_Format, ...)
+	template <typename ... Args>
+	void LOG(const char * a_Format, const Args & ... a_Args)
 	{
-		va_list argList;
-		va_start(argList, a_Format);
-		vprintf(a_Format, argList);
+		fmt::printf(a_Format, a_Args...);
 		putchar('\n');
 		fflush(stdout);
-		va_end(argList);
 	}
 
-	void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
+	#define LOGERROR   LOG
+	#define LOGWARNING LOG
+	#define LOGD       LOG
+	#define LOGINFO    LOG
+	#define LOGWARN    LOG
 
-	void inline LOGWARNING(const char * a_Format, ...)
+	template <typename ... Args>
+	void FLOG(const char * a_Format, const Args & ... a_Args)
 	{
-		va_list argList;
-		va_start(argList, a_Format);
-		vprintf(a_Format, argList);
+		fmt::print(a_Format, a_Args...);
 		putchar('\n');
 		fflush(stdout);
-		va_end(argList);
 	}
 
-	void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
-
-	void inline LOGD(const char * a_Format, ...)
-	{
-		va_list argList;
-		va_start(argList, a_Format);
-		vprintf(a_Format, argList);
-		putchar('\n');
-		fflush(stdout);
-		va_end(argList);
-	}
-
-	void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
-
-	void inline LOG(const char * a_Format, ...)
-	{
-		va_list argList;
-		va_start(argList, a_Format);
-		vprintf(a_Format, argList);
-		putchar('\n');
-		fflush(stdout);
-		va_end(argList);
-	}
-
-	#define LOGINFO LOG
-	#define LOGWARN LOGWARNING
+	#define FLOGERROR   FLOG
+	#define FLOGWARNING FLOG
+	#define FLOGD       FLOG
+	#define FLOGINFO    FLOG
+	#define FLOGWARN    FLOG
 
 #endif
 
@@ -412,6 +351,9 @@ template class SizeChecker<UInt8,  1>;
 #ifdef SELF_TEST
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
+
+/** Use to mark code that should be impossible to reach. */
+#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)
 
 
 

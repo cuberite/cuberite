@@ -71,11 +71,11 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Fallen onto a solid block
 		/*
-		LOGD(
-			"Sand: Checked below at {%d, %d, %d} (rel {%d, %d, %d}), it's %s, finishing the fall.",
-			BlockX, BlockY, BlockZ,
-			BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width,
-			ItemTypeToString(BlockBelow).c_str()
+		FLOGD(
+			"Sand: Checked below at {0} (rel {1}), it's {2}, finishing the fall.",
+			Vector3i{BlockX, BlockY, BlockZ},
+			cChunkDef::AbsoluteToRelative({BlockX, BlockY, BlockZ}, {a_Chunk.GetPosX(), a_Chunk.GetPosZ()}),
+			ItemTypeToString(BlockBelow)
 		);
 		*/
 
@@ -83,6 +83,13 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		}
+		Destroy(true);
+		return;
+	}
+	else if ((m_BlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockBelow))
+	{
+		// Concrete powder falling into water solidifies on the first water it touches
+		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, E_BLOCK_CONCRETE, m_BlockMeta);
 		Destroy(true);
 		return;
 	}

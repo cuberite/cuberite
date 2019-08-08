@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	BeaconEntity.cpp
@@ -48,4 +45,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(BlockEntities ${SRCS} ${HDRS})
+	target_link_libraries(BlockEntities fmt::fmt)
 endif()

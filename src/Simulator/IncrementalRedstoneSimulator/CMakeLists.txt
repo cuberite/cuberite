@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 set (SRCS
 	IncrementalRedstoneSimulator.cpp
@@ -33,5 +30,6 @@ set (HDRS
 
 if(NOT MSVC)
 	add_library(IncrementalRedstoneSimulator ${SRCS} ${HDRS})
+	target_link_libraries(IncrementalRedstoneSimulator fmt::fmt)
 endif()
 

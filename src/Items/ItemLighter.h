@@ -81,7 +81,3 @@ public:
 		return false;
 	}
 } ;
-
-
-
-

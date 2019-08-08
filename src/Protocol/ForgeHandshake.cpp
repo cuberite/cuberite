@@ -146,7 +146,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 	if (a_Size < 4)
 	{
-		SetError(Printf("ParseModList invalid packet, missing length (size = " SIZE_T_FMT ")", a_Size));
+		SetError(Printf("ParseModList invalid packet, missing length (size = %zu)", a_Size));
 		return Mods;
 	}
 
@@ -181,6 +181,7 @@ AStringMap cForgeHandshake::ParseModList(const char * a_Data, size_t a_Size)
 
 
 
+
 void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
 	if (a_Size == 2)
@@ -194,9 +195,10 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const char * a
 	}
 	else
 	{
-		SetError(Printf("Received unexpected length of ClientHello: " SIZE_T_FMT, a_Size));
+		SetError(Printf("Received unexpected length of ClientHello: %zu", a_Size));
 	}
 }
+
 
 
 
@@ -212,7 +214,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 		AppendPrintf(ClientModsString, "%s@%s, ", item.first.c_str(), item.second.c_str());
 	}
 
-	LOG("Client connected with " SIZE_T_FMT " mods: %s", ClientMods.size(), ClientModsString.c_str());
+	LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString.c_str());
 
 	m_Client->m_ForgeMods = ClientMods;
 
@@ -248,11 +250,12 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const char * a_Dat
 
 
 
+
 void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size)
 {
 	if (a_Size != 2)
 	{
-		SetError(Printf("Unexpected HandshakeAck packet length: " SIZE_T_FMT "", a_Size));
+		SetError(Printf("Unexpected HandshakeAck packet length: %zu", a_Size));
 		return;
 	}
 
@@ -331,7 +334,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 {
 	if (!m_IsForgeClient)
 	{
-		SetError(Printf("Received unexpected Forge data from non-Forge client (" SIZE_T_FMT " bytes)", a_Size));
+		SetError(Printf("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Size));
 		return;
 	}
 	if (m_Errored)
@@ -342,7 +345,7 @@ void cForgeHandshake::DataReceived(cClientHandle * a_Client, const char * a_Data
 
 	if (a_Size <= 1)
 	{
-		SetError(Printf("Received unexpectedly short Forge data (" SIZE_T_FMT " bytes)", a_Size));
+		SetError(Printf("Received unexpectedly short Forge data (%zu bytes)", a_Size));
 		return;
 	}
 

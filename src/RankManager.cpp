@@ -770,7 +770,6 @@ std::vector<cUUID> cRankManager::GetAllPlayerUUIDs(void)
 
 
 
-
 AStringVector cRankManager::GetAllRanks(void)
 {
 	ASSERT(m_IsInitialized);
@@ -2202,7 +2201,6 @@ bool cRankManager::UpdatePlayerName(const cUUID & a_PlayerUUID, const AString & 
 
 
 
-
 bool cRankManager::AreDBTablesEmpty(void)
 {
 	return (
@@ -2271,6 +2269,7 @@ void cRankManager::CreateDefaults(void)
 	// Set the default rank:
 	SetDefaultRank("Default");
 }
+
 
 
 

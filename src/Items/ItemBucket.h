@@ -140,7 +140,7 @@ public:
 			return false;
 		}
 
-		if (a_Player->GetGameMode() != gmCreative)
+		if (!a_Player->IsGameModeCreative())
 		{
 			// Remove fluid bucket, add empty bucket:
 			if (!a_Player->GetInventory().RemoveOneEquippedItem())
@@ -242,12 +242,12 @@ public:
 
 			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
-				if (a_CBBlockType != E_BLOCK_AIR)
+				if ((a_CBBlockType != E_BLOCK_AIR) && !IsBlockLiquid(a_CBBlockType))
 				{
 					m_ReplacedBlockType = a_CBBlockType;
 					m_ReplacedBlockMeta = a_CBBlockMeta;
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
-					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
+					if (!cFluidSimulator::CanWashAway(a_CBBlockType))
 					{
 						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}

@@ -109,6 +109,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 
 
 
+
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnVehicle(*this, 10, static_cast<char>(m_Payload));  // 10 = Minecarts
@@ -403,6 +404,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 
 
 
+
 void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 {
 	// If the rail is powered set to speed up else slow down.
@@ -576,6 +578,7 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::mi
 	// No special handling
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
 }
+
 
 
 
@@ -869,6 +872,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 
 
 
+
 bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 {
 	cMinecartCollisionCallback MinecartCollisionCallback(
@@ -1035,12 +1039,12 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
-		TDI.FinalDamage = static_cast<int>(GetMaxHealth());  // Instant hit for creative
+		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
 		SetInvulnerableTicks(0);
 		return super::DoTakeDamage(TDI);  // No drops for creative
 	}
 
-	m_LastDamage = TDI.FinalDamage;
+	m_LastDamage = static_cast<int>(TDI.FinalDamage);
 	if (!super::DoTakeDamage(TDI))
 	{
 		return false;

@@ -54,8 +54,8 @@
 #include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
-#include "Server.h"
-#include "BoundingBox.h"
+#include "../Server.h"
+#include "../BoundingBox.h"
 
 
 
@@ -75,7 +75,6 @@ Since only the header is actually in the memory, this number can be high, but st
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
@@ -85,7 +84,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
 	AString fnam;
-	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator);
+	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator());
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -180,7 +179,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 {
 	// Construct the filename for offloading:
 	AString OffloadFileName;
-	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator, cFile::PathSeparator);
+	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
 	cFile::CreateFolder(FILE_IO_PREFIX + OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -190,7 +189,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 		localtime_r(&t, &stm);
 	#endif
 	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
-		cFile::PathSeparator, a_ChunkX, a_ChunkZ,
+		cFile::PathSeparator(), a_ChunkX, a_ChunkZ,
 		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
 	);
 
@@ -286,7 +285,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator);
+	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
 	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
@@ -472,6 +471,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	m_World->QueueSetChunkData(std::move(SetChunkData));
 	return true;
 }
+
 
 
 
@@ -727,10 +727,10 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 			{
 				TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
 			}
-			LOGINFO("WorldLoader(%s): Block entity mismatch: block type %s (%d), type \"%s\", at {%d, %d, %d}; the entity will be lost.",
-				m_World->GetName().c_str(),
-				ItemTypeToString(a_BlockType).c_str(), a_BlockType, TypeName.c_str(),
-				a_BlockX, a_BlockY, a_BlockZ
+			LOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
+				m_World->GetName(),
+				ItemTypeToString(a_BlockType), a_BlockType, TypeName,
+				Vector3i{a_BlockX, a_BlockY, a_BlockZ}
 			);
 			return nullptr;
 		}
@@ -937,10 +937,10 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 		expectedTypes.append(et);
 		expectedTypes.push_back('\"');
 	}
-	LOGWARNING("Block entity type mismatch: exp %s, got \"%s\". The block entity at {%d, %d, %d} will lose all its properties.",
+	LOGWARNING("Block entity type mismatch: exp {0}, got \"{1}\". The block entity at {2} will lose all its properties.",
 		expectedTypes.c_str() + 2,  // Skip the first ", " that is extra in the string
-		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))).c_str(),
-		a_BlockX, a_BlockY, a_BlockZ
+		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))),
+		Vector3i{a_BlockX, a_BlockY, a_BlockZ}
 	);
 	return false;
 }
@@ -2077,6 +2077,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	// Store the new arrow in the entities list:
 	a_Entities.emplace_back(std::move(Arrow));
 }
+
 
 
 

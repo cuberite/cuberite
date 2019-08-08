@@ -2,8 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Painting.h"
-#include "ClientHandle.h"
 #include "Player.h"
+#include "../ClientHandle.h"
 #include "../Chunk.h"
 
 
@@ -15,7 +15,6 @@ cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, double a_X,
 	m_Name(a_Name)
 {
 }
-
 
 
 

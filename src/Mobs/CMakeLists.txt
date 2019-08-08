@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	AggressiveMonster.cpp
@@ -83,4 +80,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
+	target_link_libraries(Mobs fmt::fmt)
 endif()

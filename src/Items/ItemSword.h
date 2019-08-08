@@ -46,13 +46,11 @@ public:
 	{
 		switch (a_Action)
 		{
-			case dlaAttackEntity: return 1;
-			case dlaBreakBlock:   return 2;
+			case dlaAttackEntity:       return 1;
+			case dlaBreakBlock:         return 2;
+			case dlaBreakBlockInstant:  return 0;
 		}
-
-		#ifndef __clang__
-		return 0;
-		#endif
+		UNREACHABLE("Unsupported durability loss action");
 	}
 
 
@@ -83,7 +81,3 @@ public:
 	}
 
 } ;
-
-
-
-

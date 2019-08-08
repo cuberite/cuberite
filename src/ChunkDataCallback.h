@@ -115,13 +115,13 @@ public:
 	};
 
 	cChunkDataCopyCollector():
-		m_Pool(cpp14::make_unique<MemCallbacks>()),
+		m_Pool(cpp14::make_unique<MemCallbacks>(), 0, cChunkData::NumSections),  // Keep 1 chunk worth of reserve
 		m_Data(m_Pool)
 	{
 	}
 
 
-	cListAllocationPool<cChunkData::sChunkSection, cChunkData::NumSections> m_Pool;  // Keep 1 chunk worth of reserve
+	cListAllocationPool<cChunkData::sChunkSection> m_Pool;
 	cChunkData m_Data;
 
 protected:

@@ -74,7 +74,7 @@ return
 		cBlockInfo =
 		{
 			Desc = [[
-				This class is used to query and register block properties.
+				This class is used to query block properties.
 			]],
 			Functions =
 			{
@@ -130,7 +130,7 @@ return
 							Type = "cBlockInfo",
 						},
 					},
-					Notes = "Returns the {{cBlockInfo}} structure for the specified block type.",
+					Notes = "Returns the {{cBlockInfo}} structure for the specified block type. <b>OBSOLETE</b>, use static functions instead",
 				},
 				GetHardness =
 				{
@@ -238,7 +238,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether the specified block type will be destroyed after a single hit.",
+					Notes = "Returns true if the specified block type will be destroyed after a single hit.",
 				},
 				IsPistonBreakable =
 				{
@@ -256,7 +256,43 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns whether a piston can break the specified block type.",
+					Notes = "Returns true if a piston can break the specified block type.",
+				},
+				IsRainBlocker =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block type blocks rain from passing through.",
+				},
+				IsSkylightDispersant =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsSnowable =
 				{
@@ -293,24 +329,6 @@ return
 						},
 					},
 					Notes = "Returns whether the specified block type is solid.",
-				},
-				IsSkylightDispersant =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if skylight is impeded by passage through a block of the specified type.",
 				},
 				IsTransparent =
 				{
@@ -354,57 +372,57 @@ return
 				m_BlockHeight =
 				{
 					Type = "number",
-					Notes = "The height of the block, a value between 0.0 and 1.0",
+					Notes = "The height of the block, a value between 0.0 and 1.0. <b>OBSOLETE</b>, use cBlockInfo:GetBlockHeight() instead.",
 				},
 				m_CanBeTerraformed =
 				{
 					Type = "bool",
-					Notes = "Is this block suited to be terraformed?",
+					Notes = "Is this block suited to be terraformed? <b>OBSOLETE</b>, use cBlockInfo:CanBeTerraformed() instead.",
 				},
 				m_FullyOccupiesVoxel =
 				{
 					Type = "bool",
-					Notes = "Does this block fully occupy its voxel - is it a 'full' block?",
+					Notes = "Does this block fully occupy its voxel - is it a 'full' block? <b>OBSOLETE</b>, use cBlockInfo:FullyOccupiesVoxel() instead.",
 				},
 				m_Hardness =
 				{
 					Type = "number",
-					Notes = "The greater the value the longer the player needs to break the block.",
+					Notes = "The greater the value the longer the player needs to break the block. <b>OBSOLETE</b>, use cBlockInfo:GetHardness() instead.",
 				},
 				m_IsSnowable =
 				{
 					Type = "bool",
-					Notes = "Can this block hold snow atop?",
+					Notes = "Can this block hold snow atop? <b>OBSOLETE</b>, use cBlockInfo:IsSnowable() instead",
 				},
 				m_IsSolid =
 				{
 					Type = "bool",
-					Notes = "Is this block solid (player cannot walk through)?",
+					Notes = "Is this block solid (player cannot walk through)? <b>OBSOLETE</b>, use cBlockInfo:IsSolid() instead.",
 				},
 				m_LightValue =
 				{
 					Type = "number",
-					Notes = "How much light do the blocks emit on their own?",
+					Notes = "How much light do the blocks emit on their own? <b>OBSOLETE</b>, use cBlockInfo:GetLightValue() instead.",
 				},
 				m_OneHitDig =
 				{
 					Type = "bool",
-					Notes = "Is a block destroyed after a single hit?",
+					Notes = "Is a block destroyed after a single hit? <b>OBSOLETE</b>, use cBlockInfo:IsOneHitDig() instead.",
 				},
 				m_PistonBreakable =
 				{
 					Type = "bool",
-					Notes = "Can a piston break this block?",
+					Notes = "Can a piston break this block? <b>OBSOLETE</b>, use cBlockInfo:IsPistonBreakable instead.",
 				},
 				m_SpreadLightFalloff =
 				{
 					Type = "number",
-					Notes = "How much light do the blocks consume?",
+					Notes = "How much light do the blocks consume? <b>OBSOLETE</b>, use cBlockInfo:GetSpreadLightFalloff() instead.",
 				},
 				m_Transparent =
 				{
 					Type = "bool",
-					Notes = "Is a block completely transparent? (light doesn't get decreased(?))",
+					Notes = "Is a block completely transparent? (light doesn't get decreased(?)). <b>OBSOLETE</b>, use cBlockInfo:IsTransparent() instead.",
 				},
 			},
 		},
@@ -3213,6 +3231,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the entity classname that this class implements. Each descendant overrides this function.",
 				},
+				GetEnchantmentBlastKnockbackReduction =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns explosion knock back reduction percent from blast protection level.",
+				},
 				GetEnchantmentCoverAgainst =
 				{
 					Params =
@@ -3298,6 +3326,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the weapon that the entity has equipped. Returns an empty cItem if no weapon equipped or not applicable.",
+				},
+				GetOffHandEquipedItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item that the entity has equipped on off-hand. Returns an empty cItem if no item equipped or not applicable.",
 				},
 				GetGravity =
 				{
@@ -3706,6 +3744,46 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is invisible",
 				},
+				IsInFire =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a fire block",
+				},
+				IsInLava =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a lava block",
+				},
+				IsInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if any part of the entity is in a water block",
+				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
+				},
 				IsItemFrame =
 				{
 					Returns =
@@ -3854,7 +3932,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is submerged in water (head is in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if the entity's head is in a water block <b>Currently deprecated in favour of IsHeadInWater()</b>",
 				},
 				IsSwimming =
 				{
@@ -3864,7 +3942,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the mob or player is swimming in water (feet are in a water block). Note, this function is only updated with mobs or players.",
+					Notes = "Returns true if any part of the entity is in a water block. Note, this function is only updated with mobs or players. <b>Currently deprecated in favour of IsInWater()</b>",
 				},
 				IsTicking =
 				{
@@ -7155,7 +7233,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							IsOptional = true,
 						},
 						{
-							Name = "PrioritarySlot",
+							Name = "PrioritySlot",
 							Type = "number",
 							IsOptional = true,
 						},
@@ -7166,7 +7244,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							Type = "number",
 						},
 					},
-					Notes = "Adds as many items out of ItemStack as can fit. If AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true (default), empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the number of items that fit.",
+					Notes = "Adds as many items out of ItemStack as can fit. If AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true (default), empty slots can be used for the rest. If PrioritySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritySlot is set to -1 (default), regular order applies. Returns the number of items that fit.",
 				},
 				AddItems =
 				{
@@ -7182,7 +7260,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							IsOptional = true,
 						},
 						{
-							Name = "PrioritarySlot",
+							Name = "PrioritySlot",
 							Type = "number",
 							IsOptional = true,
 						},
@@ -7193,7 +7271,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							Type = "number",
 						},
 					},
-					Notes = "Same as AddItem, but works on an entire list of item stacks. The a_ItemStackList is modified to reflect the leftover items. If a_AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true, empty slots can be used for the rest. If PrioritarySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritarySlot is set to -1 (default), regular order applies. Returns the total number of items that fit.",
+					Notes = "Same as AddItem, but works on an entire list of item stacks. The a_ItemStackList is modified to reflect the leftover items. If a_AllowNewStacks is set to false, only existing stacks can be topped up. If AllowNewStacks is set to true, empty slots can be used for the rest. If PrioritySlot is set to a non-negative value, then the corresponding slot will be used first (if empty or compatible with added items). If PrioritySlot is set to -1 (default), regular order applies. Returns the total number of items that fit.",
 				},
 				ChangeSlotCount =
 				{
@@ -8693,6 +8771,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+                                BurnsInDaylight =
+                                {
+                                        Returns =
+                                        {
+                                                {
+                                                        Type = "boolean",
+                                                },
+                                        },
+                                        Notes = "Returns whether the mob burns in daylight.",
+                                },
 				CanBeLeashed =
 				{
 					Returns =
@@ -8911,6 +8999,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the age of the monster",
+				},
+				SetBurnsInDaylight =
+				{
+					Params =
+					{
+						{
+							Name = "BurnsInDaylight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick",
 				},
 				SetCanBeLeashed =
 				{
@@ -15203,6 +15302,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15226,6 +15329,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
@@ -16419,6 +16526,46 @@ end
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
 				},
+				E_META_END_PORTAL_FRAME_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_NO_EYE =
+				{
+					Notes = "The lack of the flag in the metadata of end portal frames indicating that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction.",
+				},
+				E_META_END_PORTAL_FRAME_XP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_XM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction and has an ender eye in it.",
+				},
 				E_META_HEAD_CREEPER =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a creeper head.",
@@ -16442,6 +16589,14 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				},
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
 				esBed =
 				{

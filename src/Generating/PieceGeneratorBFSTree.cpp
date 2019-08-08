@@ -235,12 +235,11 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 
 	/*
 	// DEBUG:
-	printf("Placed the starting piece at {%d, %d, %d}\n", a_BlockX, a_BlockY, a_BlockZ);
+	FLOGD("Placed the starting piece at {0}", Vector3i{a_BlockX, a_BlockY, a_BlockZ});
 	cCuboid Hitbox = a_OutPieces[0]->GetHitBox();
 	Hitbox.Sort();
-	printf("  Hitbox: {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n",
-		Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
-		Hitbox.p2.x, Hitbox.p2.y, Hitbox.p2.z,
+	FLOGD("  Hitbox: {0} - {1} ({2} * {3} * {4})\n",
+		Hitbox.p1, Hitbox.p2,
 		Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 	);
 	DebugConnectorPool(ConnectorPool, 0);
@@ -264,12 +263,11 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 				// DEBUG:
 				const cPlacedPiece * NewPiece = a_OutPieces.back();
 				const Vector3i & Coords = NewPiece->GetCoords();
-				printf("Placed a new piece at {%d, %d, %d}, rotation %d\n", Coords.x, Coords.y, Coords.z, NewPiece->GetNumCCWRotations());
+				FLOGD("Placed a new piece at {0}, rotation {1}\n", Coords, NewPiece->GetNumCCWRotations());
 				cCuboid Hitbox = NewPiece->GetHitBox();
 				Hitbox.Sort();
-				printf("  Hitbox: {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n",
-					Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
-					Hitbox.p2.x, Hitbox.p2.y, Hitbox.p2.z,
+				FLOGD("  Hitbox: {0} - {1} ({2} * {3} * {4})\n",
+					Hitbox.p1, Hitbox.p2,
 					Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 				);
 				DebugConnectorPool(ConnectorPool, NumProcessed + 1);
@@ -294,14 +292,14 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 // DEBUG:
 void cPieceGeneratorBFSTree::DebugConnectorPool(const cPieceGeneratorBFSTree::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
 {
-	printf("  Connector pool: " SIZE_T_FMT " items\n", a_ConnectorPool.size() - a_NumProcessed);
+	fmt::print("  Connector pool: {0} items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
 
 	typedef cPieceGeneratorBFSTree::cFreeConnectors::difference_type difType;
 
 	for (auto itr = a_ConnectorPool.cbegin() + static_cast<difType>(a_NumProcessed), end = a_ConnectorPool.cend(); itr != end; ++itr, ++idx)
 	{
-		printf("    " SIZE_T_FMT ": {%d, %d, %d}, type %d, direction %s, depth %d\n",
+		fmt::print("    {0}: {{{1}, {2}, {3}}}, type {4}, direction {5}, depth {6}\n",
 			idx,
 			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,

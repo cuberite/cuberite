@@ -2,8 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Slime.h"
-#include "FastRandom.h"
-#include "World.h"
+#include "../FastRandom.h"
+#include "../World.h"
 
 
 

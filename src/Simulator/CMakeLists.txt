@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	DelayedFluidSimulator.cpp
@@ -29,7 +26,7 @@ SET (HDRS
 	VaporizeFluidSimulator.h
 )
 
-
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
+	target_link_libraries(Simulator fmt::fmt)
 endif()

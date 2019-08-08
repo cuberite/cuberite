@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	EnvelopeParser.cpp
@@ -34,4 +31,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(HTTPServer ${SRCS} ${HDRS})
+	target_link_libraries(HTTPServer fmt::fmt)
 endif()

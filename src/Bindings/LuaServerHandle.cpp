@@ -22,7 +22,6 @@ cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_C
 
 
 
-
 cLuaServerHandle::~cLuaServerHandle()
 {
 	// If the server handle is still open, close it explicitly:
@@ -144,7 +143,7 @@ cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a
 	cCSLock Lock(m_CSConnections);
 	m_Connections.push_back(res);
 
-	return res;
+	return std::move(res);
 }
 
 

@@ -29,6 +29,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 
 
 
+
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnVehicle(*this, 1);
@@ -153,6 +154,7 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 
 
+
 void cBoat::SetLastDamage(int TimeSinceLastHit)
 {
 	m_LastDamage = TimeSinceLastHit;
@@ -207,10 +209,7 @@ AString cBoat::MaterialToString(eMaterial a_Material)
 		case bmAcacia:  return "acacia";
 		case bmDarkOak: return "dark_oak";
 	}
-	ASSERT(!"Unhandled boat material");
-	#ifndef __clang__
-		return "oak";
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 
@@ -264,9 +263,7 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
 		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
 	}
-	#ifndef __clang__
-		return cItem(E_ITEM_BOAT);
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 

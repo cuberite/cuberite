@@ -28,7 +28,7 @@ cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cMobHeadEntity &>(a_Src);
+	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
 	m_OwnerName = src.m_OwnerName;
 	m_OwnerTexture = src.m_OwnerTexture;
 	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
@@ -36,6 +36,7 @@ void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 	m_Rotation = src.m_Rotation;
 	m_Type = src.m_Type;
 }
+
 
 
 

@@ -60,11 +60,11 @@ protected:
 	{
 		/*
 		// DEBUG:
-		LOGD("Hit block %d:%d at {%d, %d, %d} face %d, %s (%s)",
+		FLOGD("Hit block {0}:{1} at {2} face {3}, {4} ({5})",
 			a_BlockType, a_BlockMeta,
-			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
+			Vector3i{a_BlockX, a_BlockY, a_BlockZ}, a_EntryFace,
 			cBlockInfo::IsSolid(a_BlockType) ? "solid" : "non-solid",
-			ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
+			ItemToString(cItem(a_BlockType, 1, a_BlockMeta))
 		);
 		*/
 
@@ -306,10 +306,8 @@ void cProjectileEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	SetSpeed(0, 0, 0);
 
 	// DEBUG:
-	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, hit solid block at face %d",
-		m_UniqueID,
-		a_HitPos.x, a_HitPos.y, a_HitPos.z,
-		a_HitFace
+	FLOGD("Projectile {0}: pos {1:.02f}, hit solid block at face {2}",
+		m_UniqueID, a_HitPos, a_HitFace
 	);
 
 	m_IsInGround = true;
@@ -356,10 +354,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
 	}
-	ASSERT(!"Unhandled projectile entity kind!");
-	#ifndef __clang__
-		return "";
-	#endif
+	UNREACHABLE("Unsupported projectile kind");
 }
 
 
@@ -404,11 +399,11 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
 
 		// DEBUG:
-		LOGD("Projectile %d has hit an entity %d (%s) at {%.02f, %.02f, %.02f} (coeff %.03f)",
+		FLOGD("Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f})",
 			m_UniqueID,
 			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
 			EntityCollisionCallback.GetHitEntity()->GetClass(),
-			HitPos.x, HitPos.y, HitPos.z,
+			HitPos,
 			EntityCollisionCallback.GetMinCoeff()
 		);
 
@@ -441,11 +436,8 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 	SetPitchFromSpeed();
 
 	/*
-	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}, rot {%.02f, %.02f}",
-		m_UniqueID,
-		GetPosX(), GetPosY(), GetPosZ(),
-		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetYaw(), GetPitch()
+	FLOGD("Projectile {0}: pos {1:.02f}, speed {2:.02f}, rot {{{3:.02f}, {4:.02f}}}",
+		m_UniqueID, GetPos(), GetSpeed(), GetYaw(), GetPitch()
 	);
 	*/
 }

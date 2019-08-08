@@ -21,7 +21,7 @@
 	ignore = dirty
 [submodule "lib/jsoncpp"]
 	path = lib/jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp.git
+	url = https://github.com/cuberite/jsoncpp.git
 	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
@@ -58,4 +58,8 @@
 [submodule "lib/zlib"]
 	path = lib/zlib
 	url = https://github.com/cuberite/zlib.git
+	ignore = dirty
+[submodule "lib/fmt"]
+	path = lib/fmt
+	url = https://github.com/fmtlib/fmt.git
 	ignore = dirty

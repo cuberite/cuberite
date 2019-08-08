@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	ArrowEntity.cpp
@@ -62,5 +59,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Entities ${SRCS} ${HDRS})
-	target_link_libraries(Entities WorldStorage)
+	target_link_libraries(Entities fmt::fmt WorldStorage)
 endif()

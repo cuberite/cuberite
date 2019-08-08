@@ -22,21 +22,8 @@ Declares the 1.9 protocol classes:
 #include "Protocol.h"
 #include "../ByteBuffer.h"
 
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
-
-#include "mbedTLS++/AesCfb128Decryptor.h"
-#include "mbedTLS++/AesCfb128Encryptor.h"
+#include "../mbedTLS++/AesCfb128Decryptor.h"
+#include "../mbedTLS++/AesCfb128Encryptor.h"
 
 
 
@@ -70,7 +57,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
+	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
 	virtual void SendEntityLook                 (const cEntity & a_Entity) override;
@@ -83,6 +70,7 @@ public:
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
+	virtual void SendHeldItemChange             (int a_ItemIndex) override;
 	virtual void SendHideTitle                  (void) override;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
@@ -255,6 +243,10 @@ protected:
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
 	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
+	/** Converts the hand parameter received by the protocol into eHand constants.
+	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
+	eHand HandIntToEnum(Int32 a_Hand);
+
 	/** Writes the item data into a packet. */
 	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
@@ -350,7 +342,3 @@ protected:
 	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
 
 } ;
-
-
-
-

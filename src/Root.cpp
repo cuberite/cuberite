@@ -36,7 +36,6 @@
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 #include "IniFile.h"
-#include "SettingsRepositoryInterface.h"
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
@@ -62,6 +61,7 @@ cRoot::cRoot(void) :
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
 {
+	Temporary::RegisterAllBlockHandlers(m_BlockTypeRegistry);
 	s_Root = this;
 	m_InputThreadRunFlag.clear();
 }
@@ -72,7 +72,7 @@ cRoot::cRoot(void) :
 
 cRoot::~cRoot()
 {
-	s_Root = 0;
+	s_Root = nullptr;
 }
 
 
@@ -755,6 +755,8 @@ void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 
 
 
+
+
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	for (const auto & itr : m_WorldsByName)
@@ -762,6 +764,21 @@ void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClien
 		itr.second->BroadcastPlayerListAddPlayer(a_Player);
 	}  // for itr - m_WorldsByName[]
 }
+
+
+
+
+
+void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	for (const auto & itr : m_WorldsByName)
+	{
+		itr.second->BroadcastPlayerListRemovePlayer(a_Player);
+	}  // for itr - m_WorldsByName[]
+}
+
+
+
 
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
@@ -783,6 +800,8 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 		itr->second->BroadcastChat(a_Message);
 	}  // for itr - m_WorldsByName[]
 }
+
+
 
 
 
@@ -1029,11 +1048,11 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
 		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
 		a_Output.Out("  Per-chunk memory size breakdown:");
-		a_Output.Out("    block types:    " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
-		a_Output.Out("    block metadata: " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		a_Output.Out("    block lighting: " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		a_Output.Out("    heightmap:      " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
-		a_Output.Out("    biomemap:       " SIZE_T_FMT_PRECISION(6)  " bytes (" SIZE_T_FMT_PRECISION(3)  " KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
+		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
+		a_Output.Out("    block metadata: %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;

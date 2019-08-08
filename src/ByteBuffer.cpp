@@ -126,7 +126,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	}
 	ASSERT(m_BufferSize >= m_WritePos);
 	size_t TillEnd = m_BufferSize - m_WritePos;
-	const char * Bytes = reinterpret_cast<const char *>(a_Bytes);
+	const char * Bytes = static_cast<const char *>(a_Bytes);
 	if (TillEnd <= a_Count)
 	{
 		// Need to wrap around the ringbuffer end
@@ -645,7 +645,6 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 
 
 
-
 bool cByteBuffer::WriteBool(bool a_Value)
 {
 	CHECK_THREAD
@@ -739,7 +738,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
-	char * Dst = reinterpret_cast<char *>(a_Buffer);  // So that we can do byte math
+	char * Dst = static_cast<char *>(a_Buffer);  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
@@ -772,7 +771,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Count);
-	char * Src = reinterpret_cast<char *>(const_cast<void*>(a_Buffer));  // So that we can do byte math
+	const char * Src = static_cast<const char *>(a_Buffer);  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
 	if (BytesToEndOfBuffer <= a_Count)

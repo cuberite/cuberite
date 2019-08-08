@@ -5,10 +5,10 @@
 
 #include "Globals.h"
 
-#include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
 #include "../StringCompression.h"
+#include "../OSSupport/GZipFile.h"
 
 
 
@@ -45,7 +45,6 @@ bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, c
 
 	return LoadFromSchematicNBT(a_BlockArea, NBT);
 }
-
 
 
 
@@ -100,7 +99,6 @@ bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockAre
 	}
 	return true;
 }
-
 
 
 

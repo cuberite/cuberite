@@ -15,7 +15,7 @@
 
 
 
-/// The maximum size of an inflated chunk; raw chunk data is 192 KiB, allow 64 KiB more of entities
+/** The maximum size of an inflated chunk; raw chunk data is 192 KiB, allow 64 KiB more of entities */
 #define CHUNK_INFLATE_MAX 256 KiB
 
 
@@ -115,7 +115,7 @@ void cZapper::ZapRegionInMCAFile(const cRegion & a_Region, int a_MCAX, int a_MCA
 		int ChunkZ = a_MCAZ * ChunksPerMCAZ + (i / ChunksPerMCAX);
 
 		LoadChunkData(fIn, HeaderIn[i], ChunkData, ChunkX, ChunkZ);
-		
+
 		if (a_Region.TouchesChunk(ChunkX, ChunkZ))
 		{
 			ZapRegionInRawChunkData(a_Region, ChunkData, ChunkX, ChunkZ);
@@ -162,7 +162,7 @@ void cZapper::LoadChunkData(cFile & a_InFile, int a_ChunkHeaderValue, AString & 
 	a_InFile.Read(ChunkHeader, sizeof(ChunkHeader));
 	if (ChunkHeader[4] != 2)
 	{
-		fprintf(stderr, "Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping", a_ChunkX, a_ChunkZ, ChunkHeader[5]);
+		fprintf(stderr, "Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping", a_ChunkX, a_ChunkZ, ChunkHeader[4]);
 		return;
 	}
 	int ActualSize = (ChunkHeader[0] << 24) |  (ChunkHeader[1] << 16) | (ChunkHeader[2] << 8) | ChunkHeader[3];
@@ -218,14 +218,14 @@ void cZapper::ZapRegionInRawChunkData(const cRegion & a_Region, AString & a_Chun
 		return;
 	}
 	ZapRegionInNBTChunk(a_Region, NBT, a_ChunkX, a_ChunkZ);
-	
+
 	cFastNBTWriter Writer;
 	for (int ch = NBT.GetFirstChild(0); ch >= 0; ch = NBT.GetNextSibling(ch))
 	{
 		SerializeNBTTag(NBT, ch, Writer);
 	}
 	Writer.Finish();
-	
+
 	/*
 	// DEBUG: Output dst to a file:
 	cFile f2;
@@ -251,7 +251,7 @@ void cZapper::ZapRegionInNBTChunk(const cRegion & a_Region, cParsedNBT & a_NBT, 
 		fprintf(stderr, "Cannot find Level tag in chunk [%d, %d]'s NBT. Skipping chunk.", a_ChunkX, a_ChunkZ);
 		return;
 	}
-	
+
 	// Create a copy of the region and limit it to the current chunk:
 	int BlockX = a_ChunkX * 16;
 	int BlockZ = a_ChunkZ * 16;
@@ -273,7 +273,7 @@ void cZapper::ZapRegionInNBTChunk(const cRegion & a_Region, cParsedNBT & a_NBT, 
 		}
 		ZapRegionBlocksInNBT(Local, a_NBT, SectionsTag);
 	}
-	
+
 	if (a_Region.m_ShouldZapEntities)
 	{
 		int EntitiesTag = a_NBT.FindChildByName(LevelTag, "Entities");
@@ -320,7 +320,7 @@ void cZapper::ZapRegionBlocksInNBT(const cRegion & a_Region, cParsedNBT & a_NBT,
 		{
 			ZapRegionInNBTSectionNibbles(a_Region, y, (unsigned char *)(a_NBT.GetData(BlockAddTag)));
 		}
-	}  // for Child - Level/Sections/[]
+	}  // for Child - Level / Sections / []
 }
 
 
@@ -426,7 +426,7 @@ void cZapper::SerializeNBTTag(const cParsedNBT & a_NBT, int a_Tag, cFastNBTWrite
 			a_Writer.EndCompound();
 			break;
 		}
-		
+
 		default:
 		{
 			ASSERT(!"Unknown NBT tag");
@@ -434,7 +434,3 @@ void cZapper::SerializeNBTTag(const cParsedNBT & a_NBT, int a_Tag, cFastNBTWrite
 		}
 	}
 }
-
-
-
-

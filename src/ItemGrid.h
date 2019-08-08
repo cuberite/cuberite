@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Item.h"
+#include "LazyArray.h"
 
 
 
@@ -33,12 +34,10 @@ public:
 
 	cItemGrid(int a_Width, int a_Height);
 
-	~cItemGrid();
-
 	// tolua_begin
 	int GetWidth   (void) const { return m_Width; }
 	int GetHeight  (void) const { return m_Height; }
-	int GetNumSlots(void) const { return m_NumSlots; }
+	int GetNumSlots(void) const { return m_Slots.size(); }
 
 	/** Converts XY coords into slot number; returns -1 on invalid coords */
 	int GetSlotNum(int a_X, int a_Y) const;
@@ -49,7 +48,6 @@ public:
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
 
 	/** Copies all items from a_Src to this grid.
-	Both grids must be the same size (asserts).
 	Doesn't copy the listeners. */
 	void CopyFrom(const cItemGrid & a_Src);
 
@@ -84,21 +82,21 @@ public:
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used  first (if empty or compatible with added items).
-	If a_PrioritarySlot is set to -1, regular order applies.
+	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used  first (if empty or compatible with added items).
+	If a_PrioritySlot is set to -1, regular order applies.
 	Returns the number of items that fit.
 	*/
-	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
+	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used first (if empty or compatible with added items).
-	If a_PrioritarySlot is set to -1, regular order applies.
+	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used first (if empty or compatible with added items).
+	If a_PrioritySlot is set to -1, regular order applies.
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
+	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
 	/** Removes the specified item from the grid, as many as possible, up to a_ItemStack.m_ItemCount.
 	Returns the number of items that were removed. */
@@ -185,8 +183,7 @@ public:
 protected:
 	int     m_Width;
 	int     m_Height;
-	int     m_NumSlots;  // m_Width * m_Height, for easier validity checking in the access functions
-	cItem * m_Slots;     // x + m_Width * y
+	cLazyArray<cItem> m_Slots;
 
 	cListeners       m_Listeners;    ///< Listeners which should be notified on slot changes; the pointers are not owned by this object
 	cCriticalSection m_CSListeners;  ///< CS that guards the m_Listeners against multi-thread access

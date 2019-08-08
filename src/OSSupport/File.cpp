@@ -213,7 +213,6 @@ long cFile::Seek (int iPosition)
 
 
 
-
 long cFile::Tell (void) const
 {
 	ASSERT(IsOpen());
@@ -285,7 +284,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
 	a_Contents.assign(DataSize, '\0');
-	return Read(reinterpret_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
+	return Read(static_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
 }
 
 
@@ -475,10 +474,13 @@ bool cFile::CreateFolderRecursive(const AString & a_FolderPath)
 
 	// Go through each path element and create the folder:
 	auto len = a_FolderPath.length();
-	auto PathSep = GetPathSeparator()[0];
 	for (decltype(len) i = 0; i < len; i++)
 	{
-		if (a_FolderPath[i] == PathSep)
+	#ifdef _WIN32
+		if ((a_FolderPath[i] == '\\') || (a_FolderPath[i] == '/'))
+	#else
+		if (a_FolderPath[i] == '/')
+	#endif
 		{
 			CreateFolder(a_FolderPath.substr(0, i));
 		}
@@ -690,13 +692,9 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::Printf(const char * a_Fmt, ...)
+int cFile::Printf(const char * a_Fmt, fmt::ArgList a_ArgList)
 {
-	AString buf;
-	va_list args;
-	va_start(args, a_Fmt);
-	AppendVPrintf(buf, a_Fmt, args);
-	va_end(args);
+	AString buf = ::Printf(a_Fmt, a_ArgList);
 	return Write(buf.c_str(), buf.length());
 }
 

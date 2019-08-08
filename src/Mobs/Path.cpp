@@ -66,10 +66,16 @@ cPath::cPath(
 	ProcessCell(GetCell(m_Source), nullptr, 0);
 }
 
+
+
+
+
 cPath::cPath() : m_IsValid(false)
 {
 
 }
+
+
 
 
 

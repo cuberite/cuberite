@@ -21,22 +21,24 @@ typedef std::map<AString, AString> AStringMap;
 
 
 
-
-/** Add the formated string to the existing data in the string.
-Returns a_Dst. */
-extern AString & AppendVPrintf(AString & a_Dst, const char * format, va_list args) FORMATSTRING(2, 0);
-
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf       (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
+extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
+FMT_VARIADIC(AString &, Printf, AString &, const char *)
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, ...) FORMATSTRING(1, 2);
+extern AString Printf(const char * format, fmt::ArgList args);
+FMT_VARIADIC(AString, Printf, const char *)
 
-/** Add the formatted string to the existing data in the string.
-Returns a_Dst */
-extern AString & AppendPrintf (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
+/** Add the formated string to the existing data in the string.
+Returns a_Dst. */
+template <typename... Args>
+extern AString & AppendPrintf(AString & a_Dst, const char * format, const Args & ... args)
+{
+	a_Dst += Printf(format, args...);
+	return a_Dst;
+}
 
 /** Split the string at any of the listed delimiters.
 Return the splitted strings as a stringvector. */
@@ -91,8 +93,7 @@ extern AString UnicodeCharToUtf8(unsigned a_UnicodeChar);
 /** Converts a UTF-8 string into a UTF-16 BE string. */
 extern std::u16string UTF8ToRawBEUTF16(const AString & a_String);
 
-/** Creates a nicely formatted HEX dump of the given memory block.
-Max a_BytesPerLine is 120. */
+/** Creates a nicely formatted HEX dump of the given memory block. */
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
 /** Returns a copy of a_Message with all quotes and backslashes escaped by a backslash. */
@@ -143,6 +144,12 @@ extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const 
 
 /** Concatenates the specified strings into a single string, separated by the specified separator. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
+
+/** Converts a string into a float. Returns false if the conversion fails. */
+extern bool StringToFloat(const AString & a_String, float & a_Num);
+
+/** Returns true if only whitespace characters are present in the string */
+bool IsOnlyWhitespace(const AString & a_String);
 
 
 

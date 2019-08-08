@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 set(SRCS
 	AesCfb128Decryptor.cpp
@@ -37,8 +34,5 @@ set(HDRS
 
 if(NOT MSVC)
 	add_library(mbedTLS++ ${SRCS} ${HDRS})
-
-	if (UNIX)
-		target_link_libraries(mbedTLS++ mbedtls)
-	endif()
+	target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
 endif()

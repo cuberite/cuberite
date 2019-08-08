@@ -129,7 +129,7 @@ public:
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Returns true if there is a block entity at the coords specified */
-	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool HasBlockEntityAt(Vector3i a_BlockPos);
 
 	/** Sets or resets the internal flag that prevents chunk from being unloaded.
 	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
@@ -154,7 +154,7 @@ public:
 
 	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
-	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta); }
+	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta); }
 
 	/** Queues block for ticking (m_ToTickQueue) */
 	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
@@ -163,10 +163,25 @@ public:
 	void QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ);
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const;
-	BLOCKTYPE GetBlock(const Vector3i & a_RelCoords) const { return GetBlock(a_RelCoords.x, a_RelCoords.y, a_RelCoords.z); }
-	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
+	{
+		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta, a_SendToClients);
+	}
+
+	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_ChunkData.GetBlock(a_RelCoords); }
+
+	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+	{
+		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
+	}
+
+	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	void GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+	{
+		GetBlockInfo({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+	}
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -337,35 +352,6 @@ public:
 
 	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
-	// Broadcast various packets to all clients of this chunk:
-	// (Please keep these alpha-sorted)
-	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle);
-	void BroadcastBlockAction        (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastCollectEntity      (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastDetachEntity       (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
-	void BroadcastEntityEffect       (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityHeadLook     (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityLook         (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityMetadata     (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityRelMove      (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityRelMoveLook  (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityStatus       (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastLeashEntity        (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
-	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = nullptr);
-	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastSoundEffect        (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastThunderbolt        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastUnleashEntity      (const cEntity & a_Entity);
-	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
-
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
 	Vector3i PositionToWorldPosition(Vector3i a_RelPos)
@@ -392,39 +378,49 @@ public:
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
+		return m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+	}
+
+	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_ChunkData.GetMeta(a_RelPos); }
+
+	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	{
+		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta, a_ShouldMarkDirty, a_ShouldInformClients);
 	}
 
 	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
 	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
 	such as leaf decay flags. */
-	inline void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
 	{
-			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
-			if (hasChanged)
+		bool hasChanged = m_ChunkData.SetMeta(a_RelPos, a_Meta);
+		if (hasChanged)
+		{
+			if (a_ShouldMarkDirty)
 			{
-				if (a_ShouldMarkDirty)
-				{
-					MarkDirty();
-				}
-				if (a_ShouldInformClients)
-				{
-					m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
-				}
+				MarkDirty();
 			}
+			if (a_ShouldInformClients)
+			{
+				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
+			}
+		}
 	}
 
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_ChunkData.GetBlockLight(a_RelPos); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_ChunkData.GetSkyLight(a_RelPos); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered  (int a_RelX, int a_RelY, int a_RelZ) const {return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ)); }
+	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelPos)); }
+	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -478,10 +474,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	// Makes a copy of the list
-	cClientHandleList GetAllClients(void) const
+	cChunkClientHandles GetAllClients(void) const
 	{
-		return cClientHandleList(m_LoadedByClient.begin(), m_LoadedByClient.end());
+		return cChunkClientHandles(m_LoadedByClient);
 	}
 
 private:

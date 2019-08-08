@@ -23,6 +23,9 @@ public:
 
 	// Override functions
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	// tolua_begin
@@ -40,6 +43,9 @@ public:
 	void SetReward(int a_Reward) { m_Reward = a_Reward; }
 
 	// tolua_end
+
+	/** Split reward into small values according to regular Minecraft rules */
+	static std::vector<int> Split(int a_Reward);
 
 protected:
 	int m_Reward;

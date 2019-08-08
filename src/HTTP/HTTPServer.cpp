@@ -9,7 +9,7 @@
 #include "HTTPServerConnection.h"
 #include "HTTPFormParser.h"
 #include "SslHTTPServerConnection.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/SslConfig.h"
 
 
 
@@ -216,7 +216,7 @@ void cHTTPServer::NewRequest(cHTTPServerConnection & a_Connection, cHTTPIncoming
 
 void cHTTPServer::RequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const void * a_Data, size_t a_Size)
 {
-	m_Callbacks->OnRequestBody(a_Connection, a_Request, reinterpret_cast<const char *>(a_Data), a_Size);
+	m_Callbacks->OnRequestBody(a_Connection, a_Request, static_cast<const char *>(a_Data), a_Size);
 }
 
 

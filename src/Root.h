@@ -7,6 +7,7 @@
 #include "Defines.h"
 #include "FunctionRef.h"
 #include "RankManager.h"
+#include "BlockTypeRegistry.h"
 
 
 
@@ -88,6 +89,9 @@ public:
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
 	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
 
+	/** Returns the (read-write) storage for registered block types. */
+	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
+
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
 
@@ -154,8 +158,11 @@ public:
 	/** Send playerlist of all worlds to player */
 	void SendPlayerLists(cPlayer * a_DestPlayer);
 
-	/** Broadcast Player through all worlds */
+	/** Broadcast playerlist addition through all worlds */
 	void BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
+
+	/** Broadcast playerlist removal through all worlds */
+	void BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 
 	// tolua_begin
 
@@ -223,6 +230,9 @@ private:
 	std::unique_ptr<cRankManager> m_RankManager;
 
 	cHTTPServer m_HTTPServer;
+
+	/** The storage for all registered block types. */
+	BlockTypeRegistry m_BlockTypeRegistry;
 
 
 	void LoadGlobalSettings();

@@ -11,7 +11,7 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
@@ -20,10 +20,6 @@
 #include "../Entities/LeashKnot.h"
 
 
-
-
-// Ticks to wait to do leash calculations
-#define LEASH_ACTIONS_TICK_STEP 10
 
 
 
@@ -194,7 +190,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		{
 			if (
 				(IsOnGround() && (GetSpeed().SqrLength() <= 0.5)) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
-				IsSwimming()
+				IsInWater()
 			)
 			{
 				m_bOnGround = false;
@@ -221,7 +217,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		{
 			Distance *= 2.5f;
 		}
-		else if (IsSwimming())
+		else if (IsInWater())
 		{
 			Distance *= 1.3f;
 		}
@@ -239,23 +235,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		AddSpeedX(Distance.x);
 		AddSpeedZ(Distance.z);
 	}
-
-	// Speed up leashed mobs getting far from player
-	if (IsLeashed() && GetLeashedTo()->IsPlayer())
-	{
-		Distance = GetLeashedTo()->GetPosition() - GetPosition();
-		Distance.Normalize();
-		AddSpeedX(Distance.x);
-		AddSpeedZ(Distance.z);
-	}
-
 }
-
-
-
-
-
-
 
 
 
@@ -400,10 +380,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}  // switch (m_EMState)
 
 	// Leash calculations
-	if ((m_TicksAlive % LEASH_ACTIONS_TICK_STEP) == 0)
-	{
-		CalcLeashActions();
-	}
+	CalcLeashActions(a_Dt);
 
 	BroadcastMovementUpdate();
 
@@ -422,7 +399,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cMonster::CalcLeashActions()
+void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 {
 	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
 	// This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't be loaded yet.
@@ -435,19 +412,54 @@ void cMonster::CalcLeashActions()
 			SetLeashToPos(nullptr);
 		}
 	}
-	else if (IsLeashed())  // Mob is already leashed to an entity: follow it.
-	{
-		// TODO: leashed mobs in vanilla can move around up to 5 blocks distance from leash origin
-		MoveToPosition(m_LeashedTo->GetPosition());
 
-		// If distance to target > 10 break leash
-		Vector3f a_Distance(m_LeashedTo->GetPosition() - GetPosition());
-		double Distance(a_Distance.Length());
-		if (Distance > 10.0)
+	if (!IsLeashed())
+	{
+		return;
+	}
+
+	static const double CloseFollowDistance = 1.8;   // The closest the mob will path towards the leashed to entity
+	static const double LeashNaturalLength  = 5.0;   // The closest the mob is actively pulled towards the entity
+	static const double LeashMaximumLength  = 10.0;  // Length where the leash breaks
+	static const double LeashSpringConstant = 20.0;  // How stiff the leash is
+
+	const auto LeashedToPos = m_LeashedTo->GetPosition();
+	const auto Displacement = LeashedToPos - GetPosition();
+	const auto Distance = Displacement.Length();
+	const auto Direction = Displacement.NormalizeCopy();
+
+	// If the leash is over-extended, break the leash:
+	if (Distance > LeashMaximumLength)
+	{
+		LOGD("Leash broken (distance)");
+		Unleash(false);
+		return;
+	}
+
+	// If the mob isn't following close enough, pull the mob towards the leashed to entity:
+	if (Distance > LeashNaturalLength)
+	{
+		// Accelerate monster towards the leashed to entity:
+		const auto Extension = Distance - LeashNaturalLength;
+		auto Acceleration = Direction * (Extension * LeashSpringConstant);
+
+		// Stop mobs from floating up when on the ground
+		if (IsOnGround() && (Acceleration.y < std::abs(GetGravity())))
 		{
-			LOGD("Leash broken (distance)");
-			Unleash(false);
+			Acceleration.y = 0.0;
 		}
+
+		// Apply the acceleration
+		using namespace std::chrono;
+		AddSpeed(Acceleration * duration_cast<duration<double>>(a_Dt).count());
+	}
+
+	// Passively follow the leashed to entity:
+	if (Distance > CloseFollowDistance)
+	{
+		const Vector3d TargetBlock((LeashedToPos - Direction * CloseFollowDistance).Floor());
+		// Move to centre of target block face
+		MoveToPosition(TargetBlock + Vector3d{ 0.5, 0.0, 0.5 });
 	}
 }
 
@@ -648,7 +660,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	if ((a_TDI.Attacker != nullptr) && (!IsBaby()))
 	{
-		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+		m_World->SpawnSplitExperienceOrbs(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
 	m_DestroyTimer = std::chrono::milliseconds(0);
 }
@@ -700,13 +712,11 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
-
-	if (Closest != nullptr)
+	m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 	{
-		EventSeePlayer(Closest, a_Chunk);
-	}
+		EventSeePlayer(&a_Player, a_Chunk);
+		return true;
+	}, false);
 }
 
 
@@ -1067,7 +1077,6 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
 /** Sets the target. */
 void cMonster::SetTarget (cPawn * a_NewTarget)
 {
@@ -1335,6 +1344,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 
 
 
+
 bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
 	// If the Y coord is out of range, return the most logical result without considering anything else:
@@ -1359,7 +1369,8 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	if (
 		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)        // Not raining
+		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT) &&     // Not raining
+		!IsInWater()                                                // Isn't swimming
 	)
 	{
 		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head

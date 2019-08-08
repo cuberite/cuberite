@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
+#include "../Items/ItemHandler.h"
 
 
 
@@ -132,6 +133,7 @@ public:
 		)
 		{
 			a_ChunkInterface.SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, 0, 0);
+			a_Player.UseEquippedItem(cItemHandler::dlaBreakBlockInstant);
 		}
 	}
 
@@ -184,7 +186,3 @@ public:
 		return 7;
 	}
 } ;
-
-
-
-

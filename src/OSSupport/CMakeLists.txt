@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	CriticalSection.cpp
@@ -48,4 +45,5 @@ endif()
 
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
+	target_link_libraries(OSSupport fmt::fmt)
 endif()

@@ -629,17 +629,6 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	if (
@@ -1200,7 +1189,7 @@ void cBlockArea::MirrorXY(void)
 	int MaxZ = m_Size.z - 1;
 	for (int y = 0; y < m_Size.y; y++)
 	{
-		for (int z = 0; z <= HalfZ; z++)
+		for (int z = 0; z < HalfZ; z++)
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
@@ -1255,7 +1244,7 @@ void cBlockArea::MirrorXZ(void)
 	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfY = m_Size.y / 2;
 	int MaxY = m_Size.y - 1;
-	for (int y = 0; y <= HalfY; y++)
+	for (int y = 0; y < HalfY; y++)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
@@ -1316,7 +1305,7 @@ void cBlockArea::MirrorYZ(void)
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
-			for (int x = 0; x <= HalfX; x++)
+			for (int x = 0; x < HalfX; x++)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
@@ -2272,7 +2261,6 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-
 void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
@@ -2458,129 +2446,124 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 	int DstOffZ = std::max(0,  a_RelZ);  // Offset in Dst where to start writing
 	int SizeZ   = std::min(a_Src.GetSizeZ() - SrcOffZ, GetSizeZ() - DstOffZ);  // How many blocks to copy
 
-	switch (a_Strategy)
+	[&]
 	{
-		case cBlockArea::msOverwrite:
+		switch (a_Strategy)
 		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorOverwrite<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msOverwrite
+			case cBlockArea::msOverwrite:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorOverwrite<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msOverwrite
 
-		case cBlockArea::msFillAir:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorFillAir<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msFillAir
+			case cBlockArea::msFillAir:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorFillAir<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msFillAir
 
-		case cBlockArea::msImprint:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorImprint<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msImprint
+			case cBlockArea::msImprint:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorImprint<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msImprint
 
-		case cBlockArea::msLake:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorLake<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msLake
+			case cBlockArea::msLake:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorLake<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msLake
 
-		case cBlockArea::msSpongePrint:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorSpongePrint<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msSpongePrint
+			case cBlockArea::msSpongePrint:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorSpongePrint<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msSpongePrint
 
-		case cBlockArea::msDifference:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorDifference<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msDifference
+			case cBlockArea::msDifference:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorDifference<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msDifference
 
-		case cBlockArea::msSimpleCompare:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msSimpleCompare
+			case cBlockArea::msSimpleCompare:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msSimpleCompare
 
-		case cBlockArea::msMask:
-		{
-			InternalMergeBlocks<MetasValid, MergeCombinatorMask<MetasValid> >(
-				GetBlockTypes(), a_Src.GetBlockTypes(),
-				DstMetas, SrcMetas,
-				SizeX, SizeY, SizeZ,
-				SrcOffX, SrcOffY, SrcOffZ,
-				DstOffX, DstOffY, DstOffZ,
-				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-				m_Size.x, m_Size.y, m_Size.z
-			);
-			break;
-		}  // case msMask
-
-		#ifndef __clang__  // Clang complains about a default case in a switch with all cases covered
-		default:
-		{
-			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
-			ASSERT(!"Unknown block area merge strategy");
-			return;
-		}
-		#endif
-	}  // switch (a_Strategy)
+			case cBlockArea::msMask:
+			{
+				InternalMergeBlocks<MetasValid, MergeCombinatorMask<MetasValid> >(
+					GetBlockTypes(), a_Src.GetBlockTypes(),
+					DstMetas, SrcMetas,
+					SizeX, SizeY, SizeZ,
+					SrcOffX, SrcOffY, SrcOffZ,
+					DstOffX, DstOffY, DstOffZ,
+					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+					m_Size.x, m_Size.y, m_Size.z
+				);
+				return;
+			}  // case msMask
+		}  // switch (a_Strategy)
+		UNREACHABLE("Unsupported block area merge strategy");
+	}();
 
 	if (HasBlockEntities())
 	{
@@ -2895,7 +2878,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2916,7 +2899,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2937,7 +2920,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2958,12 +2941,13 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight(InChunkX, InChunkY, InChunkZ);
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
 	}
 }
+
 
 
 

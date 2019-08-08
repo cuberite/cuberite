@@ -820,10 +820,29 @@ public:
 	/** Logs all items in the current stack trace to the server console */
 	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
 
-	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	/** Prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	int ApiParamError(const char * a_MsgFormat, ...);
+	int ApiParamError(fmt::StringRef a_Msg);
+
+	/** Formats and prints the message using printf-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	template <typename... Args>
+	int ApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
+	{
+		return ApiParamError(Printf(a_MsgFormat, a_Args...));
+	}
+
+	/** Formats and prints the message using python-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	template <typename... Args>
+	int FApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
+	{
+		return ApiParamError(fmt::format(a_MsgFormat, a_Args...));
+	}
+
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);

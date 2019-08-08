@@ -56,7 +56,7 @@ public:
 						// Too close to the edge, cannot simulate
 						return true;
 					}
-					if (IsBlockWater(BlockType))
+					if (IsBlockWater(BlockType) || (BlockType == E_BLOCK_FROSTED_ICE))
 					{
 						return true;
 					}

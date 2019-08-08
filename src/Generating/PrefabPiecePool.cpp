@@ -5,9 +5,9 @@
 
 #include "Globals.h"
 #include "PrefabPiecePool.h"
-#include "../Bindings/LuaState.h"
-#include "WorldStorage/SchematicFileSerializer.h"
 #include "VerticalStrategy.h"
+#include "../Bindings/LuaState.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
 
 
@@ -498,9 +498,12 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 			!cPiece::cConnector::StringToDirection(DirectionStr, Direction)
 		)
 		{
-			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d ({%d, %d, %d}, type %d, direction %s). Skipping the connector.",
-				a_PieceName.c_str(), a_FileName.c_str(), idx, RelX, RelY, RelZ, Type, DirectionStr.c_str()
-			);
+			if (a_LogWarnings)
+			{
+				FLOGWARNING("Piece {0} in file {1} has a malformed Connector at index {2} ({3}, type {4}, direction {5}). Skipping the connector.",
+					a_PieceName, a_FileName, idx, Vector3i{RelX, RelY, RelZ}, Type, DirectionStr
+				);
+			}
 			res = false;
 			lua_pop(a_LuaState, 1);  // stk: [Connectors]
 			idx += 1;
@@ -771,7 +774,7 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 
 int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
 {
-	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
@@ -780,7 +783,7 @@ int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const c
 
 int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
 {
-	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
 }
 
 

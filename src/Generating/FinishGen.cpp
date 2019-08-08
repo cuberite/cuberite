@@ -14,6 +14,7 @@
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"
 #include "../IniFile.h"
+#include "../MobSpawner.h"
 
 
 
@@ -670,24 +671,66 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
-bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
+bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
 {
+	if (!IsDesertVariant(a_ChunkDesc.GetBiome(a_RelX, a_RelZ)))
+	{
+		return false;
+	}
+
+	int CactusHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxCactusHeight);
+
+	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
+	if (a_RelY + CactusHeight >= cChunkDef::Height - 1)
+	{
+		CactusHeight = cChunkDef::Height - a_RelY - 1;
+	}
+
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
-		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
-		(a_RelY < 1) || (a_RelY >= cChunkDef::Height - 2) ||
-		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
+		(a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) ||
+		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width - 1)
 	)
 	{
 		return false;
 	}
 
-	// Only allow dirt, grass or sand below sugarcane:
+	for (int i = 0; i < CactusHeight; i++)
+	{
+		const bool cactusExists = i != 0;
+
+		const int y = a_RelY + 1;
+		if (
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX + 1, y, a_RelZ)) 	 ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX - 1, y, a_RelZ)) 	 ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ + 1)) ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ - 1))
+		)
+		{
+			return cactusExists;
+		}
+
+		// All conditions are met, we can place a cactus here
+		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_CACTUS);
+	}
+
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// cFinishGenSprinkleFoliage:
+
+bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
+{
+	int SugarcaneHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxSugarcaneHeight);
+
+	// Only allow dirt, grass, sand and sugarcane below sugarcane:
 	switch (a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ))
 	{
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
 		case E_BLOCK_SAND:
+		case E_BLOCK_SUGARCANE:
 		{
 			break;
 		}
@@ -697,19 +740,39 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 		}
 	}
 
-	// Water is required next to the block below the sugarcane:
+	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
+	if (a_RelY + SugarcaneHeight >= cChunkDef::Height - 1)
+	{
+		SugarcaneHeight = cChunkDef::Height - a_RelY - 1;
+	}
+
+	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1))
+		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
+		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
 	)
 	{
 		return false;
 	}
 
-	// All conditions met, place a sugarcane here:
-	a_ChunkDesc.SetBlockType(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
+	// Water is required next to the block below the sugarcane (if the block below isn't sugarcane already)
+	if (
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1)) &&
+		a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ) != E_BLOCK_SUGARCANE
+	)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < SugarcaneHeight; i++)
+	{
+		// All conditions met, place a sugarcane here
+		a_ChunkDesc.SetBlockType(a_RelX, ++a_RelY, a_RelZ, E_BLOCK_SUGARCANE);
+	}
+
 	return true;
 }
 
@@ -777,7 +840,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
-						++Top;
+						// Checks and block placing are handled in the TryAddSugarcane method
 					}
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
@@ -788,29 +851,22 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				case E_BLOCK_SAND:
 				{
-					int y = Top + 1;
-					if (
-						(x > 0) && (x < cChunkDef::Width - 1) &&
-						(z > 0) && (z < cChunkDef::Width - 1) &&
-						(val1 + val2 > 0.5f) &&
-						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
-						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
-					)
+					if (val1 + val2 > 0.5f)
 					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
+						if (!TryAddCactus(a_ChunkDesc, x, Top, z))
+						{
+							TryAddSugarcane(a_ChunkDesc, x, Top, z);
+						}
 					}
-					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
+					else
 					{
-						++Top;
+						TryAddSugarcane(a_ChunkDesc, x, Top, z);
 					}
 					break;
 				}
 			}  // switch (TopBlock)
 			a_ChunkDesc.SetHeight(x, z, Top);
-		}  // for y
+		}  // for x
 	}  // for z
 }
 
@@ -1492,7 +1548,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
-	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+	FLOGD("Spawning {0} #{1} at {2:.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), NewMob->GetPosition());
 	a_ChunkDesc.GetEntities().emplace_back(std::move(NewMob));
 
 	return true;
@@ -1504,102 +1560,27 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 
 eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 {
-
-	std::set<eMonsterType> ListOfSpawnables;
+	std::vector<eMonsterType> ListOfSpawnables;
 	int chunkX = a_ChunkDesc.GetChunkX();
 	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise2DInt(chunkX + chunkZ, chunkZ) / 7) % cChunkDef::Width;
 
-	// Check biomes first to get a list of animals
-	switch (a_ChunkDesc.GetBiome(x, z))
+	for (auto MobType : cMobSpawner::GetAllowedMobTypes(a_ChunkDesc.GetBiome(x, z)))
 	{
-		// No animals in deserts or non-overworld dimensions
-		case biNether:
-		case biEnd:
-		case biDesertHills:
-		case biDesert:
-		case biDesertM:
+		if (cMonster::FamilyFromType(MobType) == cMonster::eFamily::mfPassive)
 		{
-			return mtInvalidType;
-		}
-
-		// Mooshroom only - no other mobs on mushroom islands
-		case biMushroomIsland:
-		case biMushroomShore:
-		{
-			return mtMooshroom;
-		}
-
-		// Add squid in ocean biomes
-		case biOcean:
-		case biFrozenOcean:
-		case biFrozenRiver:
-		case biRiver:
-		case biDeepOcean:
-		{
-			ListOfSpawnables.insert(mtSquid);
-			break;
-		}
-
-		// Add ocelots in jungle biomes
-		case biJungle:
-		case biJungleHills:
-		case biJungleEdge:
-		case biJungleM:
-		case biJungleEdgeM:
-		{
-			ListOfSpawnables.insert(mtOcelot);
-			break;
-		}
-
-		// Add horses in plains-like biomes
-		case biPlains:
-		case biSunflowerPlains:
-		case biSavanna:
-		case biSavannaPlateau:
-		case biSavannaM:
-		case biSavannaPlateauM:
-		{
-			ListOfSpawnables.insert(mtHorse);
-			break;
-		}
-
-		// Add wolves in forest and spruce forests
-		case biForest:
-		case biTaiga:
-		case biMegaTaiga:
-		case biColdTaiga:
-		case biColdTaigaM:
-		{
-			ListOfSpawnables.insert(mtWolf);
-			break;
-		}
-		// Nothing special about this biome
-		default:
-		{
-			break;
+			ListOfSpawnables.push_back(MobType);
 		}
 	}
-	ListOfSpawnables.insert(mtChicken);
-	ListOfSpawnables.insert(mtCow);
-	ListOfSpawnables.insert(mtPig);
-	ListOfSpawnables.insert(mtSheep);
 
 	if (ListOfSpawnables.empty())
 	{
 		return mtInvalidType;
 	}
 
-	auto MobIter = ListOfSpawnables.begin();
-	using diff_type =
-		std::iterator_traits<decltype(MobIter)>::difference_type;
-	diff_type RandMob = static_cast<diff_type>
-		(static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7)
-		% ListOfSpawnables.size());
-	std::advance(MobIter, RandMob);
-
-	return *MobIter;
+	auto RandMob = (static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size());
+	return ListOfSpawnables[RandMob];
 }
 
 
@@ -2007,7 +1988,7 @@ void cFinishGenOrePockets::imprintSphere(
 		(blockZ >= baseZ) && (blockZ < baseZ + cChunkDef::Width)
 	)
 	{
-		// LOGD("Imprinting a sphere center at {%d, %d, %d}", blockX, blockY, blockZ);
+		// FLOGD("Imprinting a sphere center at {0}", Vector3i{blockX, blockY, blockZ});
 		a_ChunkDesc.SetBlockTypeMeta(blockX - baseX, blockY, blockZ - baseZ, a_OreType, a_OreMeta);
 	}
 	return;

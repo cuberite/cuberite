@@ -2,8 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "HangingEntity.h"
-#include "ClientHandle.h"
 #include "Player.h"
+#include "../ClientHandle.h"
 
 
 
