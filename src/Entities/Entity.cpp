@@ -459,7 +459,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
-						a_TDI.FinalDamage +=2.5 * BaneOfArthropodsLevel;
+						a_TDI.FinalDamage += 2.5 * BaneOfArthropodsLevel;
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
