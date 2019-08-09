@@ -94,6 +94,14 @@ public:
 	Note that this function doesn't check for underflows when using negative amounts. */
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 
+	/** Clamps this cuboid, so that it doesn't reach outside of a_Limits in any direction.
+	Assumes both this and a_Limits are sorted. */
+	void Clamp(const cCuboid & a_Limits);
+
+	/** Clamps this cuboid's p2 so that the cuboid's size doesn't exceed the specified max size.
+	Assumes this cuboid is sorted. */
+	void ClampSize(Vector3i a_MaxSize);
+
 	/** Clamps both X coords to the specified range. Works on unsorted cuboids, too. */
 	void ClampX(int a_MinX, int a_MaxX);
 

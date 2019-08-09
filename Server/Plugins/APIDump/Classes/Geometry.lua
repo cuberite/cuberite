@@ -581,6 +581,28 @@ return
 					Notes = "Assigns all the coords to the specified values. Sort-state is ignored.",
 				},
 			},
+			Clamp =
+			{
+				Params =
+				{
+					{
+						Name = "Limits",
+						Type = "cCuboid",
+					},
+				},
+				Notes = "Clamps this cuboid, so that it doesn't reach outside of Limits in any direction. Assumes both cuboids are sorted.",
+			},
+			ClampSize =
+			{
+				Params =
+				{
+					{
+						Name = "MaxSize",
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Clamps this cuboid's p2 so that the cuboid's size doesn't exceed the specified max size. Assumes the cuboid is sorted.",
+			},
 			ClampX =
 			{
 				Params =
