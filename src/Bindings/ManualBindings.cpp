@@ -24,7 +24,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../BoundingBox.h"
-#include "../BuildInfo.h"
+#include "BuildInfo.h"
 #include "../ClientHandle.h"
 #include "../CommandOutput.h"
 #include "../CompositeChat.h"

@@ -88,7 +88,6 @@ SET (HDRS
 	BlockTypeRegistry.h
 	BrewingRecipes.h
 	BoundingBox.h
-	BuildInfo.h
 	BuildInfo.h.cmake
 	ByteBuffer.h
 	ChatColor.h
