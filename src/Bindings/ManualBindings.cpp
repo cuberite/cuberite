@@ -3954,6 +3954,134 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cCuboid_Assign(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x1, y1, z1, x2, y2, z2;
+	if (L.GetStackValues(2, x1, y1, z1, x2, y2, z2))
+	{
+		LOGWARNING("cCuboid:Assign(x1, y1, z1, x2, y2, z2) is deprecated, use cCuboid:Assign(Vector3i, Vector3i) instead.");
+		L.LogStackTrace();
+		self->Assign({x1, y1, z1}, {x2, y2, z2});
+		return 0;
+	}
+
+	// Try the (cCuboid) param version:
+	cCuboid * other = nullptr;
+	if (L.GetStackValue(2, other) && (other != nullptr))
+	{
+		self->Assign(*other);
+		return 0;
+	}
+
+	// Try the (Vector3i, Vector3i) param version:
+	Vector3i * pt1 = nullptr;
+	Vector3i * pt2 = nullptr;
+	if (L.GetStackValues(2, pt1, pt2) && (pt1 != nullptr) && (pt2 != nullptr))
+	{
+		self->Assign(*pt1, *pt2);
+		return 0;
+	}
+	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
+}
+
+
+
+
+
+static int tolua_cCuboid_IsInside(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3d) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	// Try the (Vector3i) param version:
+	{
+		Vector3i * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+
+	// Try the (Vector3d) param version:
+	{
+		Vector3d * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3i or a Vector3d.");
+}
+
+
+
+
+
+static int tolua_cCuboid_Move(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:Move(x, y, z) is deprecated, use cCuboid:Move(Vector3i) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	Vector3i * offset = nullptr;
+	if (!L.GetStackValue(2, offset) || (offset == nullptr))
+	{
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3i.");
+	}
+	self->Move(*offset);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 {
 	// Check the params:
@@ -4119,6 +4247,12 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "md5HexString", tolua_md5HexString);
 			tolua_function(tolua_S, "sha1", tolua_sha1);
 			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cCuboid");
+			tolua_function(tolua_S, "Assign",   tolua_cCuboid_Assign);
+			tolua_function(tolua_S, "IsInside", tolua_cCuboid_IsInside);
+			tolua_function(tolua_S, "Move",     tolua_cCuboid_Move);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cEntity");
