@@ -33,10 +33,12 @@
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
 	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-	{ \
-		return; \
-	}
+	do { \
+		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+		{ \
+			return; \
+		} \
+	} while (false)
 
 
 

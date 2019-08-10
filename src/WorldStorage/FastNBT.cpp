@@ -143,10 +143,12 @@ std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
 // cParsedNBT:
 
 #define NEEDBYTES(N, ERR) \
-	if (m_Length - m_Pos < static_cast<size_t>(N)) \
-	{ \
-		return ERR; \
-	}
+	do { \
+		if (m_Length - m_Pos < static_cast<size_t>(N)) \
+		{ \
+			return ERR; \
+		} \
+	} while (false)
 
 
 
