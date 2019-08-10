@@ -487,6 +487,11 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
 	L.GetStackValues(1, Self, Position, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
 
+	if (Position == nullptr)
+	{
+		return L.ApiParamError("Expected a non-nil Vector3d for parameter #2");
+	}
+
 	if (!FnRef.IsValid())
 	{
 		return L.ApiParamError("Expected a valid callback function for parameter #3");
