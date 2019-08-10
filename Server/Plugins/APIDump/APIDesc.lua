@@ -15302,6 +15302,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15325,6 +15329,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
