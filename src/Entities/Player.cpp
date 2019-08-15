@@ -1295,7 +1295,7 @@ bool cPlayer::IsGameModeSpectator(void) const
 
 bool cPlayer::CanMobsTarget(void) const
 {
-	return (IsGameModeSurvival() || IsGameModeAdventure()) && m_Health > 0;
+	return (IsGameModeSurvival() || IsGameModeAdventure()) && (m_Health > 0);
 }
 
 
