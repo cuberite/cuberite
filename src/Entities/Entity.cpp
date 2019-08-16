@@ -319,7 +319,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount)
 {
 	TakeDamageInfo TDI;
 	TDI.DamageType = a_DamageType;
@@ -414,7 +414,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
-				a_TDI.FinalDamage *= 1.5;  // 150% damage
+				a_TDI.FinalDamage *= 1.5f;  // 150% damage
 				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
 			}
 		}
@@ -427,7 +427,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
-			a_TDI.FinalDamage += static_cast<int>(ceil(1.25 * SharpnessLevel));
+			a_TDI.FinalDamage += 1.25f * SharpnessLevel;
 		}
 		else if (SmiteLevel > 0)
 		{
@@ -441,7 +441,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtWither:
 					case mtZombiePigman:
 					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * SmiteLevel));
+						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;
 					}
 					default: break;
@@ -459,7 +459,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
+						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
@@ -525,7 +525,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
 	}
 
-	m_Health -= static_cast<float>(a_TDI.FinalDamage);
+	m_Health -= a_TDI.FinalDamage;
 	m_Health = std::max(m_Health, 0.0f);
 
 	// Add knockback:
@@ -868,7 +868,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Position changed -> super::Tick() called:
-		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT)
+		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT);
 
 		// Set swim states (water, lava, and fire):
 		SetSwimState(*NextChunk);
@@ -920,7 +920,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int BlockZ = POSZ_TOINT;
 
 	// Position changed -> super::HandlePhysics() called
-	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ)
+	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ);
 
 	// TODO Add collision detection with entities.
 	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);

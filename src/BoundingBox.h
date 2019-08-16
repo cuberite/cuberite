@@ -31,9 +31,10 @@ public:
 	For example: cBoundingBox([0, 0, 0], 6, 6, -3) would create a bounding cube from (-3, -3, -3) to (3, 3, 3). */
 	cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height, double a_VerticalOffset);
 	cBoundingBox(Vector3d a_Pos, double a_CubeLength);
-	cBoundingBox(const cBoundingBox & a_Orig);
 
-	cBoundingBox & operator=(const cBoundingBox & a_Other);
+	#ifdef TOLUA_EXPOSITION  // tolua isn't aware of implicitly generated copy constructors
+		cBoundingBox(const cBoundingBox & a_Orig);
+	#endif
 
 	/** Moves the entire boundingbox by the specified offset */
 	void Move(double a_OffX, double a_OffY, double a_OffZ);

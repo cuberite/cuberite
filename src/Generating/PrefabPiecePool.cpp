@@ -16,10 +16,12 @@
 
 // Conditionally log a warning
 #define CONDWARNING(ShouldLog, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(__VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(__VA_ARGS__); \
+		} \
+	} while (false)
 
 
 

@@ -10,14 +10,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
 
-void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
+void cCuboid::Assign(Vector3i a_Point1, Vector3i a_Point2)
 {
-	p1.x = a_X1;
-	p1.y = a_Y1;
-	p1.z = a_Z1;
-	p2.x = a_X2;
-	p2.y = a_Y2;
-	p2.z = a_Z2;
+	p1 = a_Point1;
+	p2 = a_Point2;
 }
 
 
@@ -75,14 +71,10 @@ bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 
 
 
-void cCuboid::Move(int a_OfsX, int a_OfsY, int a_OfsZ)
+void cCuboid::Move(Vector3i a_Offset)
 {
-	p1.x += a_OfsX;
-	p1.y += a_OfsY;
-	p1.z += a_OfsZ;
-	p2.x += a_OfsX;
-	p2.y += a_OfsY;
-	p2.z += a_OfsZ;
+	p1.Move(a_Offset);
+	p2.Move(a_Offset);
 }
 
 
@@ -129,10 +121,49 @@ void cCuboid::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY,
 
 
 
+void cCuboid::Clamp(const cCuboid & a_Limits)
+{
+	ASSERT(IsSorted());
+	ASSERT(a_Limits.IsSorted());
+
+	p1.x = ::Clamp(p1.x, a_Limits.p1.x, a_Limits.p2.x);
+	p1.y = ::Clamp(p1.y, a_Limits.p1.y, a_Limits.p2.y);
+	p1.z = ::Clamp(p1.z, a_Limits.p1.z, a_Limits.p2.z);
+	p2.x = ::Clamp(p2.x, a_Limits.p1.x, a_Limits.p2.x);
+	p2.y = ::Clamp(p2.y, a_Limits.p1.y, a_Limits.p2.y);
+	p2.z = ::Clamp(p2.z, a_Limits.p1.z, a_Limits.p2.z);
+}
+
+
+
+
+
+void cCuboid::ClampSize(Vector3i a_MaxSize)
+{
+	ASSERT(IsSorted());
+
+	if (p2.x - p1.x > a_MaxSize.x)
+	{
+		p2.x = p1.x + a_MaxSize.x;
+	}
+	if (p2.y - p1.y > a_MaxSize.y)
+	{
+		p2.y = p1.y + a_MaxSize.y;
+	}
+	if (p2.z - p1.z > a_MaxSize.z)
+	{
+		p2.z = p1.z + a_MaxSize.z;
+	}
+}
+
+
+
+
+
 void cCuboid::ClampX(int a_MinX, int a_MaxX)
 {
-	p1.x = Clamp(p1.x, a_MinX, a_MaxX);
-	p2.x = Clamp(p2.x, a_MinX, a_MaxX);
+	p1.x = ::Clamp(p1.x, a_MinX, a_MaxX);
+	p2.x = ::Clamp(p2.x, a_MinX, a_MaxX);
 }
 
 
@@ -141,8 +172,8 @@ void cCuboid::ClampX(int a_MinX, int a_MaxX)
 
 void cCuboid::ClampY(int a_MinY, int a_MaxY)
 {
-	p1.y = Clamp(p1.y, a_MinY, a_MaxY);
-	p2.y = Clamp(p2.y, a_MinY, a_MaxY);
+	p1.y = ::Clamp(p1.y, a_MinY, a_MaxY);
+	p2.y = ::Clamp(p2.y, a_MinY, a_MaxY);
 }
 
 
@@ -151,8 +182,8 @@ void cCuboid::ClampY(int a_MinY, int a_MaxY)
 
 void cCuboid::ClampZ(int a_MinZ, int a_MaxZ)
 {
-	p1.z = Clamp(p1.z, a_MinZ, a_MaxZ);
-	p2.z = Clamp(p2.z, a_MinZ, a_MaxZ);
+	p1.z = ::Clamp(p1.z, a_MinZ, a_MaxZ);
+	p2.z = ::Clamp(p2.z, a_MinZ, a_MaxZ);
 }
 
 
