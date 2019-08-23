@@ -17,6 +17,7 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	BlockState.cpp
 	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
@@ -84,6 +85,7 @@ SET (HDRS
 	BlockID.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
+	BlockState.h
 	BlockTracer.h
 	BlockTypeRegistry.h
 	BrewingRecipes.h
