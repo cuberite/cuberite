@@ -296,7 +296,7 @@ template class SizeChecker<UInt8,  1>;
 /** Faster than (int)floorf((float)x / (float)div) */
 #define FAST_FLOOR_DIV(x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
-// Own version of assert() that writes failed assertions to the log for review
+// Own version of ASSERT() that plays nicely with the testing framework
 #ifdef TEST_GLOBALS
 
 	class cAssertFailure
@@ -318,50 +318,27 @@ template class SizeChecker<UInt8,  1>;
 		int lineNumber() const { return mLineNumber; }
 	};
 
-	#ifdef _WIN32
-		#if (defined(_MSC_VER) && defined(_DEBUG))
-			#define DBG_BREAK _CrtDbgBreak()
-		#else
-			#define DBG_BREAK
-		#endif
-		#define REPORT_ERROR(FMT, ...) \
-		{ \
-			AString msg = Printf(FMT, __VA_ARGS__); \
-			puts(msg.c_str()); \
-			fflush(stdout); \
-			OutputDebugStringA(msg.c_str()); \
-			DBG_BREAK; \
-		}
-	#else
-		#define REPORT_ERROR(FMT, ...) \
-		{ \
-			AString msg = Printf(FMT, __VA_ARGS__); \
-			puts(msg.c_str()); \
-			fflush(stdout); \
-		}
-	#endif
-
 	#ifdef _DEBUG
 		#define ASSERT(x) do { if (!(x)) { throw cAssertFailure(#x, __FILE__, __LINE__);} } while (0)
 	#else
 		#define ASSERT(...)
 	#endif
 
-#else
+	// Pretty much the same as ASSERT() but stays in Release builds
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
+
+#else  // TEST_GLOBALS
+
 	#ifdef _DEBUG
 		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
 	#else
 		#define ASSERT(x)
 	#endif
-#endif
 
-// Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
+	// Pretty much the same as ASSERT() but stays in Release builds
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
 
-// Same as assert but in all Self test builds
-#ifdef SELF_TEST
-	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
-#endif
+#endif  // else TEST_GLOBALS
 
 /** Use to mark code that should be impossible to reach. */
 #define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)

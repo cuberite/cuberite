@@ -1,5 +1,6 @@
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "HTTP/UrlClient.h"
 #include "OSSupport/NetworkSingleton.h"
 
@@ -228,28 +229,15 @@ int TestRequests()
 
 
 
-int main()
-{
-	LOGD("Test started");
-
-	LOGD("Initializing cNetwork...");
+IMPLEMENT_TEST_MAIN("UrlClient",
+	LOG("Initializing cNetwork...");
 	cNetworkSingleton::Get().Initialise();
-
-	LOGD("Testing...");
+	LOG("Testing...");
 	auto res = TestRequests();
-
-	LOGD("Terminating cNetwork...");
+	LOG("Terminating cNetwork...");
 	cNetworkSingleton::Get().Terminate();
 
 	// No leaked callback instances
-	LOGD("cCallback instances still alive: %d", g_ActiveCallbacks.load());
-	assert_test(g_ActiveCallbacks == 0);
-
-	LOGD("cUrlClient test finished");
-
-	return res;
-}
-
-
-
-
+	LOG("cCallback instances still alive: %d", g_ActiveCallbacks.load());
+	TEST_EQUAL(g_ActiveCallbacks, 0);
+)

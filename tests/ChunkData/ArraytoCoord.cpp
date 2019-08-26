@@ -5,9 +5,9 @@
 
 
 
-int main(int argc, char** argv)
+/** Performs the entire ArrayToCoords test. */
+static void test()
 {
-	LOGD("Test started");
 
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
@@ -104,8 +104,12 @@ int main(int argc, char** argv)
 		buffer.SetSkyLight(SrcNibbleBuffer);
 		TEST_EQUAL(buffer.GetSkyLight({ 6, 24, 1 }), 0xf);
 	}
-
-	// All tests passed:
-	return 0;
 }
 
+
+
+
+
+IMPLEMENT_TEST_MAIN("ChunkData ArrayToCoord",
+	test();
+)

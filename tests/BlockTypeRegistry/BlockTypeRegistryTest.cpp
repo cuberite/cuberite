@@ -236,30 +236,6 @@ static void testBlockTypeRegistry()
 
 
 
-int main()
-{
-	LOGD("BlockTypeRegistryTest started");
-
-	try
-	{
-		testBlockTypeRegistry();
-	}
-	catch (const TestException & exc)
-	{
-		LOGERROR("BlockTypeRegistryTest has failed, an unhandled exception was thrown: %s", exc.mMessage.c_str());
-		return 1;
-	}
-	catch (...)
-	{
-		LOGERROR("BlockTypeRegistryTest has failed, an unhandled exception was thrown.");
-		return 1;
-	}
-
-	LOGD("BlockTypeRegistryTest finished");
-
-	return 0;
-}
-
-
-
-
+IMPLEMENT_TEST_MAIN("BlockTypeRegistryTest",
+	testBlockTypeRegistry();
+)

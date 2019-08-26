@@ -5,7 +5,10 @@
 
 
 
-int main(int argc, char** argv)
+
+
+/** Performs the entire Copies test. */
+static void test()
 {
 	LOGD("Test started");
 
@@ -150,7 +153,12 @@ int main(int argc, char** argv)
 		buffer.CopySkyLight(DstNibbleBuffer);
 		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
 	}
-
-	// All tests successful:
-	return 0;
 }
+
+
+
+
+
+IMPLEMENT_TEST_MAIN("ChunkData Copies",
+	test()
+)

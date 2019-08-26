@@ -5,10 +5,10 @@
 
 
 
-int main(int argc, char** argv)
-{
-	LOGD("Test started");
 
+/** Performs the entire cChunkData coordinates test. */
+static void test()
+{
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
 	{
@@ -46,41 +46,41 @@ int main(int argc, char** argv)
 
 		// Out of range SetBlock
 		TEST_ASSERTS(
-			buffer.SetBlock({ -1, 0, 0 }, 0);
+			buffer.SetBlock({ -1, 0, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetBlock({ 0, -1, 0 }, 0);
+			buffer.SetBlock({ 0, -1, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetBlock({ 0, 0, -1 }, 0);
+			buffer.SetBlock({ 0, 0, -1 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetBlock({ 256, 0, 0 }, 0);
+			buffer.SetBlock({ 256, 0, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetBlock({ 0, 256, 0 }, 0);
+			buffer.SetBlock({ 0, 256, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetBlock({ 0, 0, 256 }, 0);
+			buffer.SetBlock({ 0, 0, 256 }, 0)
 		);
 		// Out of range SetMeta
 		TEST_ASSERTS(
-			buffer.SetMeta({ -1, 0, 0 }, 0);
+			buffer.SetMeta({ -1, 0, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetMeta({ 0, -1, 0 }, 0);
+			buffer.SetMeta({ 0, -1, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetMeta({ 0, 0, -1 }, 0);
+			buffer.SetMeta({ 0, 0, -1 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetMeta({ 256, 0, 0 }, 0);
+			buffer.SetMeta({ 256, 0, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetMeta({ 0, 256, 0 }, 0);
+			buffer.SetMeta({ 0, 256, 0 }, 0)
 		);
 		TEST_ASSERTS(
-			buffer.SetMeta({ 0, 0, 256 }, 0);
+			buffer.SetMeta({ 0, 0, 256 }, 0)
 		);
 
 		// Reading out of range blocks should return air
@@ -124,6 +124,12 @@ int main(int argc, char** argv)
 		copy = std::move(buffer);
 		TEST_EQUAL(copy.GetBlock({ 0, 0, 0 }), 0x42);
 	}
-
-	return 0;
 }
+
+
+
+
+
+IMPLEMENT_TEST_MAIN("ChunkData Coordinates",
+	test();
+)
