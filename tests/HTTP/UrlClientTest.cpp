@@ -233,7 +233,7 @@ IMPLEMENT_TEST_MAIN("UrlClient",
 	LOG("Initializing cNetwork...");
 	cNetworkSingleton::Get().Initialise();
 	LOG("Testing...");
-	auto res = TestRequests();
+	TEST_EQUAL(TestRequests(), 0);
 	LOG("Terminating cNetwork...");
 	cNetworkSingleton::Get().Terminate();
 
