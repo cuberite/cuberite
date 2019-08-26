@@ -1,5 +1,6 @@
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "ChunkData.h"
 
 
@@ -31,72 +32,72 @@ int main(int argc, char** argv)
 
 		// Empty chunks
 		buffer.SetBlock({ 0, 0, 0 }, 0xAB);
-		testassert(buffer.GetBlock({ 0, 0, 0 }) == 0xAB);
+		TEST_EQUAL(buffer.GetBlock({ 0, 0, 0 }), 0xAB);
 		buffer.SetMeta({ 0, 16, 0 }, 0xC);
-		testassert(buffer.GetMeta({ 0, 16, 0 }) == 0xC);
+		TEST_EQUAL(buffer.GetMeta({ 0, 16, 0 }), 0xC);
 
 		// loaded but not written segments
-		testassert(buffer.GetBlock({ 1, 0, 0 }) == 0x0);
-		testassert(buffer.GetMeta({ 1, 16, 0 }) == 0x0);
+		TEST_EQUAL(buffer.GetBlock({ 1, 0, 0 }), 0x0);
+		TEST_EQUAL(buffer.GetMeta({ 1, 16, 0 }), 0x0);
 
 		// Notloaded segments
-		testassert(buffer.GetBlock({ 0, 32, 0 }) == 0x0);
-		testassert(buffer.GetMeta({ 0, 48, 0 }) == 0x0);
+		TEST_EQUAL(buffer.GetBlock({ 0, 32, 0 }), 0x0);
+		TEST_EQUAL(buffer.GetMeta({ 0, 48, 0 }), 0x0);
 
 		// Out of range SetBlock
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ -1, 0, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ 0, -1, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ 0, 0, -1 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ 256, 0, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ 0, 256, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetBlock({ 0, 0, 256 }, 0);
 		);
 		// Out of range SetMeta
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ -1, 0, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ 0, -1, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ 0, 0, -1 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ 256, 0, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ 0, 256, 0 }, 0);
 		);
-		CheckAsserts(
+		TEST_ASSERTS(
 			buffer.SetMeta({ 0, 0, 256 }, 0);
 		);
 
 		// Reading out of range blocks should return air
-		testassert(buffer.GetBlock({ -1, 0, 0 }) == 0);
-		testassert(buffer.GetBlock({ 0, -1, 0 }) == 0);
-		testassert(buffer.GetBlock({ 0, 0, -1 }) == 0);
-		testassert(buffer.GetBlock({ 256, 0, 0 }) == 0);
-		testassert(buffer.GetBlock({ 0, 256, 0 }) == 0);
-		testassert(buffer.GetBlock({ 0, 0, 256 }) == 0);
+		TEST_EQUAL(buffer.GetBlock({  -1,   0,   0 }), 0);
+		TEST_EQUAL(buffer.GetBlock({   0,  -1,   0 }), 0);
+		TEST_EQUAL(buffer.GetBlock({   0,   0,  -1 }), 0);
+		TEST_EQUAL(buffer.GetBlock({ 256,   0,   0 }), 0);
+		TEST_EQUAL(buffer.GetBlock({   0, 256,   0 }), 0);
+		TEST_EQUAL(buffer.GetBlock({   0,   0, 256 }), 0);
 
 		// Reading out of range metas should return 0
-		testassert(buffer.GetMeta({ -1, 0, 0 }) == 0);
-		testassert(buffer.GetMeta({ 0, -1, 0 }) == 0);
-		testassert(buffer.GetMeta({ 0, 0, -1 }) == 0);
-		testassert(buffer.GetMeta({ 256, 0, 0 }) == 0);
-		testassert(buffer.GetMeta({ 0, 256, 0 }) == 0);
-		testassert(buffer.GetMeta({ 0, 0, 256 }) == 0);
+		TEST_EQUAL(buffer.GetMeta({  -1,   0,   0 }), 0);
+		TEST_EQUAL(buffer.GetMeta({   0,  -1,   0 }), 0);
+		TEST_EQUAL(buffer.GetMeta({   0,   0,  -1 }), 0);
+		TEST_EQUAL(buffer.GetMeta({ 256,   0,   0 }), 0);
+		TEST_EQUAL(buffer.GetMeta({   0, 256,   0 }), 0);
+		TEST_EQUAL(buffer.GetMeta({   0,   0, 256 }), 0);
 	}
 
 	{
@@ -105,13 +106,13 @@ int main(int argc, char** argv)
 		// Zero's
 		buffer.SetBlock({ 0, 0, 0 }, 0x0);
 		buffer.SetBlock({ 0, 0, 1 }, 0xab);
-		testassert(buffer.GetBlock({ 0, 0, 0 }) == 0x0);
-		testassert(buffer.GetBlock({ 0, 0, 1 }) == 0xab);
+		TEST_EQUAL(buffer.GetBlock({ 0, 0, 0 }), 0x0);
+		TEST_EQUAL(buffer.GetBlock({ 0, 0, 1 }), 0xab);
 
 		buffer.SetMeta({ 0, 16, 0 }, 0x0);
 		buffer.SetMeta({ 0, 16, 1 }, 0xc);
-		testassert(buffer.GetMeta({ 0, 16, 0 }) == 0x0);
-		testassert(buffer.GetMeta({ 0, 16, 1 }) == 0xc);
+		TEST_EQUAL(buffer.GetMeta({ 0, 16, 0 }), 0x0);
+		TEST_EQUAL(buffer.GetMeta({ 0, 16, 1 }), 0xc);
 	}
 
 
@@ -121,7 +122,7 @@ int main(int argc, char** argv)
 		buffer.SetBlock({ 0, 0, 0 }, 0x42);
 		cChunkData copy(Pool);
 		copy = std::move(buffer);
-		testassert(copy.GetBlock({ 0, 0, 0 }) == 0x42);
+		TEST_EQUAL(copy.GetBlock({ 0, 0, 0 }), 0x42);
 	}
 
 	return 0;

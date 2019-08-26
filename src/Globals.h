@@ -301,6 +301,21 @@ template class SizeChecker<UInt8,  1>;
 
 	class cAssertFailure
 	{
+		AString mExpression;
+		AString mFileName;
+		int mLineNumber;
+
+	public:
+		cAssertFailure(const AString & aExpression, const AString & aFileName, int aLineNumber):
+			mExpression(aExpression),
+			mFileName(aFileName),
+			mLineNumber(aLineNumber)
+		{
+		}
+
+		const AString & expression() const { return mExpression; }
+		const AString & fileName() const { return mFileName; }
+		int lineNumber() const { return mLineNumber; }
 	};
 
 	#ifdef _WIN32
@@ -327,13 +342,9 @@ template class SizeChecker<UInt8,  1>;
 	#endif
 
 	#ifdef _DEBUG
-		#define ASSERT(x) do { if (!(x)) { throw cAssertFailure();} } while (0)
-		#define testassert(x) do { if (!(x)) { REPORT_ERROR("Test failure: %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } } while (0)
-		#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; } REPORT_ERROR("Test failure: assert didn't fire for %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } while (0)
+		#define ASSERT(x) do { if (!(x)) { throw cAssertFailure(#x, __FILE__, __LINE__);} } while (0)
 	#else
 		#define ASSERT(...)
-		#define testassert(...)
-		#define CheckAsserts(...) LOG("Assert checking is disabled in Release-mode executables (file %s, line %d)", __FILE__, __LINE__)
 	#endif
 
 #else
@@ -345,7 +356,7 @@ template class SizeChecker<UInt8,  1>;
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
+#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST

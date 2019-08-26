@@ -34,6 +34,18 @@ public:
 
 
 
+/** Checks that the two values are equal; if not, throws a TestException, includes the specified message. */
+#define TEST_EQUAL_MSG(VAL1, VAL2, MSG) \
+	if (VAL1 != VAL2) \
+	{ \
+		throw TestException(Printf("%s (line %d): Equality test failed: %s != %s (%s)", \
+			__FUNCTION__, __LINE__, \
+			#VAL1, #VAL2, MSG \
+		)); \
+	}
+
+
+
 /** Checks that the two values are not equal; if they are, throws a TestException. */
 #define TEST_NOTEQUAL(VAL1, VAL2) \
 	if (VAL1 == VAL2) \
@@ -69,11 +81,37 @@ public:
 	} \
 	catch (...) \
 	{ \
-		throw TestException(Printf("%s (line %d): An unexpected exception object was thrown, was expecting type %s", \
+		throw TestException(Printf("%s (line %d): An unexpected unknown exception object was thrown, was expecting type %s", \
 			__FUNCTION__, __LINE__, \
 			#ExcClass \
 		)); \
 	}
 
 
+
+
+
+/** Checks that the statement throws an exception of any type. */
+#define TEST_THROWS_ANY(Stmt) \
+	try \
+	{ \
+		Stmt; \
+		throw TestException(Printf("%s (line %d): Failed to throw an exception of any type", \
+			__FUNCTION__, __LINE__ \
+		)); \
+	} \
+	catch (const TestException & exc) \
+	{ \
+		throw exc; \
+	} \
+	catch (...) \
+	{ \
+		/* This is the expected case */ \
+	}
+
+
+
+
+/** Checks that the statement causes an ASSERT trigger. */
+#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
 
