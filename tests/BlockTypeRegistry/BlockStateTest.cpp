@@ -109,37 +109,8 @@ static void testReplacing()
 
 
 
-int main()
-{
-	LOGD("BlockStateTest started");
-
-	try
-	{
-		testStaticCreation();
-		testDynamicCreation();
-		testReplacing();
-	}
-	catch (const TestException & exc)
-	{
-		LOGERROR("BlockStateTest has failed explicitly: %s", exc.mMessage.c_str());
-		return 1;
-	}
-	catch (const std::runtime_error & exc)
-	{
-		LOGERROR("BlockStateTest has failed, an unhandled exception was thrown: %s", exc.what());
-		return 1;
-	}
-	catch (...)
-	{
-		LOGERROR("BlockStateTest has failed, an unknown exception was thrown.");
-		return 1;
-	}
-
-	LOGD("BlockStateTest finished");
-
-	return 0;
-}
-
-
-
-
+IMPLEMENT_TEST_MAIN("BlockStateTest",
+	testStaticCreation();
+	testDynamicCreation();
+	testReplacing();
+)

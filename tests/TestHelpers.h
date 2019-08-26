@@ -1,5 +1,20 @@
 // Helper macros for writing exception-based tests
 
+/*
+The tests are supposed to be contained in small static functions that get called from a main function provided by this framework:
+static void test1()
+{
+	// Perform the test
+}
+
+...
+
+IMPLEMENT_TEST_MAIN("TestName",
+	test1();
+	...
+)
+*/
+
 
 
 
@@ -10,11 +25,17 @@ It bears a single message that is to be displayed to stderr. */
 class TestException
 {
 public:
-	TestException(const AString & aMessage):
+	TestException(const AString & aFileName, int aLineNumber, const AString & aFunctionName, const AString & aMessage):
+		mFileName(aFileName),
+		mLineNumber(aLineNumber),
+		mFunctionName(aFunctionName),
 		mMessage(aMessage)
 	{
 	}
 
+	AString mFileName;
+	int mLineNumber;
+	AString mFunctionName;
 	AString mMessage;
 };
 
@@ -26,11 +47,25 @@ public:
 #define TEST_EQUAL(VAL1, VAL2) \
 	if (VAL1 != VAL2) \
 	{ \
-		throw TestException(Printf("%s (line %d): Equality test failed: %s != %s", \
-			__FUNCTION__, __LINE__, \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Equality test failed: %s != %s", \
 			#VAL1, #VAL2 \
 		)); \
 	}
+
+
+
+
+
+/** Checks that the two values are equal; if not, throws a TestException, includes the specified message. */
+#define TEST_EQUAL_MSG(VAL1, VAL2, MSG) \
+	if (VAL1 != VAL2) \
+	{ \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Equality test failed: %s != %s (%s)", \
+			#VAL1, #VAL2, MSG \
+		)); \
+	}
+
+
 
 
 
@@ -38,11 +73,52 @@ public:
 #define TEST_NOTEQUAL(VAL1, VAL2) \
 	if (VAL1 == VAL2) \
 	{ \
-		throw TestException(Printf("%s (line %d): Inequality test failed: %s == %s", \
-			__FUNCTION__, __LINE__, \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Inequality test failed: %s == %s", \
 			#VAL1, #VAL2 \
 		)); \
 	}
+
+
+
+
+
+/** Checks that the statement evaluates to true. */
+#define TEST_TRUE(X) TEST_EQUAL(X, true)
+
+
+
+
+
+/** Checks that the statement evaluates to false. */
+#define TEST_FALSE(X) TEST_EQUAL(X, false)
+
+
+
+
+
+/** Checks that the statement returns a value greater than or equal to the specified value. */
+#define TEST_GREATER_THAN_OR_EQUAL(Stmt, Val) \
+	do { \
+		if (Stmt < Val) \
+		{ \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s < %s", #Stmt, #Val)); \
+		} \
+	} while (false)
+
+
+
+
+
+/** Checks that the statement returns a value less than or equal to the specified value. */
+#define TEST_LESS_THAN_OR_EQUAL(Stmt, Val) \
+	do { \
+		if (Stmt > Val) \
+		{ \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s > %s", #Stmt, #Val)); \
+		} \
+	} while (false)
+
+
 
 
 
@@ -51,8 +127,7 @@ public:
 	try \
 	{ \
 		Stmt; \
-		throw TestException(Printf("%s (line %d): Failed to throw an exception of type %s", \
-			__FUNCTION__, __LINE__, \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Failed to throw an exception of type %s", \
 			#ExcClass \
 		)); \
 	} \
@@ -62,18 +137,88 @@ public:
 	} \
 	catch (const std::exception & exc) \
 	{ \
-		throw TestException(Printf("%s (line %d): An unexpected std::exception descendant was thrown, was expecting type %s. Message is: %s", \
-			__FUNCTION__, __LINE__, \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("An unexpected std::exception descendant was thrown, was expecting type %s. Message is: %s", \
 			#ExcClass, exc.what() \
 		)); \
 	} \
 	catch (...) \
 	{ \
-		throw TestException(Printf("%s (line %d): An unexpected exception object was thrown, was expecting type %s", \
-			__FUNCTION__, __LINE__, \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("An unexpected unknown exception object was thrown, was expecting type %s", \
 			#ExcClass \
 		)); \
 	}
 
 
 
+
+
+/** Checks that the statement throws an exception of any type. */
+#define TEST_THROWS_ANY(Stmt) \
+	try \
+	{ \
+		Stmt; \
+		throw TestException(__FILE__, __LINE__, __FUNCTION__, "Failed to throw an exception of any type"); \
+	} \
+	catch (const TestException & exc) \
+	{ \
+		throw exc; \
+	} \
+	catch (...) \
+	{ \
+		/* This is the expected case */ \
+	}
+
+
+
+
+
+/** Checks that the statement causes an ASSERT trigger. */
+#ifdef _DEBUG
+	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
+#else
+	#define TEST_ASSERTS(Stmt) LOG("Skipped, cannot test in Release mode: TEST_ASSERT(%s); (%s:%d)", #Stmt, __FILE__, __LINE__);
+#endif  // else _DEBUG
+
+
+
+
+
+/** Used to implement the main() function for tests. */
+#define IMPLEMENT_TEST_MAIN(TestName, TestCode) \
+int main() \
+{ \
+	LOG("Test started: %s", TestName); \
+	\
+	try \
+	{ \
+		TestCode; \
+	} \
+	catch (const TestException & exc) \
+	{ \
+		LOGERROR("Test has failed at file %s, line %d, function %s: %s", \
+			exc.mFileName.c_str(), \
+			exc.mLineNumber, \
+			exc.mFunctionName.c_str(), \
+			exc.mMessage.c_str() \
+		); \
+		return 1; \
+	} \
+	catch (const std::exception & exc) \
+	{ \
+		LOGERROR("Test has failed, an exception was thrown: %s", exc.what()); \
+		return 1; \
+	} \
+	catch (const cAssertFailure & exc) \
+	{ \
+		LOGERROR("Test has failed, an unexpected ASSERT was triggered at %s:%d", exc.fileName().c_str(), exc.lineNumber()); \
+		return 1; \
+	} \
+	catch (...) \
+	{ \
+		LOGERROR("Test has failed, an unhandled exception was thrown."); \
+		return 1; \
+	} \
+	\
+	LOG("Test finished"); \
+	return 0; \
+}
