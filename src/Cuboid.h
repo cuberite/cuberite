@@ -117,6 +117,28 @@ public:
 	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
 	void Engulf(Vector3i a_Point);
 
+	// tolua_end
+
+	/** Checks the two cuboids for equality. */
+	bool operator == (const cCuboid & aOther) const
+	{
+		return (
+			(p1.x == aOther.p1.x) &&
+			(p1.y == aOther.p1.y) &&
+			(p1.z == aOther.p1.z) &&
+			(p2.x == aOther.p2.x) &&
+			(p2.y == aOther.p2.y) &&
+			(p2.z == aOther.p2.z)
+		);
+	}
+
+	bool operator != (const cCuboid & aOther) const
+	{
+		return !operator ==(aOther);
+	}
+
+
+	// tolua_begin
 
 private:
 
