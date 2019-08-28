@@ -18,6 +18,7 @@ SET (SRCS
 	BlockID.cpp
 	BlockInfo.cpp
 	BlockState.cpp
+	BlockTypePalette.cpp
 	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
@@ -59,6 +60,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	NetherPortalScanner.cpp
 	OverridesSettingsRepository.cpp
+	PalettedBlockArea.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -87,6 +89,7 @@ SET (HDRS
 	BlockInfo.h
 	BlockState.h
 	BlockTracer.h
+	BlockTypePalette.h
 	BlockTypeRegistry.h
 	BrewingRecipes.h
 	BoundingBox.h
@@ -140,6 +143,7 @@ SET (HDRS
 	NetherPortalScanner.h
 	OpaqueWorld.h
 	OverridesSettingsRepository.h
+	PalettedBlockArea.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h
