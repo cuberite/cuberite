@@ -65,6 +65,12 @@ public:
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
+
+	/** Returns a string that describes the chunk coords, suitable for logging. */
+	AString ToString() const
+	{
+		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
+	}
 } ;
 
 
@@ -445,7 +451,15 @@ struct sSetBlock
 	BLOCKTYPE m_BlockType;
 	NIBBLETYPE m_BlockMeta;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+		m_RelX(a_BlockX),
+		m_RelY(a_BlockY),
+		m_RelZ(a_BlockZ),
+		m_BlockType(a_BlockType),
+		m_BlockMeta(a_BlockMeta)
+	{
+		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
+	}
 
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
@@ -525,7 +539,7 @@ public:
 	virtual ~cChunkCoordCallback() {}
 
 	/** Called with the chunk's coords, and an optional operation status flag for operations that support it. */
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) = 0;
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) = 0;
 } ;
 
 

@@ -1648,13 +1648,13 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_JUNGLE:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta);
+			bool IsLarge = GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta);
 			GetJungleTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
 		case E_META_SAPLING_DARK_OAK:
 		{
-			if (!GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta))
+			if (!GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta))
 			{
 				return;
 			}
@@ -1666,6 +1666,92 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
 	GrowTreeImage(Other);
+}
+
+
+
+
+
+bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta)
+{
+	bool IsLarge = true;
+	a_Meta = a_Meta & 0x07;
+
+	// Check to see if we are the northwest corner
+	for (int x = 0; x  < 2; ++x)
+	{
+		for (int z = 0; z < 2; ++z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the southwest corner
+	for (int x = 0; x  < 2; ++x)
+	{
+		for (int z = 0; z > -2; --z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_Z;
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the southeast corner
+	for (int x = 0; x > -2; --x)
+	{
+		for (int z = 0; z > -2; --z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_Z;
+		--a_X;
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the northeast corner
+	for (int x = 0; x > -2; --x)
+	{
+		for (int z = 0; z < 2; ++z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_X;
+	}
+
+	return IsLarge;
 }
 
 
@@ -2514,7 +2600,7 @@ void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
 	if (!a_SetChunkData->AreBiomesValid())
 	{
 		// The biomes are not assigned, get them from the generator:
-		m_Generator.GenerateBiomes(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ(), a_SetChunkData->GetBiomes());
+		m_Generator.GenerateBiomes({a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()}, a_SetChunkData->GetBiomes());
 		a_SetChunkData->MarkBiomesValid();
 	}
 
@@ -3157,7 +3243,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
 
-	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, true);
+	m_Generator.QueueGenerateChunk({a_ChunkX, a_ChunkZ}, true);
 }
 
 
@@ -3770,27 +3856,27 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(cChunkCoords a_Coords)
 {
-	return m_World->IsChunkValid(a_ChunkX, a_ChunkZ);
+	return m_World->IsChunkValid(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(cChunkCoords a_Coords)
 {
-	return m_World->IsChunkQueued(a_ChunkX, a_ChunkZ);
+	return m_World->IsChunkQueued(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(cChunkCoords a_Coords)
 {
-	return m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
+	return m_World->HasChunkAnyClients(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 

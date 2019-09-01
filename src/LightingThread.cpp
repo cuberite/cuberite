@@ -237,7 +237,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		if (a_Item.m_CallbackAfter != nullptr)
 		{
-			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+			a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 		}
 		return;
 	}
@@ -318,7 +318,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{
-		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+		a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 	}
 }
 

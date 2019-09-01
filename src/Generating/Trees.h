@@ -19,8 +19,6 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 
 #include "../Noise/Noise.h"
 
-class cWorld;
-
 
 
 
@@ -104,9 +102,3 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 
 /** Generates an image of a small jungle tree (1x1 trunk) */
 void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
-
-/** Moves the x and z coordinants to the north-west corner of a 2x2 of saplings. Returns true if a 2x2 was found, otherwise it returns false */
-bool GetLargeTreeAdjustment(cWorld & a_World, int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta);
-
-
-

@@ -19,7 +19,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	cChunkDesc WorkerDesc(ChunkX, ChunkZ);
+	cChunkDesc WorkerDesc({ChunkX, ChunkZ});
 
 	// Generate trees:
 	for (int x = 0; x <= 2; x++)
@@ -34,7 +34,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 			if ((x != 1) || (z != 1))
 			{
 				Dest = &WorkerDesc;
-				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
+				WorkerDesc.SetChunkCoords({BaseX, BaseZ});
 
 				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
 

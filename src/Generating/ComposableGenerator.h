@@ -183,17 +183,17 @@ typedef std::list<cFinishGenPtr> cFinishGenList;
 
 
 class cComposableGenerator :
-	public cChunkGenerator::cGenerator
+	public cChunkGenerator
 {
-	typedef cChunkGenerator::cGenerator super;
+	typedef cChunkGenerator Super;
 
 public:
-	cComposableGenerator(cChunkGenerator & a_ChunkGenerator);
+	cComposableGenerator();
 
 	// cChunkGenerator::cGenerator overrides:
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
+	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 
 protected:
 	// The generator's composition:
