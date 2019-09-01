@@ -25,6 +25,8 @@ void cChunkGenerator::Initialize(cIniFile & a_IniFile)
 		LOGINFO("Chosen a new random seed for world: %d", m_Seed);
 		a_IniFile.SetValueI("Seed", "Seed", m_Seed);
 	}
+
+	m_Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 }
 
 

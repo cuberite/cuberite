@@ -1133,11 +1133,8 @@ private:
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
 
-	/** Sets generator values to dimension specific defaults, if those values do not exist */
-	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);
-
 	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
-	void InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile);
+	void InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile);
 
 	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
 	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */

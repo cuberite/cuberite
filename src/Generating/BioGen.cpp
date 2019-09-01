@@ -32,7 +32,15 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "");
+	AString defaultBiome;
+	switch (StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld")))
+	{
+		case dimOverworld: defaultBiome = "Plains";    break;
+		case dimNether:    defaultBiome = "Nether";    break;
+		case dimEnd:       defaultBiome = "End";       break;
+		case dimNotSet:    defaultBiome = "Swampland"; break;
+	}
+	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", defaultBiome);
 	m_Biome = StringToBiome(Biome);
 	if (m_Biome == biInvalidBiome)
 	{
@@ -1144,11 +1152,11 @@ protected:
 
 cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
 {
-	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
+	AString BiomeGenName = a_IniFile.GetValue("Generator", "BiomeGen");
 	if (BiomeGenName.empty())
 	{
-		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
-		BiomeGenName = "MultiStepMap";
+		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"Grown\".");
+		BiomeGenName = "Grown";
 	}
 
 	cBiomeGen * res = nullptr;
@@ -1175,9 +1183,9 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	{
 		res = new cBioGenTwoLevel(a_Seed);
 	}
-	else if (NoCaseCompare(BiomeGenName, "grown") == 0)
+	else if (NoCaseCompare(BiomeGenName, "multistepmap") == 0)
 	{
-		res = new cBioGenGrown(a_Seed);
+		res = new cBioGenMultiStepMap(a_Seed);
 	}
 	else if (NoCaseCompare(BiomeGenName, "grownprot") == 0)
 	{
@@ -1185,24 +1193,11 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	}
 	else
 	{
-		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
+		if (NoCaseCompare(BiomeGenName, "grown") != 0)
 		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"Grown\" instead.", BiomeGenName.c_str());
 		}
-		res = new cBioGenMultiStepMap(a_Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 5000; x++)
-		{
-			cChunkDef::BiomeMap Biomes;
-			res->GenBiomes(x * 5, x * 5, Biomes);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
+		res = new cBioGenGrown(a_Seed);
 	}
 	res->InitializeBiomeGen(a_IniFile);
 

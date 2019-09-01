@@ -50,6 +50,9 @@ protected:
 
 	/** The main seed, read from the INI file, used for the entire generator. */
 	int m_Seed;
+
+	/** The dimension, read from the INI file. */
+	eDimension m_Dimension;
 };
 
 
