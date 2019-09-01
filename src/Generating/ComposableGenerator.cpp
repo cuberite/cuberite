@@ -37,9 +37,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
 
-cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, int a_Seed)
+cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
+	cIniFile & a_IniFile,
+	cBiomeGenPtr a_BiomeGen,
+	cTerrainShapeGenPtr a_ShapeGen,
+	int a_Seed
+)
 {
-	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
+	AString CompoGenName = a_IniFile.GetValue("Generator", "CompositionGen");
 	if (CompoGenName.empty())
 	{
 		LOGWARN("[Generator] CompositionGen value not set in world.ini, using \"Biomal\".");
@@ -123,6 +128,9 @@ void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 {
 	Super::Initialize(a_IniFile);
 
+	// Add the defaults, if they're not overridden:
+	InitializeGeneratorDefaults(a_IniFile, m_Dimension);
+
 	InitBiomeGen(a_IniFile);
 	InitShapeGen(a_IniFile);
 	InitCompositionGen(a_IniFile);
@@ -189,6 +197,84 @@ void cComposableGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_C
 
 
 
+void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDimension a_Dimension)
+{
+	switch (a_Dimension)
+	{
+		case dimOverworld:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "Finishers",
+				"RoughRavines, "
+				"WormNestCaves, "
+				"WaterLakes, "
+				"WaterSprings, "
+				"LavaLakes, "
+				"LavaSprings, "
+				"OreNests, "
+				"Mineshafts, "
+				"Trees, "
+				"Villages, "
+				"TallGrass, "
+				"SprinkleFoliage, "
+				"Ice, "
+				"Snow, "
+				"Lilypads, "
+				"BottomLava, "
+				"DeadBushes, "
+				"NaturalPatches, "
+				"PreSimulator, "
+				"Animals"
+			);
+			break;
+		}  // dimOverworld
+
+		case dimNether:
+		{
+			a_IniFile.GetValueSet("Generator", "Generator",        "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",         "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",    "Nether");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",         "HeightMap");
+			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
+			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
+			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
+			a_IniFile.GetValueSet("Generator", "Finishers",
+				"SoulsandRims, "
+				"WormNestCaves, "
+				"BottomLava, "
+				"LavaSprings, "
+				"NetherClumpFoliage, "
+				"NetherOreNests, "
+				"PieceStructures: NetherFort, "
+				"GlowStone, "
+				"PreSimulator");
+			break;
+		}  // dimNether
+
+		case dimEnd:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "");
+			break;
+		}  // dimEnd
+
+		default:
+		{
+			ASSERT(!"Unhandled dimension");
+			break;
+		}
+	}
+}
+
+
+
+
+
 void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
@@ -228,7 +314,12 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
-	m_ShapeGen = cTerrainShapeGen::CreateShapeGen(a_IniFile, m_BiomeGen, m_Seed, CacheOffByDefault);
+	m_ShapeGen = cTerrainShapeGen::CreateShapeGen(
+		a_IniFile,
+		m_BiomeGen,
+		m_Seed,
+		CacheOffByDefault
+	);
 
 	/*
 	// TODO
@@ -255,7 +346,12 @@ void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
-	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(a_IniFile, m_BiomeGen, m_ShapeGen, m_Seed);
+	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(
+		a_IniFile,
+		m_BiomeGen,
+		m_ShapeGen,
+		m_Seed
+	);
 
 	// Add a cache over the composition generator:
 	// Even a cache of size 1 is useful due to the CompositedHeiGen cache after us doing re-composition on its misses
@@ -276,10 +372,9 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
-	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 	auto seaLevel = a_IniFile.GetValueI("Generator", "SeaLevel");
 
-	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "");
+	AString Finishers = a_IniFile.GetValue("Generator", "Finishers");
 
 	// Create all requested finishers:
 	AStringVector Str = StringSplitAndTrim(Finishers, ",");
@@ -294,11 +389,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		// Finishers, alpha-sorted:
 		if (NoCaseCompare(finisher, "Animals") == 0)
 		{
-			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPassiveMobs(m_Seed, a_IniFile, Dimension)));
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPassiveMobs(m_Seed, a_IniFile, m_Dimension)));
 		}
 		else if (NoCaseCompare(finisher, "BottomLava") == 0)
 		{
-			int DefaultBottomLavaLevel = (Dimension == dimNether) ? 30 : 10;
+			int DefaultBottomLavaLevel = (m_Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenBottomLava(BottomLavaLevel)));
 		}
@@ -369,7 +464,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(finisher, "LavaSprings") == 0)
 		{
-			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenFluidSprings(m_Seed, E_BLOCK_LAVA, a_IniFile, Dimension)));
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenFluidSprings(m_Seed, E_BLOCK_LAVA, a_IniFile, m_Dimension)));
 		}
 		else if (NoCaseCompare(finisher, "Lilypads") == 0)
 		{
@@ -566,7 +661,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(finisher, "WaterSprings") == 0)
 		{
-			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenFluidSprings(m_Seed, E_BLOCK_WATER, a_IniFile, Dimension)));
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenFluidSprings(m_Seed, E_BLOCK_WATER, a_IniFile, m_Dimension)));
 		}
 		else if (NoCaseCompare(finisher, "WormNestCaves") == 0)
 		{

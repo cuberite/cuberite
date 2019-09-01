@@ -7,6 +7,7 @@
 #include "Root.h"
 #include "IniFile.h"
 #include "Generating/ChunkDesc.h"
+#include "Generating/ComposableGenerator.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
 #include "LineBlockTracer.h"
@@ -400,8 +401,9 @@ cWorld::cWorld(
 	m_TNTShrapnelLevel = static_cast<eShrapnelLevel>(Clamp<int>(TNTShrapnelLevel, slNone,     slAll));
 	m_Weather          = static_cast<eWeather>      (Clamp<int>(Weather,          wSunny,     wStorm));
 
-	InitialiseGeneratorDefaults(IniFile);
-	InitialiseAndLoadMobSpawningValues(IniFile);
+	cComposableGenerator::InitializeGeneratorDefaults(IniFile, m_Dimension);
+
+	InitializeAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
 	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
@@ -881,54 +883,7 @@ eWeather cWorld::ChooseNewWeather()
 
 
 
-void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
-{
-	switch (GetDimension())
-	{
-		case dimEnd:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			break;
-		}
-		case dimOverworld:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "RoughRavines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, TallGrass, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
-			break;
-		}
-		case dimNether:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",        "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",         "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome",    "Nether");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",         "HeightMap");
-			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
-			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
-			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers",        "SoulsandRims, WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherOreNests, PieceStructures: NetherFort, GlowStone, PreSimulator");
-			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
-			break;
-		}
-		case dimNotSet:
-		{
-			ASSERT(!"Dimension not set");
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
+void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 {
 	AString DefaultMonsters;
 	switch (m_Dimension)

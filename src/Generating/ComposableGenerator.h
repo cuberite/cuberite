@@ -55,11 +55,16 @@ public:
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
 
-	/** Creates the correct BiomeGen descendant based on the ini file settings and the seed provided.
+	/** Creates the correct BiomeGen descendant based on the ini file settings.
+	a_Seed is the seed read from the INI file.
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default.
 	Used in BiomeVisualiser, too.
 	Implemented in BioGen.cpp! */
-	static cBiomeGenPtr CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
+	static cBiomeGenPtr CreateBiomeGen(
+		cIniFile & a_IniFile,
+		int a_Seed,
+		bool & a_CacheOffByDefault
+	);
 } ;
 
 
@@ -91,7 +96,12 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default
 	Implemented in ShapeGen.cpp!
 	*/
-	static cTerrainShapeGenPtr CreateShapeGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
+	static cTerrainShapeGenPtr CreateShapeGen(
+		cIniFile & a_IniFile,
+		cBiomeGenPtr a_BiomeGen,
+		int a_Seed,
+		bool & a_CacheOffByDefault
+	);
 } ;
 
 
@@ -126,7 +136,12 @@ public:
 	}
 
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */
-	static cTerrainHeightGenPtr CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
+	static cTerrainHeightGenPtr CreateHeightGen(
+		cIniFile & a_IniFile,
+		cBiomeGenPtr a_BiomeGen,
+		int a_Seed,
+		bool & a_CacheOffByDefault
+	);
 } ;
 
 
@@ -152,9 +167,13 @@ public:
 
 	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
 	a_BiomeGen is the underlying biome generator, some composition generators may depend on it providing additional biomes around the chunk
-	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk
-	*/
-	static cTerrainCompositionGenPtr CreateCompositionGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, int a_Seed);
+	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk. */
+	static cTerrainCompositionGenPtr CreateCompositionGen(
+		cIniFile & a_IniFile,
+		cBiomeGenPtr a_BiomeGen,
+		cTerrainShapeGenPtr a_ShapeGen,
+		int a_Seed
+	);
 } ;
 
 
@@ -195,7 +214,13 @@ public:
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 
+	/** If there's no particular sub-generator set in the INI file,
+	adds the default one, based on the dimension. */
+	static void InitializeGeneratorDefaults(cIniFile & a_IniFile, eDimension a_Dimension);
+
+
 protected:
+
 	// The generator's composition:
 	/** The biome generator. */
 	cBiomeGenPtr m_BiomeGen;

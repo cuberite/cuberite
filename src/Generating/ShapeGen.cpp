@@ -75,9 +75,14 @@ typedef std::shared_ptr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainShapeGen:
 
-cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
+cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
+	cIniFile & a_IniFile,
+	cBiomeGenPtr a_BiomeGen,
+	int a_Seed,
+	bool & a_CacheOffByDefault
+)
 {
-	AString shapeGenName = a_IniFile.GetValueSet("Generator", "ShapeGen", "");
+	AString shapeGenName = a_IniFile.GetValue("Generator", "ShapeGen");
 	if (shapeGenName.empty())
 	{
 		LOGWARN("[Generator] ShapeGen value not set in world.ini, using \"BiomalNoise3D\".");
