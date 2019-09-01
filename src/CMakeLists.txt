@@ -27,6 +27,7 @@ SET (SRCS
 	ChatColor.cpp
 	Chunk.cpp
 	ChunkData.cpp
+	ChunkGeneratorThread.cpp
 	ChunkMap.cpp
 	ChunkSender.cpp
 	ChunkStay.cpp
@@ -100,6 +101,7 @@ SET (HDRS
 	ChunkData.h
 	ChunkDataCallback.h
 	ChunkDef.h
+	ChunkGeneratorThread.h
 	ChunkMap.h
 	ChunkSender.h
 	ChunkStay.h

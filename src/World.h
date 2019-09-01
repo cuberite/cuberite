@@ -8,7 +8,7 @@
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
-#include "Generating/ChunkGenerator.h"
+#include "ChunkGeneratorThread.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
@@ -824,7 +824,7 @@ public:
 
 	// tolua_end
 
-	cChunkGenerator & GetGenerator(void) { return m_Generator; }
+	cChunkGeneratorThread & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
 
@@ -883,16 +883,16 @@ private:
 
 	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	class cChunkGeneratorCallbacks :
-		public cChunkGenerator::cChunkSink,
-		public cChunkGenerator::cPluginInterface
+		public cChunkGeneratorThread::cChunkSink,
+		public cChunkGeneratorThread::cPluginInterface
 	{
 		cWorld * m_World;
 
 		// cChunkSink overrides:
 		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
-		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
-		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
-		virtual bool IsChunkQueued     (int a_ChunkX, int a_ChunkZ) override;
+		virtual bool IsChunkValid      (cChunkCoords a_Coords) override;
+		virtual bool HasChunkAnyClients(cChunkCoords a_Coords) override;
+		virtual bool IsChunkQueued     (cChunkCoords a_Coords) override;
 
 		// cPluginInterface overrides:
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
@@ -1031,8 +1031,8 @@ private:
 	Only used when this world is an Overworld. */
 	AString m_LinkedEndWorldName;
 
-
-	cChunkGenerator  m_Generator;
+	/** The thread responsible for generating chunks. */
+	cChunkGeneratorThread m_Generator;
 
 	cScoreboard      m_Scoreboard;
 	cMapManager      m_MapManager;
@@ -1143,4 +1143,8 @@ private:
 	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
+	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
+	If so, adjusts the X and Z coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
+	Returns false if not a part of large-tree sapling. */
+	bool GetLargeTreeAdjustment(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_SaplingMeta);
 };  // tolua_export

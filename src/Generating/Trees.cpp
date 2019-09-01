@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "Trees.h"
-#include "../World.h"
 
 
 
@@ -1055,90 +1054,4 @@ void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	// Top plus, all leaves:
 	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
-}
-
-
-
-
-
-bool GetLargeTreeAdjustment(cWorld & a_World, int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta)
-{
-	bool IsLarge = true;
-	a_Meta = a_Meta & 0x07;
-
-	// Check to see if we are the northwest corner
-	for (int x = 0; x  < 2; ++x)
-	{
-		for (int z = 0; z < 2; ++z)
-		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			a_World.GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
-		}
-	}
-
-	if (IsLarge)
-	{
-		return true;
-	}
-
-	IsLarge = true;
-	// Check to see if we are the southwest corner
-	for (int x = 0; x  < 2; ++x)
-	{
-		for (int z = 0; z > -2; --z)
-		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			a_World.GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
-		}
-	}
-
-	if (IsLarge)
-	{
-		--a_Z;
-		return true;
-	}
-
-	IsLarge = true;
-	// Check to see if we are the southeast corner
-	for (int x = 0; x > -2; --x)
-	{
-		for (int z = 0; z > -2; --z)
-		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			a_World.GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
-		}
-	}
-
-	if (IsLarge)
-	{
-		--a_Z;
-		--a_X;
-		return true;
-	}
-
-	IsLarge = true;
-	// Check to see if we are the northeast corner
-	for (int x = 0; x > -2; --x)
-	{
-		for (int z = 0; z < 2; ++z)
-		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			a_World.GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
-		}
-	}
-
-	if (IsLarge)
-	{
-		--a_X;
-	}
-
-	return IsLarge;
 }

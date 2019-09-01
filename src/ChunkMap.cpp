@@ -1798,7 +1798,7 @@ void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkC
 	// The chunk is present and lit, just call the callback, report as success:
 	if (a_Callback != nullptr)
 	{
-		a_Callback->Call(a_ChunkX, a_ChunkZ, true);
+		a_Callback->Call({a_ChunkX, a_ChunkZ}, true);
 	}
 }
 
@@ -1831,34 +1831,34 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 			}
 
 			// cChunkCoordCallback override:
-			virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_CBIsSuccess) override
+			virtual void Call(cChunkCoords a_Coords, bool a_CBIsSuccess) override
 			{
 				// If success is reported, the chunk is already valid, no need to do anything else:
 				if (a_CBIsSuccess)
 				{
 					if (m_Callback != nullptr)
 					{
-						m_Callback->Call(a_CBChunkX, a_CBChunkZ, true);
+						m_Callback->Call(a_Coords, true);
 					}
 					return;
 				}
 
 				// The chunk failed to load, generate it:
 				cCSLock CBLock(m_ChunkMap.m_CSChunks);
-				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_CBChunkX, a_CBChunkZ);
+				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 
 				if (CBChunk == nullptr)
 				{
 					// An error occurred, but we promised to call the callback, so call it even when there's no real chunk data:
 					if (m_Callback != nullptr)
 					{
-						m_Callback->Call(a_CBChunkX, a_CBChunkZ, false);
+						m_Callback->Call(a_Coords, false);
 					}
 					return;
 				}
 
 				CBChunk->SetPresence(cChunk::cpQueued);
-				m_World.GetGenerator().QueueGenerateChunk(a_CBChunkX, a_CBChunkZ, false, m_Callback);
+				m_World.GetGenerator().QueueGenerateChunk(a_Coords, false, m_Callback);
 			}
 
 		protected:
@@ -1873,7 +1873,7 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 	// The chunk is valid, just call the callback:
 	if (a_Callback != nullptr)
 	{
-		a_Callback->Call(a_ChunkX, a_ChunkZ, true);
+		a_Callback->Call({a_ChunkX, a_ChunkZ}, true);
 	}
 	return true;
 }

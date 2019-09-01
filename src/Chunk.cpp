@@ -50,23 +50,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// sSetBlock:
-
-sSetBlock::sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
-	m_RelX(a_BlockX),
-	m_RelY(a_BlockY),
-	m_RelZ(a_BlockZ),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta)
-{
-	cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
 cChunk::cChunk(
@@ -276,7 +259,7 @@ void cChunk::MarkLoadFailed(void)
 	// If the chunk is marked as needed, generate it:
 	if (m_ShouldGenerateIfLoadFailed)
 	{
-		m_World->GetGenerator().QueueGenerateChunk(m_PosX, m_PosZ, false);
+		m_World->GetGenerator().QueueGenerateChunk({m_PosX, m_PosZ}, false);
 	}
 	else
 	{

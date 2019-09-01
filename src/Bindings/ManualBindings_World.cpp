@@ -727,9 +727,9 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	{
 	public:
 		// cChunkCoordCallback override:
-		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
+		virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 		{
-			m_LuaCallback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
+			m_LuaCallback.Call(a_Coords.m_ChunkX, a_Coords.m_ChunkZ, a_IsSuccess);
 		}
 
 		cLuaState::cOptionalCallback m_LuaCallback;

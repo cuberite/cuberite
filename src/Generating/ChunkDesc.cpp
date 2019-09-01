@@ -13,9 +13,8 @@
 
 
 
-cChunkDesc::cChunkDesc(int a_ChunkX, int a_ChunkZ) :
-	m_ChunkX(a_ChunkX),
-	m_ChunkZ(a_ChunkZ),
+cChunkDesc::cChunkDesc(cChunkCoords a_Coords) :
+	m_Coords(a_Coords),
 	m_bUseDefaultBiomes(true),
 	m_bUseDefaultHeight(true),
 	m_bUseDefaultComposition(true),
@@ -43,10 +42,9 @@ cChunkDesc::~cChunkDesc()
 
 
 
-void cChunkDesc::SetChunkCoords(int a_ChunkX, int a_ChunkZ)
+void cChunkDesc::SetChunkCoords(cChunkCoords a_Coords)
 {
-	m_ChunkX = a_ChunkX;
-	m_ChunkZ = a_ChunkZ;
+	m_Coords = a_Coords;
 }
 
 
@@ -369,9 +367,9 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	int SizeY = a_MaxRelY - a_MinRelY;
 	int SizeZ = a_MaxRelZ - a_MinRelZ;
 	a_Dest.Clear();
-	a_Dest.m_Origin.x = m_ChunkX * cChunkDef::Width + a_MinRelX;
+	a_Dest.m_Origin.x = m_Coords.m_ChunkX * cChunkDef::Width + a_MinRelX;
 	a_Dest.m_Origin.y = a_MinRelY;
-	a_Dest.m_Origin.z = m_ChunkZ * cChunkDef::Width + a_MinRelZ;
+	a_Dest.m_Origin.z = m_Coords.m_ChunkZ * cChunkDef::Width + a_MinRelZ;
 	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baTypes | cBlockArea::baMetas);
 
 	for (int y = 0; y < SizeY; y++)
@@ -593,8 +591,8 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 		}
 	}
 
-	int AbsX = a_RelX + m_ChunkX * cChunkDef::Width;
-	int AbsZ = a_RelZ + m_ChunkZ * cChunkDef::Width;
+	int AbsX = a_RelX + m_Coords.m_ChunkX * cChunkDef::Width;
+	int AbsZ = a_RelZ + m_Coords.m_ChunkZ * cChunkDef::Width;
 
 	// The block entity is not created yet, try to create it and add to list:
 	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);

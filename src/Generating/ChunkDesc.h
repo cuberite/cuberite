@@ -39,15 +39,21 @@ public:
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
 
 
-	cChunkDesc(int a_ChunkX, int a_ChunkZ);
+	cChunkDesc(cChunkCoords a_Coords);
 	~cChunkDesc();
 
-	void SetChunkCoords(int a_ChunkX, int a_ChunkZ);
+	void SetChunkCoords(cChunkCoords a_Coords);
 
 	// tolua_begin
 
-	int GetChunkX(void) const { return m_ChunkX; }
-	int GetChunkZ(void) const { return m_ChunkZ; }
+	int GetChunkX() const { return m_Coords.m_ChunkX; }  // Prefer GetChunkCoords() instead
+	int GetChunkZ() const { return m_Coords.m_ChunkZ; }  // Prefer GetChunkCoords() instead
+
+	// tolua_end
+
+	cChunkCoords GetChunkCoords() const { return m_Coords; }
+
+	// tolua_begin
 
 	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -225,8 +231,7 @@ public:
 	#endif  // _DEBUG
 
 private:
-	int m_ChunkX;
-	int m_ChunkZ;
+	cChunkCoords m_Coords;
 
 	cChunkDef::BiomeMap     m_BiomeMap;
 	cBlockArea              m_BlockArea;

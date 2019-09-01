@@ -21,17 +21,17 @@
 
 
 class cNoise3DGenerator :
-	public cChunkGenerator::cGenerator
+	public cChunkGenerator
 {
-	typedef cChunkGenerator::cGenerator super;
+	typedef cChunkGenerator Super;
 
 public:
-	cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator);
+	cNoise3DGenerator();
 	virtual ~cNoise3DGenerator() override;
 
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
+	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:

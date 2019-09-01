@@ -148,8 +148,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // cNoise3DGenerator:
 
-cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
-	super(a_ChunkGenerator),
+cNoise3DGenerator::cNoise3DGenerator():
+	Super(),
 	m_Perlin(1000),
 	m_Cubic(1000)
 {
@@ -207,7 +207,7 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 
 
-void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
+void cNoise3DGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
 	NOISE_DATATYPE Noise[17 * 257 * 17];
 	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
