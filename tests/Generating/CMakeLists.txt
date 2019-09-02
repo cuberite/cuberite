@@ -10,10 +10,16 @@ add_definitions(-DTEST_GLOBALS=1)
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BiomeDef.cpp
 	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
+	${CMAKE_SOURCE_DIR}/src/BlockID.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
+	${CMAKE_SOURCE_DIR}/src/Enchantments.cpp
+	${CMAKE_SOURCE_DIR}/src/FastRandom.cpp
+	${CMAKE_SOURCE_DIR}/src/IniFile.cpp
+	${CMAKE_SOURCE_DIR}/src/ProbabDistrib.cpp
 	${CMAKE_SOURCE_DIR}/src/StringCompression.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${CMAKE_SOURCE_DIR}/src/VoronoiMap.cpp
 
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.cpp  # Needed for PrefabPiecePool loading
 
@@ -64,11 +70,18 @@ set (GENERATING_SRCS
 set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/BiomeDef.h
 	${CMAKE_SOURCE_DIR}/src/BlockArea.h
+	${CMAKE_SOURCE_DIR}/src/BlockID.h
 	${CMAKE_SOURCE_DIR}/src/Cuboid.h
 	${CMAKE_SOURCE_DIR}/src/ChunkData.h
+	${CMAKE_SOURCE_DIR}/src/ChunkDef.h
+	${CMAKE_SOURCE_DIR}/src/Enchantments.h
+	${CMAKE_SOURCE_DIR}/src/FastRandom.h
 	${CMAKE_SOURCE_DIR}/src/Globals.h
+	${CMAKE_SOURCE_DIR}/src/IniFile.h
+	${CMAKE_SOURCE_DIR}/src/ProbabDistrib.h
 	${CMAKE_SOURCE_DIR}/src/StringCompression.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+	${CMAKE_SOURCE_DIR}/src/VoronoiMap.h
 
 	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.h
 
@@ -151,6 +164,22 @@ source_group("Generating" FILES ${GENERATING_HDRS} ${GENERATING_SRCS})
 
 
 
+# BasicGeneratingTest:
+add_executable(BasicGeneratorTest
+	BasicGeneratorTest.cpp
+	${CMAKE_SOURCE_DIR}/src/IniFile.cpp
+)
+target_link_libraries(BasicGeneratorTest GeneratorTestingSupport)
+file(COPY "${CMAKE_SOURCE_DIR}/Server/items.ini" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+add_test(
+	NAME BasicGeneratorTest
+	COMMAND BasicGeneratorTest
+)
+
+
+
+
+
 # LoadablePieces test:
 source_group("Data files" FILES Test.cubeset Test1.schematic)
 add_executable(LoadablePieces
@@ -201,6 +230,7 @@ add_test(
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
+	BasicGeneratorTest
 	GeneratorTestingSupport
 	LoadablePieces
 	PieceGeneratorBFSTree

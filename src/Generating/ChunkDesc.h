@@ -65,18 +65,18 @@ public:
 	// tolua_begin
 
 	void       SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
-	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ);
+	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ) const;
 
 	void       SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta);
-	NIBBLETYPE GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ);
+	NIBBLETYPE GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const;
 
 	void       SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID);
-	EMCSBiome  GetBiome(int a_RelX, int a_RelZ);
+	EMCSBiome  GetBiome(int a_RelX, int a_RelZ) const;
 
 	// These operate on the heightmap, so they could get out of sync with the data
 	// Use UpdateHeightmap() to re-calculate heightmap from the block data
 	void       SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
-	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ);
+	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ) const;
 
 	// tolua_end
 

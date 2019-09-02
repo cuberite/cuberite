@@ -16,6 +16,12 @@
 #include "Blocks/BlockHandler.h"
 #include "Generating/ChunkDesc.h"
 #include "DeadlockDetect.h"
+#include "Entities/Entity.h"
+#include "Mobs/Monster.h"
+#include "Simulator/FluidSimulator.h"
+#include "Simulator/FireSimulator.h"
+#include "MobSpawner.h"
+#include "ItemGrid.h"
 
 
 
@@ -106,6 +112,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
 	}
 }
+
 
 
 
@@ -352,3 +359,68 @@ bool cUUID::FromString(const AString&)
 
 
 
+
+void cEntity::SetPosition(const Vector3d & a_Position)
+{
+}
+
+
+
+
+
+void cEntity::SetHealth(float a_NewHealth)
+{
+}
+
+
+
+
+
+cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
+{
+	return cMonster::mfAmbient;
+}
+
+
+
+
+
+std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_Type)
+{
+	return nullptr;
+}
+
+
+
+
+
+bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
+{
+	return false;
+}
+
+
+
+
+
+bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
+{
+	return false;
+}
+
+
+
+
+
+void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed)
+{
+}
+
+
+
+
+
+std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
+{
+	return {};
+}
