@@ -87,7 +87,7 @@ void cChunkDesc::SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 
 
-BLOCKTYPE cChunkDesc::GetBlockType(int a_RelX, int a_RelY, int a_RelZ)
+BLOCKTYPE cChunkDesc::GetBlockType(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return cChunkDef::GetBlock(m_BlockArea.GetBlockTypes(), a_RelX, a_RelY, a_RelZ);
 }
@@ -96,7 +96,7 @@ BLOCKTYPE cChunkDesc::GetBlockType(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-NIBBLETYPE cChunkDesc::GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ)
+NIBBLETYPE cChunkDesc::GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return m_BlockArea.GetRelBlockMeta(a_RelX, a_RelY, a_RelZ);
 }
@@ -123,7 +123,7 @@ void cChunkDesc::SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID)
 
 
 
-EMCSBiome cChunkDesc::GetBiome(int a_RelX, int a_RelZ)
+EMCSBiome cChunkDesc::GetBiome(int a_RelX, int a_RelZ) const
 {
 	return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ);
 }
@@ -141,7 +141,7 @@ void cChunkDesc::SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height)
 
 
 
-HEIGHTTYPE cChunkDesc::GetHeight(int a_RelX, int a_RelZ)
+HEIGHTTYPE cChunkDesc::GetHeight(int a_RelX, int a_RelZ) const
 {
 	return cChunkDef::GetHeight(m_HeightMap, a_RelX, a_RelZ);
 }
