@@ -2031,7 +2031,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 		bool IsSmall = ((a_NBT.GetByte(IsSmallIdx) == 1) ? true : false);
 		if (IsSmall)
 		{
-			ArmorStand->SetSmall();
+			ArmorStand->SetSizeSmall();
 		}
 	}
 

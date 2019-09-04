@@ -629,7 +629,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			}
 
 			Flags = 0;  // Armor stand has its own flags
-			if (ArmorStand.IsSmall())
+			if (ArmorStand.IsSizeSmall())
 			{
 				Flags |= 0x01;
 			}

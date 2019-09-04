@@ -293,7 +293,7 @@ void cArmorStand::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 
 
 
-void cArmorStand::SetNormal()
+void cArmorStand::SetSizeNormal()
 {
 	SetHeight(0.9875);
 	SetWidth(0.25);
@@ -308,7 +308,7 @@ void cArmorStand::SetNormal()
 
 
 
-void cArmorStand::SetSmall()
+void cArmorStand::SetSizeSmall()
 {
 	SetHeight(0.9875/2);
 	SetWidth(0.25/2);
@@ -339,11 +339,11 @@ void cArmorStand::SetIsMarker(bool a_IsMarker)
 	{
 		if (m_IsSmall)
 		{
-			SetSmall();
+			SetSizeSmall();
 		}
 		else
 		{
-			SetNormal();
+			SetSizeNormal();
 		}
 	}
 }

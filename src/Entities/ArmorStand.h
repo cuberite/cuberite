@@ -49,19 +49,19 @@ public:
 	bool HasGravity(void) const { return (std::abs(m_Gravity) > std::numeric_limits<float>::epsilon()); }
 
 	/** Returns true if the armor stand is a normal sized one. */
-	bool IsNormal(void) const { return !m_IsSmall; }
+	bool IsSizeNormal(void) const { return !m_IsSmall; }
 
 	/** Returns true if the armor stand is a small one. */
-	bool IsSmall(void) const { return m_IsSmall; }
+	bool IsSizeSmall(void) const { return m_IsSmall; }
 
 	/** Returns true if the armor stand is a marker (does not interact). */
 	bool IsMarker(void) const { return m_IsMarker; }
 
 	/** Sets if the armor stand is a normal sized one. */
-	void SetNormal(void);
+	void SetSizeNormal(void);
 
 	/** Sets if the armor stand is a small one. */
-	void SetSmall(void);
+	void SetSizeSmall(void);
 
 	/** Sets whether the armor stand is a marker (does not interact). */
 	void SetIsMarker(bool a_IsMarker);
