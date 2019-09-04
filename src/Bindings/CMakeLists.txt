@@ -92,8 +92,9 @@ set(BINDING_DEPENDENCIES
 	../Defines.h
 	../EffectID.h
 	../Enchantments.h
-	../Entities/Boat.h
+	../Entities/ArmorStand.h
 	../Entities/ArrowEntity.h
+	../Entities/Boat.h
 	../Entities/Entity.h
 	../Entities/ExpOrb.h
 	../Entities/EntityEffect.h
@@ -109,7 +110,6 @@ set(BINDING_DEPENDENCIES
 	../Entities/Pawn.h
 	../Entities/Player.h
 	../Entities/Painting.h
-	../Entities/ArmorStand.h
 	../Entities/Pickup.h
 	../Entities/ProjectileEntity.h
 	../Entities/SplashPotionEntity.h
