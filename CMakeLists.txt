@@ -192,11 +192,12 @@ set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to
 set(SQLITE_ENABLE_COLUMN_METADATA OFF CACHE BOOL "" FORCE)
 
 # Set options for LibEvent, disable all their tests and benchmarks:
-set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL "Disable OpenSSL in LibEvent"       FORCE)
-set(EVENT__DISABLE_BENCHMARK YES CACHE BOOL "Disable LibEvent benchmarks"       FORCE)
-set(EVENT__DISABLE_TESTS     YES CACHE BOOL "Disable LibEvent tests"            FORCE)
-set(EVENT__DISABLE_REGRESS   YES CACHE BOOL "Disable LibEvent regression tests" FORCE)
-set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL "Disable LibEvent samples"          FORCE)
+set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL   "Disable OpenSSL in LibEvent"       FORCE)
+set(EVENT__DISABLE_BENCHMARK YES CACHE BOOL   "Disable LibEvent benchmarks"       FORCE)
+set(EVENT__DISABLE_TESTS     YES CACHE BOOL   "Disable LibEvent tests"            FORCE)
+set(EVENT__DISABLE_REGRESS   YES CACHE BOOL   "Disable LibEvent regression tests" FORCE)
+set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL   "Disable LibEvent samples"          FORCE)
+set(EVENT__LIBRARY_TYPE "STATIC" CACHE STRING "Use static LibEvent libraries"     FORCE)
 
 # Set options for JsonCPP, disabling all of their tests
 # Additionally, their library is output to a strange location; make sure the linker knows where to find it
@@ -301,8 +302,8 @@ endif()
 # Put projects into solution folders in MSVC:
 if (MSVC)
 	set_target_properties(
-		event_core
-		event_extra
+		event_core_static
+		event_extra_static
 		expat
 		fmt
 		jsoncpp_lib_static
