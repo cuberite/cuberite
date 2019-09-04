@@ -12,7 +12,7 @@ return
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has right-clicked the entity" },
 			{ Name = "Entity", Type = "{{cEntity}} descendant", Notes = "The entity that has been right-clicked" },
-			{ Name = "TargetPosition", Type = "{{Vector3f}}", Notes = "The location where the player hit" },
+			{ Name = "TargetPosition", Type = "{{Vector3f}}", Notes = "The location where the player click" },
 		},
 		Returns = [[
 			If the function returns false or no value, Cuberite calls other plugins' callbacks and finally does
