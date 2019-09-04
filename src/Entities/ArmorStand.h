@@ -25,7 +25,7 @@ public:
 	/** Returns true if the armor stand is invisible. */
 	virtual bool IsInvisible() const override;
 
-	/** Set whatever the armorstand is visible */
+	/** Set whether the armor stand is visible */
 	void SetVisible(bool a_IsVisible);
 
 	/** Returns true if the armor stand has a custom name. */
@@ -46,15 +46,15 @@ public:
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
 	/** Returns true if the armor stand has gravity. */
-	bool HasGravity(void) const { return (m_Gravity < 0.0f) || (m_Gravity > 0.0f); }
+	bool HasGravity(void) const { return (std::abs(m_Gravity) > std::numeric_limits<float>::epsilon()); }
 
 	/** Returns true if the armor stand is a normal sized one. */
-	bool IsNormal(void) const { return !m_IsSmall && !m_IsMarker; }
+	bool IsNormal(void) const { return !m_IsSmall; }
 
 	/** Returns true if the armor stand is a small one. */
-	bool IsSmall(void) const { return m_IsSmall && !m_IsMarker; }
+	bool IsSmall(void) const { return m_IsSmall; }
 
-	/** Returns true if the armor stand is a marker (null size). */
+	/** Returns true if the armor stand is a marker (does not interact). */
 	bool IsMarker(void) const { return m_IsMarker; }
 
 	/** Sets if the armor stand is a normal sized one. */
@@ -63,30 +63,30 @@ public:
 	/** Sets if the armor stand is a small one. */
 	void SetSmall(void);
 
-	/** Sets if the armor stand is a marker (null size). */
-	void SetMarker(void);
+	/** Sets whether the armor stand is a marker (does not interact). */
+	void SetIsMarker(bool a_IsMarker);
 
-	/** Returns true if the armor stand have amrs. */
+	/** Returns true if the armor stand has amrs. */
 	bool HasArms(void) const { return m_HasArms; }
 	void SetHasArms(bool a_HasArms);
 
-	/** Returns true if the armor stand have a base platform. */
+	/** Returns true if the armor stand has a base platform. */
 	bool HasBasePlate(void) const { return m_HasBasePlate; }
 	void SetHasBasePlate(bool a_HasBasePlate);
 
-	Vector3d GetHeadRotation(void) const { return m_HeadRotation; }
-	Vector3d GetBodyRotation(void) const { return m_BodyRotation; }
-	Vector3d GetLeftArmRotation(void) const { return m_LeftArmRotation; }
-	Vector3d GetRightArmRotation(void) const { return m_RightArmRotation; }
-	Vector3d GetLeftLegRotation(void) const { return m_LeftLegRotation; }
-	Vector3d GetRightLegRotation(void) const { return m_RightLegRotation; }
+	Vector3f GetHeadRotation(void) const { return m_HeadRotation; }
+	Vector3f GetBodyRotation(void) const { return m_BodyRotation; }
+	Vector3f GetLeftArmRotation(void) const { return m_LeftArmRotation; }
+	Vector3f GetRightArmRotation(void) const { return m_RightArmRotation; }
+	Vector3f GetLeftLegRotation(void) const { return m_LeftLegRotation; }
+	Vector3f GetRightLegRotation(void) const { return m_RightLegRotation; }
 
-	void SetHeadRotation(Vector3d a_HeadRotation);
-	void SetBodyRotation(Vector3d a_BodyRotation);
-	void SetLeftArmRotation(Vector3d a_LeftArmRotation);
-	void SetRightArmRotation(Vector3d a_RightArmRotation);
-	void SetLeftLegRotation(Vector3d a_LeftLegRotation);
-	void SetRightLegRotation(Vector3d a_RightLegRotation);
+	void SetHeadRotation(Vector3f a_HeadRotation);
+	void SetBodyRotation(Vector3f a_BodyRotation);
+	void SetLeftArmRotation(Vector3f a_LeftArmRotation);
+	void SetRightArmRotation(Vector3f a_RightArmRotation);
+	void SetLeftLegRotation(Vector3f a_LeftLegRotation);
+	void SetRightLegRotation(Vector3f a_RightLegRotation);
 
 	virtual cItem GetEquippedWeapon(void) const override { return m_RightHand; }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_LeftHand; }
@@ -108,7 +108,7 @@ protected:
 
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick) override;
+	virtual void OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, eHand a_Hand) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
@@ -123,12 +123,12 @@ protected:
 	bool m_IsMarker;
 	bool m_HasArms;
 	bool m_HasBasePlate;
-	Vector3d m_HeadRotation;
-	Vector3d m_BodyRotation;
-	Vector3d m_LeftArmRotation;
-	Vector3d m_RightArmRotation;
-	Vector3d m_LeftLegRotation;
-	Vector3d m_RightLegRotation;
+	Vector3f m_HeadRotation;
+	Vector3f m_BodyRotation;
+	Vector3f m_LeftArmRotation;
+	Vector3f m_RightArmRotation;
+	Vector3f m_LeftLegRotation;
+	Vector3f m_RightLegRotation;
 
 	cItem m_LeftHand;
 	cItem m_RightHand;

@@ -3699,7 +3699,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is a {{cArmorStand|armor stand}}.",
+					Notes = "Returns true if the entity is an {{cArmorStand|armor stand}}.",
 				},
 				IsBoat =
 				{
@@ -4492,7 +4492,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etArmorStand =
 				{
-					Notes = "The entity is a {{cArmorStand}}",
+					Notes = "The entity is an {{cArmorStand}}",
 				},
 				etBoat =
 				{
@@ -9690,7 +9690,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the player visibility to other players",
+					Notes = "Sets the visibility to other players",
 				},
 				HasCustomName =
 				{
@@ -9710,7 +9710,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+					Notes = "Returns the custom name of this armor stand. If the armor stand hasn't a custom name, it will return an empty string.",
 				},
 				SetCustomName =
 				{
@@ -9721,7 +9721,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string.",
+					Notes = "Sets the custom name of the armor stand. To disable the custom name, simply set an empty string. Custom name stay invisible unless IsCustomNameAlwaysVisible is set to true.",
 				},
 				SetCustomNameAlwaysVisible =
 				{
@@ -9732,7 +9732,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name.",
+					Notes = "Sets the custom name visiblity of the armor stand. If it's false, you don't see the name at all due to Minecraft behaviour. If it's true, you always see the custom name.",
 				},
 				IsCustomNameAlwaysVisible =
 				{
@@ -9742,7 +9742,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob.",
+					Notes = "Is the custom name of the armor stand always visible? If not, you don't see the name at all cause of Minecraft behaviour.",
 				},
 				HasGravity =
 				{
@@ -9790,11 +9790,18 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the armor stand is a marker (null size).",
+					Notes = "Returns true if the armor stand is a marker (does not interact).",
 				},
-				SetMarker =
+				SetIsMarker =
 				{
-					Notes = "Sets the armor stand as a marker.",
+					Params =
+					{
+						{
+							Name = "IsMarker",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets wathever the armor stand is a marker (does not interact).",
 				},
 				HasArms =
 				{
@@ -9815,7 +9822,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets whatever armor stand has arms.",
+					Notes = "Sets whether armor stand has arms.",
 				},
 				HasBasePlate =
 				{
@@ -9825,7 +9832,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the armor stand has base platform.",
+					Notes = "Returns true if the armor stand has a base platform.",
 				},
 				SetHasBasePlate =
 				{
@@ -9836,7 +9843,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets whatever armor stand has base platform.",
+					Notes = "Sets whether the armor stand has a base platform.",
 				},
 				GetHeadRotation =
 				{

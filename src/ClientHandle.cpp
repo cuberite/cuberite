@@ -1742,23 +1742,19 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 
 
 
-void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_TargetPos, bool a_IsLeftClick)
+void cClientHandle::HandleUseEntityAt(UInt32 a_TargetEntityID, Vector3f a_TargetPos, eHand a_Hand)
 {
-	// TODO: Let plugins interfere via a hook
-	// TODO: Take care of TargetPos position
-
 	// If it is a right click, call the entity's OnRightClicked() handler:
 	cWorld * World = m_Player->GetWorld();
 	World->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
 			if (
-				cPluginManager::Get()->CallHookPlayerClickingAtEntity(*m_Player, a_Entity, a_TargetPos) ||
-				m_Player->IsGameModeSpectator()  // Spectators cannot interact with every entity
+				!cPluginManager::Get()->CallHookPlayerClickingAtEntity(*m_Player, a_Entity, a_TargetPos) &&
+				!m_Player->IsGameModeSpectator()  // Spectators cannot interact with every entity
 			)
 			{
-				return false;
+				a_Entity.OnClickedAt(*m_Player, a_TargetPos, a_Hand);
 			}
-			a_Entity.OnClickedAt(*m_Player, a_TargetPos, a_IsLeftClick);
 			return false;
 		}
 	);

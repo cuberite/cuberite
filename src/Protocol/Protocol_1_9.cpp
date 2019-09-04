@@ -460,8 +460,7 @@ void cProtocol_1_9_0::SendEntityEquipment(const cEntity & a_Entity, short a_Slot
 	cPacketizer Pkt(*this, GetPacketId(sendEntityEquipment));  // Entity Equipment packet
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	// See https://wiki.vg/Protocol#Entity_Equipment
-	// TODO: Enable player left hand. Currently only user by armor stand.
-	if (a_SlotNum == 5)  // Left hand
+	if (a_SlotNum == 5)  // Left Hand. For compatibility issues, left hand was added at the end and not at the ID 1 like wants the protocol since 1.9
 	{
 		a_SlotNum = 1;
 	}
@@ -2796,8 +2795,8 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
-			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
-			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), Hand == MAIN_HAND);
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+			m_Client->HandleUseEntityAt(EntityID, Vector3f(TargetX, TargetY, TargetZ), HandIntToEnum(Hand));
 			break;
 		}
 		default:

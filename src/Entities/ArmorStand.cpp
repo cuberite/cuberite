@@ -26,13 +26,7 @@ cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
 	m_LeftArmRotation(-10.0, 0.0, -10.0),
 	m_RightArmRotation(-15.0, 0.0, 10.0),
 	m_LeftLegRotation(-1.0, 0.0, -1.0),
-	m_RightLegRotation(1.0, 0.0, 1.0),
-	m_LeftHand(cItem()),
-	m_RightHand(cItem()),
-	m_Helmet(cItem()),
-	m_ChestPlate(cItem()),
-	m_Leggings(cItem()),
-	m_Boots(cItem())
+	m_RightLegRotation(1.0, 0.0, 1.0)
 {
 	SetMaxHealth(1);
 	SetHealth(1);
@@ -68,14 +62,14 @@ void cArmorStand::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_IsLeftClick)
+void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, eHand a_Hand)
 {
 	if (IsMarker() || a_Player.GetEquippedItem().IsEmpty())  // Disallow interaction with marker and prevent acting if no item
 	{
 		return;
 	}
 
-	if (a_IsLeftClick)
+	if (a_Hand == eHand::hMain)
 	{
 		short ItemType = a_Player.GetEquippedItem().m_ItemType;
 
@@ -107,7 +101,7 @@ void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_I
 			}
 			else if (ItemCategory::IsBoots(ItemType))
 			{
-				if (GetEquippedLeggings().IsEmpty())
+				if (!GetEquippedBoots().IsEmpty())
 				{
 					return;
 				}
@@ -148,8 +142,6 @@ void cArmorStand::OnClickedAt(cPlayer & a_Player, Vector3f a_TargetPos, bool a_I
 
 void cArmorStand::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// I don't know how and why but by default the client considere it as no gravity, so disable gravity on the server unless it fixed totally and configurable
-	// Gravity for such entity is not really important
 	super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
@@ -306,7 +298,6 @@ void cArmorStand::SetNormal()
 	SetHeight(0.9875);
 	SetWidth(0.25);
 	m_IsSmall = false;
-	m_IsMarker = false;
 	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
@@ -322,7 +313,6 @@ void cArmorStand::SetSmall()
 	SetHeight(0.9875/2);
 	SetWidth(0.25/2);
 	m_IsSmall = true;
-	m_IsMarker = false;
 	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
@@ -333,15 +323,28 @@ void cArmorStand::SetSmall()
 
 
 
-void cArmorStand::SetMarker()
+void cArmorStand::SetIsMarker(bool a_IsMarker)
 {
-	SetHeight(0);
-	SetWidth(0);
-	m_IsSmall = false;
-	m_IsMarker = true;
-	if (m_World != nullptr)
+	m_IsMarker = a_IsMarker;
+	if (a_IsMarker)  // By default set size of marker to null
 	{
-		m_World->BroadcastEntityMetadata(*this);
+		SetHeight(0);
+		SetWidth(0);
+		if (m_World != nullptr)
+		{
+			m_World->BroadcastEntityMetadata(*this);
+		}
+	}
+	else  // Else, do recalculation of size
+	{
+		if (m_IsSmall)
+		{
+			SetSmall();
+		}
+		else
+		{
+			SetNormal();
+		}
 	}
 }
 
@@ -375,7 +378,7 @@ void cArmorStand::SetHasBasePlate(bool a_HasBasePlate)
 
 
 
-void cArmorStand::SetHeadRotation(Vector3d a_HeadRotation)
+void cArmorStand::SetHeadRotation(Vector3f a_HeadRotation)
 {
 	m_HeadRotation = a_HeadRotation;
 	if (m_World != nullptr)
@@ -388,7 +391,7 @@ void cArmorStand::SetHeadRotation(Vector3d a_HeadRotation)
 
 
 
-void cArmorStand::SetBodyRotation(Vector3d a_BodyRotation)
+void cArmorStand::SetBodyRotation(Vector3f a_BodyRotation)
 {
 	m_BodyRotation = a_BodyRotation;
 	if (m_World != nullptr)
@@ -401,7 +404,7 @@ void cArmorStand::SetBodyRotation(Vector3d a_BodyRotation)
 
 
 
-void cArmorStand::SetLeftArmRotation(Vector3d a_LeftArmRotation)
+void cArmorStand::SetLeftArmRotation(Vector3f a_LeftArmRotation)
 {
 	m_LeftArmRotation = a_LeftArmRotation;
 	if (m_World != nullptr)
@@ -414,7 +417,7 @@ void cArmorStand::SetLeftArmRotation(Vector3d a_LeftArmRotation)
 
 
 
-void cArmorStand::SetRightArmRotation(Vector3d a_RightArmRotation)
+void cArmorStand::SetRightArmRotation(Vector3f a_RightArmRotation)
 {
 	m_RightArmRotation = a_RightArmRotation;
 	if (m_World != nullptr)
@@ -427,7 +430,7 @@ void cArmorStand::SetRightArmRotation(Vector3d a_RightArmRotation)
 
 
 
-void cArmorStand::SetLeftLegRotation(Vector3d a_LeftLegRotation)
+void cArmorStand::SetLeftLegRotation(Vector3f a_LeftLegRotation)
 {
 	m_LeftLegRotation = a_LeftLegRotation;
 	if (m_World != nullptr)
@@ -440,7 +443,7 @@ void cArmorStand::SetLeftLegRotation(Vector3d a_LeftLegRotation)
 
 
 
-void cArmorStand::SetRightLegRotation(Vector3d a_RightLegRotation)
+void cArmorStand::SetRightLegRotation(Vector3f a_RightLegRotation)
 {
 	m_RightLegRotation = a_RightLegRotation;
 	if (m_World != nullptr)

@@ -3140,7 +3140,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Desc = "Spawns an armor stand at the given coordinates. Returns the UniqueID of the spawned armor stand, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} on failure.",
+					Desc = "Spawns an armor stand at the given coordinates and with the given orientation in degrees from south, going clockwises. Returns the UniqueID of the spawned armor stand, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} on failure.",
 				},
 			},
 			SpawnBoat =

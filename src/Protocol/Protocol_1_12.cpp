@@ -649,7 +649,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 			a_Pkt.WriteBEInt8(Flags);
 
-			if (!ArmorStand.IsInvisible())  // It will probably don't change anything if it's invisible because the CustomName will probably don't be different. So save a lot of packets.
+			if (!ArmorStand.IsMarker())  // No point sending orientation if it's a marker. However invisible armor stand keep armor visible.
 			{
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
