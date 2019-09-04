@@ -2023,9 +2023,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	}
 
 
-	/**
-		Basic properties
-	*/
+	// Basic properties
 
 	int IsSmallIdx = a_NBT.FindChildByName(a_TagIdx, "Small");
 	if ((IsSmallIdx > 0) && (a_NBT.GetType(IsSmallIdx) == TAG_Byte))
@@ -2092,9 +2090,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	}
 
 
-	/**
-		Rotations aka Poses
-	*/
+	// Rotations aka Poses
 
 	int PosesIdx = a_NBT.FindChildByName(a_TagIdx, "Pose");
 	if ((PosesIdx >= 0) && (a_NBT.GetType(PosesIdx) == TAG_Compound))
@@ -2161,9 +2157,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	}
 
 
-	/**
-		Armor
-	*/
+	//  Armor
 
 	int ArmorItems = a_NBT.FindChildByName(a_TagIdx, "ArmorItems");
 	if ((ArmorItems >= 0) && (a_NBT.GetType(ArmorItems) == TAG_List))
