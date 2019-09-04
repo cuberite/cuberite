@@ -9700,7 +9700,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the player has a custom name.",
+					Notes = "Returns true if the armor stand has a custom name.",
 				},
 				GetCustomName =
 				{
