@@ -594,7 +594,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 			a_Pkt.WriteBEInt8(Flags);
 
-			if (!ArmorStand.IsMarker())  // No point sending orientation if it's a marker. However invisible armor stand keep armor visible.
+			if (!ArmorStand.IsMarker())  // No point sending orientation if it's a marker (Marker type is ponctual like a floating particle). However invisible armor stand keep armor visible according to orientations.
 			{
 				a_Pkt.WriteBEUInt8(ARMOR_STAND_HEAD_ROTATION);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_ROTATION);
