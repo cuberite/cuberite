@@ -570,32 +570,38 @@ return
 					Params =
 					{
 						{
-							Name = "X1",
-							Type = "number",
+							Name = "Point1",
+							Type = "Vector3i",
 						},
 						{
-							Name = "Y1",
-							Type = "number",
-						},
-						{
-							Name = "Z1",
-							Type = "number",
-						},
-						{
-							Name = "X2",
-							Type = "number",
-						},
-						{
-							Name = "Y2",
-							Type = "number",
-						},
-						{
-							Name = "Z2",
-							Type = "number",
+							Name = "Point2",
+							Type = "Vector3i",
 						},
 					},
 					Notes = "Assigns all the coords to the specified values. Sort-state is ignored.",
 				},
+			},
+			Clamp =
+			{
+				Params =
+				{
+					{
+						Name = "Limits",
+						Type = "cCuboid",
+					},
+				},
+				Notes = "Clamps this cuboid, so that it doesn't reach outside of Limits in any direction. Assumes both cuboids are sorted.",
+			},
+			ClampSize =
+			{
+				Params =
+				{
+					{
+						Name = "MaxSize",
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Clamps this cuboid's p2 so that the cuboid's size doesn't exceed the specified max size. Assumes the cuboid is sorted.",
 			},
 			ClampX =
 			{
@@ -712,42 +718,6 @@ return
 						},
 					},
 					Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction).",
-				},
-				{
-					Params =
-					{
-						{
-							Name = "X1",
-							Type = "number",
-						},
-						{
-							Name = "Y1",
-							Type = "number",
-						},
-						{
-							Name = "Z1",
-							Type = "number",
-						},
-						{
-							Name = "X2",
-							Type = "number",
-						},
-						{
-							Name = "Y2",
-							Type = "number",
-						},
-						{
-							Name = "Z2",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "cCuboid",
-						},
-					},
-					Notes = "Creates a new Cuboid object with the specified points as its corners.",
 				},
 			},
 			DifX =
@@ -872,30 +842,6 @@ return
 					Params =
 					{
 						{
-							Name = "X",
-							Type = "number",
-						},
-						{
-							Name = "Y",
-							Type = "number",
-						},
-						{
-							Name = "Z",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted.",
-				},
-				{
-					Params =
-					{
-						{
 							Name = "Point",
 							Type = "Vector3i",
 						},
@@ -940,16 +886,8 @@ return
 				Params =
 				{
 					{
-						Name = "OffsetX",
-						Type = "number",
-					},
-					{
-						Name = "OffsetY",
-						Type = "number",
-					},
-					{
-						Name = "OffsetZ",
-						Type = "number",
+						Name = "Offset",
+						Type = "Vector3i",
 					},
 				},
 				Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored and preserved.",

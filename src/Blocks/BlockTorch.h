@@ -62,7 +62,7 @@ public:
 				ASSERT(!"Unhandled torch direction!");
 				break;
 			}
-		};
+		}
 		return 0x0;
 	}
 

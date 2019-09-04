@@ -116,6 +116,7 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 void cPickup::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendPickupSpawn(*this);
+	super::SpawnOn(a_Client);
 }
 
 
@@ -143,7 +144,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
 		{
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
-			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
+			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ);
 
 			// Destroy the pickup if it is on fire:
 			if (IsOnFire())

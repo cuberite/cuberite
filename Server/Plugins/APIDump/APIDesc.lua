@@ -3611,6 +3611,43 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the yaw (direction) of the entity. Measured in degrees, values range from -180 to +180. 0 means ZP, 90 means XM, -180 means ZM, -90 means XP.",
 				},
+				GetAttachedID =
+				{
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Returns the EntityID of an entity that this entity is attached to. Returns -1 if not attached to any mob.",
+				},
+				AttachToID =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Attach this entity to the entity defined by its ID. Returns true if it finish correctly attached.",
+				},
+				IsAttachedToID =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Return whatever is this entity is attached to the entity passed by its ID.",
+				},
+				Detach =
+				{
+					Notes = "Detach this entity from other entity.",
+				},
 				HandleSpeedFromAttachee =
 				{
 					Params =
@@ -9673,7 +9710,7 @@ a_Player:OpenWindow(Window);
 							Type = "string",
 						},
 					},
-					Notes = "Returns the custom name of this armor stand. If the player hasn't a custom name, it will return an empty string.",
+					Notes = "Returns the custom name of this armor stand. If the armor stand hasn't a custom name, it will return an empty string.",
 				},
 				SetCustomName =
 				{
@@ -9695,7 +9732,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Sets the custom name visiblity of the armor stand. If it's false, you don't see the name at all. If it's true, you always see the custom name.",
+					Notes = "Sets the custom name visiblity of the armor stand. If it's false, you don't see the name at all due to Minecraft behaviour. If it's true, you always see the custom name.",
 				},
 				IsCustomNameAlwaysVisible =
 				{
@@ -9705,7 +9742,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Is the custom name of the armor stand always visible? If not, you don't see the name at all.",
+					Notes = "Is the custom name of the armor stand always visible? If not, you don't see the name at all cause of Minecraft behaviour.",
 				},
 				HasGravity =
 				{
@@ -15764,6 +15801,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15787,6 +15828,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
@@ -17043,6 +17088,14 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				},
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
 				esBed =
 				{

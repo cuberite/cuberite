@@ -83,6 +83,12 @@ return
 			IsLoaded =
 			{
 				Notes = "",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
 			},
 			SetName =
 			{

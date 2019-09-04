@@ -8,6 +8,7 @@
 
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
+#include "../Simulator/RedstoneSimulator.h"
 
 
 
@@ -68,5 +69,12 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 		}
 
 		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+		auto Pos = Vector3i(m_PosX, m_PosY, m_PosZ);
+		m_World->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+			{
+				m_World->GetRedstoneSimulator()->WakeUp(Pos, &a_Chunk);
+				return true;
+			}
+		);
 	}
 }

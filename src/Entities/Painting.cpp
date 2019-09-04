@@ -22,8 +22,8 @@ cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, double a_X,
 
 void cPainting::SpawnOn(cClientHandle & a_Client)
 {
-	super::SpawnOn(a_Client);
 	a_Client.SendPaintingSpawn(*this);
+	super::SpawnOn(a_Client);
 }
 
 
@@ -37,7 +37,3 @@ void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 		a_Items.push_back(cItem(E_ITEM_PAINTING));
 	}
 }
-
-
-
-

@@ -33,10 +33,12 @@
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
 	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-	{ \
-		return; \
-	}
+	do { \
+		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+		{ \
+			return; \
+		} \
+	} while (false)
 
 
 
@@ -57,7 +59,7 @@ struct TakeDamageInfo
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
 	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
 	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
 	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
@@ -284,7 +286,7 @@ public:
 	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
 
 	float GetGravity(void) const { return m_Gravity; }
 
@@ -434,7 +436,7 @@ public:
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity() */
-	virtual void SpawnOn(cClientHandle & a_Client) = 0;
+	virtual void SpawnOn(cClientHandle & a_Client);
 
 	// tolua_begin
 
@@ -468,11 +470,24 @@ public:
 	/** Attaches to the specified entity; detaches from any previous one first */
 	virtual void AttachTo(cEntity * a_AttachTo);
 
+	/** Returns true if this entity is attached to the specified entity */
+	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	// tolua_begin
+
 	/** Detaches from the currently attached entity, if any */
 	virtual void Detach(void);
 
+	/** Gets entity (vehicle) attached to this entity */
+	UInt32 GetAttachedID();
+
+	/** Attaches to the specified entity; detaches from any previous one first */
+	virtual bool AttachToID(UInt32 a_UniqueID);
+
 	/** Returns true if this entity is attached to the specified entity */
-	bool IsAttachedTo(const cEntity * a_Entity) const;
+	bool IsAttachedToID(UInt32 a_UniqueID) const;
+
+	// tolua_end
 
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();

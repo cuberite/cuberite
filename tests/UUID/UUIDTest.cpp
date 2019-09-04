@@ -2,9 +2,13 @@
 // UUIDTest.cpp
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "UUID.h"
 
 #include <numeric>  // for std::iota
+
+
+
 
 
 /** Test that FromString -> ToShortString preserves the original value for short UUIDs. */
@@ -23,12 +27,12 @@ static void UUIDFromStringToShortString()
 	for (auto TestString : TestStrings)
 	{
 		cUUID UUID;
-		assert_test(UUID.FromString(TestString));
+		TEST_TRUE(UUID.FromString(TestString));
 		auto ResultString = UUID.ToShortString();
 		// Result should be equivalent to original
-		assert_test(NoCaseCompare(ResultString, TestString) == 0);
+		TEST_EQUAL(NoCaseCompare(ResultString, TestString), 0);
 		// And should be all lower case
-		assert_test(ResultString == StrToLower(ResultString));
+		TEST_EQUAL(ResultString, StrToLower(ResultString));
 	}
 }
 
@@ -52,12 +56,12 @@ static void UUIDFromStringToLongString()
 	for (auto TestString : TestStrings)
 	{
 		cUUID UUID;
-		assert_test(UUID.FromString(TestString));
+		TEST_TRUE(UUID.FromString(TestString));
 		auto ResultString = UUID.ToLongString();
 		// Result should be equivalent to original
-		assert_test(NoCaseCompare(ResultString, TestString) == 0);
+		TEST_EQUAL(NoCaseCompare(ResultString, TestString), 0);
 		// And should be all lower case
-		assert_test(ResultString == StrToLower(ResultString));
+		TEST_EQUAL(ResultString, StrToLower(ResultString));
 	}
 }
 
@@ -80,7 +84,7 @@ static void UUIDFromRawToRaw()
 		cUUID UUID;
 		UUID.FromRaw(TestRaw);
 		auto ResultRaw = UUID.ToRaw();
-		assert_test(ResultRaw == TestRaw);
+		TEST_EQUAL(ResultRaw, TestRaw);
 	}
 }
 
@@ -96,13 +100,13 @@ static void UUIDNil()
 
 	{
 		cUUID UUID;
-		assert_test(UUID.FromString(NilString));
-		assert_test(UUID.IsNil());
+		TEST_TRUE(UUID.FromString(NilString));
+		TEST_TRUE(UUID.IsNil());
 	}
 	{
 		cUUID UUID;
-		assert_test(UUID.FromString(NonNilString));
-		assert_test(!UUID.IsNil());
+		TEST_TRUE(UUID.FromString(NonNilString));
+		TEST_TRUE(!UUID.IsNil());
 	}
 }
 
@@ -123,9 +127,9 @@ static void UUIDType()
 	for (const auto & String : TestStrings)
 	{
 		cUUID UUID;
-		assert_test(UUID.FromString(String));
-		assert_test(UUID.Variant() == 1);
-		assert_test(UUID.Version() == 3);
+		TEST_TRUE(UUID.FromString(String));
+		TEST_EQUAL(UUID.Variant(), 1);
+		TEST_EQUAL(UUID.Version(), 3);
 	}
 
 }
@@ -134,28 +138,10 @@ static void UUIDType()
 
 
 
-int main(int argc, char * argv[])
-{
-	LOG("UUID tests started");
-
-	LOG("Testing short string UUIDs");
+IMPLEMENT_TEST_MAIN("UUID",
 	UUIDFromStringToShortString();
-
-	LOG("Testing long strings UUIDs");
 	UUIDFromStringToLongString();
-
-	LOG("Testing raw UUIDs");
 	UUIDFromRawToRaw();
-
-	LOG("Testing nil UUIDs");
 	UUIDNil();
-
-	LOG("Testing UUID type information");
 	UUIDType();
-
-	LOG("UUID tests finished");
-}
-
-
-
-
+)

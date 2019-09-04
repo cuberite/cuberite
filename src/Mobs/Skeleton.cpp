@@ -76,10 +76,6 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 
 void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
+	super::SpawnOn(a_ClientHandle);
 }
-
-
-
-

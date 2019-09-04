@@ -2194,6 +2194,7 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	if ((HandItems >= 0) && (a_NBT.GetType(HandItems) == TAG_List))
 	{
 		for (int Child = a_NBT.GetFirstChild(HandItems); Child != -1; Child = a_NBT.GetNextSibling(Child))
+
 		{
 			int Slot = a_NBT.FindChildByName(Child, "Slot");
 			if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))

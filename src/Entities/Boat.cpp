@@ -33,6 +33,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnVehicle(*this, 1);
+	super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -265,7 +266,3 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 	}
 	UNREACHABLE("Unsupported boat material");
 }
-
-
-
-

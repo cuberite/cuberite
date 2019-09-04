@@ -6,6 +6,7 @@ endif()
 
 add_definitions(-DTEST_GLOBALS=1)
 
+add_subdirectory(BlockTypeRegistry)
 add_subdirectory(BoundingBox)
 add_subdirectory(ByteBuffer)
 add_subdirectory(ChunkData)
