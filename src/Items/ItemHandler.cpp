@@ -122,6 +122,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_TRAPPED_CHEST:      return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_WOODEN_SLAB:        return new cItemSlabHandler(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB);
 		case E_BLOCK_WOOL:               return new cItemClothHandler(a_ItemType);
+		case E_ITEM_ARMOR_STAND:         return new cItemAmorStandHandler(a_ItemType);
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();
@@ -154,7 +155,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_ARMOR_STAND:         return new cItemAmorStandHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
 
