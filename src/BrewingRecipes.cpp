@@ -45,8 +45,9 @@ void cBrewingRecipes::ReloadRecipes(void)
 			ParsingLine.erase(FirstCommentSymbol);
 		}
 
-		if (ParsingLine.empty())
+		if (IsOnlyWhitespace(ParsingLine))
 		{
+			// Ignore empty and whitespace only lines
 			continue;
 		}
 		AddRecipeFromLine(ParsingLine, LineNum);

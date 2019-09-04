@@ -70,10 +70,12 @@ static const UInt32 OFF_HAND = 1;
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	if (!ByteBuf.Proc(Var))\
-	{\
-		return;\
-	}
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
@@ -81,14 +83,16 @@ static const UInt32 OFF_HAND = 1;
 
 #define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	{ \
-		if (!ByteBuf.Proc(Var)) \
+	do { \
 		{ \
+			if (!ByteBuf.Proc(Var)) \
+			{ \
+				ByteBuf.CheckValid(); \
+				return false; \
+			} \
 			ByteBuf.CheckValid(); \
-			return false; \
 		} \
-		ByteBuf.CheckValid(); \
-	}
+	} while (false)
 
 
 
@@ -2926,7 +2930,7 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 {
 	if (a_Channel == "MC|AdvCdm")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode)
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode);
 		switch (Mode)
 		{
 			case 0x00:

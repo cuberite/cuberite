@@ -11,13 +11,15 @@
 #define LEAVES_CHECK_DISTANCE 6
 
 #define PROCESS_NEIGHBOR(x, y, z) \
-	switch (a_Area.GetBlockType(x, y, z)) \
-	{ \
-		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
-		case E_BLOCK_LOG: return true; \
-		case E_BLOCK_NEW_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
-		case E_BLOCK_NEW_LOG: return true; \
-	}
+	do { \
+		switch (a_Area.GetBlockType(x, y, z)) \
+		{ \
+			case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
+			case E_BLOCK_LOG: return true; \
+			case E_BLOCK_NEW_LEAVES: a_Area.SetBlockType(x, y, z, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break; \
+			case E_BLOCK_NEW_LOG: return true; \
+		} \
+	} while (false)
 
 bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
 

@@ -1040,12 +1040,12 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
-		TDI.FinalDamage = static_cast<int>(GetMaxHealth());  // Instant hit for creative
+		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
 		SetInvulnerableTicks(0);
 		return super::DoTakeDamage(TDI);  // No drops for creative
 	}
 
-	m_LastDamage = TDI.FinalDamage;
+	m_LastDamage = static_cast<int>(TDI.FinalDamage);
 	if (!super::DoTakeDamage(TDI))
 	{
 		return false;

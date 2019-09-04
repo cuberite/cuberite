@@ -1611,7 +1611,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Returns =
 				{
 					{
-						Type = "boolean",
+						Type = "string",
 					},
 				},
 				Notes = "Returns the path to the root of the world data.",

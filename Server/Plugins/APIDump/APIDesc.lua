@@ -15794,6 +15794,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15817,6 +15821,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
@@ -17010,6 +17018,46 @@ end
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
 				},
+				E_META_END_PORTAL_FRAME_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_NO_EYE =
+				{
+					Notes = "The lack of the flag in the metadata of end portal frames indicating that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction.",
+				},
+				E_META_END_PORTAL_FRAME_XP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_XM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction and has an ender eye in it.",
+				},
 				E_META_HEAD_CREEPER =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a creeper head.",
@@ -17033,6 +17081,14 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				},
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
 				esBed =
 				{

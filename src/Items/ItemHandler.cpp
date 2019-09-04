@@ -25,6 +25,7 @@
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
+#include "ItemEyeOfEnder.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
@@ -132,6 +133,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_EGG:                 return new cItemEggHandler();
 		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
+		case E_ITEM_EYE_OF_ENDER:        return new cItemEyeOfEnderHandler();
 		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
