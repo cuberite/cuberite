@@ -3,6 +3,7 @@ enable_testing()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/mbedtls/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_definitions(-DTEST_GLOBALS=1)
@@ -168,8 +169,9 @@ source_group("Generating" FILES ${GENERATING_HDRS} ${GENERATING_SRCS})
 add_executable(BasicGeneratorTest
 	BasicGeneratorTest.cpp
 	${CMAKE_SOURCE_DIR}/src/IniFile.cpp
+	${CMAKE_SOURCE_DIR}/src/mbedTLS++/Sha1Checksum.cpp
 )
-target_link_libraries(BasicGeneratorTest GeneratorTestingSupport)
+target_link_libraries(BasicGeneratorTest GeneratorTestingSupport mbedtls)
 file(COPY "${CMAKE_SOURCE_DIR}/Server/items.ini" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 add_test(
 	NAME BasicGeneratorTest
