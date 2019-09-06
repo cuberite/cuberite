@@ -222,6 +222,10 @@ public:
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
 
+	inline const cChunkDef::BiomeMap &     GetBiomeMap()   const { return m_BiomeMap; }
+	inline const cChunkDef::BlockTypes &   GetBlockTypes() const { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
+	inline const cChunkDef::HeightMap &    GetHeightMap()  const { return m_HeightMap; }
+
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 

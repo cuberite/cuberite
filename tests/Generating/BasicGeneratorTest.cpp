@@ -3,6 +3,7 @@
 #include "Generating/ChunkDesc.h"
 #include "../TestHelpers.h"
 #include "IniFile.h"
+#include "mbedTLS++/Sha1Checksum.h"
 
 
 
@@ -27,6 +28,21 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 			}  // for y
 		}  // for z
 	}  // for x
+}
+
+
+
+
+
+static AString chunkSHA1(const cChunkDesc & a_ChunkDesc)
+{
+	cSha1Checksum cs;
+	cs.Update(a_ChunkDesc.GetBlockTypes(), cChunkDef::Width * cChunkDef::Width * cChunkDef::Height);
+	cSha1Checksum::Checksum digest;
+	cs.Finalize(digest);
+	AString res;
+	cSha1Checksum::DigestToJava(digest, res);
+	return res;
 }
 
 
@@ -67,23 +83,15 @@ static void printChunkColumn(const cChunkDesc & a_ChunkDesc, int a_X, int a_Z)
 - air at their top, unless the height at that point is equal to full chunk height.
 - valid heightmap
 Multiple chunks are tested. */
-static void testGenerateOverworld()
+static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 {
 	LOG("Testing Overworld generator...");
-
-	// Create a default Overworld generator:
-	cIniFile ini;
-	ini.AddValue("General", "Dimension", "Overworld");
-	ini.AddValueI("Seed", "Seed", 1);
-	ini.AddValue("Generator", "Finishers", "");  // Use no finishers, so that we don't have to check too many blocktypes
-	auto gen = cChunkGenerator::CreateFromIniFile(ini);
-	TEST_NOTEQUAL(gen, nullptr);
 
 	for (int chunkX = 0; chunkX < 50; ++chunkX)
 	{
 		// Generate a chunk:
 		cChunkDesc chd({chunkX, 0});
-		gen->Generate(chunkX, 0, chd);
+		aDefaultOverworldGen.Generate(chunkX, 0, chd);
 		verifyChunkDescHeightmap(chd);
 
 		// Check that it has bedrock at the bottom:
@@ -136,25 +144,18 @@ static void testGenerateOverworld()
 /** Tests that the default Nether generator generates a chunk that has the Nether look:
 - bedrock at the bottom
 - bedrock at the height's top
-- netherrack, lava or soulsand anywhere in the middle
+- at least one Nether-native block in each column
 - valid heightmap
 Multiple chunks are tested. */
-static void testGenerateNether()
+static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 {
 	LOG("Testing Nether generator...");
-
-	// Create a default Nether generator:
-	cIniFile ini;
-	ini.AddValue("General", "Dimension", "Nether");
-	ini.AddValueI("Seed", "Seed", 1);
-	auto gen = cChunkGenerator::CreateFromIniFile(ini);
-	TEST_NOTEQUAL(gen, nullptr);
 
 	for (int chunkX = 0; chunkX < 50; ++chunkX)
 	{
 		// Generate a chunk:
 		cChunkDesc chd({chunkX, 0});
-		gen->Generate(chunkX, 0, chd);
+		aDefaultNetherGen.Generate(chunkX, 0, chd);
 		verifyChunkDescHeightmap(chd);
 
 		// Check that the biome is Nether everywhere:
@@ -182,7 +183,7 @@ static void testGenerateNether()
 			}
 		}
 
-		// Check that the blocks on the top are valid Overworld blocks:
+		// Check that each column contains at least one Nether-native block:
 		for (int x = 0; x < cChunkDef::Width; ++x)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
@@ -217,7 +218,94 @@ static void testGenerateNether()
 
 
 
+/** Storage for checksums with chunk coords. */
+struct CoordsWithChecksum
+{
+	cChunkCoords mCoords;
+	AString mChecksum;
+	CoordsWithChecksum(int aChunkX, int aChunkZ, const AString & aChecksum):
+		mCoords(aChunkX, aChunkZ),
+		mChecksum(aChecksum)
+	{}
+};
+
+
+
+
+
+/** Checks that the specified generator generates chunk that match the specified checksums. */
+static void checkChunkChecksums(
+	cChunkGenerator & aGenerator,
+	const std::vector<CoordsWithChecksum> & aCoordsWithChecksum,
+	const AString & aDimension
+)
+{
+	LOG("Testing the repeatability of the %s generator", aDimension);
+	for (const auto & coords: aCoordsWithChecksum)
+	{
+		cChunkDesc chd(coords.mCoords);
+		aGenerator.Generate(coords.mCoords.m_ChunkX, coords.mCoords.m_ChunkZ, chd);
+		auto checksum = chunkSHA1(chd);
+		TEST_EQUAL_MSG(checksum, coords.mChecksum,
+			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
+		);
+	}
+}
+
+
+
+
+
+/** Checks that the generated chunks look the same across all builds on all platforms.
+This is done by SHA1-ing the blocks for known chunks and comparing against known values.
+If the generator defaults change, this test will likely break, just update the SHA1s. */
+static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChunkGenerator & aDefaultNetherGenerator)
+{
+
+	// Test the default Overworld generator:
+	std::vector<CoordsWithChecksum> overworldChecksums =
+	{
+		{0,    0, "-380dace6af9e653a2c68a51779cf5b8ff521cde1"},
+		{1,    0, "-651dfec5a64b7adccf6bf2845396e27f53c6c4c0"},
+		{1,    1, "-621454452edeb0ac369fea520fee3d80a5ecae49"},
+		{8, 1024, "5ed38ba7ffee6b29f774ad24820ad3ca1ff058bf"},
+	};
+	checkChunkChecksums(aDefaultOverworldGenerator, overworldChecksums, "Overworld");
+
+	// Test the default Nether generator:
+	std::vector<CoordsWithChecksum> netherChecksums =
+	{
+		{ 0,    0, "-25231a9ce4bc57eaeaf1f4ad01c32ddd5b2293e5"},
+		{ 1,    0, "-61ef8824b6b241b4f0e28c09505bad5d7898a8a4"},
+		{ 1,    1, "6b3ba6dcb18568e21b3a5aae9ea58368079fbaf8"},
+		{17,    0, "1acc3a28eb1be66b3e4a256f0712a48f96085a39"},
+		{ 8, 1024, "6f9b96e0613ca2fd879dbb53634b511e5649627a"},
+	};
+	checkChunkChecksums(aDefaultNetherGenerator, netherChecksums, "Nether");
+}
+
+
+
+
+
 IMPLEMENT_TEST_MAIN("BasicGeneratorTest",
-	testGenerateOverworld();
-	testGenerateNether();
+	// Create a default Overworld generator:
+	cIniFile iniOverworld;
+	iniOverworld.AddValue("General", "Dimension", "Overworld");
+	iniOverworld.AddValueI("Seed", "Seed", 1);
+	iniOverworld.AddValue("Generator", "Finishers", "");  // Use no finishers, so that we don't have to check too many blocktypes
+	auto defaultOverworldGen = cChunkGenerator::CreateFromIniFile(iniOverworld);
+	TEST_NOTEQUAL(defaultOverworldGen, nullptr);
+
+	// Create a default Nether generator:
+	cIniFile iniNether;
+	iniNether.AddValue("General", "Dimension", "Nether");
+	iniNether.AddValueI("Seed", "Seed", 1);
+	auto defaultNetherGen = cChunkGenerator::CreateFromIniFile(iniNether);
+	TEST_NOTEQUAL(defaultNetherGen, nullptr);
+
+	// Run the tests on the generators:
+	testGenerateOverworld(*defaultOverworldGen);
+	testGenerateNether(*defaultNetherGen);
+	testRepeatability(*defaultOverworldGen, *defaultNetherGen);
 )
