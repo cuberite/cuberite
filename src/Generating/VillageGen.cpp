@@ -375,7 +375,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
 	cChunkDef::BiomeMap Biomes;
-	m_BiomeGen->GenBiomes(ChunkX, ChunkZ, Biomes);
+	m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 	// Get a list of pools that support each biome within the chunk:
 	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close

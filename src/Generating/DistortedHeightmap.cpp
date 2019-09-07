@@ -299,7 +299,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes({m_CurChunkX + x, m_CurChunkZ + z}, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 

@@ -145,7 +145,7 @@ void cComposableGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef:
 {
 	if (m_BiomeGen != nullptr)  // Quick fix for generator deinitializing before the world storage finishes loading
 	{
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+		m_BiomeGen->GenBiomes({a_ChunkX, a_ChunkZ}, a_BiomeMap);
 	}
 }
 
@@ -157,7 +157,7 @@ void cComposableGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_C
 {
 	if (a_ChunkDesc.IsUsingDefaultBiomes())
 	{
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetBiomeMap());
+		m_BiomeGen->GenBiomes(a_ChunkDesc.GetChunkCoords(), a_ChunkDesc.GetBiomeMap());
 	}
 
 	cChunkDesc::Shape shape;
