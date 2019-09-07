@@ -35,7 +35,7 @@ public:
 		cChunkDesc::Shape shape;
 		m_ShapeGen->GenShape(a_ChunkX, a_ChunkZ, shape);
 		cChunkDesc desc({a_ChunkX, a_ChunkZ});
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, desc.GetBiomeMap());	  // Need to initialize biomes for the composition gen
+		m_BiomeGen->GenBiomes({a_ChunkX, a_ChunkZ}, desc.GetBiomeMap());  // Need to initialize biomes for the composition gen
 		desc.SetHeightFromShape(shape);
 		m_CompositionGen->ComposeTerrain(desc, shape);
 		memcpy(a_HeightMap, desc.GetHeightMap(), sizeof(a_HeightMap));

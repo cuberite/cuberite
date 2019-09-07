@@ -663,7 +663,7 @@ void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, 
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[x + 3 * z]);
+			m_BiomeGen->GenBiomes({a_ChunkX + x - 1, a_ChunkZ + z - 1}, neighborBiomes[x + 3 * z]);
 		}
 	}
 

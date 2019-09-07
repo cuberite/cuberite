@@ -39,7 +39,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
 
 				cChunkDesc::Shape workerShape;
-				m_BiomeGen->GenBiomes           (BaseX, BaseZ, WorkerDesc.GetBiomeMap());
+				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc.GetBiomeMap());
 				m_ShapeGen->GenShape            (BaseX, BaseZ, workerShape);
 				WorkerDesc.SetHeightFromShape   (workerShape);
 				m_CompositionGen->ComposeTerrain(WorkerDesc, workerShape);

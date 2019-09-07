@@ -531,7 +531,7 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen->GenBiomes(a_ChunkX + x, a_ChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes({a_ChunkX + x, a_ChunkZ + z}, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 
@@ -696,7 +696,7 @@ public:
 		cChunkDef::BiomeMap neighborBiomes[3][3];
 		for (int z = 0; z < 3; z++) for (int x = 0; x < 3; x++)
 		{
-			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[z][x]);
+			m_BiomeGen->GenBiomes({a_ChunkX + x - 1, a_ChunkZ + z - 1}, neighborBiomes[z][x]);
 		}
 
 		// Get the min and max heights based on the biomes:

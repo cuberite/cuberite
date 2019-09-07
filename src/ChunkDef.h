@@ -66,6 +66,11 @@ public:
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
 
+	bool operator != (const cChunkCoords & a_Other) const
+	{
+		return !(operator == (a_Other));
+	}
+
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
 	{

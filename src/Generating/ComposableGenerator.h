@@ -50,7 +50,7 @@ public:
 	virtual ~cBiomeGen() {}  // Force a virtual destructor in descendants
 
 	/** Generates biomes for the given chunk */
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) = 0;
 
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) {}
