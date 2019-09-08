@@ -27,7 +27,7 @@ public:
 
 	/** Generates the biomes for the specified chunk.
 	Used by the world loader if biomes failed loading. */
-	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
+	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) = 0;
 
 	/** Returns the biome at the specified coords.
 	Used by ChunkMap if an invalid chunk is queried for biome.
@@ -36,7 +36,7 @@ public:
 
 	/** Does the actual chunk generation.
 	Descendants need to override this and generate into a_ChunkDesc. */
-	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) = 0;
+	virtual void Generate(cChunkDesc & a_ChunkDesc) = 0;
 
 	/** Returns the seed that was read from the INI file. */
 	int GetSeed(void) const { return m_Seed; }

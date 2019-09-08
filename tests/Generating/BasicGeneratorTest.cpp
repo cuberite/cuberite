@@ -91,7 +91,7 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 	{
 		// Generate a chunk:
 		cChunkDesc chd({chunkX, 0});
-		aDefaultOverworldGen.Generate(chunkX, 0, chd);
+		aDefaultOverworldGen.Generate(chd);
 		verifyChunkDescHeightmap(chd);
 
 		// Check that it has bedrock at the bottom:
@@ -155,7 +155,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 	{
 		// Generate a chunk:
 		cChunkDesc chd({chunkX, 0});
-		aDefaultNetherGen.Generate(chunkX, 0, chd);
+		aDefaultNetherGen.Generate(chd);
 		verifyChunkDescHeightmap(chd);
 
 		// Check that the biome is Nether everywhere:
@@ -244,7 +244,7 @@ static void checkChunkChecksums(
 	for (const auto & coords: aCoordsWithChecksum)
 	{
 		cChunkDesc chd(coords.mCoords);
-		aGenerator.Generate(coords.mCoords.m_ChunkX, coords.mCoords.m_ChunkZ, chd);
+		aGenerator.Generate(chd);
 		auto checksum = chunkSHA1(chd);
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
 			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)

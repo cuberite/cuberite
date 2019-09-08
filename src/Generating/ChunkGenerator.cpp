@@ -71,7 +71,7 @@ EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 	int Y = 0;
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, Y, a_BlockZ, ChunkX, ChunkZ);
-	GenerateBiomes(ChunkX, ChunkZ, Biomes);
+	GenerateBiomes({ChunkX, ChunkZ}, Biomes);
 	return cChunkDef::GetBiome(Biomes, a_BlockX, a_BlockZ);
 }
 

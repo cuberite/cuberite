@@ -30,8 +30,8 @@ public:
 	virtual ~cNoise3DGenerator() override;
 
 	virtual void Initialize(cIniFile & a_IniFile) override;
-	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
+	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void Generate(cChunkDesc & a_ChunkDesc) override;
 
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
@@ -58,8 +58,8 @@ protected:
 	NOISE_DATATYPE m_FrequencyZ;
 	NOISE_DATATYPE m_AirThreshold;
 
-	/** Generates the 3D noise array used for terrain generation; a_Noise is of ChunkData-size */
-	void GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_Noise);
+	/** Generates the 3D noise array used for terrain generation into a_Noise; a_Noise is of ChunkData-size */
+	void GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_Noise);
 
 	/** Composes terrain - adds dirt, grass and sand */
 	void ComposeTerrain(cChunkDesc & a_ChunkDesc);

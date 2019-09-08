@@ -195,8 +195,9 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 
 
 
-void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
+	UNUSED(a_ChunkCoords);
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		a_BiomeMap[i] = biExtremeHills;
@@ -207,10 +208,10 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 
 
-void cNoise3DGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
+void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
 {
 	NOISE_DATATYPE Noise[17 * 257 * 17];
-	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
+	GenerateNoiseArray(a_ChunkDesc.GetChunkCoords(), Noise);
 
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -243,22 +244,20 @@ void cNoise3DGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Chun
 
 
 
-void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_OutNoise)
+void cNoise3DGenerator::GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_OutNoise)
 {
 	NOISE_DATATYPE NoiseO[DIM_X * DIM_Y * DIM_Z];  // Output for the Perlin noise
 	NOISE_DATATYPE NoiseW[DIM_X * DIM_Y * DIM_Z];  // Workspace that the noise calculation can use and trash
 
 	// Our noise array has different layout, XZY, instead of regular chunk's XYZ, that's why the coords are "renamed"
-	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(a_ChunkX       * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((a_ChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(a_ChunkZ       * cChunkDef::Width) / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((a_ChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkX       * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((a_ChunkCoords.m_ChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkZ       * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((a_ChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(256) / m_FrequencyY;
 
 	m_Perlin.Generate3D(NoiseO, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, NoiseW);
-
-	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
 
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
@@ -283,15 +282,11 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 		}
 	}
 
-	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_hei", a_ChunkX, a_ChunkZ));
-
 	// Upscale the Perlin noise into full-blown chunk dimensions:
 	LinearUpscale3DArray(
 		NoiseO, DIM_X, DIM_Y, DIM_Z,
 		a_OutNoise, UPSCALE_X, UPSCALE_Y, UPSCALE_Z
 	);
-
-	// DEBUG: Debug3DNoise(a_OutNoise, 17, 257, 17, Printf("Chunk_%d_%d_lerp", a_ChunkX, a_ChunkZ));
 }
 
 
