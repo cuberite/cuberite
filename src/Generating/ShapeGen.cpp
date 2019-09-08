@@ -30,11 +30,11 @@ public:
 
 
 	// cTerrainShapeGen overrides:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override
 	{
 		// Generate the heightmap:
 		cChunkDef::HeightMap heightMap;
-		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, heightMap);
+		m_HeightGen->GenHeightMap(a_ChunkCoords, heightMap);
 
 		// Convert from heightmap to shape:
 		for (int z = 0; z < cChunkDef::Width; z++)

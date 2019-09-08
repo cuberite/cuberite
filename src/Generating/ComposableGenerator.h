@@ -86,7 +86,7 @@ public:
 	virtual ~cTerrainShapeGen() {}  // Force a virtual destructor in descendants
 
 	/** Generates the shape for the given chunk */
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) = 0;
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) = 0;
 
 	/** Reads parameters from the ini file, prepares generator for use. */
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) {}
@@ -118,7 +118,7 @@ public:
 	virtual ~cTerrainHeightGen() {}  // Force a virtual destructor in descendants
 
 	/** Retrieves the heightmap for the specified chunk. */
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) = 0;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) = 0;
 
 	/** Initializes the generator, reading its parameters from the INI file. */
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) {}
@@ -128,11 +128,10 @@ public:
 	Descendants may provide a better-performing method. */
 	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ)
 	{
-		int chunkX, chunkZ;
-		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, chunkX, chunkZ);
+		auto chunkCoords = cChunkDef::BlockToChunk({a_BlockX, 0, a_BlockZ});
 		cChunkDef::HeightMap heightMap;
-		GenHeightMap(chunkX, chunkZ, heightMap);
-		return cChunkDef::GetHeight(heightMap, a_BlockX - chunkX * cChunkDef::Width, a_BlockZ - chunkZ * cChunkDef::Width);
+		GenHeightMap(chunkCoords, heightMap);
+		return cChunkDef::GetHeight(heightMap, a_BlockX - chunkCoords.m_ChunkX * cChunkDef::Width, a_BlockZ - chunkCoords.m_ChunkZ * cChunkDef::Width);
 	}
 
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */

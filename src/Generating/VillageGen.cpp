@@ -178,7 +178,7 @@ protected:
 		// Each intersecting prefab is placed on ground, then drawn
 		// Each intersecting road is drawn by replacing top soil blocks with gravel / sandstone blocks
 		cChunkDef::HeightMap HeightMap;  // Heightmap for this chunk, used by roads
-		m_HeightGen->GenHeightMap(a_Chunk.GetChunkX(), a_Chunk.GetChunkZ(), HeightMap);
+		m_HeightGen->GenHeightMap(a_Chunk.GetChunkCoords(), HeightMap);
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
 			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
@@ -208,7 +208,7 @@ protected:
 		int BlockY;
 		cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 		a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 	}

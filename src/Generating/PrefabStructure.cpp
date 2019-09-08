@@ -55,7 +55,7 @@ void cPrefabStructure::PlacePieceOnGround(cPlacedPiece & a_Piece)
 	int BlockY;
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cChunkDef::HeightMap HeightMap;
-	m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+	m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 	int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 	a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 }
