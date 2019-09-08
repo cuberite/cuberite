@@ -163,7 +163,7 @@ void cComposableGenerator::Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_C
 	cChunkDesc::Shape shape;
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
-		m_ShapeGen->GenShape(a_ChunkX, a_ChunkZ, shape);
+		m_ShapeGen->GenShape(a_ChunkDesc.GetChunkCoords(), shape);
 		a_ChunkDesc.SetHeightFromShape(shape);
 	}
 	else

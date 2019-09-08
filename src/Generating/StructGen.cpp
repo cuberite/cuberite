@@ -40,7 +40,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				cChunkDesc::Shape workerShape;
 				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc.GetBiomeMap());
-				m_ShapeGen->GenShape            (BaseX, BaseZ, workerShape);
+				m_ShapeGen->GenShape            ({BaseX, BaseZ}, workerShape);
 				WorkerDesc.SetHeightFromShape   (workerShape);
 				m_CompositionGen->ComposeTerrain(WorkerDesc, workerShape);
 			}

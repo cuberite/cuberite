@@ -115,16 +115,15 @@ protected:
 	NOISE_DATATYPE m_AirThreshold;
 
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	int m_LastChunkX;
-	int m_LastChunkZ;
+	cChunkCoords m_LastChunkCoords;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
-	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
+	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords);
 
 	// cTerrainHeightGen overrides:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
@@ -184,8 +183,7 @@ protected:
 	NOISE_DATATYPE m_AirThreshold;
 
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	int m_LastChunkX;
-	int m_LastChunkZ;
+	cChunkCoords m_LastChunkCoords;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
 
 	/** Weights for summing up neighboring biomes. */
@@ -196,16 +194,16 @@ protected:
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
-	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
+	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords);
 
 	/** Calculates the biome-related parameters for the chunk. */
-	void CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint);
+	void CalcBiomeParamArrays(cChunkCoords a_ChunkCoords, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint);
 
 	/** Returns the parameters for the specified biome. */
 	void GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE & a_HeightAmp, NOISE_DATATYPE & a_MidPoint);
 
 	// cTerrainShapeGen overrides:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
