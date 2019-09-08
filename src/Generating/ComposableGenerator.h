@@ -210,8 +210,8 @@ public:
 
 	// cChunkGenerator::cGenerator overrides:
 	virtual void Initialize(cIniFile & a_IniFile) override;
-	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Generate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
+	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void Generate(cChunkDesc & a_ChunkDesc) override;
 
 	/** If there's no particular sub-generator set in the INI file,
 	adds the default one, based on the dimension. */

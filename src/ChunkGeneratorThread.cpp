@@ -99,7 +99,7 @@ void cChunkGeneratorThread::GenerateBiomes(cChunkCoords a_Coords, cChunkDef::Bio
 {
 	if (m_Generator != nullptr)
 	{
-		m_Generator->GenerateBiomes(a_Coords.m_ChunkX, a_Coords.m_ChunkZ, a_BiomeMap);
+		m_Generator->GenerateBiomes(a_Coords, a_BiomeMap);
 	}
 }
 
@@ -247,7 +247,7 @@ void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords)
 
 	cChunkDesc ChunkDesc(a_Coords);
 	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);
-	m_Generator->Generate(a_Coords.m_ChunkX, a_Coords.m_ChunkZ, ChunkDesc);
+	m_Generator->Generate(ChunkDesc);
 	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
 	#ifdef _DEBUG
