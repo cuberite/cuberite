@@ -211,7 +211,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(BitsPerEntry);
+			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 
@@ -344,7 +344,7 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(BitsPerEntry);
+			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 
