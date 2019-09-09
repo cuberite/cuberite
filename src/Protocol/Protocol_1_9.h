@@ -32,7 +32,7 @@ Declares the 1.9 protocol classes:
 class cProtocol_1_9_0 :
 	public cProtocol
 {
-	typedef cProtocol super;
+	typedef cProtocol Super;
 
 public:
 
@@ -172,7 +172,7 @@ protected:
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Get the packet ID for a given packet */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
@@ -289,7 +289,7 @@ protected:
 class cProtocol_1_9_1 :
 	public cProtocol_1_9_0
 {
-	typedef cProtocol_1_9_0 super;
+	typedef cProtocol_1_9_0 Super;
 
 public:
 	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -308,7 +308,7 @@ public:
 class cProtocol_1_9_2 :
 	public cProtocol_1_9_1
 {
-	typedef cProtocol_1_9_1 super;
+	typedef cProtocol_1_9_1 Super;
 
 public:
 	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -326,7 +326,7 @@ public:
 class cProtocol_1_9_4 :
 	public cProtocol_1_9_2
 {
-	typedef cProtocol_1_9_2 super;
+	typedef cProtocol_1_9_2 Super;
 
 public:
 	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -339,6 +339,6 @@ public:
 
 protected:
 
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 } ;
