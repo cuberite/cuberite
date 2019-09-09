@@ -27,7 +27,7 @@ Declares the 1.12 protocol classes:
 class cProtocol_1_12 :
 	public cProtocol_1_11_1
 {
-	typedef cProtocol_1_11_1 super;
+	typedef cProtocol_1_11_1 Super;
 
 public:
 	cProtocol_1_12(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -48,7 +48,7 @@ protected:
 
 protected:
 
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 };
 
 
@@ -58,13 +58,13 @@ protected:
 class cProtocol_1_12_1 :
 	public cProtocol_1_12
 {
-	typedef cProtocol_1_12 super;
+	typedef cProtocol_1_12 Super;
 
 public:
 	cProtocol_1_12_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 protected:
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
