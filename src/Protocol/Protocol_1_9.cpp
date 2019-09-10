@@ -592,6 +592,37 @@ void cProtocol_1_9_0::SendEntityVelocity(const cEntity & a_Entity)
 
 
 
+void cProtocol_1_9_0::SendExperience(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktExperience);
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteBEFloat(Player->GetXpPercentage());
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSpawnExperienceOrb);
+	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosX());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosY());
+	Pkt.WriteBEDouble(a_ExpOrb.GetPosZ());
+	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1209,37 +1240,6 @@ void cProtocol_1_9_0::SendRespawn(eDimension a_Dimension)
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendExperience(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktExperience);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEFloat(Player->GetXpPercentage());
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnExperienceOrb);
-	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
-	Pkt.WriteBEDouble(a_ExpOrb.GetPosX());
-	Pkt.WriteBEDouble(a_ExpOrb.GetPosY());
-	Pkt.WriteBEDouble(a_ExpOrb.GetPosZ());
-	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
 }
 
 
@@ -3392,9 +3392,6 @@ eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// cProtocol_1_9_0::cPacketizer:
-
 void cProtocol_1_9_0::SendPacket(cPacketizer & a_Pkt)
 {
 	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
@@ -3445,10 +3442,22 @@ void cProtocol_1_9_0::SendPacket(cPacketizer & a_Pkt)
 		AString Hex;
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Printf("Outgoing packet: type %s (0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
-			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), a_Pkt.GetPacketType(), PacketLen, PacketLen, m_State, Hex
+		m_CommLogFile.Printf("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+			PacketLen, PacketLen, m_State, Hex
 		);
+		/*
+		// Useful for debugging a new protocol:
+		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+			PacketLen, PacketLen, m_State, Hex
+		);
+		//*/
 	}
+	/*
+	// Useful for debugging a new protocol:
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	*/
 }
 
 
