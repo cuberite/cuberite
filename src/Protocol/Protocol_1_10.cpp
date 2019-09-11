@@ -292,7 +292,7 @@ namespace Metadata
 
 
 cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 
@@ -304,7 +304,7 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendSoundEffect));  // Named sound effect packet
+	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(FloorC(a_X * 8.0));
@@ -356,7 +356,7 @@ void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
 }
 

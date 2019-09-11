@@ -4,7 +4,6 @@ SET (SRCS
 	ChunkDataSerializer.cpp
 	ForgeHandshake.cpp
 	MojangAPI.cpp
-	PacketID.cpp
 	Packetizer.cpp
 	Protocol_1_8.cpp
 	Protocol_1_9.cpp
