@@ -1,3 +1,4 @@
+include_directories (SYSTEM "../../lib/jsoncpp/include")
 
 SET (SRCS
 	Authenticator.cpp
