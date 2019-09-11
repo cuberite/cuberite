@@ -281,7 +281,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
-		cPacketizer Pkt(*this, 0x00);  // Disconnect packet (in login state)
+		cPacketizer Pkt(*this, pktDisconnectDuringLogin);
 		Pkt.WriteString(Message);
 	}
 }
@@ -1196,6 +1196,25 @@ void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 
 
 
+UInt32 cProtocolRecognizer::GetPacketID(ePacketType a_PacketType)
+{
+	switch (a_PacketType)
+	{
+		case pktDisconnectDuringLogin: return 0x00;
+		case pktStatusResponse:        return 0x00;
+		case pktPingResponse:          return 0x01;
+		default:
+		{
+			ASSERT(!"cProtocolRecognizer::GetPacketID() called for an unhandled packet");
+			return 0;
+		}
+	}
+}
+
+
+
+
+
 void cProtocolRecognizer::HandlePacketStatusRequest(void)
 {
 	cServer * Server = cRoot::Get()->GetServer();
@@ -1233,7 +1252,7 @@ void cProtocolRecognizer::HandlePacketStatusRequest(void)
 	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
 }
 
@@ -1249,6 +1268,6 @@ void cProtocolRecognizer::HandlePacketStatusPing()
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x01);  // Pong packet
+	cPacketizer Pkt(*this, pktPingResponse);
 	Pkt.WriteBEInt64(Timestamp);
 }

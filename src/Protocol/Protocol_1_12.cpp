@@ -317,7 +317,7 @@ namespace Metadata
 
 
 cProtocol_1_12::cProtocol_1_12(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
 }
 
@@ -329,7 +329,7 @@ void cProtocol_1_12::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
+	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
@@ -409,7 +409,7 @@ void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Serialize the response into a packet:
 	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Writer.write(ResponseValue));
 }
 
@@ -1019,6 +1019,47 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 
 
+UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
+{
+	switch (a_Packet)
+	{
+		case pktAttachEntity:        return 0x42;
+		case pktCameraSetTo:         return 0x38;
+		case pktCollectEntity:       return 0x4a;
+		case pktDestroyEntity:       return 0x31;
+		case pktDisplayObjective:    return 0x3a;
+		case pktEntityEffect:        return 0x4e;
+		case pktEntityEquipment:     return 0x3e;
+		case pktEntityHeadLook:      return 0x35;
+		case pktEntityLook:          return 0x28;
+		case pktEntityMeta:          return 0x3b;
+		case pktEntityProperties:    return 0x4d;
+		case pktEntityRelMove:       return 0x26;
+		case pktEntityRelMoveLook:   return 0x27;
+		case pktEntityVelocity:      return 0x3d;
+		case pktExperience:          return 0x3f;
+		case pktHeldItemChange:      return 0x39;
+		case pktLeashEntity:         return 0x3c;
+		case pktPlayerMaxSpeed:      return 0x4d;
+		case pktRemoveEntityEffect:  return 0x32;
+		case pktRespawn:             return 0x34;
+		case pktScoreboardObjective: return 0x41;
+		case pktSpawnPosition:       return 0x45;
+		case pktTeleportEntity:      return 0x4b;
+		case pktTimeUpdate:          return 0x46;
+		case pktTitle:               return 0x47;
+		case pktUpdateBlockEntity:   return 0x09;
+		case pktUpdateHealth:        return 0x40;
+		case pktUpdateScore:         return 0x44;
+
+		default: return Super::GetPacketID(a_Packet);
+	}
+}
+
+
+
+
+
 void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
@@ -1043,7 +1084,7 @@ void cProtocol_1_12::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(3);  // Set title display times
 	Pkt.WriteBEInt32(a_FadeInTicks);
 	Pkt.WriteBEInt32(a_DisplayTicks);
@@ -1058,7 +1099,7 @@ void cProtocol_1_12::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(4);  // Hide title
 }
 
@@ -1070,7 +1111,7 @@ void cProtocol_1_12::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(5);  // Reset title
 }
 
@@ -1082,7 +1123,7 @@ void cProtocol_1_12::SendCollectEntity(const cEntity & a_Entity, const cPlayer &
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendCollectEntity));  // Collect Item packet
+	cPacketizer Pkt(*this, pktCollectEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
@@ -1188,8 +1229,49 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 
 cProtocol_1_12_1::cProtocol_1_12_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
+}
+
+
+
+
+
+UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
+{
+	switch (a_Packet)
+	{
+		case pktAttachEntity:        return 0x43;
+		case pktCameraSetTo:         return 0x39;
+		case pktCollectEntity:       return 0x4b;
+		case pktDestroyEntity:       return 0x32;
+		case pktDisplayObjective:    return 0x3b;
+		case pktEntityEffect:        return 0x4f;
+		case pktEntityEquipment:     return 0x3f;
+		case pktEntityHeadLook:      return 0x36;
+		case pktEntityMeta:          return 0x3c;
+		case pktEntityProperties:    return 0x4e;
+		case pktEntityVelocity:      return 0x3e;
+		case pktExperience:          return 0x40;
+		case pktHeldItemChange:      return 0x3a;
+		case pktLeashEntity:         return 0x3d;
+		case pktPlayerList:          return 0x2e;
+		case pktPlayerAbilities:     return 0x2c;
+		case pktPlayerMaxSpeed:      return 0x4e;
+		case pktPlayerMoveLook:      return 0x2f;
+		case pktRemoveEntityEffect:  return 0x33;
+		case pktRespawn:             return 0x35;
+		case pktScoreboardObjective: return 0x42;
+		case pktSpawnPosition:       return 0x46;
+		case pktUpdateHealth:        return 0x41;
+		case pktUpdateScore:         return 0x45;
+		case pktUseBed:              return 0x30;
+		case pktTeleportEntity:      return 0x4c;
+		case pktTimeUpdate:          return 0x47;
+		case pktTitle:               return 0x48;
+
+		default: return Super::GetPacketID(a_Packet);
+	}
 }
 
 
@@ -1232,7 +1314,7 @@ void cProtocol_1_12_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Serialize the response into a packet:
 	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Writer.write(ResponseValue));
 }
 
@@ -1390,7 +1472,7 @@ void cProtocol_1_12_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Serialize the response into a packet:
 	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Writer.write(ResponseValue));
 }
 
@@ -1407,6 +1489,6 @@ void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 		return;
 	}
 
-	cPacketizer Pkt(*this, GetPacketId(sendKeepAlive));  // Keep Alive packet
+	cPacketizer Pkt(*this, pktKeepAlive);
 	Pkt.WriteBEInt64(a_PingID);
 }
