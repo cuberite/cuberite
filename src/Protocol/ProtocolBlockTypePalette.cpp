@@ -33,9 +33,9 @@ bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
 	{
 		return load(aMapping);
 	}
-	catch (const std::exception& e)
+	catch (const std::exception&)
 	{
-		LOGD("Error reading protocol palette: %s", e.what());
+		LOGD("Error reading protocol palette from string");
 		return false;
 	}
 }
