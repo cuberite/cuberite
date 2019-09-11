@@ -29,14 +29,13 @@ ProtocolBlockTypePalette::ProtocolBlockTypePalette(const AString & aMapping)
 
 bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
 {
-	// return load(aMapping);
 	try
 	{
 		return load(aMapping);
 	}
 	catch (const std::exception& e)
 	{
-		// std::cerr << e.what() << std::endl;
+		LOGD("Error reading protocol palette: %s", e.what());
 		return false;
 	}
 }

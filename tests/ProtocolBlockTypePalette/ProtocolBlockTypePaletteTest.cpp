@@ -120,8 +120,8 @@ static void TestFile(void)
 
 	// This is a bit problematic - the only permanently fixed block Id is air...
 	TEST_EQUAL(palette.index("minecraft:air", BlockState({})), 0);
-	TEST_TRUE(palette.index("minecraft:stone", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND);
-	TEST_TRUE(palette.index("minecraft:dirt", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND);
+	TEST_TRUE((palette.index("minecraft:stone", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND));
+	TEST_TRUE((palette.index("minecraft:dirt", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND));
 }
 
 

@@ -108,24 +108,27 @@ bool BlockState::operator <(const BlockState & aOther) const
 	// don't need to check it_o, size checks above ensure size(A) == size(O)
 	while (it_a != mState.end())
 	{
-		auto cmp_k = it_a->first.compare(it_o->first);
-		if (cmp_k < 0)
 		{
-			return true;
+			auto cmp_k = it_a->first.compare(it_o->first);
+			if (cmp_k < 0)
+			{
+				return true;
+			}
+			if (cmp_k > 0)
+			{
+				return false;
+			}
 		}
-		if (cmp_k > 0)
 		{
-			return false;
-		}
-
-		auto cmp_v = it_a->second.compare(it_o->second);
-		if (cmp_v < 0)
-		{
-			return true;
-		}
-		if (cmp_v > 0)
-		{
-			return false;
+			auto cmp_v = it_a->second.compare(it_o->second);
+			if (cmp_v < 0)
+			{
+				return true;
+			}
+			if (cmp_v > 0)
+			{
+				return false;
+			}
 		}
 
 		it_a++;
