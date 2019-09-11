@@ -82,6 +82,62 @@ BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, ASt
 
 
 
+// This iteratively compares "right-aligned". So it works roughly like this:
+//
+//   BlockState({{"9", "9"}})                |    "     9 9"
+//   BlockState({{"12", "34"}})              |    "    1234"
+//   BlockState({{"1", "2"}, {"3", "4"}})    |    " 1 2 3 4"
+//
+// but without actually assembling the strings ofc.
+// Equality is the worst-case
+// This will fail with an unordered collection, but std::map is ordered.
+bool BlockState::operator <(const BlockState & aOther) const
+{
+	// Can fast-fail this due to how comparison works
+	if (mState.size() < aOther.mState.size())
+	{
+		return true;
+	}
+	if (mState.size() > aOther.mState.size())
+	{
+		return false;
+	}
+	auto it_a = mState.begin();
+	auto it_o = aOther.mState.begin();
+
+	// don't need to check it_o, size checks above ensure size(A) == size(O)
+	while (it_a != mState.end())
+	{
+		auto cmp_k = it_a->first.compare(it_o->first);
+		if (cmp_k < 0)
+		{
+			return true;
+		}
+		if (cmp_k > 0)
+		{
+			return false;
+		}
+
+		auto cmp_v = it_a->second.compare(it_o->second);
+		if (cmp_v < 0)
+		{
+			return true;
+		}
+		if (cmp_v > 0)
+		{
+			return false;
+		}
+
+		it_a++;
+		it_o++;
+	}
+
+	return false;
+}
+
+
+
+
 
 bool BlockState::operator ==(const BlockState & aOther) const
 {

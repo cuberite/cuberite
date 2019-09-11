@@ -109,8 +109,36 @@ static void testReplacing()
 
 
 
+/** Tests replacing the properties in the copy-and-modify constructors. */
+static void testComparison()
+{
+	LOGD("Testing comparison of BlockStates...");
+
+	// Prop values
+	TEST_FALSE((BlockState({{"a","a"}}) < BlockState({{"a","a"}})));  // equal
+	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"b","a"}})));
+	TEST_TRUE((BlockState({{"a","z"}}) < BlockState({{"b","a"}})));
+	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"z","z"}})));
+	TEST_TRUE((BlockState({{"a","zzzzzzzzzzzzzz"}}) < BlockState({{"z","z"}})));
+	TEST_TRUE((BlockState({{"a","a"}, {"b","b"}}) < BlockState({{"a","a"}, {"b","c"}})));
+
+	// Different number of props
+	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"a","a"}, {"b","b"}})));
+	TEST_FALSE((BlockState({{"a","a"}, {"b","b"}}) < BlockState({{"a","a"}})));
+
+	// Empty props
+	TEST_TRUE((BlockState({}) < BlockState({{"foo","bar"}})));
+	TEST_FALSE((BlockState({}) < BlockState({})));
+	TEST_FALSE((BlockState({{"foo","bar"}}) < BlockState({})));
+}
+
+
+
+
+
 IMPLEMENT_TEST_MAIN("BlockStateTest",
 	testStaticCreation();
 	testDynamicCreation();
 	testReplacing();
+	testComparison();
 )

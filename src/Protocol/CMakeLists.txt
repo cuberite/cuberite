@@ -12,6 +12,7 @@ SET (SRCS
 	Protocol_1_11.cpp
 	Protocol_1_12.cpp
 	ProtocolRecognizer.cpp
+	ProtocolBlockTypePalette.cpp
 )
 
 SET (HDRS
@@ -27,6 +28,7 @@ SET (HDRS
 	Protocol_1_11.h
 	Protocol_1_12.h
 	ProtocolRecognizer.h
+	ProtocolBlockTypePalette.h
 )
 
 if (NOT MSVC)

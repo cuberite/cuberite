@@ -1,0 +1,20 @@
+#!/bin/sh
+# Expects $1 -> Version, $2 -> URL
+VERSION=$1
+cd "$(dirname $0)"
+
+echo Version $VERSION
+mkdir -p tmp/jars
+mkdir -p gen/"$VERSION"/
+
+function maybedl() {
+	if [[ ! -f "$2" ]]; then
+		curl "$1" > "$2"
+	fi
+}
+
+maybedl "$2" "./tmp/jars/$VERSION.jar" &&
+java -cp "tmp/jars/$VERSION.jar" net.minecraft.data.Main --output=tmp/"$VERSION" --reports &&
+lua Generator.lua "$VERSION" \
+	< tmp/"$VERSION"/reports/blocks.json \
+	> gen/"$VERSION"/ProtocolBlockTypePalette.json
