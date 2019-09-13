@@ -414,6 +414,10 @@ AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
 
 
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
 // UTF-8 conversion code adapted from:
 //  https://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
@@ -610,6 +614,9 @@ are equivalent to the following loop:
 ////////////////////////////////////////////////////////////////////////////////
 // End of Unicode, Inc.'s code / information
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 
 
