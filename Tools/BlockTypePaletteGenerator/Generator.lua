@@ -1,4 +1,14 @@
-require "lib";
+-- lib/lunajson/src/ is not in default Lua package paths
+package.path = 'lib/lunajson/src/?.lua;' .. package.path;
+
+-- test path
+if not pcall(function() require "lunajson.decoder" end) then
+	io.stderr:write("Could not load required libraries, please run "..
+	"`Generator.lua` within its directory and make sure to run `git submodule"..
+	" update --init --recursive`.\n");
+	os.exit();
+end
+
 local decode = (require "lunajson.decoder")();
 local encode = (require "lunajson.encoder")();
 
