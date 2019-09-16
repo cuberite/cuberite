@@ -43,22 +43,5 @@
 		<p>Once running, if the execution hits a breakpoint, the ZBS window will come up and a green arrow is displayed next to the breakpoint line. You can step through the code using F10 (Step Into) and Shift+F10 (Step Over). You can also use the Watch window to inspect variable values, or simply hover your mouse over a variable to display its value in the tooltip. Use the Remote console pane to execute commands directly *inside* the Cuberite's plugin context.</p>
 		<p>You can also use the Project -> Break menu item to break into the debugger as soon as possible. You can also set breakpoints while the Cuberite plugin is running. Note that due to the way in which the debugger is implemented, Cuberite may execute some more Lua code before the break / breakpoint comes into effect. If Cuberite is not executing any Lua code in your plugin, it will not break until the plugin code kicks in again. This may result in missed breakpoints and delays before the Break command becomes effective. Therefore it's best to set breakpoints before running the program, or while the program is waiting in another breakpoint.</p>
 		</div>
-
-		<!-- Piwik -->
-		<script type="text/javascript">
-		  var _paq = _paq || [];
-		  _paq.push(['trackPageView']);
-		  _paq.push(['enableLinkTracking']);
-		  (function() {
-			var u="https://analytics.cuberite.org/";
-			_paq.push(['setTrackerUrl', u+'piwik.php']);
-			_paq.push(['setSiteId', 5]);
-			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-			g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
-		  })();
-		</script>
-		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
-		<!-- End Piwik Code -->
-
 	</body>
 </html>
