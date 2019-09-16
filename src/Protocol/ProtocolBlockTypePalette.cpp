@@ -51,18 +51,18 @@ bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
 	auto len = root["Palette"].size();
 	for (decltype(len) i = 0; i < len; ++i)
 	{
-		const auto record = root["Palette"][i];
+		auto record = root["Palette"][i];
 		ASSERT(record.isObject());
-		const auto blocktype = record["name"].asString();
-		const auto id = std::stoul(record["id"].asString());
+		auto blocktype = record["name"].asString();
+		auto id = std::stoul(record["id"].asString());
 		std::map<AString, AString> state;
 
 		ASSERT(id < NOT_FOUND);  // this is a fatal error.
 
 		if (record.isMember("props"))
 		{
-			const auto props = record["props"];
-			for (const auto key: props.getMemberNames())
+			auto props = record["props"];
+			for (auto key: props.getMemberNames())
 			{
 				state[key] = props[key].asString();
 			}
