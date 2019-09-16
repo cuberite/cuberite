@@ -23,9 +23,6 @@ public:
 	Returns `true` on success, `false` otherwise. */
 	bool loadFromString(const AString & aMapping);
 
-	/** Returns `true` if the object is initialized, `false` otherwise */
-	bool is_initialized();
-
 	/** Returns the index of the specified {block type name, state}.
 	Returns ProtocolBlockTypePalette::NOT_FOUND if the tuple is not found. */
 	UInt32 index(const AString & aBlockTypeName, const BlockState & aBlockState) const;
@@ -41,6 +38,4 @@ protected:
 	The key is the combination of Name and serialised BlockState, the value is
 	the palette index. */
 	std::unordered_map<AString, std::map<BlockState, UInt32>> mIndex;
-
-	bool load(const std::string & in);
 };

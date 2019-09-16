@@ -20,7 +20,7 @@ ProtocolBlockTypePalette::ProtocolBlockTypePalette()
 
 ProtocolBlockTypePalette::ProtocolBlockTypePalette(const AString & aMapping)
 {
-	load(aMapping);
+	loadFromString(aMapping);
 }
 
 
@@ -28,23 +28,6 @@ ProtocolBlockTypePalette::ProtocolBlockTypePalette(const AString & aMapping)
 
 
 bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
-{
-	try
-	{
-		return load(aMapping);
-	}
-	catch (const std::exception&)
-	{
-		LOGD("Error reading protocol palette from string");
-		return false;
-	}
-}
-
-
-
-
-
-bool ProtocolBlockTypePalette::load(const std::string & aMapping)
 {
 	Json::Value root;
 	std::stringstream strm;
@@ -55,24 +38,31 @@ bool ProtocolBlockTypePalette::load(const std::string & aMapping)
 	{
 		return true;  // accept empty string.
 	}
-	if (!root.isArray())
+	if (!root.isMember("Metadata") ||
+		!root["Metadata"].isMember("ProtocolBlockType") ||
+		(root["Metadata"]["ProtocolBlockType"].asUInt() != 1) ||
+		!root.isMember("Palette") ||
+		!root["Palette"].isArray())
 	{
+		LOGD("Wrong palette format.");
 		return false;
 	}
 
-	auto len = root.size();
-	for (decltype(len) i=0; i<len; i++)
+	auto len = root["Palette"].size();
+	for (decltype(len) i = 0; i < len; ++i)
 	{
-		auto record = root[i];
-		auto blocktype = record["name"].asString();
+		const auto record = root["Palette"][i];
+		ASSERT(record.isObject());
+		const auto blocktype = record["name"].asString();
+		const auto id = std::stoul(record["id"].asString());
 		std::map<AString, AString> state;
 
-		ASSERT(i != NOT_FOUND);  // this is a fatal error.
+		ASSERT(id < NOT_FOUND);  // this is a fatal error.
 
 		if (record.isMember("props"))
 		{
-			auto props = record["props"];
-			for (auto key: props.getMemberNames())
+			const auto props = record["props"];
+			for (const auto key: props.getMemberNames())
 			{
 				state[key] = props[key].asString();
 			}
@@ -85,18 +75,9 @@ bool ProtocolBlockTypePalette::load(const std::string & aMapping)
 		}
 
 		// ASSERT(std::stoul(record["id"].asString()) == i);
-		mIndex[blocktype].insert({BlockState(state), i});
+		mIndex[blocktype].insert({BlockState(state), id});
 	}
 	return true;
-}
-
-
-
-
-
-bool ProtocolBlockTypePalette::is_initialized()
-{
-	return !mIndex.empty();
 }
 
 

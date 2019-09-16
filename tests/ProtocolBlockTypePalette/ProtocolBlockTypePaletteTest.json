@@ -1,0 +1,146 @@
+{
+  "Metadata": {
+    "ProtocolBlockType": 1
+  },
+  "Palette": [{
+      "id": 0,
+      "name": "minecraft:air"
+    }, {
+      "id": 1,
+      "name": "minecraft:stone"
+    }, {
+      "id": 221,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "false",
+        "distance": "4"
+      }
+    }, {
+      "id": 222,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "true",
+        "distance": "5"
+      }
+    }, {
+      "id": 223,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "false",
+        "distance": "5"
+      }
+    }, {
+      "id": 224,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "true",
+        "distance": "6"
+      }
+    }, {
+      "id": 225,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "false",
+        "distance": "6"
+      }
+    }, {
+      "id": 226,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "true",
+        "distance": "7"
+      }
+    }, {
+      "id": 227,
+      "name": "minecraft:dark_oak_leaves",
+      "props": {
+        "persistent": "false",
+        "distance": "7"
+      }
+    }, {
+      "id": 9988,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "north_south"
+      }
+    }, {
+      "id": 9989,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "east_west"
+      }
+    }, {
+      "id": 9990,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "ascending_east"
+      }
+    }, {
+      "id": 9991,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "ascending_west"
+      }
+    }, {
+      "id": 9992,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "ascending_north"
+      }
+    }, {
+      "id": 9993,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "true",
+        "shape": "ascending_south"
+      }
+    }, {
+      "id": 9994,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "north_south"
+      }
+    }, {
+      "id": 9995,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "east_west"
+      }
+    }, {
+      "id": 9996,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "ascending_east"
+      }
+    }, {
+      "id": 9997,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "ascending_west"
+      }
+    }, {
+      "id": 9998,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "ascending_north"
+      }
+    }, {
+      "id": 9999,
+      "name": "minecraft:powered_rail",
+      "props": {
+        "powered": "false",
+        "shape": "ascending_south"
+      }
+    }
+  ]
+}
