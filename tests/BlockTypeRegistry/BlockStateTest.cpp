@@ -109,27 +109,60 @@ static void testReplacing()
 
 
 
-/** Tests replacing the properties in the copy-and-modify constructors. */
+/** Tests the comparison operator. */
 static void testComparison()
 {
 	LOGD("Testing comparison of BlockStates...");
 
-	// Prop values
+	// Simple property value tests
 	TEST_FALSE((BlockState({{"a","a"}}) < BlockState({{"a","a"}})));  // equal
-	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"b","a"}})));
-	TEST_TRUE((BlockState({{"a","z"}}) < BlockState({{"b","a"}})));
-	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"z","z"}})));
-	TEST_TRUE((BlockState({{"a","zzzzzzzzzzzzzz"}}) < BlockState({{"z","z"}})));
-	TEST_TRUE((BlockState({{"a","a"}, {"b","b"}}) < BlockState({{"a","a"}, {"b","c"}})));
-
-	// Different number of props
-	TEST_TRUE((BlockState({{"a","a"}}) < BlockState({{"a","a"}, {"b","b"}})));
-	TEST_FALSE((BlockState({{"a","a"}, {"b","b"}}) < BlockState({{"a","a"}})));
-
-	// Empty props
+	TEST_FALSE((BlockState({}) < BlockState({})));  // equal
 	TEST_TRUE((BlockState({}) < BlockState({{"foo","bar"}})));
-	TEST_FALSE((BlockState({}) < BlockState({})));
 	TEST_FALSE((BlockState({{"foo","bar"}}) < BlockState({})));
+}
+
+
+
+
+
+/** Tests the comparison operator using crafted data to defeat the checksum. */
+static void testComparison2()
+{
+	/* The following test ensures that items inserted in different order result
+	in the same map. I.e. that the < operator is stable. */
+	std::vector<BlockState> v;
+	std::map<BlockState, bool> map1;
+	std::map<BlockState, bool> map2;
+
+	for (int i=0; i < 128; ++i)
+	{
+		v.push_back(BlockState({
+			{std::string(1, 0x1F), std::string(1, i)},
+		}));
+		v.push_back(BlockState({
+			{std::string(1, 0x10), std::string(1, i | 0x80)},
+			{std::string(1, 0x0F), std::string(1, 0x80)},
+		}));
+	}
+
+	for (size_t i = 0; i < v.size(); ++i)
+	{
+		map1[v[i]] = true;
+	}
+
+	for (auto i = v.size(); i > 0; --i)
+	{
+		map2[v[i-1]] = true;
+	}
+
+	// Check result
+	TEST_EQUAL(v.size(), 2 * 128);
+	TEST_EQUAL(map1.size(), v.size());
+	TEST_EQUAL(map1.size(), map2.size());
+	for (auto item: map1)
+	{
+		TEST_EQUAL(map1[item.first], map2[item.first]);
+	}
 }
 
 
@@ -141,4 +174,5 @@ IMPLEMENT_TEST_MAIN("BlockStateTest",
 	testDynamicCreation();
 	testReplacing();
 	testComparison();
+	testComparison2();
 )

@@ -82,57 +82,44 @@ BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, ASt
 
 
 
-// This iteratively compares "right-aligned". So it works roughly like this:
-//
-//   BlockState({{"9", "9"}})                |    "     9 9"
-//   BlockState({{"12", "34"}})              |    "    1234"
-//   BlockState({{"1", "2"}, {"3", "4"}})    |    " 1 2 3 4"
-//
-// but without actually assembling the strings ofc.
-// Equality is the worst-case
-// This will fail with an unordered collection, but std::map is ordered.
+
 bool BlockState::operator <(const BlockState & aOther) const
 {
-	// Can fast-fail this due to how comparison works
-	if (mState.size() < aOther.mState.size())
+	// Fast-return this using checksum
+	if (mChecksum != aOther.mChecksum)
 	{
-		return true;
+		return mChecksum < aOther.mChecksum;
 	}
-	if (mState.size() > aOther.mState.size())
-	{
-		return false;
-	}
-	auto it_a = mState.begin();
-	auto it_o = aOther.mState.begin();
 
-	// don't need to check it_o, size checks above ensure size(A) == size(O)
-	while (it_a != mState.end())
+	// Can fast-return this due to how comparison works
+	if (mState.size() != aOther.mState.size())
+	{
+		return mState.size() < aOther.mState.size();
+	}
+
+	auto itA = mState.begin();
+	auto itOther = aOther.mState.begin();
+
+	// don't need to check itOther, size checks above ensure size(A) == size(O)
+	while (itA != mState.end())
 	{
 		{
-			auto cmp_k = it_a->first.compare(it_o->first);
-			if (cmp_k < 0)
+			const auto cmp = itA->first.compare(itOther->first);
+			if (cmp != 0)
 			{
-				return true;
-			}
-			if (cmp_k > 0)
-			{
-				return false;
+				return cmp < 0;
 			}
 		}
 		{
-			auto cmp_v = it_a->second.compare(it_o->second);
-			if (cmp_v < 0)
+			const auto cmp = itA->second.compare(itOther->second);
+			if (cmp != 0)
 			{
-				return true;
-			}
-			if (cmp_v > 0)
-			{
-				return false;
+				return cmp < 0;
 			}
 		}
 
-		it_a++;
-		it_o++;
+		++itA;
+		++itOther;
 	}
 
 	return false;
