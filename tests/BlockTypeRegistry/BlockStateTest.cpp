@@ -136,13 +136,9 @@ static void testComparison2()
 
 	for (int i=0; i < 128; ++i)
 	{
-		v.push_back(BlockState({
-			{std::string(1, 0x1F), std::string(1, i)},
-		}));
-		v.push_back(BlockState({
-			{std::string(1, 0x10), std::string(1, i | 0x80)},
-			{std::string(1, 0x0F), std::string(1, 0x80)},
-		}));
+		v.push_back(BlockState({{std::string(1, 0x1F), std::string(1, i)}}));
+		v.push_back(BlockState({{std::string(1, 0x10), std::string(1, i | 0x80)},
+			{std::string(1, 0x0F), std::string(1, 0x80)}}));
 	}
 
 	for (size_t i = 0; i < v.size(); ++i)
