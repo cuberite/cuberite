@@ -34,9 +34,6 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(ProtocolBlockTypePaletteTest-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
 target_link_libraries(ProtocolBlockTypePaletteTest-exe fmt::fmt jsoncpp_lib_static)
-if (WIN32)
-	target_link_libraries(ProtocolBlockTypePaletteTest-exe ws2_32)
-endif()
 add_test(NAME ProtocolBlockTypePaletteTest-test COMMAND ProtocolBlockTypePaletteTest-exe)
 
 
