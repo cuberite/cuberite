@@ -122,7 +122,7 @@ static void TestComplex2(void)
 static void TestFile(void)
 {
 	LOG("Test TestFile");
-	std::ifstream f("ProtocolBlockTypePalette.json");
+	std::ifstream f("base.btp.json");
 	std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 	ProtocolBlockTypePalette palette;
 	TEST_TRUE(palette.loadFromString(str));
@@ -140,7 +140,7 @@ static void TestFile(void)
 static void TestFile2(void)
 {
 	LOG("Test TestFile2");
-	std::ifstream f("ProtocolBlockTypePaletteTest.json");
+	std::ifstream f("test.btp.json");
 	std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 	ProtocolBlockTypePalette palette;
 	TEST_TRUE(palette.loadFromString(str));

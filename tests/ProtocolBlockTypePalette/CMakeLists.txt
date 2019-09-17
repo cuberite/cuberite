@@ -26,8 +26,8 @@ set (SRCS
 )
 
 file (COPY
-	ProtocolBlockTypePaletteTest.json
-	../../Server/Protocol/1.13/ProtocolBlockTypePalette.json
+	test.btp.json
+	../../Server/Protocol/1.13/base.btp.json
 	DESTINATION ./)
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
