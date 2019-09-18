@@ -6,19 +6,8 @@
 #include "Globals.h"
 
 #include "Protocol/ProtocolBlockTypePalette.h"
-#include "json/json.h"
 
 #include "../TestHelpers.h"
-
-
-
-
-
-static void TestInit(void)
-{
-	LOG("Test TestInit");
-	ProtocolBlockTypePalette palette("{}");
-}
 
 
 
@@ -28,7 +17,6 @@ static void TestSuccess(void)
 {
 	LOG("Test TestSuccess");
 	ProtocolBlockTypePalette palette;
-	TEST_TRUE(palette.loadFromString("[]"));
 
 	auto example = "{\"Metadata\":{\"ProtocolBlockType\":1}, \"Palette\":[{\
 		\"props\": {\
@@ -53,16 +41,19 @@ static void TestErrors(void)
 {
 	LOG("Test TestErrors");
 	ProtocolBlockTypePalette palette;
-	TEST_THROWS_ANY(palette.loadFromString(""));
+	TEST_FALSE(palette.loadFromString(""));
 
 	palette.clear();
-	TEST_THROWS_ANY(palette.loadFromString("a = {}"));
+	TEST_FALSE(palette.loadFromString("[]"));
 
 	palette.clear();
-	TEST_THROWS_ANY(palette.loadFromString("{x = 1}"));  // Lua style
+	TEST_FALSE(palette.loadFromString("a = {}"));
 
 	palette.clear();
-	TEST_THROWS_ANY(palette.loadFromString("$#^%&"));
+	TEST_FALSE(palette.loadFromString("{x = 1}"));  // Lua style
+
+	palette.clear();
+	TEST_FALSE(palette.loadFromString("$#^%&"));
 }
 
 
@@ -123,14 +114,13 @@ static void TestFile(void)
 {
 	LOG("Test TestFile");
 	std::ifstream f("base.btp.json");
-	std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 	ProtocolBlockTypePalette palette;
-	TEST_TRUE(palette.loadFromString(str));
+	TEST_TRUE(palette.loadFromStream(f));
 
 	// This is a bit problematic - the only permanently fixed block Id is air...
-	TEST_EQUAL(palette.index("minecraft:air", BlockState({})), 0);
-	TEST_TRUE((palette.index("minecraft:stone", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND));
-	TEST_TRUE((palette.index("minecraft:dirt", BlockState()) != ProtocolBlockTypePalette::NOT_FOUND));
+	TEST_EQUAL(palette.index("minecraft:air", BlockState()), 0);
+	TEST_NOTEQUAL(palette.index("minecraft:stone", BlockState()), ProtocolBlockTypePalette::NOT_FOUND);
+	TEST_NOTEQUAL(palette.index("minecraft:dirt", BlockState()), ProtocolBlockTypePalette::NOT_FOUND);
 }
 
 
@@ -141,9 +131,8 @@ static void TestFile2(void)
 {
 	LOG("Test TestFile2");
 	std::ifstream f("test.btp.json");
-	std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 	ProtocolBlockTypePalette palette;
-	TEST_TRUE(palette.loadFromString(str));
+	TEST_TRUE(palette.loadFromStream(f));
 
 	TEST_EQUAL(palette.index("minecraft:air", BlockState({})), 0);
 	TEST_EQUAL(palette.index("minecraft:stone", BlockState()), 1);
@@ -163,7 +152,6 @@ static void TestFile2(void)
 
 
 IMPLEMENT_TEST_MAIN("ProtocolBlockTypePaletteTest",
-	TestInit();
 	TestSuccess();
 	TestErrors();
 	TestComplex1();

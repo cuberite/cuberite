@@ -18,51 +18,84 @@ ProtocolBlockTypePalette::ProtocolBlockTypePalette()
 
 
 
-ProtocolBlockTypePalette::ProtocolBlockTypePalette(const AString & aMapping)
+bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
 {
-	loadFromString(aMapping);
+	std::stringstream stream;
+	stream << aMapping;
+
+	return loadFromStream(stream);
 }
 
 
 
 
 
-bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
+bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 {
 	Json::Value root;
-	std::stringstream strm;
-	strm << aMapping;
-	strm >> root;
 
-	if (root.empty())
+	try
 	{
-		return true;  // accept empty string.
+		aInputStream >> root;
 	}
-	if (!root.isMember("Metadata") ||
+	#if defined _DEBUG
+	catch (std::exception & e)
+	{
+		LOGD(e.what());
+		return false;
+	}
+	#else
+	catch (std::exception &)
+	{
+		return false;
+	}
+	#endif
+
+	if (!root.isObject() ||
+		!root.isMember("Metadata") ||
 		!root["Metadata"].isMember("ProtocolBlockType") ||
-		(root["Metadata"]["ProtocolBlockType"].asUInt() != 1) ||
 		!root.isMember("Palette") ||
 		!root["Palette"].isArray())
 	{
-		LOGD("Wrong palette format.");
+		LOGD("Incorrect palette format.");
+		return false;
+	}
+
+	if (root["Metadata"]["ProtocolBlockType"].asUInt() != 1)
+	{
+		LOGD("Palette format version not supported.");
 		return false;
 	}
 
 	auto len = root["Palette"].size();
 	for (decltype(len) i = 0; i < len; ++i)
 	{
-		auto record = root["Palette"][i];
-		ASSERT(record.isObject());
-		auto blocktype = record["name"].asString();
-		auto id = std::stoul(record["id"].asString());
+		const auto & record = root["Palette"][i];
+		if (!record.isObject())
+		{
+			LOGD("Record #%u must be a JSON object.", i);
+			return false;
+		}
+
+		const auto & blocktype = record["name"].asString();
+		const auto & id = std::stoul(record["id"].asString());
 		std::map<AString, AString> state;
 
-		ASSERT(id < NOT_FOUND);  // this is a fatal error.
+		if (id >= NOT_FOUND)
+		{
+			LOGD("`id` must be less than %lu, but is %lu", NOT_FOUND, id);
+			return false;
+		}
 
 		if (record.isMember("props"))
 		{
-			auto props = record["props"];
-			for (auto key: props.getMemberNames())
+			const auto & props = record["props"];
+			if (!props.isObject())
+			{
+				LOGD("`props` key must be a JSON object.");
+				return false;
+			}
+			for (const auto & key: props.getMemberNames())
 			{
 				state[key] = props[key].asString();
 			}
@@ -74,8 +107,11 @@ bool ProtocolBlockTypePalette::loadFromString(const AString & aMapping)
 			mIndex.insert({blocktype, std::map<BlockState, UInt32>()});
 		}
 
-		// ASSERT(std::stoul(record["id"].asString()) == i);
-		mIndex[blocktype].insert({BlockState(state), id});
+		const auto & result = mIndex[blocktype].insert({BlockState(state), id});
+		if (result.second == false)
+		{
+			LOGINFO("Duplicate block state index encountered: %lu", id);
+		}
 	}
 	return true;
 }
