@@ -88,13 +88,13 @@ bool BlockState::operator <(const BlockState & aOther) const
 	// Fast-return this using checksum
 	if (mChecksum != aOther.mChecksum)
 	{
-		return mChecksum < aOther.mChecksum;
+		return (mChecksum < aOther.mChecksum);
 	}
 
 	// Can fast-return this due to how comparison works
 	if (mState.size() != aOther.mState.size())
 	{
-		return mState.size() < aOther.mState.size();
+		return (mState.size() < aOther.mState.size());
 	}
 
 	auto itA = mState.begin();
@@ -107,14 +107,14 @@ bool BlockState::operator <(const BlockState & aOther) const
 			const auto cmp = itA->first.compare(itOther->first);
 			if (cmp != 0)
 			{
-				return cmp < 0;
+				return (cmp < 0);
 			}
 		}
 		{
 			const auto cmp = itA->second.compare(itOther->second);
 			if (cmp != 0)
 			{
-				return cmp < 0;
+				return (cmp < 0);
 			}
 		}
 

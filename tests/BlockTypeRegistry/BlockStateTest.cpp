@@ -115,10 +115,10 @@ static void testComparison()
 	LOGD("Testing comparison of BlockStates...");
 
 	// Simple property value tests
-	TEST_FALSE((BlockState({{"a","a"}}) < BlockState({{"a","a"}})));  // equal
-	TEST_FALSE((BlockState({}) < BlockState({})));  // equal
-	TEST_TRUE((BlockState({}) < BlockState({{"foo","bar"}})));
-	TEST_FALSE((BlockState({{"foo","bar"}}) < BlockState({})));
+	TEST_FALSE((BlockState({{"a", "a"}}) < BlockState({{"a", "a"}})));
+	TEST_FALSE((BlockState() < BlockState()));
+	TEST_TRUE((BlockState() < BlockState({{"foo", "bar"}})));
+	TEST_FALSE((BlockState({{"foo", "bar"}}) < BlockState()));
 }
 
 
@@ -134,7 +134,7 @@ static void testComparison2()
 	std::map<BlockState, bool> map1;
 	std::map<BlockState, bool> map2;
 
-	for (int i=0; i < 128; ++i)
+	for (int i = 0; i < 128; ++i)
 	{
 		v.push_back(BlockState({{std::string(1, static_cast<char>(0x1F)), std::string(1, static_cast<char>(i))}}));
 		v.push_back(BlockState({{std::string(1, static_cast<char>(0x10)), std::string(1, static_cast<char>(i | 0x80))},
@@ -148,14 +148,14 @@ static void testComparison2()
 
 	for (auto i = v.size(); i > 0; --i)
 	{
-		map2[v[i-1]] = true;
+		map2[v[i - 1]] = true;
 	}
 
 	// Check result
 	TEST_EQUAL(v.size(), 2 * 128);
 	TEST_EQUAL(map1.size(), v.size());
 	TEST_EQUAL(map1.size(), map2.size());
-	for (auto item: map1)
+	for (const auto & item: map1)
 	{
 		TEST_EQUAL(map1[item.first], map2[item.first]);
 	}
