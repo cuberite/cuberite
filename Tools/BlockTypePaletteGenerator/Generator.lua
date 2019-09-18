@@ -75,7 +75,7 @@ assert(#registry == max_id+1, "Ensure that registry has contiguous keys");
 
 local out = {
 	Metadata = {
-		ProtocolBlockType = 1
+		ProtocolBlockTypePaletteVersion = 1
 	},
 	Palette = registry
 };

@@ -53,7 +53,7 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 
 	if (!root.isObject() ||
 		!root.isMember("Metadata") ||
-		!root["Metadata"].isMember("ProtocolBlockType") ||
+		!root["Metadata"].isMember("ProtocolBlockTypePaletteVersion") ||
 		!root.isMember("Palette") ||
 		!root["Palette"].isArray())
 	{
@@ -61,7 +61,7 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 		return false;
 	}
 
-	if (root["Metadata"]["ProtocolBlockType"].asUInt() != 1)
+	if (root["Metadata"]["ProtocolBlockTypePaletteVersion"].asUInt() != 1)
 	{
 		LOGD("Palette format version not supported.");
 		return false;

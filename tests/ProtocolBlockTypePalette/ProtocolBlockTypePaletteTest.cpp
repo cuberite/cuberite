@@ -18,7 +18,7 @@ static void TestSuccess(void)
 	LOG("Test TestSuccess");
 	ProtocolBlockTypePalette palette;
 
-	auto example = "{\"Metadata\":{\"ProtocolBlockType\":1}, \"Palette\":[{\
+	auto example = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
 		\"props\": {\
 			\"foo\": \"bar\"\
 		}, \
@@ -64,7 +64,7 @@ static void TestComplex1(void)
 {
 	LOG("Test TestComplex1");
 	ProtocolBlockTypePalette palette;
-	auto str = "{\"Metadata\":{\"ProtocolBlockType\":1}, \"Palette\":[{\
+	auto str = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
 		\"props\": {\
 			\"foo\": \"bar\", \
 			\"moo\": \"baz\"\
@@ -94,7 +94,7 @@ static void TestComplex2(void)
 {
 	LOG("Test TestComplex2");
 	ProtocolBlockTypePalette palette;
-	auto str = "{\"Metadata\":{\"ProtocolBlockType\":1}, \"Palette\":[{\
+	auto str = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
 		\"id\": \"0\", \
 		\"name\": \"a\"\
 	}, {\
