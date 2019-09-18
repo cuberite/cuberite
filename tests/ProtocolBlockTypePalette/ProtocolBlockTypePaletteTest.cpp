@@ -78,8 +78,15 @@ static void TestComplex1(void)
 		}, \
 		\"id\": \"1\", \
 		\"name\": \"b\"\
+	}, {\
+		\"props\": {\
+			\"foo\": \"baz\", \
+			\"moo\": \"bar\"\
+		}, \
+		\"id\": \"1001\", \
+		\"name\": \"b\"\
 	}]}";
-	TEST_TRUE(palette.loadFromString(str));
+	TEST_TRUE(palette.loadFromString(str));  // This should print info message about duplicate ID
 	TEST_EQUAL(palette.index("b", BlockState({{"foo","bar"}})), ProtocolBlockTypePalette::NOT_FOUND);
 	TEST_EQUAL(palette.index("b", BlockState({{"foo","bar"}, {"moo","baz"}})), 0);
 	TEST_EQUAL(palette.index("b", BlockState({{"foo","baz"}, {"moo","bar"}})), 1);

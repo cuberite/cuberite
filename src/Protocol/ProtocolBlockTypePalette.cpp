@@ -83,7 +83,7 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 
 		if (id >= NOT_FOUND)
 		{
-			LOGD("`id` must be less than %lu, but is %lu", NOT_FOUND, id);
+			LOGD("`id` must be less than ProtocolBlockTypePalette::NOT_FOUND, but is %lu", id);
 			return false;
 		}
 
@@ -110,7 +110,7 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 		const auto & result = mIndex[blocktype].insert({BlockState(state), id});
 		if (result.second == false)
 		{
-			LOGINFO("Duplicate block state index encountered: %lu", id);
+			LOGINFO("Duplicate block state encountered (Current ID: %lu, other: %lu)", result.first->second, id);
 		}
 	}
 	return true;
