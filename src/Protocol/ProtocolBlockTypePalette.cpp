@@ -39,13 +39,13 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 		aInputStream >> root;
 	}
 	#if defined _DEBUG
-	catch (std::exception & e)
+	catch (const std::exception & e)
 	{
 		LOGD(e.what());
 		return false;
 	}
 	#else
-	catch (std::exception &)
+	catch (const std::exception &)
 	{
 		return false;
 	}
@@ -77,8 +77,8 @@ bool ProtocolBlockTypePalette::loadFromStream(std::istream & aInputStream)
 			return false;
 		}
 
-		const auto & blocktype = record["name"].asString();
-		const auto & id = std::stoul(record["id"].asString());
+		auto blocktype = record["name"].asString();
+		auto id = std::stoul(record["id"].asString());
 		std::map<AString, AString> state;
 
 		if (id >= NOT_FOUND)
