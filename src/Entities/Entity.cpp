@@ -288,7 +288,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	}
 	ApplyArmorDamage(ArmorCover);
 
-	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
+	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, static_cast<float>(FinalDamage), a_KnockbackAmount);
 }
 
 
@@ -518,7 +518,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 			if (Random.RandBool(Chance / 100.0))
 			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandReal(1.0f, 4.0f), 0);
 			}
 		}
 
