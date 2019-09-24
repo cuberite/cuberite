@@ -241,7 +241,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	}
 
 	// Query and prepare chunk data:
-	if (!m_World.GetChunkData(a_ChunkX, a_ChunkZ, *this))
+	if (!m_World.GetChunkData({a_ChunkX, a_ChunkZ}, *this))
 	{
 		return;
 	}
