@@ -32,10 +32,12 @@ Implements the 1.13 protocol classes:
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	if (!ByteBuf.Proc(Var))\
-	{\
-		return;\
-	}
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
@@ -43,14 +45,16 @@ Implements the 1.13 protocol classes:
 
 #define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	{ \
-		if (!ByteBuf.Proc(Var)) \
+	do { \
 		{ \
+			if (!ByteBuf.Proc(Var)) \
+			{ \
+				ByteBuf.CheckValid(); \
+				return false; \
+			} \
 			ByteBuf.CheckValid(); \
-			return false; \
 		} \
-		ByteBuf.CheckValid(); \
-	}
+	} while (false)
 
 
 
