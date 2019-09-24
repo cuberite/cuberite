@@ -234,7 +234,9 @@ public:
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 
-	bool GetChunkData      (int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback);
+	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
+	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
+	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
 
 	/** Gets the chunk's blocks, only the block types */
 	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);

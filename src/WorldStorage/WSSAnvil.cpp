@@ -491,68 +491,11 @@ void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString &
 
 bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer)
 {
-	a_Writer.BeginCompound("Level");
-	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
-	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
-
-	cNBTChunkSerializer Serializer(a_Writer);
-	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
+	if (!NBTChunkSerializer::serialize(*m_World, a_Chunk, a_Writer))
 	{
-		LOGWARNING("Cannot get chunk [%d, %d] data for NBT saving", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOGWARNING("Failed to save chunk %s.", a_Chunk.ToString());
 		return false;
 	}
-	Serializer.Finish();  // Close NBT tags
-
-	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
-	if (Serializer.m_BiomesAreValid)
-	{
-		a_Writer.AddByteArray("Biomes",    reinterpret_cast<const char *>(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
-		a_Writer.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
-	}
-
-	// Save heightmap (Vanilla require this):
-	a_Writer.AddIntArray("HeightMap", reinterpret_cast<const int *>(Serializer.m_VanillaHeightMap), ARRAYCOUNT(Serializer.m_VanillaHeightMap));
-
-	// Save blockdata:
-	a_Writer.BeginList("Sections", TAG_Compound);
-	for (size_t Y = 0; Y != cChunkData::NumSections; ++Y)
-	{
-		auto Section = Serializer.m_Data.GetSection(Y);
-		if (Section == nullptr)
-		{
-			continue;
-		}
-
-		a_Writer.BeginCompound("");
-		a_Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(Section->m_BlockTypes), ARRAYCOUNT(Section->m_BlockTypes));
-		a_Writer.AddByteArray("Data",   reinterpret_cast<const char *>(Section->m_BlockMetas), ARRAYCOUNT(Section->m_BlockMetas));
-
-		#ifdef DEBUG_SKYLIGHT
-			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
-		#else
-			a_Writer.AddByteArray("BlockLight", reinterpret_cast<const char *>(Section->m_BlockLight),    ARRAYCOUNT(Section->m_BlockLight));
-		#endif
-
-		a_Writer.AddByteArray("SkyLight", reinterpret_cast<const char *>(Section->m_BlockSkyLight), ARRAYCOUNT(Section->m_BlockSkyLight));
-		a_Writer.AddByte("Y", static_cast<unsigned char>(Y));
-		a_Writer.EndCompound();
-	}
-	a_Writer.EndList();  // "Sections"
-
-	// Store the information that the lighting is valid.
-	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
-	if (Serializer.IsLightValid())
-	{
-		a_Writer.AddByte("MCSIsLightValid", 1);
-	}
-
-	// Save the world age to the chunk data. Required by vanilla and mcedit.
-	a_Writer.AddLong("LastUpdate", m_World->GetWorldAge());
-
-	// Store the flag that the chunk has all the ores, trees, dungeons etc. MCS chunks are always complete.
-	a_Writer.AddByte("TerrainPopulated", 1);
-
-	a_Writer.EndCompound();  // "Level"
 	return true;
 }
 

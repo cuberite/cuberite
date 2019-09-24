@@ -444,12 +444,18 @@ void cChunkMap::ChunkLighted(
 
 
 
-bool cChunkMap::GetChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback)
+bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback)
 {
+	if (!a_Callback.Coords(a_Coords.m_ChunkX, a_Coords.m_ChunkZ))
+	{
+		// The callback doesn't want the data
+		return false;
+	}
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(a_Coords);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
+		// The chunk is not present
 		return false;
 	}
 	Chunk->GetAllData(a_Callback);
