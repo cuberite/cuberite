@@ -2636,9 +2636,9 @@ void cWorld::ChunkLighted(
 
 
 
-bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback)
+bool cWorld::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const
 {
-	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkZ, a_Callback);
+	return m_ChunkMap->GetChunkData(a_Coords, a_Callback);
 }
 
 

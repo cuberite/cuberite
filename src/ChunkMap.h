@@ -108,7 +108,9 @@ public:
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 
-	bool GetChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback);
+	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
+	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
+	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback);
 
 	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
@@ -439,7 +441,7 @@ private:
 
 	typedef std::list<cChunkStay *> cChunkStays;
 
-	cCriticalSection m_CSChunks;
+	mutable cCriticalSection m_CSChunks;
 
 	/** A map of chunk coordinates to chunk pointers
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
@@ -468,7 +470,7 @@ private:
 	// Deprecated in favor of the vector version
 	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 	{
-		return GetChunkNoGen(cChunkCoords(a_ChunkX, a_ChunkZ));
+		return GetChunkNoGen({a_ChunkX, a_ChunkZ});
 	}
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
