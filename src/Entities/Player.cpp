@@ -2209,7 +2209,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		SetRoll     (static_cast<float>(JSON_PlayerRotation[2].asDouble()));
 	}
 
-	m_Health              = root.get("health",         0).asInt();
+	m_Health              = root.get("health",         0).asFloat();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();

@@ -425,7 +425,7 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
 			// Fall particles
 			GetWorld()->BroadcastParticleEffect(

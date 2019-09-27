@@ -712,7 +712,7 @@ int cRoot::GetTotalChunkCount(void)
 	int res = 0;
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		res += itr->second->GetNumChunks();
+		res += static_cast<int>(itr->second->GetNumChunks());
 	}
 	return res;
 }

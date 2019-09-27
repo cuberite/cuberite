@@ -1376,7 +1376,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			double Length = DistanceFromExplosion.Length();
 			if (Length <= ExplosionSizeInt)  // Entity is impacted by explosion
 			{
-				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, ExplosionSizeInt);
+				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize));
 
 				// Exposure reduced by armor
 				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());

@@ -2352,7 +2352,7 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 	std::vector<int> Rewards = cExpOrb::Split(a_Reward);
 
 	// Check generate number to decide speed limit (distribute range)
-	float SpeedLimit = (Rewards.size() / 2) + 5;
+	float SpeedLimit = static_cast<float>((Rewards.size() / 2) + 5);
 	if (SpeedLimit > 10)
 	{
 		SpeedLimit = 10;

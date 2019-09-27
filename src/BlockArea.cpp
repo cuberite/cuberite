@@ -1633,7 +1633,7 @@ void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a
 	// Update the block entities, if appropriate:
 	if (HasBlockEntities())
 	{
-		auto itr = m_BlockEntities->find(static_cast<int>(idx));
+		auto itr = m_BlockEntities->find(idx);
 		if (itr != m_BlockEntities->end())
 		{
 			if (itr->second->GetBlockType() == a_BlockType)
@@ -1827,7 +1827,7 @@ void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   B
 	// Update the block entities, if appropriate:
 	if (HasBlockEntities())
 	{
-		auto itr = m_BlockEntities->find(static_cast<int>(idx));
+		auto itr = m_BlockEntities->find(idx);
 		if (itr != m_BlockEntities->end())
 		{
 			if (itr->second->GetBlockType() == a_BlockType)
@@ -2173,7 +2173,7 @@ bool cBlockArea::DoWithBlockEntityRelAt(int a_RelX, int a_RelY, int a_RelZ, cBlo
 	{
 		return false;
 	}
-	auto idx = static_cast<int>(MakeIndex(a_RelX, a_RelY, a_RelZ));
+	auto idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
 	auto itr = m_BlockEntities->find(idx);
 	if (itr == m_BlockEntities->end())
 	{
@@ -2400,7 +2400,7 @@ void cBlockArea::RelSetData(
 	// Update the block entities, if appropriate:
 	if (HasBlockEntities())
 	{
-		auto itr = m_BlockEntities->find(static_cast<int>(Index));
+		auto itr = m_BlockEntities->find(Index);
 		if (itr != m_BlockEntities->end())
 		{
 			if (itr->second->GetBlockType() == a_BlockType)
@@ -2617,7 +2617,7 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 		}
 
 		// This block should have a block entity, check that there is one:
-		auto itr = m_BlockEntities->find(static_cast<int>(idx));
+		auto itr = m_BlockEntities->find(idx);
 		if (itr != m_BlockEntities->end())
 		{
 			// There is one already
@@ -2631,7 +2631,7 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 		if (a_Src.IsValidRelCoords(srcX, srcY, srcZ))
 		{
 			auto srcIdx = a_Src.MakeIndex(srcX, srcY, srcZ);
-			auto itrSrc = a_Src.m_BlockEntities->find(static_cast<int>(srcIdx));
+			auto itrSrc = a_Src.m_BlockEntities->find(srcIdx);
 			if (itrSrc != a_Src.m_BlockEntities->end())
 			{
 				m_BlockEntities->insert({idx, itrSrc->second->Clone(x, y, z)});
@@ -2669,7 +2669,7 @@ void cBlockArea::RescanBlockEntities(void)
 			continue;
 		}
 		// This block should have a block entity, check that there is one:
-		auto itr = m_BlockEntities->find(static_cast<int>(idx));
+		auto itr = m_BlockEntities->find(idx);
 		if (itr != m_BlockEntities->end())
 		{
 			continue;

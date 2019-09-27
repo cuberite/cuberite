@@ -458,7 +458,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 				continue;
 			}
 			// This block entity is inside the chunk, clone it (and remove any that is there currently):
-			auto idx = MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width);
+			auto idx = static_cast<size_t>(MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width));
 			auto itr = m_BlockEntities.find(idx);
 			if (itr != m_BlockEntities.end())
 			{
@@ -1421,7 +1421,7 @@ void cChunk::CreateBlockEntities(void)
 			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
 				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
 				auto WorldPos = RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
 
 				if (!HasBlockEntityAt(WorldPos))
@@ -1461,7 +1461,7 @@ void cChunk::WakeUpSimulators(void)
 			auto WorldPos = [&]
 			{
 				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += SectionIdx * cChunkData::SectionHeight;
+				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
 				return RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
 			};
 
@@ -1761,7 +1761,7 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 		return nullptr;
 	}
 
-	auto itr = m_BlockEntities.find(MakeIndexNoCheck(RelX, a_BlockY, RelZ));
+	auto itr = m_BlockEntities.find(static_cast<size_t>(MakeIndexNoCheck(RelX, a_BlockY, RelZ)));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second;
 }
 
@@ -1921,8 +1921,8 @@ void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
 	ASSERT(a_BlockEntity != nullptr);
-	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
-	m_BlockEntities.erase(Idx);
+	auto idx = static_cast<size_t>(MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()));
+	m_BlockEntities.erase(idx);
 }
 
 
