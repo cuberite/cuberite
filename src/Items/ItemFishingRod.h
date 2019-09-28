@@ -245,7 +245,7 @@ public:
 		}
 		else
 		{
-			auto Floater = cpp14::make_unique<cFloater>(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
+			auto Floater = cpp14::make_unique<cFloater>(a_Player->GetPosition().addedY(1.5), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
 			auto FloaterPtr = Floater.get();
 			if (!FloaterPtr->Initialize(std::move(Floater), *a_World))
 			{

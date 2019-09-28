@@ -479,6 +479,14 @@ public:
 		return cChunkClientHandles(m_LoadedByClient);
 	}
 
+	/** Converts the coord relative to this chunk into an absolute coord.
+	Doesn't check relative coord validity. */
+	Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition)
+	{
+		return cChunkDef::RelativeToAbsolute(a_RelBlockPosition, m_PosX, m_PosZ);
+	}
+
+
 private:
 
 	friend class cChunkMap;

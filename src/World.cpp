@@ -2236,7 +2236,7 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed, bool IsPlayerCreated)
 {
 	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
@@ -2252,10 +2252,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
 
-		auto Pickup = cpp14::make_unique<cPickup>(
-			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
-		);
+		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
@@ -2265,7 +2262,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool IsPlayerCreated)
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -2274,12 +2271,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		auto Pickup = cpp14::make_unique<cPickup>(
-			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
-		);
-		auto PickupPtr = Pickup.get();
-		PickupPtr->Initialize(std::move(Pickup), *this);
+		auto pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, IsPlayerCreated, a_Speed);
+		auto pickupPtr = pickup.get();
+		pickupPtr->Initialize(std::move(pickup), *this);
 	}
 }
 
@@ -2287,27 +2281,27 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-UInt32 cWorld::SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
+UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine)
 {
-	auto Pickup = cpp14::make_unique<cPickup>(a_PosX, a_PosY, a_PosZ, a_Item, false, a_SpeedX, a_SpeedY, a_SpeedZ, a_LifetimeTicks, a_CanCombine);
-	auto PickupPtr = Pickup.get();
-	if (!PickupPtr->Initialize(std::move(Pickup), *this))
+	auto pickup = cpp14::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
+	auto pickupPtr = pickup.get();
+	if (!pickupPtr->Initialize(std::move(pickup), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	return PickupPtr->GetUniqueID();
+	return pickupPtr->GetUniqueID();
 }
 
 
 
 
 
-UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	auto FallingBlockPtr = FallingBlock.get();
-	auto ID = FallingBlock->GetUniqueID();
-	if (!FallingBlockPtr->Initialize(std::move(FallingBlock), *this))
+	auto fallingBlock = cpp14::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
+	auto fallingBlockPtr = fallingBlock.get();
+	auto ID = fallingBlock->GetUniqueID();
+	if (!fallingBlockPtr->Initialize(std::move(fallingBlock), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
@@ -2318,7 +2312,7 @@ UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType,
 
 
 
-UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+UInt32 cWorld::SpawnExperienceOrb(Vector3d a_Pos, int a_Reward)
 {
 	if (a_Reward < 1)
 	{
@@ -2326,20 +2320,20 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 		return cEntity::INVALID_ID;
 	}
 
-	auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, a_Reward);
-	auto ExpOrbPtr = ExpOrb.get();
-	if (!ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+	auto expOrb = cpp14::make_unique<cExpOrb>(a_Pos, a_Reward);
+	auto expOrbPtr = expOrb.get();
+	if (!expOrbPtr->Initialize(std::move(expOrb), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	return ExpOrbPtr->GetUniqueID();
+	return expOrbPtr->GetUniqueID();
 }
 
 
 
 
 
-std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward)
 {
 	std::vector<UInt32> OrbsID;
 
@@ -2361,7 +2355,7 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 	auto & Random = GetRandomProvider();
 	for (auto Reward : Rewards)
 	{
-		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, Reward);
+		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_Pos, Reward);
 		auto ExpOrbPtr = ExpOrb.get();
 		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
 		double SpeedY = Random.RandReal(0.5);
@@ -2382,16 +2376,16 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(double a_X, double a_Y, dou
 
 
 
-UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>(a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>(a_X, a_Y, a_Z); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>(a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>  (a_Pos); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_Pos); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>    (a_Pos); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper> (a_Pos); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
@@ -3503,9 +3497,9 @@ UInt32 cWorld::SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster)
 
 
 
-UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
-	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
+	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_Pos, a_Item, a_Speed);
 	if (Projectile == nullptr)
 	{
 		return cEntity::INVALID_ID;
@@ -3518,6 +3512,15 @@ UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cPr
 	}
 
 	return ProjectilePtr->GetUniqueID();
+}
+
+
+
+
+
+UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+{
+	return CreateProjectile({a_PosX, a_PosY, a_PosZ}, a_Kind, a_Creator, a_Item, a_Speed);
 }
 
 

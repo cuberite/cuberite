@@ -600,19 +600,18 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		}
 
 		// Get the BlockEntity's position
-		int x, y, z;
-		if (!GetBlockEntityNBTPos(a_NBT, Child, x, y, z) || (y < 0) || (y >= cChunkDef::Height))
+		Vector3i absPos;
+		if (!GetBlockEntityNBTPos(a_NBT, Child, absPos) || (absPos.y < 0) || (absPos.y >= cChunkDef::Height))
 		{
 			LOGWARNING("Bad block entity, missing the coords. Will be ignored.");
 			continue;
 		}
-		int RelX = x, RelY = y, RelZ = z, ChunkX, ChunkZ;
-		cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
+		auto relPos = cChunkDef::AbsoluteToRelative(absPos);
 
 		// Load the proper BlockEntity type based on the block type:
-		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, RelX, RelY, RelZ);
-		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, RelX, RelY, RelZ);
-		std::unique_ptr<cBlockEntity> be(LoadBlockEntityFromNBT(a_NBT, Child, x, y, z, BlockType, BlockMeta));
+		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, relPos);
+		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, relPos);
+		std::unique_ptr<cBlockEntity> be(LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta));
 		if (be.get() == nullptr)
 		{
 			continue;
@@ -630,32 +629,32 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 
 
-cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
+	ASSERT((a_Pos.y >= 0) && (a_Pos.y < cChunkDef::Height));
 
 	// Load the specific BlockEntity type:
 	switch (a_BlockType)
 	{
 		// Specific entity loaders:
-		case E_BLOCK_BEACON:        return LoadBeaconFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_BED:           return LoadBedFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_BREWING_STAND: return LoadBrewingstandFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_CHEST:         return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_COMMAND_BLOCK: return LoadCommandBlockFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_DISPENSER:     return LoadDispenserFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_DROPPER:       return LoadDropperFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_FLOWER_POT:    return LoadFlowerPotFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_FURNACE:       return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_HEAD:          return LoadMobHeadFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_HOPPER:        return LoadHopperFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_JUKEBOX:       return LoadJukeboxFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_LIT_FURNACE:   return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_MOB_SPAWNER:   return LoadMobSpawnerFromNBT  (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_NOTE_BLOCK:    return LoadNoteBlockFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
-		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ);
+		case E_BLOCK_BEACON:        return LoadBeaconFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_BED:           return LoadBedFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_BREWING_STAND: return LoadBrewingstandFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_CHEST:         return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_COMMAND_BLOCK: return LoadCommandBlockFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_DISPENSER:     return LoadDispenserFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_DROPPER:       return LoadDropperFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_FLOWER_POT:    return LoadFlowerPotFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_FURNACE:       return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_HEAD:          return LoadMobHeadFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_HOPPER:        return LoadHopperFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_JUKEBOX:       return LoadJukeboxFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_LIT_FURNACE:   return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_MOB_SPAWNER:   return LoadMobSpawnerFromNBT  (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_NOTE_BLOCK:    return LoadNoteBlockFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 
 		// Blocktypes that have block entities but don't load their contents from disk:
 		case E_BLOCK_ENDER_CHEST:   return nullptr;
@@ -673,7 +672,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 			LOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
 				m_World->GetName(),
 				ItemTypeToString(a_BlockType), a_BlockType, TypeName,
-				Vector3i{a_BlockX, a_BlockY, a_BlockZ}
+				a_Pos
 			);
 			return nullptr;
 		}
@@ -848,7 +847,7 @@ AString cWSSAnvil::DecodeSignLine(const AString & a_Line)
 
 
 
-bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos)
 {
 	// Check if the given tag is a compound:
 	if (a_NBT.GetType(a_TagIdx) != TAG_Compound)
@@ -883,7 +882,7 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 	LOGWARNING("Block entity type mismatch: exp {0}, got \"{1}\". The block entity at {2} will lose all its properties.",
 		expectedTypes.c_str() + 2,  // Skip the first ", " that is extra in the string
 		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))),
-		Vector3i{a_BlockX, a_BlockY, a_BlockZ}
+		a_Pos
 	);
 	return false;
 }
@@ -892,16 +891,16 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 
 
-cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({"Beacon", "minecraft:beacon"});
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto Beacon = cpp14::make_unique<cBeaconEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Beacon = cpp14::make_unique<cBeaconEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Levels");
 	if (CurrentLine >= 0)
@@ -935,11 +934,11 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 
 
 
-cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Bed", "minecraft:bed" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -953,7 +952,7 @@ cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx,
 		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
 	}
 
-	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World, Color);
+	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
 	return Bed.release();
 }
 
@@ -961,11 +960,11 @@ cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx,
 
 
 
-cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Brewingstand", "minecraft:brewing_stand" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -976,7 +975,7 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 		return nullptr;  // Make it an empty brewingstand - the chunk loader will provide an empty cBrewingstandEntity for this
 	}
 
-	auto Brewingstand = cpp14::make_unique<cBrewingstandEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Brewingstand = cpp14::make_unique<cBrewingstandEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	// Fuel has to be loaded at first, because of slot events:
 	int Fuel = a_NBT.FindChildByName(a_TagIdx, "Fuel");
@@ -1019,12 +1018,12 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 
 
 
-cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	// Note that older Cuberite code used "TrappedChest" for trapped chests; new code mimics vanilla and uses "Chest" throughout, but we allow migration here:
 	static const AStringVector expectedTypes({ "Chest", "TrappedChest", "minecraft:chest" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -1034,7 +1033,7 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	{
 		return nullptr;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	auto Chest = cpp14::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Chest = cpp14::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
 	return Chest.release();
 }
@@ -1043,16 +1042,16 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 
 
 
-cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Control", "minecraft:command_block" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto CmdBlock = cpp14::make_unique<cCommandBlockEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto CmdBlock = cpp14::make_unique<cCommandBlockEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Command");
 	if (currentLine >= 0)
@@ -1081,11 +1080,11 @@ cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int 
 
 
 
-cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Trap", "minecraft:dispenser" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -1095,7 +1094,7 @@ cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		return nullptr;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
 	}
-	auto Dispenser = cpp14::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Dispenser = cpp14::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
 	return Dispenser.release();
 }
@@ -1104,11 +1103,11 @@ cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Dropper", "minecraft:dropper" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -1118,7 +1117,7 @@ cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	{
 		return nullptr;  // Make it an empty dropper - the chunk loader will provide an empty cDropperEntity for this
 	}
-	auto Dropper = cpp14::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Dropper = cpp14::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
 	return Dropper.release();
 }
@@ -1127,16 +1126,16 @@ cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "FlowerPot", "minecraft:flower_pot" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto FlowerPot = cpp14::make_unique<cFlowerPotEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto FlowerPot = cpp14::make_unique<cFlowerPotEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	cItem Item;
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
@@ -1166,11 +1165,11 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Furnace", "minecraft:furnace" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -1181,7 +1180,7 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 		return nullptr;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
 	}
 
-	auto Furnace = cpp14::make_unique<cFurnaceEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Furnace = cpp14::make_unique<cFurnaceEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	Furnace->SetLoading(true);
 
 	// Load slots:
@@ -1226,11 +1225,11 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Hopper", "minecraft:hopper" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
@@ -1240,7 +1239,7 @@ cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagI
 	{
 		return nullptr;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
 	}
-	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
 	return Hopper.release();
 }
@@ -1249,16 +1248,16 @@ cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagI
 
 
 
-cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "RecordPlayer", "minecraft:jukebox" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto Jukebox = cpp14::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Jukebox = cpp14::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
 	if (Record >= 0)
 	{
@@ -1271,16 +1270,16 @@ cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "MobSpawner", "minecraft:mob_spawner" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto MobSpawner = cpp14::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto MobSpawner = cpp14::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	// Load entity (Cuberite worlds):
 	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
@@ -1320,16 +1319,16 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 
 
 
-cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Skull", "minecraft:skull" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto MobHead = cpp14::make_unique<cMobHeadEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto MobHead = cpp14::make_unique<cMobHeadEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
 	if (currentLine >= 0)
@@ -1394,16 +1393,16 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Music", "minecraft:noteblock" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto NoteBlock = cpp14::make_unique<cNoteEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto NoteBlock = cpp14::make_unique<cNoteEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	int note = a_NBT.FindChildByName(a_TagIdx, "note");
 	if (note >= 0)
 	{
@@ -1416,16 +1415,16 @@ cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Sign", "minecraft:sign" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	auto Sign = cpp14::make_unique<cSignEntity>(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, m_World);
+	auto Sign = cpp14::make_unique<cSignEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Text1");
 	if (currentLine >= 0)
@@ -1609,7 +1608,7 @@ void cWSSAnvil::LoadOldMinecartFromNBT(cEntityList & a_Entities, const cParsedNB
 
 void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBoat> Boat = cpp14::make_unique<cBoat>(Vector3d(), cBoat::bmOak);
+	auto Boat = cpp14::make_unique<cBoat>(Vector3d(), cBoat::bmOak);
 	if (!LoadEntityBaseFromNBT(*Boat.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1629,7 +1628,7 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cEnderCrystal> EnderCrystal = cpp14::make_unique<cEnderCrystal>(0, 0, 0);
+	auto EnderCrystal = cpp14::make_unique<cEnderCrystal>(Vector3d());
 	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1654,7 +1653,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	BLOCKTYPE Type = static_cast<BLOCKTYPE>(a_NBT.GetInt(TypeIdx));
 	NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_NBT.GetByte(MetaIdx));
 
-	std::unique_ptr<cFallingBlock> FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(0, 0, 0), Type, Meta);
+	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(0, 0, 0), Type, Meta);
 	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1668,7 +1667,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cRideableMinecart> Minecart = cpp14::make_unique<cRideableMinecart>(0, 0, 0, cItem(), 1);  // TODO: Load the block and the height
+	auto Minecart = cpp14::make_unique<cRideableMinecart>(Vector3d(), cItem(), 1);  // TODO: Load the block and the height
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1687,7 +1686,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	{
 		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	std::unique_ptr<cMinecartWithChest> Minecart = cpp14::make_unique<cMinecartWithChest>(0, 0, 0);
+	auto Minecart = cpp14::make_unique<cMinecartWithChest>(Vector3d());
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1714,7 +1713,7 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithFurnace> Minecart = cpp14::make_unique<cMinecartWithFurnace>(0, 0, 0);
+	auto Minecart = cpp14::make_unique<cMinecartWithFurnace>(Vector3d());
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1731,7 +1730,7 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithTNT> Minecart = cpp14::make_unique<cMinecartWithTNT>(0, 0, 0);
+	auto Minecart = cpp14::make_unique<cMinecartWithTNT>(Vector3d());
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1748,7 +1747,7 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cMinecartWithHopper> Minecart = cpp14::make_unique<cMinecartWithHopper>(0, 0, 0);
+	auto Minecart = cpp14::make_unique<cMinecartWithHopper>(Vector3d());
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1777,7 +1776,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	std::unique_ptr<cPickup> Pickup = cpp14::make_unique<cPickup>(0, 0, 0, Item, false);  // Pickup delay doesn't matter, just say false
+	auto Pickup = cpp14::make_unique<cPickup>(Vector3d(), Item, false);  // Pickup delay doesn't matter, just say false
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1799,7 +1798,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cTNTEntity> TNT = cpp14::make_unique<cTNTEntity>(Vector3d(), 0);
+	auto TNT = cpp14::make_unique<cTNTEntity>(Vector3d(), 0);
 	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1821,7 +1820,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cExpOrb> ExpOrb = cpp14::make_unique<cExpOrb>(0.0, 0.0, 0.0, 0);
+	auto ExpOrb = cpp14::make_unique<cExpOrb>(Vector3d(), 0);
 	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1890,7 +1889,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 
-	std::unique_ptr<cItemFrame> ItemFrame = cpp14::make_unique<cItemFrame>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	auto ItemFrame = cpp14::make_unique<cItemFrame>(BLOCK_FACE_NONE, Vector3d());
 	if (!LoadEntityBaseFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1915,7 +1914,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadLeashKnotFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	auto LeashKnot = cpp14::make_unique<cLeashKnot>(BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	auto LeashKnot = cpp14::make_unique<cLeashKnot>(BLOCK_FACE_NONE, Vector3d());
 
 	if (!LoadEntityBaseFromNBT(*LeashKnot.get(), a_NBT, a_TagIdx))
 	{
@@ -1940,7 +1939,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	std::unique_ptr<cPainting> Painting = cpp14::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, 0.0, 0.0, 0.0);
+	auto Painting = cpp14::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d());
 	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1956,7 +1955,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cArrowEntity> Arrow = cpp14::make_unique<cArrowEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto Arrow = cpp14::make_unique<cArrowEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2027,7 +2026,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cSplashPotionEntity> SplashPotion = cpp14::make_unique<cSplashPotionEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0), cItem());
+	auto SplashPotion = cpp14::make_unique<cSplashPotionEntity>(nullptr, Vector3d(), Vector3d(), cItem());
 	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2051,7 +2050,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownSnowballEntity> Snowball = cpp14::make_unique<cThrownSnowballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto Snowball = cpp14::make_unique<cThrownSnowballEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*Snowball.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2067,7 +2066,7 @@ void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownEggEntity> Egg = cpp14::make_unique<cThrownEggEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto Egg = cpp14::make_unique<cThrownEggEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*Egg.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2083,7 +2082,7 @@ void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cGhastFireballEntity> Fireball = cpp14::make_unique<cGhastFireballEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto Fireball = cpp14::make_unique<cGhastFireballEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*Fireball.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2099,7 +2098,7 @@ void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cFireChargeEntity> FireCharge = cpp14::make_unique<cFireChargeEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto FireCharge = cpp14::make_unique<cFireChargeEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*FireCharge.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2115,7 +2114,7 @@ void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cThrownEnderPearlEntity> Enderpearl = cpp14::make_unique<cThrownEnderPearlEntity>(nullptr, 0, 0, 0, Vector3d(0, 0, 0));
+	auto Enderpearl = cpp14::make_unique<cThrownEnderPearlEntity>(nullptr, Vector3d(), Vector3d());
 	if (!LoadProjectileBaseFromNBT(*Enderpearl.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2131,7 +2130,7 @@ void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cPar
 
 void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::unique_ptr<cBat> Monster = cpp14::make_unique<cBat>();
+	auto Monster = cpp14::make_unique<cBat>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -3291,7 +3290,7 @@ bool cWSSAnvil::LoadFloatsListFromNBT(float * a_Floats, int a_NumFloats, const c
 
 
 
-bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z)
+bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, Vector3i & a_AbsPos)
 {
 	int x = a_NBT.FindChildByName(a_TagIdx, "x");
 	if ((x < 0) || (a_NBT.GetType(x) != TAG_Int))
@@ -3308,9 +3307,11 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 	{
 		return false;
 	}
-	a_X = Clamp(a_NBT.GetInt(x), -40000000, 40000000);  // World is limited to 30M blocks in XZ, we clamp to 40M
-	a_Y = Clamp(a_NBT.GetInt(y), -10000,    10000);     // Y is limited to 0 .. 255, we clamp to 10K
-	a_Z = Clamp(a_NBT.GetInt(z), -40000000, 40000000);
+	a_AbsPos.Set(
+		Clamp(a_NBT.GetInt(x), -40000000, 40000000),  // World is limited to 30M blocks in XZ, we clamp to 40M
+		Clamp(a_NBT.GetInt(y), -10000,    10000),     // Y is limited to 0 .. 255, we clamp to 10K
+		Clamp(a_NBT.GetInt(z), -40000000, 40000000)
+	);
 	return true;
 }
 

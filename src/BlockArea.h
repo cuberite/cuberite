@@ -388,6 +388,15 @@ public:
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
+
+	/** Returns the index into the internal arrays for the specified coords */
+	size_t MakeIndex(Vector3i a_RelPos) const
+	{
+		return MakeIndexForSize(a_RelPos, m_Size);
+	}
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Returns the index into the internal arrays for the specified coords */
 	size_t MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 	{
 		return MakeIndexForSize({ a_RelX, a_RelY, a_RelZ }, m_Size);

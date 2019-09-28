@@ -1,11 +1,5 @@
 // BlockEntityWithItems.cpp
 
-// Implements the cBlockEntityWithItems class representing a common ancestor for all block entities that have an ItemGrid
-
-
-
-
-
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
 #include "../Simulator/RedstoneSimulator.h"
@@ -17,11 +11,11 @@
 cBlockEntityWithItems::cBlockEntityWithItems(
 	BLOCKTYPE a_BlockType,
 	NIBBLETYPE a_BlockMeta,
-	int a_BlockX, int a_BlockY, int a_BlockZ,
+	Vector3i a_Pos,
 	int a_ItemGridWidth, int a_ItemGridHeight,
 	cWorld * a_World
 ):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	cBlockEntityWindowOwner(this),
 	m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 {
@@ -39,7 +33,7 @@ void cBlockEntityWithItems::Destroy(void)
 	cItems Pickups;
 	m_Contents.CopyToItems(Pickups);
 	m_Contents.Clear();
-	m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);  // Spawn in centre of block
+	m_World->SpawnItemPickups(Pickups, m_Pos.x + 0.5, m_Pos.y + 0.5, m_Pos.z + 0.5);  // Spawn in centre of block
 }
 
 
@@ -48,7 +42,7 @@ void cBlockEntityWithItems::Destroy(void)
 
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBlockEntityWithItems &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 }
@@ -69,10 +63,9 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 		}
 
 		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-		auto Pos = Vector3i(m_PosX, m_PosY, m_PosZ);
-		m_World->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+		m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
 			{
-				m_World->GetRedstoneSimulator()->WakeUp(Pos, &a_Chunk);
+				m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
 				return true;
 			}
 		);

@@ -436,21 +436,58 @@ public:
 	// tolua_begin
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) override;
+	void SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed = 1.0, bool a_IsPlayerCreated = false);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns item pickups for each item in the list. May compress pickups if too many entities: */
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool a_IsPlayerCreated = false) override
+	{
+		return SpawnItemPickups(a_Pickups, {a_BlockX, a_BlockY, a_BlockZ}, a_FlyAwaySpeed, a_IsPlayerCreated);
+	}
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) override;
+	void SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool a_IsPlayerCreated = false);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool a_IsPlayerCreated = false) override
+	{
+		return SpawnItemPickups(a_Pickups, {a_BlockX, a_BlockY, a_BlockZ}, {a_SpeedX, a_SpeedY, a_SpeedZ}, a_IsPlayerCreated);
+	}
 
 	/** Spawns a single pickup containing the specified item. */
-	virtual UInt32 SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true) override;
+	UInt32 SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks = 6000, bool a_CanCombine = true);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns a single pickup containing the specified item. */
+	virtual UInt32 SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f, int a_LifetimeTicks = 6000, bool a_CanCombine = true) override
+	{
+		return SpawnItemPickup({a_PosX, a_PosY, a_PosZ}, a_Item, {a_SpeedX, a_SpeedY, a_SpeedZ}, a_LifetimeTicks, a_CanCombine);
+	}
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
+	UInt32 SpawnFallingBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Spawns an falling block entity at the given position.
+	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		return SpawnFallingBlock({a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
+	}
 
 	/** Spawns an minecart at the given coordinates.
 	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+	UInt32 SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns an minecart at the given coordinates.
+	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1)
+	{
+		return SpawnMinecart({a_X, a_Y, a_Z}, a_MinecartType, a_Content, a_BlockHeight);
+	}
 
 	// DEPRECATED, use the vector-parametered version instead.
 	UInt32 SpawnBoat(double a_X, double a_Y, double a_Z, cBoat::eMaterial a_Material)
@@ -465,13 +502,29 @@ public:
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
-	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+	UInt32 SpawnExperienceOrb(Vector3d a_Pos, int a_Reward);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns an experience orb at the given location with the given reward.
+	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override
+	{
+		return SpawnExperienceOrb({a_X, a_Y, a_Z}, a_Reward);
+	}
 
 	// tolua_end
 
 	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
 	Returns an vector of UniqueID of all the orbs. */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override;  // Exported in ManualBindings_World.cpp
+	std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward);  // Exported in ManualBindings_World.cpp
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
+	Returns an vector of UniqueID of all the orbs. */
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override
+	{
+		return SpawnSplitExperienceOrbs({a_X, a_Y, a_Z}, a_Reward);
+	}
 
 	// tolua_begin
 
@@ -846,6 +899,11 @@ public:
 	UInt32 SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster);
 
 	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
+	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
+	UInt32 CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
 	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 

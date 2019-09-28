@@ -8,19 +8,20 @@
 
 
 // tolua_begin
-
 class cFallingBlock :
 	public cEntity
 {
-	typedef cEntity super;
-
-public:
 	// tolua_end
+
+	using super = cEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cFallingBlock)
 
-	/** Creates a new falling block. a_BlockPosition is expected in world coords */
-	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	/** Creates a new falling block.
+	a_BlockPosition is expected in world coords */
+	cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	// tolua_begin
 

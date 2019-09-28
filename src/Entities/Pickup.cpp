@@ -93,20 +93,23 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
-	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer(0)
-	, m_Item(a_Item)
-	, m_bCollected(false)
-	, m_bIsPlayerCreated(IsPlayerCreated)
-	, m_bCanCombine(a_CanCombine)
-	, m_Lifetime(cTickTime(a_LifetimeTicks))
+////////////////////////////////////////////////////////////////////////////////
+// cPickup:
+
+cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
+	super(etPickup, a_Pos, 0.2, 0.2),
+	m_Timer(0),
+	m_Item(a_Item),
+	m_bCollected(false),
+	m_bIsPlayerCreated(IsPlayerCreated),
+	m_bCanCombine(a_CanCombine),
+	m_Lifetime(cTickTime(a_LifetimeTicks))
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	SetSpeed(a_Speed);
 }
 
 

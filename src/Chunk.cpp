@@ -464,7 +464,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			{
 				m_BlockEntities.erase(itr);
 			}
-			auto clone = be->Clone(posX, posY, posZ);
+			auto clone = be->Clone({posX, posY, posZ});
 			clone->SetWorld(m_World);
 			AddBlockEntityClean(clone);
 			m_World->BroadcastBlockEntity({posX, posY, posZ});
@@ -1047,7 +1047,7 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 				Meta
 			);
 			VERIFY(UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, Meta));
-			auto Absolute = RelativeToAbsolute(Vector3i{a_RelX + x, a_RelY, a_RelZ + z}, m_PosX, m_PosZ);
+			auto Absolute = RelativeToAbsolute(Vector3i{a_RelX + x, a_RelY, a_RelZ + z});
 			cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 			cBlockHandler::NeighborChanged(ChunkInterface, Absolute.x, Absolute.y - 1, Absolute.z, BLOCK_FACE_YP);
 			break;
@@ -1422,12 +1422,12 @@ void cChunk::CreateBlockEntities(void)
 			{
 				auto RelPos = IndexToCoordinate(BlockIdx);
 				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				auto WorldPos = RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+				auto WorldPos = RelativeToAbsolute(RelPos);
 
 				if (!HasBlockEntityAt(WorldPos))
 				{
 					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-						BlockType, GetMeta(RelPos), WorldPos.x, WorldPos.y, WorldPos.z, m_World
+						BlockType, GetMeta(RelPos), WorldPos, m_World
 					));
 				}
 			}
@@ -1462,7 +1462,7 @@ void cChunk::WakeUpSimulators(void)
 			{
 				auto RelPos = IndexToCoordinate(BlockIdx);
 				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				return RelativeToAbsolute(RelPos, m_PosX, m_PosZ);
+				return RelativeToAbsolute(RelPos);
 			};
 
 			// The redstone sim takes multiple blocks, use the inbuilt checker
@@ -1563,7 +1563,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_BREWING_STAND:
 		{
 			// Fast set block has already marked dirty
-			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)

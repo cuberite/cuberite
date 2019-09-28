@@ -12,12 +12,13 @@ class cEnderCrystal :
 	public cEntity
 {
 	// tolua_end
-	typedef cEntity super;
+	using super = cEntity;
 
 public:
+
 	CLASS_PROTODEF(cEnderCrystal)
 
-	cEnderCrystal(double a_X, double a_Y, double a_Z);
+	cEnderCrystal(Vector3d a_Pos);
 
 private:
 

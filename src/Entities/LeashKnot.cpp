@@ -14,8 +14,8 @@
 
 
 
-cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z) :
-	cHangingEntity(etLeashKnot, a_BlockFace, a_X, a_Y, a_Z),
+cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos) :
+	super(etLeashKnot, a_BlockFace, a_Pos),
 	m_ShouldSelfDestroy(false),
 	m_TicksToSelfDestroy(20 * 1)
 {
