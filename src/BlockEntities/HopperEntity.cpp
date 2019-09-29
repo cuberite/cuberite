@@ -542,7 +542,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 	auto relCoord = a_Chunk.AbsoluteToRelative(a_Coords);
 	for (const auto & ofs: neighborOfs)
 	{
-		auto otherHalfRelCoord = relCoord.addedXZ(ofs.x, ofs.z);
+		auto otherHalfRelCoord = relCoord + ofs;
 		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord.x, otherHalfRelCoord.z);
 		if (neighbor == nullptr)
 		{
