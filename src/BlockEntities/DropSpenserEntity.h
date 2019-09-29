@@ -26,9 +26,14 @@ class cClientHandle;
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 3,
@@ -39,7 +44,7 @@ public:
 
 	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
 
-	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 	virtual ~cDropSpenserEntity() override;
 
 	// cBlockEntity overrides:
@@ -51,7 +56,7 @@ public:
 	// tolua_begin
 
 	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should materialize) */
-	void AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction);
+	void AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction);
 
 	/** Sets the dropspenser to dropspense an item in the next tick */
 	void Activate(void);

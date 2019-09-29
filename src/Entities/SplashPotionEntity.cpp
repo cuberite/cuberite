@@ -21,11 +21,11 @@
 
 cSplashPotionEntity::cSplashPotionEntity(
 	cEntity * a_Creator,
-	double a_X, double a_Y, double a_Z,
-	const Vector3d & a_Speed,
+	Vector3d a_Pos,
+	Vector3d a_Speed,
 	const cItem & a_Item
-) :
-	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+):
+	super(pkSplashPotion, a_Creator, a_Pos, 0.25, 0.25),
 	m_Item(a_Item),
 	m_DestroyTimer(-1)
 {

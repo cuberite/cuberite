@@ -20,16 +20,16 @@
 class cCommandBlockEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-
-public:
-
 	// tolua_end
+
+	using super = cBlockEntity;
+
+public:  // tolua_export
 
 	BLOCKENTITY_PROTODEF(cCommandBlockEntity)
 
 	/** Creates a new empty command block entity */
-	cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;

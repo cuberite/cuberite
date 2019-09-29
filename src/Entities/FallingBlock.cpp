@@ -10,8 +10,8 @@
 
 
 
-cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y, a_BlockPosition.z + 0.5f, 0.98, 0.98),
+cFallingBlock::cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	super(etFallingBlock, Vector3d(0.5, 0, 0.5) + a_BlockPosition, 0.98, 0.98),
 	m_BlockType(a_BlockType),
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)

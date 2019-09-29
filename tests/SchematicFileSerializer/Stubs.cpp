@@ -34,6 +34,9 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 }
 
 
+
+
+
 cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 {
 }
@@ -217,7 +220,7 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockEntity::SetPos(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockEntity::SetPos(Vector3i a_NewPos)
 {
 }
 
@@ -225,16 +228,7 @@ void cBlockEntity::SetPos(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	return nullptr;
-}
-
-
-
-
-
-cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
+cBlockEntity * cBlockEntity::Clone(Vector3i a_Pos)
 {
 	return nullptr;
 }
@@ -242,3 +236,8 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 
 
 
+
+cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
+{
+	return nullptr;
+}

@@ -19,16 +19,16 @@
 class cSignEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-
-public:
-
 	// tolua_end
+
+	using super = cBlockEntity;
+
+public:  // tolua_export
 
 	BLOCKENTITY_PROTODEF(cSignEntity)
 
 	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr */
-	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 

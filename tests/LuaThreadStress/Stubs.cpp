@@ -284,7 +284,7 @@ bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockTy
 
 
 
-cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
+cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
 {
 	return nullptr;
 }
@@ -309,7 +309,7 @@ void cDeadlockDetect::UntrackCriticalSection(cCriticalSection & a_CS)
 
 
 
-void cBlockEntity::SetPos(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockEntity::SetPos(Vector3i a_NewPos)
 {
 }
 
@@ -326,7 +326,7 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 
 
 
-cBlockEntity * cBlockEntity::Clone(int a_BlockX, int a_BlockY, int a_BlockZ)
+cBlockEntity * cBlockEntity::Clone(Vector3i a_Pos)
 {
 	return nullptr;
 }

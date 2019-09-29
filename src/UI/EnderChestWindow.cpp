@@ -12,7 +12,7 @@
 
 
 
-cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
+cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest):
 	cWindow(wtChest, "Ender Chest"),
 	m_World(a_EnderChest->GetWorld()),
 	m_BlockPos(a_EnderChest->GetPos())
