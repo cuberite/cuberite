@@ -1145,7 +1145,7 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 			for (auto & Coord : Coords)
 			{
 				if (
-					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + 1, a_RelZ + Coord.z, BlockType) &&
+					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + i, a_RelZ + Coord.z, BlockType) &&
 					(
 						cBlockInfo::IsSolid(BlockType) ||
 						(BlockType == E_BLOCK_LAVA) ||
@@ -1153,12 +1153,25 @@ int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 					)
 				)
 				{
+					// Remove the cactus
+					GetWorld()->DigBlock(a_RelX + GetPosX() * cChunkDef::Width, Top + i, a_RelZ + GetPosZ() * cChunkDef::Width);
+
+					// Drop the cactus on the other side of the blocking block
+					cBlockHandler * Handler = BlockHandler(E_BLOCK_CACTUS);
+					cChunkInterface ChunkInterface(GetWorld()->GetChunkMap());
+					cBlockInServerPluginInterface PluginInterface(*GetWorld());
+					Handler->DropBlock(
+						ChunkInterface,
+						*GetWorld(),
+						PluginInterface,
+						nullptr,
+						a_RelX + GetPosX() * cChunkDef::Width  - Coord.x,
+						Top + i,
+						a_RelZ + GetPosZ() * cChunkDef::Width - Coord.z
+					);
 					return false;
 				}
 			}  // for i - Coords[]
-			{
-				GetWorld()->DigBlock(a_RelX + GetPosX() * cChunkDef::Width, Top + i, a_RelZ + GetPosZ() * cChunkDef::Width);
-			}
 		}
 		else
 		{
