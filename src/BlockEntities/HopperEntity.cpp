@@ -556,7 +556,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 			continue;
 		}
 
-		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs)));
+		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs));
 		if (chest == nullptr)
 		{
 			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);

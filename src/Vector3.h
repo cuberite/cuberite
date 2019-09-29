@@ -289,12 +289,6 @@ public:
 		);
 	}
 
-	/** Returns a copy of this vector moved by the specified offset on all axes. */
-	inline Vector3<T> added(Vector3<T> a_Offset) const
-	{
-		return Vector3<T>(x + a_Offset.x, y + a_Offset.y, z + a_Offset.z);
-	}
-
 	/** Returns a copy of this vector moved by the specified amount on the X axis. */
 	inline Vector3<T> addedX(T a_AddX) const
 	{

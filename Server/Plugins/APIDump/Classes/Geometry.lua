@@ -1150,23 +1150,6 @@ end
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
 			},
-			added =
-			{
-				Params =
-				{
-					{
-						Name = "ofs",
-						Type = "Vector3d",
-					},
-				},
-				Returns =
-				{
-					{
-						Type = "Vector3d",
-					},
-				},
-				Notes = "Returns a copy of the vector, moved by the specified offsets on each of the axes",
-			},
 			addedX =
 			{
 				Params =
@@ -1731,23 +1714,6 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
-			},
-			added =
-			{
-				Params =
-				{
-					{
-						Name = "ofs",
-						Type = "Vector3f",
-					},
-				},
-				Returns =
-				{
-					{
-						Type = "Vector3f",
-					},
-				},
-				Notes = "Returns a copy of the vector, moved by the specified offsets on each of the axes",
 			},
 			addedX =
 			{
@@ -2345,23 +2311,6 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
-			},
-			added =
-			{
-				Params =
-				{
-					{
-						Name = "ofs",
-						Type = "Vector3i",
-					},
-				},
-				Returns =
-				{
-					{
-						Type = "Vector3i",
-					},
-				},
-				Notes = "Returns a copy of the vector, moved by the specified offsets on each of the axes",
 			},
 			addedX =
 			{
