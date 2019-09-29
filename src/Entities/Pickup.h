@@ -26,7 +26,7 @@ public:  // tolua_export
 
 	CLASS_PROTODEF(cPickup)
 
-	cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed = Vector3d(), int a_LifetimeTicks = 6000, bool a_CanCombine = true);
+	cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed = Vector3f(), int a_LifetimeTicks = 6000, bool a_CanCombine = true);
 
 	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
