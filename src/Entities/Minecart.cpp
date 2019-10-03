@@ -90,8 +90,11 @@ protected:
 
 
 
-cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
-	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
+////////////////////////////////////////////////////////////////////////////////
+// cMinecart:
+
+cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
+	super(etMinecart, a_Pos, 0.98, 0.7),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
@@ -1164,8 +1167,8 @@ void cMinecart::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
-cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height) :
-	super(mpNone, a_X, a_Y, a_Z),
+cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height):
+	super(mpNone, a_Pos),
 	m_Content(a_Content),
 	m_Height(a_Height)
 {
@@ -1209,8 +1212,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithChest:
 
-cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
-	super(mpChest, a_X, a_Y, a_Z),
+cMinecartWithChest::cMinecartWithChest(Vector3d a_Pos):
+	super(mpChest, a_Pos),
 	cEntityWindowOwner(this),
 	m_Contents(ContentsWidth, ContentsHeight)
 {
@@ -1283,8 +1286,8 @@ void cMinecartWithChest::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithFurnace:
 
-cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
-	super(mpFurnace, a_X, a_Y, a_Z),
+cMinecartWithFurnace::cMinecartWithFurnace(Vector3d a_Pos):
+	super(mpFurnace, a_Pos),
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
@@ -1350,8 +1353,8 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithTNT:
 
-cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
-	super(mpTNT, a_X, a_Y, a_Z)
+cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
+	super(mpTNT, a_Pos)
 {
 }
 
@@ -1364,8 +1367,8 @@ cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithHopper:
 
-cMinecartWithHopper::cMinecartWithHopper(double a_X, double a_Y, double a_Z) :
-	super(mpHopper, a_X, a_Y, a_Z)
+cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
+	super(mpHopper, a_Pos)
 {
 }
 

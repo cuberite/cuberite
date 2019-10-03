@@ -245,6 +245,14 @@ public:
 	}
 
 
+
+	inline static int MakeIndexNoCheck(Vector3i a_RelPos)
+	{
+		return MakeIndexNoCheck(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+	}
+
+
+
 	inline static Vector3i IndexToCoordinate(size_t index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
@@ -276,6 +284,13 @@ public:
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
+	}
+
+
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	{
+		ASSERT(IsValidRelPos(a_RelPos));
+		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
 	}
 
 
@@ -354,6 +369,18 @@ public:
 			return ExpandNibble(a_Buffer, Index);
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
+		return 0;
+	}
+
+
+	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, Vector3i a_RelPos)
+	{
+		if (IsValidRelPos(a_RelPos))
+		{
+			auto Index = MakeIndexNoCheck(a_RelPos);
+			return (a_Buffer[static_cast<size_t>(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
+		}
+		ASSERT(!"Coords out of chunk range!");
 		return 0;
 	}
 

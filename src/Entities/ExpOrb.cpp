@@ -5,25 +5,10 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
-	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0)
-{
-	SetMaxHealth(5);
-	SetHealth(5);
-	SetGravity(-16);
-	SetAirDrag(0.02f);
-}
-
-
-
-
-
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
-	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0)
+cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
+	super(etExpOrb, a_Pos, 0.98, 0.98),  // TODO: Check size
+	m_Reward(a_Reward),
+	m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);

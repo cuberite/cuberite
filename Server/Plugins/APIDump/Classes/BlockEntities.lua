@@ -275,6 +275,16 @@ return
 				},
 				Notes = "Returns the block Z-coord of the block entity's block",
 			},
+			GetRelPos =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns the relative coords of the block entity's block within its chunk",
+			},
 			GetRelX =
 			{
 				Returns =

@@ -18,9 +18,14 @@ class cClientHandle;
 class cFurnaceEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		fsInput  = 0,  // Input slot number
@@ -36,7 +41,7 @@ public:
 	BLOCKENTITY_PROTODEF(cFurnaceEntity)
 
 	/** Constructor used for normal operation */
-	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cFurnaceEntity() override;
 

@@ -156,7 +156,7 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -558,7 +558,9 @@ public:
 	@return exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
+
 protected:
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -569,6 +571,7 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
+
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
@@ -685,6 +688,7 @@ protected:
 	/** Set the entities position and last sent position.
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
 	virtual void ResetPosition(Vector3d a_NewPos);
+
 
 private:
 

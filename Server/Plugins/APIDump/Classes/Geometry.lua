@@ -1150,6 +1150,78 @@ end
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
 			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
 			Clamp =
 			{
 				Params =
@@ -1642,6 +1714,78 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
+			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
 			},
 			Clamp =
 			{
@@ -2167,6 +2311,78 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
+			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
 			},
 			Clamp =
 			{
