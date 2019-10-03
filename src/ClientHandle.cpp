@@ -1461,6 +1461,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 					Success = true;
 				}
+
+				// Check if the item is place able, for example a torch on a fence
+				if (!Success && Placeable)
+				{
+					// place a block
+					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				}
 			}
 			else
 			{
