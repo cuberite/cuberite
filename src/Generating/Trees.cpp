@@ -29,6 +29,32 @@ static const sCoords Corners[] =
 	{1, 1},
 } ;
 
+// Array with possible directions for a branch to go to.
+static const Vector3d AvailableBranchDirections[] =
+{
+	{ -1, 0, 0 }, { 0, 0, -1  },
+	{ -1, 0, 1 }, { -1, 0, -1 },
+	{ 1, 0, 1  }, { 1, 0, -1  },
+	{ 1, 0, 0  }, { 0, 0, 1   },
+
+	{ -0.5, 0, 0   }, { 0, 0, -0.5    },
+	{ -0.5, 0, 0.5 }, { -0.5, 0, -0.5 },
+	{ 0.5, 0, 0.5  }, { 0.5, 0, -0.5  },
+	{ 0.5, 0, 0    }, { 0, 0, 0.5     },
+
+	{ -1, 0.5, 0 }, { 0, 0.5, -1  },
+	{ -1, 0.5, 1 }, { -1, 0.5, -1 },
+	{ 1, 0.5, 1  }, { 1, 0.5, -1  },
+	{ 1, 0.5, 0  }, { 0, 0.5, 1   },
+
+	{ -0.5, 0.5, 0   },  { 0, 0.5, -0.5    },
+	{ -0.5, 0.5, 0.5 },  { -0.5, 0.5, -0.5 },
+	{ 0.5, 0.5, 0.5  },  { 0.5, 0.5, -0.5  },
+	{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
+
+};
+
+
 // BigO = a big ring of blocks, used for generating horz slices of treetops, the number indicates the radius
 
 static const sCoords BigO1[] =
@@ -58,7 +84,8 @@ static const sCoords BigO3[] =
 	/*  3 */           {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3},
 } ;
 
-static const sCoords BigO4[] =  // Part of Big Jungle tree
+
+static const sCoords BigO4[] =  // Part of dark oak tree
 {
 	/* -4 */                     {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
 	/* -3 */           {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
@@ -69,6 +96,48 @@ static const sCoords BigO4[] =  // Part of Big Jungle tree
 	/*  2 */ {-4,  2}, {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2}, {4,  2},
 	/*  3 */           {-3,  3}, {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3}, {3,  3},
 	/*  4 */                     {-2,  4}, {-1,  4}, {0,  4}, {1,  4}, {2,  4},
+};
+
+static const sCoords BigO3Jungle[] =
+{
+	/* -3 */                               {0, -3}, {1, -3},
+	/* -2 */                     {-1, -2}, {0, -2}, {1, -2}, {2, -2},
+	/* -1 */           {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1},
+	/*  0 */ {-3,  0}, {-2,  0}, {-1,  0}, {0,  0}, {1,  0}, {2,  0}, {3,  0}, {4,  0},
+	/*  1 */ {-3,  1}, {-2,  1}, {-1,  1}, {0,  1}, {1,  1}, {2,  1}, {3,  1}, {4,  1},
+	/*  2 */           {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2},
+	/*  3 */                     {-1,  3}, {0,  3}, {1,  3}, {2,  3},
+	/*  4 */                               {0,  4}, {1,  4},
+};
+
+static const sCoords BigO4Jungle[] =
+{
+	/* -4 */                                         {0, -4}, {1, -4},
+	/* -3 */                     {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
+	/* -2 */           {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2},
+	/* -1 */           {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1},
+	/*  0 */ {-4,  0}, {-3,  0}, {-2,  0}, {-1,  0},                   {2,  0}, {3,  0}, {4,  0}, {5,  0},
+	/*  1 */ {-4,  1}, {-3,  1}, {-2,  1}, {-1,  1},                   {2,  1}, {3,  1}, {4,  1}, {5,  1},
+	/*  2 */           {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2}, {4,  2},
+	/*  3 */           {-3,  3}, {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3}, {3,  3}, {4,  3},
+	/*  4 */                     {-2,  4}, {-1,  4}, {0,  4}, {1,  4}, {2,  4}, {3,  4},
+	/*  5 */                                         {0,  5}, {1,  5},
+};
+
+static const sCoords BigO5Jungle[] =
+{
+	/* -5 */                                                   {0, -5}, {1, -5},
+	/* -4 */                               {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4}, {3, -4},
+	/* -3 */                     {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3}, {4, -3},
+	/* -2 */           {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2}, {5, -2},
+	/* -1 */           {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1}, {5, -1},
+	/*  0 */ {-5,  0}, {-4,  0}, {-3,  0}, {-2,  0}, {-1,  0},                   {2,  0}, {3,  0}, {4,  0}, {5,  0}, {6,  0},
+	/*  1 */ {-5,  1}, {-4,  1}, {-3,  1}, {-2,  1}, {-1,  1},                   {2,  1}, {3,  1}, {4,  1}, {5,  1}, {6,  1},
+	/*  2 */           {-4,  2}, {-3,  2}, {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2}, {4,  2}, {5,  2},
+	/*  3 */           {-4,  3}, {-3,  3}, {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3}, {3,  3}, {4,  3}, {5,  3},
+	/*  4 */                     {-3,  4}, {-2,  4}, {-1,  4}, {0,  4}, {1,  4}, {2,  4}, {3,  4}, {4,  4},
+	/*  5 */                               {-2,  5}, {-1,  5}, {0,  5}, {1,  5}, {2,  5}, {3,  5},
+	/*  6 */                                                   {0,  6}, {1,  6},
 } ;
 
 
@@ -81,7 +150,7 @@ typedef struct
 	size_t          Count;
 } sCoordsArr;
 
-static const sCoordsArr BigOs[] =
+static const sCoordsArr BigOLayers[] =
 {
 	{BigO1, ARRAYCOUNT(BigO1)},
 	{BigO2, ARRAYCOUNT(BigO2)},
@@ -89,6 +158,12 @@ static const sCoordsArr BigOs[] =
 	{BigO4, ARRAYCOUNT(BigO4)},
 } ;
 
+static const sCoordsArr BigOJungleLayers[] =
+{
+	{BigO5Jungle, ARRAYCOUNT(BigO5Jungle)},
+	{BigO4Jungle, ARRAYCOUNT(BigO4Jungle)},
+	{BigO3Jungle, ARRAYCOUNT(BigO3Jungle)},
+};
 
 
 
@@ -367,40 +442,15 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 {
 	int Height = 7 + a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 4;
 
-	// Array with possible directions for a branch to go to.
-	const Vector3d AvailableDirections[] =
-	{
-		{ -1, 0, 0 }, { 0, 0, -1  },
-		{ -1, 0, 1 }, { -1, 0, -1 },
-		{ 1, 0, 1  }, { 1, 0, -1  },
-		{ 1, 0, 0  }, { 0, 0, 1   },
-
-		{ -0.5, 0, 0   }, { 0, 0, -0.5    },
-		{ -0.5, 0, 0.5 }, { -0.5, 0, -0.5 },
-		{ 0.5, 0, 0.5  }, { 0.5, 0, -0.5  },
-		{ 0.5, 0, 0    }, { 0, 0, 0.5     },
-
-		{ -1, 0.5, 0 }, { 0, 0.5, -1  },
-		{ -1, 0.5, 1 }, { -1, 0.5, -1 },
-		{ 1, 0.5, 1  }, { 1, 0.5, -1  },
-		{ 1, 0.5, 0  }, { 0, 0.5, 1   },
-
-		{ -0.5, 0.5, 0   },  { 0, 0.5, -0.5    },
-		{ -0.5, 0.5, 0.5 },  { -0.5, 0.5, -0.5 },
-		{ 0.5, 0.5, 0.5  },  { 0.5, 0.5, -0.5  },
-		{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
-
-	};
-
 	// Create branches
 	for (int i = 4; i < Height; i++)
 	{
 		// Get a direction for the trunk to go to.
-		Vector3d BranchStartDirection = AvailableDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % ARRAYCOUNT(AvailableDirections)];
-		Vector3d BranchDirection = AvailableDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % ARRAYCOUNT(AvailableDirections)] / 3;
+		Vector3d BranchStartDirection = AvailableBranchDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % ARRAYCOUNT(AvailableBranchDirections)];
+		Vector3d BranchDirection = AvailableBranchDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % ARRAYCOUNT(AvailableBranchDirections)] / 3;
 
 		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 3;
-		GetLargeAppleTreeBranch(a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_Noise, a_LogBlocks);
+		GetTreeBranch(E_BLOCK_LOG, E_META_LOG_APPLE, a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_LogBlocks);
 	}
 
 	// Place leaves around each log block
@@ -431,7 +481,7 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 
 
 
-void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, int a_TreeHeight, cNoise & a_Noise, sSetBlockVector & a_LogBlocks)
+Vector3d GetTreeBranch(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, int a_TreeHeight, sSetBlockVector & a_LogBlocks)
 {
 	Vector3d CurrentPos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	Vector3d Direction  = a_StartDirection;
@@ -440,12 +490,13 @@ void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Bra
 		CurrentPos += Direction;
 		if (CurrentPos.y >= a_TreeHeight)
 		{
-			return;
+			return CurrentPos - Direction;
 		}
-		Direction -= a_Direction;
+		Direction += a_Direction;
 		Direction.Clamp(-1.0, 1.0);
-		a_LogBlocks.push_back(sSetBlock(FloorC(CurrentPos.x), FloorC(CurrentPos.y), FloorC(CurrentPos.z), E_BLOCK_LOG, GetLogMetaFromDirection(E_META_LOG_APPLE, Direction)));
+		a_LogBlocks.push_back(sSetBlock(FloorC(CurrentPos.x), FloorC(CurrentPos.y), FloorC(CurrentPos.z), a_BlockType, GetLogMetaFromDirection(a_BlockMeta, Direction)));
 	}
+	return CurrentPos;
 }
 
 
@@ -532,25 +583,17 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 		{ 1, 1, 0 }, { 0, 1, 1 },
 	};
 
-	// Set the starting point of the branch
-	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
-
 	// Get a direction for the trunk to go to.
 	Vector3i BranchDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 8];
 
 	// Calculate a height for the branch between 1 and 3
 	int BranchHeight = a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 3 + 1;
 
-	// Place the logs of the branch.
-	for (int i = 0; i < BranchHeight; i++)
-	{
-		BranchPos = BranchPos + BranchDirection;
-		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
-	}
+	Vector3i BranchPos = GetTreeBranch(E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD, a_BlockX, a_BlockY + Height - 1, a_BlockZ, BranchHeight, Vector3i(BranchDirection), Vector3i(BranchDirection), a_BlockY + Height + BranchHeight, a_LogBlocks).Floor();
 
 	// Add the leaves to the top of the branch
-	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
-	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 
 	// Choose if we have to add another branch
@@ -560,25 +603,17 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 		return;
 	}
 
-	// Reset the starting point of the branch
-	BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
-
 	// Invert the direction of the previous branch.
 	BranchDirection = Vector3d(-BranchDirection.x, 1, -BranchDirection.z);
 
 	// Calculate a new height for the second branch
 	BranchHeight = a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq * 10, a_BlockZ * a_Seq) % 3 + 1;
 
-	// Place the logs in the same way as the first branch
-	for (int i = 0; i < BranchHeight; i++)
-	{
-		BranchPos = BranchPos + BranchDirection;
-		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
-	}
+	BranchPos = GetTreeBranch(E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD, a_BlockX, a_BlockY + Height - 1, a_BlockZ, BranchHeight, BranchDirection, BranchDirection, a_BlockY + Height + BranchHeight, a_LogBlocks).Floor();
 
 	// And add the leaves ontop of the second branch
-	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
-	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 }
 
@@ -852,8 +887,8 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 		{
 			break;
 		}
-		ASSERT(static_cast<size_t>(LayerSize) < ARRAYCOUNT(BigOs));
-		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOs[LayerSize].Coords, BigOs[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
+		ASSERT(static_cast<size_t>(LayerSize) < ARRAYCOUNT(BigOLayers));
+		PushCoordBlocks(a_BlockX, h, a_BlockZ, a_OtherBlocks, BigOLayers[LayerSize].Coords, BigOLayers[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
 	}
 }
@@ -947,22 +982,18 @@ void GetJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 
 void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	// TODO: Generate proper jungle trees with branches
-
-	// Vines are around the BigO4, but not in the corners; need proper meta for direction
-	static const sMetaCoords Vines[] =
+	static const sMetaCoords VinesTrunk[] =
 	{
-		{-2, -5, 1}, {-1, -5, 1}, {0, -5, 1}, {1, -5, 1}, {2, -5, 1},  // North face
-		{-2,  5, 4}, {-1,  5, 4}, {0,  5, 4}, {1,  5, 4}, {2,  5, 4},  // South face
-		{5,  -2, 2}, {5,  -1, 2}, {5,  0, 2}, {5,  1, 2}, {5,  2, 2},  // East face
-		{-5, -2, 8}, {-5, -1, 8}, {-5, 0, 8}, {-5, 1, 8}, {-5, 2, 8},  // West face
-		// TODO: vines around the trunk, proper metas and height
-	} ;
+		{0, -1, 1}, {1, -1, 1},  // North face
+		{0,  2, 4}, {1,  2, 4},  // South face
+		{-1, 1, 8}, {-1, 0, 8},  // West face
+		{2,  1, 2}, {2,  0, 2},  // East face
+	};
 
-	int Height = 24 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 24;
+	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 12;
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
-	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO4) + ARRAYCOUNT(BigO3) + static_cast<size_t>(Height) * ARRAYCOUNT(Vines) + 50);
+	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO5Jungle) + ARRAYCOUNT(BigO4Jungle) + ARRAYCOUNT(BigO3Jungle) + static_cast<size_t>(Height) * 4 + 50);
 
 	for (int i = 0; i < Height; i++)
 	{
@@ -970,6 +1001,16 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 		a_LogBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY + i, a_BlockZ,     E_BLOCK_LOG, E_META_LOG_JUNGLE));
 		a_LogBlocks.push_back(sSetBlock(a_BlockX,     a_BlockY + i, a_BlockZ + 1, E_BLOCK_LOG, E_META_LOG_JUNGLE));
 		a_LogBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY + i, a_BlockZ + 1, E_BLOCK_LOG, E_META_LOG_JUNGLE));
+
+		// Randomly place vines around the trunk
+		for (size_t j = 0; j < ARRAYCOUNT(VinesTrunk); j++)
+		{
+			if (a_Noise.IntNoise3DInt(a_BlockX + VinesTrunk[j].x, a_BlockY + i, a_BlockZ + VinesTrunk[j].z) % 3 != 0)
+			{
+				continue;
+			}
+			a_OtherBlocks.push_back(sSetBlock(a_BlockX + VinesTrunk[j].x, a_BlockY + i, a_BlockZ + VinesTrunk[j].z, E_BLOCK_VINES, VinesTrunk[j].Meta));
+		}
 	}
 	int hei = a_BlockY + Height - 2;
 
@@ -982,21 +1023,27 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 		a_OtherBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY - i, a_BlockZ + 1, E_BLOCK_DIRT, E_META_DIRT_NORMAL));
 	}
 
-	// Put vines around the lowermost leaves layer:
-	PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_OtherBlocks, Vines, ARRAYCOUNT(Vines), E_BLOCK_VINES);
-
-	// The lower two leaves layers are BigO4 with log in the middle and possibly corners:
-	for (int i = 0; i < 2; i++)
+	int numBranches = (a_Noise.IntNoise2DInt(a_BlockX * a_Seq, a_BlockZ * a_Seq) / 11) % 3 + 1;
+	int branchStartHeight = 8 + Height % 11;
+	int branchInterval = (Height - branchStartHeight) / numBranches;
+	for (int i = branchStartHeight; i < (Height - 6); i += branchInterval)
 	{
-		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO4, ARRAYCOUNT(BigO4), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-		hei++;
-	}  // for i - 2*
+		// Get a direction for the trunk to go to.
+		Vector3d BranchStartDirection = AvailableBranchDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % ARRAYCOUNT(AvailableBranchDirections)];
+		Vector3d BranchDirection = AvailableBranchDirections[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % ARRAYCOUNT(AvailableBranchDirections)] / 3;
 
-	// The top leaves layer is a BigO3 with leaves in the middle and possibly corners:
-	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-	PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 2;
+		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_LogBlocks).Floor();
+		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+	}
+
+	// Place the canopy.
+	for (size_t i = 0; i < ARRAYCOUNT(BigOJungleLayers); i++)
+	{
+		PushCoordBlocks(a_BlockX, hei++, a_BlockZ, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+	}
 }
 
 
