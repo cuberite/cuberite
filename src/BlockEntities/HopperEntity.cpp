@@ -148,7 +148,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 	// Try moving an item in:
 	bool res = false;
-	switch (a_Chunk.GetBlock(GetRelPos()))
+	switch (a_Chunk.GetBlock(GetRelPos().addedY(1)))
 	{
 		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
@@ -168,7 +168,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_HOPPER:
 		{
-			res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(GetRelPos().addedY(1))));
+			res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))));
 			break;
 		}
 	}
