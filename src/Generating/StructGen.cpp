@@ -157,9 +157,10 @@ void cStructGenTrees::ApplyTreeImage(
 			// Inside this chunk, integrate into a_ChunkDesc:
 			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))
 			{
+				case E_BLOCK_NEW_LEAVES:
 				case E_BLOCK_LEAVES:
 				{
-					if (itr->m_BlockType != E_BLOCK_LOG)
+					if ((itr->m_BlockType != E_BLOCK_LOG) && (itr->m_BlockType != E_BLOCK_NEW_LOG))
 					{
 						break;
 					}
