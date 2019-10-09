@@ -57,7 +57,7 @@ static const Vector3d & pickBranchDirection(cNoise a_Noise, Vector3i a_BlockPos,
 		}
 	};
 
-	size_t index = a_Noise.IntNoise3DInt(a_BlockPos.x, a_BlockPos.y + a_Seq, a_BlockPos.z) % directions.size();
+	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos.x, a_BlockPos.y + a_Seq, a_BlockPos.z)) % directions.size();
 	return directions[index];
 }
 
