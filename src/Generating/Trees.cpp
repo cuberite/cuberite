@@ -30,9 +30,9 @@ static const sCoords Corners[] =
 } ;
 
 // Array with possible directions for a branch to go to.
-static const std::array<Vector3d, 32> & availableBranchDirections()
+static const Vector3d & pickBranchDirection(Vector3i a_BlockPos, int a_Seq)
 {
-	static const std::array<Vector3d, 32> res =
+	static const std::array<Vector3d, 32> directions =
 	{
 		{
 			{ -1, 0, 0 }, { 0, 0, -1  },
@@ -56,7 +56,8 @@ static const std::array<Vector3d, 32> & availableBranchDirections()
 			{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
 		}
 	};
-	return res;
+
+	return directions[(static_cast<int>(a_BlockPos.SqrLength()) + a_Seq) % directions.size()];
 }
 
 // BigO = a big ring of blocks, used for generating horz slices of treetops, the number indicates the radius
@@ -450,8 +451,8 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 	for (int i = 4; i < Height; i++)
 	{
 		// Get a direction for the trunk to go to.
-		Vector3d BranchStartDirection = availableBranchDirections()[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % availableBranchDirections().size()];
-		Vector3d BranchDirection = availableBranchDirections()[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % availableBranchDirections().size()] / 3;
+		Vector3d BranchStartDirection = pickBranchDirection({ a_BlockX, a_BlockY + i, a_BlockZ }, a_Seq);
+		Vector3d BranchDirection = pickBranchDirection({ a_BlockX, a_BlockY / i, a_BlockZ }, a_Seq) / 3;
 
 		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 3;
 		GetTreeBranch(E_BLOCK_LOG, E_META_LOG_APPLE, a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_LogBlocks);
@@ -1033,8 +1034,8 @@ void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	for (int i = branchStartHeight; i < (Height - 6); i += branchInterval)
 	{
 		// Get a direction for the trunk to go to.
-		Vector3d BranchStartDirection = availableBranchDirections()[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ)) % availableBranchDirections().size()];
-		Vector3d BranchDirection = availableBranchDirections()[static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ)) % availableBranchDirections().size()] / 3;
+		Vector3d BranchStartDirection = pickBranchDirection({ a_BlockX, a_BlockY + i, a_BlockZ }, a_Seq);
+		Vector3d BranchDirection = pickBranchDirection({ a_BlockX, a_BlockY / i, a_BlockZ }, a_Seq) / 3;
 
 		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 2;
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_LogBlocks).Floor();
