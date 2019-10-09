@@ -5,6 +5,7 @@
 #include "BlockHandler.h"
 #include "WorldInterface.h"
 #include "../ChunkMap.h"
+#include "../World.h"
 
 
 
@@ -30,19 +31,16 @@ NIBBLETYPE cChunkInterface::GetBlockMeta(Vector3i a_Pos)
 
 bool cChunkInterface::GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	return m_ChunkMap->GetBlockTypeMeta(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta);
+	return m_ChunkMap->GetBlockTypeMeta(a_Pos, a_BlockType, a_BlockMeta);
 }
 
 
 
 
 
-/** Sets the block at the specified coords to the specified value.
-Full processing, incl. updating neighbors, is performed.
-*/
-void cChunkInterface::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunkInterface::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta, true);
 }
 
 
@@ -106,10 +104,26 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 
 
 
-bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, int a_X, int a_Y, int a_Z)
+bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
-	cBlockHandler * Handler = cBlockInfo::GetHandler(GetBlock({a_X, a_Y, a_Z}));
-	Handler->OnDestroyed(*this, a_WorldInterface, a_X, a_Y, a_Z);
-	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
+	BLOCKTYPE blockType;
+	NIBBLETYPE blockMeta;
+	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
+	auto handler = cBlockInfo::GetHandler(blockType);
+	handler->OnBreaking(*this, a_WorldInterface, a_BlockPos);
+	if (!m_ChunkMap->DigBlock(a_BlockPos))
+	{
+		return false;
+	}
+	handler->OnBroken(*this, a_WorldInterface, a_BlockPos, blockType, blockMeta);
+	return true;
 }
 
+
+
+
+
+void cChunkInterface::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	m_ChunkMap->GetWorld()->DropBlockAsPickups(a_BlockPos, a_Digger, a_Tool);
+}

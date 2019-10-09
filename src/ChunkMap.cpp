@@ -145,108 +145,6 @@ cChunkPtr cChunkMap::GetChunkNoLoad(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
-{
-	// We already have m_CSChunks locked since this can be called only from within the tick thread
-	ASSERT(m_CSChunks.IsLockedByCurrentThread());
-
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return false;
-	}
-
-	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType)
-{
-	// We already have m_CSChunks locked since this can be called only from within the tick thread
-	ASSERT(m_CSChunks.IsLockedByCurrentThread());
-
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return false;
-	}
-
-	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta)
-{
-	// We already have m_CSChunks locked since this can be called only from within the tick thread
-	ASSERT(m_CSChunks.IsLockedByCurrentThread());
-
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return false;
-	}
-
-	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE   a_BlockType, NIBBLETYPE   a_BlockMeta)
-{
-	// We already have m_CSChunks locked since this can be called only from within the tick thread
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return false;
-	}
-
-	Chunk->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	// We already have m_CSChunks locked since this can be called only from within the tick thread
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return false;
-	}
-
-	Chunk->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-	return true;
-}
-
-
-
-
-
 cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
@@ -581,7 +479,7 @@ void cChunkMap::SetBlocks(const sSetBlockVector & a_Blocks)
 		// If the chunk is valid, set the block:
 		if (chunk != nullptr)
 		{
-			chunk->SetBlock(block.m_RelX, block.m_RelY, block.m_RelZ, block.m_BlockType, block.m_BlockMeta);
+			chunk->SetBlock({block.m_RelX, block.m_RelY, block.m_RelZ}, block.m_BlockType, block.m_BlockMeta, true);
 		}
 	}  // for block - a_Blocks[]
 }
@@ -711,38 +609,40 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
-	cChunkInterface ChunkInterface(this);
-	BlockHandler(GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnDestroyed(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ);
-
-	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
-	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ);
+	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkZ);
-	if ((Chunk != nullptr) && Chunk->IsValid())
+	auto chunk = GetChunk(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ);
+	if ((chunk != nullptr) && chunk->IsValid())
 	{
-		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
-		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, Chunk);
+		BLOCKTYPE blockType;
+		NIBBLETYPE blockMeta;
+		GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
+		cChunkInterface ChunkInterface(this);
+		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
+		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta, a_SendToClients);
+		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
+		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
 	}
-	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 
 
 
 
-bool cChunkMap::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
-	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ);
+	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkZ);
-	if ((Chunk != nullptr) && Chunk->IsValid())
+	auto chunk = GetChunk(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ);
+	if ((chunk != nullptr) && chunk->IsValid())
 	{
-		Chunk->GetBlockTypeMeta(X, Y, Z, a_BlockType, a_BlockMeta);
+		chunk->GetBlockTypeMeta(relPos, a_BlockType, a_BlockMeta);
 		return true;
 	}
 	return false;
@@ -776,14 +676,15 @@ void cChunkMap::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_Filt
 	cCSLock Lock(m_CSChunks);
 	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
 	{
-		cChunkPtr Chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkZ);
-		if ((Chunk == nullptr) || !Chunk->IsValid())
+		auto chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkZ);
+		if ((chunk == nullptr) || !chunk->IsValid())
 		{
 			continue;
 		}
-		if (Chunk->GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == a_FilterBlockType)
+		Vector3i relPos(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
+		if (chunk->GetBlock(relPos) == a_FilterBlockType)
 		{
-			Chunk->SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+			chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
 		}
 	}
 }
@@ -797,16 +698,17 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 	cCSLock Lock(m_CSChunks);
 	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
 	{
-		cChunkPtr Chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkZ);
-		if ((Chunk == nullptr) || !Chunk->IsValid())
+		auto chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkZ);
+		if ((chunk == nullptr) || !chunk->IsValid())
 		{
 			continue;
 		}
-		switch (Chunk->GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ))
+		Vector3i relPos(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
+		switch (chunk->GetBlock(relPos))
 		{
 			CASE_TREE_OVERWRITTEN_BLOCKS:
 			{
-				Chunk->SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+				chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
 				break;
 			}
 			case E_BLOCK_LEAVES:
@@ -814,7 +716,7 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 			{
 				if ((itr->m_BlockType == E_BLOCK_LOG) || (itr->m_BlockType == E_BLOCK_NEW_LOG))
 				{
-					Chunk->SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+					chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
 				}
 				break;
 			}
@@ -930,25 +832,41 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cChunkMap::DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cChunkMap::DigBlock(Vector3i a_BlockPos)
 {
-	int PosX = a_BlockX, PosY = a_BlockY, PosZ = a_BlockZ, ChunkX, ChunkZ;
-
-	cChunkDef::AbsoluteToRelative(PosX, PosY, PosZ, ChunkX, ChunkZ);
+	auto chunkCoords = cChunkDef::BlockToChunk(a_BlockPos);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoords);
 
 	{
 		cCSLock Lock(m_CSChunks);
-		cChunkPtr DestChunk = GetChunk( ChunkX, ChunkZ);
-		if ((DestChunk == nullptr) || !DestChunk->IsValid())
+		auto destChunk = GetChunk(chunkCoords.m_ChunkX, chunkCoords.m_ChunkZ);
+		if ((destChunk == nullptr) || !destChunk->IsValid())
 		{
 			return false;
 		}
 
-		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-		m_World->GetSimulatorManager()->WakeUp({a_BlockX, a_BlockY, a_BlockZ}, DestChunk);
+		destChunk->SetBlock(relPos, E_BLOCK_AIR, 0, true);
+		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, destChunk);
 	}
-
 	return true;
+}
+
+
+
+
+
+cItems cChunkMap::PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	auto chunkCoords = cChunkDef::BlockToChunk(a_BlockPos);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoords);
+
+	cCSLock Lock(m_CSChunks);
+	auto destChunk = GetChunk(chunkCoords.m_ChunkX, chunkCoords.m_ChunkZ);
+	if ((destChunk == nullptr) || !destChunk->IsValid())
+	{
+		return {};
+	}
+	return destChunk->PickupsFromBlock(relPos, a_Digger, a_Tool);
 }
 
 
@@ -1305,11 +1223,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							auto & Random = GetRandomProvider();
 							if (Random.RandBool(0.25))  // 25% chance of pickups
 							{
-								cItems Drops;
-								cBlockHandler * Handler = BlockHandler(Block);
-
-								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
-								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
+								auto pickups = area.PickupsFromBlock({bx + x, by + y, bz + z});
+								m_World->SpawnItemPickups(pickups, bx + x, by + y, bz + z);
 							}
 							else if ((m_World->GetTNTShrapnelLevel() > slNone) && Random.RandBool(0.20))  // 20% chance of flinging stuff around
 							{

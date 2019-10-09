@@ -8,13 +8,20 @@
 
 
 class cBlockButtonHandler :
-	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>;
+
 public:
-	cBlockButtonHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>(a_BlockType)
+
+	cBlockButtonHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
@@ -51,12 +58,6 @@ public:
 		);
 
 		return true;
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 	virtual bool IsUseable(void) override

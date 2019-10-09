@@ -22,9 +22,16 @@ public:
 	bool GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 
 	/** Sets the block at the specified coords to the specified value.
-	Full processing, incl. updating neighbors, is performed.
-	*/
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	Full processing, incl. updating neighbors, is performed. */
+	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Sets the block at the specified coords to the specified value.
+	Full processing, incl. updating neighbors, is performed. */
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
+	}
 
 	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true);
 
@@ -44,7 +51,11 @@ public:
 
 	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 
-	bool DigBlock(cWorldInterface & a_WorldInterface, int a_X, int a_Y, int a_Z);
+	bool DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos);
+
+	/** Digs the block and spawns the relevant pickups, as if a_Digger used a_Tool to dig the block. */
+	void DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
+
 
 private:
 	cChunkMap * m_ChunkMap;

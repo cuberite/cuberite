@@ -8,19 +8,29 @@
 
 
 class cBlockSugarcaneHandler :
-	public cBlockPlant
+	public cBlockPlant<false>
 {
-	typedef cBlockPlant Super;
+	using super = cBlockPlant<false>;
+
 public:
-	cBlockSugarcaneHandler(BLOCKTYPE a_BlockType)
-		: Super(a_BlockType, false)
+
+	cBlockSugarcaneHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		a_Pickups.push_back(cItem(E_ITEM_SUGARCANE, 1, 0));
+		return cItem(E_ITEM_SUGARCANE, 1, 0);
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
@@ -86,6 +96,7 @@ public:
 		return 7;
 	}
 
+
 protected:
 
 	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
@@ -93,7 +104,7 @@ protected:
 		auto Action = paStay;
 		if (((a_RelY + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR))
 		{
-			Action = Super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+			Action = super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
 		}
 
 		return Action;

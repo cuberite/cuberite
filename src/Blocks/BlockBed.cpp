@@ -15,35 +15,33 @@
 
 
 
-void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockBedHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
 {
-	Vector3i ThisPos(a_BlockX, a_BlockY, a_BlockZ);
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(ThisPos);
-	Vector3i Direction = MetaDataToDirection(OldMeta & 0x3);
-	if (OldMeta & 0x8)
+	auto Direction = MetaDataToDirection(a_OldBlockMeta & 0x03);
+	if ((a_OldBlockMeta & 0x08) != 0)
 	{
 		// Was pillow
-		if (a_ChunkInterface.GetBlock(ThisPos - Direction) == E_BLOCK_BED)
+		if (a_ChunkInterface.GetBlock(a_BlockPos - Direction) == E_BLOCK_BED)
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(ThisPos - Direction, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockPos - Direction, E_BLOCK_AIR, 0);
 
 			// Then destroy the bed entity
-			Vector3i PillowPos(ThisPos - Direction);
-			a_ChunkInterface.SetBlock(PillowPos.x, PillowPos.y, PillowPos.z, E_BLOCK_AIR, 0);
+			Vector3i PillowPos(a_BlockPos - Direction);
+			a_ChunkInterface.SetBlock(PillowPos, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
 		// Was foot end
-		if (a_ChunkInterface.GetBlock(ThisPos + Direction) == E_BLOCK_BED)
+		if (a_ChunkInterface.GetBlock(a_BlockPos + Direction) == E_BLOCK_BED)
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(ThisPos + Direction, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(a_BlockPos + Direction, E_BLOCK_AIR, 0);
 
 			// Then destroy the bed entity
-			Vector3i FootPos(ThisPos + Direction);
-			a_ChunkInterface.SetBlock(FootPos.x, FootPos.y, FootPos.z, E_BLOCK_AIR, 0);
+			Vector3i FootPos(a_BlockPos + Direction);
+			a_ChunkInterface.SetBlock(FootPos, E_BLOCK_AIR, 0);
 		}
 	}
 }
@@ -155,14 +153,12 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-void cBlockBedHandler::ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ)
+cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
 {
-	short Color = E_META_WOOL_RED;
-	a_WorldInterface.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, [&](cBedEntity & a_Bed)
-		{
-			Color = a_Bed.GetColor();
-			return true;
-		}
-	);
-	a_Pickups.Add(cItem(E_ITEM_BED, 1, Color));
+	short color = E_META_WOOL_RED;
+	if (a_BlockEntity != nullptr)
+	{
+		color = reinterpret_cast<cBedEntity *>(a_BlockEntity)->GetColor();
+	}
+	return cItem(E_ITEM_BED, 1, color);
 }

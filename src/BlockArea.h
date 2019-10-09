@@ -24,6 +24,7 @@
 
 // fwd:
 class cCuboid;
+class cItems;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
 
@@ -421,6 +422,9 @@ public:
 	/** Direct read-only access to block entities. */
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
 
+	/** Returns the pickups that would result if the block at the specified position was mined by a_Digger, using a_Tool. */
+	cItems PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
+
 
 protected:
 
@@ -519,6 +523,9 @@ protected:
 
 	/** Removes from m_BlockEntities those BEs that no longer match the blocktype at their coords. */
 	void RemoveNonMatchingBlockEntities(void);
+
+	/** Returns the cBlockEntity at the specified coords, or nullptr if none. */
+	cBlockEntity * GetBlockEntityRel(Vector3i a_RelPos);
 
 	// tolua_begin
 } ;

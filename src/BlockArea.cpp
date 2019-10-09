@@ -14,6 +14,7 @@
 #include "Blocks/BlockHandler.h"
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Item.h"
 
 
 
@@ -2215,6 +2216,21 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 
 
 
+cItems cBlockArea::PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	auto relPos = a_AbsPos - m_Origin;
+	BLOCKTYPE blockType;
+	NIBBLETYPE blockMeta;
+	GetRelBlockTypeMeta(relPos.x, relPos.y, relPos.z, blockType, blockMeta);
+	auto blockEntity = GetBlockEntityRel(relPos);
+	auto handler = BlockHandler(blockType);
+	return handler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
+}
+
+
+
+
+
 void cBlockArea::SetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array)
 {
 	if (a_Array == nullptr)
@@ -2704,6 +2720,28 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 			delete keyPair.second;
 		}
 	}
+}
+
+
+
+
+
+cBlockEntity * cBlockArea::GetBlockEntityRel(Vector3i a_RelPos)
+{
+	if (!HasBlockEntities())
+	{
+		return nullptr;
+	}
+
+	auto idx = MakeIndex(a_RelPos);
+	for (const auto & be: *m_BlockEntities)
+	{
+		if (be.first == idx)
+		{
+			return be.second;
+		}
+	}
+	return nullptr;
 }
 
 

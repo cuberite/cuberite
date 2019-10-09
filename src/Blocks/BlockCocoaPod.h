@@ -44,11 +44,20 @@ public:
 		}
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		int GrowState = a_BlockMeta >> 2;
-		a_Pickups.Add(E_ITEM_DYE, ((GrowState >= 2) ? 3 : 1), E_META_DYE_BROWN);
+		// If fully grown, give 3 items, otherwise just one:
+		auto growState = a_BlockMeta >> 2;
+		return cItem(E_ITEM_DYE, ((growState >= 2) ? 3 : 1), E_META_DYE_BROWN);
 	}
+
+
+
+
 
 	static eBlockFace MetaToBlockFace(NIBBLETYPE a_Meta)
 	{

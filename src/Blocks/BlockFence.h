@@ -122,13 +122,21 @@ public:
 		return true;
 	}
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		auto LeashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, { a_BlockX, a_BlockY, a_BlockZ });
 
-		if (LeashKnot != nullptr)
+
+
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override
+	{
+		// Destroy any leash knot tied to the fence:
+		auto leashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, a_BlockPos);
+		if (leashKnot != nullptr)
 		{
-			LeashKnot->SetShouldSelfDestroy();
+			leashKnot->SetShouldSelfDestroy();
 		}
 	}
 

@@ -412,8 +412,22 @@ public:
 
 	// tolua_end
 
-	bool GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // TODO: Exported in ManualBindings.cpp
-	bool GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);  // TODO: Exported in ManualBindings.cpp
+	/** Retrieves the block type and meta at the specified coords.
+	Stores the result into a_BlockType and a_BlockMeta.
+	Returns true if successful, false if chunk not present. */
+	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // TODO: Export in ManualBindings_World.cpp
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Retrieves the block type and meta at the specified coords.
+	Stores the result into a_BlockType and a_BlockMeta.
+	Returns true if successful, false if chunk not present. */
+	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)  // Exported in ManualBindings_World.cpp
+	{
+		return GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
+	}
+
+	bool GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);  // Exported in ManualBindings.cpp
+
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	// tolua_begin
@@ -435,14 +449,21 @@ public:
 
 	// tolua_begin
 
-	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
+	/** Spawns item pickups for each item in the list.
+	The initial position of the pickups is at the center of the specified block, with a small random offset.
+	May compress pickups if too many entities. */
+	void SpawnItemPickups(const cItems & a_Pickups, Vector3i a_BlockPos, double a_FlyAwaySpeed = 1.0, bool a_IsPlayerCreated = false);
+
+	/** Spawns item pickups for each item in the list.
+	May compress pickups if too many entities. */
 	void SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed = 1.0, bool a_IsPlayerCreated = false);
 
 	/** OBSOLETE, use the Vector3d-based overload instead.
-	Spawns item pickups for each item in the list. May compress pickups if too many entities: */
+	Spawns item pickups for each item in the list.
+	May compress pickups if too many entities. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool a_IsPlayerCreated = false) override
 	{
-		return SpawnItemPickups(a_Pickups, {a_BlockX, a_BlockY, a_BlockZ}, a_FlyAwaySpeed, a_IsPlayerCreated);
+		return SpawnItemPickups(a_Pickups, Vector3d{a_BlockX, a_BlockY, a_BlockZ}, a_FlyAwaySpeed, a_IsPlayerCreated);
 	}
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
@@ -516,12 +537,12 @@ public:
 
 	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
 	Returns an vector of UniqueID of all the orbs. */
-	std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward);  // Exported in ManualBindings_World.cpp
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward) override;  // Exported in ManualBindings_World.cpp
 
 	/** OBSOLETE, use the Vector3d-based overload instead.
 	Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
 	Returns an vector of UniqueID of all the orbs. */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) override
+	std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward)
 	{
 		return SpawnSplitExperienceOrbs({a_X, a_Y, a_Z}, a_Reward);
 	}
@@ -554,7 +575,37 @@ public:
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
 	// tolua_begin
-	bool DigBlock   (int a_X, int a_Y, int a_Z);
+
+	/** Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
+	Wakes up the simulators.
+	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
+	Returns true on success, false if the chunk is not loaded. */
+	bool DigBlock(Vector3i a_BlockPos);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
+	Wakes up the simulators.
+	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
+	Returns true on success, false if the chunk is not loaded. */
+	bool DigBlock(int a_X, int a_Y, int a_Z)
+	{
+		return DigBlock({a_X, a_Y, a_Z});
+	}
+
+	/** Digs the specified block, and spawns the appropriate pickups for it.
+	a_Digger is an optional entity causing the digging, usually the player.
+	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves).
+	An empty hand is assumed if a_Tool is nullptr.
+	Returns true on success, false if the chunk is not loaded. */
+	bool DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
+
+	/** Returns all the pickups that would result if the a_Digger dug up the block at a_BlockPos using a_Tool
+	a_Digger is usually a player, but can be nullptr for natural causes.
+	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves).
+	An empty hand is assumed if a_Tool is nullptr.
+	Returns an empty cItems object if the chunk is not present. */
+	cItems PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
+
 	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.

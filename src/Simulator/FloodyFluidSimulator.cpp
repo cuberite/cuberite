@@ -193,7 +193,7 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 	if (a_MyMeta >= 8)
 	{
 		FLUID_FLOG("  Not fed and downwards, turning into non-downwards meta {0}", m_Falloff);
-		a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, m_Falloff);
+		a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, m_StationaryFluidBlock, m_Falloff, true);
 	}
 	else
 	{
@@ -201,12 +201,12 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 		if (a_MyMeta < 8)
 		{
 			FLUID_FLOG("  Not fed, decreasing from {0} to {1}", a_MyMeta - m_Falloff, a_MyMeta);
-			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, a_MyMeta);
+			a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, m_StationaryFluidBlock, a_MyMeta, true);
 		}
 		else
 		{
 			FLUID_FLOG("  Not fed, meta {0}, erasing altogether", a_MyMeta);
-			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0, true);
 		}
 	}
 	return true;
@@ -254,7 +254,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			FLUID_FLOG("  Lava flowing into water, turning water at rel {0} into {1}",
 				Vector3i{a_RelX, a_RelY, a_RelZ}, ItemTypeToString(NewBlock)
 			);
-			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
+			a_NearChunk->SetBlock({a_RelX, a_RelY, a_RelZ}, NewBlock, 0, true);
 
 			m_World.BroadcastSoundEffect(
 				"block.lava.extinguish",
@@ -274,7 +274,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			FLUID_FLOG("  Water flowing into lava, turning lava at rel {0} into {1}",
 				Vector3i{a_RelX, a_RelY, a_RelZ}, ItemTypeToString(NewBlock)
 			);
-			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
+			a_NearChunk->SetBlock({a_RelX, a_RelY, a_RelZ}, NewBlock, 0, true);
 
 			m_World.BroadcastSoundEffect(
 				"block.lava.extinguish",
@@ -302,23 +302,13 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		cBlockHandler * Handler = BlockHandler(BlockType);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			cChunkInterface ChunkInterface(m_World.GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(m_World);
-			Handler->DropBlock(
-				ChunkInterface,
-				m_World,
-				PluginInterface,
-				nullptr,
-				BlockX,
-				a_RelY,
-				BlockZ
-			);
+			m_World.DropBlockAsPickups({BlockX, a_RelY, BlockZ}, nullptr, nullptr);
 		}
 	}  // if (CanWashAway)
 
 	// Spread:
 	FLUID_FLOG("  Spreading to {0} with meta {1}", Vector3i{BlockX, a_RelY, BlockZ}, a_NewMeta);
-	a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
+	a_NearChunk->SetBlock({a_RelX, a_RelY, a_RelZ}, m_FluidBlock, a_NewMeta, true);
 	m_World.GetSimulatorManager()->WakeUp({BlockX, a_RelY, BlockZ}, a_NearChunk);
 
 	HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
@@ -362,7 +352,7 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 			{
 				// Found enough, turn into a source and bail out
 				// FLUID_FLOG("    Found enough neighbor sources, turning into a source");
-				a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, 0);
+				a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, m_FluidBlock, 0, true);
 				return true;
 			}
 		}
@@ -411,13 +401,13 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 		if (a_Meta == 0)
 		{
 			// Source lava block
-			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
+			a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_OBSIDIAN, 0, true);
 			return true;
 		}
 		// Ignore last lava level
 		else if (a_Meta <= 4)
 		{
-			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
+			a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_COBBLESTONE, 0, true);
 			return true;
 		}
 	}

@@ -10,9 +10,12 @@
 class cBlockConcretePowderHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
+
 	cBlockConcretePowderHandler(BLOCKTYPE a_BlockType):
-		cBlockHandler(a_BlockType)
+		super(a_BlockType)
 	{
 	}
 
@@ -20,21 +23,25 @@ public:
 
 
 
-	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	virtual void Check(
+		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
+		Vector3i a_RelPos,
+		cChunk & a_Chunk
+	) override
 	{
-		if (GetSoaked(Vector3i(a_RelX, a_RelY, a_RelZ), a_Chunk))
+		if (GetSoaked(a_RelPos, a_Chunk))
 		{
 			return;
 		}
-		cBlockHandler::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
+		super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
 	}
 
 
 
 
 
-	/** Check blocks above and around to see if they are water. If one is, convert this into concrete block.
-		Returns TRUE if the block was changed. */
+	/** Check blocks above and around to see if they are water. If one is, converts this into concrete block.
+	Returns true if the block was changed. */
 	bool GetSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		static const std::array<Vector3i, 5> WaterCheck
@@ -62,7 +69,7 @@ public:
 		{
 			NIBBLETYPE BlockMeta;
 			BlockMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
-			a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_CONCRETE, BlockMeta);
+			a_Chunk.SetBlock(a_Rel, E_BLOCK_CONCRETE, BlockMeta, true);
 			return true;
 		}
 		return false;

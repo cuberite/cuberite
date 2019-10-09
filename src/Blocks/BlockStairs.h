@@ -8,11 +8,14 @@
 
 
 class cBlockStairsHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>;
+
 public:
-	cBlockStairsHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
+
+	cBlockStairsHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 
 	}
@@ -51,12 +54,6 @@ public:
 			case BLOCK_FACE_NONE: return false;
 		}
 		return true;
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)

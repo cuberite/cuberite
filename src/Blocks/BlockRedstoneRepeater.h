@@ -5,16 +5,22 @@
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
+#include "ClearMetaOnDrop.h"
 #include "../Chunk.h"
 
 
 
-class cBlockRedstoneRepeaterHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+
+
+class cBlockRedstoneRepeaterHandler:
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>;
+
 public:
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
+
+	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
@@ -40,12 +46,6 @@ public:
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
 	}
 
 	virtual bool IsUseable(void) override

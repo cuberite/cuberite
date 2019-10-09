@@ -2,22 +2,34 @@
 #pragma once
 
 #include "BlockHandler.h"
-
 #include <unordered_set>
+#include "ClearMetaOnDrop.h"
+#include "../Item.h"
 
 
+
+
+// fwd:
 class cWorld;
 
 
-class cBlockPistonHandler :
-	public cBlockHandler
+
+
+
+class cBlockPistonHandler:
+	public cClearMetaOnDrop<cBlockHandler>
 {
+	using super = cClearMetaOnDrop<cBlockHandler>;
+
 public:
+
 	cBlockPistonHandler(BLOCKTYPE a_BlockType);
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override;
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -174,23 +186,24 @@ private:
 
 
 
-class cBlockPistonHeadHandler :
+class cBlockPistonHeadHandler:
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using super = cBlockHandler;
 
 public:
 	cBlockPistonHeadHandler(void);
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override;
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// No pickups
 		// Also with 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...
+		return {};
 	}
 } ;
-
-
-
-

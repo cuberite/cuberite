@@ -10,9 +10,12 @@
 class cBlockSpongeHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
+
 	cBlockSpongeHandler(BLOCKTYPE a_BlockType):
-		cBlockHandler(a_BlockType)
+		super(a_BlockType)
 	{
 	}
 
@@ -20,13 +23,17 @@ public:
 
 
 
-	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	virtual void Check(
+		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
+		Vector3i a_RelPos,
+		cChunk & a_Chunk
+	) override
 	{
-		if (GetSoaked(Vector3i(a_RelX, a_RelY, a_RelZ), a_Chunk))
+		if (GetSoaked(a_RelPos, a_Chunk))
 		{
 			return;
 		}
-		cBlockHandler::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
+		super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
 	}
 
 
@@ -115,7 +122,7 @@ public:
 			}
 			Seeds.pop();
 		}
-		a_Chunk.SetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_SPONGE, E_META_SPONGE_WET);
+		a_Chunk.SetBlock(a_Rel, E_BLOCK_SPONGE, E_META_SPONGE_WET, true);
 		return true;
 	}
 

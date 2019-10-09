@@ -13,11 +13,13 @@
 class cBlockDoorHandler :
 	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
-	typedef cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
+	using super = cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>;
+
 public:
+
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override;
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 
@@ -54,56 +56,38 @@ public:
 
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override;
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		if ((a_BlockMeta & 0x08) != 0)  // is top part of door
+		// Top part of a door doesn't drop anything:
+		if ((a_BlockMeta & 0x08) != 0)
 		{
-			return;
+			return {};
 		}
+
 		switch (m_BlockType)
 		{
-			case E_BLOCK_OAK_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_WOODEN_DOOR);
-				break;
-			}
-			case E_BLOCK_ACACIA_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_ACACIA_DOOR);
-				break;
-			}
-			case E_BLOCK_BIRCH_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_BIRCH_DOOR);
-				break;
-			}
-			case E_BLOCK_DARK_OAK_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_DARK_OAK_DOOR);
-				break;
-			}
-			case E_BLOCK_JUNGLE_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_JUNGLE_DOOR);
-				break;
-			}
-			case E_BLOCK_SPRUCE_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_SPRUCE_DOOR);
-				break;
-			}
-			case E_BLOCK_IRON_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_IRON_DOOR);
-				break;
-			}
+			case E_BLOCK_OAK_DOOR:      return cItem(E_ITEM_WOODEN_DOOR);
+			case E_BLOCK_ACACIA_DOOR:   return cItem(E_ITEM_ACACIA_DOOR);
+			case E_BLOCK_BIRCH_DOOR:    return cItem(E_ITEM_BIRCH_DOOR);
+			case E_BLOCK_DARK_OAK_DOOR: return cItem(E_ITEM_DARK_OAK_DOOR);
+			case E_BLOCK_JUNGLE_DOOR:   return cItem(E_ITEM_JUNGLE_DOOR);
+			case E_BLOCK_SPRUCE_DOOR:   return cItem(E_ITEM_SPRUCE_DOOR);
+			case E_BLOCK_IRON_DOOR:     return cItem(E_ITEM_IRON_DOOR);
 			default:
 			{
 				ASSERT(!"Unhandled door type!");
-				break;
+				return {};
 			}
 		}
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{

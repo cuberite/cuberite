@@ -10,11 +10,14 @@
 
 
 class cBlockComparatorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>;
+
 public:
-	cBlockComparatorHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
+
+	cBlockComparatorHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
@@ -30,12 +33,6 @@ public:
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(E_ITEM_COMPARATOR, 1, 0));
 	}
 
 	virtual bool IsUseable(void) override

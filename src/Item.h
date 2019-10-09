@@ -20,6 +20,7 @@
 
 // fwd:
 class cItemHandler;
+class cItemGrid;
 class cColor;
 
 namespace Json
@@ -234,6 +235,14 @@ class cItems  // tolua_export
 	: public std::vector<cItem>
 {  // tolua_export
 public:
+
+	cItems(const cItems &) = default;
+	cItems(cItems &&) = default;
+	cItems & operator = (const cItems &) = default;
+
+	/** Constructs a new instance containing the specified item. */
+	cItems(cItem && a_InitialItem);
+
 	// tolua_begin
 
 	/** Need a Lua-accessible constructor */
@@ -253,6 +262,9 @@ public:
 	{
 		push_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
 	}
+
+	/** Adds a copy of all items in a_ItemGrid. */
+	void AddItemGrid(const cItemGrid & a_ItemGrid);
 
 	// tolua_end
 } ;  // tolua_export

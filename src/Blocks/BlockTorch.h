@@ -9,11 +9,14 @@
 
 
 class cBlockTorchHandler :
-	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>;
+
 public:
-	cBlockTorchHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>(a_BlockType)
+
+	cBlockTorchHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
@@ -180,12 +183,6 @@ public:
 		}
 
 		return CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face);
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Always drop meta = 0
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

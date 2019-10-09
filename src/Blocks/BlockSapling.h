@@ -11,17 +11,28 @@
 class cBlockSaplingHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
-	cBlockSaplingHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockSaplingHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		// Only the first 2 bits contain the display information and the 4th bit is for the growth indicator, but, we use 0x07 for forward compatibility
-		a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 0x07));
+		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
+		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{

@@ -8,13 +8,20 @@
 
 
 class cBlockHopperHandler :
-	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
+	using super = cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>;
+
 public:
-	cBlockHopperHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+
+	cBlockHopperHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -39,6 +46,10 @@ public:
 		return true;
 	}
 
+
+
+
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag.  Lowest three bits are position.  0x08 == 1000
@@ -53,11 +64,9 @@ public:
 		return a_Meta;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

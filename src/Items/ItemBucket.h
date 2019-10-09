@@ -114,6 +114,8 @@ public:
 
 
 
+
+
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
@@ -164,19 +166,15 @@ public:
 				// Plugin disagrees with the washing-away
 				return false;
 			}
-
-			cBlockHandler * Handler = BlockHandler(CurrentBlockType);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				Handler->DropBlock(ChunkInterface, *a_World, a_PluginInterface, a_Player, BlockPos.x, BlockPos.y, BlockPos.z);
-			}
+			a_World->DropBlockAsPickups(BlockPos, a_Player, nullptr);
 			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
 		// Place the actual fluid block:
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
+
+
 
 
 

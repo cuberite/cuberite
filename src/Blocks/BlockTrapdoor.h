@@ -9,24 +9,28 @@
 
 
 class cBlockTrapdoorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+
 public:
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>(a_BlockType)
+
+	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
