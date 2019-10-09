@@ -57,7 +57,7 @@ static const Vector3d & pickBranchDirection(Vector3i a_BlockPos, int a_Seq)
 		}
 	};
 
-	return directions[(static_cast<int>(a_BlockPos.SqrLength()) + a_Seq) % directions.size()];
+	return directions[(static_cast<size_t>(a_BlockPos.SqrLength()) + a_Seq) % directions.size()];
 }
 
 // BigO = a big ring of blocks, used for generating horz slices of treetops, the number indicates the radius
