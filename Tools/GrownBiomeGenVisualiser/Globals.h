@@ -70,6 +70,14 @@
 
 
 
+#ifndef TOLUA_TEMPLATE_BIND
+	#define TOLUA_TEMPLATE_BIND(x)
+#endif
+
+
+
+
+
 // Integral types with predefined sizes:
 typedef long long Int64;
 typedef int       Int32;
