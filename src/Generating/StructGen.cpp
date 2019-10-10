@@ -99,7 +99,7 @@ void cStructGenTrees::GenerateSingleTree(
 
 	sSetBlockVector TreeLogs, TreeOther;
 	GetTreeImageByBiome(
-		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
+		{ a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z },
 		m_Noise, a_Seq,
 		a_ChunkDesc.GetBiome(x, z),
 		TreeLogs, TreeOther

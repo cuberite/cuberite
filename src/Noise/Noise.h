@@ -25,6 +25,7 @@ public:
 	inline NOISE_DATATYPE IntNoise1D(int a_X) const;
 	inline NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
 	inline NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
+	inline NOISE_DATATYPE IntNoise3D(Vector3i a_Pos) const;
 
 	// Return a float number in the specified range:
 	inline NOISE_DATATYPE IntNoise2DInRange(int a_X, int a_Y, float a_Min, float a_Max) const
@@ -36,6 +37,7 @@ public:
 	inline int IntNoise1DInt(int a_X) const;
 	inline int IntNoise2DInt(int a_X, int a_Y) const;
 	inline int IntNoise3DInt(int a_X, int a_Y, int a_Z) const;
+	inline int IntNoise3DInt(Vector3i a_Pos) const;
 
 	NOISE_DATATYPE LinearNoise1D(NOISE_DATATYPE a_X) const;
 	NOISE_DATATYPE CosineNoise1D(NOISE_DATATYPE a_X) const;
@@ -218,6 +220,15 @@ NOISE_DATATYPE cNoise::IntNoise3D(int a_X, int a_Y, int a_Z) const
 
 
 
+NOISE_DATATYPE cNoise::IntNoise3D(Vector3i a_Pos) const
+{
+	return IntNoise3D(a_Pos.x, a_Pos.y, a_Pos.z);
+}
+
+
+
+
+
 int cNoise::IntNoise1DInt(int a_X) const
 {
 	int x = ((a_X * m_Seed) << 13) ^ a_X;
@@ -244,6 +255,15 @@ int cNoise::IntNoise3DInt(int a_X, int a_Y, int a_Z) const
 	int n = a_X + a_Y * 57 + a_Z * 57 * 57 + m_Seed * 57 * 57 * 57;
 	n = (n << 13) ^ n;
 	return ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
+}
+
+
+
+
+
+int cNoise::IntNoise3DInt(Vector3i a_Pos) const
+{
+	return IntNoise3DInt(a_Pos.x, a_Pos.y, a_Pos.z);
 }
 
 
