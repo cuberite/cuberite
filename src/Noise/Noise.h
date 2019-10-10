@@ -8,6 +8,7 @@
 /** The datatype used by all the noise generators. */
 typedef float NOISE_DATATYPE;
 
+#include "../Vector3.h"
 #include "OctavedNoise.h"
 #include "RidgedNoise.h"
 
