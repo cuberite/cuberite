@@ -97,9 +97,8 @@ SET (HDRS
 	BlockWorkbench.h
 	BroadcastInterface.h
 	ChunkInterface.h
-	ClearMetaOnDrop.h
 	GetHandlerCompileTimeTemplate.h
-	MetaRotator.h
+	Mixins.h
 	WorldInterface.h
 )
 

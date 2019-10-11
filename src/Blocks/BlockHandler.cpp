@@ -189,6 +189,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ACACIA_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:                return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_AIR:                           return new cBlockWithNoDrops<>          (a_BlockType);
 		case E_BLOCK_ANVIL:                         return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BEACON:                        return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_BED:                           return new cBlockBedHandler             (a_BlockType);
