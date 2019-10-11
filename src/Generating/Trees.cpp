@@ -495,7 +495,7 @@ Vector3d GetTreeBranch(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 		CurrentPos += Direction;
 		Direction += a_Direction;
 		Direction.Clamp(-1.0, 1.0);
-		a_LogBlocks.push_back(sSetBlock(FloorC(CurrentPos.x), FloorC(CurrentPos.y), FloorC(CurrentPos.z), a_BlockType, GetLogMetaFromDirection(a_BlockMeta, Direction)));
+		a_LogBlocks.push_back(sSetBlock(CurrentPos.Floor(), a_BlockType, GetLogMetaFromDirection(a_BlockMeta, Direction)));
 	}
 	return CurrentPos;
 }
