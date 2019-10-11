@@ -384,59 +384,137 @@ public:
 
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Sets the block at the specified coords to the specified value.
+	Full processing, incl. updating neighbors, is performed. */
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
+	}
 
 	/** Sets the block at the specified coords to the specified value.
-	The replacement doesn't trigger block updates.
-	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block). */
+	The replacement doesn't trigger block updates, nor wake up simulators.
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
+	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		m_ChunkMap->FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
+	}
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Sets the block at the specified coords to the specified value.
+	The replacement doesn't trigger block updates, nor wake up simulators.
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
 	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		m_ChunkMap->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+		return FastSetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
 	}
 
-	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ)
+	/** Returns the block type at the specified position.
+	Returns 0 if the chunk is not valid. */
+	BLOCKTYPE GetBlock(Vector3i a_BlockPos)
 	{
-		return m_ChunkMap->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		return m_ChunkMap->GetBlock(a_BlockPos);
 	}
 
-	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ)
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Returns the block type at the specified position.
+	Returns 0 if the chunk is not valid. */
+	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return m_ChunkMap->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		return m_ChunkMap->GetBlock({a_BlockX, a_BlockY, a_BlockZ});
 	}
 
-	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
-	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Returns the block meta at the specified position.
+	Returns 0 if the chunk is not valid. */
+	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos)
+	{
+		return m_ChunkMap->GetBlockMeta(a_BlockPos);
+	}
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Returns the block meta at the specified position.
+	Returns 0 if the chunk is not valid. */
+	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return m_ChunkMap->GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+	}
+
+	/** Sets the meta for the specified block, while keeping the blocktype.
+	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
+	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
+	Ignored if the chunk is invalid. */
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Sets the meta for the specified block, while keeping the blocktype.
+	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
+	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
+	Ignored if the chunk is invalid. */
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	{
+		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	}
+
+	/** Returns the sky light value at the specified block position.
+	The sky light is "raw" - not affected by time-of-day.
+	Returns 0 if chunk not valid. */
+	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Returns the sky light value at the specified block position.
+	The sky light is "raw" - not affected by time-of-day.
+	Returns 0 if chunk not valid. */
+	NIBBLETYPE GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return GetBlockSkyLight({a_BlockX, a_BlockY, a_BlockZ});
+	}
+
+	/** Returns the block-light value at the specified block position.
+	Returns 0 if chunk not valid. */
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Returns the block-light value at the specified block position.
+	Returns 0 if chunk not valid. */
+	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return GetBlockBlockLight({a_BlockX, a_BlockY, a_BlockZ});
+	}
 
 	// tolua_end
 
 	/** Retrieves the block type and meta at the specified coords.
 	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present. */
-	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // TODO: Export in ManualBindings_World.cpp
+	Returns true if successful, false if chunk not present.
+	TODO: Export in ManualBindings_World.cpp. */
+	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 
 	/** OBSOLETE, use the Vector3i-based overload instead.
 	Retrieves the block type and meta at the specified coords.
 	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present. */
-	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)  // Exported in ManualBindings_World.cpp
+	Returns true if successful, false if chunk not present.
+	Exported in ManualBindings_World.cpp. */
+	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 	{
 		return GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
 	}
 
-	bool GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);  // Exported in ManualBindings.cpp
+	/** Queries the whole block specification from the world.
+	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
+	Exported in ManualBindings_World.cpp. */
+	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+
+	/** Queries the whole block specification from the world.
+	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
+	Exported in ManualBindings_World.cpp. */
+	bool GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+	{
+		return GetBlockInfo({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+	}
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
-
-	// tolua_begin
-
-	// Vector3i variants:
-	void       FastSetBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta); }
-	BLOCKTYPE  GetBlock    (Vector3i a_Pos) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z); }
-	NIBBLETYPE GetBlockMeta(Vector3i a_Pos) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z); }
-	void       SetBlockMeta(Vector3i a_Pos, NIBBLETYPE a_MetaData) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData); }
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_Pos) { return GetBlockBlockLight( a_Pos.x, a_Pos.y, a_Pos.z); }
-	// tolua_end
 
 	/** Writes the block area into the specified coords.
 	Returns true if all chunks have been processed.
@@ -718,21 +796,54 @@ public:
 	Returns false if the chunk isn't loaded, otherwise returns the same value as the callback */
 	bool DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback);
 
-	void GrowTreeImage(const sSetBlockVector & a_Blocks);
+	/** Imprints the specified blocks into the world, as long as each log block replaces only allowed blocks.
+	a_Blocks specifies the logs, leaves, vines and possibly other blocks that comprise a single tree.
+	Returns true if the tree is imprinted successfully, false otherwise. */
+	bool GrowTreeImage(const sSetBlockVector & a_Blocks);
 
 	// tolua_begin
 
-	/** Grows a tree at the specified coords, either from a sapling there, or based on the biome */
-	void GrowTree           (int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Grows a tree at the specified coords.
+	If the specified block is a sapling, the tree is grown from that sapling.
+	Otherwise a tree is grown based on the biome.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
+	bool GrowTree(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/** Grows a tree at the specified coords, based on the sapling meta provided */
-	void GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	/** Grows a tree at the specified coords, based on the sapling meta provided.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
+	bool GrowTreeFromSapling(Vector3i a_BlockPos, NIBBLETYPE a_SaplingMeta)
+	{
+		// TODO: Change the implementation to use Vector3i, once cTree uses Vector3i-based functions
+		return GrowTreeFromSapling(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_SaplingMeta);
+	}
 
-	/** Grows a tree at the specified coords, based on the biome in the place */
-	void GrowTreeByBiome    (int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Grows a tree at the specified coords, based on the sapling meta provided.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
+	bool GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
 
-	/** Grows the plant at the specified block to its ripe stage (bonemeal used); returns false if the block is not growable. If a_IsBonemeal is true, block is not grown if not allowed in world.ini */
-	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false);
+	/** Grows a tree at the specified coords, based on the biome in the place.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
+	bool GrowTreeByBiome(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Grows the plant at the specified position by at most a_NumStages.
+	The block's Grow handler is invoked.
+	Returns the number of stages the plant has grown, 0 if not a plant. */
+	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
+
+	/** Grows the plant at the specified block to its ripe stage.
+	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
+	bool GrowRipePlant(Vector3i a_BlockPos);
+
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Grows the plant at the specified block to its ripe stage.
+	a_IsByBonemeal is obsolete, do not use.
+	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
+	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false)
+	{
+		UNUSED(a_IsByBonemeal);
+		return GrowRipePlant({a_BlockX, a_BlockY, a_BlockZ});
+	}
 
 	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
 	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);

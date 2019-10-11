@@ -136,10 +136,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-	if (Chunk == nullptr)
+	auto relPos = a_Chunk.AbsoluteToRelative(GetPosition());
+	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
+	if (chunk == nullptr)
 	{
 		// Inside an unloaded chunk, bail out all processing
 		return;
@@ -147,12 +146,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BLOCKTYPE InsideType;
 	NIBBLETYPE InsideMeta;
-	Chunk->GetBlockTypeMeta(RelPosX, PosY, RelPosZ, InsideType, InsideMeta);
+	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
 
 	if (!IsBlockRail(InsideType))
 	{
 		// When a descending minecart hits a flat rail, it goes through the ground; check for this
-		Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);
+		chunk->GetBlockTypeMeta(relPos.addedY(1), InsideType, InsideMeta);
 		if (IsBlockRail(InsideType))
 		{
 			// Push cart upwards
@@ -192,12 +191,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
-		super::HandlePhysics(a_Dt, *Chunk);
+		super::HandlePhysics(a_Dt, *chunk);
 	}
 
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 		m_bIsOnDetectorRail = false;
 	}
 	else if (WasDetectorRail)

@@ -75,7 +75,7 @@ public:
 
 
 
-	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, const Vector3i & a_BedPosition, bool a_IsOccupied)
+	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, Vector3i a_BedPosition, bool a_IsOccupied)
 	{
 		auto Meta = a_ChunkInterface.GetBlockMeta(a_BedPosition);
 		if (a_IsOccupied)
@@ -87,7 +87,7 @@ public:
 			Meta &= 0x0b;  // Clear the "occupied" bit of the bed's block
 		}
 
-		a_ChunkInterface.SetBlockMeta(a_BedPosition.x, a_BedPosition.y, a_BedPosition.z, Meta);
+		a_ChunkInterface.SetBlockMeta(a_BedPosition, Meta);
 	}
 
 

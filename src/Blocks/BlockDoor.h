@@ -141,6 +141,10 @@ public:
 		return false;
 	}
 
+
+
+
+
 	/** Converts the player's yaw to placed door's blockmeta */
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
@@ -169,6 +173,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
 	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
 	{
@@ -180,6 +188,10 @@ public:
 			default: return Vector3i( 0, 0,  1);  // Facing South / ZP
 		}
 	}
+
+
+
+
 
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
@@ -203,6 +215,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Returns true iff the door at the specified coords is open.
 	The coords may point to either the top part or the bottom part of the door. */
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -210,6 +226,10 @@ public:
 		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 		return ((Meta & 0x04) != 0);
 	}
+
+
+
+
 
 	/** Returns the complete meta composed from the both parts of the door as (TopMeta << 4) | BottomMeta
 	The coords may point to either part of the door.
@@ -243,6 +263,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
@@ -264,23 +288,31 @@ public:
 		if ((Meta & 0x08) == 0)
 		{
 			// The block is the bottom part of the door
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, NewMeta);
+			a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, NewMeta);
 		}
 		else
 		{
 			// The block is the top part of the door, set the meta to the corresponding top part
 			if (a_BlockY > 0)
 			{
-				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
+				a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY - 1, a_BlockZ}, NewMeta);
 			}
 		}
 	}
+
+
+
+
 
 	/** Changes the door at the specified coords from open to close or vice versa */
 	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		SetOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, !IsOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

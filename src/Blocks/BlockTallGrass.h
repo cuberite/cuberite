@@ -8,6 +8,7 @@
 
 
 
+/** Handles the grass that is 1 block tall */
 class cBlockTallGrassHandler:
 	public cBlockHandler
 {
@@ -62,6 +63,30 @@ public:
 
 		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 		return IsBlockTypeOfDirt(BelowBlock);
+	}
+
+
+
+
+
+	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	{
+		if (a_RelPos.y > (cChunkDef::Height - 2))
+		{
+			return 0;
+		}
+		auto blockMeta = a_Chunk.GetMeta(a_RelPos);
+		NIBBLETYPE largeFlowerMeta;
+		switch (blockMeta)
+		{
+			case E_META_TALL_GRASS_GRASS: largeFlowerMeta = E_META_BIG_FLOWER_DOUBLE_TALL_GRASS; break;
+			case E_META_TALL_GRASS_FERN:  largeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
+			default:                      return 0;
+		}
+		a_Chunk.SetBlock(a_RelPos,           E_BLOCK_BIG_FLOWER, largeFlowerMeta);
+		a_Chunk.SetBlock(a_RelPos.addedY(1), E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		return 1;
 	}
 
 

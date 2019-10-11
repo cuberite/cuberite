@@ -61,15 +61,32 @@ public:
 
 	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
 
+
 	bool operator == (const cChunkCoords & a_Other) const
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
 
+
 	bool operator != (const cChunkCoords & a_Other) const
 	{
 		return !(operator == (a_Other));
 	}
+
+
+	/** Simple comparison, to support ordering. */
+	bool operator < (const cChunkCoords & a_Other) const
+	{
+		if (a_Other.m_ChunkX == m_ChunkX)
+		{
+			return (m_ChunkZ < a_Other.m_ChunkZ);
+		}
+		else
+		{
+			return (m_ChunkX < a_Other.m_ChunkX);
+		}
+	}
+
 
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
@@ -152,23 +169,44 @@ public:
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
 
+
+
+
+
+	/** Converts the specified absolute position into a relative position within its chunk.
+	Use BlockToChunk to query the chunk coords. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition)
 	{
-		cChunkCoords ChunckPos = BlockToChunk(a_BlockPosition);
-
-		return {a_BlockPosition.x - ChunckPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - ChunckPos.m_ChunkZ * Width};
+		cChunkCoords chunkPos = BlockToChunk(a_BlockPosition);
+		return AbsoluteToRelative(a_BlockPosition, chunkPos);
 	}
 
+
+
+
+
+	/** Converts the absolute coords into coords relative to the specified chunk. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
 	{
 		return {a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width};
 	}
 
+
+
+
 	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
-	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, cChunkCoords a_ChunkCoords)
 	{
-		return {a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width};
+		return Vector3i(
+			a_RelBlockPosition.x + a_ChunkCoords.m_ChunkX * Width,
+			a_RelBlockPosition.y,
+			a_RelBlockPosition.z + a_ChunkCoords.m_ChunkZ * Width
+		);
 	}
+
+
+
+
 
 	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
 	inline static bool IsValidHeight(int a_Height)

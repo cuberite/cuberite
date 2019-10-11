@@ -299,7 +299,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 	// Convert coords to relative:
 	auto relCoord = a_Chunk.AbsoluteToRelative(out.second);
-	auto destChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relCoord.x, relCoord.z);
+	auto destChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relCoord);
 	if (destChunk == nullptr)
 	{
 		// The destination chunk has been unloaded, don't tick
@@ -379,7 +379,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 	for (const auto & ofs: neighborOfs)
 	{
 		auto neighborRelCoord = ofs.addedXZ(m_RelX, m_RelZ);
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(neighborRelCoord.x, neighborRelCoord.z);
+		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(neighborRelCoord);
 		if (neighbor == nullptr)
 		{
 			continue;
@@ -543,7 +543,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 	for (const auto & ofs: neighborOfs)
 	{
 		auto otherHalfRelCoord = relCoord + ofs;
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord.x, otherHalfRelCoord.z);
+		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
 		if (neighbor == nullptr)
 		{
 			continue;

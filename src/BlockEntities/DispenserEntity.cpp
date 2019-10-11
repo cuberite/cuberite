@@ -28,7 +28,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	Vector3i dispRelCoord(GetRelPos());
 	auto meta = a_Chunk.GetMeta(dispRelCoord);
 	AddDropSpenserDir(dispRelCoord, meta);
-	auto dispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(dispRelCoord.x, dispRelCoord.z);
+	auto dispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(dispRelCoord);
 	if (dispChunk == nullptr)
 	{
 		// Would dispense into / interact with a non-loaded chunk, ignore the tick
