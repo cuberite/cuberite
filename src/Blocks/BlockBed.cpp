@@ -99,7 +99,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					PillowDirection = MetaDataToDirection(Meta & 0x3);
 					if (a_ChunkInterface.GetBlock(Coords + PillowDirection) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
-						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, Vector3i{ a_BlockX, a_BlockY, a_BlockZ } + PillowDirection);
+						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, Vector3i{a_BlockX, a_BlockY, a_BlockZ} + PillowDirection);
 					}
 				}
 
@@ -127,7 +127,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 						}
 					);
 					a_WorldInterface.SetTimeOfDay(0);
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
+					a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
 			}
 		}

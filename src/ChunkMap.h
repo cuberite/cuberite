@@ -123,23 +123,35 @@ public:
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
 	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
-	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/** Sets the block at the specified coords to the specified value.
+	The replacement doesn't trigger block updates, nor wake up simulators.
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block).
+	If the chunk is invalid, the operation is ignored silently. */
+	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
 	Is more efficient than calling SetBlock() multiple times.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
 	void SetBlocks(const sSetBlockVector & a_Blocks);
 
-	void      CollectPickupsByPlayer(cPlayer & a_Player);
+	/** Makes the specified player collect all the pickups around them. */
+	void CollectPickupsByPlayer(cPlayer & a_Player);
 
-	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
-	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
+	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos);
+	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos);
+	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos);
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
+
+	/** Sets the meta for the specified block, while keeping the blocktype.
+	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
+	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
+	Ignored if the chunk is invalid. */
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
+
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
 	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
 	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
@@ -350,17 +362,10 @@ public:
 	/** Returns the number of valid chunks and the number of dirty chunks */
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew */
-	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
-
-	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
-	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
-
-	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
-	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
-
-	/** Grows a tall grass present at the block specified to a two tall grass; returns true if the grass grew */
-	bool GrowTallGrass(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Grows the plant at the specified position by at most a_NumStages.
+	The block's Grow handler is invoked.
+	Returns the number of stages the plant has grown, 0 if not a plant. */
+	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
 
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -389,7 +394,7 @@ public:
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
 	/** Queues the specified block for ticking (block update) */
-	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void QueueTickBlock(Vector3i a_AbsPos);
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSChunks; }
@@ -482,7 +487,14 @@ private:
 	}
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);
+	cChunkPtr GetChunkNoLoad(cChunkCoords a_Coords);
+
+	/** OBSOLETE, use the cChunkCoords-based overload instead.
+	Constructs a chunk, returning it. Doesn't load, doesn't generate */
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ)
+	{
+		return GetChunkNoLoad({a_ChunkX, a_ChunkZ});
+	}
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);

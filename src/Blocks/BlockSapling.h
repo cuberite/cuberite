@@ -39,6 +39,10 @@ public:
 		return (a_RelY > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
 	}
 
+
+
+
+
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
@@ -62,6 +66,10 @@ public:
 			}
 		}
 	}
+
+
+
+
 
 	bool CanGrowAt(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
@@ -149,8 +157,6 @@ public:
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ + 1, check);
 		CanGrow = CanGrow && cBlockInfo::IsTransparent(check);
 
-
-
 		while (CheckHeight && CanGrow)
 		{
 			check = a_Chunk.GetBlock(a_RelX, a_RelY + CheckHeight, a_RelZ);
@@ -175,7 +181,51 @@ public:
 		return CanGrow;
 	}
 
+
+
+
+
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	{
+		auto blockMeta = a_Chunk.GetMeta(a_RelPos);
+		auto typeMeta = blockMeta & 0x07;
+		auto growState = blockMeta >> 3;
+		int res = 0;
+
+		// Try to increase the sapling's growState:
+		if (growState < 1)
+		{
+			++growState;
+			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(growState << 3 | typeMeta));
+			if (a_NumStages == 1)
+			{
+				// Only asked to grow one stage, which we did. Bail out.
+				return 1;
+			}
+			res = 1;
+		}
+
+		// The sapling is grown, now it becomes a tree:
+		a_Chunk.GetWorld()->GrowTreeFromSapling(a_Chunk.RelativeToAbsolute(a_RelPos), blockMeta);
+		return res + 1;
+	}
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 7;
+	}
+
+
+
+
+
 private:
+
 	bool IsLargeTree(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		BLOCKTYPE type;
@@ -191,12 +241,6 @@ private:
 		LargeTree = LargeTree && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
 
 		return LargeTree;
-	}
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
-	{
-		UNUSED(a_Meta);
-		return 7;
 	}
 } ;
 

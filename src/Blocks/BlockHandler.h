@@ -200,6 +200,10 @@ public:
 	Returns block meta following rotation */
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) { return a_Meta; }
 
+	/** Grows this block, if it supports growing, by the specified amount of stages (at most).
+	Returns the number of stages actually grown, zero if not supported (default). */
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) { return 0; }
+
 	/** Returns true if the specified tool is valid and has a non-zero silk-touch enchantment.
 	Helper used in many ConvertToPickups() implementations. */
 	static bool ToolHasSilkTouch(const cItem * a_Tool);

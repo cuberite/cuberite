@@ -39,7 +39,7 @@ public:
 		// Set p the ON bit to on
 		Meta |= 0x08;
 
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta, false);
+		a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta, false);
 		a_WorldInterface.WakeUpSimulators(Pos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
 

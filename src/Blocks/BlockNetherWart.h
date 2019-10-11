@@ -42,17 +42,22 @@ public:
 
 
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		if ((Meta < 3) && (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth))
+		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
+		auto meta = std::min(oldMeta + a_NumStages, 3);
+		if ((oldMeta < 3) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
 		{
-			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, ++Meta);
+			a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(meta));
+			return meta - oldMeta;
 		}
-		else if (Meta > 3)  // In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
+
+		// In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
+		if (oldMeta > 3)
 		{
-			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_NETHER_WART, 3);
+			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, 3);
 		}
+		return 0;
 	}
 
 

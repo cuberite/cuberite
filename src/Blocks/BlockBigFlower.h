@@ -11,13 +11,18 @@
 class cBlockBigFlowerHandler :
 	public cBlockHandler
 {
-public:
-	typedef cBlockHandler super;
+	using super = cBlockHandler;
 
-	cBlockBigFlowerHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+public:
+
+	cBlockBigFlowerHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{

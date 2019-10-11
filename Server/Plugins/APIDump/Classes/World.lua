@@ -2066,7 +2066,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight()). Returns the amount of blocks the cactus grew inside this call.",
+				Notes = "OBSOLETE, use GrowPlantAt instead. Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight()). Returns the amount of blocks the cactus grew inside this call.",
 			},
 			GrowMelonPumpkin =
 			{
@@ -2095,36 +2095,71 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Grows a melon or pumpkin, based on the stem block type specified (assumed to be at the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below. Returns true if the melon or pumpkin grew successfully.",
+				Notes = "OBSOLETE, use GrowPlantAt instead. Grows a melon or pumpkin, based on the stem block type specified (assumed to be at the coords provided). Checks for normal melon / pumpkin growth conditions - stem not having another produce next to it and suitable ground below. Returns true if the melon or pumpkin grew successfully.",
 			},
-			GrowRipePlant =
+			GrowPlantAt =
 			{
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 					{
-						Name = "BlockY",
+						Name = "NumStages",
 						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "IsByBonemeal",
-						Type = "boolean",
 					},
 				},
 				Returns =
 				{
 					{
-						Type = "boolean",
+						Type = "number",
 					},
 				},
-				Notes = "Grows the plant at the specified coords. If IsByBonemeal is true, checks first if the specified plant type is bonemealable in the settings. Returns true if the plant was grown, false if not.",
+				Notes = "Grows the plant at the specified block by the specified number of stages. Returns the number of stages actually grown. Returns zero for non-growable blocks.",
+			},
+			GrowRipePlant =
+			{
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "OBSOLETE, use the Vector3-based overload instead. Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
+				},
+				{
+					Params =
+					{
+						{
+							Name = "BlockPos",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
+				},
 			},
 			GrowSugarcane =
 			{
@@ -2153,7 +2188,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight()). Returns the amount of blocks the sugarcane grew inside this call.",
+				Notes = "OBSOLETE, use GrowPlantAt instead. Grows a sugarcane block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum sugarcane growth (GetMaxSugarcaneHeight()). Returns the amount of blocks the sugarcane grew inside this call.",
 			},
 			GrowTree =
 			{

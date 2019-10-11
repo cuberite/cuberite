@@ -90,24 +90,21 @@ public:
 
 
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-
-		// Check to see if the plant can grow
-		auto Action = CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
-
-		// If there is still room to grow and the plant can grow, then grow.
-		// Otherwise if the plant needs to die, then dig it up
-		if ((Meta < RipeMeta) && (Action == paGrowth))
+		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
+		if (oldMeta >= RipeMeta)
 		{
-			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++Meta);
+			// Already ripe
+			return 0;
 		}
-		else if (Action == paDeath)
-		{
-			a_Chunk.GetWorld()->DigBlock(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width);
-		}
+		auto newMeta = std::min<int>(oldMeta + a_NumStages, RipeMeta);
+		ASSERT(newMeta > oldMeta);
+		a_Chunk.GetWorld()->SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), m_BlockType, static_cast<NIBBLETYPE>(newMeta));
+		return newMeta - oldMeta;
 	}
+
+
 
 
 
