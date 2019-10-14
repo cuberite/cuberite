@@ -2732,16 +2732,8 @@ cBlockEntity * cBlockArea::GetBlockEntityRel(Vector3i a_RelPos)
 	{
 		return nullptr;
 	}
-
-	auto idx = MakeIndex(a_RelPos);
-	for (const auto & be: *m_BlockEntities)
-	{
-		if (be.first == idx)
-		{
-			return be.second;
-		}
-	}
-	return nullptr;
+	auto itr = m_BlockEntities->find(MakeIndex(a_RelPos));
+	return (itr == m_BlockEntities->end()) ? nullptr : itr->second;
 }
 
 

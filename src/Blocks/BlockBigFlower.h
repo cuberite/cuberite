@@ -53,24 +53,25 @@ public:
 			return {};  // No drops from the top part
 		}
 
-		// With shears, drop self (tall grass and fern only?):
+		// With shears, drop self (even tall grass and fern):
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
 			// Bit 0x08 specifies whether this is a top part or bottom; cut it off from the pickup:
 			return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
 		}
 
-		auto meta = a_BlockMeta & 0x07;
-		if (meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
+		// Tall grass drops seeds, large fern drops nothing, others drop self:
+		auto flowerType = a_BlockMeta & 0x07;
+		if (flowerType == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
 			if (GetRandomProvider().RandBool(1.0 / 24.0))
 			{
 				return cItem(E_ITEM_SEEDS);
 			}
 		}
-		else if (meta != E_META_BIG_FLOWER_LARGE_FERN)
+		else if (flowerType != E_META_BIG_FLOWER_LARGE_FERN)
 		{
-			return cItem(E_BLOCK_BIG_FLOWER, 1, static_cast<short>(meta));
+			return cItem(m_BlockType, 1, static_cast<short>(flowerType));
 		}
 		return {};
 	}

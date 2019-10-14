@@ -52,7 +52,7 @@ public:
 		cItems res(cItem(m_BlockType, 1));
 		if (a_BlockEntity != nullptr)
 		{
-			auto be = reinterpret_cast<cDropSpenserEntity *>(a_BlockEntity);
+			auto be = static_cast<cDropSpenserEntity *>(a_BlockEntity);
 			res.AddItemGrid(be->GetContents());
 		}
 		return res;

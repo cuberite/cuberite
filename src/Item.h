@@ -239,6 +239,7 @@ public:
 	cItems(const cItems &) = default;
 	cItems(cItems &&) = default;
 	cItems & operator = (const cItems &) = default;
+	cItems & operator = (cItems &&) = default;
 
 	/** Constructs a new instance containing the specified item. */
 	cItems(cItem && a_InitialItem);
