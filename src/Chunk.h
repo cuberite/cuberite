@@ -152,7 +152,7 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients);
+	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
 	/** Queues block for ticking (m_ToTickQueue) */

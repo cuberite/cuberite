@@ -40,7 +40,7 @@ bool cChunkInterface::GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, 
 
 void cChunkInterface::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta, true);
+	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 }
 
 

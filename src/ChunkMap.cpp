@@ -479,7 +479,7 @@ void cChunkMap::SetBlocks(const sSetBlockVector & a_Blocks)
 		// If the chunk is valid, set the block:
 		if (chunk != nullptr)
 		{
-			chunk->SetBlock({block.m_RelX, block.m_RelY, block.m_RelZ}, block.m_BlockType, block.m_BlockMeta, true);
+			chunk->SetBlock({block.m_RelX, block.m_RelY, block.m_RelZ}, block.m_BlockType, block.m_BlockMeta);
 		}
 	}  // for block - a_Blocks[]
 }
@@ -609,7 +609,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
@@ -623,7 +623,7 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 		GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
 		cChunkInterface ChunkInterface(this);
 		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
-		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta, a_SendToClients);
+		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
 		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
 	}
@@ -684,7 +684,7 @@ void cChunkMap::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_Filt
 		Vector3i relPos(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 		if (chunk->GetBlock(relPos) == a_FilterBlockType)
 		{
-			chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
+			chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
 		}
 	}
 }
@@ -708,7 +708,7 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 		{
 			CASE_TREE_OVERWRITTEN_BLOCKS:
 			{
-				chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
+				chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
 				break;
 			}
 			case E_BLOCK_LEAVES:
@@ -716,7 +716,7 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 			{
 				if ((itr->m_BlockType == E_BLOCK_LOG) || (itr->m_BlockType == E_BLOCK_NEW_LOG))
 				{
-					chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta, true);
+					chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
 				}
 				break;
 			}
@@ -845,7 +845,7 @@ bool cChunkMap::DigBlock(Vector3i a_BlockPos)
 			return false;
 		}
 
-		destChunk->SetBlock(relPos, E_BLOCK_AIR, 0, true);
+		destChunk->SetBlock(relPos, E_BLOCK_AIR, 0);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, destChunk);
 	}
 	return true;

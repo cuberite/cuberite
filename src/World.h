@@ -383,14 +383,12 @@ public:
 	// tolua_begin
 
 	/** Sets the block at the specified coords to the specified value.
-	Full processing, incl. updating neighbors, is performed.
-	*/
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
+	Full processing, incl. updating neighbors, is performed. */
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates.
-	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block)
-	*/
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block). */
 	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		m_ChunkMap->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);

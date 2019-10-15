@@ -187,10 +187,10 @@ public:
 				{
 					a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
 				}
-				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0, true);
+				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 				return;
 			}
-			a_Chunk.SetBlock(a_RelPos, m_BlockType, Common, true);
+			a_Chunk.SetBlock(a_RelPos, m_BlockType, Common);
 		}
 		else
 		{

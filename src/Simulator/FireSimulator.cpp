@@ -129,7 +129,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		// Randomly burn out the fire if it is raining:
 		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
-			a_Chunk->SetBlock({x, y, z}, E_BLOCK_AIR, 0, true);
+			a_Chunk->SetBlock({x, y, z}, E_BLOCK_AIR, 0);
 			itr = Data.erase(itr);
 			continue;
 		}
@@ -157,7 +157,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block",
 				a_Chunk->PositionToWorldPosition({itr->x, itr->y, itr->z})
 			);
-			a_Chunk->SetBlock({x, y, z}, E_BLOCK_AIR, 0, true);
+			a_Chunk->SetBlock({x, y, z}, E_BLOCK_AIR, 0);
 			RemoveFuelNeighbors(a_Chunk, x, y, z);
 			itr = Data.erase(itr);
 			continue;
@@ -314,7 +314,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
 		// SetBlock just to make sure fire doesn't spawn
-		a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0, true);
+		a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0);
 		return 0;
 	}
 	return static_cast<int>(m_BurnStepTimeNonfuel);
@@ -403,18 +403,18 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		if (BlockType == E_BLOCK_TNT)
 		{
 			m_World.SpawnPrimedTNT({static_cast<double>(AbsX), static_cast<double>(Y), static_cast<double>(AbsZ)}, 0);
-			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_AIR, 0, true);
+			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_AIR, 0);
 			return;
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
 		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
 		{
-			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_FIRE, 0, true);
+			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_FIRE, 0);
 		}
 		else
 		{
-			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_AIR, 0, true);
+			Neighbour->SetBlock({X, Y, Z}, E_BLOCK_AIR, 0);
 		}
 	}  // for i - Coords[]
 }

@@ -35,7 +35,7 @@ void cVaporizeFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 		(blockType == m_StationaryFluidBlock)
 	)
 	{
-		a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0, true);
+		a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
 		World::GetBroadcastInterface(m_World).BroadcastSoundEffect(
 			"block.fire.extinguish",
 			Vector3d(a_Block),

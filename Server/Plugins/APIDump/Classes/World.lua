@@ -2741,13 +2741,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Name = "BlockMeta",
 						Type = "number",
 					},
-					{
-						Name = "ShouldSendToClients",
-						Type = "boolean",
-						IsOptional = true,
-					},
 				},
-				Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances. If ShouldSendToClients is true (default), the change is broadcast to all players who have this chunk loaded; if false, the change is made server-side only.",
+				Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances.",
 			},
 			SetBlockMeta =
 			{

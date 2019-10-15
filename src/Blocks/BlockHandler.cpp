@@ -557,7 +557,7 @@ void cBlockHandler::Check(
 		}
 		else
 		{
-			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0, true);
+			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 		}
 	}
 	else

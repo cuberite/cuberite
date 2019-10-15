@@ -943,11 +943,11 @@ void cChunk::ApplyWeatherToTop()
 	}
 	else if (cBlockInfo::IsSnowable(TopBlock) && (Height < cChunkDef::Height - 1))
 	{
-		SetBlock({X, Height + 1, Z}, E_BLOCK_SNOW, 0, true);
+		SetBlock({X, Height + 1, Z}, E_BLOCK_SNOW, 0);
 	}
 	else if (IsBlockWater(TopBlock) && (TopMeta == 0))
 	{
-		SetBlock({X, Height, Z}, E_BLOCK_ICE, 0, true);
+		SetBlock({X, Height, Z}, E_BLOCK_ICE, 0);
 	}
 	else if (
 		(m_World->IsDeepSnowEnabled()) &&
@@ -959,7 +959,7 @@ void cChunk::ApplyWeatherToTop()
 		)
 	)
 	{
-		SetBlock({X, Height, Z}, E_BLOCK_SNOW, 0, true);
+		SetBlock({X, Height, Z}, E_BLOCK_SNOW, 0);
 	}
 }
 
@@ -1359,7 +1359,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 		// The chunk is not available, bail out
 		return false;
 	}
-	Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta, true);
+	Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
 	return true;
 }
 
@@ -1536,9 +1536,9 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 
 
 
-void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta, a_SendToClients);
+	FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 
 	// Tick this block and its neighbors:
 	m_ToTickBlocks.push_back(a_RelPos);

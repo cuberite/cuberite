@@ -60,7 +60,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 				{
 					if (ScoopUpLiquid(a_SlotNum, E_ITEM_WATER_BUCKET))
 					{
-						dispChunk->SetBlock(dispRelCoord, E_BLOCK_AIR, 0, true);
+						dispChunk->SetBlock(dispRelCoord, E_BLOCK_AIR, 0);
 					}
 					break;
 				}
@@ -69,7 +69,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 				{
 					if (ScoopUpLiquid(a_SlotNum, E_ITEM_LAVA_BUCKET))
 					{
-						dispChunk->SetBlock(dispRelCoord, E_BLOCK_AIR, 0, true);
+						dispChunk->SetBlock(dispRelCoord, E_BLOCK_AIR, 0);
 					}
 					break;
 				}
@@ -87,7 +87,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			LOGD("Dispensing water bucket in slot %d; dispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(dispBlock).c_str(), dispBlock);
 			if (EmptyLiquidBucket(dispBlock, a_SlotNum))
 			{
-				dispChunk->SetBlock(dispRelCoord, E_BLOCK_WATER, 0, true);
+				dispChunk->SetBlock(dispRelCoord, E_BLOCK_WATER, 0);
 			}
 			else
 			{
@@ -101,7 +101,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			LOGD("Dispensing lava bucket in slot %d; dispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(dispBlock).c_str(), dispBlock);
 			if (EmptyLiquidBucket(dispBlock, a_SlotNum))
 			{
-				dispChunk->SetBlock(dispRelCoord, E_BLOCK_LAVA, 0, true);
+				dispChunk->SetBlock(dispRelCoord, E_BLOCK_LAVA, 0);
 			}
 			else
 			{
@@ -137,7 +137,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			// Spawn fire if the block in front is air.
 			if (dispBlock == E_BLOCK_AIR)
 			{
-				dispChunk->SetBlock(dispRelCoord, E_BLOCK_FIRE, 0, true);
+				dispChunk->SetBlock(dispRelCoord, E_BLOCK_FIRE, 0);
 
 				bool ItemBroke = m_Contents.DamageItem(a_SlotNum, 1);
 

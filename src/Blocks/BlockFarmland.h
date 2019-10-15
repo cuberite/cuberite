@@ -66,7 +66,7 @@ public:
 			}
 			default:
 			{
-				a_Chunk.SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_DIRT, 0, true);
+				a_Chunk.SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_DIRT, 0);
 				break;
 			}
 		}

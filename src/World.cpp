@@ -2173,9 +2173,9 @@ void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 
 
 
-void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta, a_SendToClients);
+	m_ChunkMap->SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
 }
 
 

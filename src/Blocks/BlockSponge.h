@@ -122,7 +122,7 @@ public:
 			}
 			Seeds.pop();
 		}
-		a_Chunk.SetBlock(a_Rel, E_BLOCK_SPONGE, E_META_SPONGE_WET, true);
+		a_Chunk.SetBlock(a_Rel, E_BLOCK_SPONGE, E_META_SPONGE_WET);
 		return true;
 	}
 

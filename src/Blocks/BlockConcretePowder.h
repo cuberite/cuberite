@@ -69,7 +69,7 @@ public:
 		{
 			NIBBLETYPE BlockMeta;
 			BlockMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
-			a_Chunk.SetBlock(a_Rel, E_BLOCK_CONCRETE, BlockMeta, true);
+			a_Chunk.SetBlock(a_Rel, E_BLOCK_CONCRETE, BlockMeta);
 			return true;
 		}
 		return false;
