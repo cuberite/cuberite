@@ -152,15 +152,21 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
+	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
-	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta); }
 
 	/** Queues block for ticking (m_ToTickQueue) */
-	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
+	void QueueTickBlock(Vector3i a_RelPos);
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Queues block for ticking (m_ToTickQueue) */
+	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
+	{
+		return QueueTickBlock({a_RelX, a_RelY, a_RelZ});
+	}
 
 	/** Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk */
-	void QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ);
+	void QueueTickBlockNeighbors(Vector3i a_RelPos);
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
@@ -447,7 +453,7 @@ public:
 	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts */
-	void UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
+	void UnboundedQueueTickBlock(Vector3i a_RelPos);
 
 
 
@@ -460,8 +466,19 @@ public:
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
 
-	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
-	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
+	/** OBSOLETE, use the Vector3i-based overload isntead.
+	Returns the block entity at the specified (absolute) coords.
+	Returns nullptr if no such BE or outside this chunk. */
+	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ) { return GetBlockEntity({a_BlockX, a_BlockY, a_BlockZ}); }
+
+	/** Returns the block entity at the specified (absolute) coords.
+	Returns nullptr if no such BE or outside this chunk. */
+	cBlockEntity * GetBlockEntity(Vector3i a_AbsPos);
+
+	/** Returns the block entity at the specified (relative) coords.
+	Returns nullptr if no such BE.
+	Asserts that the position is a valid relative position. */
+	cBlockEntity * GetBlockEntityRel(Vector3i a_RelPos);
 
 	/** Returns true if the chunk should be ticked in the tick-thread.
 	Checks if there are any clients and if the always-tick flag is set */
@@ -586,6 +603,10 @@ private:
 
 	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
 	void ApplyWeatherToTop(void);
+
+	/** Returns the pickups that would be produced, if the specified block was dug up by a_Digger using a_Tool.
+	Doesn't dig the block, only queries the block handlers and then plugins for the pickups. */
+	cItems PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, const cItem * a_Tool);
 
 	/** Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking); returns the amount of blocks the sugarcane grew inside this call */
 	int GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);

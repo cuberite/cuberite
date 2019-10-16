@@ -17,63 +17,50 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		auto & Random = GetRandomProvider();
 
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		// If using silk-touch, drop self rather than the resource:
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(m_BlockType);
+		}
+
+		// TODO: Handle the Fortune enchantment here
+		auto & random = GetRandomProvider();
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:
-			{
-				a_Pickups.emplace_back(E_ITEM_DYE, Random.RandInt<char>(4, 8), 4);
-				break;
-			}
-			case E_BLOCK_REDSTONE_ORE:
-			case E_BLOCK_REDSTONE_ORE_GLOWING:
-			{
-				a_Pickups.emplace_back(E_ITEM_REDSTONE_DUST,  Random.RandInt<char>(4, 5), 0);
-				break;
-			}
-			case E_BLOCK_DIAMOND_ORE:
-			{
-				a_Pickups.push_back(cItem(E_ITEM_DIAMOND));
-				break;
-			}
-			case E_BLOCK_EMERALD_ORE:
-			{
-				a_Pickups.push_back(cItem(E_ITEM_EMERALD));
-				break;
-			}
-			case E_BLOCK_COAL_ORE:
-			{
-				a_Pickups.push_back(cItem(E_ITEM_COAL));
-				break;
-			}
-			case E_BLOCK_NETHER_QUARTZ_ORE:
-			{
-				a_Pickups.push_back(cItem(E_ITEM_NETHER_QUARTZ));
-				break;
-			}
-			case E_BLOCK_CLAY:
-			{
-				a_Pickups.push_back(cItem(E_ITEM_CLAY, 4));
-				break;
-			}
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, random.RandInt<char>(4, 8), 4);
+			case E_BLOCK_REDSTONE_ORE:         return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
+			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
+			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND);
+			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD);
+			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL);
+			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ);
+			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
 			default:
 			{
-				a_Pickups.push_back(cItem(m_BlockType));
-				break;
+				return cItem(m_BlockType);
 			}
 		}
 	}
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		super::OnDestroyedByPlayer(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
-		if (a_Player.IsGameModeCreative())
+
+
+
+	virtual void OnPlayerBrokeBlock(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player, Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override
+	{
+		if (!a_Player.IsGameModeSurvival())
 		{
-			// Don't drop XP when the player is in creative mode.
+			// Don't drop XP unless the player is in survival mode.
 			return;
 		}
 
@@ -83,45 +70,45 @@ public:
 			return;
 		}
 
-		auto & Random = GetRandomProvider();
-		int Reward = 0;
+		auto & random = GetRandomProvider();
+		int reward = 0;
 
-		switch (m_BlockType)
+		switch (a_OldBlockType)
 		{
 			case E_BLOCK_NETHER_QUARTZ_ORE:
 			case E_BLOCK_LAPIS_ORE:
 			{
 				// Lapis and nether quartz get 2 - 5 experience
-				Reward = Random.RandInt(2, 5);
+				reward = random.RandInt(2, 5);
 				break;
 			}
 			case E_BLOCK_REDSTONE_ORE:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{
 				// Redstone gets 1 - 5 experience
-				Reward = Random.RandInt(1, 5);
+				reward = random.RandInt(1, 5);
 				break;
 			}
 			case E_BLOCK_DIAMOND_ORE:
 			case E_BLOCK_EMERALD_ORE:
 			{
 				// Diamond and emerald get 3 - 7 experience
-				Reward = Random.RandInt(3, 7);
+				reward = random.RandInt(3, 7);
 				break;
 			}
 			case E_BLOCK_COAL_ORE:
 			{
 				// Coal gets 0 - 2 experience
-				Reward = Random.RandInt(2);
+				reward = random.RandInt(2);
 				break;
 			}
 
 			default: break;
 		}
 
-		if (Reward != 0)
+		if (reward > 0)
 		{
-			a_WorldInterface.SpawnSplitExperienceOrbs(a_BlockX, a_BlockY, a_BlockZ, Reward);
+			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
 		}
 	}
 } ;

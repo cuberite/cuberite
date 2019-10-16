@@ -7909,6 +7909,17 @@ end
 						Notes = "Adds a new item to the end of the collection",
 					},
 				},
+				AddItemGrid =
+				{
+					Params =
+					{
+						{
+							Name = "ItemGrid",
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Adds a copy of each item in the specified {{cItemGrid|ItemGrid}}.",
+				},
 				Clear =
 				{
 					Notes = "Removes all items from the collection",
@@ -7921,7 +7932,7 @@ end
 							Type = "cItems",
 						},
 					},
-					Notes = "Creates a new cItems object",
+					Notes = "Creates a new empty cItems object",
 				},
 				Contains =
 				{

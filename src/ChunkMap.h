@@ -17,6 +17,7 @@
 
 class cWorld;
 class cItem;
+class cItems;
 class cChunkStay;
 class cChunk;
 class cPlayer;
@@ -136,8 +137,8 @@ public:
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
-	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
-	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
 	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
@@ -165,7 +166,14 @@ public:
 	/** Removes the block at the specified coords and wakes up simulators.
 	Returns false if the chunk is not loaded (and the block is not dug).
 	Returns true if successful. */
-	bool DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	bool DigBlock(Vector3i a_BlockPos);
+
+	/** Returns all the pickups that would result if the a_Digger dug up the block at a_BlockPos using a_Tool.
+	a_Digger is usually a player, but can be nullptr for natural causes.
+	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves).
+	An empty hand is assumed if a_Tool is nullptr.
+	Returns an empty cItems object if the chunk is not present. */
+	cItems PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool);
 
 	/** Sends the block at the specified coords to the specified player.
 	Uses a blockchange packet to send the block.
@@ -401,7 +409,7 @@ public:
 
 private:
 
-	// The chunks can manipulate neighbors while in their Tick() method, using LockedGetBlock() and LockedSetBlock()
+	// Chunks query their neighbors using GetChunk(), while being ticked
 	friend class cChunk;
 
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
@@ -475,21 +483,6 @@ private:
 
 	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);
-
-	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
-	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-
-	/** Gets a block type in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
-	bool LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType);
-
-	/** Gets a block meta in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
-	bool LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta);
-
-	/** Sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
-	bool LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
-	/** Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
-	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);

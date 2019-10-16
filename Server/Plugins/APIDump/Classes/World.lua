@@ -562,7 +562,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords.",
+				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 			},
 			DoExplosionAt =
 			{
@@ -1071,6 +1071,34 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
+			},
+			DropBlockAsPickups =
+			{
+				Params =
+				{
+					{
+						Name = "BlockPos",
+						Type = "Vector3i",
+					},
+					{
+						Name = "Digger",
+						Type = "cEntity",
+						IsOptional = true,
+					},
+					{
+						Name = "Tool",
+						Type = "cItem",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "IsSuccess",
+						Type = "boolean",
+					}
+				},
+				Notes = "Digs up the specified block and spawns the appropriate pickups for it. The optional Digger parameter specifies the {{cEntity|entity}} who dug the block, usually a {{cPlayer|player}}. The optional Tool parameter specifies the tool used to dig the block, not present means an empty hand. Returns true on success, false if the chunk is not present. See also DigBlock() for the pickup-less version.",
 			},
 			FastSetBlock =
 			{
@@ -2459,6 +2487,34 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false.",
 			},
+			PickupsFromBlock =
+			{
+				Params =
+				{
+					{
+						Name = "BlockPos",
+						Type = "Vector3i",
+					},
+					{
+						Name = "Digger",
+						Type = "cEntity",
+						IsOptional = true,
+					},
+					{
+						Name = "Tool",
+						Type = "cItem",
+						IsOptional = true,
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "Items",
+						Type = "cItems",
+					},
+				},
+				Notes = "Returns all the pickups that would result if the Digger dug up the block at BlockPos using Tool. Digger is usually a {{cPlayer}}, but can be nil for natural causes. Tool is usually the equipped {{cItem|item}}, can be nil for empty hand. Returns an empty {{cItems}} object if the chunk is not present."
+			},
 			PrepareChunk =
 			{
 				Params =
@@ -2685,13 +2741,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Name = "BlockMeta",
 						Type = "number",
 					},
-					{
-						Name = "ShouldSendToClients",
-						Type = "boolean",
-						IsOptional = true,
-					},
 				},
-				Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances. If ShouldSendToClients is true (default), the change is broadcast to all players who have this chunk loaded; if false, the change is made server-side only.",
+				Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances.",
 			},
 			SetBlockMeta =
 			{

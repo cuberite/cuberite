@@ -16,8 +16,8 @@
 
 
 
-cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
-	: cBlockHandler(a_BlockType)
+cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType):
+	super(a_BlockType)
 {
 }
 
@@ -25,32 +25,21 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHandler::OnBroken(
+	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+)
 {
-	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
-
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos);
 	// If the piston is extended, destroy the extension as well
-	if (IsExtended(OldMeta))
+	if (IsExtended(a_OldBlockMeta))
 	{
-		// Get the position of the extension
-		blockPos += MetadataToOffset(OldMeta);
-
-		if (a_ChunkInterface.GetBlock(blockPos) == E_BLOCK_PISTON_EXTENSION)
+		auto extPos = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
+		if (a_ChunkInterface.GetBlock(extPos) == E_BLOCK_PISTON_EXTENSION)
 		{
-			a_ChunkInterface.SetBlock(blockPos.x, blockPos.y, blockPos.z, E_BLOCK_AIR, 0);
+			a_ChunkInterface.DropBlockAsPickups(extPos);
 		}
 	}
-}
-
-
-
-
-
-void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
-{
-	// Returning Piston Item without Direction-Metavalue
-	a_Pickups.push_back(cItem(m_BlockType, 1));
 }
 
 
@@ -106,7 +95,7 @@ void cBlockPistonHandler::PushBlocks(
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
 	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
 	{
-		return a.Dot(a_PushDir) > b.Dot(a_PushDir);
+		return (a.Dot(a_PushDir) > b.Dot(a_PushDir));
 	});
 
 	// Move every block
@@ -118,17 +107,8 @@ void cBlockPistonHandler::PushBlocks(
 
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
-			// Block is breakable, drop it
-			cBlockHandler * Handler = BlockHandler(moveBlock);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World.GetChunkMap());
-				cBlockInServerPluginInterface PluginInterface(a_World);
-				Handler->DropBlock(ChunkInterface, a_World, PluginInterface, nullptr,
-					moveBlockPos.x, moveBlockPos.y, moveBlockPos.z
-				);
-			}
-			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
+			// Block is breakable, drop it:
+			a_World.DropBlockAsPickups(moveBlockPos, nullptr, nullptr);
 		}
 		else
 		{
@@ -357,26 +337,17 @@ cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
 
 
 
-void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockPistonHeadHandler::OnBroken(
+	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+)
 {
-	Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
-
-	// Get the base of the piston
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(blockPos);
-	blockPos -= cBlockPistonHandler::MetadataToOffset(OldMeta);
-
-	BLOCKTYPE Block = a_ChunkInterface.GetBlock(blockPos);
-	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
+	// Drop the base of the piston:
+	auto basePos = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
+	if (cChunkDef::IsValidHeight(basePos.y))
 	{
-		a_ChunkInterface.DigBlock(a_WorldInterface, blockPos.x, blockPos.y, blockPos.z);
-		if (a_Player.IsGameModeCreative())
-		{
-			return;  // No pickups if creative
-		}
-
-		cItems Pickups;
-		Pickups.push_back(cItem(Block, 1));
-		a_WorldInterface.SpawnItemPickups(Pickups, blockPos.x + 0.5, blockPos.y + 0.5, blockPos.z + 0.5);
+		a_ChunkInterface.DropBlockAsPickups(basePos);
 	}
 }
 

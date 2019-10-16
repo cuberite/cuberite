@@ -67,7 +67,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			{
 				continue;
 			}
-			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock({itr->x, itr->y, itr->z}, E_BLOCK_AIR, 0);
 		}
 	}
 	m_TotalBlocks -= static_cast<int>(ChunkData.size());
@@ -302,7 +302,7 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 	BLOCKTYPE  FallingBlockType;
 	NIBBLETYPE FallingBlockMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, FallingBlockType, FallingBlockMeta);
-	a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+	a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0);
 
 	// Search for a place to put it:
 	for (int y = a_RelY - 1; y >= 0; y--)

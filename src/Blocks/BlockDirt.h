@@ -20,18 +20,26 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		if (a_BlockMeta == E_META_DIRT_COARSE)
 		{
 			// Drop the coarse block (dirt, meta 1)
-			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
+			return cItem(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
 		}
 		else
 		{
-			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
+			return cItem(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
 		}
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{

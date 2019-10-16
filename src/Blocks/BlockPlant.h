@@ -1,31 +1,40 @@
 
-// BlockPlant.h
-
-// Base class for any growing block
-
-
-
-
-
 #pragma once
 
 #include "BlockHandler.h"
 
-class cBlockPlant : public cBlockHandler
+
+
+
+
+/** Base class for plants that use light values to decide whether to grow or not. */
+template <bool NeedsLightToGrow>
+class cBlockPlant:
+	public cBlockHandler
 {
-	typedef cBlockHandler Super;
-	bool m_NeedLightToGrow;
+	using super = cBlockHandler;
+
 public:
-	cBlockPlant(BLOCKTYPE a_BlockType, bool a_LightToGrow)
-		: Super(a_BlockType), m_NeedLightToGrow(a_LightToGrow){}
+
+	cBlockPlant(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
+	{
+	}
+
 
 protected:
+
+	/** The action the plant can take on an update. */
 	enum PlantAction
 	{
 		paDeath,
 		paGrowth,
 		paStay
 	};
+
+
+
+
 
 	/** Checks whether there is enough light for the plant to grow.
 	If the plant doesn't require light to grow, then it returns paGrowth.
@@ -37,33 +46,36 @@ protected:
 	{
 		// If the plant requires light to grow, check to see if there is enough light
 		// Otherwise, return true
-		if (m_NeedLightToGrow)
+		if (!NeedsLightToGrow)
 		{
-			NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ);
-			NIBBLETYPE SkyLight = a_Chunk.GetSkyLight  (a_RelX, a_RelY, a_RelZ);
-			NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
+			return paGrowth;
+		}
+		NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
 
-			// If the amount of light provided by blocks is greater than the sky light, use it instead
-			if (Blocklight > Light)
-			{
-				Light = Blocklight;
-			}
-
-			// Based on light levels, decide between growth, stay and death:
-			if (Light > 8)
-			{
-				return paGrowth;
-			}
-			else if ((Blocklight < 9) && (SkyLight < 9))
-			{
-				return paDeath;
-			}
-
-			return paStay;
+		// If the amount of light provided by blocks is greater than the sky light, use it instead
+		if (Blocklight > Light)
+		{
+			Light = Blocklight;
 		}
 
-		return paGrowth;
+		// Based on light levels, decide between growth, stay and death:
+		if (Light > 8)
+		{
+			return paGrowth;
+		}
+		else if ((Blocklight < 9) && (SkyLight < 9))
+		{
+			return paDeath;
+		}
+
+		return paStay;
 	}
+
+
+
+
 
 	/** Checks whether a plant can grow grow, based on what is returned from cBlockPlant::HasEnoughLight
 	and a random check based on what is returned from cBlockPlant::GetGrowthChance.
@@ -83,6 +95,10 @@ protected:
 		}
 		return Action;
 	}
+
+
+
+
 
 	/** Generates a int value between 4 and 25 based on surrounding blocks that affect how quickly the plant grows.
 	The higher the value, the less likely the plant is to grow */

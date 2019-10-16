@@ -16,12 +16,19 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 
-		a_Pickups.push_back(cItem(m_BlockType, 1, Meta));
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		NIBBLETYPE meta = a_BlockMeta & 0x7;
+		return cItem(m_BlockType, 1, meta);
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{

@@ -189,6 +189,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ACACIA_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:            return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:                return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_AIR:                           return new cBlockWithNoDrops<>          (a_BlockType);
 		case E_BLOCK_ANVIL:                         return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BEACON:                        return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_BED:                           return new cBlockBedHandler             (a_BlockType);
@@ -401,185 +402,72 @@ void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface 
 
 void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
-	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
+	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetPos(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
 }
 
 
 
 
 
-void cBlockHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	// Notify the neighbors
-	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ, BLOCK_FACE_XP);
-	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ, BLOCK_FACE_XM);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_YP);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_YM);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1, BLOCK_FACE_ZP);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1, BLOCK_FACE_ZM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX(-1), BLOCK_FACE_XP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX( 1), BLOCK_FACE_XM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY(-1), BLOCK_FACE_YP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY( 1), BLOCK_FACE_YM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ(-1), BLOCK_FACE_ZP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ( 1), BLOCK_FACE_ZM);
 }
 
 
 
 
 
-void cBlockHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
 {
 	// Notify the neighbors
-	NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ, BLOCK_FACE_XP);
-	NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ, BLOCK_FACE_XM);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_YP);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_YM);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ - 1, BLOCK_FACE_ZP);
-	NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ + 1, BLOCK_FACE_ZM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX(-1), BLOCK_FACE_XP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX( 1), BLOCK_FACE_XM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY(-1), BLOCK_FACE_YP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY( 1), BLOCK_FACE_YM);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ(-1), BLOCK_FACE_ZP);
+	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ( 1), BLOCK_FACE_ZM);
 }
 
 
 
 
 
-void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_NeighborX, int a_NeighborY, int a_NeighborZ, eBlockFace a_WhichNeighbor)
+void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_NeighborPos, eBlockFace a_WhichNeighbor)
 {
-	if ((a_NeighborY >= 0) && (a_NeighborY < cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_NeighborPos.y))
 	{
-		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock({a_NeighborX, a_NeighborY, a_NeighborZ}))->OnNeighborChanged(a_ChunkInterface, a_NeighborX, a_NeighborY, a_NeighborZ, a_WhichNeighbor);
+		return;
 	}
+
+	cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_NeighborPos))->OnNeighborChanged(a_ChunkInterface, a_NeighborPos, a_WhichNeighbor);
 }
 
 
 
 
 
-void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
+cItems cBlockHandler::ConvertToPickups(
+	NIBBLETYPE a_BlockMeta,
+	cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool
+)
 {
-	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to override this.
-	a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
-}
+	UNUSED(a_BlockEntity);
+	UNUSED(a_Digger);
+	UNUSED(a_Tool);
 
-
-
-
-
-void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop)
-{
-	cItems Pickups;
-	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-
-	if (a_CanDrop)
-	{
-		if ((a_Digger != nullptr) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
-		{
-			switch (m_BlockType)
-			{
-				case E_BLOCK_ACACIA_DOOR:
-				case E_BLOCK_ACTIVE_COMPARATOR:
-				case E_BLOCK_BEETROOTS:
-				case E_BLOCK_BIRCH_DOOR:
-				case E_BLOCK_BREWING_STAND:
-				case E_BLOCK_CAKE:
-				case E_BLOCK_CARROTS:
-				case E_BLOCK_CAULDRON:
-				case E_BLOCK_COCOA_POD:
-				case E_BLOCK_CROPS:
-				case E_BLOCK_DARK_OAK_DOOR:
-				case E_BLOCK_DEAD_BUSH:
-				case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-				case E_BLOCK_DOUBLE_STONE_SLAB:
-				case E_BLOCK_DOUBLE_WOODEN_SLAB:
-				case E_BLOCK_FIRE:
-				case E_BLOCK_FARMLAND:
-				case E_BLOCK_FLOWER_POT:
-				case E_BLOCK_HEAD:
-				case E_BLOCK_INACTIVE_COMPARATOR:
-				case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-				case E_BLOCK_IRON_DOOR:
-				case E_BLOCK_JUNGLE_DOOR:
-				case E_BLOCK_MELON_STEM:
-				case E_BLOCK_MOB_SPAWNER:
-				case E_BLOCK_NETHER_WART:
-				case E_BLOCK_OAK_DOOR:
-				case E_BLOCK_PISTON_EXTENSION:
-				case E_BLOCK_POTATOES:
-				case E_BLOCK_PUMPKIN_STEM:
-				case E_BLOCK_PURPUR_DOUBLE_SLAB:
-				case E_BLOCK_REDSTONE_ORE_GLOWING:
-				case E_BLOCK_REDSTONE_REPEATER_OFF:
-				case E_BLOCK_REDSTONE_REPEATER_ON:
-				case E_BLOCK_REDSTONE_TORCH_OFF:
-				case E_BLOCK_REDSTONE_WIRE:
-				case E_BLOCK_SIGN_POST:
-				case E_BLOCK_SNOW:
-				case E_BLOCK_SPRUCE_DOOR:
-				case E_BLOCK_STANDING_BANNER:
-				case E_BLOCK_SUGARCANE:
-				case E_BLOCK_TALL_GRASS:
-				case E_BLOCK_TRIPWIRE:
-				case E_BLOCK_WALL_BANNER:
-				case E_BLOCK_WALLSIGN:
-				{
-					// Silktouch can't be used for these blocks
-					ConvertToPickups(Pickups, Meta);
-					break;
-				}
-				case E_BLOCK_BED:
-				{
-					// Need to access the bed entity to get the color for the item damage
-					ConvertToPickups(a_WorldInterface, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
-					break;
-				}
-				case E_BLOCK_ENDER_CHEST:
-				{
-					// Reset meta to 0
-					Pickups.Add(m_BlockType, 1, 0);
-					break;
-				}
-				case E_BLOCK_LEAVES:
-				case E_BLOCK_NEW_LEAVES:
-				{
-					Pickups.Add(m_BlockType, 1, Meta & 0x03);
-					break;
-				}
-				default: Pickups.Add(m_BlockType, 1, Meta); break;
-			}
-		}
-		else if (m_BlockType == E_BLOCK_BED)
-		{
-			// Need to access the bed entity to get the color for the item damage
-			ConvertToPickups(a_WorldInterface, Pickups, Meta, a_BlockX, a_BlockY, a_BlockZ);
-		}
-		else
-		{
-			ConvertToPickups(Pickups, Meta);
-		}
-	}
-
-	// Allow plugins to modify the pickups:
-	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
-
-	if (!Pickups.empty())
-	{
-		auto & r1 = GetRandomProvider();
-
-		// Mid-block position first
-		double MicroX, MicroY, MicroZ;
-		MicroX = a_BlockX + 0.5;
-		MicroY = a_BlockY + 0.5;
-		MicroZ = a_BlockZ + 0.5;
-
-		// Add random offset second
-		MicroX += r1.RandReal<double>(-0.5, 0.5);
-		MicroZ += r1.RandReal<double>(-0.5, 0.5);
-
-		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
-	}
+	// Add self:
+	cItems res;
+	res.push_back(cItem(m_BlockType, 1, a_BlockMeta));
+	return res;
 }
 
 
@@ -655,25 +543,28 @@ cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a
 
 
 
-void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
+void cBlockHandler::Check(
+	cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
+	Vector3i a_RelPos,
+	cChunk & a_Chunk
+)
 {
-	if (!CanBeAt(a_ChunkInterface, a_RelX, a_RelY, a_RelZ, a_Chunk))
+	if (!CanBeAt(a_ChunkInterface, a_RelPos.x, a_RelPos.y, a_RelPos.z, a_Chunk))
 	{
 		if (DoesDropOnUnsuitable())
 		{
-			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
+			a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
 		}
-
-		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+		else
+		{
+			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
+		}
 	}
 	else
 	{
 		// Wake up the simulators for this block:
-		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp({BlockX, a_RelY, BlockZ}, &a_Chunk);
+		auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
 	}
 }
 
@@ -685,6 +576,15 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
 {
 	// Zero for transparent
 	return 0;
+}
+
+
+
+
+
+bool cBlockHandler::ToolHasSilkTouch(const cItem * a_Tool)
+{
+	return ((a_Tool != nullptr) && (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0));
 }
 
 

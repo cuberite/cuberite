@@ -9,29 +9,38 @@
 
 
 class cBlockNetherWartHandler :
-	public cBlockPlant
+	public cBlockPlant<false>
 {
-	typedef cBlockPlant Super;
+	using super = cBlockPlant<false>;
+
 public:
-	cBlockNetherWartHandler(BLOCKTYPE a_BlockType)
-		: Super(a_BlockType, false)
+
+	cBlockNetherWartHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
-	{
-		auto & rand = GetRandomProvider();
 
-		if (a_Meta == 0x3)
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		if (a_BlockMeta == 0x03)
 		{
 			// Fully grown, drop the entire produce:
-			a_Pickups.emplace_back(E_ITEM_NETHER_WART, 1 + (rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2, 0);
+			auto & rand = GetRandomProvider();
+			return cItem(E_ITEM_NETHER_WART, 1 + (rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2, 0);
 		}
 		else
 		{
-			a_Pickups.push_back(cItem(E_ITEM_NETHER_WART));
+			return cItem(E_ITEM_NETHER_WART);
 		}
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -46,11 +55,19 @@ public:
 		}
 	}
 
+
+
+
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		// Needs to be placed on top of a Soulsand block:
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_SOULSAND));
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

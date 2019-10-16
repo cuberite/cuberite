@@ -16,9 +16,23 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
+		// Only drop self when mined with silk-touch:
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(m_BlockType, 1, a_BlockMeta);
+		}
+		return {};
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

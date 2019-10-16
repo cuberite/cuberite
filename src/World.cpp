@@ -2173,9 +2173,9 @@ void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 
 
 
-void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);
+	m_ChunkMap->SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2209,9 +2209,9 @@ NIBBLETYPE cWorld::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-bool cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cWorld::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	return m_ChunkMap->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	return m_ChunkMap->GetBlockTypeMeta(a_BlockPos, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2236,7 +2236,19 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3i a_BlockPos, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
+{
+	auto & random = GetRandomProvider();
+	auto microX = random.RandReal<double>(0, 1);
+	auto microZ = random.RandReal<double>(0, 1);
+	return SpawnItemPickups(a_Pickups, Vector3d(microX, 0, microZ) + a_BlockPos, a_FlyAwaySpeed, a_IsPlayerCreated);
+}
+
+
+
+
+
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
 {
 	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
@@ -2252,7 +2264,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
 
-		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
+		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
@@ -2262,7 +2274,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool a_IsPlayerCreated)
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -2271,7 +2283,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 			continue;
 		}
 
-		auto pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, IsPlayerCreated, a_Speed);
+		auto pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
 		auto pickupPtr = pickup.get();
 		pickupPtr->Initialize(std::move(pickup), *this);
 	}
@@ -2468,12 +2480,44 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
+bool cWorld::DigBlock(Vector3i a_BlockPos)
 {
-	cBlockHandler * Handler = cBlockInfo::GetHandler(GetBlock(a_X, a_Y, a_Z));
-	cChunkInterface ChunkInterface(GetChunkMap());
-	Handler->OnDestroyed(ChunkInterface, *this, a_X, a_Y, a_Z);
-	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
+	BLOCKTYPE blockType;
+	NIBBLETYPE blockMeta;
+	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
+	cChunkInterface chunkInterface(GetChunkMap());
+	auto blockHandler = cBlockInfo::GetHandler(blockType);
+	blockHandler->OnBreaking(chunkInterface, *this, a_BlockPos);
+	if (!m_ChunkMap->DigBlock(a_BlockPos))
+	{
+		return false;
+	}
+	blockHandler->OnBroken(chunkInterface, *this, a_BlockPos, blockType, blockMeta);
+	return true;
+}
+
+
+
+
+
+bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
+	if (!DigBlock(a_BlockPos))
+	{
+		return false;
+	}
+	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos);
+	return true;
+}
+
+
+
+
+
+cItems cWorld::PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	return m_ChunkMap->PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
 }
 
 

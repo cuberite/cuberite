@@ -8,20 +8,30 @@
 
 
 class cBlockStemsHandler :
-	public cBlockPlant
+	public cBlockPlant<true>
 {
-	typedef cBlockPlant Super;
+	using super = cBlockPlant<true>;
+
 public:
-	cBlockStemsHandler(BLOCKTYPE a_BlockType)
-		: Super(a_BlockType, true)
+
+	cBlockStemsHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		short ItemType = (m_BlockType == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
-		a_Pickups.push_back(cItem(ItemType, 1, 0));
+		auto itemType = (m_BlockType == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
+		return cItem(itemType, 1, 0);
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{

@@ -76,7 +76,7 @@ public:
 
 
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		// E_META_END_PORTAL_FRAME_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);
@@ -84,7 +84,7 @@ public:
 		{
 			// LOG("Location is %d %d %d", a_BlockX, a_BlockY, a_BlockZ);
 			// Direction is the first two bits, masked by 0x3
-			FindAndSetPortal(Vector3i(a_BlockX, a_BlockY, a_BlockZ), a_BlockMeta & 3, a_ChunkInterface, a_WorldInterface);
+			FindAndSetPortal(a_BlockPos, a_BlockMeta & 3, a_ChunkInterface, a_WorldInterface);
 		}
 	}
 
