@@ -23,10 +23,9 @@ matrix:
       env: *Debug
     # clang 3.5
     - compiler: clang
+      dist: trusty
       addons: &clang35
         apt:
-          sources:
-            - llvm-toolchain-precise-3.5
           packages:
             - clang++-3.5
             - clang-3.5
@@ -34,6 +33,7 @@ matrix:
         - CC=clang-3.5;CXX=clang++-3.5
       env: *Release
     - compiler: clang
+      dist: trusty
       addons: *clang35
       before_install:
         - CC=clang-3.5;CXX=clang++-3.5
