@@ -55,6 +55,10 @@ matrix:
       before_install:
         - CC=gcc-4.8;CXX=g++-4.8
       env: *Debug
+    # gcc on arm64
+    - compiler: gcc
+      arch: arm64
+      env: *Debug
 
 script: ./CIbuild.sh
 
