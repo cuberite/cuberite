@@ -44,6 +44,12 @@ public:
 		}
 		else if ((a_Item.m_ItemDamage == E_META_DYE_BROWN) && (a_BlockFace >= BLOCK_FACE_ZM) && (a_BlockFace <= BLOCK_FACE_XP))
 		{
+			// Players can't place blocks while in adventure mode.
+			if (a_Player->IsGameModeAdventure())
+			{
+				return false;
+			}
+
 			// Cocoa (brown dye) can be planted on jungle logs:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;

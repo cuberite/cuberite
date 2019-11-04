@@ -46,6 +46,12 @@ public:
 
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
+		// Players can't pick up fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -121,6 +127,12 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
 	)
 	{
+		// Players can't place fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;

@@ -1452,8 +1452,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
-		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
-		bool BlockUsable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
+		bool BlockUsable = BlockHandler->IsUseable() && !m_Player->IsGameModeAdventure() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
