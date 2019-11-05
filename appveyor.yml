@@ -21,7 +21,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
+      - image: Visual Studio 2017
 
   build:
     project: Cuberite.sln
