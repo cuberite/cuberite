@@ -1,6 +1,5 @@
 version: 1.0.{build}
 image:
-  - Visual Studio 2017
   - Ubuntu
 configuration: Release
 clone_depth: 50
@@ -11,14 +10,17 @@ before_build:
 - cmd: echo %TIME%
 - cmd: cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
 - cmd: echo %TIME%
+
 - sh: git submodule update --init
 - sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
 - sh: make -j`nproc`
+
 - sh: 7z a "Cuberite-linux-x64.zip" Server
 - sh: appveyor PushArtifact Cuberite-linux-x64.zip
-- sh: rm -rf Server/
+
 - sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
 - sh: make -j`nproc`
+
 - sh: 7z a "Cuberite-linux-x86.zip" Server
 - sh: appveyor PushArtifact Cuberite-linux-x86.zip
 
@@ -32,7 +34,3 @@ for:
     project: Cuberite.sln
     parallel: true
     verbosity: minimal
-
-after_build:
-- cmd: 7z a "Cuberite-windows-x64.zip" Server
-- cmd: appveyor PushArtifact Cuberite-windows-x64.zip
