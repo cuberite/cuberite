@@ -17,10 +17,16 @@ before_build:
 - sh: cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 - sh: make -j`nproc`
 
-build:
-  project: Cuberite.sln
-  parallel: true
-  verbosity: minimal
+for:
+-
+  matrix:
+    only:
+      - image: Ubuntu
+
+  build:
+    project: Cuberite.sln
+    parallel: true
+    verbosity: minimal
 
 artifacts:
   - path: Server
