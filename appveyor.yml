@@ -1,14 +1,24 @@
 version: 1.0.{build}
-image: Visual Studio 2017
-configuration: Debug
+image:
+  - Visual Studio 2017
+  - Ubuntu
+configuration: Release
 clone_depth: 50
+platform:
+  - x86
+  - x64
 
 before_build:
-- echo %TIME%
-- git submodule update --init
-- echo %TIME%
-- cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- echo %TIME%
+- cmd: echo %TIME%
+- cmd: git submodule update --init
+- cmd: echo %TIME%
+- cmd: cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+- cmd: echo %TIME%
+- sh: git submodule update --init
+- sh: mkdir Release
+- sh: cd Release
+- sh: cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+- sh: make -j`nproc`
 
 build:
   project: Cuberite.sln
