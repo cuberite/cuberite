@@ -6,6 +6,19 @@ clone_depth: 50
 platform:
   - x86
   - x64
+  - Win32
+  - Win64
+
+matrix:
+  exclude:
+    - platform: Win32
+      image: Ubuntu
+    - platform: Win64
+      image: Ubuntu
+    - platform: x86
+      image: Visual Studio 2017
+    - platform: x64
+      image: Visual Studio 2017
 
 before_build:
 - cmd: echo %TIME%
@@ -14,9 +27,21 @@ before_build:
 - cmd: cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
 - cmd: echo %TIME%
 
-- sh: git submodule update --init
-- sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
-- sh: make -j`nproc`
+build:
+  project: Cuberite.sln
+  parallel: true
+  verbosity: minimal
+
+for:
+-
+  matrix:
+    only:
+      - image: Ubuntu
+
+  build_script:
+  - git submodule update --init
+  - cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
+  - make -j`nproc`
 
 artifacts:
   - path: Server
