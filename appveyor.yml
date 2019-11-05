@@ -4,17 +4,6 @@ image:
   - Ubuntu
 configuration: Release
 clone_depth: 50
-platform:
-  - Win32
-  - x86
-  - x64
-
-matrix:
-  exclude:
-    - platform: Win32
-      image: Ubuntu
-    - platform: x86
-      image: Visual Studio 2017
 
 before_build:
 - cmd: echo %TIME%
