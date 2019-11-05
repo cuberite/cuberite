@@ -45,6 +45,8 @@ for:
   - cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
   - make -j`nproc`
 
+for:
+-
   matrix:
     only:
       - image: Ubuntu
