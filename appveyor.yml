@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image:
   - Ubuntu
-	- Visual Studio 2017
+  - Visual Studio 2017
 configuration: Release
 clone_depth: 50
 platform:
