@@ -12,10 +12,15 @@ before_build:
 - cmd: cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
 - cmd: echo %TIME%
 - sh: git submodule update --init
-- sh: mkdir Release
-- sh: cd Release
-- sh: cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+- sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
 - sh: make -j`nproc`
+- sh: 7z a "Cuberite-linux-x64.zip" Server
+- sh: appveyor PushArtifact Cuberite-linux-x64.zip
+- sh: rm -rf Server/
+- sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
+- sh: make -j`nproc`
+- sh: 7z a "Cuberite-linux-x86.zip" Server
+- sh: appveyor PushArtifact Cuberite-linux-x86.zip
 
 for:
 -
@@ -28,7 +33,6 @@ for:
     parallel: true
     verbosity: minimal
 
-artifacts:
-  - path: Server
-    name: Cuberite
-    type: zip
+after_build:
+- cmd: 7z a "Cuberite-windows-x64.zip" Server
+- cmd: appveyor PushArtifact Cuberite-windows-x64.zip
