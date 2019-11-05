@@ -24,3 +24,8 @@ build:
   project: Cuberite.sln
   parallel: true
   verbosity: minimal
+
+artifacts:
+  - path: Server
+    name: Cuberite
+    type: zip
