@@ -37,7 +37,6 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
       - platform: x86
 
   build_script:
@@ -48,7 +47,6 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
       - platform: x64
 
   build_script:
