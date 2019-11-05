@@ -38,6 +38,17 @@ for:
   matrix:
     only:
       - image: Ubuntu
+			- platform: x86
+
+  build_script:
+  - git submodule update --init
+  - cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
+  - make -j`nproc`
+	
+  matrix:
+    only:
+      - image: Ubuntu
+			- platform: x64
 
   build_script:
   - git submodule update --init
