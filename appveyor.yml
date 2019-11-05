@@ -3,6 +3,9 @@ image:
   - Ubuntu
 configuration: Release
 clone_depth: 50
+platform:
+  - x86
+  - x64
 
 before_build:
 - cmd: echo %TIME%
@@ -15,22 +18,7 @@ before_build:
 - sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
 - sh: make -j`nproc`
 
-- sh: 7z a "Cuberite-linux-x64.zip" Server
-- sh: appveyor PushArtifact Cuberite-linux-x64.zip
-
-- sh: cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
-- sh: make -j`nproc`
-
-- sh: 7z a "Cuberite-linux-x86.zip" Server
-- sh: appveyor PushArtifact Cuberite-linux-x86.zip
-
-for:
--
-  matrix:
-    only:
-      - image: Visual Studio 2017
-
-  build:
-    project: Cuberite.sln
-    parallel: true
-    verbosity: minimal
+artifacts:
+  - path: Server
+    name: Cuberite
+    type: zip
