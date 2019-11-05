@@ -5,6 +5,7 @@ image:
 configuration: Release
 clone_depth: 50
 platform:
+  - Win32
   - x86
   - x64
 
