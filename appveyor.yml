@@ -13,6 +13,9 @@ for:
   matrix:
     only:
       - platform: Win32
+	
+	environment:
+	  - APPVEYOR_JOB_NAME: Windows-x86
 
   before_build:
   - echo %TIME%
@@ -26,6 +29,9 @@ for:
     only:
       - platform: x64
 
+	environment:
+	  - APPVEYOR_JOB_NAME: Windows-x64
+
   before_build:
   - echo %TIME%
   - git submodule update --init
@@ -37,6 +43,9 @@ for:
   matrix:
     only:
       - platform: ARM
+
+	environment:
+	  - APPVEYOR_JOB_NAME: Windows-ARM
 
   before_build:
   - echo %TIME%
