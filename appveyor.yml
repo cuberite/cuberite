@@ -1,19 +1,21 @@
 version: 1.0.{build}
-image:
-  - Visual Studio 2017
-configuration: Release
-platform:
-  - Win32
-  - x64
 clone_depth: 50
+
+environment:
+  matrix:
+  - job_name: Windows-x86
+    image: Visual Studio 2017
+    configuration: Release
+
+  - job_name: Windows-x64
+    image: Visual Studio 2017
+    configuration: Release
 
 for:
 -
   matrix:
     only:
-      - platform: Win32
-
-  - job_name: Windows-x86
+      - job_name: Windows-x86
 
   before_build:
   - echo %TIME%
@@ -25,9 +27,7 @@ for:
 -
   matrix:
     only:
-      - platform: x64
-
-  - job_name: Windows-x64
+      - job_name: Windows-x64
 
   before_build:
   - echo %TIME%
