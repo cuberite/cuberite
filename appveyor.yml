@@ -1,45 +1,71 @@
 version: 1.0.{build}
 image:
   - Ubuntu
-  - Visual Studio 2017
+  - Visual Studio 2017 Preview
 configuration: Release
-clone_depth: 50
 platform:
   - x86
   - x64
-  - Win32
+  - arm64
+clone_depth: 50
 
 matrix:
   exclude:
     - platform: Win32
       image: Ubuntu
+    - platform: arm64
+      image: Ubuntu
     - platform: x86
       image: Visual Studio 2017
-
-before_build:
-- cmd: echo %TIME%
-- cmd: git submodule update --init
-- cmd: echo %TIME%
-- cmd: cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- cmd: echo %TIME%
-
-build:
-  project: Cuberite.sln
-  parallel: true
-  verbosity: minimal
 
 for:
 -
   matrix:
     only:
+      - platform: x86
+        image: Visual Studio 2017 Preview
+
+  before_build:
+  - cmd: echo %TIME%
+  - cmd: git submodule update --init
+  - cmd: echo %TIME%
+  - cmd: cmake -G "Visual Studio 15 2017 Win32" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmd: echo %TIME%
+
+  build:
+    project: Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+-
+  matrix:
+    only:
       - platform: x64
-        image: Visual Studio 2017
+        image: Visual Studio 2017 Preview
 
   before_build:
   - cmd: echo %TIME%
   - cmd: git submodule update --init
   - cmd: echo %TIME%
   - cmd: cmake -G "Visual Studio 15 2017 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmd: echo %TIME%
+
+  build:
+    project: Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+-
+  matrix:
+    only:
+      - platform: arm64
+        image: Visual Studio 2017 Preview
+
+  before_build:
+  - cmd: echo %TIME%
+  - cmd: git submodule update --init
+  - cmd: echo %TIME%
+  - cmd: cmake -G "Visual Studio 15 2017 ARM64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - cmd: echo %TIME%
 
   build:
