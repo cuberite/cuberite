@@ -8,7 +8,7 @@ environment:
   - job_name: Windows-x86
   - job_name: Windows-x64
 
-before_build:
+install:
 - $env:CUBERITE_BUILD_SERIES_NAME = "Windows"
 - $env:CUBERITE_BUILD_ID = "$env:APPVEYOR_BUILD_NUMBER"
 - $env:CUBERITE_BUILD_DATETIME = "%TIME%"
