@@ -4,15 +4,20 @@ image:
   - Visual Studio 2017 Preview
 configuration: Release
 platform:
+  - Win32
   - x86
   - x64
-  - arm64
+  - ARM64
 clone_depth: 50
 
 matrix:
   exclude:
-    - platform: arm64
+    - platform: Win32
       image: Ubuntu
+    - platform: ARM64
+      image: Ubuntu
+    - platform: x86
+      image: Visual Studio 2017 Preview
 
 before_build:
 - cmd: echo %TIME%
@@ -48,7 +53,7 @@ for:
 -
   matrix:
     only:
-      - platform: arm64
+      - platform: ARM64
         image: Visual Studio 2017 Preview
 
   before_build:
