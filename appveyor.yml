@@ -1,15 +1,12 @@
 version: 1.0.{build}
+image: Visual Studio 2017
+configuration: Release
 clone_depth: 50
 
 environment:
   matrix:
   - job_name: Windows-x86
-    image: Visual Studio 2017
-    configuration: Release
-
   - job_name: Windows-x64
-    image: Visual Studio 2017
-    configuration: Release
 
 for:
 -
