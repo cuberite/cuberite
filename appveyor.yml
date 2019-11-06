@@ -13,7 +13,7 @@ for:
   matrix:
     only:
       - platform: Win32
-	
+
   environment:
     - APPVEYOR_JOB_NAME: Windows-x86
 
