@@ -27,6 +27,7 @@ build:
   parallel: true
   verbosity: minimal
 
+for:
 -
   matrix:
     only:
