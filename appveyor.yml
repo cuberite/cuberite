@@ -42,7 +42,14 @@ build:
   parallel: true
   verbosity: minimal
 
+after_build:
+- 7z a PBDs.zip %APPVEYOR_BUILD_FOLDER%\Server\Cuberite.pdb
+- rm Server\Cuberite.pdb
+- 7z a Cuberite.zip %APPVEYOR_BUILD_FOLDER%\Server
+
 artifacts:
-  - path: Server
+  - path: PDBs.zip
+    name: PDBs
+
+  - path: Cuberite.zip
     name: Cuberite
-    type: zip
