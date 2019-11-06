@@ -20,6 +20,10 @@ matrix:
       image: Visual Studio 2017
     - platform: x64
       image: Visual Studio 2017
+			
+init:
+- sh: sudo apt update
+- sh: sudo apt install --quiet --assume-yes libc6-i386 gcc-multilib g++-multilib
 
 before_build:
 - cmd: echo %TIME%
