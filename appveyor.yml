@@ -4,6 +4,10 @@ configuration: Release
 clone_depth: 50
 
 environment:
+  CUBERITE_BUILD_SERIES_NAME: Cuberite
+	CUBERITE_BUILD_ID: $APPVEYOR_BUILD_ID
+  CUBERITE_BUILD_DATETIME: `date`
+
   matrix:
   - job_name: Windows-x86
   - job_name: Windows-x64
