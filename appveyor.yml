@@ -14,8 +14,7 @@ for:
     only:
       - platform: Win32
 
-  environment:
-    APPVEYOR_JOB_NAME: Windows-x86
+  job_name: Windows-x86
 
   before_build:
   - echo %TIME%
@@ -29,8 +28,7 @@ for:
     only:
       - platform: x64
 
-  environment:
-    APPVEYOR_JOB_NAME: Windows-x64
+  job_name: Windows-x64
 
   before_build:
   - echo %TIME%
@@ -44,8 +42,7 @@ for:
     only:
       - platform: ARM
 
-  environment:
-    APPVEYOR_JOB_NAME: Windows-ARM
+  job_name: Windows-ARM
 
   before_build:
   - echo %TIME%
