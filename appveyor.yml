@@ -3,6 +3,7 @@ image:
   - Visual Studio 2017
 configuration: Release
 platform:
+  - ARM
   - Win32
   - x64
 clone_depth: 50
@@ -17,7 +18,7 @@ for:
   - echo %TIME%
   - git submodule update --init
   - echo %TIME%
-  - cmake -G "Visual Studio 15 2017 Win32" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
 -
@@ -30,6 +31,18 @@ for:
   - git submodule update --init
   - echo %TIME%
   - cmake -G "Visual Studio 15 2017 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - echo %TIME%
+
+-
+  matrix:
+    only:
+      - platform: ARM
+
+  before_build:
+  - echo %TIME%
+  - git submodule update --init
+  - echo %TIME%
+  - cmake -G "Visual Studio 15 2017 ARM" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
 build:
