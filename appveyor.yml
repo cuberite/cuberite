@@ -1,98 +1,41 @@
 version: 1.0.{build}
 image:
-  - Ubuntu
-  - Visual Studio 2017 Preview
+  - Visual Studio 2017
 configuration: Release
 platform:
   - Win32
-  - x86
   - x64
-  - ARM64
 clone_depth: 50
-
-matrix:
-  exclude:
-    - platform: Win32
-      image: Ubuntu
-    - platform: ARM64
-      image: Ubuntu
-    - platform: x86
-      image: Visual Studio 2017 Preview
-
-before_build:
-- cmd: echo %TIME%
-- cmd: git submodule update --init
-- cmd: echo %TIME%
-- cmd: cmake -G "Visual Studio 15 2017" -A Win32 -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- cmd: echo %TIME%
-
-build:
-  project: Cuberite.sln
-  parallel: true
-  verbosity: minimal
 
 for:
 -
   matrix:
     only:
-      - platform: x64
-        image: Visual Studio 2017 Preview
+      - platform: Win32
 
   before_build:
-  - cmd: echo %TIME%
-  - cmd: git submodule update --init
-  - cmd: echo %TIME%
-  - cmd: cmake -G "Visual Studio 15 2017" -A Win64 -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-  - cmd: echo %TIME%
-
-  build:
-    project: Cuberite.sln
-    parallel: true
-    verbosity: minimal
-
--
-  matrix:
-    only:
-      - platform: ARM64
-        image: Visual Studio 2017 Preview
-
-  before_build:
-  - cmd: echo %TIME%
-  - cmd: git submodule update --init
-  - cmd: echo %TIME%
-  - cmd: cmake -G "Visual Studio 15 2017" -A ARM64 -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-  - cmd: echo %TIME%
-
-  build:
-    project: Cuberite.sln
-    parallel: true
-    verbosity: minimal
-
--
-  matrix:
-    only:
-      - platform: x86
-        image: Ubuntu
-
-  init:
-  - sudo apt update
-  - sudo apt install --quiet --assume-yes libc6-i386 gcc-multilib g++-multilib
-
-  build_script:
+  - echo %TIME%
   - git submodule update --init
-  - cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE -DFORCE_32=ON
-  - make -j`nproc`
+  - echo %TIME%
+  - cmake -G "Visual Studio 15 2017 Win32" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - echo %TIME%
 
 -
   matrix:
     only:
       - platform: x64
-        image: Ubuntu
 
-  build_script:
+  before_build:
+  - echo %TIME%
   - git submodule update --init
-  - cmake . -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
-  - make -j`nproc`
+  - echo %TIME%
+  - cmake -G "Visual Studio 15 2017 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - echo %TIME%
+
+build:
+  project: Cuberite.sln
+  parallel: true
+  verbosity: minimal
 
 artifacts:
   - path: Server
