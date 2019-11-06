@@ -13,7 +13,6 @@ matrix:
   exclude:
     - platform: arm64
       image: Ubuntu
-    - image: Ubuntu
 
 before_build:
 - cmd: echo %TIME%
