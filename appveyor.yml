@@ -1,5 +1,8 @@
 version: 1.0.{build}
 image: Visual Studio 2015
+configuration:
+- Debug
+- Release
 clone_depth: 50
 
 # Set up environment variables for build info
@@ -25,12 +28,11 @@ for:
   matrix:
     only:
       - job_name: Windows-debug
+			- configuration: Debug
 
   branches:
     except:
       - master
-
-  configuration: Debug
 
   before_build:
   - mkdir Debug
@@ -51,12 +53,11 @@ for:
   matrix:
     only:
       - job_name: Windows-x86
+			- configuration: Release
 
   branches:
     only:
       - master
-
-  configuration: Release
 
   before_build:
   - mkdir Release-x86
@@ -77,12 +78,11 @@ for:
   matrix:
     only:
       - job_name: Windows-x64
+			- configuration: Release
 
   branches:
     only:
       - master
-
-  configuration: Release
 
   before_build:
   - mkdir Release-x64
