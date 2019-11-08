@@ -31,14 +31,14 @@ for:
   configuration: Debug
 
   before_build:
-  - mkdir Release-debug
-  - cd Release-debug
+  - mkdir Debug
+  - cd Debug
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
 
   build:
-    project: Release-debug\Cuberite.sln
+    project: Debug\Cuberite.sln
     parallel: true
     verbosity: minimal
 
@@ -47,7 +47,7 @@ for:
   matrix:
     only:
       - job_name: Windows-x86
-	
+
   branches:
     only:
       - master
@@ -92,8 +92,8 @@ for:
 
 cache:
   - Release-x86
-	- Release-x64
-	- Debug
+  - Release-x64
+  - Debug
 
 after_build:
 - cd ..
