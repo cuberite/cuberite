@@ -120,7 +120,7 @@ after_build:
 - echo load APIDump  1>>cmds.txt
 - echo api  1>>cmds.txt
 - echo stop  1>>cmds.txt
-- cmd: %CUBERITE_EXECUTABLE% --port 32767  0<cmds.txt
+- %CUBERITE_EXECUTABLE% --port 32767  0<cmds.txt
 - cd ..
 - cd src/Bindings/docs
 - 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
