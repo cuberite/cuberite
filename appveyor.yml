@@ -1,8 +1,5 @@
 version: 1.0.{build}
 image: Visual Studio 2015
-configuration:
-- Debug
-- Release
 clone_depth: 50
 
 # Set up environment variables for build info
@@ -14,8 +11,11 @@ environment:
 
   matrix:
   - job_name: Windows-debug
+    configuration: Debug
   - job_name: Windows-x86
+    configuration: Release
   - job_name: Windows-x64
+    configuration: Release
 
 install:
 - echo %TIME%
@@ -28,7 +28,6 @@ for:
 -
   matrix:
     only:
-      - configuration: Debug
       - job_name: Windows-debug
 
   branches:
@@ -59,7 +58,6 @@ for:
 -
   matrix:
     only:
-      - configuration: Release
       - job_name: Windows-x86
 
   branches:
@@ -87,7 +85,6 @@ for:
 -
   matrix:
     only:
-      - configuration: Release
       - job_name: Windows-x64
 
   branches:
