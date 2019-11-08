@@ -15,6 +15,8 @@ environment:
 install:
 - echo %TIME%
 - git submodule update --init
+- mkdir Release
+- cd Release
 - echo %TIME%
 
 for:
@@ -24,7 +26,7 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
 
 -
@@ -33,7 +35,7 @@ for:
       - job_name: Windows-x64
 
   before_build:
-  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
 
 build:
@@ -42,6 +44,7 @@ build:
   verbosity: minimal
 
 after_build:
+- cd ..
 - cd Install
 - echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
 - 7z a -tzip -y ../Cuberite.zip -scsWIN -i@Zip2008.list -xr!*.git*
@@ -62,6 +65,8 @@ after_build:
 - cd ..\..\..\Server
 - 7z a -tzip -y ../ManualAPI.zip -scsWIN "ManualAPI.lua"
 
+cache:
+  - Release
 
 artifacts:
   - path: Cuberite.zip
