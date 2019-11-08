@@ -79,7 +79,7 @@ for:
     verbosity: minimal
 
   cache:
-	  - Release-x86
+    - Release-x86
 
 ################################
 # Windows 64-bit release build #
