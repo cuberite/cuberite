@@ -18,7 +18,9 @@ install:
 - git submodule update --init
 
 for:
-# Windows 32-bit debug build
+##############################
+# Windows 32-bit debug build #
+##############################
 -
   matrix:
     only:
@@ -42,7 +44,9 @@ for:
     parallel: true
     verbosity: minimal
 
-# Windows 32-bit release build
+################################
+# Windows 32-bit release build #
+################################
 -
   matrix:
     only:
@@ -66,7 +70,9 @@ for:
     parallel: true
     verbosity: minimal
 
-# Windows 64-bit release build
+################################
+# Windows 64-bit release build #
+################################
 -
   matrix:
     only:
