@@ -1,47 +1,99 @@
 version: 1.0.{build}
 image: Visual Studio 2015
-configuration: Release
 clone_depth: 50
 
+# Set up environment variables for build info
 environment:
   CUBERITE_BUILD_SERIES_NAME: AppVeyor
   CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
   CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
 
   matrix:
+  - job_name: Windows-debug
   - job_name: Windows-x86
   - job_name: Windows-x64
 
 install:
 - echo %TIME%
 - git submodule update --init
-- mkdir Release
-- cd Release
-- echo %TIME%
 
 for:
+# Windows 32-bit debug build
+-
+  matrix:
+    only:
+      - job_name: Windows-debug
+
+  branches:
+    except:
+		  - master
+
+  configuration: Debug
+
+  before_build:
+  - mkdir Release-debug
+  - cd Release-debug
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  - echo %TIME%
+
+  build:
+    project: Release-debug\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+# Windows 32-bit release build
 -
   matrix:
     only:
       - job_name: Windows-x86
+	
+  branches:
+    only:
+      - master
+
+  configuration: Release
 
   before_build:
+  - mkdir Release-x86
+  - cd Release-x86
+  - echo %TIME%
   - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
 
+  build:
+    project: Release-x86\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+# Windows 64-bit release build
 -
   matrix:
     only:
       - job_name: Windows-x64
 
+  branches:
+    only:
+      - master
+
+  configuration: Release
+
   before_build:
+  - mkdir Release-x64
+  - cd Release-x64
+  - echo %TIME%
   - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
 
-build:
-  project: Release\Cuberite.sln
-  parallel: true
-  verbosity: minimal
+  build:
+    project: Release-x64\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+cache:
+  - Release-x86
+	- Release-x64
+	- Debug
 
 after_build:
 - cd ..
@@ -64,9 +116,6 @@ after_build:
 - 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
 - cd ..\..\..\Server
 - 7z a -tzip -y ../ManualAPI.zip -scsWIN "ManualAPI.lua"
-
-cache:
-  - Release
 
 artifacts:
   - path: Cuberite.zip
