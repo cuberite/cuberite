@@ -43,13 +43,16 @@ build:
   verbosity: minimal
 
 after_build:
-- 7z a PBDs.zip %APPVEYOR_BUILD_FOLDER%\Server\Cuberite.pdb
+- 7z a PDBs.zip Server\Cuberite.pdb src\bindings\Bindings.cpp src\bindings\Bindings.h
 - rm Server\Cuberite.pdb
-- 7z a Cuberite.zip %APPVEYOR_BUILD_FOLDER%\Server
+- 7z a Cuberite.zip %APPVEYOR_BUILD_FOLDER%\Server\*
 
 artifacts:
   - path: PDBs.zip
     name: PDBs
+
+  - path: Server\.luacheckrc
+    name: .luacheckrc
 
   - path: Cuberite.zip
     name: Cuberite
