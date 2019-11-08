@@ -4,13 +4,18 @@ configuration: Release
 clone_depth: 50
 
 environment:
-  CUBERITE_BUILD_SERIES_NAME: Windows
+  CUBERITE_BUILD_SERIES_NAME: AppVeyor
   CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
   CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
 
   matrix:
   - job_name: Windows-x86
   - job_name: Windows-x64
+
+install:
+- echo %TIME%
+- git submodule update --init
+- echo %TIME%
 
 for:
 -
@@ -19,9 +24,6 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - echo %TIME%
-  - git submodule update --init
-  - echo %TIME%
   - cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
@@ -31,9 +33,6 @@ for:
       - job_name: Windows-x64
 
   before_build:
-  - echo %TIME%
-  - git submodule update --init
-  - echo %TIME%
   - cmake -G "Visual Studio 15 2017 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
@@ -43,16 +42,39 @@ build:
   verbosity: minimal
 
 after_build:
-- 7z a PDBs.zip Server\Cuberite.pdb src\bindings\Bindings.cpp src\bindings\Bindings.h
-- rm Server\Cuberite.pdb
-- 7z a Cuberite.zip %APPVEYOR_BUILD_FOLDER%\Server\*
+- cd Install
+- echo Cuberite Windows-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
+- 7z a -tzip -y Cuberite.zip -scsWIN -i@Zip2008.list -xr!*.git*
+- cd ..
+- 7z a -tzip -y PDBs.zip -scsWIN -i@Install/Zip2008_PDBs.list -xr!*.git*
+- cd Server\plugins
+- git clone https://github.com/madmaxoft/ManualApiDump
+- cd ..
+- echo load ManualApiDump  1>cmds.txt
+- echo manualapi  1>>cmds.txt
+- echo load APIDump  1>>cmds.txt
+- echo api  1>>cmds.txt
+- echo stop  1>>cmds.txt
+- cuberite --port 32767  0<cmds.txt
+- cd ..
+- cd src/Bindings/docs
+- 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
+- cd ..\..\..\Server
+- 7z a -tzip -y ../ManualAPI.zip -scsWIN "ManualAPI.lua"
+
 
 artifacts:
+  - path: Install\Cuberite.zip
+    name: Cuberite
+
   - path: PDBs.zip
     name: PDBs
 
+  - path: AutoAPI.zip
+    name: AutoAPI
+
+  - path: ManualAPI.zip
+    name: ManualAPI
+
   - path: Server\.luacheckrc
     name: .luacheckrc
-
-  - path: Cuberite.zip
-    name: Cuberite
