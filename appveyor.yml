@@ -34,9 +34,9 @@ for:
     only:
       - job_name: Windows-debug
 
-  branches:
-    except:
-      - master
+  #branches:
+  #  except:
+  #    - master
 
   before_build:
   - if not exist Debug mkdir Debug
