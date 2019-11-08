@@ -24,7 +24,7 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmake -G "Visual Studio 15 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
 -
@@ -33,7 +33,7 @@ for:
       - job_name: Windows-x64
 
   before_build:
-  - cmake -G "Visual Studio 15 2017 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
+  - cmake -G "Visual Studio 15 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
   - echo %TIME%
 
 build:
