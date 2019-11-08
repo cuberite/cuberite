@@ -43,7 +43,7 @@ build:
 
 after_build:
 - cd Install
-- echo Cuberite Windows-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
+- echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
 - 7z a -tzip -y Cuberite.zip -scsWIN -i@Zip2008.list -xr!*.git*
 - cd ..
 - 7z a -tzip -y PDBs.zip -scsWIN -i@Install/Zip2008_PDBs.list -xr!*.git*
