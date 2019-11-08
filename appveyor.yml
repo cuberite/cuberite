@@ -10,7 +10,7 @@ environment:
   CUBERITE_BUILD_SERIES_NAME: AppVeyor
   CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
   CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
-	CUBERITE_EXECUTABLE: cuberite
+  CUBERITE_EXECUTABLE: cuberite
 
   matrix:
   - job_name: Windows-debug
@@ -36,7 +36,7 @@ for:
       - master
 
   environment:
-	  CUBERITE_EXECUTABLE: cuberite_debug
+    CUBERITE_EXECUTABLE: cuberite_debug
 
   before_build:
   - mkdir Debug
