@@ -29,7 +29,7 @@ for:
   matrix:
     only:
       - job_name: Windows-debug
-      - configuration: Debug
+        configuration: Debug
 
   branches:
     except:
@@ -50,6 +50,9 @@ for:
     parallel: true
     verbosity: minimal
 
+  cache:
+    - Debug
+
 ################################
 # Windows 32-bit release build #
 ################################
@@ -57,7 +60,7 @@ for:
   matrix:
     only:
       - job_name: Windows-x86
-      - configuration: Release
+        configuration: Release
 
   branches:
     only:
@@ -75,14 +78,17 @@ for:
     parallel: true
     verbosity: minimal
 
+  cache:
+	  - Release-x86
+
 ################################
 # Windows 64-bit release build #
 ################################
 -
   matrix:
     only:
-      - job_name: Windows-x64
       - configuration: Release
+        job_name: Windows-x64
 
   branches:
     only:
@@ -100,10 +106,8 @@ for:
     parallel: true
     verbosity: minimal
 
-cache:
-  - Release-x86
-  - Release-x64
-  - Debug
+  cache:
+    - Release-x64
 
 after_build:
 - cd ..
