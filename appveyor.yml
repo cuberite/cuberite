@@ -7,15 +7,19 @@ environment:
   CUBERITE_BUILD_SERIES_NAME: AppVeyor
   CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
   CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
-  CUBERITE_EXECUTABLE: cuberite
 
   matrix:
   - job_name: Windows-debug
     configuration: Debug
+    CUBERITE_EXECUTABLE: cuberite_debug
+
   - job_name: Windows-x86
     configuration: Release
+    CUBERITE_EXECUTABLE: cuberite
+
   - job_name: Windows-x64
     configuration: Release
+    CUBERITE_EXECUTABLE: cuberite
 
 install:
 - echo %TIME%
@@ -34,11 +38,8 @@ for:
     except:
       - master
 
-  environment:
-    CUBERITE_EXECUTABLE: cuberite_debug
-
   before_build:
-  - mkdir Debug
+  - if not exist Debug mkdir Debug
   - cd Debug
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
@@ -65,7 +66,7 @@ for:
       - master
 
   before_build:
-  - mkdir Release-x86
+  - if not exist Release-x86 mkdir Release-x86
   - cd Release-x86
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015" ..
@@ -92,7 +93,7 @@ for:
       - master
 
   before_build:
-  - mkdir Release-x64
+  - if not exist Release-x64 mkdir Release-x64
   - cd Release-x64
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015 Win64" ..
