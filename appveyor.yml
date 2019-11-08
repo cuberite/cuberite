@@ -10,6 +10,7 @@ environment:
   CUBERITE_BUILD_SERIES_NAME: AppVeyor
   CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
   CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
+	CUBERITE_EXECUTABLE: cuberite
 
   matrix:
   - job_name: Windows-debug
@@ -33,6 +34,9 @@ for:
   branches:
     except:
       - master
+
+  environment:
+	  CUBERITE_EXECUTABLE: cuberite_debug
 
   before_build:
   - mkdir Debug
@@ -116,7 +120,7 @@ after_build:
 - echo load APIDump  1>>cmds.txt
 - echo api  1>>cmds.txt
 - echo stop  1>>cmds.txt
-- cuberite --port 32767  0<cmds.txt
+- %CUBERITE_EXECUTABLE% --port 32767  0<cmds.txt
 - cd ..
 - cd src/Bindings/docs
 - 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
