@@ -28,7 +28,7 @@ for:
 -
   matrix:
     only:
-		  - configuration: Debug
+      - configuration: Debug
       - job_name: Windows-debug
 
   branches:
@@ -59,7 +59,7 @@ for:
 -
   matrix:
     only:
-		  - configuration: Release
+      - configuration: Release
       - job_name: Windows-x86
 
   branches:
@@ -87,8 +87,8 @@ for:
 -
   matrix:
     only:
-		  - job_name: Windows-x64
       - configuration: Release
+      - job_name: Windows-x64
 
   branches:
     only:
