@@ -62,7 +62,7 @@ for:
   - mkdir Release-x86
   - cd Release-x86
   - echo %TIME%
-  - cmake -G "Visual Studio 14 2015" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  - cmake -G "Visual Studio 14 2015" ..
   - echo %TIME%
 
   build:
@@ -88,7 +88,7 @@ for:
   - mkdir Release-x64
   - cd Release-x64
   - echo %TIME%
-  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  - cmake -G "Visual Studio 14 2015 Win64" ..
   - echo %TIME%
 
   build:
