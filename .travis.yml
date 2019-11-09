@@ -16,6 +16,7 @@ matrix:
         homebrew:
           packages:
             - ccache
+          update: true
     - os: osx
       compiler: clang
       env: &Debug
@@ -63,6 +64,10 @@ matrix:
     # gcc on arm64
     - compiler: gcc
       arch: arm64
+      addons:
+        apt:
+          packages:
+            - ccache
       env: *Debug
 
 script: ./CIbuild.sh
