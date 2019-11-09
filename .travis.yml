@@ -71,7 +71,16 @@ matrix:
       env: *Debug
 
 script: ./CIbuild.sh
-cache: ccache
+before_cache:
+  - |
+    if [["$TRAVIS_OS_NAME" == "osx"]]; then
+      brew cleanup
+    fi
+cache:
+  ccache: true
+  directories:
+    - $HOME/Library/Caches/Homebrew
+
 
 notifications:
   email:
