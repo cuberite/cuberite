@@ -70,6 +70,8 @@ matrix:
             - ccache
       env: *Debug
 
+before_script:
+  - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
 script: ./CIbuild.sh
 before_cache:
   - |
