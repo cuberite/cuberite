@@ -12,10 +12,15 @@ matrix:
       compiler: clang
       env: &Release
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
+      addons: &osx_ccache
+        homebrew:
+          packages:
+            - ccache
     - os: osx
       compiler: clang
       env: &Debug
         - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
+      addons: *osx_ccache
     # Default clang
     - compiler: clang
       env: *Release
@@ -61,6 +66,7 @@ matrix:
       env: *Debug
 
 script: ./CIbuild.sh
+cache: ccache
 
 notifications:
   email:
