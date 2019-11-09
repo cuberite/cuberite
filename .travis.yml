@@ -12,16 +12,10 @@ matrix:
       compiler: clang
       env: &Release
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
-      addons: &osx_ccache
-        homebrew:
-          packages:
-            - ccache
-          update: true
     - os: osx
       compiler: clang
       env: &Debug
         - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
-      addons: *osx_ccache
     # Default clang
     - compiler: clang
       env: *Release
@@ -73,15 +67,7 @@ matrix:
 before_script:
   - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
 script: ./CIbuild.sh
-before_cache:
-  - |
-    if [["$TRAVIS_OS_NAME" == "osx"]]; then
-      brew cleanup
-    fi
-cache:
-  ccache: true
-  directories:
-    - $HOME/Library/Caches/Homebrew
+cache: ccache
 
 
 notifications:
