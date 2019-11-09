@@ -6,6 +6,15 @@ os: linux
 
 matrix:
   include:
+    # gcc on arm64
+    - compiler: gcc
+      arch: arm64
+      addons:
+        apt:
+          packages:
+            - ccache
+      env: &Debug
+        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
     # AppleClang
     # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
     - os: osx
@@ -14,8 +23,7 @@ matrix:
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
     - os: osx
       compiler: clang
-      env: &Debug
-        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
+      env: *Debug
     # Default clang
     - compiler: clang
       env: *Release
@@ -54,14 +62,6 @@ matrix:
       addons: *gcc48
       before_install:
         - CC=gcc-4.8;CXX=g++-4.8
-      env: *Debug
-    # gcc on arm64
-    - compiler: gcc
-      arch: arm64
-      addons:
-        apt:
-          packages:
-            - ccache
       env: *Debug
 
 before_script:
