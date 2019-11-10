@@ -12,6 +12,7 @@
 #include "DeadlockDetect.h"
 #include "LineBlockTracer.h"
 #include "UUID.h"
+#include "BlockInServerPluginInterface.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -1572,17 +1573,17 @@ bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 
 
 
-void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 {
 	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
 	{
 		// There is a sapling here, grow a tree according to its type:
-		GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
+		return GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
 	}
 	else
 	{
 		// There is nothing here, grow a tree based on the current biome here:
-		GrowTreeByBiome(a_X, a_Y, a_Z);
+		return GrowTreeByBiome(a_X, a_Y, a_Z);
 	}
 }
 
@@ -1590,7 +1591,7 @@ void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
+bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
@@ -1611,7 +1612,7 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 		{
 			if (!GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta))
 			{
-				return;
+				return false;
 			}
 
 			GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other);
@@ -1620,7 +1621,7 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
-	GrowTreeImage(Other);
+	return GrowTreeImage(Other);
 }
 
 
@@ -1713,21 +1714,21 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 
 
 
-void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
 	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
-	GrowTreeImage(Other);
+	return GrowTreeImage(Other);
 }
 
 
 
 
 
-void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
+bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 {
 	// Check that the tree has place to grow
 
@@ -1744,7 +1745,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 	// Query blocktypes and metas at those log blocks:
 	if (!GetBlocks(b2, false))
 	{
-		return;
+		return false;
 	}
 
 	// Check that at each log's coord there's an block allowed to be overwritten:
@@ -1758,339 +1759,32 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 			}
 			default:
 			{
-				return;
+				return false;
 			}
 		}
 	}  // for itr - b2[]
 
 	// All ok, replace blocks with the tree image:
 	m_ChunkMap->ReplaceTreeBlocks(a_Blocks);
+	return true;
 }
 
 
 
 
 
-bool cWorld::GrowRipePlant(const int a_BlockX, const int a_BlockY, const int a_BlockZ, bool a_IsByBonemeal)
+int cWorld::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 {
-	auto & random = GetRandomProvider();
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	const Vector3i BlockPos{a_BlockX, a_BlockY, a_BlockZ};
-	switch (BlockType)
-	{
-		case E_BLOCK_BEETROOTS:
-		{
-			if ((a_IsByBonemeal && !m_IsBeetrootsBonemealable) || (BlockMeta >= 3))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += 1;
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
+	return m_ChunkMap->GrowPlantAt(a_BlockPos, a_NumStages);
+}
 
-		case E_BLOCK_CARROTS:
-		{
-			if ((a_IsByBonemeal && !m_IsCarrotsBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
 
-		case E_BLOCK_COCOA_POD:
-		{
-			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
-			int GrowState = BlockMeta >> 2;
 
-			if (GrowState >= 2)
-			{
-				return false;
-			}
-			++GrowState;
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
 
-		case E_BLOCK_CROPS:
-		{
-			if ((a_IsByBonemeal && !m_IsCropsBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
 
-		case E_BLOCK_MELON_STEM:
-		{
-			if (BlockMeta < 7)
-			{
-				if (a_IsByBonemeal && !m_IsMelonStemBonemealable)
-				{
-					return false;
-				}
-
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			}
-			else
-			{
-				if (a_IsByBonemeal && !m_IsMelonBonemealable)
-				{
-					return false;
-				}
-				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
-				{
-					return false;
-				}
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_POTATOES:
-		{
-			if ((a_IsByBonemeal && !m_IsPotatoesBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_PUMPKIN_STEM:
-		{
-			if (BlockMeta < 7)
-			{
-				if (a_IsByBonemeal && !m_IsPumpkinStemBonemealable)
-				{
-					return false;
-				}
-
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			}
-			else
-			{
-				if (a_IsByBonemeal && !m_IsPumpkinBonemealable)
-				{
-					return false;
-				}
-				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
-				{
-					return false;
-				}
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_SAPLING:
-		{
-			if (a_IsByBonemeal && !m_IsSaplingBonemealable)
-			{
-				return false;
-			}
-			NIBBLETYPE TypeMeta = BlockMeta & 0x07;
-			int GrowState = BlockMeta >> 3;
-
-			if (GrowState < 1)
-			{
-				// Non-bonemeal forces a growth, while bonemeal only has a chance of growing it
-				if (!a_IsByBonemeal)
-				{
-					++GrowState;
-				}
-				else if (random.RandBool(0.45))
-				{
-					++GrowState;
-				}
-
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 3 | TypeMeta));
-			}
-			else if (random.RandBool(0.45))
-			{
-				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_GRASS:
-		{
-			if (a_IsByBonemeal && !m_IsGrassBonemealable)
-			{
-				return false;
-			}
-			auto & r1 = GetRandomProvider();
-			for (int i = 0; i < 60; i++)
-			{
-				int OfsX = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-				int OfsY = r1.RandInt(3) + r1.RandInt(3) - 3;
-				int OfsZ = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-				BLOCKTYPE Ground = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ);
-				if (Ground != E_BLOCK_GRASS)
-				{
-					continue;
-				}
-				BLOCKTYPE Above  = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ);
-				if (Above != E_BLOCK_AIR)
-				{
-					continue;
-				}
-				BLOCKTYPE  SpawnType;
-				NIBBLETYPE SpawnMeta = 0;
-				switch (r1.RandInt(10))
-				{
-					case 0:  SpawnType = E_BLOCK_YELLOW_FLOWER; break;
-					case 1:  SpawnType = E_BLOCK_RED_ROSE;      break;
-					default:
-					{
-						SpawnType = E_BLOCK_TALL_GRASS;
-						SpawnMeta = E_META_TALL_GRASS_GRASS;
-						break;
-					}
-				}  // switch (random spawn block type)
-				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, {a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ}, 0);
-			}  // for i - 50 times
-			return true;
-		}
-
-		case E_BLOCK_SUGARCANE:
-		{
-			if (a_IsByBonemeal && !m_IsSugarcaneBonemealable)
-			{
-				return false;
-			}
-			if (m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_CACTUS:
-		{
-			if (a_IsByBonemeal && !m_IsCactusBonemealable)
-			{
-				return false;
-			}
-			if (m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_TALL_GRASS:
-		{
-			if (a_IsByBonemeal && !m_IsTallGrassBonemealable)
-			{
-				return false;
-			}
-			if (!m_ChunkMap->GrowTallGrass(a_BlockX, a_BlockY, a_BlockZ))
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			return true;
-		}
-
-		case E_BLOCK_BIG_FLOWER:
-		{
-			if (a_IsByBonemeal && !m_IsBigFlowerBonemealable)
-			{
-				return false;
-			}
-			if (BlockMeta & 8)  // the upper flower block does not save the type of the flower
-			{
-				GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_BIG_FLOWER)
-				{
-					return false;
-				}
-			}
-			if (
-				(BlockMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
-				(BlockMeta == E_META_BIG_FLOWER_LARGE_FERN)
-			)  // tall grass and fern do not work
-			{
-				return false;
-			}
-
-			// spawn flower item
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, BlockPos, 0);
-			cItems FlowerItem;
-			FlowerItem.Add(E_BLOCK_BIG_FLOWER, 1, BlockMeta);
-			SpawnItemPickups(FlowerItem, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
-			return true;
-		}
-
-	}  // switch (BlockType)
-	return false;
+bool cWorld::GrowRipePlant(Vector3i a_BlockPos)
+{
+	return (GrowPlantAt(a_BlockPos, 16) > 0);
 }
 
 
@@ -2099,7 +1793,8 @@ bool cWorld::GrowRipePlant(const int a_BlockX, const int a_BlockY, const int a_B
 
 int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	return m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	LOGWARNING("cWorld::GrowCactus is obsolete, use cWorld::GrowPlantAt instead");
+	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ});
 }
 
 
@@ -2108,7 +1803,8 @@ int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocks
 
 bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
-	return m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType);
+	LOGWARNING("cWorld::GrowMelonPumpkin is obsolete, use cWorld::GrowPlantAt instead");
+	return (m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, 16) > 0);  // 8 stages for the stem, 8 attempts for the produce
 }
 
 
@@ -2117,7 +1813,8 @@ bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYP
 
 int cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	return m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	LOGWARNING("cWorld::GrowSugarcane is obsolete, use cWorld::GrowPlantAt instead");
+	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, a_NumBlocksToGrow);
 }
 
 
@@ -2173,36 +1870,36 @@ void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 
 
 
-void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 }
 
 
 
 
 
-void cWorld::SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
 {
-	m_ChunkMap->SetBlockMeta(a_X, a_Y, a_Z, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
 }
 
 
 
 
 
-NIBBLETYPE cWorld::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
+NIBBLETYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos)
 {
-	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
+	return m_ChunkMap->GetBlockSkyLight(a_BlockPos);
 }
 
 
 
 
 
-NIBBLETYPE cWorld::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+NIBBLETYPE cWorld::GetBlockBlockLight(Vector3i a_BlockPos)
 {
-	return m_ChunkMap->GetBlockBlockLight(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->GetBlockBlockLight(a_BlockPos);
 }
 
 
@@ -2218,9 +1915,9 @@ bool cWorld::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBB
 
 
 
-bool cWorld::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	return m_ChunkMap->GetBlockInfo(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+	return m_ChunkMap->GetBlockInfo(a_BlockPos, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
 }
 
 

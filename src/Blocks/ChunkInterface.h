@@ -33,15 +33,26 @@ public:
 		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
 	}
 
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true);
+	/** Sets the meta for the specified block, while keeping the blocktype.
+	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
+	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
+	Ignored if the chunk is invalid. */
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true);
+
+	/** OBSOLETE, Use the Vector3-based overload instead.
+	Sets the meta for the specified block, while keeping the blocktype.
+	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
+	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
+	Ignored if the chunk is invalid. */
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClient = true)
+	{
+		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClient);
+	}
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates.
-	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block)
-	*/
-	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
-	void FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block). */
+	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */

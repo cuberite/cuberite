@@ -82,13 +82,9 @@ public:
 		return false;
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
-	{
-		if (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth)
-		{
-			a_Chunk.GetWorld()->GrowSugarcane(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
-		}
-	}
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -97,17 +93,60 @@ public:
 	}
 
 
-protected:
 
-	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+
+
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
 	{
-		auto Action = paStay;
-		if (((a_RelY + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR))
+		// Check the total height of the sugarcane blocks here:
+		int top = a_RelPos.y + 1;
+		while (
+			(top < cChunkDef::Height) &&
+			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+		)
 		{
-			Action = super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+			++top;
+		}
+		int bottom = a_RelPos.y - 1;
+		while (
+			(bottom > 0) &&
+			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+		)
+		{
+			--bottom;
 		}
 
-		return Action;
+		// Grow by at most a_NumStages, but no more than max height:
+		auto toGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top - bottom));
+		Vector3i topPos(a_RelPos.x, top, a_RelPos.z);
+		for (int i = 0; i < toGrow; i++)
+		{
+			if (a_Chunk.GetBlock(topPos.addedY(i)) == E_BLOCK_AIR)
+			{
+				a_Chunk.SetBlock(topPos.addedY(i), E_BLOCK_SUGARCANE, 0);
+			}
+			else
+			{
+				return i;
+			}
+		}  // for i
+		return toGrow;
+	}
+
+
+
+
+
+protected:
+
+	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) override
+	{
+		// Only allow growing if there's an air block above:
+		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		{
+			return super::CanGrow(a_Chunk, a_RelPos);
+		}
+		return paStay;
 	}
 } ;
 

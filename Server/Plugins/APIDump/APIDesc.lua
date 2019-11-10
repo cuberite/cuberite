@@ -17718,6 +17718,7 @@ end
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",
 		"Globals.esMax",
+		"Globals.E_BLOCK_*",
 	},
 	IgnoreVariables =
 	{

@@ -57,7 +57,7 @@ cChunk::cChunk(
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
-) :
+):
 	m_Presence(cpInvalid),
 	m_ShouldGenerateIfLoadFailed(false),
 	m_IsLightValid(false),
@@ -611,7 +611,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 			continue;
 		}
 
-		auto newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
+		auto newMob = a_MobSpawner.TryToSpawnHere(this, {TryX, TryY, TryZ}, Biome, MaxNbOfSuccess);
 		if (newMob == nullptr)
 		{
 			continue;
@@ -984,92 +984,30 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 
 
 
-bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
+int cChunk::GrowPlantAt(Vector3i a_RelPos, int a_NumStages)
 {
-	auto & Random = GetRandomProvider();
+	auto blockHandler = BlockHandler(GetBlock(a_RelPos));
+	return blockHandler->Grow(*this, a_RelPos, a_NumStages);
+}
 
-	// Convert the stem BlockType into produce BlockType
-	BLOCKTYPE ProduceType;
-	switch (a_BlockType)
-	{
-		case E_BLOCK_MELON_STEM:   ProduceType = E_BLOCK_MELON;   break;
-		case E_BLOCK_PUMPKIN_STEM: ProduceType = E_BLOCK_PUMPKIN; break;
-		default:
-		{
-			ASSERT(!"Unhandled blocktype in TickMelonPumpkin()");
-			return false;
-		}
-	}
 
-	// Check if there's another melon / pumpkin around that stem, if so, abort:
-	bool IsValid;
-	BLOCKTYPE BlockType[4];
-	NIBBLETYPE BlockMeta;  // unused
-	IsValid =            UnboundedRelGetBlock(a_RelX + 1, a_RelY, a_RelZ,     BlockType[0], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX - 1, a_RelY, a_RelZ,     BlockType[1], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
-	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
-	if (
-		!IsValid ||
-		(BlockType[0] == ProduceType) ||
-		(BlockType[1] == ProduceType) ||
-		(BlockType[2] == ProduceType) ||
-		(BlockType[3] == ProduceType)
-	)
+
+
+
+bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+{
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		// Neighbors not valid or already taken by the same produce
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-
-	// Pick a direction in which to place the produce:
-	int x = 0, z = 0;
-	int CheckType = Random.RandInt(3);  // The index to the neighbors array which should be checked for emptiness
-	switch (CheckType)
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
-		case 0: x =  1; break;
-		case 1: x = -1; break;
-		case 2: z =  1; break;
-		case 3: z = -1; break;
+		// The chunk is not available, bail out
+		return false;
 	}
-
-	// Check that the block in that direction is empty:
-	switch (BlockType[CheckType])
-	{
-		case E_BLOCK_AIR:
-		case E_BLOCK_SNOW:
-		case E_BLOCK_TALL_GRASS:
-		case E_BLOCK_DEAD_BUSH:
-		{
-			break;
-		}
-		default: return false;
-	}
-
-	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
-	BLOCKTYPE Soil;
-	VERIFY(UnboundedRelGetBlock(a_RelX + x, a_RelY - 1, a_RelZ + z, Soil, BlockMeta));
-	switch (Soil)
-	{
-		case E_BLOCK_DIRT:
-		case E_BLOCK_GRASS:
-		case E_BLOCK_FARMLAND:
-		{
-			// Place a randomly-facing produce:
-			NIBBLETYPE Meta = (ProduceType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
-			FLOGD("Growing melon / pumpkin at {0} (<{1}, {2}> from stem), overwriting {3}, growing on top of {4}, meta {5}",
-				PositionToWorldPosition(a_RelX + x, a_RelY, a_RelZ + z),
-				x, z,
-				ItemTypeToString(BlockType[CheckType]),
-				ItemTypeToString(Soil),
-				Meta
-			);
-			VERIFY(UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, Meta));
-			auto absolute = RelativeToAbsolute(Vector3i{a_RelX + x, a_RelY, a_RelZ + z});
-			cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-			cBlockHandler::NeighborChanged(ChunkInterface, absolute.addedY(-1), BLOCK_FACE_YP);
-			break;
-		}
-	}
+	chunk->GetBlockTypeMeta(a_RelPos, a_BlockType, a_BlockMeta);
 	return true;
 }
 
@@ -1077,162 +1015,20 @@ bool cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 
 
-int cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+bool cChunk::UnboundedRelGetBlockType(Vector3i a_RelPos, BLOCKTYPE & a_BlockType) const
 {
-	// Check the total height of the sugarcane blocks here:
-	int Top = a_RelY + 1;
-	while (
-		(Top < cChunkDef::Height) &&
-		(GetBlock(a_RelX, Top, a_RelZ) == E_BLOCK_SUGARCANE)
-	)
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		++Top;
-	}
-	int Bottom = a_RelY - 1;
-	while (
-		(Bottom > 0) &&
-		(GetBlock(a_RelX, Bottom, a_RelZ) == E_BLOCK_SUGARCANE)
-	)
-	{
-		--Bottom;
-	}
-
-	// Grow by at most a_NumBlocks, but no more than max height:
-	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxSugarcaneHeight() + 1 - (Top - Bottom));
-	for (int i = 0; i < ToGrow; i++)
-	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
-		{
-			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_SUGARCANE, 0);
-		}
-		else
-		{
-			return i;
-		}
-	}  // for i
-	return ToGrow;
-}
-
-
-
-
-
-int cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
-{
-	// Check the total height of the cacti blocks here:
-	int Top = a_RelY + 1;
-	while (
-		(Top < cChunkDef::Height) &&
-		(GetBlock(a_RelX, Top, a_RelZ) == E_BLOCK_CACTUS)
-	)
-	{
-		++Top;
-	}
-	int Bottom = a_RelY - 1;
-	while (
-		(Bottom > 0) &&
-		(GetBlock(a_RelX, Bottom, a_RelZ) == E_BLOCK_CACTUS)
-	)
-	{
-		--Bottom;
-	}
-
-	// Grow by at most a_NumBlocks, but no more than max height:
-	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxCactusHeight() + 1 - (Top - Bottom));
-	for (int i = 0; i < ToGrow; i++)
-	{
-		BLOCKTYPE  BlockType;
-		if (UnboundedRelGetBlockType(a_RelX, Top + i, a_RelZ, BlockType) && (BlockType == E_BLOCK_AIR))
-		{
-			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);
-
-			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
-			static const struct
-			{
-				int x, z;
-			} Coords[] =
-			{
-				{-1,  0},
-				{ 1,  0},
-				{ 0, -1},
-				{ 0,  1},
-			} ;
-			for (auto & Coord : Coords)
-			{
-				if (
-					UnboundedRelGetBlockType(a_RelX + Coord.x, Top + i, a_RelZ + Coord.z, BlockType) &&
-					(
-						cBlockInfo::IsSolid(BlockType) ||
-						(BlockType == E_BLOCK_LAVA) ||
-						(BlockType == E_BLOCK_STATIONARY_LAVA)
-					)
-				)
-				{
-					// Remove the cactus
-					GetWorld()->DropBlockAsPickups(RelativeToAbsolute({a_RelX, a_RelY, a_RelZ}), nullptr, nullptr);
-					return false;
-				}
-			}  // for i - Coords[]
-		}
-		else
-		{
-			return i;
-		}
-	}  // for i
-	return ToGrow;
-}
-
-
-
-
-
-bool cChunk::GrowTallGrass(int a_RelX, int a_RelY, int a_RelZ)
-{
-	if (a_RelY > (cChunkDef::Height - 2))
-	{
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
-	{
-		return false;
-	}
-	if (BlockType != E_BLOCK_TALL_GRASS)
-	{
-		return false;
-	}
-	NIBBLETYPE LargeFlowerMeta;
-	switch (BlockMeta)
-	{
-		case E_META_TALL_GRASS_GRASS: LargeFlowerMeta = E_META_BIG_FLOWER_DOUBLE_TALL_GRASS; break;
-		case E_META_TALL_GRASS_FERN:  LargeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
-		default:                      return false;
-	}
-	return UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_BIG_FLOWER, LargeFlowerMeta) &&
-		UnboundedRelFastSetBlock(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
-}
-
-
-
-
-
-bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
-{
-	if (!cChunkDef::IsValidHeight(a_RelY))
-	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
-		return false;
-	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	a_BlockType = chunk->GetBlock(a_RelPos);
 	return true;
 }
 
@@ -1240,20 +1036,20 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 
 
-bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
+bool cChunk::UnboundedRelGetBlockMeta(Vector3i a_RelPos, NIBBLETYPE & a_BlockMeta) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	a_BlockType = Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
+	a_BlockMeta = chunk->GetMeta(a_RelPos);
 	return true;
 }
 
@@ -1261,20 +1057,20 @@ bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 
 
-bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
+bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockBlockLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	a_BlockMeta = Chunk->GetMeta(a_RelX, a_RelY, a_RelZ);
+	a_BlockBlockLight = chunk->GetBlockLight(a_RelPos);
 	return true;
 }
 
@@ -1282,20 +1078,20 @@ bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLE
 
 
 
-bool cChunk::UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockBlockLight) const
+bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockSkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	a_BlockBlockLight = Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockSkyLight = chunk->GetSkyLight(a_RelPos);
 	return true;
 }
 
@@ -1303,20 +1099,21 @@ bool cChunk::UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, 
 
 
 
-bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockSkyLight) const
+bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	a_BlockSkyLight = Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockLight = chunk->GetBlockLight(a_RelPos);
+	a_SkyLight   = chunk->GetSkyLight  (a_RelPos);
 	return true;
 }
 
@@ -1324,21 +1121,20 @@ bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NI
 
 
 
-bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
+bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	a_BlockLight = Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
-	a_SkyLight = Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	chunk->SetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 	return true;
 }
 
@@ -1346,41 +1142,20 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 
 
 
-bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if (!cChunkDef::IsValidHeight(a_RelY))
+	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		LOGWARNING("UnboundedRelSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
+		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
 	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
+	if ((chunk == nullptr) || !chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
 	}
-	Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
-	return true;
-}
-
-
-
-
-
-bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	if (!cChunkDef::IsValidHeight(a_RelY))
-	{
-		LOGWARNING("UnboundedRelFastSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
-		return false;
-	}
-	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		// The chunk is not available, bail out
-		return false;
-	}
-	Chunk->FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	chunk->FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 	return true;
 }
 
@@ -1392,10 +1167,9 @@ void cChunk::UnboundedQueueTickBlock(Vector3i a_RelPos)
 {
 	if (!cChunkDef::IsValidHeight(a_RelPos.y))
 	{
-		// Outside of chunkmap
 		return;
 	}
-	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos.x, a_RelPos.z);
+	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
 	if ((chunk != nullptr) && chunk->IsValid())
 	{
 		chunk->QueueTickBlock(a_RelPos);
@@ -1436,14 +1210,14 @@ void cChunk::CreateBlockEntities(void)
 			auto BlockType = Section->m_BlockTypes[BlockIdx];
 			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
-				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				auto WorldPos = RelativeToAbsolute(RelPos);
+				auto relPos = IndexToCoordinate(BlockIdx);
+				relPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
+				auto absPos = RelativeToAbsolute(relPos);
 
-				if (!HasBlockEntityAt(WorldPos))
+				if (!HasBlockEntityAt(absPos))
 				{
 					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-						BlockType, GetMeta(RelPos), WorldPos, m_World
+						BlockType, GetMeta(relPos), absPos, m_World
 					));
 				}
 			}
@@ -1590,7 +1364,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 void cChunk::QueueTickBlock(Vector3i a_RelPos)
 {
-	ASSERT (IsValidRelPos(a_RelPos));
+	ASSERT(IsValidRelPos(a_RelPos));
 
 	if (!IsValid())
 	{
@@ -1606,7 +1380,7 @@ void cChunk::QueueTickBlock(Vector3i a_RelPos)
 
 void cChunk::QueueTickBlockNeighbors(Vector3i a_RelPos)
 {
-	static const Vector3i neighborCoords[] =
+	static const Vector3i neighborOfs[] =
 	{
 		{ 1,  0,  0},
 		{-1,  0,  0},
@@ -1615,9 +1389,9 @@ void cChunk::QueueTickBlockNeighbors(Vector3i a_RelPos)
 		{ 0,  0,  1},
 		{ 0,  0, -1},
 	} ;
-	for (const auto & neighbor: neighborCoords)
+	for (const auto & ofs: neighborOfs)
 	{
-		UnboundedQueueTickBlock(a_RelPos + neighbor);
+		UnboundedQueueTickBlock(a_RelPos + ofs);
 	}  // for i - Coords[]
 }
 
@@ -2581,22 +2355,22 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 
 
 
-cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) const
+cChunk * cChunk::GetRelNeighborChunkAdjustCoords(Vector3i & a_RelPos) const
 {
 	cChunk * ToReturn = const_cast<cChunk *>(this);
 
 	// The most common case: inside this chunk:
 	if (
-		(a_RelX >= 0) && (a_RelX < Width) &&
-		(a_RelZ >= 0) && (a_RelZ < Width)
+		(a_RelPos.x >= 0) && (a_RelPos.x < Width) &&
+		(a_RelPos.z >= 0) && (a_RelPos.z < Width)
 	)
 	{
 		return ToReturn;
 	}
 
 	// Request for a different chunk, calculate chunk offset:
-	int RelX = a_RelX;  // Make a local copy of the coords (faster access)
-	int RelZ = a_RelZ;
+	int RelX = a_RelPos.x;  // Make a local copy of the coords (faster access)
+	int RelZ = a_RelPos.z;
 	while ((RelX >= Width) && (ToReturn != nullptr))
 	{
 		RelX -= Width;
@@ -2619,19 +2393,19 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 	}
 	if (ToReturn != nullptr)
 	{
-		a_RelX = RelX;
-		a_RelZ = RelZ;
+		a_RelPos.x = RelX;
+		a_RelPos.z = RelZ;
 		return ToReturn;
 	}
 
 	// The chunk cannot be walked through neighbors, find it through the chunkmap:
-	int AbsX = a_RelX + m_PosX * Width;
-	int AbsZ = a_RelZ + m_PosZ * Width;
+	int AbsX = a_RelPos.x + m_PosX * Width;
+	int AbsZ = a_RelPos.z + m_PosZ * Width;
 	int DstChunkX, DstChunkZ;
 	BlockToChunk(AbsX, AbsZ, DstChunkX, DstChunkZ);
 	ToReturn = m_ChunkMap->FindChunk(DstChunkX, DstChunkZ);
-	a_RelX = AbsX - DstChunkX * Width;
-	a_RelZ = AbsZ - DstChunkZ * Width;
+	a_RelPos.x = AbsX - DstChunkX * Width;
+	a_RelPos.z = AbsZ - DstChunkZ * Width;
 	return ToReturn;
 }
 
