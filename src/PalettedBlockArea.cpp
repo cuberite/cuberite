@@ -178,7 +178,7 @@ void PalettedBlockArea::paste(const PalettedBlockArea & aSrc, const cCuboid & aS
 	}
 
 	// Create a transform map from aSrc's palette to our palette:
-	auto paletteTransform = mPalette.createTransformMap(aSrc.mPalette);
+	auto paletteTransform = mPalette.createTransformMapAddMissing(aSrc.mPalette);
 
 	// Copy the data:
 	UInt32 srcStrideY = static_cast<UInt32>(aSrc.size().x * aSrc.size().z);

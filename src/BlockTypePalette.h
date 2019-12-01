@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <utility>
 #include "BlockState.h"
 
@@ -7,12 +8,32 @@
 
 
 
-/** Holds a palette that maps block type + state into numbers.
-Used primarily by PalettedBlockArea to translate between numeric and stringular block representation.
-The object itself provides no thread safety, users of this class need to handle locking, if required. */
+/** Holds a palette that maps between block type + state and numbers.
+Used primarily by PalettedBlockArea to map from stringular block representation to numeric,
+and by protocols to map from stringular block representation to protocol-numeric.
+The object itself provides no thread safety, users of this class need to handle locking, if required.
+Note that the palette itself doesn't support erasing;
+to erase, create a new instance and re-add only the wanted items.
+
+Internally, the object uses two synced maps, one for each translation direction. */
 class BlockTypePalette
 {
 public:
+
+	/** Exception that is thrown if requiesting an index not present in the palette. */
+	class NoSuchIndexException:
+		public std::runtime_error
+	{
+		using Super = std::runtime_error;
+
+	public:
+		NoSuchIndexException(UInt32 aIndex):
+			Super(Printf("No such palette index: %u", aIndex))
+		{
+		}
+	};
+
+
 
 	/** Create a new empty instance. */
 	BlockTypePalette();
@@ -29,16 +50,31 @@ public:
 	UInt32 count() const;
 
 	/** Returns the blockspec represented by the specified palette index.
-	The index must be valid (ASSERTed). */
+	If the index is not valid, throws a NoSuchIndexException. */
 	const std::pair<AString, BlockState> & entry(UInt32 aIndex) const;
 
-	/** Adds missing entries from aOther to this, and returns an index-transform map from aOther to this.
+	/** Returns an index-transform map from aFrom to this (this.entry(idx) == aFrom.entry(res[idx])).
+	Entries from aFrom that are not present in this are added.
 	Used when pasting two areas, to transform the src palette to dst palette. */
-	std::map<UInt32, UInt32> createTransformMap(const BlockTypePalette & aOther);
+	std::map<UInt32, UInt32> createTransformMapAddMissing(const BlockTypePalette & aFrom);
+
+	/** Returns an index-transform map from aFrom to this (this.entry(idx) == aFrom.entry(res[idx])).
+	Entries from aFrom that are not present in this are assigned the fallback index.
+	Used for protocol block type mapping. */
+	std::map<UInt32, UInt32> createTransformMapWithFallback(const BlockTypePalette & aFrom, UInt32 aFallbackIndex) const;
 
 
 protected:
 
-	/** The palette. Each item in the vector represents a single entry in the palette, the vector index is the palette index. */
-	std::vector<std::pair<AString, BlockState>> mPalette;
+	/** The mapping from numeric to stringular representation.
+	mNumberToBlock[index] = {"blockTypeName", blockState}. */
+	std::map<UInt32, std::pair<AString, BlockState>> mNumberToBlock;
+
+	/** The mapping from stringular to numeric representation.
+	mStringToNumber["blockTypeName"][blockState] = index. */
+	std::unordered_map<AString, std::map<BlockState, UInt32>> mBlockToNumber;
+
+	/** The maximum index ever used in the maps.
+	Used when adding new entries through the index() call. */
+	UInt32 mMaxIndex;
 };
