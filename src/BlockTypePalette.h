@@ -34,6 +34,20 @@ public:
 	};
 
 
+	/** Exception that is thrown when loading the palette fails hard (bad format). */
+	class LoadFailedException:
+		public std::runtime_error
+	{
+		using Super = std::runtime_error;
+
+	public:
+		LoadFailedException(const AString & aReason):
+			Super(aReason)
+		{
+		}
+	};
+
+
 
 	/** Create a new empty instance. */
 	BlockTypePalette();
@@ -63,6 +77,13 @@ public:
 	Used for protocol block type mapping. */
 	std::map<UInt32, UInt32> createTransformMapWithFallback(const BlockTypePalette & aFrom, UInt32 aFallbackIndex) const;
 
+	/** Loads the palette from the string representation.
+	Throws a LoadFailedException if the loading fails hard (bad string format).
+	If the string specifies duplicate entries (either to already existing entries, or to itself),
+	the duplicates replace the current values silently (this allows us to chain multiple files as "overrides".
+	Currently handles only JSON representation, expected to handle also Lua representation in the future. */
+	void loadFromString(const AString & aString);
+
 
 protected:
 
@@ -77,4 +98,11 @@ protected:
 	/** The maximum index ever used in the maps.
 	Used when adding new entries through the index() call. */
 	UInt32 mMaxIndex;
+
+
+	/** Loads the palette from the JSON representation.
+	Throws a LoadFailedException if the loading fails hard (bad string format).
+	If the string specifies duplicate entries (either to already existing entries, or to itself),
+	the duplicates replace the current values silently (this allows us to chain multiple files as "overrides". */
+	void loadFromJsonString(const AString & aJsonPalette);
 };
