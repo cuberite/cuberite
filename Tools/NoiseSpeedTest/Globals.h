@@ -233,3 +233,10 @@ public:
 
 
 
+
+/** Clamps the value into the specified range. */
+template <typename T>
+T Clamp(T a_Value, T a_Min, T a_Max)
+{
+	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}
