@@ -184,7 +184,6 @@ function ShowPage(WebAdmin, TemplateRequest)
 		</div>
 	</div>
 </div>
-</div>
 </body>
 </html>
 ]])
