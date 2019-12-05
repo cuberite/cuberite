@@ -56,7 +56,6 @@ end
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = cWebAdmin:GetBaseURL(TemplateRequest.Request.Path)
-	local RootURL = BaseURL .. "../"
 	local Title = "Cuberite WebAdmin"
 	local NumPlayers = cRoot:Get():GetServer():GetNumPlayers()
 	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
@@ -90,7 +89,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>]] .. Title .. [[</title>
-	<link rel="stylesheet" type="text/css" href="]] .. RootURL .. [[style.css">
+	<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
 <div class="header color-background">
@@ -104,7 +103,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 </div>
 <div class="panel">
 	<div class="wrapper">
-		<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>&nbsp;&nbsp;&nbsp;<a href="]] .. RootURL .. [[" class="link-logout">Log Out</a></div>
+		<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>&nbsp;&nbsp;&nbsp;<a href="/" class="link-logout">Log Out</a></div>
 		<ul class="menu top-links">
 			<li>Players online: <strong>]] .. NumPlayers .. [[</strong></li>
 			<li>Memory: <strong>]] .. string.format("%.2f", MemoryUsageKiB / 1024) .. [[MB</strong></li>
