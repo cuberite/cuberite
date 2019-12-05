@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # This script cross-compiles cuberite for the android platform. It uses
 # the following enviroment variables
 #   CMAKE: Should be the path to a cmake executable of version 3.7+
