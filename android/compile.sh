@@ -43,32 +43,21 @@ fi
 cd $BASEDIR
 
 case "$1" in
-	armeabi)
-		APILEVEL=16
-	;;
 
 	armeabi-v7a)
-		APILEVEL=16
+		APILEVEL=29
 	;;
 
 	arm64-v8a)
-		APILEVEL=21
-	;;
-
-	mips)
-		APILEVEL=16
-	;;
-
-	mips64)
-		APILEVEL=21
+		APILEVEL=29
 	;;
 
 	x86)
-		APILEVEL=16
+		APILEVEL=29
 	;;
 
 	x86_64)
-		APILEVEL=21
+		APILEVEL=29
 	;;
 
 	all)
@@ -77,7 +66,7 @@ case "$1" in
 		cd $BASEDIR/../Server
 		zip -r $BASEDIR/Server/server.zip *
 
-		for arch in armeabi armeabi-v7a arm64-v8a mips mips64 x86 x86_64; do
+		for arch in armeabi-v7a arm64-v8a x86 x86_64; do
 			echo "Doing ... $arch ..." && \
 			cd $BASEDIR && \
 			"$SELF" clean && \
@@ -88,7 +77,7 @@ case "$1" in
 		done
 
 		cd $BASEDIR/Server
-		for file in server.zip armeabi.zip armeabi-v7a.zip arm64-v8a.zip mips.zip mips64.zip x86.zip x86_64.zip; do
+		for file in server.zip armeabi-v7a.zip arm64-v8a.zip x86.zip x86_64.zip; do
 			echo "Generating sha1 sum for ... $file ..." && \
 			sha1sum "$file" > "$file".sha1
 		done
