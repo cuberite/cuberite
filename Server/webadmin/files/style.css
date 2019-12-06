@@ -91,13 +91,6 @@ a:hover, a:active {
 	padding: 8px;
 }
 
-.panel svg,
-.sidebar svg {
-	fill: #343434;
-	padding: 0 4px 0 0;
-	vertical-align: text-top;
-}
-
 .welcome {
 	display: inline;
 }
