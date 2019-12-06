@@ -68,7 +68,7 @@ a:hover, a:active {
 }
 
 .wrapper {
-	padding: 0 1.5em;
+	padding: 0 15px;
 	margin: auto;
 	max-width: 1000px;
 }
