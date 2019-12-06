@@ -103,8 +103,8 @@ function ShowPage(WebAdmin, TemplateRequest)
 </div>
 <div class="panel">
 	<div class="wrapper">
-		<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>&nbsp;&nbsp;&nbsp;<a href="/" class="link-logout">Log Out</a></div>
-		<ul class="menu top-links">
+		<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong><a href="/" class="link-logout">Log Out</a></div>
+		<ul class="stats">
 			<li>Players online: <strong>]] .. NumPlayers .. [[</strong></li>
 			<li>Memory: <strong>]] .. string.format("%.2f", MemoryUsageKiB / 1024) .. [[MB</strong></li>
 			<li>Chunks: <strong>]] .. NumChunks .. [[</strong></li>
@@ -113,11 +113,15 @@ function ShowPage(WebAdmin, TemplateRequest)
 </div>
 <div class="columns">
 	<div class="wrapper">
-		<div class="tborder left">
-			<h2 class="thead color-background">Menu</h2>
-			<div class="trow"><a href="]] .. BaseURL .. [[" class="sidebar-item link-home">Home</a></div>
-			<div class="tcat">Server Management</div>
-			<div class="trow">
+		<div class="column left">
+			<h2 class="head color-background">Menu</h2>
+			<ul class="sidebar">
+				<li>
+					<a href="]] .. BaseURL .. [[" class="link-home">Home</a>
+				</li>
+			</ul>
+			<div class="category">Server Management</div>
+			<ul class="sidebar">
 	]])
 
 	-- Get all tabs:
@@ -146,39 +150,35 @@ function ShowPage(WebAdmin, TemplateRequest)
 		
 		-- Translate the plugin name into the folder name (-> title)
 		local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
-		Output("<div class=\"sidebar-item link-page\"><strong>" .. pluginWebTitle .. "</strong></div>\n");
+		Output("<li><strong class=\"link-page\">" .. pluginWebTitle .. "</strong></li>\n");
 
 		-- Output each tab:
 		for _, tab in pairs(pluginTabs) do
-			Output("<div><a href=\"" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "\" class=\"sidebar-item link-subpage\">" .. tab.Title .. "</a></div>\n")
+			Output("<li><a href=\"" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "\" class=\"sidebar-item link-subpage\">" .. tab.Title .. "</a></li>\n")
 		end
 		Output("\n");
 	end
 
 
 	Output([[
-			</div>
+			</ul>
 		</div>
-		<div class="tborder">
-			<h1 class="thead color-background">]] .. SubTitle .. [[</h1>
-			<div class="tbody">]] .. PageContent .. [[</div>
+		<div class="column">
+			<h1 class="head color-background">]] .. SubTitle .. [[</h1>
+			<div class="main-content">]] .. PageContent .. [[</div>
 		</div>
 	</div>
 </div>
 <div class="footer">
-	<div class="upper">
+	<div class="footer-container">
 		<div class="wrapper">
-			<ul class="menu bottom-links">
+			<span class="copyright">Copyright © <a href="https://cuberite.org/" target="_blank">Cuberite Team</a></span>
+			<ul class="footer-links">
 				<li><a href="https://cuberite.org/" target="_blank">Cuberite</a></li>
 				<li><a href="https://forum.cuberite.org/" target="_blank">Forums</a></li>
 				<li><a href="https://api.cuberite.org/" target="_blank">API Docs</a></li>
 				<li><a href="https://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
-		</div>
-	</div>
-	<div class="lower color-background">
-		<div class="wrapper">
-			<span id="copyright">Copyright © <a href="https://cuberite.org/" target="_blank">Cuberite Team</a>.</span>
 		</div>
 	</div>
 </div>
