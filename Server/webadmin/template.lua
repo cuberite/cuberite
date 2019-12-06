@@ -8,18 +8,6 @@ end
 
 
 
-function GetTableSize(Table)
-	local Size = 0
-	for key,value in pairs(Table) do
-		Size = Size + 1
-	end
-	return Size
-end
-
-
-
-
-
 local function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
 
@@ -69,6 +57,17 @@ function ShowPage(WebAdmin, TemplateRequest)
 	if (PageContent == "") then
 		PageContent, SubTitle = GetDefaultPage()
 	end
+
+	--[[
+	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
+	local reqParamsClass = ""
+	for key, value in pairs(TemplateRequest.Request.Params) do
+		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
+	end
+	if (string.gsub(reqParamsClass, "%s", "") == "") then
+		reqParamsClass = " no-param"
+	end
+	--]]
 
 	Output([[
 <!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
