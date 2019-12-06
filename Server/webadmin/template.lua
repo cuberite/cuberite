@@ -105,7 +105,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<div class="wrapper">
 		<div class="welcome">
 			<strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>
-			<a href="/" class="link-logout">Log Out</a>
+			<a href="/" class="link-logout">Log out</a>
 		</div>
 		<ul class="stats">
 			<li>Players online: <strong>]] .. NumPlayers .. [[</strong></li>
