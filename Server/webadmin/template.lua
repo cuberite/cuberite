@@ -103,7 +103,10 @@ function ShowPage(WebAdmin, TemplateRequest)
 </div>
 <div class="panel">
 	<div class="wrapper">
-		<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong><a href="/" class="link-logout">Log Out</a></div>
+		<div class="welcome">
+			<strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>
+			<a href="/" class="link-logout">Log Out</a>
+		</div>
 		<ul class="stats">
 			<li>Players online: <strong>]] .. NumPlayers .. [[</strong></li>
 			<li>Memory: <strong>]] .. string.format("%.2f", MemoryUsageKiB / 1024) .. [[MB</strong></li>
