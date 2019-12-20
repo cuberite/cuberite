@@ -1,0 +1,5 @@
+# Ignore the scripts' outputs:
+*.json
+*.btp.txt
+UpgradeBlockTypePalette.txt
+

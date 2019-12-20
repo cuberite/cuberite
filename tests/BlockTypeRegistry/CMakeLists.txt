@@ -58,8 +58,8 @@ target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_lib_static)
 
 # Extra files for BlockTypePalette test:
 file (COPY
-	test.btp.json
-	../../Server/Protocol/1.13/base.btp.json
+	../../Server/Protocol/1.13/base.btp.txt
+	../../Server/Protocol/UpgradeBlockTypePalette.txt
 	DESTINATION ./
 )
 
