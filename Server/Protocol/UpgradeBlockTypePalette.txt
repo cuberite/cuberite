@@ -1,0 +1,554 @@
+UpgradeBlockTypePalette
+FileVersion	1
+CommonPrefix	minecraft:
+
+0	0	air
+1	0	stone
+1	1	granite
+1	2	polished_granite
+1	3	diorite
+1	4	polished_diorite
+1	5	andesite
+1	6	polished_andesite
+2	0	grass_block
+3	0	dirt
+3	1	coarse_dirt
+3	2	podzol
+4	0	cobblestone
+5	0	oak_planks
+5	1	spruce_planks
+5	2	birch_planks
+5	3	jungle_planks
+5	4	acacia_planks
+5	5	dark_oak_planks
+6	0	oak_sapling
+6	1	spruce_sapling
+6	2	birch_sapling
+6	3	jungle_sapling
+6	4	acacia_sapling
+6	5	dark_oak_sapling
+7	0	bedrock
+8	0	flowing_water
+9	0	water
+10	0	flowing_lava
+11	0	lava
+12	0	sand
+12	1	red_sand
+13	0	gravel
+14	0	gold_ore
+15	0	iron_ore
+16	0	coal_ore
+17	0	oak_log
+17	1	spruce_log
+17	2	birch_log
+17	3	jungle_log
+18	0	oak_leaves
+18	1	spruce_leaves
+18	2	birch_leaves
+18	3	jungle_leaves
+19	0	sponge
+19	1	wet_sponge
+20	0	glass
+21	0	lapis_ore
+22	0	lapis_block
+23	0	dispenser
+24	0	sandstone
+24	1	chiseled_sandstone
+24	2	smooth_sandstone
+25	0	note_block
+26	0	bed
+27	0	powered_rail
+28	0	detector_rail
+29	0	sticky_piston
+30	0	cobweb
+31	0	dead_bush
+31	1	grass
+31	2	fern
+32	0	dead_bush
+33	0	piston
+34	0	piston_head
+35	0	white_wool
+35	1	orange_wool
+35	2	magenta_wool
+35	3	light_blue_wool
+35	4	yellow_wool
+35	5	lime_wool
+35	6	pink_wool
+35	7	gray_wool
+35	8	light_gray_wool
+35	9	cyan_wool
+35	10	purple_wool
+35	11	blue_wool
+35	12	brown_wool
+35	13	green_wool
+35	14	red_wool
+35	15	black_wool
+36	0	moving_piston
+37	0	dandelion
+38	0	poppy
+38	1	blue_orchid
+38	2	allium
+38	3	azure_bluet
+38	4	red_tulip
+38	5	orange_tulip
+38	6	white_tulip
+38	7	pink_tulip
+38	8	oxeye_daisy
+39	0	brown_mushroom
+40	0	red_mushroom
+41	0	gold_block
+42	0	iron_block
+43	0	stone_slab
+43	1	sandstone_slab
+43	2	oak_slab
+43	3	cobblestone_slab
+43	4	brick_slab
+43	5	stone_brick_slab
+43	6	nether_brick_slab
+43	7	smooth_quartz
+43	8	stone_slab
+43	9	sandstone_slab
+44	0	stone_slab
+44	1	sandstone_slab
+44	2	oak_slab
+44	3	cobblestone_slab
+44	4	brick_slab
+44	5	stone_brick_slab
+44	6	nether_brick_slab
+44	7	quartz_slab
+44	8	stone_slab	type	top
+44	9	sandstone_slab	type	top
+44	10	oak_slab
+44	11	cobblestone_slab	type	top
+44	12	brick_slab	type	top
+44	13	stone_brick_slab	type	top
+44	14	nether_brick_slab	type	top
+44	15	quartz_slab	type	top
+45	0	bricks
+46	0	tnt
+47	0	bookshelf
+48	0	mossy_cobblestone
+49	0	obsidian
+50	0	torch
+51	0	fire
+52	0	spawner
+53	0	oak_stairs
+53	4	oak_stairs	half	top
+54	0	chest
+55	0	redstone_wire
+56	0	diamond_ore
+57	0	diamond_block
+58	0	crafting_table
+59	0	wheat
+59	0	wheat	age	0
+59	1	wheat	age	1
+59	2	wheat	age	2
+59	3	wheat	age	3
+59	4	wheat	age	4
+59	5	wheat	age	5
+59	6	wheat	age	6
+60	0	farmland
+60	0	farmland	moisture	0
+61	0	furnace
+62	0	furnace
+63	0	sign
+64	0	oak_door
+65	0	ladder
+66	0	rail
+67	0	cobblestone_stairs
+67	4	cobblestone_stairs	half	top
+68	0	wall_sign
+69	0	lever
+70	0	stone_pressure_plate
+71	0	iron_door
+72	0	oak_pressure_plate
+73	0	redstone_ore
+74	0	redstone_ore
+75	0	redstone_torch
+76	0	redstone_torch	powered	true
+77	0	stone_button
+78	0	snow
+79	0	ice
+80	0	snow_block
+81	0	cactus
+82	0	clay
+83	0	sugar_cane
+84	0	jukebox
+85	0	oak_fence
+86	0	pumpkin
+87	0	netherrack
+88	0	soul_sand
+89	0	glowstone
+90	0	nether_portal
+91	0	jack_o_lantern
+92	0	cake
+93	0	repeater
+94	0	repeater	powered	true
+95	0	white_stained_glass
+95	1	orange_stained_glass
+95	2	magenta_stained_glass
+95	3	light_blue_stained_glass
+95	4	yellow_stained_glass
+95	5	lime_stained_glass
+95	6	pink_stained_glass
+95	7	gray_stained_glass
+95	8	light_gray_stained_glass
+95	9	cyan_stained_glass
+95	10	purple_stained_glass
+95	11	blue_stained_glass
+95	12	brown_stained_glass
+95	13	green_stained_glass
+95	14	red_stained_glass
+95	15	black_stained_glass
+96	0	oak_trapdoor
+97	0	infested_stone
+97	1	infested_cobblestone
+97	2	infested_stone_bricks
+97	3	infested_mossy_stone_bricks
+97	4	infested_cracked_stone_bricks
+97	5	infested_chiseled_stone_bricks
+98	0	stone_bricks
+98	1	mossy_stone_bricks
+98	2	cracked_stone_bricks
+98	3	chiseled_stone_bricks
+99	0	brown_mushroom_block	up	false
+99	0	brown_mushroom_block
+99	1	brown_mushroom_block
+99	2	brown_mushroom_block
+99	3	brown_mushroom_block
+99	4	brown_mushroom_block
+99	5	brown_mushroom_block
+99	6	brown_mushroom_block
+99	7	brown_mushroom_block
+99	8	brown_mushroom_block
+99	9	brown_mushroom_block
+99	10	mushroom_stem	up	false
+99	14	brown_mushroom_block
+99	15	mushroom_stem
+100	0	red_mushroom_block
+100	0	red_mushroom_block	up	false
+100	1	red_mushroom_block
+100	2	red_mushroom_block
+100	3	red_mushroom_block
+100	4	red_mushroom_block
+100	5	red_mushroom_block
+100	6	red_mushroom_block
+100	7	red_mushroom_block
+100	8	red_mushroom_block
+100	9	red_mushroom_block
+100	10	mushroom_stem	up	false
+100	14	red_mushroom_block
+100	15	mushroom_stem
+101	0	iron_bars
+102	0	glass_pane
+103	0	melon
+104	0	pumpkin_stem
+105	0	melon_stem
+106	0	vine
+107	0	oak_fence_gate
+108	0	brick_stairs
+108	4	brick_stairs	half	top
+109	0	stone_brick_stairs
+109	4	stone_brick_stairs	half	top
+110	0	mycelium
+111	0	lily_pad
+112	0	nether_bricks
+113	0	nether_brick_fence
+114	0	nether_brick_stairs
+114	4	netherbrick_stairs	half	top
+115	0	nether_wart
+115	0	nether_wart	age	0
+115	3	nether_wart	age	3
+116	0	enchanting_table
+117	0	brewing_stand
+118	0	cauldron
+119	0	end_portal
+120	0	end_portal_frame
+120	4	end_portal_frame	eye	true
+121	0	end_stone
+122	0	dragon_egg
+123	0	redstone_lamp
+124	0	redstone_lamp	lit	on
+125	0	oak_slab
+125	1	spruce_slab
+125	2	birch_slab
+125	3	jungle_slab
+125	4	acacia_slab
+125	5	dark_oak_slab
+126	0	oak_slab
+126	1	spruce_slab
+126	2	birch_slab
+126	3	jungle_slab
+126	4	acacia_slab
+126	5	dark_oak_slab
+126	8	oak_slab	type	top
+126	9	spruce_slab	type	top
+126	10	birch_slab	type	top
+126	11	jungle_slab	type	top
+126	12	acacia_slab	type	top
+126	13	dark_oak_slab	type	top
+127	0	cocoa
+127	8	cocoa
+128	0	sandstone_stairs
+128	4	sandstone_stairs	half	top
+129	0	emerald_ore
+130	0	ender_chest
+131	0	tripwire_hook
+132	0	tripwire
+133	0	emerald_block
+134	0	spruce_stairs
+134	4	spruce_stairs	half	top
+135	0	birch_stairs
+135	4	birch_stairs	half	top
+136	0	jungle_stairs
+136	4	jungle_stairs	half	top
+137	0	command_block
+138	0	beacon
+139	0	cobblestone_wall
+139	1	mossy_cobblestone_wall
+140	0	flower_pot
+140	1	potted_poppy
+140	2	potted_dandelion
+140	3	potted_oak_sapling
+140	4	potted_spruce_sapling
+140	5	potted_birch_sapling
+140	6	potted_jungle_sapling
+140	7	potted_red_mushroom
+140	8	potted_brown_mushroom
+140	9	potted_cactus
+140	10	potted_dead_bush
+140	11	potted_fern
+140	12	potted_acacia_sapling
+140	13	potted_dark_oak_sapling
+141	0	carrots
+141	0	carrots	age	0
+141	1	carrots	age	1
+141	2	carrots	age	2
+142	0	potatoes	age	0
+142	0	potatoes
+142	1	potatoes	age	1
+142	2	potatoes	age	2
+142	3	potatoes	age	3
+142	4	potatoes	age	4
+142	5	potatoes	age	5
+142	6	potatoes	age	6
+143	0	oak_button
+144	0	mob_head
+145	0	anvil
+145	4	chipped_anvil
+145	8	damaged_anvil
+146	0	trapped_chest
+147	0	light_weighted_pressure_plate
+148	0	heavy_weighted_pressure_plate
+149	0	comparator
+150	0	comparator	powered	true
+151	0	daylight_detector
+152	0	redstone_block
+153	0	nether_quartz_ore
+154	0	hopper
+155	0	quartz_block
+155	1	chiseled_quartz_block
+155	2	quartz_pillar
+155	3	quartz_pillar
+155	4	quartz_pillar
+156	0	quartz_stairs
+156	4	quartz_stairs	half	top
+157	0	activator_rail
+158	0	dropper
+159	0	white_terracotta
+159	1	orange_terracotta
+159	2	magenta_terracotta
+159	3	light_blue_terracotta
+159	4	yellow_terracotta
+159	5	lime_terracotta
+159	6	pink_terracotta
+159	7	gray_terracotta
+159	8	light_gray_terracotta
+159	9	cyan_terracotta
+159	10	purple_terracotta
+159	11	blue_terracotta
+159	12	brown_terracotta
+159	13	green_terracotta
+159	14	red_terracotta
+159	15	black_terracotta
+160	0	white_stained_glass_pane
+160	1	orange_stained_glass_pane
+160	2	magenta_stained_glass_pane
+160	3	light_blue_stained_glass_pane
+160	4	yellow_stained_glass_pane
+160	5	lime_stained_glass_pane
+160	6	pink_stained_glass_pane
+160	7	gray_stained_glass_pane
+160	8	light_gray_stained_glass_pane
+160	9	cyan_stained_glass_pane
+160	10	purple_stained_glass_pane
+160	11	blue_stained_glass_pane
+160	12	brown_stained_glass_pane
+160	13	green_stained_glass_pane
+160	14	red_stained_glass_pane
+160	15	black_stained_glass_pane
+161	0	acacia_leaves
+161	1	dark_oak_leaves
+162	0	acacia_log
+162	1	dark_oak_log
+163	0	acacia_stairs
+163	4	acacia_stairs	half	top
+164	0	dark_oak_stairs
+164	4	dark_oak_stairs	half	top
+165	0	slime_block
+166	0	barrier
+167	0	iron_trapdoor
+168	0	prismarine
+168	1	prismarine_bricks
+168	2	dark_prismarine
+169	0	sea_lantern
+170	0	hay_block
+171	0	white_carpet
+171	1	orange_carpet
+171	2	magenta_carpet
+171	3	light_blue_carpet
+171	4	yellow_carpet
+171	5	lime_carpet
+171	6	pink_carpet
+171	7	gray_carpet
+171	8	light_gray_carpet
+171	9	cyan_carpet
+171	10	purple_carpet
+171	11	blue_carpet
+171	12	brown_carpet
+171	13	green_carpet
+171	14	red_carpet
+171	15	black_carpet
+172	0	terracotta
+173	0	coal_block
+174	0	packed_ice
+175	0	sunflower
+175	1	lilac
+175	2	tall_grass
+175	3	large_fern
+175	4	rose_bush
+175	5	peony
+175	8	large_flower_(top_part)
+175	10	large_flower_(top_part)
+176	0	white_banner
+177	0	white_wall_banner
+178	0	daylight_detector
+179	0	red_sandstone
+179	1	chiseled_red_sandstone
+179	2	smooth_red_sandstone
+180	0	red_sandstone_stairs
+180	4	red_sandstone_stairs	half	top
+181	0	red_sandstone_slab
+181	8	red_sandstone_slab
+182	0	red_sandstone_slab
+182	8	red_sandstone_slab	type	top
+183	0	spruce_fence_gate
+184	0	birch_fence_gate
+185	0	jungle_fence_gate
+186	0	dark_oak_fence_gate
+187	0	acacia_fence_gate
+188	0	spruce_fence
+189	0	birch_fence
+190	0	jungle_fence
+191	0	dark_oak_fence
+192	0	acacia_fence
+193	0	spruce_door
+194	0	birch_door
+195	0	jungle_door
+196	0	acacia_door
+197	0	dark_oak_door
+198	0	end_rod
+199	0	chorus_plant
+200	0	chorus_flower
+200	5	chorus_flower	age	5
+201	0	purpur_block
+202	0	purpur_pillar
+203	0	purpur_stairs
+203	4	purpur_stairs	half	top
+204	0	purpur_slab
+205	0	purpur_slab
+205	8	purpur_slab	type	top
+206	0	end_stone_bricks
+207	0	beetroots	age	0
+207	0	beetroots
+207	1	beetroots	age	1
+207	2	beetroots	age	2
+208	0	grass_path
+209	0	end_gateway
+210	0	repeating_command_block
+211	0	chain_command_block
+212	0	frosted_ice
+213	0	magma_block
+214	0	nether_wart_block
+215	0	red_nether_bricks
+216	0	bone_block
+217	0	structure_void
+218	0	observer
+219	0	white_shulker_box
+220	0	orange_shulker_box
+221	0	magenta_shulker_box
+222	0	light_blue_shulker_box
+223	0	yellow_shulker_box
+224	0	lime_shulker_box
+225	0	pink_shulker_box
+226	0	gray_shulker_box
+227	0	light_gray_shulker_box
+228	0	cyan_shulker_box
+229	0	purple_shulker_box
+230	0	blue_shulker_box
+231	0	brown_shulker_box
+232	0	green_shulker_box
+233	0	red_shulker_box
+234	0	black_shulker_box
+235	0	white_glazed_terracotta
+236	0	orange_glazed_terracotta
+237	0	magenta_glazed_terracotta
+238	0	light_blue_glazed_terracotta
+239	0	yellow_glazed_terracotta
+240	0	lime_glazed_terracotta
+241	0	pink_glazed_terracotta
+242	0	gray_glazed_terracotta
+243	0	light_gray_glazed_terracotta
+244	0	cyan_glazed_terracotta
+245	0	purple_glazed_terracotta
+246	0	blue_glazed_terracotta
+247	0	brown_glazed_terracotta
+248	0	green_glazed_terracotta
+249	0	red_glazed_terracotta
+250	0	black_glazed_terracotta
+251	0	white_concrete
+251	1	orange_concrete
+251	2	magenta_concrete
+251	3	light_blue_concrete
+251	4	yellow_concrete
+251	5	lime_concrete
+251	6	pink_concrete
+251	7	gray_concrete
+251	8	light_gray_concrete
+251	9	cyan_concrete
+251	10	purple_concrete
+251	11	blue_concrete
+251	12	brown_concrete
+251	13	green_concrete
+251	14	red_concrete
+251	15	black_concrete
+252	0	white_concrete_powder
+252	1	orange_concrete_powder
+252	2	magenta_concrete_powder
+252	3	light_blue_concrete_powder
+252	4	yellow_concrete_powder
+252	5	lime_concrete_powder
+252	6	pink_concrete_powder
+252	7	gray_concrete_powder
+252	8	light_gray_concrete_powder
+252	9	cyan_concrete_powder
+252	10	purple_concrete_powder
+252	11	blue_concrete_powder
+252	12	brown_concrete_powder
+252	13	green_concrete_powder
+252	14	red_concrete_powder
+252	15	black_concrete_powder
+255	0	structure_block
+255	1	structure_block
+255	2	structure_block
+255	3	structure_block

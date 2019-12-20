@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "../TestHelpers.h"
 #include "BlockTypePalette.h"
+#include "Stopwatch.h"
 
 
 
@@ -123,31 +124,7 @@ static void testTransformWithFallback()
 
 
 
-/** Tests that loading a simple JSON palette succeeds. */
-static void testLoadSimpleSuccess(void)
-{
-	LOG("Testing loading a simple JSON palette");
-
-	BlockTypePalette palette;
-
-	auto example = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
-		\"props\": {\
-			\"foo\": \"bar\"\
-		}, \
-		\"name\": \"b\", \
-		\"id\": \"0\"\
-	}]}";
-
-	palette.loadFromString(example);
-	TEST_EQUAL(palette.maybeIndex("b", BlockState({{"foo", "bar"}})), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("b", BlockState({{"foo", "baz"}})), (std::make_pair<UInt32, bool>(0, false)));
-	TEST_EQUAL(palette.maybeIndex("a", BlockState({{"foo", "bar"}})), (std::make_pair<UInt32, bool>(0, false)));
-}
-
-
-
-
-
+/** Tests that loading fails for nonsense input */
 static void testLoadErrors(void)
 {
 	LOG("Testing palette load error reporting.");
@@ -164,69 +141,154 @@ static void testLoadErrors(void)
 
 
 
-static void testLoadComplex1(void)
+/** Tests that loading a simple JSON palette succeeds. */
+static void testLoadJsonSimple(void)
 {
-	LOG("Testing loading a complex palette (1)");
+	LOG("Testing loading a simple JSON palette");
+
 	BlockTypePalette palette;
-	auto str = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
-		\"props\": {\
-			\"foo\": \"bar\", \
-			\"moo\": \"baz\"\
+
+	auto example = " \
+	{ \
+		\"minecraft:air\": { \
+			\"states\": [ \
+				{ \
+					\"id\": 0, \
+					\"default\": true \
+				} \
+			] \
+		} \
+	}";
+
+	palette.loadFromString(example);
+	TEST_EQUAL(palette.maybeIndex("minecraft:air", BlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air", BlockState({{"foo", "baz"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:a",   BlockState()).second, false);
+}
+
+
+
+
+
+/** Tests loading a complex block with multiple states and duplicates. */
+static void testLoadJsonComplex(void)
+{
+	LOG("Testing loading a complex JSON palette");
+	BlockTypePalette palette;
+	auto str = " \
+	{ \
+		\"minecraft:oak_sapling\": { \
+		\"properties\": { \
+			\"stage\": [ \
+				\"0\", \
+				\"1\" \
+			] \
 		}, \
-		\"id\": \"0\", \
-		\"name\": \"b\"\
-	}, {\
-		\"props\": {\
-			\"foo\": \"baz\", \
-			\"moo\": \"bar\"\
-		}, \
-		\"id\": \"1\", \
-		\"name\": \"b\"\
-	}, {\
-		\"props\": {\
-			\"foo\": \"baz\", \
-			\"moo\": \"bar\"\
-		}, \
-		\"id\": \"1001\", \
-		\"name\": \"b\"\
-	}]}";
+			\"states\": [ \
+				{ \
+					\"properties\": { \
+						\"stage\": \"0\" \
+					}, \
+					\"id\" : 21, \
+					\"default\" : true \
+				}, \
+				{ \
+					\"properties\": { \
+						\"stage\": \"1\" \
+					}, \
+					\"id\" : 22 \
+				}, \
+				{ \
+					\"properties\": { \
+						\"stage\": \"1\" \
+					}, \
+					\"id\" : 23 \
+				}\
+			] \
+		} \
+	}";
+
 	// Note: The palette has a duplicate entry with differrent IDs, the latter ID wins
 	palette.loadFromString(str);
-	TEST_EQUAL(palette.maybeIndex("b", {{"foo", "bar"}}).second, false);
-	TEST_EQUAL(palette.maybeIndex("b", {{"foo", "bar"}, {"moo", "baz"}}), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("b", {{"foo", "baz"}, {"moo", "bar"}}), (std::make_pair<UInt32, bool>(1001, true)));
-	TEST_EQUAL(palette.maybeIndex("c", {{"foo", "baz"}, {"moo", "bar"}}).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:oak_sapling", {{"stage", "10"}}).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:oak_sapling", {{"stage", "0"}}), (std::make_pair<UInt32, bool>(21, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:oak_sapling", {{"stage", "1"}}), (std::make_pair<UInt32, bool>(23, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:oak_sapling", {{"foo", "baz"}}).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:oak_sap",     {{"stage", "0"}}).second, false);
 }
 
 
 
 
 
-static void testLoadComplex2(void)
+/** Tests loading a palette from simple regular TSV text data. */
+static void testLoadTsvRegular(void)
 {
-	LOG("Testing loading a complex palette (2)");
+	LOG("Testing loading a simple regular TSV palette");
 	BlockTypePalette palette;
-	auto str = "{\"Metadata\":{\"ProtocolBlockTypePaletteVersion\":1}, \"Palette\":[{\
-		\"id\": \"0\", \
-		\"name\": \"a\"\
-	}, {\
-		\"id\": \"1\", \
-		\"name\": \"b\"\
-	}]}";
+	auto str = "\
+BlockTypePalette\r\n\
+FileVersion\t1\n\
+CommonPrefix\tminecraft:\r\n\
+\n\
+0\tair\r\n\
+1\tstone\n\
+2\tgrass\tsnow_covered\t0\n\
+3\tgrass\tsnow_covered\t1\n\
+";
 	palette.loadFromString(str);
-	TEST_EQUAL(palette.maybeIndex("a", BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("b", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(2, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(3, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState({{"snow_covered", "0"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "2"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState()).second, false);
 }
 
 
 
 
 
-static void testLoadFromFile1(void)
+/** Tests loading a palette from simple upgrade TSV text data. */
+static void testLoadTsvUpgrade(void)
 {
-	LOG("Testing loading a palette from file \"test.btp.json\"");
+	LOG("Testing loading a simple upgrade TSV palette");
 	BlockTypePalette palette;
-	palette.loadFromString(cFile::ReadWholeFile("test.btp.json"));
+	auto str = "\
+UpgradeBlockTypePalette\r\n\
+FileVersion\t1\n\
+CommonPrefix\tminecraft:\r\n\
+\n\
+0\t0\tair\r\n\
+1\t0\tstone\n\
+2\t0\tgrass\tsnow_covered\t0\n\
+2\t1\tgrass\tsnow_covered\t1\n\
+";
+	palette.loadFromString(str);
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(16, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(32, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(33, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState({{"snow_covered", "0"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "2"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState()).second, false);
+}
+
+
+
+
+
+/** Tests loading a palette from a real-life protocol base file (1.13). */
+static void testLoadFromBaseFile(void)
+{
+	LOG("Testing loading a palette from file \"base.btp.txt\" (1.13)");
+	BlockTypePalette palette;
+	{
+		auto fileContents = cFile::ReadWholeFile("base.btp.txt");
+		cStopwatch sw("Loading palette");
+		palette.loadFromString(fileContents);
+	}
 
 	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
 	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
@@ -250,15 +312,19 @@ static void testLoadFromFile1(void)
 
 
 
-static void testLoadFromFile2(void)
+/** Tests loading an upgrade-palette from a real-life upgrade file. */
+static void testLoadFromUpgradeFile(void)
 {
-	LOG("Testing loading a palette from file \"base.btp.json\" (version 1.13)");
+	LOG("Testing loading an upgrade palette from file \"UpgradeBlockTypePalette.txt\".");
 	BlockTypePalette palette;
-	palette.loadFromString(cFile::ReadWholeFile("base.btp.json"));
+	{
+		auto fileContents = cFile::ReadWholeFile("UpgradeBlockTypePalette.txt");
+		cStopwatch sw("Loading upgrade palette");
+		palette.loadFromString(fileContents);
+	}
 
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0,  true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(1,  true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:dirt",  BlockState()), (std::make_pair<UInt32, bool>(10, true)));
+	TEST_EQUAL(palette.entry(0), (std::make_pair<AString, BlockState>("minecraft:air", {})));
+	TEST_EQUAL(palette.entry(44 * 16 + 8), (std::make_pair<AString, BlockState>("minecraft:stone_slab", {{"type", "top"}})));
 }
 
 
@@ -269,12 +335,13 @@ IMPLEMENT_TEST_MAIN("BlockTypePalette",
 	testBasic();
 	testTransformAddMissing();
 	testTransformWithFallback();
-	testLoadSimpleSuccess();
 	testLoadErrors();
-	testLoadComplex1();
-	testLoadComplex2();
-	testLoadFromFile1();
-	testLoadFromFile2();
+	testLoadJsonSimple();
+	testLoadJsonComplex();
+	testLoadTsvRegular();
+	testLoadTsvUpgrade();
+	testLoadFromBaseFile();
+	testLoadFromUpgradeFile();
 )
 
 
