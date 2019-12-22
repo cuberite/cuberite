@@ -531,6 +531,11 @@ struct sSetBlock
 		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
 	}
 
+	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
+	{
+	}
+
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
 		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
