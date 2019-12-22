@@ -1,16 +1,132 @@
 version: 1.0.{build}
-image: Visual Studio 2017
-configuration: Debug
+image: Visual Studio 2015
 clone_depth: 50
 
-before_build:
+# Set up environment variables for build info
+environment:
+  CUBERITE_BUILD_SERIES_NAME: AppVeyor
+  CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
+  CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
+
+  matrix:
+  - job_name: Windows-x64-debug
+    configuration: Debug
+    CUBERITE_EXECUTABLE: cuberite_debug
+
+  - job_name: Windows-x86
+    configuration: Release
+    CUBERITE_EXECUTABLE: cuberite
+
+  - job_name: Windows-x64
+    configuration: Release
+    CUBERITE_EXECUTABLE: cuberite
+
+install:
 - echo %TIME%
 - git submodule update --init
-- echo %TIME%
-- cmake -G "Visual Studio 15 2017" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- echo %TIME%
 
-build:
-  project: Cuberite.sln
-  parallel: true
-  verbosity: minimal
+for:
+##############################
+# Windows 64-bit debug build #
+##############################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64-debug
+
+  before_build:
+  - if not exist Debug-x64 mkdir Debug-x64
+  - cd Debug-x64
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Debug-x64\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+################################
+# Windows 32-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x86
+
+  before_build:
+  - if not exist Release-x86 mkdir Release-x86
+  - cd Release-x86
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015" ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Release-x86\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+################################
+# Windows 64-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64
+
+  before_build:
+  - if not exist Release-x64 mkdir Release-x64
+  - cd Release-x64
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Release-x64\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+cache:
+  - Debug-x64
+  - Release-x86
+  - Release-x64
+
+after_build:
+- cd Install
+- echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
+- 7z a -tzip -y ../Cuberite.zip -scsWIN -i@Zip2008.list -xr!*.git*
+- cd ..
+- 7z a -tzip -y PDBs.zip -scsWIN -i@Install/Zip2008_PDBs.list -xr!*.git*
+- cd Server\plugins
+- git clone https://github.com/madmaxoft/ManualApiDump
+- cd ..
+- echo load ManualApiDump  1>cmds.txt
+- echo manualapi  1>>cmds.txt
+- echo load APIDump  1>>cmds.txt
+- echo api  1>>cmds.txt
+- echo stop  1>>cmds.txt
+- "%CUBERITE_EXECUTABLE% --port 32767  0<cmds.txt"
+- cd ..
+- cd src/Bindings/docs
+- 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
+- cd ..\..\..\Server
+- 7z a -tzip -y ../ManualAPI.zip -scsWIN "ManualAPI.lua"
+
+artifacts:
+  - path: Cuberite.zip
+    name: Cuberite
+
+  - path: PDBs.zip
+    name: PDBs
+
+  - path: AutoAPI.zip
+    name: AutoAPI
+
+  - path: ManualAPI.zip
+    name: ManualAPI
+
+  - path: Server\.luacheckrc
+    name: .luacheckrc
