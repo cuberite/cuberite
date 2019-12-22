@@ -58,6 +58,17 @@ function ShowPage(WebAdmin, TemplateRequest)
 		PageContent, SubTitle = GetDefaultPage()
 	end
 
+	--[[
+	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
+	local reqParamsClass = ""
+	for key, value in pairs(TemplateRequest.Request.Params) do
+		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
+	end
+	if (string.gsub(reqParamsClass, "%s", "") == "") then
+		reqParamsClass = " no-param"
+	end
+	--]]
+
 	Output([[
 <!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
 <!DOCTYPE html>
@@ -92,16 +103,17 @@ function ShowPage(WebAdmin, TemplateRequest)
 	</div>
 </div>
 <div class="columns">
-	<div class="wrapper">
-		<div class="column left">
-			<h2 class="head color-background">Menu</h2>
-			<ul class="sidebar">
-				<li>
-					<a href="]] .. BaseURL .. [[" class="link-home">Home</a>
-				</li>
-			</ul>
-			<div class="category">Server Management</div>
-			<ul class="sidebar">
+	<div class="columns-wrapper">
+		<div class="columns-spacing">
+			<div class="box left">
+				<h2 class="head color-background">Menu</h2>
+				<ul class="sidebar">
+					<li>
+						<a href="]] .. BaseURL .. [[" class="link-home">Home</a>
+					</li>
+				</ul>
+				<div class="category">Server Management</div>
+				<ul class="sidebar">
 	]])
 
 	-- Get all tabs:
@@ -141,11 +153,12 @@ function ShowPage(WebAdmin, TemplateRequest)
 
 
 	Output([[
-			</ul>
-		</div>
-		<div class="column">
-			<h1 class="head color-background">]] .. SubTitle .. [[</h1>
-			<div class="main-content">]] .. PageContent .. [[</div>
+				</ul>
+			</div>
+			<div class="box right">
+				<h1 class="head color-background">]] .. SubTitle .. [[</h1>
+				<div class="main-content">]] .. PageContent .. [[</div>
+			</div>
 		</div>
 	</div>
 </div>

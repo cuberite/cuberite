@@ -8,6 +8,7 @@ html,
 body {
 	height: 100%;
 	width: 100%;
+	position: relative;
 }
 
 body {
@@ -86,7 +87,6 @@ a:hover, a:active {
 .panel {
 	background: #F4F7F6;
 	border-bottom: 1px solid #CCDDD9;
-	margin: 0 0 15px;
 	overflow: hidden;
 	padding: 8px;
 }
@@ -130,27 +130,39 @@ a:hover, a:active {
 	height: 100%;
 }
 
-.guest-iframe {
-	border: 0;
-	min-height: 250px;
-	max-height: 450px;
+.columns-wrapper {
+	display: table;
+	margin: auto;
+	max-width: 1030px;
+	padding: 0;
+	width: 100%;
 }
 
-.column {
+.columns-spacing {
+	display: table-cell;
+	padding: 15px;
+}
+
+.box {
 	background: #f9fbfa;
 	border: 1px solid #CCDDD9;
 	border-radius: 7px;
-	margin: 0 0 0 235px;
 }
 
-.column.left {
+.box.left {
 	float: left;
 	margin: 0;
 	width: 220px;
 }
 
-.column.no-spacing {
-	margin: 0;
+.box.right {
+	margin: 0 0 0 235px;
+}
+
+.guest-iframe {
+	border: 0;
+	min-height: 250px;
+	max-height: 450px;
 }
 
 .head {
@@ -279,7 +291,6 @@ input:disabled {
 .footer-container {
 	background: #F4F7F6;
 	border-top: 1px solid #CCDDD9;
-	margin-top: 15px;
 	overflow: hidden;
 	padding: 10px;
 }
