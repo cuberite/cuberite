@@ -24,7 +24,7 @@ echo "Testing..."
 cd Server/;
 touch apiCheckFailed.flag
 if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
-	${CUBERITE_PATH} <<- EOF
+	./Cuberite <<- EOF
 		load APIDump
 		apicheck
 		restart

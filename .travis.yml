@@ -14,13 +14,13 @@ matrix:
           packages:
             - ccache
       env: &Debug
-        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
+        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
     # AppleClang
     # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
     - os: osx
       compiler: clang
       env: &Release
-        - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
+        - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE
     - os: osx
       compiler: clang
       env: *Debug
