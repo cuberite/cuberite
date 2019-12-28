@@ -11,15 +11,15 @@ environment:
   matrix:
   - job_name: Windows-x64-debug
     configuration: Debug
-    CUBERITE_EXECUTABLE: cuberite_debug
+    BUILD_DIR: Debug-x64
 
   - job_name: Windows-x86
     configuration: Release
-    CUBERITE_EXECUTABLE: cuberite
+    BUILD_DIR: Release-x86
 
   - job_name: Windows-x64
     configuration: Release
-    CUBERITE_EXECUTABLE: cuberite
+    BUILD_DIR: Release-x64
 
 install:
 - echo %TIME%
@@ -35,8 +35,8 @@ for:
       - job_name: Windows-x64-debug
 
   before_build:
-  - if not exist Debug-x64 mkdir Debug-x64
-  - cd Debug-x64
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
   - echo %TIME%
@@ -56,8 +56,8 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - if not exist Release-x86 mkdir Release-x86
-  - cd Release-x86
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015" ..
   - echo %TIME%
@@ -77,8 +77,8 @@ for:
       - job_name: Windows-x64
 
   before_build:
-  - if not exist Release-x64 mkdir Release-x64
-  - cd Release-x64
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
   - echo %TIME%
   - cmake -G "Visual Studio 14 2015 Win64" ..
   - echo %TIME%
@@ -89,44 +89,24 @@ for:
     parallel: true
     verbosity: minimal
 
+###########################################
+# Cache for speeding up subsequent builds #
+###########################################
 cache:
   - Debug-x64
   - Release-x86
   - Release-x64
 
+#####################
+# Package artifacts #
+#####################
+
 after_build:
-- cd Install
-- echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>..\Server\buildinfo.txt  
-- 7z a -tzip -y ../Cuberite.zip -scsWIN -i@Zip2008.list -xr!*.git*
-- cd ..
-- 7z a -tzip -y PDBs.zip -scsWIN -i@Install/Zip2008_PDBs.list -xr!*.git*
-- cd Server\plugins
-- git clone https://github.com/madmaxoft/ManualApiDump
-- cd ..
-- echo load ManualApiDump  1>cmds.txt
-- echo manualapi  1>>cmds.txt
-- echo load APIDump  1>>cmds.txt
-- echo api  1>>cmds.txt
-- echo stop  1>>cmds.txt
-- "%CUBERITE_EXECUTABLE% --port 32767  0<cmds.txt"
-- cd ..
-- cd src/Bindings/docs
-- 7z a -tzip -y ../../../AutoAPI.zip -scsWIN "*.lua" -x!_raw.lua
-- cd ..\..\..\Server
-- 7z a -tzip -y ../ManualAPI.zip -scsWIN "ManualAPI.lua"
-
-artifacts:
-  - path: Cuberite.zip
-    name: Cuberite
-
-  - path: PDBs.zip
-    name: PDBs
-
-  - path: AutoAPI.zip
-    name: AutoAPI
-
-  - path: ManualAPI.zip
-    name: ManualAPI
-
-  - path: Server\.luacheckrc
-    name: .luacheckrc
+- cd %BUILD_DIR%\Server
+- echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>buildinfo.txt
+- Install\PackWindowsExecutables.cmd
+- appveyor PushArtifact Cuberite.zip -FileName Cuberite.zip
+- appveyor PushArtifact PDBs.zip -FileName PDBs.zip
+- appveyor PushArtifact AutoAPI.zip -FileName AutoAPI.zip
+- appveyor PushArtifact ManualAPI.zip -FileName ManualAPI.zip
+- appveyor PushArtifact .luacheckrc -FileName .luacheckrc
