@@ -347,10 +347,6 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 # If the orig and link point to the same thing, does nothing (-> in-source build)
 # If ${link} already exists, does nothing.
 function(make_symlink orig link)
-	# Get OS dependent path to use in `execute_process`
-	file(TO_NATIVE_PATH "${orig}" orig)
-	file(TO_NATIVE_PATH "${link}" link)
-
 	# If both are the same, or link already exists, bail out:
 	if ("${orig}" STREQUAL "${link}")
 		return()
@@ -364,6 +360,8 @@ function(make_symlink orig link)
 	if (CMAKE_HOST_UNIX)
 		set(command ln -s ${orig} ${link})
 	else()
+		file(TO_NATIVE_PATH "${orig}" orig)
+		file(TO_NATIVE_PATH "${link}" link)
 		if (IS_DIRECTORY ${orig})
 			set(command cmd.exe /c mklink /j ${link} ${orig})
 		else()
@@ -374,11 +372,12 @@ function(make_symlink orig link)
 	execute_process(
 		COMMAND ${command}
 		RESULT_VARIABLE result
-		ERROR_VARIABLE output
+		ERROR_VARIABLE stderr
+		OUTPUT_VARIABLE stdout
 	)
 
 	if (NOT ${result} EQUAL 0)
-		message(FATAL_ERROR "Could not create symbolic link for: ${link} --> ${orig}: ${output}")
+		message(FATAL_ERROR "Could not create symbolic link for: ${link} --> ${orig}: ${stderr} ${stdout}")
 	endif()
 endfunction(make_symlink)
 
