@@ -93,9 +93,9 @@ for:
 # Cache for speeding up subsequent builds #
 ###########################################
 cache:
-  - Debug-x64
-  - Release-x86
-  - Release-x64
+  - Debug-x64\CMakeCache.txt
+  - Release-x86\CMakeCache.txt
+  - Release-x64\CMakeCache.txt
 
 #####################
 # Package artifacts #
