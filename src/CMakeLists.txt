@@ -388,7 +388,6 @@ endfunction(make_symlink)
 # Populate the output folder with symlinks to the Server folder's internals:
 set(symlinks
 	Install
-	lang
 	Plugins
 	Prefabs
 	Protocol
