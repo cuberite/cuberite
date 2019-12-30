@@ -395,8 +395,10 @@ set(symlinks
 	brewing.txt
 	crafting.txt
 	favicon.png
+	furnace.txt
 	items.ini
 	monsters.ini
+	README.txt
 )
 message("Creating output folder and symlinks...")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
