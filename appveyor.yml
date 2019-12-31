@@ -54,6 +54,10 @@ for:
   matrix:
     only:
       - job_name: Windows-x86
+	
+  branches:
+    only:
+      - master
 
   before_build:
   - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
@@ -75,6 +79,10 @@ for:
   matrix:
     only:
       - job_name: Windows-x64
+
+  branches:
+    only:
+      - master
 
   before_build:
   - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
