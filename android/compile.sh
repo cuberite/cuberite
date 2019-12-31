@@ -15,16 +15,16 @@ function usage() {
 }
 
 BASEDIR="$(realpath $(dirname $0))"
+BUILDDIR="$BASEDIR/../android-build"
 SELF="./$(basename $0)"
 
 # Clean doesn't need CMAKE and NDK, so it's handled here
 if [ "$1" == "clean" ]; then
-	cd $BASEDIR
-	rm -rf ../android-build/
+	rm -rf $BUILDDIR
 	exit 0
 fi
 
-if [ -z "$CMAKE" -o -z "$NDK" ];then
+if [ -z "$CMAKE" -o -z "$NDK" ]; then
 	usage;
 fi
 
@@ -62,6 +62,7 @@ case "$1" in
 
 	all)
 		echo "Packing server.zip ..."
+		rm -rf Server
 		mkdir -p Server
 		cd $BASEDIR/../Server
 		zip -r $BASEDIR/Server/server.zip *
@@ -71,9 +72,8 @@ case "$1" in
 			cd $BASEDIR && \
 			"$SELF" clean && \
 			"$SELF" "$arch" && \
-			cd Server && \
-			zip "$arch".zip Cuberite && \
-			rm Cuberite
+			cd $BUILDDIR/Server && \
+			zip $BASEDIR/Server/"$arch".zip Cuberite
 		done
 
 		cd $BASEDIR/Server
@@ -91,8 +91,8 @@ case "$1" in
 	;;
 esac
 
-mkdir -p $BASEDIR/../android-build
-cd $BASEDIR/../android-build
+mkdir -p $BUILDDIR
+cd $BUILDDIR
 "$CMAKE" $BASEDIR/../android -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$1" \
     -DANDROID_NATIVE_API_LEVEL="$APILEVEL" \
