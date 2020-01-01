@@ -358,7 +358,7 @@ function(make_symlink orig link)
 	# Create the symlink (platform-dependent):
 	message("Creating symlink, orig = ${orig}; link = ${link}")
 	if (CMAKE_HOST_UNIX)
-		set(command ln -fs ${orig} ${link})
+		set(command ln -s ${orig} ${link})
 	else()
 		file(TO_NATIVE_PATH "${orig}" orig)
 		file(TO_NATIVE_PATH "${link}" link)
