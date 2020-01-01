@@ -45,19 +45,19 @@ cd $BASEDIR
 case "$1" in
 
 	armeabi-v7a)
-		APILEVEL=29
+		APILEVEL=14
 	;;
 
 	arm64-v8a)
-		APILEVEL=29
+		APILEVEL=21
 	;;
 
 	x86)
-		APILEVEL=29
+		APILEVEL=14
 	;;
 
 	x86_64)
-		APILEVEL=29
+		APILEVEL=21
 	;;
 
 	all)
