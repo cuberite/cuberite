@@ -39,6 +39,7 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
+#include "BlockTypePalette.h"
 
 
 
@@ -191,6 +192,24 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 	// cClientHandle::FASTBREAK_PERCENTAGE = settingsRepo->GetValueSetI("AntiCheat", "FastBreakPercentage", 97) / 100.0f;
 	cClientHandle::FASTBREAK_PERCENTAGE = 0;  // AntiCheat disabled due to bugs. We will enabled it once they are fixed. See #3506.
+
+	// Load the UpgradeBlockTypePalette:
+	LOG("Loading UpgradeBlockTypePalette...");
+	try
+	{
+		auto paletteStr = cFile::ReadWholeFile("Protocol/UpgradeBlockTypePalette.txt");
+		if (paletteStr.empty())
+		{
+			throw std::runtime_error("File is empty");
+		}
+		m_UpgradeBlockTypePalette.reset(new BlockTypePalette);
+		m_UpgradeBlockTypePalette->loadFromString(paletteStr);
+	}
+	catch (const std::exception & exc)
+	{
+		LOGERROR("Failed to load the Upgrade block type palette from Protocol/UpgradeBlockTypePalette.txt: %s\nAborting", exc.what());
+		throw;
+	}
 
 	m_MojangAPI = new cMojangAPI;
 	bool ShouldAuthenticate = settingsRepo->GetValueSetB("Authentication", "Authenticate", true);

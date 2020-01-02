@@ -28,6 +28,7 @@ class cCompositeChat;
 class cSettingsRepositoryInterface;
 class cDeadlockDetect;
 class cUUID;
+class BlockTypePalette;
 
 using cPlayerListCallback =  cFunctionRef<bool(cPlayer &)>;
 using cWorldListCallback  =  cFunctionRef<bool(cWorld  &)>;
@@ -91,6 +92,9 @@ public:
 
 	/** Returns the (read-write) storage for registered block types. */
 	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
+
+	/** Returns the block type palette used for upgrading blocks from pre-1.13 data. */
+	const BlockTypePalette & GetUpgradeBlockTypePalette() const { return *m_UpgradeBlockTypePalette; }
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -233,6 +237,9 @@ private:
 
 	/** The storage for all registered block types. */
 	BlockTypeRegistry m_BlockTypeRegistry;
+
+	/** The upgrade palette for pre-1.13 blocks. */
+	std::unique_ptr<BlockTypePalette> m_UpgradeBlockTypePalette;
 
 
 	void LoadGlobalSettings();
