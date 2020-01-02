@@ -22,7 +22,7 @@ include_directories(SYSTEM
 )
 
 # Disable some compiler warnings (the lazy way out)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion -Wno-sign-conversion")
 
 # Build the rest of the server
 add_subdirectory(../ Cuberite)
