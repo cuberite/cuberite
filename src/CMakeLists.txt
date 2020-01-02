@@ -403,12 +403,12 @@ set(symlinks
 message("Creating output folder and symlinks...")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
 foreach (symlink ${symlinks})
-	make_symlink("${CMAKE_SOURCE_DIR}/Server/${symlink}" "${CMAKE_BINARY_DIR}/Server/${symlink}")
+	make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/${symlink}" "${CMAKE_BINARY_DIR}/Server/${symlink}")
 endforeach(symlink)
-make_symlink("${CMAKE_SOURCE_DIR}/BACKERS"                           "${CMAKE_BINARY_DIR}/Server/BACKERS")
-make_symlink("${CMAKE_SOURCE_DIR}/CONTRIBUTORS"                      "${CMAKE_BINARY_DIR}/Server/CONTRIBUTORS")
-make_symlink("${CMAKE_SOURCE_DIR}/LICENSE"                           "${CMAKE_BINARY_DIR}/Server/LICENSE")
-make_symlink("${CMAKE_SOURCE_DIR}/Server/Install/ThirdPartyLicenses" "${CMAKE_BINARY_DIR}/Server/ThirdPartyLicenses")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../BACKERS"                           "${CMAKE_BINARY_DIR}/Server/BACKERS")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../CONTRIBUTORS"                      "${CMAKE_BINARY_DIR}/Server/CONTRIBUTORS")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"                           "${CMAKE_BINARY_DIR}/Server/LICENSE")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/Install/ThirdPartyLicenses" "${CMAKE_BINARY_DIR}/Server/ThirdPartyLicenses")
 
 
 
@@ -444,7 +444,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls 
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")
-make_symlink("${CMAKE_SOURCE_DIR}/src/Bindings/docs" "${CMAKE_BINARY_DIR}/Server/BindingsDocs")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/Bindings/docs" "${CMAKE_BINARY_DIR}/Server/BindingsDocs")
 
 
 # For MSVC, set the startup project to Cuberite, and the debugger dir:
