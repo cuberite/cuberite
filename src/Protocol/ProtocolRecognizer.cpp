@@ -27,20 +27,9 @@
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
-	m_Protocol(nullptr),
 	m_Buffer(8192),  // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 	m_InPingForUnrecognizedVersion(false)
 {
-}
-
-
-
-
-
-cProtocolRecognizer::~cProtocolRecognizer()
-{
-	delete m_Protocol;
-	m_Protocol = nullptr;
 }
 
 
@@ -61,6 +50,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_11_1:  return "1.11.1";
 		case PROTO_VERSION_1_12:    return "1.12";
 		case PROTO_VERSION_1_12_1:  return "1.12.1";
+		case PROTO_VERSION_1_13:    return "1.13";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -1098,62 +1088,62 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_8_0:
 		{
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol_1_8_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_8_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_0:
 		{
-			m_Protocol = new cProtocol_1_9_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_1:
 		{
-			m_Protocol = new cProtocol_1_9_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_2:
 		{
-			m_Protocol = new cProtocol_1_9_2(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_2(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_4:
 		{
-			m_Protocol = new cProtocol_1_9_4(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_4(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_10_0:
 		{
-			m_Protocol = new cProtocol_1_10_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_10_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_11_0:
 		{
-			m_Protocol = new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_11_1:
 		{
-			m_Protocol = new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12:
 		{
-			m_Protocol = new cProtocol_1_12(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12_1:
 		{
-			m_Protocol = new cProtocol_1_12_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12_2:
 		{
-			m_Protocol = new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_13:
 		{
-			m_Protocol = new cProtocol_1_13(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_13(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		default:
