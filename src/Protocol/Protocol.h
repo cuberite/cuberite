@@ -57,6 +57,11 @@ public:
 	virtual ~cProtocol() {}
 
 
+	/** Called after construction so that the protocol class can initialize itself.
+	Throws a std::exception descendant on failure; the client is kicked
+	with the exception's message as a result. */
+	virtual void Initialize(cClientHandle & a_Client) {}
+
 	/** Logical types of outgoing packets.
 	These values get translated to on-wire packet IDs in GetPacketID(), specific for each protocol.
 	This is mainly useful for protocol sub-versions that re-number the packets while using mostly the same packet layout. */

@@ -1038,7 +1038,24 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 		// Not enough bytes for the packet, keep waiting
 		return false;
 	}
-	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar);
+	if (!TryRecognizeLengthedProtocol(PacketLen - ReadSoFar))
+	{
+		return false;
+	}
+
+	// The protocol has been recognized, initialize it:
+	ASSERT(m_Protocol != nullptr);
+	try
+	{
+		m_Protocol->Initialize(*m_Client);
+	}
+	catch (const std::exception & exc)
+	{
+		m_Client->Kick(exc.what());
+		m_Protocol.reset();
+		return false;
+	}
+	return true;
 }
 
 

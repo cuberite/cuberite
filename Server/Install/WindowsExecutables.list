@@ -2,6 +2,7 @@ Cuberite.exe
 *.dll
 Plugins
 Prefabs
+Protocol
 webadmin
 BACKERS
 brewing.txt

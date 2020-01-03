@@ -11,6 +11,7 @@ Implements the 1.13 protocol classes:
 #include "ProtocolRecognizer.h"
 #include "ChunkDataSerializer.h"
 #include "Packetizer.h"
+#include "ProtocolPalettes.h"
 
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -21,9 +22,11 @@ Implements the 1.13 protocol classes:
 #include "../Entities/FireworkEntity.h"
 #include "../Entities/SplashPotionEntity.h"
 
+#include "../BlockTypePalette.h"
+#include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
-#include "../ClientHandle.h"
+
 #include "../Bindings/PluginManager.h"
 
 
@@ -63,6 +66,25 @@ Implements the 1.13 protocol classes:
 cProtocol_1_13::cProtocol_1_13(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
+}
+
+
+
+
+
+void cProtocol_1_13::Initialize(cClientHandle & a_Client)
+{
+	// Get the palettes; fail if not available:
+	auto paletteVersion = this->GetPaletteVersion();
+	m_BlockTypePalette = cRoot::Get()->GetProtocolPalettes().blockTypePalette(paletteVersion);
+	if (m_BlockTypePalette == nullptr)
+	{
+		throw std::runtime_error(Printf("This server doesn't support protocol %s.", paletteVersion));
+	}
+
+	// Process the palette into the temporary BLOCKTYPE -> NetBlockID map:
+	auto upg = cRoot::Get()->GetUpgradeBlockTypePalette();
+	m_BlockTypeMap = m_BlockTypePalette->createTransformMapWithFallback(upg, 0);
 }
 
 
@@ -126,6 +148,15 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 		case pktWindowProperty:       return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
+}
+
+
+
+
+
+AString cProtocol_1_13::GetPaletteVersion() const
+{
+	return "1.13";
 }
 
 
@@ -292,7 +323,7 @@ void cProtocol_1_13::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSeriali
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ, m_BlockTypeMap);
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
 }

@@ -12,6 +12,7 @@ SET (SRCS
 	Protocol_1_11.cpp
 	Protocol_1_12.cpp
 	Protocol_1_13.cpp
+	ProtocolPalettes.cpp
 	ProtocolRecognizer.cpp
 )
 
@@ -28,6 +29,7 @@ SET (HDRS
 	Protocol_1_11.h
 	Protocol_1_12.h
 	Protocol_1_13.h
+	ProtocolPalettes.h
 	ProtocolRecognizer.h
 )
 
