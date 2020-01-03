@@ -10,7 +10,7 @@ CommonPrefix	minecraft:
 1	4	polished_diorite
 1	5	andesite
 1	6	polished_andesite
-2	0	grass_block
+2	0	grass_block	snowy	false
 3	0	dirt
 3	1	coarse_dirt
 3	2	podzol
@@ -38,14 +38,26 @@ CommonPrefix	minecraft:
 14	0	gold_ore
 15	0	iron_ore
 16	0	coal_ore
-17	0	oak_log
-17	1	spruce_log
-17	2	birch_log
-17	3	jungle_log
-18	0	oak_leaves
-18	1	spruce_leaves
-18	2	birch_leaves
-18	3	jungle_leaves
+17	0	oak_log	axis	y
+17	1	spruce_log	axis	y
+17	2	birch_log	axis	y
+17	3	jungle_log	axis	y
+17	4	oak_log	axis	x
+17	5	spruce_log	axis	x
+17	6	birch_log	axis	x
+17	7	jungle_log	axis	x
+17	8	oak_log	axis	z
+17	9	spruce_log	axis	z
+17	10	birch_log	axis	z
+17	11	jungle_log	axis	z
+17	12	oak_wood	axis	y
+17	13	spruce_wood	axis	y
+17	14	birch_wood	axis	y
+17	15	jungle_wood	axis	y
+18	0	oak_leaves	persistent	false	distance	7
+18	1	spruce_leaves	persistent	false	distance	7
+18	2	birch_leaves	persistent	false	distance	7
+18	3	jungle_leaves	persistent	false	distance	7
 19	0	sponge
 19	1	wet_sponge
 20	0	glass

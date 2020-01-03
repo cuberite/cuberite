@@ -1,10 +1,3 @@
-
-// ChunkDataSerializer.cpp
-
-// Implements the cChunkDataSerializer class representing the object that can:
-//  - serialize chunk data to different protocol versions
-//  - cache such serialized data for multiple clients
-
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
@@ -52,7 +45,7 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
+const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
 {
 	Serializations::const_iterator itr = m_Serializations.find(a_Version);
 	if (itr != m_Serializations.end())
@@ -63,11 +56,10 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 	AString data;
 	switch (a_Version)
 	{
-		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
+		case RELEASE_1_8_0: Serialize47 (data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_0: Serialize107(data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_4: Serialize110(data, a_ChunkX, a_ChunkZ); break;
-		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ); break;
-		// TODO: Other protocol versions may serialize the data differently; implement here
+		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ, a_BlockTypeMap); break;
 
 		default:
 		{
@@ -442,9 +434,11 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 
 
 
-void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
+
+	ASSERT(!a_BlockTypeMap.empty());  // We need a protocol-specific translation map
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
@@ -489,17 +483,10 @@ void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_Ch
 
 			for (size_t Index = 0; Index < cChunkData::SectionBlockCount; Index++)
 			{
-				UInt64 Value = a_Section.m_BlockTypes[Index];
-				/*
-				if (Index % 2 == 0)
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] & 0x0f;
-				}
-				else
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] >> 4;
-				}
-				*/
+				UInt32 blockType = a_Section.m_BlockTypes[Index];
+				UInt32 blockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
+				auto itr = a_BlockTypeMap.find(blockType * 16 | blockMeta);
+				UInt64 Value = (itr == a_BlockTypeMap.end()) ? 0 :itr->second;
 				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
 
 				// Painful part where we write data into the long array.  Based off of the normal code.
