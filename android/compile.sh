@@ -45,7 +45,7 @@ cd $BASEDIR
 case "$1" in
 
 	armeabi-v7a)
-		APILEVEL=14
+		APILEVEL=16
 	;;
 
 	arm64-v8a)
@@ -53,7 +53,7 @@ case "$1" in
 	;;
 
 	x86)
-		APILEVEL=14
+		APILEVEL=16
 	;;
 
 	x86_64)
