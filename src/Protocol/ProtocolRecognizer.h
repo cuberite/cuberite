@@ -1,13 +1,3 @@
-
-// ProtocolRecognizer.h
-
-// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
-// protocol versions and redirects everything to them
-
-
-
-
-
 #pragma once
 
 #include "Protocol.h"
@@ -26,7 +16,9 @@
 
 
 
-class cProtocolRecognizer :
+/** Meta-protocol that recognizes multiple protocol versions, creates the specific
+protocol version instance and redirects everything to it. */
+class cProtocolRecognizer:
 	public cProtocol
 {
 	typedef cProtocol super;
@@ -49,7 +41,7 @@ public:
 	};
 
 	cProtocolRecognizer(cClientHandle * a_Client);
-	virtual ~cProtocolRecognizer() override;
+	virtual ~cProtocolRecognizer() override {}
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
@@ -149,9 +141,11 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+
 protected:
+
 	/** The recognized protocol */
-	cProtocol * m_Protocol;
+	std::unique_ptr<cProtocol> m_Protocol;
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
