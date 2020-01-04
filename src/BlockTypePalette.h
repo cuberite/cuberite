@@ -126,11 +126,10 @@ protected:
 	void loadFromJsonString(const AString & aJsonPalette);
 
 	/** Loads the palette from the regular or upgrade TSV representation.
-	aIsUpgrade specifies whether the format is an upgrade TSV (true) or a regular one (false)
 	Throws a LoadFailedException if the loading fails hard (bad string format);
 	but still a part of the data may already be loaded at that point.
 	See also: loadFromString(). */
-	void loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade);
+	void loadFromTsv(const AString & aTsvPalette);
 
 	/** Adds a mapping between the numeric and stringular representation into both maps,
 	updates the mMaxIndex, if appropriate.

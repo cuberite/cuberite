@@ -129,11 +129,11 @@ void BlockTypePalette::loadFromString(const AString & aString)
 	// Detect format by checking the header line (none -> JSON):
 	if (aString.substr(0, hdrTsvRegular.length()) == hdrTsvRegular)
 	{
-		return loadFromTsv(aString, false);
+		return loadFromTsv(aString);
 	}
 	else if (aString.substr(0, hdrTsvUpgrade.length()) == hdrTsvUpgrade)
 	{
-		return loadFromTsv(aString, true);
+		return loadFromTsv(aString);
 	}
 	return loadFromJsonString(aString);
 }
@@ -194,92 +194,214 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 
 
 
-void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
+void BlockTypePalette::loadFromTsv(const AString & aTsvPalette)
 {
-	auto lines = StringSplitAndTrim(aTsvPalette, "\n");
+	// Parses the TSV data using a state machine
+	// The data is "split" at tabs, CRs and LFs, and at each split,
+	// the machine state dictates what to do with the value
 
-	// Parse the header:
-	int fileVersion = 0;
+	static const AString hdrTsvRegular = "BlockTypePalette";
+	static const AString hdrTsvUpgrade = "UpgradeBlockTypePalette";
+	enum
+	{
+		Signature,
+		HeaderKey,
+		HeaderValue,
+		Index,
+		Meta,
+		BlockTypeName,
+		BlockStateKey,
+		BlockStateValue
+	} state = Signature;
+	int line = 1;
+	auto len = aTsvPalette.length();
+	size_t lastIdx = 0;
+	AString currHeaderKey;
+	bool isFileVersionPresent = false;
+	bool isUpgrade = false;
 	AString commonPrefix;
-	auto numLines = lines.size();
-	for (size_t idx = 1; idx < numLines; ++idx)
+	AString blockTypeName, blockStateKey;
+	UInt32 id = 0;
+	std::map<AString, AString> blockStatePairs;
+	for (size_t i = 0; i < len; ++i)
 	{
-		const auto & line = lines[idx];
-		if (line.empty())
+		auto ch = aTsvPalette[i];
+		if (ch == '\t')
 		{
-			// End of headers, erase them from lines[] and go parse the data
-			lines.erase(lines.begin(), lines.begin() + static_cast<AStringVector::difference_type>(idx) + 1);
-			break;
-		}
-		auto s = StringSplit(line, "\t");
-		if (s.size() != 2)
-		{
-			throw LoadFailedException(Printf("Invalid header format on line %u", idx + 1));
-		}
-		if (s[0] == "FileVersion")
-		{
-			try
+			switch (state)
 			{
-				fileVersion = std::stoi(s[1]);
-			}
-			catch (const std::exception & exc)
-			{
-				throw LoadFailedException(Printf("Invalid file version: \"%d\" (%s)", s[1], exc.what()));
-			}
-		}
-		else if (s[0] == "CommonPrefix")
-		{
-			commonPrefix = s[1];
-		}
-	}
-	if (fileVersion != 1)
-	{
-		throw LoadFailedException(Printf("Unknown file version (%d), only version 1 is supported", fileVersion));
-	}
+				case Signature:
+				{
+					throw LoadFailedException("Signature is invalid (contains a TAB)");
+				}
 
-	// Parse the data:
-	size_t minSplit = aIsUpgrade ? 3 : 2;
-	for (const auto & line: lines)
-	{
-		auto s = StringSplit(line, "\t");
-		auto numSplit = s.size();
-		if (numSplit < minSplit)
-		{
-			throw LoadFailedException(Printf("Not enough values on data line: \"%s\"", line));
-		}
-		UInt32 id;
-		try
-		{
-			id = static_cast<UInt32>(std::stoi(s[0]));
-		}
-		catch (const std::exception & exc)
-		{
-			throw LoadFailedException(Printf("Invalid block ID: \"%s\" (%s)", s[0], exc.what()));
-		}
-		size_t idx = 1;
-		if (aIsUpgrade)
-		{
-			id = id * 16;
-			try
-			{
-				id = id + static_cast<UInt32>(Clamp(std::stoi(s[1]), 0, 15));
+				case HeaderKey:
+				{
+					currHeaderKey = aTsvPalette.substr(lastIdx, i - lastIdx);
+					state = HeaderValue;
+					break;
+				}
+
+				case HeaderValue:
+				{
+					throw LoadFailedException(Printf("Header value contains TAB (line %d)", line));
+				}
+
+				case Index:
+				{
+					try
+					{
+						id = static_cast<UInt32>(std::stoul(aTsvPalette.substr(lastIdx, i - lastIdx)));
+					}
+					catch (const std::exception & exc)
+					{
+						throw LoadFailedException(Printf("Invalid ID (line %d; %s)", line, exc.what()));
+					}
+					state = isUpgrade ? Meta : BlockTypeName;
+					break;
+				}
+
+				case Meta:
+				{
+					id = id * 16;
+					try
+					{
+						id = id + static_cast<UInt32>(Clamp(std::stoi(aTsvPalette.substr(lastIdx, i - lastIdx)), 0, 15));
+					}
+					catch (const std::exception & exc)
+					{
+						throw LoadFailedException(Printf("Invalid Meta (line %d; %s)", line, exc.what()));
+					}
+					state = BlockTypeName;
+					break;
+				}
+
+				case BlockTypeName:
+				{
+					blockTypeName = aTsvPalette.substr(lastIdx, i - lastIdx);
+					state = BlockStateKey;
+					break;
+				}
+
+				case BlockStateKey:
+				{
+					blockStateKey = aTsvPalette.substr(lastIdx, i - lastIdx);
+					state = BlockStateValue;
+					break;
+				}
+
+				case BlockStateValue:
+				{
+					blockStatePairs[blockStateKey] = aTsvPalette.substr(lastIdx, i - lastIdx);
+					blockStateKey.clear();
+					state = BlockStateKey;
+					break;
+				}
 			}
-			catch (const std::exception & exc)
-			{
-				throw LoadFailedException(Printf("Invalid block meta: \"%s\" (%s)", s[1], exc.what()));
-			}
-			idx = 2;
+			lastIdx = i + 1;
 		}
-		const auto & blockTypeName = s[idx];
-		idx += 1;
-		std::map<AString, AString> state;
-		while (idx + 1 < numSplit)
+		else if ((ch == '\n') || (ch == '\r'))
 		{
-			state[s[idx]] = s[idx + 1];
-			idx += 2;
-		}
-		addMapping(id, commonPrefix + blockTypeName, state);
-	}
+			if ((ch == '\n') && (i > 0) && (aTsvPalette[i - 1] == '\r'))
+			{
+				// This is the LF of a CRLF, skip it:
+				lastIdx = i + 1;
+				continue;
+			}
+			switch (state)
+			{
+				case Signature:
+				{
+					auto signature = aTsvPalette.substr(lastIdx, i - lastIdx);
+					if (signature == hdrTsvRegular)
+					{
+						isUpgrade = false;
+					}
+					else if (signature == hdrTsvUpgrade)
+					{
+						isUpgrade = true;
+					}
+					else
+					{
+						throw LoadFailedException("Unknown signature");
+					}
+					state = HeaderKey;
+					break;
+				}  // case Signature
+
+				case HeaderKey:
+				{
+					if (lastIdx == i)
+					{
+						// This is the end of the headers
+						if (!isFileVersionPresent)
+						{
+							throw LoadFailedException("FileVersion is missing");
+						}
+						state = Index;
+					}
+					else
+					{
+						throw LoadFailedException(Printf("Header without a value (line %d)", line));
+					}
+					break;
+				}  // case HeaderKey
+
+				case HeaderValue:
+				{
+					auto headerValue = aTsvPalette.substr(lastIdx, i - lastIdx);
+					if (currHeaderKey == "FileVersion")
+					{
+						auto fileVersion = std::stoi(headerValue);
+						if (fileVersion != 1)
+						{
+							throw LoadFailedException(Printf("Unsupported FileVersion: %d", fileVersion));
+						}
+						isFileVersionPresent = true;
+					}
+					else if (currHeaderKey == "CommonPrefix")
+					{
+						commonPrefix = headerValue;
+					}
+					state = HeaderKey;
+					break;
+				}  // case HeaderValue
+
+				case Index:
+				{
+					throw LoadFailedException(Printf("Incomplete line, ended after Index (line %d)", line));
+				}
+
+				case Meta:
+				{
+					throw LoadFailedException(Printf("Incomplete line, ended after Meta (line %d)", line));
+				}
+
+				case BlockTypeName:
+				{
+					addMapping(id, commonPrefix + aTsvPalette.substr(lastIdx, i - lastIdx), {});
+					state = Index;
+					break;
+				}
+
+				case BlockStateKey:
+				{
+					throw LoadFailedException(Printf("Incomplete line, ended after BlockStateKey (line %d)", line));
+				}
+
+				case BlockStateValue:
+				{
+					blockStatePairs[blockStateKey] = aTsvPalette.substr(lastIdx, i - lastIdx);
+					addMapping(id, commonPrefix + blockTypeName, blockStatePairs);
+					blockStatePairs.clear();
+					state = Index;
+					break;
+				}
+			}  // switch (state)
+			lastIdx = i + 1;
+			line = line + 1;
+		}  // if \r or \n
+	}  // for i - aTsvPalette[]
 }
 
 
