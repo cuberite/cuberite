@@ -229,8 +229,8 @@ static void testLoadTsvRegular(void)
 	auto str = "\
 BlockTypePalette\r\n\
 FileVersion\t1\n\
-CommonPrefix\tminecraft:\r\n\
-\n\
+CommonPrefix\tminecraft:\n\
+\r\n\
 0\tair\r\n\
 1\tstone\n\
 2\tgrass\tsnow_covered\t0\n\
