@@ -7,6 +7,30 @@
 
 
 
+/** Returns the index into aString >= aStartIdx at which the next separator occurs.
+Separator is one of \t, \n or \r.
+Returns AString::npos if no such separator. */
+static size_t findNextSeparator(const AString & aString, size_t aStartIdx = 0)
+{
+	for (size_t i = aStartIdx, len = aString.length(); i < len; ++i)
+	{
+		switch (aString[i])
+		{
+			case '\t':
+			case '\n':
+			case '\r':
+			{
+				return i;
+			}
+		}
+	}
+	return AString::npos;
+}
+
+
+
+
+
 BlockTypePalette::BlockTypePalette():
 	mMaxIndex(0)
 {
@@ -196,89 +220,150 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 
 void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 {
-	auto lines = StringSplitAndTrim(aTsvPalette, "\n");
+	static const AString hdrTsvRegular = "BlockTypePalette";
+	static const AString hdrTsvUpgrade = "UpgradeBlockTypePalette";
+
+	// Check the file signature:
+	auto idx = findNextSeparator(aTsvPalette);
+	if ((idx == AString::npos) || (aTsvPalette[idx] == '\t'))
+	{
+		throw LoadFailedException("Invalid signature");
+	}
+	auto signature = aTsvPalette.substr(0, idx);
+	bool isUpgrade = (signature == hdrTsvUpgrade);
+	if (!isUpgrade && (signature != hdrTsvRegular))
+	{
+		throw LoadFailedException("Unknown signature");
+	}
+	if (aTsvPalette[idx] == '\r')   // CR of the CRLF pair, skip the LF:
+	{
+		idx += 1;
+	}
 
 	// Parse the header:
-	int fileVersion = 0;
+	bool hasHadVersion = false;
 	AString commonPrefix;
-	auto numLines = lines.size();
-	for (size_t idx = 1; idx < numLines; ++idx)
+	int line = 2;
+	auto len = aTsvPalette.length();
+	while (true)
 	{
-		const auto & line = lines[idx];
-		if (line.empty())
+		auto keyStart = idx + 1;
+		auto keyEnd = findNextSeparator(aTsvPalette, idx + 1);
+		if (keyEnd == AString::npos)
 		{
-			// End of headers, erase them from lines[] and go parse the data
-			lines.erase(lines.begin(), lines.begin() + static_cast<AStringVector::difference_type>(idx) + 1);
+			throw LoadFailedException(Printf("Invalid header key format on line %u", line));
+		}
+		if (keyEnd == idx + 1)  // Empty line, end of headers
+		{
+			if (aTsvPalette[keyEnd] == '\r')  // CR of the CRLF pair, skip the LF:
+			{
+				++keyEnd;
+			}
+			idx = keyEnd;
+			++line;
 			break;
 		}
-		auto s = StringSplit(line, "\t");
-		if (s.size() != 2)
+		auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
+		if ((valueEnd == AString::npos) || (aTsvPalette[valueEnd] == '\t'))
 		{
-			throw LoadFailedException(Printf("Invalid header format on line %u", idx + 1));
+			throw LoadFailedException(Printf("Invalid header value format on line %u", line));
 		}
-		if (s[0] == "FileVersion")
+		auto key = aTsvPalette.substr(keyStart, keyEnd - keyStart);
+		if (key == "FileVersion")
 		{
-			try
+			unsigned version = 0;
+			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);
+			if (!StringToInteger(value, version))
 			{
-				fileVersion = std::stoi(s[1]);
+				throw LoadFailedException("Invalid FileVersion value");
 			}
-			catch (const std::exception & exc)
+			else if (version != 1)
 			{
-				throw LoadFailedException(Printf("Invalid file version: \"%d\" (%s)", s[1], exc.what()));
+				throw LoadFailedException(Printf("Unknown FileVersion: %u. Only version 1 is supported.", version));
 			}
+			hasHadVersion = true;
 		}
-		else if (s[0] == "CommonPrefix")
+		else if (key == "CommonPrefix")
 		{
-			commonPrefix = s[1];
+			commonPrefix = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);
 		}
+		idx = valueEnd;
+		if (aTsvPalette[idx] == '\r')  // CR of the CRLF pair, skip the LF:
+		{
+			++idx;
+		}
+		++line;
 	}
-	if (fileVersion != 1)
+	if (!hasHadVersion)
 	{
-		throw LoadFailedException(Printf("Unknown file version (%d), only version 1 is supported", fileVersion));
+		throw LoadFailedException("No FileVersion value");
 	}
 
 	// Parse the data:
-	size_t minSplit = aIsUpgrade ? 3 : 2;
-	for (const auto & line: lines)
+	while (idx + 1 < len)
 	{
-		auto s = StringSplit(line, "\t");
-		auto numSplit = s.size();
-		if (numSplit < minSplit)
+		auto lineStart = idx + 1;
+		auto idEnd = findNextSeparator(aTsvPalette, lineStart);
+		if ((idEnd == AString::npos) || (aTsvPalette[idEnd] != '\t'))
 		{
-			throw LoadFailedException(Printf("Not enough values on data line: \"%s\"", line));
+			throw LoadFailedException(Printf("Incomplete data on line %u (id)", line));
 		}
 		UInt32 id;
-		try
+		if (!StringToInteger(aTsvPalette.substr(lineStart, idEnd - lineStart), id))
 		{
-			id = static_cast<UInt32>(std::stoi(s[0]));
+			throw LoadFailedException(Printf("Failed to parse id on line %u", line));
 		}
-		catch (const std::exception & exc)
+		size_t metaEnd = idEnd;
+		if (isUpgrade)
 		{
-			throw LoadFailedException(Printf("Invalid block ID: \"%s\" (%s)", s[0], exc.what()));
-		}
-		size_t idx = 1;
-		if (aIsUpgrade)
-		{
-			id = id * 16;
-			try
+			metaEnd = findNextSeparator(aTsvPalette, idEnd + 1);
+			if ((metaEnd == AString::npos) || (aTsvPalette[metaEnd] != '\t'))
 			{
-				id = id + static_cast<UInt32>(Clamp(std::stoi(s[1]), 0, 15));
+				throw LoadFailedException(Printf("Incomplete data on line %u (meta)", line));
 			}
-			catch (const std::exception & exc)
+			UInt32 meta = 0;
+			if (!StringToInteger(aTsvPalette.substr(idEnd + 1, metaEnd - idEnd - 1), meta))
 			{
-				throw LoadFailedException(Printf("Invalid block meta: \"%s\" (%s)", s[1], exc.what()));
+				throw LoadFailedException(Printf("Failed to parse meta on line %u", line));
 			}
-			idx = 2;
+			if (meta > 15)
+			{
+				throw LoadFailedException(Printf("Invalid meta value on line %u: %u", line, meta));
+			}
+			id = (id * 16) | meta;
 		}
-		const auto & blockTypeName = s[idx];
-		idx += 1;
-		std::map<AString, AString> state;
-		while (idx + 1 < numSplit)
+		auto blockTypeEnd = findNextSeparator(aTsvPalette, metaEnd + 1);
+		if (blockTypeEnd == AString::npos)
 		{
-			state[s[idx]] = s[idx + 1];
-			idx += 2;
+			throw LoadFailedException(Printf("Incomplete data on line %u (blockTypeName)", line));
 		}
-		addMapping(id, commonPrefix + blockTypeName, state);
+		auto blockTypeName = aTsvPalette.substr(metaEnd + 1, blockTypeEnd - metaEnd - 1);
+		auto blockStateEnd = blockTypeEnd;
+		AStringMap blockState;
+		while (aTsvPalette[blockStateEnd] == '\t')
+		{
+			auto keyEnd = findNextSeparator(aTsvPalette, blockStateEnd + 1);
+			if ((keyEnd == AString::npos) || (aTsvPalette[keyEnd] != '\t'))
+			{
+				throw LoadFailedException(Printf("Incomplete data on line %u (blockState key)", line));
+			}
+			auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
+			if (valueEnd == AString::npos)
+			{
+				throw LoadFailedException(Printf("Incomplete data on line %u (blockState value)", line));
+			}
+			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
+			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);
+			blockState[key] = value;
+			blockStateEnd = valueEnd;
+		}
+		addMapping(id, commonPrefix + blockTypeName, std::move(blockState));
+		++line;
+		if (aTsvPalette[blockStateEnd] == '\r')  // CR of the CRLF pair, skip the LF:
+		{
+			++blockStateEnd;
+		}
+		idx = blockStateEnd;
 	}
 }
 
