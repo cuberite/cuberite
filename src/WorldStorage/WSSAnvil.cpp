@@ -27,6 +27,7 @@
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
@@ -656,6 +657,24 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 
+		// Shulker boxes:
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX: return LoadShulkerBoxFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+
 		// Blocktypes that have block entities but don't load their contents from disk:
 		case E_BLOCK_ENDER_CHEST:   return nullptr;
 
@@ -669,7 +688,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 			{
 				TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
 			}
-			LOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
+			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
 				m_World->GetName(),
 				ItemTypeToString(a_BlockType), a_BlockType, TypeName,
 				a_Pos
@@ -1451,6 +1470,29 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 	}
 
 	return Sign.release();
+}
+
+
+
+
+
+cBlockEntity * cWSSAnvil::LoadShulkerBoxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "minecraft:shulker_box" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return nullptr;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
+	}
+	auto ShulkerBox = cpp14::make_unique<cShulkerBoxEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	LoadItemGridFromNBT(ShulkerBox->GetContents(), a_NBT, Items);
+	return ShulkerBox.release();
 }
 
 

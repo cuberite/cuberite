@@ -225,6 +225,28 @@ bool cItemGrid::IsSlotEmpty(int a_X, int a_Y) const
 
 
 
+bool cItemGrid::IsEmpty(void) const
+{
+	if (!m_Slots.IsStorageAllocated())
+	{
+		return true;  // Already clear
+	}
+
+	for (int i = 0; i < m_Slots.size(); i++)
+	{
+		if (!m_Slots.GetAt(i).IsEmpty())
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+
+
 void cItemGrid::Clear(void)
 {
 	if (!m_Slots.IsStorageAllocated())

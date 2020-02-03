@@ -20,6 +20,7 @@
 #include "MobSpawnerEntity.h"
 #include "JukeboxEntity.h"
 #include "NoteEntity.h"
+#include "ShulkerBoxEntity.h"
 #include "SignEntity.h"
 
 
@@ -62,6 +63,25 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 		{
 			return true;
 		}
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:
+		{
+			return true;
+		}
 		default:
 		{
 			return false;
@@ -96,6 +116,25 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 		case E_BLOCK_SIGN_POST:     return new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_TRAPPED_CHEST: return new cChestEntity       (a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_WALLSIGN:      return new cSignEntity        (a_BlockType, a_BlockMeta, a_Pos, a_World);
+
+		// Shulker boxes:
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX: return new cShulkerBoxEntity(a_BlockType, a_BlockMeta, a_Pos, a_World);
+
 		default:
 		{
 			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",

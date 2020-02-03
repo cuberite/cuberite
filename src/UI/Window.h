@@ -26,6 +26,7 @@ class cFurnaceEntity;
 class cHopperEntity;
 class cMinecartWithChest;
 class cBeaconEntity;
+class cShulkerBoxEntity;
 class cSlotArea;
 class cSlotAreaAnvil;
 class cWorld;
@@ -67,7 +68,8 @@ public:
 		wtAnvil       = 8,
 		wtHopper      = 9,
 		wtDropper     = 10,
-		wtAnimalChest = 11,
+		wtShulkerBox  = 11,
+		wtAnimalChest = 12,
 	};
 
 	// tolua_end

@@ -22,6 +22,7 @@ class cBrewingstandEntity;
 class cChestEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
+class cShulkerBoxEntity;
 class cMinecartWithChest;
 class cCraftingRecipe;
 class cWorld;
@@ -541,6 +542,25 @@ public:
 private:
 	cHorse & m_Horse;
 };
+
+
+
+
+
+class cSlotAreaShulkerBox :
+	public cSlotArea
+{
+public:
+	cSlotAreaShulkerBox(cShulkerBoxEntity * a_ShulkerBox, cWindow & a_ParentWindow);
+
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+
+protected:
+	cShulkerBoxEntity * m_ShulkerBox;
+} ;
 
 
 

@@ -737,6 +737,9 @@ public:
 	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
 
+	/** Calls the callback for each shulker box in the specified chunk; returns true if all shulker boxes processed, false if the callback aborted by returning true */
+	bool ForEachShulkerBoxInChunk(int a_ChunkX, int a_ChunkZ, cShulkerBoxCallback a_Callback);  // Exported in ManualBindings.cpp
+
 	/** Does an explosion with the specified strength at the specified coordinates.
 	Executes the HOOK_EXPLODING and HOOK_EXPLODED hooks as part of the processing.
 	a_SourceData exact type depends on the a_Source, see the declaration of the esXXX constants in BlockID.h for details.
@@ -781,6 +784,9 @@ public:
 
 	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
 	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Exported in ManualBindings.cpp
+
+	/** Calls the callback for the shulker box at the specified coords; returns false if there's no shulker box at those coords, true if found */
+	bool DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp

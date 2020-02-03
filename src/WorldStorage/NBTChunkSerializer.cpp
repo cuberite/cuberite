@@ -23,6 +23,7 @@
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/NoteEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
@@ -226,6 +227,24 @@ public:
 			case E_BLOCK_SIGN_POST:     AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
 			case E_BLOCK_TRAPPED_CHEST: AddChestEntity       (static_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
 			case E_BLOCK_WALLSIGN:      AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
+
+			// Shulker boxes:
+			case E_BLOCK_WHITE_SHULKER_BOX:
+			case E_BLOCK_ORANGE_SHULKER_BOX:
+			case E_BLOCK_MAGENTA_SHULKER_BOX:
+			case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+			case E_BLOCK_YELLOW_SHULKER_BOX:
+			case E_BLOCK_LIME_SHULKER_BOX:
+			case E_BLOCK_PINK_SHULKER_BOX:
+			case E_BLOCK_GRAY_SHULKER_BOX:
+			case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+			case E_BLOCK_CYAN_SHULKER_BOX:
+			case E_BLOCK_PURPLE_SHULKER_BOX:
+			case E_BLOCK_BLUE_SHULKER_BOX:
+			case E_BLOCK_BROWN_SHULKER_BOX:
+			case E_BLOCK_GREEN_SHULKER_BOX:
+			case E_BLOCK_RED_SHULKER_BOX:
+			case E_BLOCK_BLACK_SHULKER_BOX: AddShulkerBoxEntity(static_cast<cShulkerBoxEntity *>(a_Entity)); break;
 
 			default:
 			{
@@ -591,6 +610,20 @@ public:
 			AddBasicTileEntity(a_FlowerPot, "FlowerPot");
 			mWriter.AddInt   ("Item", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemType));
 			mWriter.AddInt   ("Data", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemDamage));
+		mWriter.EndCompound();
+	}
+
+
+
+
+
+	void AddShulkerBoxEntity(cShulkerBoxEntity * a_ShulkerBox)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_ShulkerBox, "minecraft:shulker_box");
+			mWriter.BeginList("Items", TAG_Compound);
+				AddItemGrid(a_ShulkerBox->GetContents());
+			mWriter.EndList();
 		mWriter.EndCompound();
 	}
 

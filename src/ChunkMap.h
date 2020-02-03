@@ -33,6 +33,7 @@ class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
+class cShulkerBoxEntity;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
@@ -57,6 +58,7 @@ using cNoteBlockCallback    = cFunctionRef<bool(cNoteEntity         &)>;
 using cCommandBlockCallback = cFunctionRef<bool(cCommandBlockEntity &)>;
 using cMobHeadCallback      = cFunctionRef<bool(cMobHeadEntity      &)>;
 using cFlowerPotCallback    = cFunctionRef<bool(cFlowerPotEntity    &)>;
+using cShulkerBoxCallback   = cFunctionRef<bool(cShulkerBoxEntity   &)>;
 
 
 
@@ -267,6 +269,10 @@ public:
 	Returns true if all furnaces processed, false if the callback aborted by returning true. */
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback);  // Lua-accessible
 
+	/** Calls the callback for each shulker box in the specified chunk.
+	Returns true if all shulker boxes processed, false if the callback aborted by returning true. */
+	bool ForEachShulkerBoxInChunk(int a_ChunkX, int a_ChunkZ, cShulkerBoxCallback a_Callback);  // Lua-accessible
+
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there's no block entity at those coords, true if found. */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);  // Lua-acessible
@@ -317,6 +323,10 @@ public:
 	/** Calls the callback for the flower pot at the specified coords.
 	Returns false if there's no flower pot at those coords or callback returns true, returns true if found. */
 	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the shulker box at the specified coords.
+	Returns false if there's no shulker box at those coords or callback returns true, returns true if found. */
+	bool DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback);  // Lua-accessible
 
 	/** Retrieves the test on the sign at the specified coords.
 	Returns false if there's no sign at those coords, true if found. */

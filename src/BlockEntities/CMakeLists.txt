@@ -18,6 +18,7 @@ SET (SRCS
 	MobHeadEntity.cpp
 	MobSpawnerEntity.cpp
 	NoteEntity.cpp
+	ShulkerBoxEntity.cpp
 	SignEntity.cpp
 )
 
@@ -40,6 +41,7 @@ SET (HDRS
 	MobHeadEntity.h
 	MobSpawnerEntity.h
 	NoteEntity.h
+	ShulkerBoxEntity.h
 	SignEntity.h
 )
 

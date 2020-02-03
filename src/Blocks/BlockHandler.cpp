@@ -72,6 +72,7 @@
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSeaLantern.h"
+#include "BlockShulkerBox.h"
 #include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
@@ -354,6 +355,24 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WOOL:                          return new cBlockClothHandler           (a_BlockType);
 		case E_BLOCK_WORKBENCH:                     return new cBlockWorkbenchHandler       (a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:                 return new cBlockFlowerHandler          (a_BlockType);
+
+		// Shulker boxes:
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:             return new cBlockShulkerBoxHandler      (a_BlockType);
 
 		default: return new cBlockHandler(a_BlockType);
 	}

@@ -73,6 +73,9 @@ public:
 	/** Returns true if the specified slot is empty or the slot doesn't exist */
 	bool IsSlotEmpty(int a_X, int a_Y) const;
 
+	/** Returns true if the item grid has no items in it */
+	bool IsEmpty(void) const;
+
 	/** Sets all items as empty */
 	void Clear(void);
 

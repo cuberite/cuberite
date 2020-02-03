@@ -14,6 +14,7 @@
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/HopperEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
@@ -76,6 +77,7 @@ const AString cWindow::GetWindowTypeName(void) const
 		case wtAnvil:       return "minecraft:anvil";
 		case wtHopper:      return "minecraft:hopper";
 		case wtDropper:     return "minecraft:dropper";
+		case wtShulkerBox:  return "minecraft:shulker_box";
 		case wtAnimalChest: return "EntityHorse";
 		default:
 		{

@@ -1396,6 +1396,15 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 
 
+bool cWorld::ForEachShulkerBoxInChunk(int a_ChunkX, int a_ChunkZ, cShulkerBoxCallback a_Callback)
+{
+	return m_ChunkMap->ForEachShulkerBoxInChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
@@ -1540,6 +1549,15 @@ bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
 {
 	return m_ChunkMap->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback)
+{
+	return m_ChunkMap->DoWithShulkerBoxAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

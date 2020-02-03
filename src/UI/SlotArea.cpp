@@ -12,6 +12,7 @@
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "AnvilWindow.h"
@@ -2758,6 +2759,115 @@ void cSlotAreaHorse::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 	}
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaShulkerBox:
+
+cSlotAreaShulkerBox::cSlotAreaShulkerBox(cShulkerBoxEntity * a_ShulkerBox, cWindow & a_ParentWindow) :
+	cSlotArea(27, a_ParentWindow),
+	m_ShulkerBox(a_ShulkerBox)
+{
+}
+
+
+
+
+
+static bool IsShulkerBoxItem(const cItem & a_ItemStack)
+{
+	switch (a_ItemStack.m_ItemType)
+	{
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+void cSlotAreaShulkerBox::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+
+	switch (a_ClickAction)
+	{
+		case caLeftClick:
+		case caRightClick:
+		case caDblClick:
+		{
+			// Check for invalid item types
+			if (DraggingItem.IsEmpty())
+			{
+				break;
+			}
+
+			if (IsShulkerBoxItem(DraggingItem))
+			{
+				return;
+			}
+		}
+		default: break;
+	}
+
+	cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+}
+
+
+
+
+
+const cItem * cSlotAreaShulkerBox::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	// a_SlotNum ranges from 0 to 26, use that to index the shulker box entity's inventory directly:
+	return &(m_ShulkerBox->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaShulkerBox::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	m_ShulkerBox->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cSlotAreaShulkerBox::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
+{
+	if (IsShulkerBoxItem(a_ItemStack))
+	{
+		return;
+	}
+	cSlotArea::DistributeStack(a_ItemStack, a_Player, a_Apply, a_KeepEmptySlots, a_BackFill);
+}
 
 
 
