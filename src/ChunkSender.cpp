@@ -287,7 +287,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 
 
 
-void cChunkSender::Entity(cEntity *)
+void cChunkSender::Entity(cEntity * a_Entity)
 {
 	m_Entities.push_back(a_Entity->GetUniqueID());
 }
