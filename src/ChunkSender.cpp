@@ -247,22 +247,31 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	}
 	cChunkDataSerializer Data(m_Data, m_BiomeMap, m_World.GetDimension());
 
-	for (const auto client : a_Clients)
+	for (const auto Client : a_Clients)
 	{
 		// Send:
-		client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
+		Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
 
 		// Send block-entity packets:
 		for (const auto & Pos : m_BlockEntities)
 		{
-			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *client);
+			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *Client);
 		}  // for itr - m_Packets[]
+
+		// Send entity packets:
+		for (const auto EntityID : m_Entities)
+		{
+			m_World.DoWithEntityByID(EntityID, [=](cEntity & a_Entity)
+			{
+				a_Entity.SpawnOn(*Client);
+				return true;
+			});
+		}
 
 	}
 	m_Data.Clear();
 	m_BlockEntities.clear();
-
-	// TODO: Send entity spawn packets
+	m_Entities.clear();
 }
 
 
@@ -280,7 +289,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 
 void cChunkSender::Entity(cEntity *)
 {
-	// Nothing needed yet, perhaps in the future when we save entities into chunks we'd like to send them upon load, too ;)
+	m_Entities.push_back(a_Entity->GetUniqueID());
 }
 
 
