@@ -24,18 +24,18 @@ class cEntity;
 class cSplashPotionEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
+
+	using super = cProjectileEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cSplashPotionEntity)
 
 	cSplashPotionEntity(
 		cEntity * a_Creator,
-		double a_X, double a_Y, double a_Z,
-		const Vector3d & a_Speed,
+		Vector3d a_Pos,
+		Vector3d a_Speed,
 		const cItem & a_Item
 	);
 

@@ -9,7 +9,7 @@
 
 
 cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
-	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
+	super(etTNT, a_Pos, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);

@@ -413,13 +413,15 @@ protected:
 				return;
 			}
 			case biInvalidBiome:
-			case biHell:
-			case biSky:
+			case biNether:
+			case biEnd:
 			case biNumBiomes:
 			case biVariant:
 			case biNumVariantBiomes:
 			{
-				ASSERT(!"Unhandled biome");
+				// This generator is not supposed to be used for these biomes, but it has to produce *something*
+				// so let's produce stone:
+				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patStone.Get(), a_ShapeColumn);
 				return;
 			}
 		}  // switch (Biome)

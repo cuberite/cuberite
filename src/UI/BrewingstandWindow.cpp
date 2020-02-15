@@ -13,8 +13,8 @@
 
 
 
-cBrewingstandWindow::cBrewingstandWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandEntity * a_Brewingstand) :
-	cWindow(wtBrewery, "Brewingstand")
+cBrewingstandWindow::cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand):
+	super(wtBrewery, "Brewingstand")
 {
 	m_SlotAreas.push_back(new cSlotAreaBrewingstand(a_Brewingstand, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));

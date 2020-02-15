@@ -1,0 +1,1699 @@
+UpgradeBlockTypePalette
+FileVersion	1
+CommonPrefix	minecraft:
+
+0	0	air
+1	0	stone
+1	1	granite
+1	2	polished_granite
+1	3	diorite
+1	4	polished_diorite
+1	5	andesite
+1	6	polished_andesite
+2	0	grass_block	snowy	false
+3	0	dirt
+3	1	coarse_dirt
+3	2	podzol	snowy	false
+4	0	cobblestone
+5	0	oak_planks
+5	1	spruce_planks
+5	2	birch_planks
+5	3	jungle_planks
+5	4	acacia_planks
+5	5	dark_oak_planks
+6	0	oak_sapling	stage	0
+6	1	spruce_sapling	stage	0
+6	2	birch_sapling	stage	0
+6	3	jungle_sapling	stage	0
+6	4	acacia_sapling	stage	0
+6	5	dark_oak_sapling	stage	0
+6	8	oak_sapling	stage	1
+6	9	spruce_sapling	stage	1
+6	10	birch_sapling	stage	1
+6	11	jungle_sapling	stage	1
+6	12	acacia_sapling	stage	1
+6	13	dark_oak_sapling	stage	1
+7	0	bedrock
+8	0	water	level	0
+8	1	water	level	1
+8	2	water	level	2
+8	3	water	level	3
+8	4	water	level	4
+8	5	water	level	5
+8	6	water	level	6
+8	7	water	level	7
+8	8	water	level	8
+8	9	water	level	9
+8	10	water	level	10
+8	11	water	level	11
+8	12	water	level	12
+8	13	water	level	13
+8	14	water	level	14
+8	15	water	level	15
+9	0	water	level	0
+9	1	water	level	1
+9	2	water	level	2
+9	3	water	level	3
+9	4	water	level	4
+9	5	water	level	5
+9	6	water	level	6
+9	7	water	level	7
+9	8	water	level	8
+9	9	water	level	9
+9	10	water	level	10
+9	11	water	level	11
+9	12	water	level	12
+9	13	water	level	13
+9	14	water	level	14
+9	15	water	level	15
+10	0	lava	level	0
+10	1	lava	level	1
+10	2	lava	level	2
+10	3	lava	level	3
+10	4	lava	level	4
+10	5	lava	level	5
+10	6	lava	level	6
+10	7	lava	level	7
+10	8	lava	level	8
+10	9	lava	level	9
+10	10	lava	level	10
+10	11	lava	level	11
+10	12	lava	level	12
+10	13	lava	level	13
+10	14	lava	level	14
+10	15	lava	level	15
+11	0	lava	level	0
+11	1	lava	level	1
+11	2	lava	level	2
+11	3	lava	level	3
+11	4	lava	level	4
+11	5	lava	level	5
+11	6	lava	level	6
+11	7	lava	level	7
+11	8	lava	level	8
+11	9	lava	level	9
+11	10	lava	level	10
+11	11	lava	level	11
+11	12	lava	level	12
+11	13	lava	level	13
+11	14	lava	level	14
+11	15	lava	level	15
+12	0	sand
+12	1	red_sand
+13	0	gravel
+14	0	gold_ore
+15	0	iron_ore
+16	0	coal_ore
+17	0	oak_log	axis	y
+17	1	spruce_log	axis	y
+17	2	birch_log	axis	y
+17	3	jungle_log	axis	y
+17	4	oak_log	axis	x
+17	5	spruce_log	axis	x
+17	6	birch_log	axis	x
+17	7	jungle_log	axis	x
+17	8	oak_log	axis	z
+17	9	spruce_log	axis	z
+17	10	birch_log	axis	z
+17	11	jungle_log	axis	z
+17	12	oak_bark
+17	13	spruce_bark
+17	14	birch_bark
+17	15	jungle_bark
+18	0	oak_leaves	decayable	true	check_decay	false
+18	1	spruce_leaves	decayable	true	check_decay	false
+18	2	birch_leaves	decayable	true	check_decay	false
+18	3	jungle_leaves	decayable	true	check_decay	false
+18	4	oak_leaves	decayable	false	check_decay	false
+18	5	spruce_leaves	decayable	false	check_decay	false
+18	6	birch_leaves	decayable	false	check_decay	false
+18	7	jungle_leaves	decayable	false	check_decay	false
+18	8	oak_leaves	decayable	true	check_decay	true
+18	9	spruce_leaves	decayable	true	check_decay	true
+18	10	birch_leaves	decayable	true	check_decay	true
+18	11	jungle_leaves	decayable	true	check_decay	true
+18	12	oak_leaves	decayable	false	check_decay	true
+18	13	spruce_leaves	decayable	false	check_decay	true
+18	14	birch_leaves	decayable	false	check_decay	true
+18	15	jungle_leaves	decayable	false	check_decay	true
+19	0	sponge
+19	1	wet_sponge
+20	0	glass
+21	0	lapis_ore
+22	0	lapis_block
+23	0	dispenser	facing	down	triggered	false
+23	1	dispenser	facing	up	triggered	false
+23	2	dispenser	facing	north	triggered	false
+23	3	dispenser	facing	south	triggered	false
+23	4	dispenser	facing	west	triggered	false
+23	5	dispenser	facing	east	triggered	false
+23	8	dispenser	facing	down	triggered	true
+23	9	dispenser	facing	up	triggered	true
+23	10	dispenser	facing	north	triggered	true
+23	11	dispenser	facing	south	triggered	true
+23	12	dispenser	facing	west	triggered	true
+23	13	dispenser	facing	east	triggered	true
+24	0	sandstone
+24	1	chiseled_sandstone
+24	2	cut_sandstone
+25	0	note_block
+26	0	red_bed	facing	south	occupied	false	part	foot
+26	1	red_bed	facing	west	occupied	false	part	foot
+26	2	red_bed	facing	north	occupied	false	part	foot
+26	3	red_bed	facing	east	occupied	false	part	foot
+26	8	red_bed	facing	south	occupied	false	part	head
+26	9	red_bed	facing	west	occupied	false	part	head
+26	10	red_bed	facing	north	occupied	false	part	head
+26	11	red_bed	facing	east	occupied	false	part	head
+26	12	red_bed	facing	south	occupied	true	part	head
+26	13	red_bed	facing	west	occupied	true	part	head
+26	14	red_bed	facing	north	occupied	true	part	head
+26	15	red_bed	facing	east	occupied	true	part	head
+27	0	powered_rail	shape	north_south	powered	false
+27	1	powered_rail	shape	east_west	powered	false
+27	2	powered_rail	shape	ascending_east	powered	false
+27	3	powered_rail	shape	ascending_west	powered	false
+27	4	powered_rail	shape	ascending_north	powered	false
+27	5	powered_rail	shape	ascending_south	powered	false
+27	8	powered_rail	shape	north_south	powered	true
+27	9	powered_rail	shape	east_west	powered	true
+27	10	powered_rail	shape	ascending_east	powered	true
+27	11	powered_rail	shape	ascending_west	powered	true
+27	12	powered_rail	shape	ascending_north	powered	true
+27	13	powered_rail	shape	ascending_south	powered	true
+28	0	detector_rail	shape	north_south	powered	false
+28	1	detector_rail	shape	east_west	powered	false
+28	2	detector_rail	shape	ascending_east	powered	false
+28	3	detector_rail	shape	ascending_west	powered	false
+28	4	detector_rail	shape	ascending_north	powered	false
+28	5	detector_rail	shape	ascending_south	powered	false
+28	8	detector_rail	shape	north_south	powered	true
+28	9	detector_rail	shape	east_west	powered	true
+28	10	detector_rail	shape	ascending_east	powered	true
+28	11	detector_rail	shape	ascending_west	powered	true
+28	12	detector_rail	shape	ascending_north	powered	true
+28	13	detector_rail	shape	ascending_south	powered	true
+29	0	sticky_piston	facing	down	extended	false
+29	1	sticky_piston	facing	up	extended	false
+29	2	sticky_piston	facing	north	extended	false
+29	3	sticky_piston	facing	south	extended	false
+29	4	sticky_piston	facing	west	extended	false
+29	5	sticky_piston	facing	east	extended	false
+29	8	sticky_piston	facing	down	extended	true
+29	9	sticky_piston	facing	up	extended	true
+29	10	sticky_piston	facing	north	extended	true
+29	11	sticky_piston	facing	south	extended	true
+29	12	sticky_piston	facing	west	extended	true
+29	13	sticky_piston	facing	east	extended	true
+30	0	cobweb
+31	0	dead_bush
+31	1	grass
+31	2	fern
+32	0	dead_bush
+33	0	piston	facing	down	extended	false
+33	1	piston	facing	up	extended	false
+33	2	piston	facing	north	extended	false
+33	3	piston	facing	south	extended	false
+33	4	piston	facing	west	extended	false
+33	5	piston	facing	east	extended	false
+33	8	piston	facing	down	extended	true
+33	9	piston	facing	up	extended	true
+33	10	piston	facing	north	extended	true
+33	11	piston	facing	south	extended	true
+33	12	piston	facing	west	extended	true
+33	13	piston	facing	east	extended	true
+34	0	piston_head	facing	down	short	false	type	normal
+34	1	piston_head	facing	up	short	false	type	normal
+34	2	piston_head	facing	north	short	false	type	normal
+34	3	piston_head	facing	south	short	false	type	normal
+34	4	piston_head	facing	west	short	false	type	normal
+34	5	piston_head	facing	east	short	false	type	normal
+34	8	piston_head	facing	down	short	false	type	sticky
+34	9	piston_head	facing	up	short	false	type	sticky
+34	10	piston_head	facing	north	short	false	type	sticky
+34	11	piston_head	facing	south	short	false	type	sticky
+34	12	piston_head	facing	west	short	false	type	sticky
+34	13	piston_head	facing	east	short	false	type	sticky
+35	0	white_wool
+35	1	orange_wool
+35	2	magenta_wool
+35	3	light_blue_wool
+35	4	yellow_wool
+35	5	lime_wool
+35	6	pink_wool
+35	7	gray_wool
+35	8	light_gray_wool
+35	9	cyan_wool
+35	10	purple_wool
+35	11	blue_wool
+35	12	brown_wool
+35	13	green_wool
+35	14	red_wool
+35	15	black_wool
+36	0	moving_piston	facing	down	type	normal
+36	1	moving_piston	facing	up	type	normal
+36	2	moving_piston	facing	north	type	normal
+36	3	moving_piston	facing	south	type	normal
+36	4	moving_piston	facing	west	type	normal
+36	5	moving_piston	facing	east	type	normal
+36	8	moving_piston	facing	down	type	sticky
+36	9	moving_piston	facing	up	type	sticky
+36	10	moving_piston	facing	north	type	sticky
+36	11	moving_piston	facing	south	type	sticky
+36	12	moving_piston	facing	west	type	sticky
+36	13	moving_piston	facing	east	type	sticky
+37	0	dandelion
+38	0	poppy
+38	1	blue_orchid
+38	2	allium
+38	3	azure_bluet
+38	4	red_tulip
+38	5	orange_tulip
+38	6	white_tulip
+38	7	pink_tulip
+38	8	oxeye_daisy
+39	0	brown_mushroom
+40	0	red_mushroom
+41	0	gold_block
+42	0	iron_block
+43	0	stone_slab	type	double
+43	1	sandstone_slab	type	double
+43	2	petrified_oak_slab	type	double
+43	3	cobblestone_slab	type	double
+43	4	brick_slab	type	double
+43	5	stone_brick_slab	type	double
+43	6	nether_brick_slab	type	double
+43	7	quartz_slab	type	double
+43	8	smooth_stone
+43	9	smooth_sandstone
+43	10	petrified_oak_slab	type	double
+43	11	cobblestone_slab	type	double
+43	12	brick_slab	type	double
+43	13	stone_brick_slab	type	double
+43	14	nether_brick_slab	type	double
+43	15	smooth_quartz
+44	0	stone_slab	type	bottom
+44	1	sandstone_slab	type	bottom
+44	2	petrified_oak_slab	type	bottom
+44	3	cobblestone_slab	type	bottom
+44	4	brick_slab	type	bottom
+44	5	stone_brick_slab	type	bottom
+44	6	nether_brick_slab	type	bottom
+44	7	quartz_slab	type	bottom
+44	8	stone_slab	type	top
+44	9	sandstone_slab	type	top
+44	10	petrified_oak_slab	type	top
+44	11	cobblestone_slab	type	top
+44	12	brick_slab	type	top
+44	13	stone_brick_slab	type	top
+44	14	nether_brick_slab	type	top
+44	15	quartz_slab	type	top
+45	0	bricks
+46	0	tnt	unstable	false
+46	1	tnt	unstable	true
+47	0	bookshelf
+48	0	mossy_cobblestone
+49	0	obsidian
+50	1	wall_torch	facing	east
+50	2	wall_torch	facing	west
+50	3	wall_torch	facing	south
+50	4	wall_torch	facing	north
+50	5	torch
+51	0	fire	north	false	south	false	east	false	age	0	up	false	west	false
+51	1	fire	north	false	south	false	east	false	age	1	up	false	west	false
+51	2	fire	north	false	south	false	east	false	age	2	up	false	west	false
+51	3	fire	north	false	south	false	east	false	age	3	up	false	west	false
+51	4	fire	north	false	south	false	east	false	age	4	up	false	west	false
+51	5	fire	north	false	south	false	east	false	age	5	up	false	west	false
+51	6	fire	north	false	south	false	east	false	age	6	up	false	west	false
+51	7	fire	north	false	south	false	east	false	age	7	up	false	west	false
+51	8	fire	north	false	south	false	east	false	age	8	up	false	west	false
+51	9	fire	north	false	south	false	east	false	age	9	up	false	west	false
+51	10	fire	north	false	south	false	east	false	age	10	up	false	west	false
+51	11	fire	north	false	south	false	east	false	age	11	up	false	west	false
+51	12	fire	north	false	south	false	east	false	age	12	up	false	west	false
+51	13	fire	north	false	south	false	east	false	age	13	up	false	west	false
+51	14	fire	north	false	south	false	east	false	age	14	up	false	west	false
+51	15	fire	north	false	south	false	east	false	age	15	up	false	west	false
+52	0	mob_spawner
+53	0	oak_stairs	facing	east	shape	straight	half	bottom
+53	1	oak_stairs	facing	west	shape	straight	half	bottom
+53	2	oak_stairs	facing	south	shape	straight	half	bottom
+53	3	oak_stairs	facing	north	shape	straight	half	bottom
+53	4	oak_stairs	facing	east	shape	straight	half	top
+53	5	oak_stairs	facing	west	shape	straight	half	top
+53	6	oak_stairs	facing	south	shape	straight	half	top
+53	7	oak_stairs	facing	north	shape	straight	half	top
+54	2	chest	facing	north	type	single
+54	3	chest	facing	south	type	single
+54	4	chest	facing	west	type	single
+54	5	chest	facing	east	type	single
+55	0	redstone_wire	south	none	east	none	north	none	power	0	west	none
+55	1	redstone_wire	south	none	east	none	north	none	power	1	west	none
+55	2	redstone_wire	south	none	east	none	north	none	power	2	west	none
+55	3	redstone_wire	south	none	east	none	north	none	power	3	west	none
+55	4	redstone_wire	south	none	east	none	north	none	power	4	west	none
+55	5	redstone_wire	south	none	east	none	north	none	power	5	west	none
+55	6	redstone_wire	south	none	east	none	north	none	power	6	west	none
+55	7	redstone_wire	south	none	east	none	north	none	power	7	west	none
+55	8	redstone_wire	south	none	east	none	north	none	power	8	west	none
+55	9	redstone_wire	south	none	east	none	north	none	power	9	west	none
+55	10	redstone_wire	south	none	east	none	north	none	power	10	west	none
+55	11	redstone_wire	south	none	east	none	north	none	power	11	west	none
+55	12	redstone_wire	south	none	east	none	north	none	power	12	west	none
+55	13	redstone_wire	south	none	east	none	north	none	power	13	west	none
+55	14	redstone_wire	south	none	east	none	north	none	power	14	west	none
+55	15	redstone_wire	south	none	east	none	north	none	power	15	west	none
+56	0	diamond_ore
+57	0	diamond_block
+58	0	crafting_table
+59	0	wheat	age	0
+59	1	wheat	age	1
+59	2	wheat	age	2
+59	3	wheat	age	3
+59	4	wheat	age	4
+59	5	wheat	age	5
+59	6	wheat	age	6
+59	7	wheat	age	7
+60	0	farmland	moisture	0
+60	1	farmland	moisture	1
+60	2	farmland	moisture	2
+60	3	farmland	moisture	3
+60	4	farmland	moisture	4
+60	5	farmland	moisture	5
+60	6	farmland	moisture	6
+60	7	farmland	moisture	7
+61	2	furnace	facing	north	lit	false
+61	3	furnace	facing	south	lit	false
+61	4	furnace	facing	west	lit	false
+61	5	furnace	facing	east	lit	false
+62	2	furnace	facing	north	lit	true
+62	3	furnace	facing	south	lit	true
+62	4	furnace	facing	west	lit	true
+62	5	furnace	facing	east	lit	true
+63	0	sign	rotation	0
+63	1	sign	rotation	1
+63	2	sign	rotation	2
+63	3	sign	rotation	3
+63	4	sign	rotation	4
+63	5	sign	rotation	5
+63	6	sign	rotation	6
+63	7	sign	rotation	7
+63	8	sign	rotation	8
+63	9	sign	rotation	9
+63	10	sign	rotation	10
+63	11	sign	rotation	11
+63	12	sign	rotation	12
+63	13	sign	rotation	13
+63	14	sign	rotation	14
+63	15	sign	rotation	15
+64	0	oak_door	hinge	right	half	lower	facing	east	powered	false	open	false
+64	1	oak_door	hinge	right	half	lower	facing	south	powered	false	open	false
+64	2	oak_door	hinge	right	half	lower	facing	west	powered	false	open	false
+64	3	oak_door	hinge	right	half	lower	facing	north	powered	false	open	false
+64	4	oak_door	hinge	right	half	lower	facing	east	powered	false	open	true
+64	5	oak_door	hinge	right	half	lower	facing	south	powered	false	open	true
+64	6	oak_door	hinge	right	half	lower	facing	west	powered	false	open	true
+64	7	oak_door	hinge	right	half	lower	facing	north	powered	false	open	true
+64	8	oak_door	hinge	left	half	upper	facing	east	powered	false	open	false
+64	9	oak_door	hinge	right	half	upper	facing	east	powered	false	open	false
+64	10	oak_door	hinge	left	half	upper	facing	east	powered	true	open	false
+64	11	oak_door	hinge	right	half	upper	facing	east	powered	true	open	false
+64	12	oak_door	hinge	left	half	upper	facing	east	powered	false	open	true
+64	13	oak_door	hinge	left	half	upper	facing	south	powered	false	open	true
+64	14	oak_door	hinge	left	half	upper	facing	west	powered	false	open	true
+64	15	oak_door	hinge	left	half	upper	facing	north	powered	false	open	true
+65	2	ladder	facing	north
+65	3	ladder	facing	south
+65	4	ladder	facing	west
+65	5	ladder	facing	east
+66	0	rail	shape	north_south
+66	1	rail	shape	east_west
+66	2	rail	shape	ascending_east
+66	3	rail	shape	ascending_west
+66	4	rail	shape	ascending_north
+66	5	rail	shape	ascending_south
+66	6	rail	shape	south_east
+66	7	rail	shape	south_west
+66	8	rail	shape	north_west
+66	9	rail	shape	north_east
+67	0	cobblestone_stairs	facing	east	shape	straight	half	bottom
+67	1	cobblestone_stairs	facing	west	shape	straight	half	bottom
+67	2	cobblestone_stairs	facing	south	shape	straight	half	bottom
+67	3	cobblestone_stairs	facing	north	shape	straight	half	bottom
+67	4	cobblestone_stairs	facing	east	shape	straight	half	top
+67	5	cobblestone_stairs	facing	west	shape	straight	half	top
+67	6	cobblestone_stairs	facing	south	shape	straight	half	top
+67	7	cobblestone_stairs	facing	north	shape	straight	half	top
+68	2	wall_sign	facing	north
+68	3	wall_sign	facing	south
+68	4	wall_sign	facing	west
+68	5	wall_sign	facing	east
+69	0	lever	facing	west	face	ceiling	powered	false
+69	1	lever	facing	east	face	wall	powered	false
+69	2	lever	facing	west	face	wall	powered	false
+69	3	lever	facing	south	face	wall	powered	false
+69	4	lever	facing	north	face	wall	powered	false
+69	5	lever	facing	north	face	floor	powered	false
+69	6	lever	facing	west	face	floor	powered	false
+69	7	lever	facing	north	face	ceiling	powered	false
+69	8	lever	facing	west	face	ceiling	powered	true
+69	9	lever	facing	east	face	wall	powered	true
+69	10	lever	facing	west	face	wall	powered	true
+69	11	lever	facing	south	face	wall	powered	true
+69	12	lever	facing	north	face	wall	powered	true
+69	13	lever	facing	north	face	floor	powered	true
+69	14	lever	facing	west	face	floor	powered	true
+69	15	lever	facing	north	face	ceiling	powered	true
+70	0	stone_pressure_plate	powered	false
+70	1	stone_pressure_plate	powered	true
+71	0	iron_door	hinge	right	half	lower	facing	east	powered	false	open	false
+71	1	iron_door	hinge	right	half	lower	facing	south	powered	false	open	false
+71	2	iron_door	hinge	right	half	lower	facing	west	powered	false	open	false
+71	3	iron_door	hinge	right	half	lower	facing	north	powered	false	open	false
+71	4	iron_door	hinge	right	half	lower	facing	east	powered	false	open	true
+71	5	iron_door	hinge	right	half	lower	facing	south	powered	false	open	true
+71	6	iron_door	hinge	right	half	lower	facing	west	powered	false	open	true
+71	7	iron_door	hinge	right	half	lower	facing	north	powered	false	open	true
+71	8	iron_door	hinge	left	half	upper	facing	east	powered	false	open	false
+71	9	iron_door	hinge	right	half	upper	facing	east	powered	false	open	false
+71	10	iron_door	hinge	left	half	upper	facing	east	powered	true	open	false
+71	11	iron_door	hinge	right	half	upper	facing	east	powered	true	open	false
+71	12	iron_door	hinge	left	half	upper	facing	east	powered	false	open	true
+71	13	iron_door	hinge	left	half	upper	facing	south	powered	false	open	true
+71	14	iron_door	hinge	left	half	upper	facing	west	powered	false	open	true
+71	15	iron_door	hinge	left	half	upper	facing	north	powered	false	open	true
+72	0	oak_pressure_plate	powered	false
+72	1	oak_pressure_plate	powered	true
+73	0	redstone_ore	lit	false
+74	0	redstone_ore	lit	true
+75	1	redstone_wall_torch	facing	east	lit	false
+75	2	redstone_wall_torch	facing	west	lit	false
+75	3	redstone_wall_torch	facing	south	lit	false
+75	4	redstone_wall_torch	facing	north	lit	false
+75	5	redstone_torch	lit	false
+76	1	redstone_wall_torch	facing	east	lit	true
+76	2	redstone_wall_torch	facing	west	lit	true
+76	3	redstone_wall_torch	facing	south	lit	true
+76	4	redstone_wall_torch	facing	north	lit	true
+76	5	redstone_torch	lit	true
+77	0	stone_button	facing	north	face	ceiling	powered	false
+77	1	stone_button	facing	east	face	wall	powered	false
+77	2	stone_button	facing	west	face	wall	powered	false
+77	3	stone_button	facing	south	face	wall	powered	false
+77	4	stone_button	facing	north	face	wall	powered	false
+77	5	stone_button	facing	north	face	floor	powered	false
+77	8	stone_button	facing	north	face	ceiling	powered	true
+77	9	stone_button	facing	east	face	wall	powered	true
+77	10	stone_button	facing	west	face	wall	powered	true
+77	11	stone_button	facing	south	face	wall	powered	true
+77	12	stone_button	facing	north	face	wall	powered	true
+77	13	stone_button	facing	north	face	floor	powered	true
+78	0	snow	layers	1
+78	1	snow	layers	2
+78	2	snow	layers	3
+78	3	snow	layers	4
+78	4	snow	layers	5
+78	5	snow	layers	6
+78	6	snow	layers	7
+78	7	snow	layers	8
+79	0	ice
+80	0	snow_block
+81	0	cactus	age	0
+81	1	cactus	age	1
+81	2	cactus	age	2
+81	3	cactus	age	3
+81	4	cactus	age	4
+81	5	cactus	age	5
+81	6	cactus	age	6
+81	7	cactus	age	7
+81	8	cactus	age	8
+81	9	cactus	age	9
+81	10	cactus	age	10
+81	11	cactus	age	11
+81	12	cactus	age	12
+81	13	cactus	age	13
+81	14	cactus	age	14
+81	15	cactus	age	15
+82	0	clay
+83	0	sugar_cane	age	0
+83	1	sugar_cane	age	1
+83	2	sugar_cane	age	2
+83	3	sugar_cane	age	3
+83	4	sugar_cane	age	4
+83	5	sugar_cane	age	5
+83	6	sugar_cane	age	6
+83	7	sugar_cane	age	7
+83	8	sugar_cane	age	8
+83	9	sugar_cane	age	9
+83	10	sugar_cane	age	10
+83	11	sugar_cane	age	11
+83	12	sugar_cane	age	12
+83	13	sugar_cane	age	13
+83	14	sugar_cane	age	14
+83	15	sugar_cane	age	15
+84	0	jukebox	has_record	false
+84	1	jukebox	has_record	true
+85	0	oak_fence	east	false	north	false	west	false	south	false
+86	0	carved_pumpkin	facing	south
+86	1	carved_pumpkin	facing	west
+86	2	carved_pumpkin	facing	north
+86	3	carved_pumpkin	facing	east
+87	0	netherrack
+88	0	soul_sand
+89	0	glowstone
+90	1	portal	axis	x
+90	2	portal	axis	z
+91	0	jack_o_lantern	facing	south
+91	1	jack_o_lantern	facing	west
+91	2	jack_o_lantern	facing	north
+91	3	jack_o_lantern	facing	east
+92	0	cake	bites	0
+92	1	cake	bites	1
+92	2	cake	bites	2
+92	3	cake	bites	3
+92	4	cake	bites	4
+92	5	cake	bites	5
+92	6	cake	bites	6
+93	0	repeater	facing	south	powered	false	locked	false	delay	1
+93	1	repeater	facing	west	powered	false	locked	false	delay	1
+93	2	repeater	facing	north	powered	false	locked	false	delay	1
+93	3	repeater	facing	east	powered	false	locked	false	delay	1
+93	4	repeater	facing	south	powered	false	locked	false	delay	2
+93	5	repeater	facing	west	powered	false	locked	false	delay	2
+93	6	repeater	facing	north	powered	false	locked	false	delay	2
+93	7	repeater	facing	east	powered	false	locked	false	delay	2
+93	8	repeater	facing	south	powered	false	locked	false	delay	3
+93	9	repeater	facing	west	powered	false	locked	false	delay	3
+93	10	repeater	facing	north	powered	false	locked	false	delay	3
+93	11	repeater	facing	east	powered	false	locked	false	delay	3
+93	12	repeater	facing	south	powered	false	locked	false	delay	4
+93	13	repeater	facing	west	powered	false	locked	false	delay	4
+93	14	repeater	facing	north	powered	false	locked	false	delay	4
+93	15	repeater	facing	east	powered	false	locked	false	delay	4
+94	0	repeater	facing	south	powered	true	locked	false	delay	1
+94	1	repeater	facing	west	powered	true	locked	false	delay	1
+94	2	repeater	facing	north	powered	true	locked	false	delay	1
+94	3	repeater	facing	east	powered	true	locked	false	delay	1
+94	4	repeater	facing	south	powered	true	locked	false	delay	2
+94	5	repeater	facing	west	powered	true	locked	false	delay	2
+94	6	repeater	facing	north	powered	true	locked	false	delay	2
+94	7	repeater	facing	east	powered	true	locked	false	delay	2
+94	8	repeater	facing	south	powered	true	locked	false	delay	3
+94	9	repeater	facing	west	powered	true	locked	false	delay	3
+94	10	repeater	facing	north	powered	true	locked	false	delay	3
+94	11	repeater	facing	east	powered	true	locked	false	delay	3
+94	12	repeater	facing	south	powered	true	locked	false	delay	4
+94	13	repeater	facing	west	powered	true	locked	false	delay	4
+94	14	repeater	facing	north	powered	true	locked	false	delay	4
+94	15	repeater	facing	east	powered	true	locked	false	delay	4
+95	0	white_stained_glass
+95	1	orange_stained_glass
+95	2	magenta_stained_glass
+95	3	light_blue_stained_glass
+95	4	yellow_stained_glass
+95	5	lime_stained_glass
+95	6	pink_stained_glass
+95	7	gray_stained_glass
+95	8	light_gray_stained_glass
+95	9	cyan_stained_glass
+95	10	purple_stained_glass
+95	11	blue_stained_glass
+95	12	brown_stained_glass
+95	13	green_stained_glass
+95	14	red_stained_glass
+95	15	black_stained_glass
+96	0	oak_trapdoor	facing	north	open	false	half	bottom
+96	1	oak_trapdoor	facing	south	open	false	half	bottom
+96	2	oak_trapdoor	facing	west	open	false	half	bottom
+96	3	oak_trapdoor	facing	east	open	false	half	bottom
+96	4	oak_trapdoor	facing	north	open	true	half	bottom
+96	5	oak_trapdoor	facing	south	open	true	half	bottom
+96	6	oak_trapdoor	facing	west	open	true	half	bottom
+96	7	oak_trapdoor	facing	east	open	true	half	bottom
+96	8	oak_trapdoor	facing	north	open	false	half	top
+96	9	oak_trapdoor	facing	south	open	false	half	top
+96	10	oak_trapdoor	facing	west	open	false	half	top
+96	11	oak_trapdoor	facing	east	open	false	half	top
+96	12	oak_trapdoor	facing	north	open	true	half	top
+96	13	oak_trapdoor	facing	south	open	true	half	top
+96	14	oak_trapdoor	facing	west	open	true	half	top
+96	15	oak_trapdoor	facing	east	open	true	half	top
+97	0	infested_stone
+97	1	infested_cobblestone
+97	2	infested_stone_bricks
+97	3	infested_mossy_stone_bricks
+97	4	infested_cracked_stone_bricks
+97	5	infested_chiseled_stone_bricks
+98	0	stone_bricks
+98	1	mossy_stone_bricks
+98	2	cracked_stone_bricks
+98	3	chiseled_stone_bricks
+99	0	brown_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+99	1	brown_mushroom_block	down	false	south	false	east	false	north	true	up	true	west	true
+99	2	brown_mushroom_block	down	false	south	false	east	false	north	true	up	true	west	false
+99	3	brown_mushroom_block	down	false	south	false	east	true	north	true	up	true	west	false
+99	4	brown_mushroom_block	down	false	south	false	east	false	north	false	up	true	west	true
+99	5	brown_mushroom_block	down	false	south	false	east	false	north	false	up	true	west	false
+99	6	brown_mushroom_block	down	false	south	false	east	true	north	false	up	true	west	false
+99	7	brown_mushroom_block	down	false	south	true	east	false	north	false	up	true	west	true
+99	8	brown_mushroom_block	down	false	south	true	east	false	north	false	up	true	west	false
+99	9	brown_mushroom_block	down	false	south	true	east	true	north	false	up	true	west	false
+99	10	mushroom_stem	down	false	south	true	east	true	north	true	up	false	west	true
+99	11	brown_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+99	12	brown_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+99	13	brown_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+99	14	brown_mushroom_block	down	true	south	true	east	true	north	true	up	true	west	true
+99	15	mushroom_stem	down	true	south	true	east	true	north	true	up	true	west	true
+100	0	red_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+100	1	red_mushroom_block	down	false	south	false	east	false	north	true	up	true	west	true
+100	2	red_mushroom_block	down	false	south	false	east	false	north	true	up	true	west	false
+100	3	red_mushroom_block	down	false	south	false	east	true	north	true	up	true	west	false
+100	4	red_mushroom_block	down	false	south	false	east	false	north	false	up	true	west	true
+100	5	red_mushroom_block	down	false	south	false	east	false	north	false	up	true	west	false
+100	6	red_mushroom_block	down	false	south	false	east	true	north	false	up	true	west	false
+100	7	red_mushroom_block	down	false	south	true	east	false	north	false	up	true	west	true
+100	8	red_mushroom_block	down	false	south	true	east	false	north	false	up	true	west	false
+100	9	red_mushroom_block	down	false	south	true	east	true	north	false	up	true	west	false
+100	10	mushroom_stem	down	false	south	true	east	true	north	true	up	false	west	true
+100	11	red_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+100	12	red_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+100	13	red_mushroom_block	down	false	south	false	east	false	north	false	up	false	west	false
+100	14	red_mushroom_block	down	true	south	true	east	true	north	true	up	true	west	true
+100	15	mushroom_stem	down	true	south	true	east	true	north	true	up	true	west	true
+101	0	iron_bars	east	false	north	false	west	false	south	false
+102	0	glass_pane	east	false	north	false	west	false	south	false
+103	0	melon_block
+104	0	pumpkin_stem	age	0
+104	1	pumpkin_stem	age	1
+104	2	pumpkin_stem	age	2
+104	3	pumpkin_stem	age	3
+104	4	pumpkin_stem	age	4
+104	5	pumpkin_stem	age	5
+104	6	pumpkin_stem	age	6
+104	7	pumpkin_stem	age	7
+105	0	melon_stem	age	0
+105	1	melon_stem	age	1
+105	2	melon_stem	age	2
+105	3	melon_stem	age	3
+105	4	melon_stem	age	4
+105	5	melon_stem	age	5
+105	6	melon_stem	age	6
+105	7	melon_stem	age	7
+106	0	vine	south	false	east	false	north	false	up	true	west	false
+106	1	vine	south	true	east	false	north	false	up	true	west	false
+106	2	vine	south	false	east	false	north	false	up	true	west	true
+106	3	vine	south	true	east	false	north	false	up	true	west	true
+106	4	vine	south	false	east	false	north	true	up	true	west	false
+106	5	vine	south	true	east	false	north	true	up	true	west	false
+106	6	vine	south	false	east	false	north	true	up	true	west	true
+106	7	vine	south	true	east	false	north	true	up	true	west	true
+106	8	vine	south	false	east	true	north	false	up	true	west	false
+106	9	vine	south	true	east	true	north	false	up	true	west	false
+106	10	vine	south	false	east	true	north	false	up	true	west	true
+106	11	vine	south	true	east	true	north	false	up	true	west	true
+106	12	vine	south	false	east	true	north	true	up	true	west	false
+106	13	vine	south	true	east	true	north	true	up	true	west	false
+106	14	vine	south	false	east	true	north	true	up	true	west	true
+106	15	vine	south	true	east	true	north	true	up	true	west	true
+107	0	oak_fence_gate	facing	south	powered	false	open	false	in_wall	false
+107	1	oak_fence_gate	facing	west	powered	false	open	false	in_wall	false
+107	2	oak_fence_gate	facing	north	powered	false	open	false	in_wall	false
+107	3	oak_fence_gate	facing	east	powered	false	open	false	in_wall	false
+107	4	oak_fence_gate	facing	south	powered	false	open	true	in_wall	false
+107	5	oak_fence_gate	facing	west	powered	false	open	true	in_wall	false
+107	6	oak_fence_gate	facing	north	powered	false	open	true	in_wall	false
+107	7	oak_fence_gate	facing	east	powered	false	open	true	in_wall	false
+107	8	oak_fence_gate	facing	south	powered	true	open	false	in_wall	false
+107	9	oak_fence_gate	facing	west	powered	true	open	false	in_wall	false
+107	10	oak_fence_gate	facing	north	powered	true	open	false	in_wall	false
+107	11	oak_fence_gate	facing	east	powered	true	open	false	in_wall	false
+107	12	oak_fence_gate	facing	south	powered	true	open	true	in_wall	false
+107	13	oak_fence_gate	facing	west	powered	true	open	true	in_wall	false
+107	14	oak_fence_gate	facing	north	powered	true	open	true	in_wall	false
+107	15	oak_fence_gate	facing	east	powered	true	open	true	in_wall	false
+108	0	brick_stairs	facing	east	shape	straight	half	bottom
+108	1	brick_stairs	facing	west	shape	straight	half	bottom
+108	2	brick_stairs	facing	south	shape	straight	half	bottom
+108	3	brick_stairs	facing	north	shape	straight	half	bottom
+108	4	brick_stairs	facing	east	shape	straight	half	top
+108	5	brick_stairs	facing	west	shape	straight	half	top
+108	6	brick_stairs	facing	south	shape	straight	half	top
+108	7	brick_stairs	facing	north	shape	straight	half	top
+109	0	stone_brick_stairs	facing	east	shape	straight	half	bottom
+109	1	stone_brick_stairs	facing	west	shape	straight	half	bottom
+109	2	stone_brick_stairs	facing	south	shape	straight	half	bottom
+109	3	stone_brick_stairs	facing	north	shape	straight	half	bottom
+109	4	stone_brick_stairs	facing	east	shape	straight	half	top
+109	5	stone_brick_stairs	facing	west	shape	straight	half	top
+109	6	stone_brick_stairs	facing	south	shape	straight	half	top
+109	7	stone_brick_stairs	facing	north	shape	straight	half	top
+110	0	mycelium	snowy	false
+111	0	lily_pad
+112	0	nether_bricks
+113	0	nether_brick_fence	east	false	north	false	west	false	south	false
+114	0	nether_brick_stairs	facing	east	shape	straight	half	bottom
+114	1	nether_brick_stairs	facing	west	shape	straight	half	bottom
+114	2	nether_brick_stairs	facing	south	shape	straight	half	bottom
+114	3	nether_brick_stairs	facing	north	shape	straight	half	bottom
+114	4	nether_brick_stairs	facing	east	shape	straight	half	top
+114	5	nether_brick_stairs	facing	west	shape	straight	half	top
+114	6	nether_brick_stairs	facing	south	shape	straight	half	top
+114	7	nether_brick_stairs	facing	north	shape	straight	half	top
+115	0	nether_wart	age	0
+115	1	nether_wart	age	1
+115	2	nether_wart	age	2
+115	3	nether_wart	age	3
+116	0	enchanting_table
+117	0	brewing_stand	has_bottle_0	false	has_bottle_1	false	has_bottle_2	false
+117	1	brewing_stand	has_bottle_0	true	has_bottle_1	false	has_bottle_2	false
+117	2	brewing_stand	has_bottle_0	false	has_bottle_1	true	has_bottle_2	false
+117	3	brewing_stand	has_bottle_0	true	has_bottle_1	true	has_bottle_2	false
+117	4	brewing_stand	has_bottle_0	false	has_bottle_1	false	has_bottle_2	true
+117	5	brewing_stand	has_bottle_0	true	has_bottle_1	false	has_bottle_2	true
+117	6	brewing_stand	has_bottle_0	false	has_bottle_1	true	has_bottle_2	true
+117	7	brewing_stand	has_bottle_0	true	has_bottle_1	true	has_bottle_2	true
+118	0	cauldron	level	0
+118	1	cauldron	level	1
+118	2	cauldron	level	2
+118	3	cauldron	level	3
+119	0	end_portal
+120	0	end_portal_frame	facing	south	eye	false
+120	1	end_portal_frame	facing	west	eye	false
+120	2	end_portal_frame	facing	north	eye	false
+120	3	end_portal_frame	facing	east	eye	false
+120	4	end_portal_frame	facing	south	eye	true
+120	5	end_portal_frame	facing	west	eye	true
+120	6	end_portal_frame	facing	north	eye	true
+120	7	end_portal_frame	facing	east	eye	true
+121	0	end_stone
+122	0	dragon_egg
+123	0	redstone_lamp	lit	false
+124	0	redstone_lamp	lit	true
+125	0	oak_slab	type	double
+125	1	spruce_slab	type	double
+125	2	birch_slab	type	double
+125	3	jungle_slab	type	double
+125	4	acacia_slab	type	double
+125	5	dark_oak_slab	type	double
+126	0	oak_slab	type	bottom
+126	1	spruce_slab	type	bottom
+126	2	birch_slab	type	bottom
+126	3	jungle_slab	type	bottom
+126	4	acacia_slab	type	bottom
+126	5	dark_oak_slab	type	bottom
+126	8	oak_slab	type	top
+126	9	spruce_slab	type	top
+126	10	birch_slab	type	top
+126	11	jungle_slab	type	top
+126	12	acacia_slab	type	top
+126	13	dark_oak_slab	type	top
+127	0	cocoa	facing	south	age	0
+127	1	cocoa	facing	west	age	0
+127	2	cocoa	facing	north	age	0
+127	3	cocoa	facing	east	age	0
+127	4	cocoa	facing	south	age	1
+127	5	cocoa	facing	west	age	1
+127	6	cocoa	facing	north	age	1
+127	7	cocoa	facing	east	age	1
+127	8	cocoa	facing	south	age	2
+127	9	cocoa	facing	west	age	2
+127	10	cocoa	facing	north	age	2
+127	11	cocoa	facing	east	age	2
+128	0	sandstone_stairs	facing	east	shape	straight	half	bottom
+128	1	sandstone_stairs	facing	west	shape	straight	half	bottom
+128	2	sandstone_stairs	facing	south	shape	straight	half	bottom
+128	3	sandstone_stairs	facing	north	shape	straight	half	bottom
+128	4	sandstone_stairs	facing	east	shape	straight	half	top
+128	5	sandstone_stairs	facing	west	shape	straight	half	top
+128	6	sandstone_stairs	facing	south	shape	straight	half	top
+128	7	sandstone_stairs	facing	north	shape	straight	half	top
+129	0	emerald_ore
+130	2	ender_chest	facing	north
+130	3	ender_chest	facing	south
+130	4	ender_chest	facing	west
+130	5	ender_chest	facing	east
+131	0	tripwire_hook	attached	false	facing	south	powered	false
+131	1	tripwire_hook	attached	false	facing	west	powered	false
+131	2	tripwire_hook	attached	false	facing	north	powered	false
+131	3	tripwire_hook	attached	false	facing	east	powered	false
+131	4	tripwire_hook	attached	true	facing	south	powered	false
+131	5	tripwire_hook	attached	true	facing	west	powered	false
+131	6	tripwire_hook	attached	true	facing	north	powered	false
+131	7	tripwire_hook	attached	true	facing	east	powered	false
+131	8	tripwire_hook	attached	false	facing	south	powered	true
+131	9	tripwire_hook	attached	false	facing	west	powered	true
+131	10	tripwire_hook	attached	false	facing	north	powered	true
+131	11	tripwire_hook	attached	false	facing	east	powered	true
+131	12	tripwire_hook	attached	true	facing	south	powered	true
+131	13	tripwire_hook	attached	true	facing	west	powered	true
+131	14	tripwire_hook	attached	true	facing	north	powered	true
+131	15	tripwire_hook	attached	true	facing	east	powered	true
+132	0	tripwire	attached	false	disarmed	false	powered	false	east	false	north	false	south	false	west	false
+132	1	tripwire	attached	false	disarmed	false	powered	true	east	false	north	false	south	false	west	false
+132	2	tripwire	attached	false	disarmed	false	powered	false	east	false	north	false	south	false	west	false
+132	3	tripwire	attached	false	disarmed	false	powered	true	east	false	north	false	south	false	west	false
+132	4	tripwire	attached	true	disarmed	false	powered	false	east	false	north	false	south	false	west	false
+132	5	tripwire	attached	true	disarmed	false	powered	true	east	false	north	false	south	false	west	false
+132	6	tripwire	attached	true	disarmed	false	powered	false	east	false	north	false	south	false	west	false
+132	7	tripwire	attached	true	disarmed	false	powered	true	east	false	north	false	south	false	west	false
+132	8	tripwire	attached	false	disarmed	true	powered	false	east	false	north	false	south	false	west	false
+132	9	tripwire	attached	false	disarmed	true	powered	true	east	false	north	false	south	false	west	false
+132	10	tripwire	attached	false	disarmed	true	powered	false	east	false	north	false	south	false	west	false
+132	11	tripwire	attached	false	disarmed	true	powered	true	east	false	north	false	south	false	west	false
+132	12	tripwire	attached	true	disarmed	true	powered	false	east	false	north	false	south	false	west	false
+132	13	tripwire	attached	true	disarmed	true	powered	true	east	false	north	false	south	false	west	false
+132	14	tripwire	attached	true	disarmed	true	powered	false	east	false	north	false	south	false	west	false
+133	0	emerald_block
+134	0	spruce_stairs	facing	east	shape	straight	half	bottom
+134	1	spruce_stairs	facing	west	shape	straight	half	bottom
+134	2	spruce_stairs	facing	south	shape	straight	half	bottom
+134	3	spruce_stairs	facing	north	shape	straight	half	bottom
+134	4	spruce_stairs	facing	east	shape	straight	half	top
+134	5	spruce_stairs	facing	west	shape	straight	half	top
+134	6	spruce_stairs	facing	south	shape	straight	half	top
+134	7	spruce_stairs	facing	north	shape	straight	half	top
+135	0	birch_stairs	facing	east	shape	straight	half	bottom
+135	1	birch_stairs	facing	west	shape	straight	half	bottom
+135	2	birch_stairs	facing	south	shape	straight	half	bottom
+135	3	birch_stairs	facing	north	shape	straight	half	bottom
+135	4	birch_stairs	facing	east	shape	straight	half	top
+135	5	birch_stairs	facing	west	shape	straight	half	top
+135	6	birch_stairs	facing	south	shape	straight	half	top
+135	7	birch_stairs	facing	north	shape	straight	half	top
+136	0	jungle_stairs	facing	east	shape	straight	half	bottom
+136	1	jungle_stairs	facing	west	shape	straight	half	bottom
+136	2	jungle_stairs	facing	south	shape	straight	half	bottom
+136	3	jungle_stairs	facing	north	shape	straight	half	bottom
+136	4	jungle_stairs	facing	east	shape	straight	half	top
+136	5	jungle_stairs	facing	west	shape	straight	half	top
+136	6	jungle_stairs	facing	south	shape	straight	half	top
+136	7	jungle_stairs	facing	north	shape	straight	half	top
+137	0	command_block	conditional	false	facing	down
+137	1	command_block	conditional	false	facing	up
+137	2	command_block	conditional	false	facing	north
+137	3	command_block	conditional	false	facing	south
+137	4	command_block	conditional	false	facing	west
+137	5	command_block	conditional	false	facing	east
+137	8	command_block	conditional	true	facing	down
+137	9	command_block	conditional	true	facing	up
+137	10	command_block	conditional	true	facing	north
+137	11	command_block	conditional	true	facing	south
+137	12	command_block	conditional	true	facing	west
+137	13	command_block	conditional	true	facing	east
+138	0	beacon
+139	0	cobblestone_wall	south	false	east	false	north	false	up	false	west	false
+139	1	mossy_cobblestone_wall	south	false	east	false	north	false	up	false	west	false
+140	0	potted_cactus
+140	1	potted_cactus
+140	2	potted_cactus
+140	3	potted_cactus
+140	4	potted_cactus
+140	5	potted_cactus
+140	6	potted_cactus
+140	7	potted_cactus
+140	8	potted_cactus
+140	9	potted_cactus
+140	10	potted_cactus
+140	11	potted_cactus
+140	12	potted_cactus
+140	13	potted_cactus
+140	14	potted_cactus
+140	15	potted_cactus
+141	0	carrots	age	0
+141	1	carrots	age	1
+141	2	carrots	age	2
+141	3	carrots	age	3
+141	4	carrots	age	4
+141	5	carrots	age	5
+141	6	carrots	age	6
+141	7	carrots	age	7
+142	0	potatoes	age	0
+142	1	potatoes	age	1
+142	2	potatoes	age	2
+142	3	potatoes	age	3
+142	4	potatoes	age	4
+142	5	potatoes	age	5
+142	6	potatoes	age	6
+142	7	potatoes	age	7
+143	0	oak_button	facing	north	face	ceiling	powered	false
+143	1	oak_button	facing	east	face	wall	powered	false
+143	2	oak_button	facing	west	face	wall	powered	false
+143	3	oak_button	facing	south	face	wall	powered	false
+143	4	oak_button	facing	north	face	wall	powered	false
+143	5	oak_button	facing	north	face	floor	powered	false
+143	8	oak_button	facing	north	face	ceiling	powered	true
+143	9	oak_button	facing	east	face	wall	powered	true
+143	10	oak_button	facing	west	face	wall	powered	true
+143	11	oak_button	facing	south	face	wall	powered	true
+143	12	oak_button	facing	north	face	wall	powered	true
+143	13	oak_button	facing	north	face	floor	powered	true
+144	0	%%FILTER_ME%%	facing	down	nodrop	false
+144	1	%%FILTER_ME%%	facing	up	nodrop	false
+144	2	%%FILTER_ME%%	facing	north	nodrop	false
+144	3	%%FILTER_ME%%	facing	south	nodrop	false
+144	4	%%FILTER_ME%%	facing	west	nodrop	false
+144	5	%%FILTER_ME%%	facing	east	nodrop	false
+144	8	%%FILTER_ME%%	facing	down	nodrop	true
+144	9	%%FILTER_ME%%	facing	up	nodrop	true
+144	10	%%FILTER_ME%%	facing	north	nodrop	true
+144	11	%%FILTER_ME%%	facing	south	nodrop	true
+144	12	%%FILTER_ME%%	facing	west	nodrop	true
+144	13	%%FILTER_ME%%	facing	east	nodrop	true
+145	0	anvil	facing	south
+145	1	anvil	facing	west
+145	2	anvil	facing	north
+145	3	anvil	facing	east
+145	4	chipped_anvil	facing	south
+145	5	chipped_anvil	facing	west
+145	6	chipped_anvil	facing	north
+145	7	chipped_anvil	facing	east
+145	8	damaged_anvil	facing	south
+145	9	damaged_anvil	facing	west
+145	10	damaged_anvil	facing	north
+145	11	damaged_anvil	facing	east
+146	2	trapped_chest	facing	north	type	single
+146	3	trapped_chest	facing	south	type	single
+146	4	trapped_chest	facing	west	type	single
+146	5	trapped_chest	facing	east	type	single
+147	0	light_weighted_pressure_plate	power	0
+147	1	light_weighted_pressure_plate	power	1
+147	2	light_weighted_pressure_plate	power	2
+147	3	light_weighted_pressure_plate	power	3
+147	4	light_weighted_pressure_plate	power	4
+147	5	light_weighted_pressure_plate	power	5
+147	6	light_weighted_pressure_plate	power	6
+147	7	light_weighted_pressure_plate	power	7
+147	8	light_weighted_pressure_plate	power	8
+147	9	light_weighted_pressure_plate	power	9
+147	10	light_weighted_pressure_plate	power	10
+147	11	light_weighted_pressure_plate	power	11
+147	12	light_weighted_pressure_plate	power	12
+147	13	light_weighted_pressure_plate	power	13
+147	14	light_weighted_pressure_plate	power	14
+147	15	light_weighted_pressure_plate	power	15
+148	0	heavy_weighted_pressure_plate	power	0
+148	1	heavy_weighted_pressure_plate	power	1
+148	2	heavy_weighted_pressure_plate	power	2
+148	3	heavy_weighted_pressure_plate	power	3
+148	4	heavy_weighted_pressure_plate	power	4
+148	5	heavy_weighted_pressure_plate	power	5
+148	6	heavy_weighted_pressure_plate	power	6
+148	7	heavy_weighted_pressure_plate	power	7
+148	8	heavy_weighted_pressure_plate	power	8
+148	9	heavy_weighted_pressure_plate	power	9
+148	10	heavy_weighted_pressure_plate	power	10
+148	11	heavy_weighted_pressure_plate	power	11
+148	12	heavy_weighted_pressure_plate	power	12
+148	13	heavy_weighted_pressure_plate	power	13
+148	14	heavy_weighted_pressure_plate	power	14
+148	15	heavy_weighted_pressure_plate	power	15
+149	0	comparator	facing	south	mode	compare	powered	false
+149	1	comparator	facing	west	mode	compare	powered	false
+149	2	comparator	facing	north	mode	compare	powered	false
+149	3	comparator	facing	east	mode	compare	powered	false
+149	4	comparator	facing	south	mode	subtract	powered	false
+149	5	comparator	facing	west	mode	subtract	powered	false
+149	6	comparator	facing	north	mode	subtract	powered	false
+149	7	comparator	facing	east	mode	subtract	powered	false
+149	8	comparator	facing	south	mode	compare	powered	true
+149	9	comparator	facing	west	mode	compare	powered	true
+149	10	comparator	facing	north	mode	compare	powered	true
+149	11	comparator	facing	east	mode	compare	powered	true
+149	12	comparator	facing	south	mode	subtract	powered	true
+149	13	comparator	facing	west	mode	subtract	powered	true
+149	14	comparator	facing	north	mode	subtract	powered	true
+149	15	comparator	facing	east	mode	subtract	powered	true
+150	0	comparator	facing	south	mode	compare	powered	false
+150	1	comparator	facing	west	mode	compare	powered	false
+150	2	comparator	facing	north	mode	compare	powered	false
+150	3	comparator	facing	east	mode	compare	powered	false
+150	4	comparator	facing	south	mode	subtract	powered	false
+150	5	comparator	facing	west	mode	subtract	powered	false
+150	6	comparator	facing	north	mode	subtract	powered	false
+150	7	comparator	facing	east	mode	subtract	powered	false
+150	8	comparator	facing	south	mode	compare	powered	true
+150	9	comparator	facing	west	mode	compare	powered	true
+150	10	comparator	facing	north	mode	compare	powered	true
+150	11	comparator	facing	east	mode	compare	powered	true
+150	12	comparator	facing	south	mode	subtract	powered	true
+150	13	comparator	facing	west	mode	subtract	powered	true
+150	14	comparator	facing	north	mode	subtract	powered	true
+150	15	comparator	facing	east	mode	subtract	powered	true
+151	0	daylight_detector	inverted	false	power	0
+151	1	daylight_detector	inverted	false	power	1
+151	2	daylight_detector	inverted	false	power	2
+151	3	daylight_detector	inverted	false	power	3
+151	4	daylight_detector	inverted	false	power	4
+151	5	daylight_detector	inverted	false	power	5
+151	6	daylight_detector	inverted	false	power	6
+151	7	daylight_detector	inverted	false	power	7
+151	8	daylight_detector	inverted	false	power	8
+151	9	daylight_detector	inverted	false	power	9
+151	10	daylight_detector	inverted	false	power	10
+151	11	daylight_detector	inverted	false	power	11
+151	12	daylight_detector	inverted	false	power	12
+151	13	daylight_detector	inverted	false	power	13
+151	14	daylight_detector	inverted	false	power	14
+151	15	daylight_detector	inverted	false	power	15
+152	0	redstone_block
+153	0	nether_quartz_ore
+154	0	hopper	facing	down	enabled	true
+154	2	hopper	facing	north	enabled	true
+154	3	hopper	facing	south	enabled	true
+154	4	hopper	facing	west	enabled	true
+154	5	hopper	facing	east	enabled	true
+154	8	hopper	facing	down	enabled	false
+154	10	hopper	facing	north	enabled	false
+154	11	hopper	facing	south	enabled	false
+154	12	hopper	facing	west	enabled	false
+154	13	hopper	facing	east	enabled	false
+155	0	quartz_block
+155	1	chiseled_quartz_block
+155	2	quartz_pillar	axis	y
+155	3	quartz_pillar	axis	x
+155	4	quartz_pillar	axis	z
+156	0	quartz_stairs	facing	east	shape	straight	half	bottom
+156	1	quartz_stairs	facing	west	shape	straight	half	bottom
+156	2	quartz_stairs	facing	south	shape	straight	half	bottom
+156	3	quartz_stairs	facing	north	shape	straight	half	bottom
+156	4	quartz_stairs	facing	east	shape	straight	half	top
+156	5	quartz_stairs	facing	west	shape	straight	half	top
+156	6	quartz_stairs	facing	south	shape	straight	half	top
+156	7	quartz_stairs	facing	north	shape	straight	half	top
+157	0	activator_rail	shape	north_south	powered	false
+157	1	activator_rail	shape	east_west	powered	false
+157	2	activator_rail	shape	ascending_east	powered	false
+157	3	activator_rail	shape	ascending_west	powered	false
+157	4	activator_rail	shape	ascending_north	powered	false
+157	5	activator_rail	shape	ascending_south	powered	false
+157	8	activator_rail	shape	north_south	powered	true
+157	9	activator_rail	shape	east_west	powered	true
+157	10	activator_rail	shape	ascending_east	powered	true
+157	11	activator_rail	shape	ascending_west	powered	true
+157	12	activator_rail	shape	ascending_north	powered	true
+157	13	activator_rail	shape	ascending_south	powered	true
+158	0	dropper	facing	down	triggered	false
+158	1	dropper	facing	up	triggered	false
+158	2	dropper	facing	north	triggered	false
+158	3	dropper	facing	south	triggered	false
+158	4	dropper	facing	west	triggered	false
+158	5	dropper	facing	east	triggered	false
+158	8	dropper	facing	down	triggered	true
+158	9	dropper	facing	up	triggered	true
+158	10	dropper	facing	north	triggered	true
+158	11	dropper	facing	south	triggered	true
+158	12	dropper	facing	west	triggered	true
+158	13	dropper	facing	east	triggered	true
+159	0	white_terracotta
+159	1	orange_terracotta
+159	2	magenta_terracotta
+159	3	light_blue_terracotta
+159	4	yellow_terracotta
+159	5	lime_terracotta
+159	6	pink_terracotta
+159	7	gray_terracotta
+159	8	light_gray_terracotta
+159	9	cyan_terracotta
+159	10	purple_terracotta
+159	11	blue_terracotta
+159	12	brown_terracotta
+159	13	green_terracotta
+159	14	red_terracotta
+159	15	black_terracotta
+160	0	white_stained_glass_pane	east	false	north	false	west	false	south	false
+160	1	orange_stained_glass_pane	east	false	north	false	west	false	south	false
+160	2	magenta_stained_glass_pane	east	false	north	false	west	false	south	false
+160	3	light_blue_stained_glass_pane	east	false	north	false	west	false	south	false
+160	4	yellow_stained_glass_pane	east	false	north	false	west	false	south	false
+160	5	lime_stained_glass_pane	east	false	north	false	west	false	south	false
+160	6	pink_stained_glass_pane	east	false	north	false	west	false	south	false
+160	7	gray_stained_glass_pane	east	false	north	false	west	false	south	false
+160	8	light_gray_stained_glass_pane	east	false	north	false	west	false	south	false
+160	9	cyan_stained_glass_pane	east	false	north	false	west	false	south	false
+160	10	purple_stained_glass_pane	east	false	north	false	west	false	south	false
+160	11	blue_stained_glass_pane	east	false	north	false	west	false	south	false
+160	12	brown_stained_glass_pane	east	false	north	false	west	false	south	false
+160	13	green_stained_glass_pane	east	false	north	false	west	false	south	false
+160	14	red_stained_glass_pane	east	false	north	false	west	false	south	false
+160	15	black_stained_glass_pane	east	false	north	false	west	false	south	false
+161	0	acacia_leaves	decayable	true	check_decay	false
+161	1	dark_oak_leaves	decayable	true	check_decay	false
+161	4	acacia_leaves	decayable	false	check_decay	false
+161	5	dark_oak_leaves	decayable	false	check_decay	false
+161	8	acacia_leaves	decayable	true	check_decay	true
+161	9	dark_oak_leaves	decayable	true	check_decay	true
+161	12	acacia_leaves	decayable	false	check_decay	true
+161	13	dark_oak_leaves	decayable	false	check_decay	true
+162	0	acacia_log	axis	y
+162	1	dark_oak_log	axis	y
+162	4	acacia_log	axis	x
+162	5	dark_oak_log	axis	x
+162	8	acacia_log	axis	z
+162	9	dark_oak_log	axis	z
+162	12	acacia_bark
+162	13	dark_oak_bark
+163	0	acacia_stairs	facing	east	shape	straight	half	bottom
+163	1	acacia_stairs	facing	west	shape	straight	half	bottom
+163	2	acacia_stairs	facing	south	shape	straight	half	bottom
+163	3	acacia_stairs	facing	north	shape	straight	half	bottom
+163	4	acacia_stairs	facing	east	shape	straight	half	top
+163	5	acacia_stairs	facing	west	shape	straight	half	top
+163	6	acacia_stairs	facing	south	shape	straight	half	top
+163	7	acacia_stairs	facing	north	shape	straight	half	top
+164	0	dark_oak_stairs	facing	east	shape	straight	half	bottom
+164	1	dark_oak_stairs	facing	west	shape	straight	half	bottom
+164	2	dark_oak_stairs	facing	south	shape	straight	half	bottom
+164	3	dark_oak_stairs	facing	north	shape	straight	half	bottom
+164	4	dark_oak_stairs	facing	east	shape	straight	half	top
+164	5	dark_oak_stairs	facing	west	shape	straight	half	top
+164	6	dark_oak_stairs	facing	south	shape	straight	half	top
+164	7	dark_oak_stairs	facing	north	shape	straight	half	top
+165	0	slime_block
+166	0	barrier
+167	0	iron_trapdoor	facing	north	open	false	half	bottom
+167	1	iron_trapdoor	facing	south	open	false	half	bottom
+167	2	iron_trapdoor	facing	west	open	false	half	bottom
+167	3	iron_trapdoor	facing	east	open	false	half	bottom
+167	4	iron_trapdoor	facing	north	open	true	half	bottom
+167	5	iron_trapdoor	facing	south	open	true	half	bottom
+167	6	iron_trapdoor	facing	west	open	true	half	bottom
+167	7	iron_trapdoor	facing	east	open	true	half	bottom
+167	8	iron_trapdoor	facing	north	open	false	half	top
+167	9	iron_trapdoor	facing	south	open	false	half	top
+167	10	iron_trapdoor	facing	west	open	false	half	top
+167	11	iron_trapdoor	facing	east	open	false	half	top
+167	12	iron_trapdoor	facing	north	open	true	half	top
+167	13	iron_trapdoor	facing	south	open	true	half	top
+167	14	iron_trapdoor	facing	west	open	true	half	top
+167	15	iron_trapdoor	facing	east	open	true	half	top
+168	0	prismarine
+168	1	prismarine_bricks
+168	2	dark_prismarine
+169	0	sea_lantern
+170	0	hay_block	axis	y
+170	4	hay_block	axis	x
+170	8	hay_block	axis	z
+171	0	white_carpet
+171	1	orange_carpet
+171	2	magenta_carpet
+171	3	light_blue_carpet
+171	4	yellow_carpet
+171	5	lime_carpet
+171	6	pink_carpet
+171	7	gray_carpet
+171	8	light_gray_carpet
+171	9	cyan_carpet
+171	10	purple_carpet
+171	11	blue_carpet
+171	12	brown_carpet
+171	13	green_carpet
+171	14	red_carpet
+171	15	black_carpet
+172	0	terracotta
+173	0	coal_block
+174	0	packed_ice
+175	0	sunflower	half	lower
+175	1	lilac	half	lower
+175	2	tall_grass	half	lower
+175	3	large_fern	half	lower
+175	4	rose_bush	half	lower
+175	5	peony	half	lower
+175	8	peony	half	upper
+175	9	peony	half	upper
+175	10	peony	half	upper
+175	11	peony	half	upper
+176	0	white_banner	rotation	0
+176	1	white_banner	rotation	1
+176	2	white_banner	rotation	2
+176	3	white_banner	rotation	3
+176	4	white_banner	rotation	4
+176	5	white_banner	rotation	5
+176	6	white_banner	rotation	6
+176	7	white_banner	rotation	7
+176	8	white_banner	rotation	8
+176	9	white_banner	rotation	9
+176	10	white_banner	rotation	10
+176	11	white_banner	rotation	11
+176	12	white_banner	rotation	12
+176	13	white_banner	rotation	13
+176	14	white_banner	rotation	14
+176	15	white_banner	rotation	15
+177	2	white_wall_banner	facing	north
+177	3	white_wall_banner	facing	south
+177	4	white_wall_banner	facing	west
+177	5	white_wall_banner	facing	east
+178	0	daylight_detector	inverted	true	power	0
+178	1	daylight_detector	inverted	true	power	1
+178	2	daylight_detector	inverted	true	power	2
+178	3	daylight_detector	inverted	true	power	3
+178	4	daylight_detector	inverted	true	power	4
+178	5	daylight_detector	inverted	true	power	5
+178	6	daylight_detector	inverted	true	power	6
+178	7	daylight_detector	inverted	true	power	7
+178	8	daylight_detector	inverted	true	power	8
+178	9	daylight_detector	inverted	true	power	9
+178	10	daylight_detector	inverted	true	power	10
+178	11	daylight_detector	inverted	true	power	11
+178	12	daylight_detector	inverted	true	power	12
+178	13	daylight_detector	inverted	true	power	13
+178	14	daylight_detector	inverted	true	power	14
+178	15	daylight_detector	inverted	true	power	15
+179	0	red_sandstone
+179	1	chiseled_red_sandstone
+179	2	cut_red_sandstone
+180	0	red_sandstone_stairs	facing	east	shape	straight	half	bottom
+180	1	red_sandstone_stairs	facing	west	shape	straight	half	bottom
+180	2	red_sandstone_stairs	facing	south	shape	straight	half	bottom
+180	3	red_sandstone_stairs	facing	north	shape	straight	half	bottom
+180	4	red_sandstone_stairs	facing	east	shape	straight	half	top
+180	5	red_sandstone_stairs	facing	west	shape	straight	half	top
+180	6	red_sandstone_stairs	facing	south	shape	straight	half	top
+180	7	red_sandstone_stairs	facing	north	shape	straight	half	top
+181	0	red_sandstone_slab	type	double
+181	8	smooth_red_sandstone
+182	0	red_sandstone_slab	type	bottom
+182	8	red_sandstone_slab	type	top
+183	0	spruce_fence_gate	facing	south	powered	false	open	false	in_wall	false
+183	1	spruce_fence_gate	facing	west	powered	false	open	false	in_wall	false
+183	2	spruce_fence_gate	facing	north	powered	false	open	false	in_wall	false
+183	3	spruce_fence_gate	facing	east	powered	false	open	false	in_wall	false
+183	4	spruce_fence_gate	facing	south	powered	false	open	true	in_wall	false
+183	5	spruce_fence_gate	facing	west	powered	false	open	true	in_wall	false
+183	6	spruce_fence_gate	facing	north	powered	false	open	true	in_wall	false
+183	7	spruce_fence_gate	facing	east	powered	false	open	true	in_wall	false
+183	8	spruce_fence_gate	facing	south	powered	true	open	false	in_wall	false
+183	9	spruce_fence_gate	facing	west	powered	true	open	false	in_wall	false
+183	10	spruce_fence_gate	facing	north	powered	true	open	false	in_wall	false
+183	11	spruce_fence_gate	facing	east	powered	true	open	false	in_wall	false
+183	12	spruce_fence_gate	facing	south	powered	true	open	true	in_wall	false
+183	13	spruce_fence_gate	facing	west	powered	true	open	true	in_wall	false
+183	14	spruce_fence_gate	facing	north	powered	true	open	true	in_wall	false
+183	15	spruce_fence_gate	facing	east	powered	true	open	true	in_wall	false
+184	0	birch_fence_gate	facing	south	powered	false	open	false	in_wall	false
+184	1	birch_fence_gate	facing	west	powered	false	open	false	in_wall	false
+184	2	birch_fence_gate	facing	north	powered	false	open	false	in_wall	false
+184	3	birch_fence_gate	facing	east	powered	false	open	false	in_wall	false
+184	4	birch_fence_gate	facing	south	powered	false	open	true	in_wall	false
+184	5	birch_fence_gate	facing	west	powered	false	open	true	in_wall	false
+184	6	birch_fence_gate	facing	north	powered	false	open	true	in_wall	false
+184	7	birch_fence_gate	facing	east	powered	false	open	true	in_wall	false
+184	8	birch_fence_gate	facing	south	powered	true	open	false	in_wall	false
+184	9	birch_fence_gate	facing	west	powered	true	open	false	in_wall	false
+184	10	birch_fence_gate	facing	north	powered	true	open	false	in_wall	false
+184	11	birch_fence_gate	facing	east	powered	true	open	false	in_wall	false
+184	12	birch_fence_gate	facing	south	powered	true	open	true	in_wall	false
+184	13	birch_fence_gate	facing	west	powered	true	open	true	in_wall	false
+184	14	birch_fence_gate	facing	north	powered	true	open	true	in_wall	false
+184	15	birch_fence_gate	facing	east	powered	true	open	true	in_wall	false
+185	0	jungle_fence_gate	facing	south	powered	false	open	false	in_wall	false
+185	1	jungle_fence_gate	facing	west	powered	false	open	false	in_wall	false
+185	2	jungle_fence_gate	facing	north	powered	false	open	false	in_wall	false
+185	3	jungle_fence_gate	facing	east	powered	false	open	false	in_wall	false
+185	4	jungle_fence_gate	facing	south	powered	false	open	true	in_wall	false
+185	5	jungle_fence_gate	facing	west	powered	false	open	true	in_wall	false
+185	6	jungle_fence_gate	facing	north	powered	false	open	true	in_wall	false
+185	7	jungle_fence_gate	facing	east	powered	false	open	true	in_wall	false
+185	8	jungle_fence_gate	facing	south	powered	true	open	false	in_wall	false
+185	9	jungle_fence_gate	facing	west	powered	true	open	false	in_wall	false
+185	10	jungle_fence_gate	facing	north	powered	true	open	false	in_wall	false
+185	11	jungle_fence_gate	facing	east	powered	true	open	false	in_wall	false
+185	12	jungle_fence_gate	facing	south	powered	true	open	true	in_wall	false
+185	13	jungle_fence_gate	facing	west	powered	true	open	true	in_wall	false
+185	14	jungle_fence_gate	facing	north	powered	true	open	true	in_wall	false
+185	15	jungle_fence_gate	facing	east	powered	true	open	true	in_wall	false
+186	0	dark_oak_fence_gate	facing	south	powered	false	open	false	in_wall	false
+186	1	dark_oak_fence_gate	facing	west	powered	false	open	false	in_wall	false
+186	2	dark_oak_fence_gate	facing	north	powered	false	open	false	in_wall	false
+186	3	dark_oak_fence_gate	facing	east	powered	false	open	false	in_wall	false
+186	4	dark_oak_fence_gate	facing	south	powered	false	open	true	in_wall	false
+186	5	dark_oak_fence_gate	facing	west	powered	false	open	true	in_wall	false
+186	6	dark_oak_fence_gate	facing	north	powered	false	open	true	in_wall	false
+186	7	dark_oak_fence_gate	facing	east	powered	false	open	true	in_wall	false
+186	8	dark_oak_fence_gate	facing	south	powered	true	open	false	in_wall	false
+186	9	dark_oak_fence_gate	facing	west	powered	true	open	false	in_wall	false
+186	10	dark_oak_fence_gate	facing	north	powered	true	open	false	in_wall	false
+186	11	dark_oak_fence_gate	facing	east	powered	true	open	false	in_wall	false
+186	12	dark_oak_fence_gate	facing	south	powered	true	open	true	in_wall	false
+186	13	dark_oak_fence_gate	facing	west	powered	true	open	true	in_wall	false
+186	14	dark_oak_fence_gate	facing	north	powered	true	open	true	in_wall	false
+186	15	dark_oak_fence_gate	facing	east	powered	true	open	true	in_wall	false
+187	0	acacia_fence_gate	facing	south	powered	false	open	false	in_wall	false
+187	1	acacia_fence_gate	facing	west	powered	false	open	false	in_wall	false
+187	2	acacia_fence_gate	facing	north	powered	false	open	false	in_wall	false
+187	3	acacia_fence_gate	facing	east	powered	false	open	false	in_wall	false
+187	4	acacia_fence_gate	facing	south	powered	false	open	true	in_wall	false
+187	5	acacia_fence_gate	facing	west	powered	false	open	true	in_wall	false
+187	6	acacia_fence_gate	facing	north	powered	false	open	true	in_wall	false
+187	7	acacia_fence_gate	facing	east	powered	false	open	true	in_wall	false
+187	8	acacia_fence_gate	facing	south	powered	true	open	false	in_wall	false
+187	9	acacia_fence_gate	facing	west	powered	true	open	false	in_wall	false
+187	10	acacia_fence_gate	facing	north	powered	true	open	false	in_wall	false
+187	11	acacia_fence_gate	facing	east	powered	true	open	false	in_wall	false
+187	12	acacia_fence_gate	facing	south	powered	true	open	true	in_wall	false
+187	13	acacia_fence_gate	facing	west	powered	true	open	true	in_wall	false
+187	14	acacia_fence_gate	facing	north	powered	true	open	true	in_wall	false
+187	15	acacia_fence_gate	facing	east	powered	true	open	true	in_wall	false
+188	0	spruce_fence	east	false	north	false	west	false	south	false
+189	0	birch_fence	east	false	north	false	west	false	south	false
+190	0	jungle_fence	east	false	north	false	west	false	south	false
+191	0	dark_oak_fence	east	false	north	false	west	false	south	false
+192	0	acacia_fence	east	false	north	false	west	false	south	false
+193	0	spruce_door	hinge	right	half	lower	facing	east	powered	false	open	false
+193	1	spruce_door	hinge	right	half	lower	facing	south	powered	false	open	false
+193	2	spruce_door	hinge	right	half	lower	facing	west	powered	false	open	false
+193	3	spruce_door	hinge	right	half	lower	facing	north	powered	false	open	false
+193	4	spruce_door	hinge	right	half	lower	facing	east	powered	false	open	true
+193	5	spruce_door	hinge	right	half	lower	facing	south	powered	false	open	true
+193	6	spruce_door	hinge	right	half	lower	facing	west	powered	false	open	true
+193	7	spruce_door	hinge	right	half	lower	facing	north	powered	false	open	true
+193	8	spruce_door	hinge	left	half	upper	facing	east	powered	false	open	false
+193	9	spruce_door	hinge	right	half	upper	facing	east	powered	false	open	false
+193	10	spruce_door	hinge	left	half	upper	facing	east	powered	true	open	false
+193	11	spruce_door	hinge	right	half	upper	facing	east	powered	true	open	false
+194	0	birch_door	hinge	right	half	lower	facing	east	powered	false	open	false
+194	1	birch_door	hinge	right	half	lower	facing	south	powered	false	open	false
+194	2	birch_door	hinge	right	half	lower	facing	west	powered	false	open	false
+194	3	birch_door	hinge	right	half	lower	facing	north	powered	false	open	false
+194	4	birch_door	hinge	right	half	lower	facing	east	powered	false	open	true
+194	5	birch_door	hinge	right	half	lower	facing	south	powered	false	open	true
+194	6	birch_door	hinge	right	half	lower	facing	west	powered	false	open	true
+194	7	birch_door	hinge	right	half	lower	facing	north	powered	false	open	true
+194	8	birch_door	hinge	left	half	upper	facing	east	powered	false	open	false
+194	9	birch_door	hinge	right	half	upper	facing	east	powered	false	open	false
+194	10	birch_door	hinge	left	half	upper	facing	east	powered	true	open	false
+194	11	birch_door	hinge	right	half	upper	facing	east	powered	true	open	false
+195	0	jungle_door	hinge	right	half	lower	facing	east	powered	false	open	false
+195	1	jungle_door	hinge	right	half	lower	facing	south	powered	false	open	false
+195	2	jungle_door	hinge	right	half	lower	facing	west	powered	false	open	false
+195	3	jungle_door	hinge	right	half	lower	facing	north	powered	false	open	false
+195	4	jungle_door	hinge	right	half	lower	facing	east	powered	false	open	true
+195	5	jungle_door	hinge	right	half	lower	facing	south	powered	false	open	true
+195	6	jungle_door	hinge	right	half	lower	facing	west	powered	false	open	true
+195	7	jungle_door	hinge	right	half	lower	facing	north	powered	false	open	true
+195	8	jungle_door	hinge	left	half	upper	facing	east	powered	false	open	false
+195	9	jungle_door	hinge	right	half	upper	facing	east	powered	false	open	false
+195	10	jungle_door	hinge	left	half	upper	facing	east	powered	true	open	false
+195	11	jungle_door	hinge	right	half	upper	facing	east	powered	true	open	false
+196	0	acacia_door	hinge	right	half	lower	facing	east	powered	false	open	false
+196	1	acacia_door	hinge	right	half	lower	facing	south	powered	false	open	false
+196	2	acacia_door	hinge	right	half	lower	facing	west	powered	false	open	false
+196	3	acacia_door	hinge	right	half	lower	facing	north	powered	false	open	false
+196	4	acacia_door	hinge	right	half	lower	facing	east	powered	false	open	true
+196	5	acacia_door	hinge	right	half	lower	facing	south	powered	false	open	true
+196	6	acacia_door	hinge	right	half	lower	facing	west	powered	false	open	true
+196	7	acacia_door	hinge	right	half	lower	facing	north	powered	false	open	true
+196	8	acacia_door	hinge	left	half	upper	facing	east	powered	false	open	false
+196	9	acacia_door	hinge	right	half	upper	facing	east	powered	false	open	false
+196	10	acacia_door	hinge	left	half	upper	facing	east	powered	true	open	false
+196	11	acacia_door	hinge	right	half	upper	facing	east	powered	true	open	false
+197	0	dark_oak_door	hinge	right	half	lower	facing	east	powered	false	open	false
+197	1	dark_oak_door	hinge	right	half	lower	facing	south	powered	false	open	false
+197	2	dark_oak_door	hinge	right	half	lower	facing	west	powered	false	open	false
+197	3	dark_oak_door	hinge	right	half	lower	facing	north	powered	false	open	false
+197	4	dark_oak_door	hinge	right	half	lower	facing	east	powered	false	open	true
+197	5	dark_oak_door	hinge	right	half	lower	facing	south	powered	false	open	true
+197	6	dark_oak_door	hinge	right	half	lower	facing	west	powered	false	open	true
+197	7	dark_oak_door	hinge	right	half	lower	facing	north	powered	false	open	true
+197	8	dark_oak_door	hinge	left	half	upper	facing	east	powered	false	open	false
+197	9	dark_oak_door	hinge	right	half	upper	facing	east	powered	false	open	false
+197	10	dark_oak_door	hinge	left	half	upper	facing	east	powered	true	open	false
+197	11	dark_oak_door	hinge	right	half	upper	facing	east	powered	true	open	false
+198	0	end_rod	facing	down
+198	1	end_rod	facing	up
+198	2	end_rod	facing	north
+198	3	end_rod	facing	south
+198	4	end_rod	facing	west
+198	5	end_rod	facing	east
+199	0	chorus_plant	up	false	south	false	east	false	north	false	down	false	west	false
+200	0	chorus_flower	age	0
+200	1	chorus_flower	age	1
+200	2	chorus_flower	age	2
+200	3	chorus_flower	age	3
+200	4	chorus_flower	age	4
+200	5	chorus_flower	age	5
+201	0	purpur_block
+202	0	purpur_pillar	axis	y
+202	4	purpur_pillar	axis	x
+202	8	purpur_pillar	axis	z
+203	0	purpur_stairs	facing	east	shape	straight	half	bottom
+203	1	purpur_stairs	facing	west	shape	straight	half	bottom
+203	2	purpur_stairs	facing	south	shape	straight	half	bottom
+203	3	purpur_stairs	facing	north	shape	straight	half	bottom
+203	4	purpur_stairs	facing	east	shape	straight	half	top
+203	5	purpur_stairs	facing	west	shape	straight	half	top
+203	6	purpur_stairs	facing	south	shape	straight	half	top
+203	7	purpur_stairs	facing	north	shape	straight	half	top
+204	0	purpur_slab	type	double
+205	0	purpur_slab	type	bottom
+205	8	purpur_slab	type	top
+206	0	end_stone_bricks
+207	0	beetroots	age	0
+207	1	beetroots	age	1
+207	2	beetroots	age	2
+207	3	beetroots	age	3
+208	0	grass_path
+209	0	end_gateway
+210	0	repeating_command_block	conditional	false	facing	down
+210	1	repeating_command_block	conditional	false	facing	up
+210	2	repeating_command_block	conditional	false	facing	north
+210	3	repeating_command_block	conditional	false	facing	south
+210	4	repeating_command_block	conditional	false	facing	west
+210	5	repeating_command_block	conditional	false	facing	east
+210	8	repeating_command_block	conditional	true	facing	down
+210	9	repeating_command_block	conditional	true	facing	up
+210	10	repeating_command_block	conditional	true	facing	north
+210	11	repeating_command_block	conditional	true	facing	south
+210	12	repeating_command_block	conditional	true	facing	west
+210	13	repeating_command_block	conditional	true	facing	east
+211	0	chain_command_block	conditional	false	facing	down
+211	1	chain_command_block	conditional	false	facing	up
+211	2	chain_command_block	conditional	false	facing	north
+211	3	chain_command_block	conditional	false	facing	south
+211	4	chain_command_block	conditional	false	facing	west
+211	5	chain_command_block	conditional	false	facing	east
+211	8	chain_command_block	conditional	true	facing	down
+211	9	chain_command_block	conditional	true	facing	up
+211	10	chain_command_block	conditional	true	facing	north
+211	11	chain_command_block	conditional	true	facing	south
+211	12	chain_command_block	conditional	true	facing	west
+211	13	chain_command_block	conditional	true	facing	east
+212	0	frosted_ice	age	0
+212	1	frosted_ice	age	1
+212	2	frosted_ice	age	2
+212	3	frosted_ice	age	3
+213	0	magma_block
+214	0	nether_wart_block
+215	0	red_nether_bricks
+216	0	bone_block	axis	y
+216	4	bone_block	axis	x
+216	8	bone_block	axis	z
+217	0	structure_void
+218	0	observer	facing	down	powered	false
+218	1	observer	facing	up	powered	false
+218	2	observer	facing	north	powered	false
+218	3	observer	facing	south	powered	false
+218	4	observer	facing	west	powered	false
+218	5	observer	facing	east	powered	false
+218	8	observer	facing	down	powered	true
+218	9	observer	facing	up	powered	true
+218	10	observer	facing	north	powered	true
+218	11	observer	facing	south	powered	true
+218	12	observer	facing	west	powered	true
+218	13	observer	facing	east	powered	true
+219	0	white_shulker_box	facing	down
+219	1	white_shulker_box	facing	up
+219	2	white_shulker_box	facing	north
+219	3	white_shulker_box	facing	south
+219	4	white_shulker_box	facing	west
+219	5	white_shulker_box	facing	east
+220	0	orange_shulker_box	facing	down
+220	1	orange_shulker_box	facing	up
+220	2	orange_shulker_box	facing	north
+220	3	orange_shulker_box	facing	south
+220	4	orange_shulker_box	facing	west
+220	5	orange_shulker_box	facing	east
+221	0	magenta_shulker_box	facing	down
+221	1	magenta_shulker_box	facing	up
+221	2	magenta_shulker_box	facing	north
+221	3	magenta_shulker_box	facing	south
+221	4	magenta_shulker_box	facing	west
+221	5	magenta_shulker_box	facing	east
+222	0	light_blue_shulker_box	facing	down
+222	1	light_blue_shulker_box	facing	up
+222	2	light_blue_shulker_box	facing	north
+222	3	light_blue_shulker_box	facing	south
+222	4	light_blue_shulker_box	facing	west
+222	5	light_blue_shulker_box	facing	east
+223	0	yellow_shulker_box	facing	down
+223	1	yellow_shulker_box	facing	up
+223	2	yellow_shulker_box	facing	north
+223	3	yellow_shulker_box	facing	south
+223	4	yellow_shulker_box	facing	west
+223	5	yellow_shulker_box	facing	east
+224	0	lime_shulker_box	facing	down
+224	1	lime_shulker_box	facing	up
+224	2	lime_shulker_box	facing	north
+224	3	lime_shulker_box	facing	south
+224	4	lime_shulker_box	facing	west
+224	5	lime_shulker_box	facing	east
+225	0	pink_shulker_box	facing	down
+225	1	pink_shulker_box	facing	up
+225	2	pink_shulker_box	facing	north
+225	3	pink_shulker_box	facing	south
+225	4	pink_shulker_box	facing	west
+225	5	pink_shulker_box	facing	east
+226	0	gray_shulker_box	facing	down
+226	1	gray_shulker_box	facing	up
+226	2	gray_shulker_box	facing	north
+226	3	gray_shulker_box	facing	south
+226	4	gray_shulker_box	facing	west
+226	5	gray_shulker_box	facing	east
+227	0	light_gray_shulker_box	facing	down
+227	1	light_gray_shulker_box	facing	up
+227	2	light_gray_shulker_box	facing	north
+227	3	light_gray_shulker_box	facing	south
+227	4	light_gray_shulker_box	facing	west
+227	5	light_gray_shulker_box	facing	east
+228	0	cyan_shulker_box	facing	down
+228	1	cyan_shulker_box	facing	up
+228	2	cyan_shulker_box	facing	north
+228	3	cyan_shulker_box	facing	south
+228	4	cyan_shulker_box	facing	west
+228	5	cyan_shulker_box	facing	east
+229	0	purple_shulker_box	facing	down
+229	1	purple_shulker_box	facing	up
+229	2	purple_shulker_box	facing	north
+229	3	purple_shulker_box	facing	south
+229	4	purple_shulker_box	facing	west
+229	5	purple_shulker_box	facing	east
+230	0	blue_shulker_box	facing	down
+230	1	blue_shulker_box	facing	up
+230	2	blue_shulker_box	facing	north
+230	3	blue_shulker_box	facing	south
+230	4	blue_shulker_box	facing	west
+230	5	blue_shulker_box	facing	east
+231	0	brown_shulker_box	facing	down
+231	1	brown_shulker_box	facing	up
+231	2	brown_shulker_box	facing	north
+231	3	brown_shulker_box	facing	south
+231	4	brown_shulker_box	facing	west
+231	5	brown_shulker_box	facing	east
+232	0	green_shulker_box	facing	down
+232	1	green_shulker_box	facing	up
+232	2	green_shulker_box	facing	north
+232	3	green_shulker_box	facing	south
+232	4	green_shulker_box	facing	west
+232	5	green_shulker_box	facing	east
+233	0	red_shulker_box	facing	down
+233	1	red_shulker_box	facing	up
+233	2	red_shulker_box	facing	north
+233	3	red_shulker_box	facing	south
+233	4	red_shulker_box	facing	west
+233	5	red_shulker_box	facing	east
+234	0	black_shulker_box	facing	down
+234	1	black_shulker_box	facing	up
+234	2	black_shulker_box	facing	north
+234	3	black_shulker_box	facing	south
+234	4	black_shulker_box	facing	west
+234	5	black_shulker_box	facing	east
+235	0	white_glazed_terracotta	facing	south
+235	1	white_glazed_terracotta	facing	west
+235	2	white_glazed_terracotta	facing	north
+235	3	white_glazed_terracotta	facing	east
+236	0	orange_glazed_terracotta	facing	south
+236	1	orange_glazed_terracotta	facing	west
+236	2	orange_glazed_terracotta	facing	north
+236	3	orange_glazed_terracotta	facing	east
+237	0	magenta_glazed_terracotta	facing	south
+237	1	magenta_glazed_terracotta	facing	west
+237	2	magenta_glazed_terracotta	facing	north
+237	3	magenta_glazed_terracotta	facing	east
+238	0	light_blue_glazed_terracotta	facing	south
+238	1	light_blue_glazed_terracotta	facing	west
+238	2	light_blue_glazed_terracotta	facing	north
+238	3	light_blue_glazed_terracotta	facing	east
+239	0	yellow_glazed_terracotta	facing	south
+239	1	yellow_glazed_terracotta	facing	west
+239	2	yellow_glazed_terracotta	facing	north
+239	3	yellow_glazed_terracotta	facing	east
+240	0	lime_glazed_terracotta	facing	south
+240	1	lime_glazed_terracotta	facing	west
+240	2	lime_glazed_terracotta	facing	north
+240	3	lime_glazed_terracotta	facing	east
+241	0	pink_glazed_terracotta	facing	south
+241	1	pink_glazed_terracotta	facing	west
+241	2	pink_glazed_terracotta	facing	north
+241	3	pink_glazed_terracotta	facing	east
+242	0	gray_glazed_terracotta	facing	south
+242	1	gray_glazed_terracotta	facing	west
+242	2	gray_glazed_terracotta	facing	north
+242	3	gray_glazed_terracotta	facing	east
+243	0	light_gray_glazed_terracotta	facing	south
+243	1	light_gray_glazed_terracotta	facing	west
+243	2	light_gray_glazed_terracotta	facing	north
+243	3	light_gray_glazed_terracotta	facing	east
+244	0	cyan_glazed_terracotta	facing	south
+244	1	cyan_glazed_terracotta	facing	west
+244	2	cyan_glazed_terracotta	facing	north
+244	3	cyan_glazed_terracotta	facing	east
+245	0	purple_glazed_terracotta	facing	south
+245	1	purple_glazed_terracotta	facing	west
+245	2	purple_glazed_terracotta	facing	north
+245	3	purple_glazed_terracotta	facing	east
+246	0	blue_glazed_terracotta	facing	south
+246	1	blue_glazed_terracotta	facing	west
+246	2	blue_glazed_terracotta	facing	north
+246	3	blue_glazed_terracotta	facing	east
+247	0	brown_glazed_terracotta	facing	south
+247	1	brown_glazed_terracotta	facing	west
+247	2	brown_glazed_terracotta	facing	north
+247	3	brown_glazed_terracotta	facing	east
+248	0	green_glazed_terracotta	facing	south
+248	1	green_glazed_terracotta	facing	west
+248	2	green_glazed_terracotta	facing	north
+248	3	green_glazed_terracotta	facing	east
+249	0	red_glazed_terracotta	facing	south
+249	1	red_glazed_terracotta	facing	west
+249	2	red_glazed_terracotta	facing	north
+249	3	red_glazed_terracotta	facing	east
+250	0	black_glazed_terracotta	facing	south
+250	1	black_glazed_terracotta	facing	west
+250	2	black_glazed_terracotta	facing	north
+250	3	black_glazed_terracotta	facing	east
+251	0	white_concrete
+251	1	orange_concrete
+251	2	magenta_concrete
+251	3	light_blue_concrete
+251	4	yellow_concrete
+251	5	lime_concrete
+251	6	pink_concrete
+251	7	gray_concrete
+251	8	light_gray_concrete
+251	9	cyan_concrete
+251	10	purple_concrete
+251	11	blue_concrete
+251	12	brown_concrete
+251	13	green_concrete
+251	14	red_concrete
+251	15	black_concrete
+252	0	white_concrete_powder
+252	1	orange_concrete_powder
+252	2	magenta_concrete_powder
+252	3	light_blue_concrete_powder
+252	4	yellow_concrete_powder
+252	5	lime_concrete_powder
+252	6	pink_concrete_powder
+252	7	gray_concrete_powder
+252	8	light_gray_concrete_powder
+252	9	cyan_concrete_powder
+252	10	purple_concrete_powder
+252	11	blue_concrete_powder
+252	12	brown_concrete_powder
+252	13	green_concrete_powder
+252	14	red_concrete_powder
+252	15	black_concrete_powder
+255	0	structure_block	mode	save
+255	1	structure_block	mode	load
+255	2	structure_block	mode	corner
+255	3	structure_block	mode	data

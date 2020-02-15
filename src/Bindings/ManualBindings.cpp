@@ -24,7 +24,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../BoundingBox.h"
-#include "../BuildInfo.h"
+#include "BuildInfo.h"
 #include "../ClientHandle.h"
 #include "../CommandOutput.h"
 #include "../CompositeChat.h"
@@ -3477,14 +3477,13 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	}
 
 	NIBBLETYPE a_BlockMeta = static_cast<NIBBLETYPE>(tolua_tonumber(tolua_S, 2, 0));
-	int a_OutputX, a_OutputY, a_OutputZ;
-	bool res = self->GetOutputBlockPos(a_BlockMeta, a_OutputX, a_OutputY, a_OutputZ);
-	tolua_pushboolean(tolua_S, res);
-	if (res)
+	auto res = self->GetOutputBlockPos(a_BlockMeta);
+	tolua_pushboolean(tolua_S, res.first);
+	if (res.first)
 	{
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputX));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputY));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputZ));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.x));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.y));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.z));
 		return 4;
 	}
 	return 1;
@@ -3954,6 +3953,134 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cCuboid_Assign(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x1, y1, z1, x2, y2, z2;
+	if (L.GetStackValues(2, x1, y1, z1, x2, y2, z2))
+	{
+		LOGWARNING("cCuboid:Assign(x1, y1, z1, x2, y2, z2) is deprecated, use cCuboid:Assign(Vector3i, Vector3i) instead.");
+		L.LogStackTrace();
+		self->Assign({x1, y1, z1}, {x2, y2, z2});
+		return 0;
+	}
+
+	// Try the (cCuboid) param version:
+	cCuboid * other = nullptr;
+	if (L.GetStackValue(2, other) && (other != nullptr))
+	{
+		self->Assign(*other);
+		return 0;
+	}
+
+	// Try the (Vector3i, Vector3i) param version:
+	Vector3i * pt1 = nullptr;
+	Vector3i * pt2 = nullptr;
+	if (L.GetStackValues(2, pt1, pt2) && (pt1 != nullptr) && (pt2 != nullptr))
+	{
+		self->Assign(*pt1, *pt2);
+		return 0;
+	}
+	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
+}
+
+
+
+
+
+static int tolua_cCuboid_IsInside(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3d) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	// Try the (Vector3i) param version:
+	{
+		Vector3i * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+
+	// Try the (Vector3d) param version:
+	{
+		Vector3d * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3i or a Vector3d.");
+}
+
+
+
+
+
+static int tolua_cCuboid_Move(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:Move(x, y, z) is deprecated, use cCuboid:Move(Vector3i) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	Vector3i * offset = nullptr;
+	if (!L.GetStackValue(2, offset) || (offset == nullptr))
+	{
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3i.");
+	}
+	self->Move(*offset);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 {
 	// Check the params:
@@ -4119,6 +4246,12 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "md5HexString", tolua_md5HexString);
 			tolua_function(tolua_S, "sha1", tolua_sha1);
 			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cCuboid");
+			tolua_function(tolua_S, "Assign",   tolua_cCuboid_Assign);
+			tolua_function(tolua_S, "IsInside", tolua_cCuboid_IsInside);
+			tolua_function(tolua_S, "Move",     tolua_cCuboid_Move);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cEntity");

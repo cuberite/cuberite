@@ -8,8 +8,8 @@
 
 
 
-cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
+cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+	super(pkArrow, a_Creator, a_Pos, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
@@ -198,17 +198,16 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
-		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
-		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
+		auto relPos = a_Chunk.RelativeToAbsolute(m_HitBlockPos);
+		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 
-		if (Chunk == nullptr)
+		if (chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;
 		}
 
-		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		if (chunk->GetBlock(relPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}

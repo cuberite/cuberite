@@ -12,7 +12,6 @@
 #include "FinishGen.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
-#include "../World.h"
 #include "../IniFile.h"
 #include "../MobSpawner.h"
 

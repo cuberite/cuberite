@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "BlockPlant.h"
@@ -8,20 +7,20 @@
 
 
 class cBlockCactusHandler :
-	public cBlockPlant
+	public cClearMetaOnDrop<cBlockPlant<false>>
 {
-	typedef cBlockPlant Super;
+	using super = cClearMetaOnDrop<cBlockPlant<false>>;
+
 public:
-	cBlockCactusHandler(BLOCKTYPE a_BlockType)
-		: Super(a_BlockType, false)
+
+	cBlockCactusHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
@@ -67,13 +66,9 @@ public:
 		return true;
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
-	{
-		if (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth)
-		{
-			a_Chunk.GetWorld()->GrowCactus(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
-		}
-	}
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -81,17 +76,91 @@ public:
 		return 7;
 	}
 
-protected:
 
-	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+
+
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
 	{
-		auto Action = paStay;
-		if (((a_RelY + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR))
+		// Check the total height of the cacti blocks here:
+		int top = a_RelPos.y + 1;
+		while (
+			(top < cChunkDef::Height) &&
+			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_CACTUS)
+		)
 		{
-			Action = Super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+			++top;
+		}
+		int bottom = a_RelPos.y - 1;
+		while (
+			(bottom > 0) &&
+			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_CACTUS)
+		)
+		{
+			--bottom;
 		}
 
-		return Action;
+		// Refuse if already too high:
+		auto numToGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxCactusHeight() + 1 - (top - bottom));
+		if (numToGrow <= 0)
+		{
+			return 0;
+		}
+
+		BLOCKTYPE blockType;
+		for (int i = 0; i < numToGrow; ++i)
+		{
+			Vector3i pos(a_RelPos.x, top + i, a_RelPos.z);
+			if (!a_Chunk.UnboundedRelGetBlockType(pos, blockType) || (blockType != E_BLOCK_AIR))
+			{
+				// Cannot grow there
+				return i;
+			}
+
+			a_Chunk.UnboundedRelFastSetBlock(pos, E_BLOCK_CACTUS, 0);
+
+			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks; if they aren't, drop as pickup and bail out the growing
+			static const Vector3i neighborOffsets[] =
+			{
+				{-1, 0,  0},
+				{ 1, 0,  0},
+				{ 0, 0, -1},
+				{ 0, 0,  1},
+			} ;
+			for (const auto & ofs: neighborOffsets)
+			{
+				if (
+					a_Chunk.UnboundedRelGetBlockType(pos + ofs, blockType) &&
+					(
+						cBlockInfo::IsSolid(blockType) ||
+						(blockType == E_BLOCK_LAVA) ||
+						(blockType == E_BLOCK_STATIONARY_LAVA)
+					)
+				)
+				{
+					// Remove the cactus
+					auto absPos = a_Chunk.RelativeToAbsolute(pos);
+					a_Chunk.GetWorld()->DropBlockAsPickups(absPos);
+					return i + 1;
+				}
+			}  // for neighbor
+		}  // for i - numToGrow
+		return numToGrow;
+	}
+
+
+
+
+
+protected:
+
+	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) override
+	{
+		// Only allow growing if there's an air block above:
+		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		{
+			return super::CanGrow(a_Chunk, a_RelPos);
+		}
+		return paStay;
 	}
 } ;
 

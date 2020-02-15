@@ -49,8 +49,7 @@ protected:
 	NOISE_DATATYPE m_FrequencyY;
 	NOISE_DATATYPE m_FrequencyZ;
 
-	int m_CurChunkX;
-	int m_CurChunkZ;
+	cChunkCoords m_CurChunkCoords;
 	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
 
 	/** The bime generator to query for biomes. */
@@ -82,7 +81,7 @@ protected:
 
 
 	/** Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap). */
-	void PrepareState(int a_ChunkX, int a_ChunkZ);
+	void PrepareState(cChunkCoords a_ChunkCoords);
 
 	/** Generates the m_DistortedHeightmap array for the current chunk. */
 	void GenerateHeightArray(void);
@@ -101,6 +100,6 @@ protected:
 
 
 	// cTerrainShapeGen overrides:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) override;
 } ;

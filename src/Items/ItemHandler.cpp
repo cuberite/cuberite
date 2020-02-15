@@ -24,6 +24,7 @@
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
+#include "ItemEyeOfEnder.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
@@ -131,6 +132,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_EGG:                 return new cItemEggHandler();
 		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
+		case E_ITEM_EYE_OF_ENDER:        return new cItemEyeOfEnderHandler();
 		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
@@ -359,9 +361,11 @@ bool cItemHandler::OnPlayerPlace(
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
+	auto blockHandler = BlockHandler(ClickedBlock);
+	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
+	if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, ClickedBlockMeta))
 	{
-		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+		a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
 	}
 	else
 	{
@@ -474,28 +478,6 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cI
 	UNUSED(a_Dir);
 
 	return false;
-}
-
-
-
-
-
-void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	UNUSED(a_Item);
-
-	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
-
-	if (a_Player->IsGameModeSurvival())
-	{
-		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
-	}
-
-	auto Action = (cBlockInfo::IsOneHitDig(Block) ? dlaBreakBlockInstant : dlaBreakBlock);
-	a_Player->UseEquippedItem(Action);
 }
 
 

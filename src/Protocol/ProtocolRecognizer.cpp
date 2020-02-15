@@ -12,6 +12,7 @@
 #include "Protocol_1_10.h"
 #include "Protocol_1_11.h"
 #include "Protocol_1_12.h"
+#include "Protocol_1_13.h"
 #include "Packetizer.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -26,20 +27,9 @@
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
-	m_Protocol(nullptr),
 	m_Buffer(8192),  // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 	m_InPingForUnrecognizedVersion(false)
 {
-}
-
-
-
-
-
-cProtocolRecognizer::~cProtocolRecognizer()
-{
-	delete m_Protocol;
-	m_Protocol = nullptr;
 }
 
 
@@ -60,6 +50,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_11_1:  return "1.11.1";
 		case PROTO_VERSION_1_12:    return "1.12";
 		case PROTO_VERSION_1_12_1:  return "1.12.1";
+		case PROTO_VERSION_1_13:    return "1.13";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -281,7 +272,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
-		cPacketizer Pkt(*this, 0x00);  // Disconnect packet (in login state)
+		cPacketizer Pkt(*this, pktDisconnectDuringLogin);
 		Pkt.WriteString(Message);
 	}
 }
@@ -1047,7 +1038,24 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 		// Not enough bytes for the packet, keep waiting
 		return false;
 	}
-	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar);
+	if (!TryRecognizeLengthedProtocol(PacketLen - ReadSoFar))
+	{
+		return false;
+	}
+
+	// The protocol has been recognized, initialize it:
+	ASSERT(m_Protocol != nullptr);
+	try
+	{
+		m_Protocol->Initialize(*m_Client);
+	}
+	catch (const std::exception & exc)
+	{
+		m_Client->Kick(exc.what());
+		m_Protocol.reset();
+		return false;
+	}
+	return true;
 }
 
 
@@ -1097,57 +1105,62 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_8_0:
 		{
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol_1_8_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_8_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_0:
 		{
-			m_Protocol = new cProtocol_1_9_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_1:
 		{
-			m_Protocol = new cProtocol_1_9_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_2:
 		{
-			m_Protocol = new cProtocol_1_9_2(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_2(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_9_4:
 		{
-			m_Protocol = new cProtocol_1_9_4(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_9_4(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_10_0:
 		{
-			m_Protocol = new cProtocol_1_10_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_10_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_11_0:
 		{
-			m_Protocol = new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_11_0(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_11_1:
 		{
-			m_Protocol = new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_11_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12:
 		{
-			m_Protocol = new cProtocol_1_12(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12_1:
 		{
-			m_Protocol = new cProtocol_1_12_1(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12_1(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		case PROTO_VERSION_1_12_2:
 		{
-			m_Protocol = new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState);
+			m_Protocol.reset(new cProtocol_1_12_2(m_Client, ServerAddress, ServerPort, NextState));
+			return true;
+		}
+		case PROTO_VERSION_1_13:
+		{
+			m_Protocol.reset(new cProtocol_1_13(m_Client, ServerAddress, ServerPort, NextState));
 			return true;
 		}
 		default:
@@ -1196,6 +1209,25 @@ void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
 
 
 
+UInt32 cProtocolRecognizer::GetPacketID(ePacketType a_PacketType)
+{
+	switch (a_PacketType)
+	{
+		case pktDisconnectDuringLogin: return 0x00;
+		case pktStatusResponse:        return 0x00;
+		case pktPingResponse:          return 0x01;
+		default:
+		{
+			ASSERT(!"cProtocolRecognizer::GetPacketID() called for an unhandled packet");
+			return 0;
+		}
+	}
+}
+
+
+
+
+
 void cProtocolRecognizer::HandlePacketStatusRequest(void)
 {
 	cServer * Server = cRoot::Get()->GetServer();
@@ -1233,7 +1265,7 @@ void cProtocolRecognizer::HandlePacketStatusRequest(void)
 	Json::FastWriter Writer;
 	AString Response = Writer.write(ResponseValue);
 
-	cPacketizer Pkt(*this, 0x00);  // Response packet
+	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
 }
 
@@ -1249,6 +1281,6 @@ void cProtocolRecognizer::HandlePacketStatusPing()
 		return;
 	}
 
-	cPacketizer Pkt(*this, 0x01);  // Pong packet
+	cPacketizer Pkt(*this, pktPingResponse);
 	Pkt.WriteBEInt64(Timestamp);
 }

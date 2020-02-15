@@ -13,7 +13,7 @@
 
 
 
-cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :
+cFurnaceWindow::cFurnaceWindow(cFurnaceEntity * a_Furnace):
 	cWindow(wtFurnace, "Furnace")
 {
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));

@@ -1,13 +1,3 @@
-
-// ProtocolRecognizer.h
-
-// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
-// protocol versions and redirects everything to them
-
-
-
-
-
 #pragma once
 
 #include "Protocol.h"
@@ -18,15 +8,17 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11.x, 1.12.x"
-#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340"
-#define MCS_LATEST_PROTOCOL_VERSION 340
+#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11.x, 1.12.x, 1.13"
+#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340, 393"
+#define MCS_LATEST_PROTOCOL_VERSION 393
 
 
 
 
 
-class cProtocolRecognizer :
+/** Meta-protocol that recognizes multiple protocol versions, creates the specific
+protocol version instance and redirects everything to it. */
+class cProtocolRecognizer:
 	public cProtocol
 {
 	typedef cProtocol super;
@@ -45,10 +37,11 @@ public:
 		PROTO_VERSION_1_12   = 335,
 		PROTO_VERSION_1_12_1 = 338,
 		PROTO_VERSION_1_12_2 = 340,
+		PROTO_VERSION_1_13   = 393
 	};
 
 	cProtocolRecognizer(cClientHandle * a_Client);
-	virtual ~cProtocolRecognizer() override;
+	virtual ~cProtocolRecognizer() override {}
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
@@ -148,9 +141,11 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+
 protected:
+
 	/** The recognized protocol */
-	cProtocol * m_Protocol;
+	std::unique_ptr<cProtocol> m_Protocol;
 
 	/** Buffer for the incoming data until we recognize the protocol */
 	cByteBuffer m_Buffer;
@@ -158,12 +153,8 @@ protected:
 	/** Is a server list ping for an unrecognized version currently occuring? */
 	bool m_InPingForUnrecognizedVersion;
 
-	/** GetPacketId is implemented in each protocol version class */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
-	{
-		ASSERT(!"cProtocolRecognizer::GetPacketId should never be called! Something is horribly wrong! (this method being called implies that someone other than a Protocol-derived class is calling GetPacketId)");
-		return 0;
-	}
+	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
 
 	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
 	void HandlePacketStatusRequest();

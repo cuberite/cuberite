@@ -299,11 +299,6 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 	}
 	else
 	{
-		if ((PixelX > 320.0) || (PixelZ > 320.0))
-		{
-			;
-		}
-
 		Rot = 0;
 		Type = cMapDecorator::eType::E_TYPE_PLAYER_OUTSIDE;
 

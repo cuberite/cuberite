@@ -32,7 +32,7 @@ Declares the 1.9 protocol classes:
 class cProtocol_1_9_0 :
 	public cProtocol
 {
-	typedef cProtocol super;
+	typedef cProtocol Super;
 
 public:
 
@@ -67,6 +67,8 @@ public:
 	virtual void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
+	virtual void SendExperience                 (void) override;
+	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
@@ -98,8 +100,6 @@ public:
 	virtual void SendResetTitle                 (void) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendExperience                 (void) override;
-	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
@@ -172,7 +172,7 @@ protected:
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Get the packet ID for a given packet */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
@@ -248,7 +248,7 @@ protected:
 	eHand HandIntToEnum(Int32 a_Hand);
 
 	/** Writes the item data into a packet. */
-	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
@@ -289,7 +289,7 @@ protected:
 class cProtocol_1_9_1 :
 	public cProtocol_1_9_0
 {
-	typedef cProtocol_1_9_0 super;
+	typedef cProtocol_1_9_0 Super;
 
 public:
 	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -308,7 +308,7 @@ public:
 class cProtocol_1_9_2 :
 	public cProtocol_1_9_1
 {
-	typedef cProtocol_1_9_1 super;
+	typedef cProtocol_1_9_1 Super;
 
 public:
 	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -326,7 +326,7 @@ public:
 class cProtocol_1_9_4 :
 	public cProtocol_1_9_2
 {
-	typedef cProtocol_1_9_2 super;
+	typedef cProtocol_1_9_2 Super;
 
 public:
 	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
@@ -339,6 +339,6 @@ public:
 
 protected:
 
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 } ;

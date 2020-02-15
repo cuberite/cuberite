@@ -33,10 +33,12 @@
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
 	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-	{ \
-		return; \
-	}
+	do { \
+		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+		{ \
+			return; \
+		} \
+	} while (false)
 
 
 
@@ -57,7 +59,7 @@ struct TakeDamageInfo
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
 	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
 	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
 	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
@@ -154,7 +156,7 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -279,7 +281,7 @@ public:
 	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
 
 	float GetGravity(void) const { return m_Gravity; }
 
@@ -556,7 +558,9 @@ public:
 	@return exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
+
 protected:
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -567,6 +571,7 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
+
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
@@ -683,6 +688,7 @@ protected:
 	/** Set the entities position and last sent position.
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
 	virtual void ResetPosition(Vector3d a_NewPos);
+
 
 private:
 

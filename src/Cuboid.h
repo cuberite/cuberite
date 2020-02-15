@@ -13,21 +13,20 @@ public:
 	Vector3i p1, p2;
 
 	cCuboid(void) {}
-	cCuboid(const Vector3i & a_p1, const Vector3i & a_p2) : p1(a_p1), p2(a_p2) {}
+	cCuboid(Vector3i a_p1, Vector3i a_p2) : p1(a_p1), p2(a_p2) {}
 	cCuboid(int a_X1, int a_Y1, int a_Z1) : p1(a_X1, a_Y1, a_Z1), p2(a_X1, a_Y1, a_Z1) {}
 
 	#ifdef TOLUA_EXPOSITION  // tolua isn't aware of implicitly generated copy constructors
 		cCuboid(const cCuboid & a_Cuboid);
 	#endif
 
-	// DEPRECATED, use cCuboid(Vector3i, Vector3i) instead
-	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2)
-	{
-		LOGWARNING("cCuboid(int, int, int, int, int, int) constructor is deprecated, use cCuboid(Vector3i, Vector3i) constructor instead.");
-	}
+	// tolua_end
+	// Exported in ManualBindings.cpp to support the old deprecated coord-based overload.
 
-	void Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2);
+	void Assign(Vector3i a_Point1, Vector3i a_Point2);
 	void Assign(const cCuboid & a_SrcCuboid) { *this = a_SrcCuboid; }
+
+	// tolua_begin
 
 	void Sort(void);
 
@@ -55,21 +54,15 @@ public:
 		);
 	}
 
+	// tolua_end
+	// Exported in ManualBindings.cpp to support the old deprecated coord-based overload.
+
 	bool IsInside(Vector3i v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
 			(v.y >= p1.y) && (v.y <= p2.y) &&
 			(v.z >= p1.z) && (v.z <= p2.z)
-		);
-	}
-
-	bool IsInside(int a_X, int a_Y, int a_Z) const
-	{
-		return (
-			(a_X >= p1.x) && (a_X <= p2.x) &&
-			(a_Y >= p1.y) && (a_Y <= p2.y) &&
-			(a_Z >= p1.z) && (a_Z <= p2.z)
 		);
 	}
 
@@ -82,17 +75,32 @@ public:
 		);
 	}
 
-	/** Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords).
+	// tolua_begin
+
+	/** Returns true if this cuboid is completely inside the specified cuboid (in all 6 coords).
 	Assumes both cuboids are sorted. */
 	bool IsCompletelyInside(const cCuboid & a_Outer) const;
 
-	/** Moves the cuboid by the specified offsets in each direction */
-	void Move(int a_OfsX, int a_OfsY, int a_OfsZ);
+	// tolua_end
+
+	/** Moves the cuboid by the specified offset.
+	Exported in ManualBindings to support the old deprecated coord-based overload. */
+	void Move(Vector3i a_Offset);
+
+	// tolua_begin
 
 	/** Expands the cuboid by the specified amount in each direction.
 	Works on unsorted cuboids as well.
 	Note that this function doesn't check for underflows when using negative amounts. */
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+
+	/** Clamps this cuboid, so that it doesn't reach outside of a_Limits in any direction.
+	Assumes both this and a_Limits are sorted. */
+	void Clamp(const cCuboid & a_Limits);
+
+	/** Clamps this cuboid's p2 so that the cuboid's size doesn't exceed the specified max size.
+	Assumes this cuboid is sorted. */
+	void ClampSize(Vector3i a_MaxSize);
 
 	/** Clamps both X coords to the specified range. Works on unsorted cuboids, too. */
 	void ClampX(int a_MinX, int a_MaxX);
@@ -108,6 +116,29 @@ public:
 
 	/** If needed, expands the cuboid so that it contains the specified point. Assumes sorted. Doesn't contract. */
 	void Engulf(Vector3i a_Point);
+
+	// tolua_end
+
+	/** Checks the two cuboids for equality. */
+	bool operator == (const cCuboid & aOther) const
+	{
+		return (
+			(p1.x == aOther.p1.x) &&
+			(p1.y == aOther.p1.y) &&
+			(p1.z == aOther.p1.z) &&
+			(p2.x == aOther.p2.x) &&
+			(p2.y == aOther.p2.y) &&
+			(p2.z == aOther.p2.z)
+		);
+	}
+
+	bool operator != (const cCuboid & aOther) const
+	{
+		return !operator ==(aOther);
+	}
+
+
+	// tolua_begin
 
 private:
 

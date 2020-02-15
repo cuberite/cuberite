@@ -1339,7 +1339,6 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	cWorld * World = m_Player->GetWorld();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
@@ -1352,22 +1351,29 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
-		LOGD("Dug air - what the function?");
 		return;
 	}
 
 	m_Player->AddFoodExhaustion(0.025);
-	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
-	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ);
-	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, {a_BlockX, a_BlockY, a_BlockZ}, a_OldBlock, this);
-	// This call would remove the water, placed from the ice block handler
-	if (!((a_OldBlock == E_BLOCK_ICE) && (ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}) == E_BLOCK_WATER)))
+	auto blockHandler = BlockHandler(a_OldBlock);
+	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
+	blockHandler->OnPlayerBreakingBlock(ChunkInterface, *World, *m_Player, absPos);
+	if (m_Player->IsGameModeSurvival())
 	{
-		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+		World->DropBlockAsPickups(absPos, m_Player, &m_Player->GetEquippedItem());
+	}
+	else
+	{
+		World->DigBlock(absPos);
 	}
 
+	// Damage the tool:
+	auto dlAction = (cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+	m_Player->UseEquippedItem(dlAction);
+
+	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
+	blockHandler->OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
@@ -1446,7 +1452,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
-		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
+		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
 		bool BlockUsable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
@@ -1460,6 +1466,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 					Success = true;
+				}
+
+				// Check if the item is place able, for example a torch on a fence
+				if (!Success && Placeable)
+				{
+					// place a block
+					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 				}
 			}
 			else

@@ -237,7 +237,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		if (a_Item.m_CallbackAfter != nullptr)
 		{
-			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+			a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 		}
 		return;
 	}
@@ -318,7 +318,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{
-		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+		a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 	}
 }
 
@@ -336,7 +336,7 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 3; x++)
 		{
 			Reader.m_ReadingChunkX = x;
-			VERIFY(m_World.GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader));
+			VERIFY(m_World.GetChunkData({a_ChunkX + x - 1, a_ChunkZ + z - 1}, Reader));
 		}  // for z
 	}  // for x
 

@@ -10,28 +10,40 @@
 
 
 
-/** Handler used for all types of dirt and grass */
+/** Handler used for all types of dirt and grassblock.
+TODO: Split the Grassblock handler away from this class. */
 class cBlockDirtHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
-	cBlockDirtHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockDirtHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		if (a_BlockMeta == E_META_DIRT_COARSE)
 		{
 			// Drop the coarse block (dirt, meta 1)
-			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
+			return cItem(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
 		}
 		else
 		{
-			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
+			return cItem(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
 		}
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -83,36 +95,40 @@ public:
 				// Y Coord out of range
 				continue;
 			}
-			int BlockX = a_RelX + OfsX;
-			int BlockY = a_RelY + OfsY;
-			int BlockZ = a_RelZ + OfsZ;
-			cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(BlockX, BlockZ);
-			if (Chunk == nullptr)
+			Vector3i pos(a_RelX + OfsX, a_RelY + OfsY, a_RelZ + OfsZ);
+			auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(pos);
+			if (chunk == nullptr)
 			{
 				// Unloaded chunk
 				continue;
 			}
-			Chunk->GetBlockTypeMeta(BlockX, BlockY, BlockZ, DestBlock, DestMeta);
+			chunk->GetBlockTypeMeta(pos, DestBlock, DestMeta);
 			if ((DestBlock != E_BLOCK_DIRT) || (DestMeta != E_META_DIRT_NORMAL))
 			{
 				// Not a regular dirt block
 				continue;
 			}
-			BLOCKTYPE above = Chunk->GetBlock(BlockX, BlockY + 1, BlockZ);
-			NIBBLETYPE light = std::max(Chunk->GetBlockLight(BlockX, BlockY + 1, BlockZ), Chunk->GetTimeAlteredLight(Chunk->GetSkyLight(BlockX, BlockY + 1, BlockZ)));
+			auto abovePos = pos.addedY(1);
+			BLOCKTYPE above = chunk->GetBlock(abovePos);
+			NIBBLETYPE light = std::max(chunk->GetBlockLight(abovePos), chunk->GetTimeAlteredLight(chunk->GetSkyLight(abovePos)));
 			if ((light > 4)  &&
 				cBlockInfo::IsTransparent(above) &&
 				(!IsBlockLava(above)) &&
 				(!IsBlockWaterOrIce(above))
 			)
 			{
-				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
+				auto absPos = chunk->RelativeToAbsolute(pos);
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*chunk->GetWorld(), absPos.x, absPos.y, absPos.z, ssGrassSpread))
 				{
-					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
+					chunk->FastSetBlock(pos, E_BLOCK_GRASS, 0);
 				}
 			}
 		}  // for i - repeat twice
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

@@ -27,11 +27,11 @@
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 	{
 		cChunkSender & ChunkSender = m_ChunkSender;
 		m_World.DoWithChunk(
-			a_ChunkX, a_ChunkZ,
+			a_Coords.m_ChunkX, a_Coords.m_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
 				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MIDHIGH, a_Chunk.GetAllClients());
@@ -241,7 +241,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	}
 
 	// Query and prepare chunk data:
-	if (!m_World.GetChunkData(a_ChunkX, a_ChunkZ, *this))
+	if (!m_World.GetChunkData({a_ChunkX, a_ChunkZ}, *this))
 	{
 		return;
 	}
