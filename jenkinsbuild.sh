@@ -59,6 +59,8 @@ CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=cca
 CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 -DBUILD_TOOLS=1 -DCMAKE_BUILD_TYPE=${COMPILEMODE^^} -DFORCE_32=${FORCE32^^}
 make -j 4
 
+# Prepare artifacts directory
+mkdir artifacts
 
 # Package Server
 echo Cuberite "$CUBERITE_BUILD_SERIES_NAME-$CUBERITE_BUILD_ID\n$BUILD_URL" > Server/buildinfo.txt
@@ -70,11 +72,12 @@ echo Cuberite "$CUBERITE_BUILD_SERIES_NAME-$CUBERITE_BUILD_ID\n$BUILD_URL" > Ser
 # T: files-from (list of server files accepted for release archives)
 # f: file (output file location)
 pushd Server
-tar -hzcv -T Install/UnixExecutables.list -f ../Cuberite.tar.gz
+tar -hzcv -T Install/UnixExecutables.list -f ../artifacts/Cuberite.tar.gz
 popd
-sha1sum Cuberite.tar.gz > Cuberite.tar.gz.sha1
+sha1sum artifacts/Cuberite.tar.gz > artifacts/Cuberite.tar.gz.sha1
 
 # Package ProtoProxy
 pushd Tools/ProtoProxy
-sha1sum ProtoProxy > ProtoProxy.sha1
+cp ProtoProxy ../../artifacts/
 popd
+sha1sum artifacts/ProtoProxy > artifacts/ProtoProxy.sha1
