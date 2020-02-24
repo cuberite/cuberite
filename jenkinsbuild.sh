@@ -24,11 +24,15 @@ case $key in
     shift
     ;;
     -m|--compile-mode)
-    COMPILEMODE="$2"
+    COMPILEMODE="-DCMAKE_BUILD_TYPE=$2"
     shift
     ;;
     -n|--build-number)
     BUILDID="$2"
+    shift
+    ;;
+    -p|--toolchain-file)
+    TOOLCHAINFILE="-DCMAKE_TOOLCHAIN_FILE=$2"
     shift
     ;;
     -b|--branch)
@@ -36,7 +40,7 @@ case $key in
     shift
     ;;
     -32|--force-32)
-    FORCE32="$2"
+    FORCE32="-DFORCE_32=$2"
     shift
     ;;
     *)
@@ -56,7 +60,7 @@ export CCACHE_CPP2=true
 CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 
 # Build
-CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 -DBUILD_TOOLS=1 -DCMAKE_BUILD_TYPE=${COMPILEMODE^^} -DFORCE_32=${FORCE32^^}
+CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 -DBUILD_TOOLS=1 ${TOOLCHAINFILE} ${COMPILEMODE^^} ${FORCE32^^}
 make -j 2
 
 
