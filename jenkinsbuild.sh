@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 # Parse arguments.
 while [[ $# -gt 1 ]]
