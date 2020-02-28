@@ -68,6 +68,13 @@ public:
 	{
 		// Reset meta to 0
 		cItems res(cItem(Base::m_BlockType, 1, 0));
+
+		// Drop the contents:
+		if (a_BlockEntity != nullptr)
+		{
+			auto container = static_cast<cBlockEntityWithItems *>(a_BlockEntity);
+			res.AddItemGrid(container->GetContents());
+		}
 		return res;
 	}
 };
