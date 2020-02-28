@@ -48,7 +48,7 @@ public:
 
 
 /** Wrapper for blocks that have a cBlockEntityWithItems descendant attached to them.
-When converting to pickups, drops self with meta reset to zero. */
+When converting to pickups, drops self with meta reset to zero, and adds the container contents. */
 template <typename Base = cBlockEntityHandler>
 class cContainerEntityHandler:
 	public Base
