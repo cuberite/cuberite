@@ -48,7 +48,7 @@ public:
 
 
 /** Wrapper for blocks that have a cBlockEntityWithItems descendant attached to them.
-When converting to pickups, drops self with meta reset to zero, and adds the container contents. */
+When converting to pickups, drops self with meta reset to zero. */
 template <typename Base = cBlockEntityHandler>
 class cContainerEntityHandler:
 	public Base
@@ -68,13 +68,6 @@ public:
 	{
 		// Reset meta to 0
 		cItems res(cItem(Base::m_BlockType, 1, 0));
-
-		// Drop the contents:
-		if (a_BlockEntity != nullptr)
-		{
-			auto container = static_cast<cBlockEntityWithItems *>(a_BlockEntity);
-			res.AddItemGrid(container->GetContents());
-		}
 		return res;
 	}
 };
