@@ -1315,7 +1315,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
 
 				double Impact = (1 - ((Length / ExplosionSizeInt) / 2)) * EntityExposure;
-				
+
 				if (a_Entity.IsTNT() || a_Entity.IsFallingBlock())
 				{
 					// Larger impact for primed TNT and falling blocks, to make them move
