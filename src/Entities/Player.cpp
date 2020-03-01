@@ -2066,8 +2066,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			}
 		}
 
-		// Queue add to new world and removal from the old one
-
 		// Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 		cChunk * ParentChunk = this->GetParentChunk();
 
