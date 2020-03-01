@@ -73,13 +73,6 @@ public:
 		auto by = FloorC(y);
 		auto bz = FloorC(z);
 
-		// Verify that block type for spawn point is water
-		BLOCKTYPE SpawnBlock = a_World->GetBlock(bx, by, bz);
-		if (!IsBlockWater(SpawnBlock))
-		{
-			return false;
-		}
-
 		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
 		BLOCKTYPE BlockAbove = a_World->GetBlock(bx, by + 1, bz);
 		if (BlockAbove != E_BLOCK_AIR)
