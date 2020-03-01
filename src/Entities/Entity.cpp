@@ -1326,7 +1326,8 @@ void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool
 bool cEntity::DetectPortal()
 {
 	// Don't let attached entities change worlds, like players riding a minecart
-	if (m_AttachedTo != nullptr || m_Attachee != nullptr) {
+	if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+	{
 		return false;
 	}
 
