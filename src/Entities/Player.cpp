@@ -2069,9 +2069,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			}
 		}
 
-		// Broadcast the player into the new world.
-		a_World->BroadcastSpawnEntity(*this);
-
 		// Queue add to new world and removal from the old one
 
 		// Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
@@ -2086,6 +2083,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// New world will take over and announce client at its next tick
 		auto PlayerPtr = static_cast<cPlayer *>(ParentChunk->RemoveEntity(*this).release());
 		a_World->AddPlayer(std::unique_ptr<cPlayer>(PlayerPtr), &a_OldWorld);
+
+		// Broadcast the player into the new world.
+		a_World->BroadcastSpawnEntity(*this);
 	});
 
 	return true;
