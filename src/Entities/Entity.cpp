@@ -1330,6 +1330,11 @@ bool cEntity::DetectPortal()
 	{
 		m_IsWorldChangeScheduled = false;
 
+		if (m_AttachedTo != nullptr || m_Attachee != nullptr) {
+			// Don't let attached entities change worlds, like players riding a minecart
+			return false;
+		}
+
 		if (m_WorldChangeSetPortalCooldown)
 		{
 			// Delay the portal check.
