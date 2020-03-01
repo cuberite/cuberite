@@ -1325,16 +1325,15 @@ void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool
 
 bool cEntity::DetectPortal()
 {
+	// Don't let attached entities change worlds, like players riding a minecart
+	if (m_AttachedTo != nullptr || m_Attachee != nullptr) {
+		return false;
+	}
+
 	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
 	if (m_IsWorldChangeScheduled)
 	{
 		m_IsWorldChangeScheduled = false;
-
-		if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
-		{
-			// Don't let attached entities change worlds, like players riding a minecart
-			return false;
-		}
 
 		if (m_WorldChangeSetPortalCooldown)
 		{
