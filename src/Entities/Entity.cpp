@@ -1888,6 +1888,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				m_World->BroadcastEntityVelocity(*this, a_Exclude);
 				m_World->BroadcastTeleportEntity(*this, a_Exclude);
+				m_LastSentPosition = GetPosition();
 				m_bHasSentNoSpeed = true;
 			}
 		}
