@@ -1181,11 +1181,9 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Vector3d LastSentPos = a_Player.GetLastSentPos();
-	LOG("SpawnPacket lastpos %f %f",LastSentPos.x, LastSentPos.z);
-	LOG("SpawnPacket %f %f",a_Player.GetPosX(), a_Player.GetPosZ());
-	Pkt.WriteBEDouble(a_Player.GetPosX());
-	Pkt.WriteBEDouble(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteBEDouble(a_Player.GetPosZ());
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
 	WriteEntityMetadata(Pkt, a_Player);
@@ -1385,9 +1383,10 @@ void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
 	Pkt.WriteBEUInt8(70);  // Falling block
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosX());
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosY());
-	Pkt.WriteBEDouble(a_FallingBlock.GetPosZ());
+	Vector3d LastSentPos = a_FallingBlock.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
 	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
@@ -1410,9 +1409,10 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
-	Pkt.WriteBEDouble(a_Mob.GetPosX());
-	Pkt.WriteBEDouble(a_Mob.GetPosY());
-	Pkt.WriteBEDouble(a_Mob.GetPosZ());
+	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
@@ -1469,9 +1469,10 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Pkt.WriteBEDouble(a_Vehicle.GetPosX());
-	Pkt.WriteBEDouble(a_Vehicle.GetPosY());
-	Pkt.WriteBEDouble(a_Vehicle.GetPosZ());
+	Vector3d LastSentPos = a_Vehicle.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
 	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
 	Pkt.WriteBEInt32(a_VehicleSubType);

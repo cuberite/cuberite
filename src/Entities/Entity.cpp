@@ -2259,7 +2259,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 		return static_cast<float>(OverlapSize / EntitySize);
 	}
-
+	else
 	{
 		return 0;
 	}

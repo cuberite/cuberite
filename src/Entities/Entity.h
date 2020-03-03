@@ -454,8 +454,6 @@ public:
 
 	// tolua_end
 
-	//virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
-
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 
@@ -556,7 +554,7 @@ public:
 	@param a_ExplosionPosition explosion position
 	@param a_ExlosionPower explosion power
 	@return exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower);
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
 
 protected:

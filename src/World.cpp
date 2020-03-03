@@ -1026,7 +1026,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		m_ChunkMap->AddEntity(std::move(Entity));
 		ASSERT(!EntityPtr->IsTicking());
 		EntityPtr->SetIsTicking(true);
-		BroadcastSpawnEntity(*(static_cast <cEntity *>(EntityPtr)));
 	}
 	EntitiesToAdd.clear();
 
@@ -3507,7 +3506,6 @@ void cWorld::AddQueuedPlayers(void)
 			Client->SendHealth();
 			Client->SendWholeInventory(*Player->GetWindow());
 		}
-		BroadcastSpawnEntity(*(static_cast <cEntity *>(Player)));
 	}  // for itr - PlayersToAdd[]
 
 	// Call EntityChangedWorld callback on all eligible clients

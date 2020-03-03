@@ -24,15 +24,6 @@ cFallingBlock::cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NI
 
 
 
-float cFallingBlock::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower)
-{
-	return a_ExplosionPower * a_ExplosionPower;
-}
-
-
-
-
-
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnFallingBlock(*this);
