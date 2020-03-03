@@ -158,9 +158,6 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
-	// Spawn the entity on the clients:
-	a_EntityWorld.BroadcastSpawnEntity(*this);
-
 	// If has any mob leashed broadcast every leashed entity to this
 	if (HasAnyMobLeashed())
 	{
@@ -1310,13 +1307,9 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
+bool cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
-	m_NewWorld = a_World;
-	m_NewWorldPosition = a_NewPosition;
-	m_IsWorldChangeScheduled = true;
-	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
-	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
+	return MoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
 }
 
 
@@ -1325,28 +1318,6 @@ void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool
 
 bool cEntity::DetectPortal()
 {
-	// Don't let attached entities change worlds, like players riding a minecart
-	if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
-	{
-		return false;
-	}
-
-	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
-	if (m_IsWorldChangeScheduled)
-	{
-		m_IsWorldChangeScheduled = false;
-
-		if (m_WorldChangeSetPortalCooldown)
-		{
-			// Delay the portal check.
-			m_PortalCooldownData.m_TicksDelayed = 0;
-			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-		}
-
-		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
-		return true;
-	}
-
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
 		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
@@ -1374,6 +1345,12 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
+					return false;
+				}
+
 				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
@@ -1393,12 +1370,6 @@ bool cEntity::DetectPortal()
 					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-					if (IsPlayer())
-					{
-						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(static_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
-					}
 
 					Vector3d TargetPos = GetPosition();
 					TargetPos.x *= 8.0;
@@ -1428,8 +1399,6 @@ bool cEntity::DetectPortal()
 						{
 							static_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
 						}
-
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					Vector3d TargetPos = GetPosition();
@@ -1450,6 +1419,12 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
+					return false;
+				}
+
 				// End portal in the end
 				if (GetWorld()->GetDimension() == dimEnd)
 				{
@@ -1460,7 +1435,6 @@ bool cEntity::DetectPortal()
 					}
 					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					eDimension DestionationDim = DestinationWorld->GetDimension();
-
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
@@ -1475,13 +1449,12 @@ bool cEntity::DetectPortal()
 						{
 							Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
 						}
-						Player->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(TargetWorld, true);
 				}
 				// End portal in the overworld
 				else
@@ -1501,13 +1474,12 @@ bool cEntity::DetectPortal()
 						{
 							static_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
 						}
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(TargetWorld, true);
 				}
 
 			}
@@ -1525,10 +1497,16 @@ bool cEntity::DetectPortal()
 
 
 
-bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
+
+	if (m_IsWorldChangeScheduled)
+	{
+		// World move is already in progress, don't proceed
+		return false;
+	}
 
 	if (GetWorld() == a_World)
 	{
@@ -1542,6 +1520,11 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// A Plugin doesn't allow the entity to changing the world
 		return false;
 	}
+
+	m_IsWorldChangeScheduled = true;
+
+	// If entity is attached to another entity, detach, to prevent client side effects
+	Detach();
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
@@ -1577,17 +1560,10 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		UNUSED(OldChunkCoords);  // Non Debug mode only
 		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
+
+		m_IsWorldChangeScheduled = false;
 	});
 	return true;
-}
-
-
-
-
-
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
-{
-	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
 }
 
 
@@ -1612,7 +1588,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return DoMoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
+	return MoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
 }
 
 
@@ -2283,7 +2259,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 		return static_cast<float>(OverlapSize / EntitySize);
 	}
-	else
+
 	{
 		return 0;
 	}

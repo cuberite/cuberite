@@ -19,6 +19,7 @@ public:
 	cTNTEntity(Vector3d a_Pos, int a_FuseTicks = 80);
 
 	// cEntity overrides:
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower);
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 

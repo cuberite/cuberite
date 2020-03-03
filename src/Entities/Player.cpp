@@ -193,9 +193,6 @@ bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
-	// Spawn the entity on the clients:
-	GetWorld()->BroadcastSpawnEntity(*this);
-
 	return true;
 }
 
@@ -2003,10 +2000,16 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+bool cPlayer::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 {
 	ASSERT(a_World != nullptr);
 	ASSERT(IsTicking());
+
+	if (m_IsWorldChangeScheduled)
+	{
+		// World move is already in progress, don't proceed
+		return false;
+	}
 
 	if (GetWorld() == a_World)
 	{
@@ -2021,10 +2024,15 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		return false;
 	}
 
+	m_IsWorldChangeScheduled = true;
+
 	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
 	{
 		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
 		GetClientHandle()->InvalidateCachedSentChunk();
+
+		// If player is attached to entity, detach, to prevent client side effects
+		Detach();
 
 		// Prevent further ticking in this world
 		SetIsTicking(false);
@@ -2069,11 +2077,6 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 			}
 		}
 
-		// Broadcast the player into the new world.
-		a_World->BroadcastSpawnEntity(*this);
-
-		// Queue add to new world and removal from the old one
-
 		// Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 		cChunk * ParentChunk = this->GetParentChunk();
 
@@ -2086,6 +2089,8 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// New world will take over and announce client at its next tick
 		auto PlayerPtr = static_cast<cPlayer *>(ParentChunk->RemoveEntity(*this).release());
 		a_World->AddPlayer(std::unique_ptr<cPlayer>(PlayerPtr), &a_OldWorld);
+
+		m_IsWorldChangeScheduled = false;
 	});
 
 	return true;

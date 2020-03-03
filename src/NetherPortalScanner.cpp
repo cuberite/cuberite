@@ -296,7 +296,7 @@ void cNetherPortalScanner::OnDisabled(void)
 	}
 
 	FLOGD("Placing player at {0}", Position);
-	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
+	m_Entity->MoveToWorld(m_World, true, Position);
 	delete this;
 }
 

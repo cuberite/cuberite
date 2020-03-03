@@ -31,6 +31,7 @@ public:  // tolua_export
 	// tolua_end
 
 	// cEntity overrides:
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 

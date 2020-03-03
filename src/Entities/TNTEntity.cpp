@@ -20,6 +20,15 @@ cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
 
 
 
+float cTNTEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower)
+{
+	return a_ExplosionPower * a_ExplosionPower;
+}
+
+
+
+
+
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnObject(*this, 50, 1, 0, 0);  // 50 means TNT
