@@ -732,8 +732,8 @@ protected:
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
 	virtual void ResetPosition(Vector3d a_NewPos);
 
-  /** If has any mobs are leashed, broadcasts every leashed entity to this. */
-  void BroadcastLeashedMobs();
+	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
+	void BroadcastLeashedMobs();
 
 private:
 

@@ -2040,8 +2040,8 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
 	SetWorld(a_WorldChangeInfo.m_NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
-  // Set capabilities based on new world
-  SetCapabilities();
+	// Set capabilities based on new world
+	SetCapabilities();
 
 	cClientHandle * ch = GetClientHandle();
 	if (ch != nullptr)
