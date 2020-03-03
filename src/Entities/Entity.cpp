@@ -158,6 +158,9 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
+	// Spawn the entity on the clients:
+	a_EntityWorld.BroadcastSpawnEntity(*this);
+
 	// If has any mob leashed broadcast every leashed entity to this
 	if (HasAnyMobLeashed())
 	{

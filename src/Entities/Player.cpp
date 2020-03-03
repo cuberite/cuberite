@@ -193,6 +193,9 @@ bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
+	// Spawn the entity on the clients:
+	GetWorld()->BroadcastSpawnEntity(*this);
+
 	return true;
 }
 
