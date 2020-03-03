@@ -2026,6 +2026,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
 		GetClientHandle()->InvalidateCachedSentChunk();
 
+		// If player is attached to entity, detach, to prevent client side effects
+		Detach();
+
 		// Prevent further ticking in this world
 		SetIsTicking(false);
 

@@ -1368,6 +1368,12 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
+					return false;
+				}
+
 				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
@@ -1441,6 +1447,12 @@ bool cEntity::DetectPortal()
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
+					return false;
+				}
+
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
 					return false;
 				}
 
@@ -1536,6 +1548,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 		// A Plugin doesn't allow the entity to changing the world
 		return false;
 	}
+
+	// If entity is attached to another entity, detach, to prevent client side effects
+	Detach();
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
