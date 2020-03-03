@@ -227,9 +227,24 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 
 
 
-bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
+	cItems & a_Pickups
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_BLOCK_TO_PICKUPS, &a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups);
+	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make breaking API changes
+	return CallSimpleHooks(
+		cPluginManager::HOOK_BLOCK_TO_PICKUPS,
+		&a_World,
+		a_Digger,
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		a_BlockType, a_BlockMeta, &a_Pickups
+	);
 }
 
 
@@ -414,15 +429,15 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
+			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
+			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
+			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
+			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");
@@ -454,15 +469,15 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");

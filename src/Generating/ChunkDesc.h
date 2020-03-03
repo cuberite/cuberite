@@ -39,15 +39,21 @@ public:
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
 
 
-	cChunkDesc(int a_ChunkX, int a_ChunkZ);
+	cChunkDesc(cChunkCoords a_Coords);
 	~cChunkDesc();
 
-	void SetChunkCoords(int a_ChunkX, int a_ChunkZ);
+	void SetChunkCoords(cChunkCoords a_Coords);
 
 	// tolua_begin
 
-	int GetChunkX(void) const { return m_ChunkX; }
-	int GetChunkZ(void) const { return m_ChunkZ; }
+	int GetChunkX() const { return m_Coords.m_ChunkX; }  // Prefer GetChunkCoords() instead
+	int GetChunkZ() const { return m_Coords.m_ChunkZ; }  // Prefer GetChunkCoords() instead
+
+	// tolua_end
+
+	cChunkCoords GetChunkCoords() const { return m_Coords; }
+
+	// tolua_begin
 
 	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -59,18 +65,18 @@ public:
 	// tolua_begin
 
 	void       SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
-	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ);
+	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ) const;
 
 	void       SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta);
-	NIBBLETYPE GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ);
+	NIBBLETYPE GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const;
 
 	void       SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID);
-	EMCSBiome  GetBiome(int a_RelX, int a_RelZ);
+	EMCSBiome  GetBiome(int a_RelX, int a_RelZ) const;
 
 	// These operate on the heightmap, so they could get out of sync with the data
 	// Use UpdateHeightmap() to re-calculate heightmap from the block data
 	void       SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
-	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ);
+	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ) const;
 
 	// tolua_end
 
@@ -216,6 +222,10 @@ public:
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
 
+	inline const cChunkDef::BiomeMap &     GetBiomeMap()   const { return m_BiomeMap; }
+	inline const cChunkDef::BlockTypes &   GetBlockTypes() const { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
+	inline const cChunkDef::HeightMap &    GetHeightMap()  const { return m_HeightMap; }
+
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 
@@ -225,8 +235,7 @@ public:
 	#endif  // _DEBUG
 
 private:
-	int m_ChunkX;
-	int m_ChunkZ;
+	cChunkCoords m_Coords;
 
 	cChunkDef::BiomeMap     m_BiomeMap;
 	cBlockArea              m_BlockArea;

@@ -8,17 +8,15 @@
 
 
 class cBlockCauldronHandler :
-	public cBlockHandler
+	public cClearMetaOnDrop<cBlockHandler>
 {
-public:
-	cBlockCauldronHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
+	using super = cClearMetaOnDrop<cBlockHandler>;
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+public:
+
+	cBlockCauldronHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
-		a_Pickups.push_back(cItem(E_ITEM_CAULDRON, 1, 0));
 	}
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override

@@ -15,15 +15,20 @@
 
 
 
-
 // tolua_begin
 
 class cArrowEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
+	// tolua_end
+
+	using super = cProjectileEntity;
+
+	// tolua_begin
+
 
 public:
+
 	/** Determines when the arrow can be picked up (depending on player gamemode). Corresponds to the MCA file "pickup" field */
 	enum ePickupState
 	{
@@ -37,7 +42,7 @@ public:
 	CLASS_PROTODEF(cArrowEntity)
 
 	/** Creates a new arrow with psNoPickup state and default damage modifier coeff */
-	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
 	/** Creates a new arrow as shot by a player, initializes it from the player object */
 	cArrowEntity(cPlayer & a_Player, double a_Force);

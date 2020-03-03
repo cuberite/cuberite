@@ -60,10 +60,8 @@ public:
 			if (Item.m_ItemCount <= 0)
 			{
 				/* Experimental: show animation pickups getting together */
-				int DiffX = FloorC(m_Pickup->GetPosX() * 32.0) - FloorC(EntityPos.x * 32.0);
-				int DiffY = FloorC(m_Pickup->GetPosY() * 32.0) - FloorC(EntityPos.y * 32.0);
-				int DiffZ = FloorC(m_Pickup->GetPosZ() * 32.0) - FloorC(EntityPos.z * 32.0);
-				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, static_cast<char>(DiffX), static_cast<char>(DiffY), static_cast<char>(DiffZ));
+				auto Diff = (m_Pickup->GetPosition() * 32.0).Floor() - (EntityPos * 32.0).Floor();
+				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, Vector3<char>(Diff));
 				/* End of experimental animation */
 				a_Entity.Destroy();
 
@@ -95,20 +93,23 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
-	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer(0)
-	, m_Item(a_Item)
-	, m_bCollected(false)
-	, m_bIsPlayerCreated(IsPlayerCreated)
-	, m_bCanCombine(a_CanCombine)
-	, m_Lifetime(cTickTime(a_LifetimeTicks))
+////////////////////////////////////////////////////////////////////////////////
+// cPickup:
+
+cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
+	super(etPickup, a_Pos, 0.2, 0.2),
+	m_Timer(0),
+	m_Item(a_Item),
+	m_bCollected(false),
+	m_bIsPlayerCreated(IsPlayerCreated),
+	m_bCanCombine(a_CanCombine),
+	m_Lifetime(cTickTime(a_LifetimeTicks))
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	SetSpeed(a_Speed);
 }
 
 
@@ -145,7 +146,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
 		{
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
-			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
+			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ);
 
 			// Destroy the pickup if it is on fire:
 			if (IsOnFire())

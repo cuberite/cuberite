@@ -174,7 +174,6 @@ protected:
 
 
 
-
 /** Generates a 2D array of random integers in the specified range [0 .. Range). */
 template <int Range, int SizeX, int SizeZ = SizeX>
 class cIntGenChoice :
@@ -201,7 +200,6 @@ public:
 		}  // for z
 	}
 };
-
 
 
 
@@ -1112,7 +1110,6 @@ protected:
 
 	Underlying m_Underlying;
 };
-
 
 
 

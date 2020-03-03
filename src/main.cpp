@@ -235,16 +235,19 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
 	}
-	catch (fmt::FormatError & f)
+	catch (const fmt::FormatError & exc)
 	{
-		FLOGERROR("Formatting exception: {0}", f.what());
+		cRoot::m_TerminateEventRaised = true;
+		FLOGERROR("Formatting exception: {0}", exc.what());
 	}
-	catch (std::exception & e)
+	catch (const std::exception & exc)
 	{
-		LOGERROR("Standard exception: %s", e.what());
+		cRoot::m_TerminateEventRaised = true;
+		LOGERROR("Standard exception: %s", exc.what());
 	}
 	catch (...)
 	{
+		cRoot::m_TerminateEventRaised = true;
 		LOGERROR("Unknown exception!");
 	}
 

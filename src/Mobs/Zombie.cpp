@@ -14,7 +14,6 @@ cZombie::cZombie(bool a_IsVillagerZombie) :
 	m_IsVillagerZombie(a_IsVillagerZombie),
 	m_IsConverting(false)
 {
-	SetBurnsInDaylight(true);
 }
 
 

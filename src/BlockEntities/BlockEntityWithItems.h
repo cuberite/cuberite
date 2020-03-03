@@ -12,7 +12,7 @@
 #include "BlockEntity.h"
 #include "../ItemGrid.h"
 #include "../UI/WindowOwner.h"
-#include "World.h"
+#include "../World.h"
 
 
 
@@ -26,10 +26,11 @@ class cBlockEntityWithItems :
 	// tolua_begin
 	public cBlockEntityWindowOwner
 {
-	typedef cBlockEntity Super;
-
-public:
 	// tolua_end
+
+	using super = cBlockEntity;
+
+public:  // tolua_export
 
 	BLOCKENTITY_PROTODEF(cBlockEntityWithItems)
 
@@ -37,7 +38,7 @@ public:
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
 		NIBBLETYPE a_BlockMeta,                     // Meta of the block that the entity represents
-		int a_BlockX, int a_BlockY, int a_BlockZ,   // Position of the block entity
+		Vector3i a_Pos,                             // Abs position of the block entity
 		int a_ItemGridWidth, int a_ItemGridHeight,  // Dimensions of the ItemGrid
 		cWorld * a_World                            // Optional world to assign to the entity
 	);

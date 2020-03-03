@@ -24,7 +24,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../BoundingBox.h"
-#include "../BuildInfo.h"
+#include "BuildInfo.h"
 #include "../ClientHandle.h"
 #include "../CommandOutput.h"
 #include "../CompositeChat.h"
@@ -372,7 +372,7 @@ static AString GetLogMessage(lua_State * tolua_S)
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		return reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		return static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
 	}
 	else
 	{
@@ -405,7 +405,7 @@ static int tolua_LOG(lua_State * tolua_S)
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType());
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType());
 	}
 
 	// Log the message:
@@ -525,7 +525,7 @@ cPluginLua * cManualBindings::GetLuaPlugin(lua_State * L)
 		lua_pop(L, 1);
 		return nullptr;
 	}
-	cPluginLua * Plugin = reinterpret_cast<cPluginLua *>(const_cast<void*>(lua_topointer(L, -1)));
+	cPluginLua * Plugin = static_cast<cPluginLua *>(const_cast<void*>(lua_topointer(L, -1)));
 	lua_pop(L, 1);
 
 	return Plugin;
@@ -1088,7 +1088,7 @@ static int tolua_cPluginManager_AddHook_DefFn(cPluginManager * a_PluginManager, 
 	// The arg types have already been checked
 
 	// Retrieve and check the cPlugin parameter
-	cPluginLua * Plugin = reinterpret_cast<cPluginLua *>(tolua_tousertype(S, a_ParamIdx, nullptr));
+	cPluginLua * Plugin = static_cast<cPluginLua *>(tolua_tousertype(S, a_ParamIdx, nullptr));
 	if (Plugin == nullptr)
 	{
 		LOGWARNING("cPluginManager.AddHook(): Invalid Plugin parameter, expected a valid cPlugin object. Hook not added");
@@ -1162,7 +1162,7 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 	if (tolua_isusertype(S, 1, "cPluginManager", 0, &err))
 	{
 		// Style 2 or 3, retrieve the PlgMgr instance
-		PlgMgr = reinterpret_cast<cPluginManager *>(tolua_tousertype(S, 1, nullptr));
+		PlgMgr = static_cast<cPluginManager *>(tolua_tousertype(S, 1, nullptr));
 		if (PlgMgr == nullptr)
 		{
 			LOGWARNING("Malformed plugin, use cPluginManager.AddHook(HOOK_TYPE, CallbackFunction). Fixing the call for you.");
@@ -1582,7 +1582,7 @@ static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cPlayer * self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
@@ -1613,7 +1613,7 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cPlayer * self = reinterpret_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cPlayer * self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
@@ -1970,14 +1970,14 @@ static int tolua_get_HTTPRequest_FormData(lua_State* a_LuaState)
 		return 0;
 	}
 
-	const auto & FormData = self->FormData;
+	auto & FormData = self->FormData;
 	lua_newtable(a_LuaState);
 	int top = lua_gettop(a_LuaState);
-	for (auto itr = FormData.cbegin(); itr != FormData.cend(); ++itr)
+	for (auto & Data : FormData)
 	{
-		lua_pushstring(a_LuaState, itr->first.c_str());
-		tolua_pushusertype(a_LuaState, const_cast<void *>(reinterpret_cast<const void *>(&(itr->second))), "HTTPFormData");
-		// lua_pushlstring(a_LuaState, it->second.Value.c_str(), it->second.Value.size());  // Might contain binary data
+		lua_pushstring(a_LuaState, Data.first.c_str());
+		tolua_pushusertype(a_LuaState, &Data.second, "HTTPFormData");
+		// lua_pushlstring(a_LuaState, Data.second.Value.c_str(), Data.second.Value.size());  // Might contain binary data
 		lua_settable(a_LuaState, top);
 	}
 
@@ -2339,7 +2339,7 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 	{
 		return 0;
 	}
-	cClientHandle * Client = reinterpret_cast<cClientHandle *>(tolua_tousertype(L, 1, nullptr));
+	cClientHandle * Client = static_cast<cClientHandle *>(tolua_tousertype(L, 1, nullptr));
 	if (Client == nullptr)
 	{
 		LOGWARNING("ClientHandle is nil in cClientHandle:SendPluginMessage()");
@@ -2450,6 +2450,7 @@ static int tolua_cClientHandle_IsUUIDOnline(lua_State * tolua_S)
 	L.Push(cClientHandle::IsUUIDOnline(UUID));
 	return 1;
 }
+
 
 
 
@@ -2789,7 +2790,7 @@ static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 	}
 
 	{
-		const cItemGrid * self = reinterpret_cast<const cItemGrid *>(tolua_tousertype(L, 1, nullptr));
+		const cItemGrid * self = static_cast<const cItemGrid *>(tolua_tousertype(L, 1, nullptr));
 		int SlotNum = static_cast<int>(tolua_tonumber(L, 2, 0));
 		if (self == nullptr)
 		{
@@ -3442,7 +3443,7 @@ static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 	}
 
 	// Get the groups:
-	cScoreboard * Scoreboard = reinterpret_cast<cScoreboard *>(tolua_tousertype(L, 1, nullptr));
+	cScoreboard * Scoreboard = static_cast<cScoreboard *>(tolua_tousertype(L, 1, nullptr));
 	AStringVector Teams = Scoreboard->GetTeamNames();
 
 	// Push the results:
@@ -3468,7 +3469,7 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cHopperEntity * self = reinterpret_cast<cHopperEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cHopperEntity * self = static_cast<cHopperEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cHopperEntity::GetOutputBlockPos()'", nullptr);
@@ -3476,19 +3477,17 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	}
 
 	NIBBLETYPE a_BlockMeta = static_cast<NIBBLETYPE>(tolua_tonumber(tolua_S, 2, 0));
-	int a_OutputX, a_OutputY, a_OutputZ;
-	bool res = self->GetOutputBlockPos(a_BlockMeta, a_OutputX, a_OutputY, a_OutputZ);
-	tolua_pushboolean(tolua_S, res);
-	if (res)
+	auto res = self->GetOutputBlockPos(a_BlockMeta);
+	tolua_pushboolean(tolua_S, res.first);
+	if (res.first)
 	{
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputX));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputY));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputZ));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.x));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.y));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.z));
 		return 4;
 	}
 	return 1;
 }
-
 
 
 
@@ -3688,7 +3687,7 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddRunCommandPart'", nullptr);
@@ -3725,7 +3724,7 @@ static int tolua_cCompositeChat_AddSuggestCommandPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddSuggestCommandPart'", nullptr);
@@ -3762,7 +3761,7 @@ static int tolua_cCompositeChat_AddTextPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddTextPart'", nullptr);
@@ -3798,7 +3797,7 @@ static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddUrlPart'", nullptr);
@@ -3835,7 +3834,7 @@ static int tolua_cCompositeChat_Clear(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
@@ -3868,7 +3867,7 @@ static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
@@ -3903,7 +3902,7 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:SetMessageType'", nullptr);
@@ -3935,7 +3934,7 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = reinterpret_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:UnderlineUrls'", nullptr);
@@ -3948,6 +3947,134 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
 	return 1;
+}
+
+
+
+
+
+static int tolua_cCuboid_Assign(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x1, y1, z1, x2, y2, z2;
+	if (L.GetStackValues(2, x1, y1, z1, x2, y2, z2))
+	{
+		LOGWARNING("cCuboid:Assign(x1, y1, z1, x2, y2, z2) is deprecated, use cCuboid:Assign(Vector3i, Vector3i) instead.");
+		L.LogStackTrace();
+		self->Assign({x1, y1, z1}, {x2, y2, z2});
+		return 0;
+	}
+
+	// Try the (cCuboid) param version:
+	cCuboid * other = nullptr;
+	if (L.GetStackValue(2, other) && (other != nullptr))
+	{
+		self->Assign(*other);
+		return 0;
+	}
+
+	// Try the (Vector3i, Vector3i) param version:
+	Vector3i * pt1 = nullptr;
+	Vector3i * pt2 = nullptr;
+	if (L.GetStackValues(2, pt1, pt2) && (pt1 != nullptr) && (pt2 != nullptr))
+	{
+		self->Assign(*pt1, *pt2);
+		return 0;
+	}
+	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
+}
+
+
+
+
+
+static int tolua_cCuboid_IsInside(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3d) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	// Try the (Vector3i) param version:
+	{
+		Vector3i * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+
+	// Try the (Vector3d) param version:
+	{
+		Vector3d * pt = nullptr;
+		if (L.GetStackValue(2, pt) && (pt != nullptr))
+		{
+			L.Push(self->IsInside(*pt));
+			return 1;
+		}
+	}
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3i or a Vector3d.");
+}
+
+
+
+
+
+static int tolua_cCuboid_Move(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:Move(x, y, z) is deprecated, use cCuboid:Move(Vector3i) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	Vector3i * offset = nullptr;
+	if (!L.GetStackValue(2, offset) || (offset == nullptr))
+	{
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3i.");
+	}
+	self->Move(*offset);
+	return 0;
 }
 
 
@@ -4009,7 +4136,7 @@ static int tolua_cEntity_GetPosition(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 
 	// Get the params:
-	cEntity * self = reinterpret_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cEntity * self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
@@ -4031,7 +4158,7 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 
 	// Get the params:
-	cEntity * self = reinterpret_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	cEntity * self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
 	if (self == nullptr)
 	{
 		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
@@ -4119,6 +4246,12 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "md5HexString", tolua_md5HexString);
 			tolua_function(tolua_S, "sha1", tolua_sha1);
 			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cCuboid");
+			tolua_function(tolua_S, "Assign",   tolua_cCuboid_Assign);
+			tolua_function(tolua_S, "IsInside", tolua_cCuboid_IsInside);
+			tolua_function(tolua_S, "Move",     tolua_cCuboid_Move);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cEntity");

@@ -3,8 +3,8 @@
 
 #include "BlockHandler.h"
 #include "../Entities/Player.h"
-#include "Chunk.h"
-#include "MetaRotator.h"
+#include "../Chunk.h"
+#include "Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
 
@@ -13,11 +13,13 @@
 class cBlockDoorHandler :
 	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
-	typedef cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true> super;
+	using super = cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>;
+
 public:
+
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override;
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 
@@ -54,56 +56,38 @@ public:
 
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override;
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		if ((a_BlockMeta & 0x08) != 0)  // is top part of door
+		// Top part of a door doesn't drop anything:
+		if ((a_BlockMeta & 0x08) != 0)
 		{
-			return;
+			return {};
 		}
+
 		switch (m_BlockType)
 		{
-			case E_BLOCK_OAK_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_WOODEN_DOOR);
-				break;
-			}
-			case E_BLOCK_ACACIA_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_ACACIA_DOOR);
-				break;
-			}
-			case E_BLOCK_BIRCH_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_BIRCH_DOOR);
-				break;
-			}
-			case E_BLOCK_DARK_OAK_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_DARK_OAK_DOOR);
-				break;
-			}
-			case E_BLOCK_JUNGLE_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_JUNGLE_DOOR);
-				break;
-			}
-			case E_BLOCK_SPRUCE_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_SPRUCE_DOOR);
-				break;
-			}
-			case E_BLOCK_IRON_DOOR:
-			{
-				a_Pickups.Add(E_ITEM_IRON_DOOR);
-				break;
-			}
+			case E_BLOCK_OAK_DOOR:      return cItem(E_ITEM_WOODEN_DOOR);
+			case E_BLOCK_ACACIA_DOOR:   return cItem(E_ITEM_ACACIA_DOOR);
+			case E_BLOCK_BIRCH_DOOR:    return cItem(E_ITEM_BIRCH_DOOR);
+			case E_BLOCK_DARK_OAK_DOOR: return cItem(E_ITEM_DARK_OAK_DOOR);
+			case E_BLOCK_JUNGLE_DOOR:   return cItem(E_ITEM_JUNGLE_DOOR);
+			case E_BLOCK_SPRUCE_DOOR:   return cItem(E_ITEM_SPRUCE_DOOR);
+			case E_BLOCK_IRON_DOOR:     return cItem(E_ITEM_IRON_DOOR);
 			default:
 			{
 				ASSERT(!"Unhandled door type!");
-				break;
+				return {};
 			}
 		}
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
@@ -157,6 +141,10 @@ public:
 		return false;
 	}
 
+
+
+
+
 	/** Converts the player's yaw to placed door's blockmeta */
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
@@ -185,6 +173,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
 	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
 	{
@@ -196,6 +188,10 @@ public:
 			default: return Vector3i( 0, 0,  1);  // Facing South / ZP
 		}
 	}
+
+
+
+
 
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
@@ -219,6 +215,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Returns true iff the door at the specified coords is open.
 	The coords may point to either the top part or the bottom part of the door. */
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -226,6 +226,10 @@ public:
 		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 		return ((Meta & 0x04) != 0);
 	}
+
+
+
+
 
 	/** Returns the complete meta composed from the both parts of the door as (TopMeta << 4) | BottomMeta
 	The coords may point to either part of the door.
@@ -259,6 +263,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
@@ -280,23 +288,31 @@ public:
 		if ((Meta & 0x08) == 0)
 		{
 			// The block is the bottom part of the door
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, NewMeta);
+			a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, NewMeta);
 		}
 		else
 		{
 			// The block is the top part of the door, set the meta to the corresponding top part
 			if (a_BlockY > 0)
 			{
-				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
+				a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY - 1, a_BlockZ}, NewMeta);
 			}
 		}
 	}
+
+
+
+
 
 	/** Changes the door at the specified coords from open to close or vice versa */
 	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		SetOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, !IsOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

@@ -24,6 +24,7 @@
 
 // fwd:
 class cCuboid;
+class cItems;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
 
@@ -120,11 +121,27 @@ public:
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinBlockX, a_MinBlockY, a_MinBlockZ, GetDataTypes());
+	}
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes);
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinCoords.x, a_MinCoords.y, a_MinCoords.z, GetDataTypes());
+	}
 
 	// tolua_begin
 
@@ -372,6 +389,15 @@ public:
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
+
+	/** Returns the index into the internal arrays for the specified coords */
+	size_t MakeIndex(Vector3i a_RelPos) const
+	{
+		return MakeIndexForSize(a_RelPos, m_Size);
+	}
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Returns the index into the internal arrays for the specified coords */
 	size_t MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 	{
 		return MakeIndexForSize({ a_RelX, a_RelY, a_RelZ }, m_Size);
@@ -395,6 +421,9 @@ public:
 
 	/** Direct read-only access to block entities. */
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
+
+	/** Returns the pickups that would result if the block at the specified position was mined by a_Digger, using a_Tool. */
+	cItems PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
 
 protected:
@@ -494,6 +523,9 @@ protected:
 
 	/** Removes from m_BlockEntities those BEs that no longer match the blocktype at their coords. */
 	void RemoveNonMatchingBlockEntities(void);
+
+	/** Returns the cBlockEntity at the specified coords, or nullptr if none. */
+	cBlockEntity * GetBlockEntityRel(Vector3i a_RelPos);
 
 	// tolua_begin
 } ;

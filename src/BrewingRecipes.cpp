@@ -11,9 +11,6 @@
 
 
 
-
-
-
 cBrewingRecipes::cBrewingRecipes()
 {
 	ReloadRecipes();
@@ -48,8 +45,9 @@ void cBrewingRecipes::ReloadRecipes(void)
 			ParsingLine.erase(FirstCommentSymbol);
 		}
 
-		if (ParsingLine.empty())
+		if (IsOnlyWhitespace(ParsingLine))
 		{
+			// Ignore empty and whitespace only lines
 			continue;
 		}
 		AddRecipeFromLine(ParsingLine, LineNum);
@@ -192,7 +190,6 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	}
 	return nullptr;
 }
-
 
 
 

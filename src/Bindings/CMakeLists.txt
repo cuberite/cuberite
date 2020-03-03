@@ -1,7 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-include_directories (".")
 
 SET (SRCS
 	Bindings.cpp
@@ -165,20 +161,11 @@ endif ()
 
 set_source_files_properties(${BINDING_OUTPUTS} PROPERTIES GENERATED TRUE)
 
-if (NOT MSVC)
-	set(BINDING_COMPILE_FLAGS "-Wno-error -Wno-deprecated")
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(BINDING_COMPILE_FLAGS "${BINDING_COMPILE_FLAGS} -Wno-old-style-cast -Wno-missing-prototypes")
-		if(NOT APPLE AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5) # Workaround for VERSION_GREATER_EQUAL, which is only supported on CMake 3.7+
-			set(BINDING_COMPILE_FLAGS "${BINDING_COMPILE_FLAGS} -Wno-zero-as-null-pointer-constant")
-		endif()
-	endif()
-else()
-	set(BINDING_COMPILE_FLAGS "/Wd4996")  # Disable deprecation warnings
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_source_files_properties(Bindings.cpp PROPERTIES COMPILE_FLAGS "-Wno-old-style-cast -Wno-missing-prototypes")
 endif()
-
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "${BINDING_COMPILE_FLAGS}")
 
 if(NOT MSVC)
 	add_library(Bindings ${SRCS} ${HDRS})

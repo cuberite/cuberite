@@ -2,8 +2,8 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "Blocks/BlockButton.h"
-#include "Blocks/BlockLever.h"
+#include "../../Blocks/BlockButton.h"
+#include "../../Blocks/BlockLever.h"
 
 
 

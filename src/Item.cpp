@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Item.h"
+#include "ItemGrid.h"
 #include "json/json.h"
 #include "Items/ItemHandler.h"
 
@@ -626,6 +627,15 @@ int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 ////////////////////////////////////////////////////////////////////////////////
 // cItems:
 
+cItems::cItems(cItem && a_InitialItem)
+{
+	push_back(std::move(a_InitialItem));
+}
+
+
+
+
+
 cItem * cItems::Get(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
@@ -711,3 +721,14 @@ bool cItems::ContainsType(const cItem & a_Item)
 }
 
 
+
+
+
+void cItems::AddItemGrid(const cItemGrid & a_ItemGrid)
+{
+	auto numSlots = a_ItemGrid.GetNumSlots();
+	for (int i = 0; i < numSlots; ++i)
+	{
+		Add(a_ItemGrid.GetSlot(i));
+	}
+}

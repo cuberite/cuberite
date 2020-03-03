@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "Entities/ItemFrame.h"
+#include "../Entities/ItemFrame.h"
 #include "../Entities/Player.h"
 
 
@@ -38,7 +38,7 @@ public:
 
 		if (Block == E_BLOCK_AIR)
 		{
-			auto ItemFrame = cpp14::make_unique<cItemFrame>(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto ItemFrame = cpp14::make_unique<cItemFrame>(a_BlockFace, Vector3i{a_BlockX, a_BlockY, a_BlockZ});
 			auto ItemFramePtr = ItemFrame.get();
 			if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 			{

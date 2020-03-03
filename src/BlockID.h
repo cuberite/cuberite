@@ -66,7 +66,8 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	E_BLOCK_DIAMOND_BLOCK = 57,
 	E_BLOCK_CRAFTING_TABLE = 58,
 	E_BLOCK_WORKBENCH = 58,
-	E_BLOCK_CROPS = 59,
+	E_BLOCK_WHEAT = 59,
+	E_BLOCK_CROPS = E_BLOCK_WHEAT,
 	E_BLOCK_FARMLAND = 60,
 	E_BLOCK_FURNACE = 61,
 	E_BLOCK_LIT_FURNACE = 62,
@@ -172,7 +173,8 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	E_BLOCK_ACTIVATOR_RAIL = 157,
 
 	E_BLOCK_DROPPER = 158,
-	E_BLOCK_STAINED_CLAY = 159,
+	E_BLOCK_STAINED_CLAY = 159,  // Synonym to terracotta
+	E_BLOCK_TERRACOTTA = 159,  // Synonym to stained clay
 	E_BLOCK_STAINED_GLASS_PANE = 160,
 	E_BLOCK_NEW_LEAVES = 161,  // Acacia and Dark Oak IDs in Minecraft 1.7.x
 	E_BLOCK_NEW_LOG = 162,
@@ -273,6 +275,8 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
 	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
+
+	E_BLOCK_UNFINISHED = 254,  // Special type used as a placeholder, signifying that the block lacks implementation
 
 	// Synonym or ID compatibility
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
@@ -659,6 +663,18 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_DOUBLE_STONE_SLAB_SMOOTH_SANDSTONE = 9,
 	E_META_DOUBLE_STONE_SLAB_TILE_QUARTZ      = 10,
 
+	// E_BLOCK_END_PORTAL_FRAME metas:
+	E_META_END_PORTAL_FRAME_ZP     = 0,  // Faces towards centre of portal
+	E_META_END_PORTAL_FRAME_XM     = 1,
+	E_META_END_PORTAL_FRAME_ZM     = 2,
+	E_META_END_PORTAL_FRAME_XP     = 3,
+	E_META_END_PORTAL_FRAME_ZP_EYE = 4,  // Frames with ender eye
+	E_META_END_PORTAL_FRAME_XM_EYE = 5,
+	E_META_END_PORTAL_FRAME_ZM_EYE = 6,
+	E_META_END_PORTAL_FRAME_XP_EYE = 7,
+	E_META_END_PORTAL_FRAME_NO_EYE = 0,  // Just the eye bitflag
+	E_META_END_PORTAL_FRAME_EYE    = 4,
+
 	// E_BLOCK_FLOWER metas:
 	E_META_FLOWER_POPPY           = 0,
 	E_META_FLOWER_BLUE_ORCHID     = 1,
@@ -793,6 +809,10 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_SNOW_LAYER_SIX          = 5,
 	E_META_SNOW_LAYER_SEVEN        = 6,
 	E_META_SNOW_LAYER_EIGHT        = 7,
+
+	// E_BLOCK_SPONGE metas:
+	E_META_SPONGE_DRY              = 0,
+	E_META_SPONGE_WET              = 1,
 
 	// E_BLOCK_STAINED_CLAY metas:
 	E_META_STAINED_CLAY_WHITE      = 0,

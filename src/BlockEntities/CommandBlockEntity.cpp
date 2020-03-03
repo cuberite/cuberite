@@ -17,14 +17,13 @@
 
 
 
-cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_ShouldExecute(false),
 	m_Result(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_COMMAND_BLOCK);
 }
-
 
 
 
@@ -116,8 +115,8 @@ void cCommandBlockEntity::Activate(void)
 
 void cCommandBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cCommandBlockEntity &>(a_Src);
+	super::CopyFrom(a_Src);
+	auto & src = static_cast<const cCommandBlockEntity &>(a_Src);
 	m_Command = src.m_Command;
 	m_LastOutput = src.m_LastOutput;
 	m_Result = src.m_Result;

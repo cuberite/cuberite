@@ -46,6 +46,12 @@ public:
 
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
+		// Players can't pick up fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -114,11 +120,19 @@ public:
 
 
 
+
+
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
 	)
 	{
+		// Players can't place fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -140,7 +154,7 @@ public:
 			return false;
 		}
 
-		if (a_Player->GetGameMode() != gmCreative)
+		if (!a_Player->IsGameModeCreative())
 		{
 			// Remove fluid bucket, add empty bucket:
 			if (!a_Player->GetInventory().RemoveOneEquippedItem())
@@ -164,19 +178,15 @@ public:
 				// Plugin disagrees with the washing-away
 				return false;
 			}
-
-			cBlockHandler * Handler = BlockHandler(CurrentBlockType);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				Handler->DropBlock(ChunkInterface, *a_World, a_PluginInterface, a_Player, BlockPos.x, BlockPos.y, BlockPos.z);
-			}
+			a_World->DropBlockAsPickups(BlockPos, a_Player, nullptr);
 			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
 		// Place the actual fluid block:
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
+
+
 
 
 
@@ -242,12 +252,12 @@ public:
 
 			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
-				if (a_CBBlockType != E_BLOCK_AIR)
+				if ((a_CBBlockType != E_BLOCK_AIR) && !IsBlockLiquid(a_CBBlockType))
 				{
 					m_ReplacedBlockType = a_CBBlockType;
 					m_ReplacedBlockMeta = a_CBBlockMeta;
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
-					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
+					if (!cFluidSimulator::CanWashAway(a_CBBlockType))
 					{
 						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}

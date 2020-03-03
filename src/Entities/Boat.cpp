@@ -14,7 +14,7 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	super(etBoat, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.7),
+	super(etBoat, a_Pos, 0.98, 0.7),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -25,6 +25,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 	SetMaxHealth(6);
 	SetHealth(6);
 }
+
 
 
 
@@ -153,6 +154,7 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 
 
+
 void cBoat::SetLastDamage(int TimeSinceLastHit)
 {
 	m_LastDamage = TimeSinceLastHit;
@@ -207,10 +209,7 @@ AString cBoat::MaterialToString(eMaterial a_Material)
 		case bmAcacia:  return "acacia";
 		case bmDarkOak: return "dark_oak";
 	}
-	ASSERT(!"Unhandled boat material");
-	#ifndef __clang__
-		return "oak";
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 
@@ -264,9 +263,7 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
 		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
 	}
-	#ifndef __clang__
-		return cItem(E_ITEM_BOAT);
-	#endif
+	UNREACHABLE("Unsupported boat material");
 }
 
 

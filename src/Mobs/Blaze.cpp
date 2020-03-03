@@ -40,7 +40,7 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
 
-		auto FireCharge = cpp14::make_unique<cFireChargeEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
+		auto FireCharge = cpp14::make_unique<cFireChargeEntity>(this, GetPosition().addedY(1), Speed);
 		auto FireChargePtr = FireCharge.get();
 		if (!FireChargePtr->Initialize(std::move(FireCharge), *m_World))
 		{

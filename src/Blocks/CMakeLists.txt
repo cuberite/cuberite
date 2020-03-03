@@ -34,6 +34,7 @@ SET (HDRS
 	BlockDropSpenser.h
 	BlockEnchantmentTable.h
 	BlockEnderchest.h
+	BlockEndPortalFrame.h
 	BlockEntity.h
 	BlockFarmland.h
 	BlockFence.h
@@ -96,9 +97,8 @@ SET (HDRS
 	BlockWorkbench.h
 	BroadcastInterface.h
 	ChunkInterface.h
-	ClearMetaOnDrop.h
 	GetHandlerCompileTimeTemplate.h
-	MetaRotator.h
+	Mixins.h
 	WorldInterface.h
 )
 

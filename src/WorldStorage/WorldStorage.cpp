@@ -94,7 +94,7 @@ void cWorldStorage::WaitForFinish(void)
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
 	m_Event.Set();  // Wake up the thread if waiting
-	super::Wait();
+	super::Stop();
 	LOGD("World storage thread finished");
 }
 
@@ -240,7 +240,7 @@ bool cWorldStorage::LoadOneChunk(void)
 	// Call the callback, if specified:
 	if (ToLoad.m_Callback != nullptr)
 	{
-		ToLoad.m_Callback->Call(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, res);
+		ToLoad.m_Callback->Call({ToLoad.m_ChunkX, ToLoad.m_ChunkZ}, res);
 	}
 	return res;
 }
@@ -274,7 +274,7 @@ bool cWorldStorage::SaveOneChunk(void)
 	// Call the callback, if specified:
 	if (ToSave.m_Callback != nullptr)
 	{
-		ToSave.m_Callback->Call(ToSave.m_ChunkX, ToSave.m_ChunkZ, Status);
+		ToSave.m_Callback->Call({ToSave.m_ChunkX, ToSave.m_ChunkZ}, Status);
 	}
 	return true;
 }

@@ -7,8 +7,6 @@
 
 
 
-
-
 cChicken::cChicken(void) :
 	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.4, 0.7),
 	m_EggDropTimer(0)
@@ -16,6 +14,7 @@ cChicken::cChicken(void) :
 	SetGravity(-2.0f);
 	SetAirDrag(0.0f);
 }
+
 
 
 
@@ -74,10 +73,12 @@ void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cChicken::HandleFalling(void)
+bool cChicken::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	// empty - chickens don't take fall damage
+	if (a_TDI.DamageType == dtFalling)
+	{
+		return false;
+	}
+
+	return super::DoTakeDamage(a_TDI);
 }
-
-
-

@@ -5,12 +5,20 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
-#include "Broadcaster.h"
 #include "../BoundingBox.h"
 
 
 
 
+
+// TODO: Ocelots should have a chance of spawning with two kittens
+/*
+	if (!IsBaby() && GetRandomProvider().RandBool(1.0 / 7.0))
+	{
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
+	}
+*/
 
 cOcelot::cOcelot(void) :
 	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", 0.6, 0.8),
@@ -39,12 +47,11 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_CheckPlayerTickCount == 23)
 		{
-			cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), 10, true);
-			if (a_Closest_Player != nullptr)
+			m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
 			{
 				cItems Items;
 				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Closest_Player->GetEquippedItem().m_ItemType))
+				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
 				{
 					if (!IsBegging())
 					{
@@ -52,7 +59,7 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 
-					MoveToPosition(a_Closest_Player->GetPosition());
+					MoveToPosition(a_Player.GetPosition());
 				}
 				else
 				{
@@ -62,8 +69,9 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 				}
-			}
 
+				return true;
+			}, true);
 			m_CheckPlayerTickCount = 0;
 		}
 		else
@@ -159,13 +167,13 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					SetOwner(a_Player.GetName(), a_Player.GetUUID());
 					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
 					m_World->BroadcastEntityStatus(*this, esWolfTamed);
-					m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 				}
 				else
 				{
 					// Taming failed
 					m_World->BroadcastEntityStatus(*this, esWolfTaming);
-					m_World->GetBroadcaster().BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
 				}
 			}
 		}
@@ -180,20 +188,6 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 		SetIsSitting(!IsSitting());
 	}
 	m_World->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cOcelot::SpawnOn(cClientHandle & a_ClientHandle)
-{
-	super::SpawnOn(a_ClientHandle);
-	if (!IsBaby() && GetRandomProvider().RandBool(1.0 / 7.0))
-	{
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true);
-	}
 }
 
 
@@ -218,3 +212,13 @@ bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition)
 
 
 
+
+bool cOcelot::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (a_TDI.DamageType == dtFalling)
+	{
+		return false;
+	}
+
+	return super::DoTakeDamage(a_TDI);
+}

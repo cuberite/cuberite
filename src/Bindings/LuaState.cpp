@@ -50,10 +50,8 @@ extern "C"
 
 
 
-
 const cLuaState::cRet cLuaState::Return = {};
 const cLuaState::cNil cLuaState::Nil = {};
-
 
 
 
@@ -131,6 +129,7 @@ void cLuaStateTracker::Add(cLuaState & a_LuaState)
 	cCSLock Lock(Instance.m_CSLuaStates);
 	Instance.m_LuaStates.push_back(&a_LuaState);
 }
+
 
 
 
@@ -305,7 +304,7 @@ void cLuaState::cTrackedRef::Invalidate(void)
 	if (!m_Ref.IsValid())
 	{
 		LOGD("%s: Inconsistent callback at %p, has a CS but an invalid Ref. This should not happen",
-			__FUNCTION__, reinterpret_cast<void *>(this)
+			__FUNCTION__, static_cast<void *>(this)
 		);
 		return;
 	}
@@ -994,6 +993,7 @@ void cLuaState::Push(cEntity * a_Entity)
 						return "cEntity";
 					}
 				}  // switch (EntityType)
+				UNREACHABLE("Unsupported entity type");
 			}();
 		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
 	}
@@ -2004,7 +2004,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
+int cLuaState::ApiParamError(fmt::StringRef a_Msg)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -2012,8 +2012,7 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
 	VERIFY(lua_getinfo(m_LuaState, "n", &entry));
 
 	// Compose the error message:
-	AString msg = Printf(a_MsgFormat, argp);
-	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
+	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", a_Msg);
 
 	// Log everything into the console:
 	LOGWARNING("%s", errorMsg.c_str());
@@ -2390,7 +2389,7 @@ void cLuaState::TrackRef(cTrackedRef & a_Ref)
 	auto canonState = QueryCanonLuaState();
 	if (canonState == nullptr)
 	{
-		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, static_cast<void *>(m_LuaState));
 		return;
 	}
 
@@ -2409,7 +2408,7 @@ void cLuaState::UntrackRef(cTrackedRef & a_Ref)
 	auto canonState = QueryCanonLuaState();
 	if (canonState == nullptr)
 	{
-		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, reinterpret_cast<void *>(m_LuaState));
+		LOGWARNING("%s: Lua state %p has invalid CanonLuaState!", __FUNCTION__, static_cast<void *>(m_LuaState));
 		return;
 	}
 

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../Item.h"
-#include "OSSupport/AtomicUniquePtr.h"
+#include "../OSSupport/AtomicUniquePtr.h"
 
 
 
@@ -34,10 +34,12 @@
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
 	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-	{ \
-		return; \
-	}
+	do { \
+		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+		{ \
+			return; \
+		} \
+	} while (false)
 
 
 
@@ -58,7 +60,7 @@ struct TakeDamageInfo
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
 	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
 	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
 	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
@@ -165,7 +167,7 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -306,7 +308,7 @@ public:
 	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
 
 	float GetGravity(void) const { return m_Gravity; }
 
@@ -360,6 +362,10 @@ public:
 	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
 	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
+	/** Returns explosion knock back reduction percent from blast protection level
+	@return knock back reduce percent */
+	virtual float GetEnchantmentBlastKnockbackReduction();
+
 	/** Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit */
 	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
 
@@ -377,6 +383,9 @@ public:
 
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
+
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const { return cItem(); }
 
 	/** Applies damage to the armor after the armor blocked the given amount */
 	virtual void ApplyArmorDamage(int DamageBlocked);
@@ -568,7 +577,8 @@ public:
 	void SetParentChunk(cChunk * a_Chunk);
 
 	/** Returns the chunk responsible for ticking this entity. */
-	cChunk * GetParentChunk();
+	cChunk * GetParentChunk() { return m_ParentChunk; }
+	const cChunk * GetParentChunk() const { return m_ParentChunk; }
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
@@ -585,7 +595,15 @@ public:
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
+	/** a lightweight calculation approach to get explosion exposure rate
+	@param a_ExplosionPosition explosion position
+	@param a_ExlosionPower explosion power
+	@return exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
+
+
 protected:
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -596,6 +614,7 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
+
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
@@ -709,8 +728,12 @@ protected:
 	m_IsHeadInWater */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
-	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
-	void BroadcastLeashedMobs();
+	/** Set the entities position and last sent position.
+	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
+	virtual void ResetPosition(Vector3d a_NewPos);
+
+  /** If has any mobs are leashed, broadcasts every leashed entity to this. */
+  void BroadcastLeashedMobs();
 
 private:
 
@@ -753,5 +776,4 @@ private:
 
 	/** List of leashed mobs to this entity */
 	cMonsterList m_LeashedMobs;
-
 } ;  // tolua_export

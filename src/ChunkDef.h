@@ -29,9 +29,9 @@ class cClientHandle;
 class cBlockEntity;
 class cChunkCoords;
 
-typedef std::unique_ptr<cEntity> OwnedEntity;
-typedef std::vector<OwnedEntity> cEntityList;
-typedef std::map<int, cBlockEntity *> cBlockEntities;
+using OwnedEntity = std::unique_ptr<cEntity>;
+using cEntityList = std::vector<OwnedEntity>;
+using cBlockEntities = std::map<size_t, cBlockEntity *>;
 
 
 
@@ -61,11 +61,66 @@ public:
 
 	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
 
+
 	bool operator == (const cChunkCoords & a_Other) const
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
+
+
+	bool operator != (const cChunkCoords & a_Other) const
+	{
+		return !(operator == (a_Other));
+	}
+
+
+	/** Simple comparison, to support ordering. */
+	bool operator < (const cChunkCoords & a_Other) const
+	{
+		if (a_Other.m_ChunkX == m_ChunkX)
+		{
+			return (m_ChunkZ < a_Other.m_ChunkZ);
+		}
+		else
+		{
+			return (m_ChunkX < a_Other.m_ChunkX);
+		}
+	}
+
+
+	/** Returns a string that describes the chunk coords, suitable for logging. */
+	AString ToString() const
+	{
+		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
+	}
 } ;
+
+
+
+
+
+/** Non-owning view of a chunk's client handles. */
+class cChunkClientHandles
+{
+public:
+	using const_iterator = std::vector<cClientHandle *>::const_iterator;
+	using iterator = const_iterator;
+
+	explicit cChunkClientHandles(const std::vector<cClientHandle *> & a_Container):
+		m_Begin(a_Container.cbegin()),
+		m_End(a_Container.cend())
+	{
+	}
+
+	const_iterator begin()  const { return m_Begin; }
+	const_iterator cbegin() const { return m_Begin; }
+
+	const_iterator end()  const { return m_End; }
+	const_iterator cend() const { return m_End; }
+
+private:
+	const_iterator m_Begin, m_End;
+};
 
 
 
@@ -114,23 +169,44 @@ public:
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
 
+
+
+
+
+	/** Converts the specified absolute position into a relative position within its chunk.
+	Use BlockToChunk to query the chunk coords. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition)
 	{
-		cChunkCoords ChunckPos = BlockToChunk(a_BlockPosition);
-
-		return {a_BlockPosition.x - ChunckPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - ChunckPos.m_ChunkZ * Width};
+		cChunkCoords chunkPos = BlockToChunk(a_BlockPosition);
+		return AbsoluteToRelative(a_BlockPosition, chunkPos);
 	}
 
+
+
+
+
+	/** Converts the absolute coords into coords relative to the specified chunk. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
 	{
 		return {a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width};
 	}
 
+
+
+
 	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
-	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, cChunkCoords a_ChunkCoords)
 	{
-		return {a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width};
+		return Vector3i(
+			a_RelBlockPosition.x + a_ChunkCoords.m_ChunkX * Width,
+			a_RelBlockPosition.y,
+			a_RelBlockPosition.z + a_ChunkCoords.m_ChunkZ * Width
+		);
 	}
+
+
+
+
 
 	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
 	inline static bool IsValidHeight(int a_Height)
@@ -142,6 +218,16 @@ public:
 	inline static bool IsValidWidth(int a_Width)
 	{
 		return ((a_Width >= 0) && (a_Width < Width));
+	}
+
+	/** Validates a chunk relative coordinate. Returns false if the coordiante is out of bounds for a chunk. */
+	inline static bool IsValidRelPos(Vector3i a_RelPos)
+	{
+		return (
+			IsValidWidth(a_RelPos.x) &&
+			IsValidHeight(a_RelPos.y) &&
+			IsValidWidth(a_RelPos.z)
+		);
 	}
 
 	/** Converts absolute block coords to chunk coords: */
@@ -180,7 +266,7 @@ public:
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
-		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
+		FLOGERROR("cChunkDef::MakeIndex(): coords out of range: {0}; returning fake index 0", Vector3i{x, y, z});
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
 		return 0;
 	}
@@ -197,19 +283,27 @@ public:
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+
+	inline static int MakeIndexNoCheck(Vector3i a_RelPos)
+	{
+		return MakeIndexNoCheck(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+	}
+
+
+
+	inline static Vector3i IndexToCoordinate(size_t index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+				static_cast<int>(index % cChunkDef::Width),                       // X
+				static_cast<int>(index / (cChunkDef::Width * cChunkDef::Width)),  // Y
+				static_cast<int>((index / cChunkDef::Width) % cChunkDef::Width)   // Z
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),  // X
-				index % cChunkDef::Height,                       // Y
-				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+				static_cast<int>(index / (cChunkDef::Height * cChunkDef::Width)),  // X
+				static_cast<int>(index % cChunkDef::Height),                       // Y
+				static_cast<int>((index / cChunkDef::Height) % cChunkDef::Width)   // Z
 			);
 		#endif
 	}
@@ -228,6 +322,13 @@ public:
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
+	}
+
+
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	{
+		ASSERT(IsValidRelPos(a_RelPos));
+		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
 	}
 
 
@@ -306,6 +407,18 @@ public:
 			return ExpandNibble(a_Buffer, Index);
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
+		return 0;
+	}
+
+
+	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, Vector3i a_RelPos)
+	{
+		if (IsValidRelPos(a_RelPos))
+		{
+			auto Index = MakeIndexNoCheck(a_RelPos);
+			return (a_Buffer[static_cast<size_t>(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
+		}
+		ASSERT(!"Coords out of chunk range!");
 		return 0;
 	}
 
@@ -408,7 +521,20 @@ struct sSetBlock
 	BLOCKTYPE m_BlockType;
 	NIBBLETYPE m_BlockMeta;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+		m_RelX(a_BlockX),
+		m_RelY(a_BlockY),
+		m_RelZ(a_BlockZ),
+		m_BlockType(a_BlockType),
+		m_BlockMeta(a_BlockMeta)
+	{
+		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
+	}
+
+	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
+	{
+	}
 
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
@@ -488,7 +614,7 @@ public:
 	virtual ~cChunkCoordCallback() {}
 
 	/** Called with the chunk's coords, and an optional operation status flag for operations that support it. */
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) = 0;
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) = 0;
 } ;
 
 

@@ -1,6 +1,3 @@
-project (Cuberite)
-
-include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	SlotArea.cpp

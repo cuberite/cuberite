@@ -2,10 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "LeashKnot.h"
-#include "ClientHandle.h"
 #include "Player.h"
-#include "Mobs/Monster.h"
-#include "BoundingBox.h"
+#include "../Mobs/Monster.h"
+#include "../BoundingBox.h"
+#include "../ClientHandle.h"
 
 // Ticks to wait in Tick function to optimize calculations
 #define TICK_STEP 10
@@ -14,8 +14,8 @@
 
 
 
-cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z) :
-	cHangingEntity(etLeashKnot, a_BlockFace, a_X, a_Y, a_Z),
+cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos) :
+	super(etLeashKnot, a_BlockFace, a_Pos),
 	m_ShouldSelfDestroy(false),
 	m_TicksToSelfDestroy(20 * 1)
 {
@@ -80,7 +80,6 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 
 
 
-
 void cLeashKnot::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
@@ -111,6 +110,7 @@ void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnObject(*this, 77, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }
+
 
 
 

@@ -93,6 +93,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
+
 AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -185,6 +186,7 @@ AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimeter)
 
 
 
+
 AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -201,6 +203,7 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -346,6 +349,7 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
+
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -356,6 +360,7 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 	}
 	return a_UTF8;
 }
+
 
 
 
@@ -409,6 +414,10 @@ AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
 
 
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
 // UTF-8 conversion code adapted from:
 //  https://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
@@ -605,7 +614,9 @@ are equivalent to the following loop:
 ////////////////////////////////////////////////////////////////////////////////
 // End of Unicode, Inc.'s code / information
 ////////////////////////////////////////////////////////////////////////////////
-
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 
 
@@ -638,7 +649,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		size_t k = std::min(a_Size - i, a_BytesPerLine);
 		for (size_t j = 0; j < k; j++)
 		{
-			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
+			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
 			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
 			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
@@ -1050,4 +1061,28 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 		res.append(*itr);
 	}
 	return res;
+}
+
+
+
+
+
+bool StringToFloat(const AString & a_String, float & a_Num)
+{
+	char *err;
+	a_Num = strtof(a_String.c_str(), &err);
+	if (*err != 0)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
+
+
+bool IsOnlyWhitespace(const AString & a_String)
+{
+	return std::all_of(a_String.cbegin(), a_String.cend(), isspace);
 }

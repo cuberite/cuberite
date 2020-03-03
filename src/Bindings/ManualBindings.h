@@ -288,17 +288,17 @@ public:
 		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
 		if (Self == nullptr)
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+			return L.ApiParamError("Invalid 'self'");
 		}
 		if (!FnRef.IsValid())
 		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
+			return L.ApiParamError("Expected a valid callback function for parameter #5");
 		}
 		if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
 		{
-			return lua_do_error(tolua_S, Printf("Error in function call '#funcname#': The provided coordinates ({%d, %d, %d}) are not valid",
-				BlockX, BlockY, BlockZ
-			).c_str());
+			return L.FApiParamError("The provided coordinates ({0}) are not valid",
+				Vector3i{BlockX, BlockY, BlockZ}
+			);
 		}
 
 		// Call the DoWith function:

@@ -5,7 +5,9 @@
 
 #include "Globals.h"
 #include "VaporizeFluidSimulator.h"
+#include "../OpaqueWorld.h"
 #include "../Chunk.h"
+#include "../Blocks/BroadcastInterface.h"
 
 
 
@@ -26,22 +28,17 @@ void cVaporizeFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	{
 		return;
 	}
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_Block);
+	auto blockType = a_Chunk->GetBlock(relPos);
 	if (
-		(BlockType == m_FluidBlock) ||
-		(BlockType == m_StationaryFluidBlock)
+		(blockType == m_FluidBlock) ||
+		(blockType == m_StationaryFluidBlock)
 	)
 	{
-		a_Chunk->SetBlock(RelX, a_Block.y, RelZ, E_BLOCK_AIR, 0);
-		a_Chunk->BroadcastSoundEffect(
+		a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+		World::GetBroadcastInterface(m_World).BroadcastSoundEffect(
 			"block.fire.extinguish",
-			{
-				static_cast<double>(a_Block.x),
-				static_cast<double>(a_Block.y),
-				static_cast<double>(a_Block.z)
-			},
+			Vector3d(a_Block),
 			1.0f,
 			0.6f
 		);

@@ -178,7 +178,7 @@ protected:
 		// Each intersecting prefab is placed on ground, then drawn
 		// Each intersecting road is drawn by replacing top soil blocks with gravel / sandstone blocks
 		cChunkDef::HeightMap HeightMap;  // Heightmap for this chunk, used by roads
-		m_HeightGen->GenHeightMap(a_Chunk.GetChunkX(), a_Chunk.GetChunkZ(), HeightMap);
+		m_HeightGen->GenHeightMap(a_Chunk.GetChunkCoords(), HeightMap);
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
 			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
@@ -208,7 +208,7 @@ protected:
 		int BlockY;
 		cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 		a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 	}
@@ -375,7 +375,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
 	cChunkDef::BiomeMap Biomes;
-	m_BiomeGen->GenBiomes(ChunkX, ChunkZ, Biomes);
+	m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 	// Get a list of pools that support each biome within the chunk:
 	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close

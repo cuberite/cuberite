@@ -19,33 +19,54 @@ public:
 
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// No pickups
+		return {};
 	}
+
+
+
+
 
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}
 
-	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+
+
+
+
+	virtual void Check(
+		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
+		Vector3i a_RelPos,
+		cChunk & a_Chunk
+	) override
 	{
 		switch (m_BlockType)
 		{
 			case E_BLOCK_STATIONARY_LAVA:
 			{
-				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_LAVA, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_LAVA, a_Chunk.GetMeta(a_RelPos));
 				break;
 			}
 			case E_BLOCK_STATIONARY_WATER:
 			{
-				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_WATER, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_WATER, a_Chunk.GetMeta(a_RelPos));
 				break;
 			}
 		}
-		super::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
+		super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
