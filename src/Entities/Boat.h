@@ -39,6 +39,7 @@ public:
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -78,6 +79,7 @@ public:
 
 	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
 private:
+	Vector3d m_LastSentPosition;
 	int m_LastDamage;
 	int m_ForwardDirection;
 

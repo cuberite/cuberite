@@ -15,6 +15,7 @@
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 	super(etBoat, a_Pos, 0.98, 0.7),
+	m_LastSentPosition(a_Pos),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -33,6 +34,35 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnVehicle(*this, 1);
+}
+
+
+
+
+
+void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
+{
+	// Process packet sending every two ticks
+	if (GetWorld()->GetWorldAge() % 2 != 0)
+	{
+		return;
+	}
+
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+
+	if (Diff.HasNonZeroLength())  // Have we moved?
+	{
+		if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
+		{
+			m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
+		}
+		else
+		{
+			// Too big a movement, do a teleport
+			m_World->BroadcastTeleportEntity(*this, a_Exclude);
+		}
+		m_LastSentPosition = GetPosition();
+	}
 }
 
 
