@@ -309,10 +309,6 @@ public:
 	/** Exported in ManualBindings */
 	const Vector3d & GetSpeed(void) const { return m_Speed; }
 
-	/** Returns the last position we sent to all the clients. Use this to
-	initialize clients with our position. */
-	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
-
 	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
 	void DestroyNoScheduling(bool a_ShouldBroadcast);
 
