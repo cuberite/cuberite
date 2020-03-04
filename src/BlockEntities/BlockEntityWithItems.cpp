@@ -26,20 +26,6 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 
 
 
-void cBlockEntityWithItems::Destroy(void)
-{
-	// Drop the contents as pickups:
-	ASSERT(m_World != nullptr);
-	cItems Pickups;
-	m_Contents.CopyToItems(Pickups);
-	m_Contents.Clear();
-	m_World->SpawnItemPickups(Pickups, m_Pos.x + 0.5, m_Pos.y + 0.5, m_Pos.z + 0.5);  // Spawn in centre of block
-}
-
-
-
-
-
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
 	super::CopyFrom(a_Src);
