@@ -167,6 +167,7 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 void cEntity::OnAddToWorld(cWorld & a_World)
 {
 	// Spawn the entity on the clients:
+	m_LastSentPosition = GetPosition();
 	a_World.BroadcastSpawnEntity(*this);
 	BroadcastLeashedMobs();
 }
