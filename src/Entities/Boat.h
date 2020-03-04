@@ -79,7 +79,6 @@ public:
 
 	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
 private:
-	Vector3d m_LastSentPosition;
 	int m_LastDamage;
 	int m_ForwardDirection;
 
