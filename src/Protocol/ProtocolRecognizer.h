@@ -8,9 +8,9 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11.x, 1.12.x, 1.13"
-#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340, 393"
-#define MCS_LATEST_PROTOCOL_VERSION 393
+#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11.x, 1.12.x"
+#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340"
+#define MCS_LATEST_PROTOCOL_VERSION 340
 
 
 
