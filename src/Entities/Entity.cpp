@@ -44,6 +44,7 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_bOnGround(false),
 	m_Gravity(-9.81f),
 	m_AirDrag(0.02f),
+	m_LastSentPosition(a_Pos),
 	m_LastPosition(a_Pos),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
@@ -66,7 +67,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
 	m_Position(a_Pos),
-	m_LastSentPosition(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
 	m_Width(a_Width),

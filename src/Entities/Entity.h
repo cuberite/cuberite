@@ -613,9 +613,6 @@ protected:
 	Data: https://minecraft.gamepedia.com/Entity#Motion_of_entities */
 	float m_AirDrag;
 
-	/** Position of the entity's XZ center and Y bottom */
-	Vector3d m_Position;
-
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
 	Only updated if cEntity::BroadcastMovementUpdate() is called! */
 	Vector3d m_LastSentPosition;
@@ -710,6 +707,9 @@ private:
 
 	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
+
+	/** Position of the entity's XZ center and Y bottom */
+	Vector3d m_Position;
 
 	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;
