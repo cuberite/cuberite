@@ -44,7 +44,6 @@ public:  // tolua_export
 	);
 
 	// cBlockEntity overrides:
-	virtual void Destroy(void) override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 
 	// tolua_begin

@@ -1878,71 +1878,68 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
 	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 == 0)
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
-		double SpeedSqr = GetSpeed().SqrLength();
-		if (SpeedSqr == 0.0)
+		return;
+	}
+
+	if (GetSpeed().HasNonZeroLength())
+	{
+		// Movin'
+		m_World->BroadcastEntityVelocity(*this, a_Exclude);
+		m_bHasSentNoSpeed = false;
+	}
+	else
+	{
+		// Speed is zero, send this to clients once only as well as an absolute position
+		if (!m_bHasSentNoSpeed)
 		{
-			// Speed is zero, send this to clients once only as well as an absolute position
-			if (!m_bHasSentNoSpeed)
+			m_World->BroadcastEntityVelocity(*this, a_Exclude);
+			m_World->BroadcastTeleportEntity(*this, a_Exclude);
+			m_LastSentPosition = GetPosition();
+			m_bHasSentNoSpeed = true;
+		}
+	}
+
+	// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+	if (Diff.HasNonZeroLength())  // Have we moved?
+	{
+		if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
+		{
+			// Difference within Byte limitations, use a relative move packet
+			if (m_bDirtyOrientation)
 			{
-				m_World->BroadcastEntityVelocity(*this, a_Exclude);
-				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_bHasSentNoSpeed = true;
+				m_World->BroadcastEntityRelMoveLook(*this, Vector3<Int8>(Diff), a_Exclude);
+				m_bDirtyOrientation = false;
 			}
+			else
+			{
+				m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
+			}
+			// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+			// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+			m_LastSentPosition = GetPosition();
 		}
 		else
 		{
-			// Movin'
-			m_World->BroadcastEntityVelocity(*this, a_Exclude);
-			m_bHasSentNoSpeed = false;
-		}
-
-		// Only send movement if speed is not 0 and 'no speed' was sent to client
-		if (!m_bHasSentNoSpeed || IsPlayer())
-		{
-			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-			Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
-
-			if (Diff.HasNonZeroLength())  // Have we moved?
-			{
-				if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
-				{
-					// Difference within Byte limitations, use a relative move packet
-					if (m_bDirtyOrientation)
-					{
-						m_World->BroadcastEntityRelMoveLook(*this, Vector3<Int8>(Diff), a_Exclude);
-						m_bDirtyOrientation = false;
-					}
-					else
-					{
-						m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
-					}
-					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
-					m_LastSentPosition = GetPosition();
-				}
-				else
-				{
-					// Too big a movement, do a teleport
-					m_World->BroadcastTeleportEntity(*this, a_Exclude);
-					m_LastSentPosition = GetPosition();  // See above
-					m_bDirtyOrientation = false;
-				}
-			}
-		}
-
-		if (m_bDirtyHead)
-		{
-			m_World->BroadcastEntityHeadLook(*this, a_Exclude);
-			m_bDirtyHead = false;
-		}
-		if (m_bDirtyOrientation)
-		{
-			// Send individual update in case above (sending with rel-move packet) wasn't done
-			GetWorld()->BroadcastEntityLook(*this, a_Exclude);
+			// Too big a movement, do a teleport
+			m_World->BroadcastTeleportEntity(*this, a_Exclude);
+			m_LastSentPosition = GetPosition();  // See above
 			m_bDirtyOrientation = false;
 		}
+	}
+
+	if (m_bDirtyHead)
+	{
+		m_World->BroadcastEntityHeadLook(*this, a_Exclude);
+		m_bDirtyHead = false;
+	}
+	if (m_bDirtyOrientation)
+	{
+		// Send individual update in case above (sending with rel-move packet) wasn't done
+		GetWorld()->BroadcastEntityLook(*this, a_Exclude);
+		m_bDirtyOrientation = false;
 	}
 }
 
