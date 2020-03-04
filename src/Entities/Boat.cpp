@@ -15,7 +15,6 @@
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 	super(etBoat, a_Pos, 0.98, 0.7),
-	m_LastSentPosition(a_Pos),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
