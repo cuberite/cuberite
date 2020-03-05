@@ -325,53 +325,6 @@ cProtocol_1_12::cProtocol_1_12(cClientHandle * a_Client, const AString & a_Serve
 
 
 
-void cProtocol_1_12::SendSpawnMob(const cMonster & a_Mob)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnMob);
-	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
-	Pkt.WriteBEDouble(a_Mob.GetPosX());
-	Pkt.WriteBEDouble(a_Mob.GetPosY());
-	Pkt.WriteBEDouble(a_Mob.GetPosZ());
-	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
-	Pkt.WriteByteAngle(a_Mob.GetYaw());
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
-	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
-}
-
-
-
-
-
-void cProtocol_1_12::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
-{
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
-	{
-		return;
-	}
-
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
-}
-
-
-
-
-
 void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	cServer * Server = cRoot::Get()->GetServer();
@@ -1074,59 +1027,6 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 {
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
 	m_Client->GetPlayer()->SendMessageInfo("The new advancements are not implemented.");
-}
-
-
-
-
-
-void cProtocol_1_12::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTitle);
-	Pkt.WriteVarInt32(3);  // Set title display times
-	Pkt.WriteBEInt32(a_FadeInTicks);
-	Pkt.WriteBEInt32(a_DisplayTicks);
-	Pkt.WriteBEInt32(a_FadeOutTicks);
-}
-
-
-
-
-
-void cProtocol_1_12::SendHideTitle(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTitle);
-	Pkt.WriteVarInt32(4);  // Hide title
-}
-
-
-
-
-
-void cProtocol_1_12::SendResetTitle(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTitle);
-	Pkt.WriteVarInt32(5);  // Reset title
-}
-
-
-
-
-
-void cProtocol_1_12::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktCollectEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
 }
 
 
