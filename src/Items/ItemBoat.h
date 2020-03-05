@@ -81,7 +81,7 @@ public:
 		}
 
 		// Spawn block at water level
-		if (a_World->SpawnBoat(Callbacks.m_Pos + Vector3d(0.5, 0.5, 0.5), cBoat::ItemToMaterial(a_Player->GetEquippedItem())) == cEntity::INVALID_ID)
+		if (a_World->SpawnBoat(Callbacks.m_Pos + Vector3d(0.5, 1, 0.5), cBoat::ItemToMaterial(a_Player->GetEquippedItem())) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
