@@ -263,9 +263,8 @@ public:
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
 	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
-	@param a_RemoveFromChunk determines if the entity should be removed from its chunk as well. Should be false when ticking from cChunk.
 	@return An owning reference to the given player. */
-	std::unique_ptr<cPlayer> RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk);
+	std::unique_ptr<cPlayer> RemovePlayer(cPlayer & a_Player);
 
 #ifdef _DEBUG
 	bool IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player);

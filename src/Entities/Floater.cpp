@@ -179,7 +179,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
-		Destroy(true);
+		Destroy();
 	}
 
 	if (m_AttachedMobID != cEntity::INVALID_ID)

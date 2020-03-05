@@ -34,7 +34,7 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 void cTNTEntity::Explode(void)
 {
 	m_FuseTicks = 0;
-	Destroy(true);
+	Destroy();
 	FLOGD("BOOM at {0}", GetPosition());
 	m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
 }
