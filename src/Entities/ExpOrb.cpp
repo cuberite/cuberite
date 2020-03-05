@@ -49,7 +49,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			a_Player.DeltaExperience(m_Reward);
 
 			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-			Destroy(true);
+			Destroy();
 			return true;
 		}
 
@@ -84,7 +84,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	m_Timer += a_Dt;
 	if (m_Timer >= std::chrono::minutes(5))
 	{
-		Destroy(true);
+		Destroy();
 	}
 }
 
@@ -96,7 +96,7 @@ bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtCactusContact)
 	{
-		Destroy(true);
+		Destroy();
 		return true;
 	}
 

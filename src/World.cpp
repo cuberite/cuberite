@@ -1024,6 +1024,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		Entity->SetWorld(this);
 		auto EntityPtr = Entity.get();
 		m_ChunkMap->AddEntity(std::move(Entity));
+		EntityPtr->OnAddToWorld(*this);
 		ASSERT(!EntityPtr->IsTicking());
 		EntityPtr->SetIsTicking(true);
 	}
@@ -1167,14 +1168,14 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			{
 				if (Monster.GetMobType() != eMonsterType::mtWolf)
 				{
-					Monster.Destroy(true);
+					Monster.Destroy();
 				}
 				else
 				{
 					auto & Wolf = static_cast<cWolf &>(Monster);
 					if (!Wolf.IsAngry() && !Wolf.IsTame())
 					{
-						Monster.Destroy(true);
+						Monster.Destroy();
 					}
 				}
 			}
@@ -2454,23 +2455,34 @@ void cWorld::AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld)
 
 
 
-std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk)
+std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
 {
-	std::unique_ptr<cPlayer> PlayerPtr;
+	// Check the chunkmap
+	std::unique_ptr<cPlayer> PlayerPtr(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
 
-	if (a_RemoveFromChunk)
+	if (PlayerPtr != nullptr)
 	{
-		// To prevent iterator invalidations when an entity goes through a portal and calls this function whilst being ticked by cChunk
-		// we should not change cChunk's entity list if asked not to
-		PlayerPtr = std::unique_ptr<cPlayer>(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
+		// Player found in the world, tell it it's being removed
+		PlayerPtr->OnRemoveFromWorld(*this);
 	}
+	else  // Check the awaiting players list
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & value) -> bool
+		auto itr = std::find_if(m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
+			[&](const decltype(m_PlayersToAdd)::value_type & value)
+			{
+				return (value.first.get() == &a_Player);
+			}
+		);
+
+		if (itr != m_PlayersToAdd.end())
 		{
-			return (value.first.get() == &a_Player);
-		});
+			PlayerPtr = std::move(itr->first);
+			m_PlayersToAdd.erase(itr);
+		}
 	}
+
+	// Remove from the player list
 	{
 		cCSLock Lock(m_CSPlayers);
 		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());
@@ -3076,6 +3088,7 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 	auto Entity = m_ChunkMap->RemoveEntity(a_Entity);
 	if (Entity != nullptr)
 	{
+		Entity->OnRemoveFromWorld(*this);
 		return Entity;
 	}
 
@@ -3475,6 +3488,7 @@ void cWorld::AddQueuedPlayers(void)
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			auto PlayerPtr = Player.get();
 			m_ChunkMap->AddEntityIfNotPresent(std::move(Player));
+			PlayerPtr->OnAddToWorld(*this);
 			ASSERT(!PlayerPtr->IsTicking());
 			PlayerPtr->SetIsTicking(true);
 			AddedPlayerPtrs.emplace_back(PlayerPtr, AwaitingPlayer.second);

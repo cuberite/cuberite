@@ -47,7 +47,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_LastPosition(a_Pos),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
-	m_IsWorldChangeScheduled(false),
 	m_IsFireproof(false),
 	m_TicksSinceLastBurnDamage(0),
 	m_TicksSinceLastLavaDamage(0),
@@ -158,19 +157,29 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
-	// Spawn the entity on the clients:
-	a_EntityWorld.BroadcastSpawnEntity(*this);
-
-	// If has any mob leashed broadcast every leashed entity to this
-	if (HasAnyMobLeashed())
-	{
-		for (auto LeashedMob : m_LeashedMobs)
-		{
-			m_World->BroadcastLeashEntity(*LeashedMob, *this);
-		}
-	}
-
 	return true;
+}
+
+
+
+
+
+void cEntity::OnAddToWorld(cWorld & a_World)
+{
+	// Spawn the entity on the clients:
+	m_LastSentPosition = GetPosition();
+	a_World.BroadcastSpawnEntity(*this);
+	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnRemoveFromWorld(cWorld & a_World)
+{
+	RemoveAllLeashedMobs();
+	a_World.BroadcastDestroyEntity(*this);
 }
 
 
@@ -216,7 +225,7 @@ void cEntity::SetParentChunk(cChunk * a_Chunk)
 
 
 
-void cEntity::Destroy(bool a_ShouldBroadcast)
+void cEntity::Destroy()
 {
 	SetIsTicking(false);
 
@@ -224,11 +233,6 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	while (!m_LeashedMobs.empty())
 	{
 		m_LeashedMobs.front()->Unleash(true, true);
-	}
-
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
 	}
 
 	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
@@ -1166,7 +1170,7 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
 	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
-	if (m_IsWorldChangeScheduled)
+	if (IsWorldChangeScheduled())
 	{
 		return;
 	}
@@ -1310,34 +1314,11 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
-{
-	m_NewWorld = a_World;
-	m_NewWorldPosition = a_NewPosition;
-	m_IsWorldChangeScheduled = true;
-	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
-	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
-}
-
-
-
-
-
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
-	if (m_IsWorldChangeScheduled)
+	// If somebody scheduled a world change, do nothing.
+	if (IsWorldChangeScheduled())
 	{
-		m_IsWorldChangeScheduled = false;
-
-		if (m_WorldChangeSetPortalCooldown)
-		{
-			// Delay the portal check.
-			m_PortalCooldownData.m_TicksDelayed = 0;
-			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-		}
-
-		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
 		return true;
 	}
 
@@ -1519,69 +1500,81 @@ bool cEntity::DetectPortal()
 
 
 
-bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
-	UNUSED(a_ShouldSendRespawn);
-	ASSERT(a_World != nullptr);
+	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
-	if (GetWorld() == a_World)
+	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
-		// Don't move to same world
-		return false;
+		m_PortalCooldownData.m_TicksDelayed = 0;
+		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	//  Ask the plugins if the entity is allowed to changing the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	if (GetWorld() == a_WorldChangeInfo.m_NewWorld)
 	{
-		// A Plugin doesn't allow the entity to changing the world
-		return false;
+		// Moving to same world, don't need to remove from world
+		SetPosition(a_WorldChangeInfo.m_NewPosition);
+		return;
 	}
+
+	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetUniqueID(), GetClass(),
+		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(), GetChunkZ()
+	);
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
 
-	// Tell others we are gone
-	GetWorld()->BroadcastDestroyEntity(*this);
+	// Remove from the old world
+	auto Self = m_World->RemoveEntity(*this);
 
-	// Take note of old chunk coords
-	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+	// Update entity before calling hook
+	ResetPosition(a_WorldChangeInfo.m_NewPosition);
+	SetWorld(a_WorldChangeInfo.m_NewWorld);
 
-	// Set position to the new position
-	ResetPosition(a_NewPosition);
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *m_World);
 
-	// Stop all mobs from targeting this entity
-	// Stop this entity from targeting other mobs
-	if (this->IsMob())
-	{
-		cMonster * Monster = static_cast<cMonster*>(this);
-		Monster->SetTarget(nullptr);
-		Monster->StopEveryoneFromTargetingMe();
-	}
-
-	// Queue add to new world and removal from the old one
-	cWorld * OldWorld = GetWorld();
-	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
-	{
-		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetUniqueID(), this->GetClass(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
-		);
-		UNUSED(OldChunkCoords);  // Non Debug mode only
-		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
-		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
-	});
-	return true;
+	// Don't do anything after adding as the old world's CS no longer protects us
+	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self));
 }
 
 
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
-	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
+	ASSERT(a_World != nullptr);
+
+	// Ask the plugins if the entity is allowed to change world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	{
+		// A Plugin isn't allowing the entity to change world
+		return false;
+	}
+
+	// Create new world change info
+	auto NewWCI = cpp14::make_unique<sWorldChangeInfo>();
+	*NewWCI = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+
+	// Publish atomically
+	auto OldWCI = m_WorldChangeInfo.exchange(std::move(NewWCI));
+
+	if (OldWCI == nullptr)
+	{
+		// Schedule a new world change.
+		GetWorld()->QueueTask(
+			[this](cWorld & a_CurWorld)
+			{
+				auto WCI = m_WorldChangeInfo.exchange(nullptr);
+				cWorld::cLock Lock(a_CurWorld);
+				DoMoveToWorld(*WCI);
+			}
+		);
+	}
+
+	return true;
 }
 
 
@@ -1606,7 +1599,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return DoMoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
+	return MoveToWorld(World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
@@ -2247,6 +2240,34 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
 
 	m_LeashedMobs.remove(a_Monster);
+}
+
+
+
+
+
+void cEntity::RemoveAllLeashedMobs()
+{
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(false, true);
+	}
+}
+
+
+
+
+
+void cEntity::BroadcastLeashedMobs()
+{
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
 }
 
 
