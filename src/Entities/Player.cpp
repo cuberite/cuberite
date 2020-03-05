@@ -2028,7 +2028,7 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 
 	// Stop all mobs from targeting this player
 	StopEveryoneFromTargetingMe();
-	
+
 	// If player is attached to entity, detach, to prevent client side effects
 	Detach();
 

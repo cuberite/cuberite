@@ -1534,7 +1534,7 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
 		GetChunkX(), GetChunkZ()
 	);
-  
+
 	// If entity is attached to another entity, detach, to prevent client side effects
 	Detach();
 
