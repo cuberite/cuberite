@@ -1349,6 +1349,12 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
+					return false;
+				}
+
 				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
@@ -1422,6 +1428,12 @@ bool cEntity::DetectPortal()
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
+					return false;
+				}
+
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
 					return false;
 				}
 
@@ -1522,6 +1534,9 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
 		GetChunkX(), GetChunkZ()
 	);
+
+	// If entity is attached to another entity, detach, to prevent client side effects
+	Detach();
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
