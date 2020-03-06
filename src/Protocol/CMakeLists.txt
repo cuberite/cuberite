@@ -14,6 +14,7 @@ target_sources(
 	Protocol_1_13.cpp
 	ProtocolPalettes.cpp
 	ProtocolRecognizer.cpp
+	RecipeMapper.cpp
 
 	Authenticator.h
 	ChunkDataSerializer.h
@@ -29,4 +30,5 @@ target_sources(
 	Protocol_1_13.h
 	ProtocolPalettes.h
 	ProtocolRecognizer.h
+	RecipeMapper.h
 )

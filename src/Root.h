@@ -18,6 +18,7 @@ class cItem;
 class cMonsterConfig;
 class cBrewingRecipes;
 class cCraftingRecipes;
+class cRecipeMapper;
 class cFurnaceRecipe;
 class cWebAdmin;
 class cPluginManager;
@@ -89,6 +90,7 @@ public:
 	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
+	cRecipeMapper * GetRecipeMapper(void) { return m_RecipeMapper.get(); }
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
 	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
 
@@ -229,6 +231,7 @@ private:
 	cMonsterConfig * m_MonsterConfig;
 
 	cCraftingRecipes * m_CraftingRecipes;
+	std::unique_ptr<cRecipeMapper> m_RecipeMapper;
 	cFurnaceRecipe *   m_FurnaceRecipe;
 	std::unique_ptr<cBrewingRecipes> m_BrewingRecipes;
 	cWebAdmin *        m_WebAdmin;
@@ -275,8 +278,3 @@ private:
 
 	static void InputThread(cRoot & a_Params);
 };  // tolua_export
-
-
-
-
-

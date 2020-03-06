@@ -1587,6 +1587,26 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 
 
+void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	// Not implemented
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendInitRecipes(UInt32 a_RecipeID)
+{
+	// Not implemented
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -2116,6 +2136,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 		case pktTimeUpdate:            return 0x03;
 		case pktTitle:                 return 0x45;
 		case pktUnloadChunk:           return 0x21;
+		case pktUnlockRecipe:          return 0x31;
 		case pktUpdateBlockEntity:     return 0x35;
 		case pktUpdateHealth:          return 0x06;
 		case pktUpdateScore:           return 0x3c;

@@ -557,6 +557,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktTimeUpdate:            return 0x44;
 		case pktTitle:                 return 0x45;
 		case pktUnloadChunk:           return 0x1d;
+		case pktUnlockRecipe:          return 0x31;
 		case pktUpdateBlockEntity:     return 0x09;
 		case pktUpdateHealth:          return 0x3e;
 		case pktUpdateScore:           return 0x42;

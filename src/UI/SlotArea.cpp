@@ -665,6 +665,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 	{
 		return;
 	}
+	a_Player.AddKnownItem(Result);
 	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
 	for (;;)
 	{
@@ -777,6 +778,70 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 }
 
 
+
+
+
+void cSlotAreaCrafting::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
+{
+	if (a_RecipeId == 0)
+	{
+		return;
+	}
+	cCraftingRecipes::cRecipe * Recipe = cRoot::Get()->GetCraftingRecipes()->getRecipeById(a_RecipeId);
+
+	std::list<cItem> usedItems;
+	ClearCraftingGrid(a_Player);
+
+	for (auto itrS = Recipe->m_Ingredients.begin(); itrS != Recipe->m_Ingredients.end(); ++itrS)
+	{
+		cItem * FoundItem = a_Player.GetInventory().FindItem(itrS->m_Item);
+		if (FoundItem == nullptr)
+		{
+			ClearCraftingGrid(a_Player);
+			break;
+		}
+		cItem Item = FoundItem->CopyOne();
+		usedItems.push_back(Item);
+		int pos = 1 + itrS->x + m_GridSize * itrS->y;
+		// Assuming there are ether shaped or unshaped recipes, no mixed ones
+		if ((itrS->x == -1) && (itrS->y == -1))
+		{
+			pos = static_cast<int>(usedItems.size());
+		}
+		// Handle x wildcard
+		else if (itrS->x == -1)
+		{
+			for (int i = 0; i < m_GridSize; i++)
+			{
+				pos = 1 + i + m_GridSize * itrS->y;
+				auto itemCheck = GetSlot(pos, a_Player);
+				if (itemCheck->IsEmpty())
+				{
+					break;
+				}
+			}
+		}
+		SetSlot(pos, a_Player, Item);
+		a_Player.GetInventory().RemoveItem(Item);
+	}
+}
+
+
+
+
+
+void cSlotAreaCrafting::ClearCraftingGrid(cPlayer & a_Player)
+{
+	for (int pos = 1; pos <= m_GridSize * m_GridSize; pos++)
+	{
+		auto Item = GetSlot(pos, a_Player);
+		if (Item->m_ItemCount > 0)
+		{
+			a_Player.GetInventory().AddItem(*Item);
+			SetSlot(pos, a_Player, cItem());
+		}
+	}
+}
 
 
 
@@ -2749,8 +2814,3 @@ void cSlotAreaHorse::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 		--a_ItemStack.m_ItemCount;
 	}
 }
-
-
-
-
-

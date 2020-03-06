@@ -10,9 +10,7 @@
 
 #include "Item.h"
 
-
-
-
+#include "Protocol/RecipeMapper.h"
 
 // fwd: cPlayer.h
 class cPlayer;
@@ -117,7 +115,8 @@ public:
 	/** Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found. */
 	void GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 
-protected:
+	/** Find recipes which contain the new item and all ingredients are in the known items */
+	std::vector<UInt32> findNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
 
 	struct cRecipeSlot
 	{
@@ -132,11 +131,22 @@ protected:
 	{
 		cRecipeSlots m_Ingredients;
 		cItem        m_Result;
+		AString      m_RecipeName;
 
 		// Size of the regular items in the recipe; "anywhere" items are excluded:
 		int m_Width;
 		int m_Height;
 	} ;
+
+	/** Returns the recipe by id aka CuberiteRecipeId, the Id is the non tech list
+	index (starting by 1), 0 is used for not found. */
+	cRecipe * getRecipeById(UInt32 a_RecipeId);
+
+	/** Gets a map of all recipes with name and recipe id */
+	std::map<AString, UInt32> getRecipeNameMap();
+
+protected:
+
 	typedef std::vector<cRecipe *> cRecipes;
 
 	cRecipes m_Recipes;
@@ -170,8 +180,9 @@ protected:
 
 	/** Searches for anything dye related for leather, calculates the appropriate color value, and sets the resulting value. */
 	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight);
+
+private:
+	/** Checks if all ingredients of the recipe are within the know items list and if the (new) ItemId is part of the ingredients. This makes sure to only find 'new' recipes */
+	bool isNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
+
 } ;
-
-
-
-

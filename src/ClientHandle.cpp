@@ -1692,7 +1692,7 @@ void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickA
 		LOGWARNING("Player \"%s\" clicked in a non-existent window. Ignoring", m_Username.c_str());
 		return;
 	}
-
+	m_Player->AddKnownItem(a_HeldItem);
 	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_ClickAction, a_HeldItem);
 }
 
@@ -3123,6 +3123,33 @@ void cClientHandle::SendUpdateSign(
 void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cClientHandle::SendUnlockRecipe(UInt32 a_RecipeId)
+{
+	m_Protocol->SendUnlockRecipe(a_RecipeId);
+}
+
+
+
+
+
+void cClientHandle::SendInitRecipes(UInt32 a_RecipeId)
+{
+	m_Protocol->SendInitRecipes(a_RecipeId);
+}
+
+
+
+
+
+void cClientHandle::HandleCraftRecipe(UInt32 a_RecipeId)
+{
+	m_Player->GetWindow()->LoadRecipe(*m_Player, a_RecipeId);
 }
 
 

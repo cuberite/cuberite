@@ -24,6 +24,7 @@
 #include "BrewingRecipes.h"
 #include "FurnaceRecipe.h"
 #include "CraftingRecipes.h"
+#include "Protocol/RecipeMapper.h"
 #include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
 #include "Entities/Player.h"
@@ -213,6 +214,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
 	m_CraftingRecipes = new cCraftingRecipes();
+	m_RecipeMapper.reset(new cRecipeMapper());
 	m_FurnaceRecipe   = new cFurnaceRecipe();
 	m_BrewingRecipes.reset(new cBrewingRecipes());
 

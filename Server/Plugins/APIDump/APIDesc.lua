@@ -6345,6 +6345,23 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Adds the specified damage (1 by default) to the specified item. Removes the item and returns true if the item reached its max damage and was destroyed.",
 				},
+				FindItem =
+				{
+					Params =
+					{
+						{
+							Name = "RecipeItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Finds an item based on ItemType and ItemDamage (<- defines the itemType, too)",
+				},
 				GetArmorGrid =
 				{
 					Returns =
@@ -7495,6 +7512,23 @@ This class represents a 2D array of items. It is used as the underlying storage 
 						},
 						Notes = "Destroys the item in the specified slot",
 					},
+				},
+				FindItem =
+				{
+					Params =
+					{
+						{
+							Name = "RecipeItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Finds an item based on ItemType and ItemDamage (<- defines the itemType, too)",
 				},
 				GetFirstEmptySlot =
 				{

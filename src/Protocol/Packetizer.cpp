@@ -121,6 +121,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktTimeUpdate:            return "pktTimeUpdate";
 		case cProtocol::pktTitle:                 return "pktTitle";
 		case cProtocol::pktUnloadChunk:           return "pktUnloadChunk";
+		case cProtocol::pktUnlockRecipe:          return "pktUnlockRecipe";
 		case cProtocol::pktUpdateBlockEntity:     return "pktUpdateBlockEntity";
 		case cProtocol::pktUpdateHealth:          return "pktUpdateHealth";
 		case cProtocol::pktUpdateScore:           return "pktUpdateScore";
@@ -134,7 +135,3 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 	}
 	return Printf("Unknown packet type: 0x%02x", a_PacketType);
 }
-
-
-
-

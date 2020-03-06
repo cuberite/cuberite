@@ -600,6 +600,9 @@ public:
 	/** get player explosion exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 
+	/** Adds an Item ID to the list of known items */
+	void AddKnownItem(const cItem & a_Item);
+
 protected:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
@@ -794,5 +797,14 @@ private:
 	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
 	If he is not on ground it also gets divided by 5. */
 	float GetDigSpeed(BLOCKTYPE a_Block);
+
+	/** Add the recipe ID to the known recipes */
+	void AddKnownRecipe(UInt32 RecipeId);
+
+	/** List on known recipes as IDs */
+	std::set<UInt32> m_KnownRecipes;
+
+	/** List of known items as IDs */
+	std::set<cItem, cItem::sItemCompare> m_KnownItems;
 
 } ;  // tolua_export

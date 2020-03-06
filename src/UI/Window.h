@@ -178,6 +178,9 @@ public:
 	/** Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea */
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 
+	/** Loads the given Recipe into the crafting grid */
+	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
+
 protected:
 	cSlotAreas m_SlotAreas;
 
@@ -226,8 +229,5 @@ protected:
 	/** Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed.
 	@param a_LimitItems if false, no checks are performed on a_Item.m_ItemCount. */
 	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems = true);
+
 } ;  // tolua_export
-
-
-
-

@@ -1019,10 +1019,24 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
 
 
 
+void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, RecipeID);
+	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    MakeAll);
+	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
+	m_Client->HandleCraftRecipe(CuberiteRecipeId);
+}
+
+
+
+
+
 void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
+	// TODO not yet used, not sure if it is needed
+	// https://wiki.vg/index.php?title=Protocol&oldid=14204#Crafting_Book_Data
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
-	m_Client->GetPlayer()->SendMessageInfo("The green crafting book feature is not implemented yet.");
 }
 
 
@@ -1277,7 +1291,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x0f: HandlePacketPlayerLook(a_ByteBuffer); return true;
 				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
 				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
-				case 0x12: break;  // Craft Recipe Request - not yet implemented
+				case 0x12: HandleCraftRecipe(a_ByteBuffer); return true;
 				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
@@ -1396,4 +1410,51 @@ void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 
 	cPacketizer Pkt(*this, pktKeepAlive);
 	Pkt.WriteBEInt64(a_PingID);
+}
+
+
+
+
+
+void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	UInt32 ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+
+	cPacketizer Pkt(*this, pktUnlockRecipe);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteBool(true);
+	Pkt.WriteBool(false);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteVarInt32(ProtocolRecipeId);
+}
+
+
+
+
+
+void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
+{
+	// Translate ID here
+	ASSERT(m_State == 3);  // In game mode?
+
+	UInt32 ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+
+	cPacketizer Pkt(*this, pktUnlockRecipe);
+	Pkt.WriteVarInt32(0);
+	Pkt.WriteBool(true);
+	Pkt.WriteBool(false);
+	if (a_RecipeID == 0)
+	{
+		Pkt.WriteVarInt32(0);
+		Pkt.WriteVarInt32(0);
+	}
+	else
+	{
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId);
+	}
 }
