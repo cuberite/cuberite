@@ -39,6 +39,35 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
+void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
+{
+	// Process packet sending every two ticks
+	if (GetWorld()->GetWorldAge() % 2 != 0)
+	{
+		return;
+	}
+
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+
+	if (Diff.HasNonZeroLength())  // Have we moved?
+	{
+		if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
+		{
+			m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
+		}
+		else
+		{
+			// Too big a movement, do a teleport
+			m_World->BroadcastTeleportEntity(*this, a_Exclude);
+		}
+		m_LastSentPosition = GetPosition();
+	}
+}
+
+
+
+
+
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	m_LastDamage = 10;
