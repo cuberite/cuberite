@@ -213,6 +213,7 @@ cPlayer::~cPlayer(void)
 	SaveToDisk();
 
 	m_ClientHandle = nullptr;
+	SetIsTicking(false);
 
 	delete m_InventoryWindow;
 	m_InventoryWindow = nullptr;
