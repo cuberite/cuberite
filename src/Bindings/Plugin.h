@@ -80,10 +80,11 @@ public:
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) = 0;
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) = 0;
-	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
-	virtual bool OnPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window) = 0;
+	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround) = 0;
+	virtual bool OnPlayerOpeningWindow		(cPlayer & a_Player, cWindow & a_Window) = 0;
 	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
+	virtual bool OnPlayerCrouching	        (cPlayer & a_Player, bool a_IsCrouched) = 0;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) = 0;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) = 0;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) = 0;
