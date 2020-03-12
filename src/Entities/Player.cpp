@@ -694,6 +694,7 @@ void cPlayer::StartEating(void)
 
 
 
+
 void cPlayer::FinishEating(void)
 {
 	// Reset the timer:
@@ -874,6 +875,11 @@ void cPlayer::SetCrouch(bool a_IsCrouched)
 			return;
 		}
 		m_IsCrouched = a_IsCrouched;
+		m_World->BroadcastEntityMetadata(*this);
+	}
+	else
+	{
+		m_IsCrouched != a_IsCrouched;
 		m_World->BroadcastEntityMetadata(*this);
 	}
 }
@@ -2574,8 +2580,8 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-					m_Stats.AddValue(statJumps, 1);
-					AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
+				m_Stats.AddValue(statJumps, 1);
+				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
