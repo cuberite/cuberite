@@ -81,7 +81,7 @@ public:
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) = 0;
 	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround) = 0;
-	virtual bool OnPlayerOpeningWindow	(cPlayer & a_Player, cWindow & a_Window) = 0;
+	virtual bool OnPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window) = 0;
 	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerCrouching	        (cPlayer & a_Player, bool a_IsCrouched) = 0;
