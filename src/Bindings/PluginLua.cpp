@@ -715,6 +715,9 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 }
 
 
+
+
+
 bool cPluginLua::OnPlayerCrouching(cPlayer & a_Player, bool a_IsCrouched)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHING,
