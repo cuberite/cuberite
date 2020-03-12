@@ -8914,6 +8914,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
 				},
+				GetRelativeRunSpeed =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the relative run speed of this mob. Standard is 1.0",
+				},
 				GetSpawnDelay =
 				{
 					IsStatic = true,

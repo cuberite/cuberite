@@ -20,7 +20,6 @@ cWolf::cWolf(void) :
 	m_CollarColor(E_META_DYE_ORANGE),
 	m_NotificationCooldown(0)
 {
-	m_RelativeWalkSpeed = 2;
 }
 
 
