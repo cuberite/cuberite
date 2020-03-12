@@ -843,6 +843,9 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 }
 
 
+
+
+
 bool cPluginManager::CallHookPlayerCrouching(cPlayer & a_Player, bool a_IsCrouched)
 {
 	return GenericCallHook(HOOK_PLAYER_CROUCHING, [&](cPlugin * a_Plugin)
@@ -851,6 +854,9 @@ bool cPluginManager::CallHookPlayerCrouching(cPlayer & a_Player, bool a_IsCrouch
 		}
 	);
 }
+
+
+
 
 
 bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
