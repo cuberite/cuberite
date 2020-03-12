@@ -4,7 +4,6 @@
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
 #include "IniFile.h"
-#include <functional>
 
 
 
@@ -23,6 +22,9 @@ struct cMonsterConfig::sAttributesStruct
 	bool    m_IsFireproof;
 	bool    m_BurnsInDaylight;
 };
+
+
+
 
 
 struct cMonsterConfig::sMonsterConfigState
