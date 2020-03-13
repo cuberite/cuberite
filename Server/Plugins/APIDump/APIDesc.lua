@@ -9106,6 +9106,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the relative walk speed of this mob. The default relative speed is 1.0.",
 				},
+				SetRelativeRunSpeed =
+				{
+					Params =
+					{
+						{
+							Name = "RelativeRunSpeed",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the relative walk speed of this mob. The default relative speed is 1.0.",
+				},
 				StringToMobType =
 				{
 					IsStatic = true,
