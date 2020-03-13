@@ -1068,11 +1068,11 @@ public:
 			mWriter.AddFloat("ItemDropChance", 1.0F);
 		mWriter.EndCompound();
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	void AddArmorStandEntity(cArmorStand * a_ArmorStand)
 	{
 		mWriter.BeginCompound("");
@@ -1110,6 +1110,30 @@ public:
 					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().x);
 					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().y);
 					mWriter.AddFloat("", a_ArmorStand->GetRightLegRotation().z);
+				mWriter.EndList();
+				mWriter.BeginList("Head", TAG_Float);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().x);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().y);
+					mWriter.AddFloat("", a_ArmorStand->GetHeadRotation().z);
+				mWriter.EndList();
+			mWriter.EndCompound();
+			mWriter.BeginList("ArmorItems", TAG_Compound);
+				if (!a_ArmorStand->GetEquippedBoots().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedBoots(), 0);
+				}
+				if (!a_ArmorStand->GetEquippedLeggings().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedLeggings(), 1);
+				}
+				if (!a_ArmorStand->GetEquippedChestplate().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedChestplate(), 2);
+				}
+				if (!a_ArmorStand->GetEquippedHelmet().IsEmpty())
+				{
+					AddItem(a_ArmorStand->GetEquippedHelmet(), 3);
+				}
 			mWriter.EndList();
 			mWriter.BeginList("HandItems", TAG_Compound);
 				if (!a_ArmorStand->GetEquippedWeapon().IsEmpty())
