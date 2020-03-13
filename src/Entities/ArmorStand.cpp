@@ -12,7 +12,7 @@
 
 
 cArmorStand::cArmorStand(Vector3d a_Pos, double a_Yaw):
-	cEntity(etArmorStand, a_Pos.x, a_Pos.y, a_Pos.z, 0.5, 0.9875),
+	super(etArmorStand, a_Pos, 0.5, 0.9875),
 	m_IsVisible(true),
 	m_CustomName(""),
 	m_CustomNameAlwaysVisible(false),
