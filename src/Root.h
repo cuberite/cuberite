@@ -28,6 +28,8 @@ class cCompositeChat;
 class cSettingsRepositoryInterface;
 class cDeadlockDetect;
 class cUUID;
+class BlockTypePalette;
+class ProtocolPalettes;
 
 using cPlayerListCallback =  cFunctionRef<bool(cPlayer &)>;
 using cWorldListCallback  =  cFunctionRef<bool(cWorld  &)>;
@@ -91,6 +93,12 @@ public:
 
 	/** Returns the (read-write) storage for registered block types. */
 	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
+
+	/** Returns the block type palette used for upgrading blocks from pre-1.13 data. */
+	const BlockTypePalette & GetUpgradeBlockTypePalette() const { return *m_UpgradeBlockTypePalette; }
+
+	/** Returns the per-protocol palettes manager. */
+	ProtocolPalettes & GetProtocolPalettes() const { return *m_ProtocolPalettes; }
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -234,8 +242,18 @@ private:
 	/** The storage for all registered block types. */
 	BlockTypeRegistry m_BlockTypeRegistry;
 
+	/** The upgrade palette for pre-1.13 blocks. */
+	std::unique_ptr<BlockTypePalette> m_UpgradeBlockTypePalette;
+
+	/** The per-protocol palettes manager. */
+	std::unique_ptr<ProtocolPalettes> m_ProtocolPalettes;
+
 
 	void LoadGlobalSettings();
+
+	/** Loads the upgrade palette and the per-protocol palettes.
+	The aProtocolFolder is the path to the folder containing the per-protocol palettes. */
+	void LoadPalettes(const AString & aProtocolFolder);
 
 	/** Loads the worlds from settings.ini, creates the worldmap */
 	void LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);

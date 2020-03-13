@@ -227,9 +227,24 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 
 
 
-bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
+	cItems & a_Pickups
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_BLOCK_TO_PICKUPS, &a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups);
+	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make breaking API changes
+	return CallSimpleHooks(
+		cPluginManager::HOOK_BLOCK_TO_PICKUPS,
+		&a_World,
+		a_Digger,
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		a_BlockType, a_BlockMeta, &a_Pickups
+	);
 }
 
 

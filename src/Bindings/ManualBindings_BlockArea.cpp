@@ -216,7 +216,7 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.FApiParamError("Coords ({0}) out of range ({1} - {2).",
+		return L.FApiParamError("Coords ({0}) out of range ({1} - {2}).",
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}

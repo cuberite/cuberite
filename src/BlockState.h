@@ -52,6 +52,9 @@ public:
 	(it's possible to erase a key from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
 	BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues);
 
+	/** Less-than comparison. */
+	bool operator <(const BlockState & aOther) const;
+
 	/** Fast equality check. */
 	bool operator ==(const BlockState & aOther) const;
 

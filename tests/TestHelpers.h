@@ -172,6 +172,14 @@ public:
 
 
 
+/** Fails the test unconditionally, with the specified message. */
+#define TEST_FAIL(MSG) \
+	throw TestException(__FILE__, __LINE__, __FUNCTION__, MSG);
+
+
+
+
+
 /** Checks that the statement causes an ASSERT trigger. */
 #ifdef _DEBUG
 	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
@@ -210,7 +218,9 @@ int main() \
 	} \
 	catch (const cAssertFailure & exc) \
 	{ \
-		LOGERROR("Test has failed, an unexpected ASSERT was triggered at %s:%d", exc.fileName().c_str(), exc.lineNumber()); \
+		LOGERROR("Test has failed, an unexpected ASSERT was triggered at %s:%d: %s", \
+			exc.fileName().c_str(), exc.lineNumber(), exc.expression().c_str() \
+		); \
 		return 1; \
 	} \
 	catch (...) \

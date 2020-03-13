@@ -132,12 +132,12 @@ cMonster::~cMonster()
 
 
 
-void cMonster::Destroy(bool a_ShouldBroadcast)
+void cMonster::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
-		Unleash(false, a_ShouldBroadcast);
+		Unleash(false, true);
 
 		// Remove leash knot if there are no more mobs leashed to
 		if (!LeashedTo->HasAnyMobLeashed() && LeashedTo->IsLeashKnot())
@@ -146,7 +146,7 @@ void cMonster::Destroy(bool a_ShouldBroadcast)
 		}
 	}
 
-	super::Destroy(a_ShouldBroadcast);
+	super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -284,7 +284,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_DestroyTimer += a_Dt;
 		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
-			Destroy(true);
+			Destroy();
 		}
 		return;
 	}
@@ -586,6 +586,20 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_TicksSinceLastDamaged = 0;
 	}
 	return true;
+}
+
+
+
+
+
+void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
+{
+	// Stop all mobs from targeting this entity
+	// Stop this entity from targeting other mobs
+	SetTarget(nullptr);
+	StopEveryoneFromTargetingMe();
+
+	super::DoMoveToWorld(a_WorldChangeInfo);
 }
 
 

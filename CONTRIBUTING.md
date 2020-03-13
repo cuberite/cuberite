@@ -29,9 +29,10 @@ Here are the conventions:
    - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
    - See the discussion in issue #3853
  - Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
- - Put spaces before and after every operator.
+ - Put spaces before and after every operator, except unary operators.
    - `a = b + c;`
    - `if (a == b)`
+   - `++itr`
  - Keep individual functions spaced out by 5 empty lines, this enhances readability and makes navigation in the source file easier.
  - Add those extra parentheses to conditions, especially in C++:
    - `if ((a == 1) && ((b == 2) || (c == 3)))` instead of ambiguous `if (a == 1 && b == 2 || c == 3)`

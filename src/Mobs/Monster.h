@@ -43,7 +43,7 @@ public:
 
 	virtual ~cMonster() override;
 
-	virtual void Destroy(bool a_ShouldBroadcast = true) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	virtual void Destroyed() override;
 
@@ -318,6 +318,8 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
+
+	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach.

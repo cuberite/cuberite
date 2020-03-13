@@ -18,9 +18,14 @@ class cClientHandle;
 class cChestEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 3,
@@ -32,7 +37,7 @@ public:
 	BLOCKENTITY_PROTODEF(cChestEntity)
 
 	/** Constructor used for normal operation */
-	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cChestEntity() override;
 
@@ -58,6 +63,7 @@ public:
 
 	/** Sets the number of players who currently have this chest open */
 	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
+
 
 private:
 
@@ -90,10 +96,9 @@ private:
 			}
 
 			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-			auto Pos = Vector3i(m_PosX, m_PosY, m_PosZ);
-			m_World->DoWithChunkAt(Pos, [&](cChunk & a_Chunk)
+			m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
 				{
-					m_World->GetRedstoneSimulator()->WakeUp(Pos, &a_Chunk);
+					m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
 					return true;
 				}
 			);

@@ -35,14 +35,15 @@ public:
 
 	CLASS_PROTODEF(cBoat)
 
+	cBoat(Vector3d a_Pos, eMaterial a_Material);
+
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
-
-	cBoat(Vector3d a_Pos, eMaterial a_Material);
 
 	int GetLastDamage(void) const { return m_LastDamage; }
 	int GetForwardDirection(void) const { return m_ForwardDirection; }

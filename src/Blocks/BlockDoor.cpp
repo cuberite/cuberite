@@ -7,8 +7,8 @@
 
 
 
-cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType)
-	: super(a_BlockType)
+cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType):
+	super(a_BlockType)
 {
 }
 
@@ -16,24 +16,22 @@ cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
 {
-	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-
-	if (OldMeta & 8)
+	if ((a_OldBlockMeta & 0x08) != 0)
 	{
 		// Was upper part of door
-		if (IsDoorBlockType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY - 1, a_BlockZ})))
+		if ((a_BlockPos.y > 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1))))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(-1));
 		}
 	}
 	else
 	{
 		// Was lower part
-		if (IsDoorBlockType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ})))
+		if ((a_BlockPos.y < cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(1))))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(1));
 		}
 	}
 }

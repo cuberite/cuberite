@@ -36,13 +36,25 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		auto & rand = GetRandomProvider();
+		// If breaking with shears, drop self:
+		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
+		{
+			return cItem(m_BlockType, a_BlockMeta & 0x03);
+		}
+
 
 		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
+		// Note: It is possible (though very rare) for a single leaves block to drop both a sapling and an apple
 		// TODO: Take into account fortune for sapling drops.
 		double chance = 0.0;
+		auto & rand = GetRandomProvider();
+		cItems res;
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
 		{
 			// Jungle leaves have a 2.5% chance of dropping a sapling.
@@ -55,12 +67,10 @@ public:
 		}
 		if (rand.RandBool(chance))
 		{
-			a_Pickups.push_back(
-				cItem(
-					E_BLOCK_SAPLING,
-					1,
-					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : static_cast<short>(4 + (a_BlockMeta & 0x01))
-				)
+			res.Add(
+				E_BLOCK_SAPLING,
+				1,
+				(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : static_cast<short>(4 + (a_BlockMeta & 0x01))
 			);
 		}
 
@@ -69,21 +79,30 @@ public:
 		{
 			if (rand.RandBool(0.005))
 			{
-				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
+				res.Add(E_ITEM_RED_APPLE, 1, 0);
 			}
 		}
+		return res;
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
-	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 
-		// Set 0x8 bit so this block gets checked for decay:
-		if ((Meta & 0x08) == 0)
+
+
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	{
+		auto meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+
+		// Set bit 0x08, so this block gets checked for decay:
+		if ((meta & 0x08) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x8, true, false);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, meta | 0x8, true, false);
 		}
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -119,14 +138,17 @@ public:
 		if (HasNearLog(Area, BlockX, a_RelY, BlockZ))
 		{
 			// Wood found, the leaves stay; unset the check bit
-			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta ^ 0x8, true, false);
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta ^ 0x08, true, false);
 			return;
 		}
 
 		// Decay the leaves:
-		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
-		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
+		a_ChunkInterface.DropBlockAsPickups({BlockX, a_RelY, BlockZ});
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

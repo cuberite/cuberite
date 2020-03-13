@@ -10,8 +10,8 @@
 
 
 
-cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y, a_BlockPosition.z + 0.5f, 0.98, 0.98),
+cFallingBlock::cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	super(etFallingBlock, Vector3d(0.5, 0, 0.5) + a_BlockPosition, 0.98, 0.98),
 	m_BlockType(a_BlockType),
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)
@@ -47,7 +47,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
 		if (BlockY < VOID_BOUNDARY)
 		{
-			Destroy(true);
+			Destroy();
 		}
 		return;
 	}
@@ -65,7 +65,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
 		// Must finish the fall with coords one below the block:
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
-		Destroy(true);
+		Destroy();
 		return;
 	}
 	else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
@@ -84,14 +84,14 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		}
-		Destroy(true);
+		Destroy();
 		return;
 	}
 	else if ((m_BlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockBelow))
 	{
 		// Concrete powder falling into water solidifies on the first water it touches
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, E_BLOCK_CONCRETE, m_BlockMeta);
-		Destroy(true);
+		Destroy();
 		return;
 	}
 

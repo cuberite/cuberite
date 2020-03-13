@@ -55,7 +55,7 @@ public:
 
 	/** Spawns experience orbs of the specified total value at the given location. The orbs' values are split according to regular Minecraft rules.
 	Returns an vector of UniqueID of all the orbs. */
-	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
+	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward) = 0;
 
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;

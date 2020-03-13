@@ -11,8 +11,8 @@
 
 
 
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World),
+cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
@@ -138,9 +138,9 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 
 bool cBeaconEntity::IsBeaconBlocked(void)
 {
-	for (int Y = m_PosY; Y < cChunkDef::Height; ++Y)
+	for (int Y = m_Pos.y; Y < cChunkDef::Height; ++Y)
 	{
-		BLOCKTYPE Block = m_World->GetBlock(m_PosX, Y, m_PosZ);
+		BLOCKTYPE Block = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
 		if (!cBlockInfo::IsTransparent(Block))
 		{
 			return true;
@@ -195,7 +195,7 @@ void cBeaconEntity::UpdateBeacon(void)
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
 
-		Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
+		Vector3d BeaconPosition(m_Pos);
 		GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
 			{
 				Vector3d Distance = BeaconPosition - a_Player.GetPosition();
@@ -233,7 +233,7 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
+	Vector3d BeaconPosition(m_Pos);
 	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
 		{
 			auto PlayerPosition = a_Player.GetPosition();
@@ -263,7 +263,7 @@ void cBeaconEntity::GiveEffects(void)
 
 void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBeaconEntity &>(a_Src);
 	m_BeaconLevel = src.m_BeaconLevel;
 	m_Contents.CopyFrom(src.m_Contents);
@@ -305,7 +305,7 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cBeaconWindow(this));
 		Window = GetWindow();
 	}
 

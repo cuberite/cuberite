@@ -99,11 +99,8 @@ public:
 		UNUSED(a_Item);
 	}
 
-	/** Called while the player diggs a block using this item */
+	/** Called while the player digs a block using this item */
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
-
-	/** Called when the player destroys a block using this item. This also calls the drop function for the destroyed block */
-	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Called when a player attacks a other entity. */
 	virtual void OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity);

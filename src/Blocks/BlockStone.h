@@ -6,24 +6,38 @@
 
 
 
-class cBlockStoneHandler :
+class cBlockStoneHandler:
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
-	cBlockStoneHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockStoneHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		if (a_BlockMeta == E_META_STONE_STONE)
+		// Convert stone to cobblestone, unless using silk-touch:
+		if (
+			(a_BlockMeta == E_META_STONE_STONE) &&
+			!ToolHasSilkTouch(a_Tool)
+		)
 		{
-			a_Pickups.push_back(cItem(E_BLOCK_COBBLESTONE, 1, 0));
-			return;
+			return cItem(E_BLOCK_COBBLESTONE, 1, 0);
 		}
-		a_Pickups.push_back(cItem(E_BLOCK_STONE, 1, a_BlockMeta));
+		return cItem(m_BlockType, 1, a_BlockMeta);
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

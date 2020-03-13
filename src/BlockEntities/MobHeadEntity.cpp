@@ -13,8 +13,8 @@
 
 
 
-cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
@@ -27,7 +27,7 @@ cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 
 void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
 	m_OwnerName = src.m_OwnerName;
 	m_OwnerTexture = src.m_OwnerTexture;
@@ -125,7 +125,7 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
-	a_Client.SendBlockChange(m_PosX, m_PosY, m_PosZ, m_BlockType, World->GetBlockMeta(GetPos()));
+	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, World->GetBlockMeta(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

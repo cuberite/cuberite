@@ -90,8 +90,11 @@ protected:
 
 
 
-cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
-	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
+////////////////////////////////////////////////////////////////////////////////
+// cMinecart:
+
+cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
+	super(etMinecart, a_Pos, 0.98, 0.7),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
@@ -134,10 +137,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
-	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-	if (Chunk == nullptr)
+	auto relPos = a_Chunk.AbsoluteToRelative(GetPosition());
+	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
+	if (chunk == nullptr)
 	{
 		// Inside an unloaded chunk, bail out all processing
 		return;
@@ -145,12 +147,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BLOCKTYPE InsideType;
 	NIBBLETYPE InsideMeta;
-	Chunk->GetBlockTypeMeta(RelPosX, PosY, RelPosZ, InsideType, InsideMeta);
+	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
 
 	if (!IsBlockRail(InsideType))
 	{
 		// When a descending minecart hits a flat rail, it goes through the ground; check for this
-		Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);
+		chunk->GetBlockTypeMeta(relPos.addedY(1), InsideType, InsideMeta);
 		if (IsBlockRail(InsideType))
 		{
 			// Push cart upwards
@@ -190,12 +192,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
-		super::HandlePhysics(a_Dt, *Chunk);
+		super::HandlePhysics(a_Dt, *chunk);
 	}
 
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 		m_bIsOnDetectorRail = false;
 	}
 	else if (WasDetectorRail)
@@ -1165,8 +1167,8 @@ void cMinecart::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
-cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height) :
-	super(mpNone, a_X, a_Y, a_Z),
+cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height):
+	super(mpNone, a_Pos),
 	m_Content(a_Content),
 	m_Height(a_Height)
 {
@@ -1210,8 +1212,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithChest:
 
-cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
-	super(mpChest, a_X, a_Y, a_Z),
+cMinecartWithChest::cMinecartWithChest(Vector3d a_Pos):
+	super(mpChest, a_Pos),
 	cEntityWindowOwner(this),
 	m_Contents(ContentsWidth, ContentsHeight)
 {
@@ -1284,8 +1286,8 @@ void cMinecartWithChest::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithFurnace:
 
-cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
-	super(mpFurnace, a_X, a_Y, a_Z),
+cMinecartWithFurnace::cMinecartWithFurnace(Vector3d a_Pos):
+	super(mpFurnace, a_Pos),
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
@@ -1351,8 +1353,8 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithTNT:
 
-cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
-	super(mpTNT, a_X, a_Y, a_Z)
+cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
+	super(mpTNT, a_Pos)
 {
 }
 
@@ -1365,8 +1367,8 @@ cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithHopper:
 
-cMinecartWithHopper::cMinecartWithHopper(double a_X, double a_Y, double a_Z) :
-	super(mpHopper, a_X, a_Y, a_Z)
+cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
+	super(mpHopper, a_Pos)
 {
 }
 

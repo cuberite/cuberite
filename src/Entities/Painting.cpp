@@ -10,8 +10,8 @@
 
 
 
-cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, double a_X, double a_Y, double a_Z)
-	: cHangingEntity(etPainting, a_Direction, a_X, a_Y, a_Z),
+cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos):
+	super(etPainting, a_Direction, a_Pos),
 	m_Name(a_Name)
 {
 }

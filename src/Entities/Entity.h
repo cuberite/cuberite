@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../Item.h"
+#include "../OSSupport/AtomicUniquePtr.h"
 
 
 
@@ -72,6 +73,16 @@ struct TakeDamageInfo
 // tolua_begin
 class cEntity
 {
+protected:
+	/** State variables for MoveToWorld. */
+	struct sWorldChangeInfo
+	{
+		cWorld * m_NewWorld;
+		Vector3d m_NewPosition;
+		bool m_SetPortalCooldown;
+		bool m_SendRespawn;
+	};
+
 public:
 
 	enum eEntityType
@@ -160,12 +171,22 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
 	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
+
+	/** Called when the entity is added to a world.
+	e.g after first spawning or after successfuly moving between worlds.
+	\param a_World The world being added to. */
+	virtual void OnAddToWorld(cWorld & a_World);
+
+	/** Called when the entity is removed from a world.
+	e.g. When the entity is destroyed or moved to a different world.
+	\param a_World The world being removed from. */
+	virtual void OnRemoveFromWorld(cWorld & a_World);
 
 	// tolua_begin
 
@@ -273,8 +294,14 @@ public:
 	If this returns false, you must stop using the cEntity pointer you have. */
 	bool IsTicking(void) const;
 
-	/** Destroys the entity and schedules it for memory freeing; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
-	virtual void Destroy(bool a_ShouldBroadcast = true);
+	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
+	virtual void Destroy();
+
+	OBSOLETE void Destroy(bool a_ShouldBroadcast)
+	{
+		LOGWARNING("cEntity:Destory(bool) is deprecated, use cEntity:Destroy() instead.");
+		Destroy();
+	}
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
@@ -447,9 +474,18 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
+	OBSOLETE void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false)
+	{
+		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
+		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
+	}
 
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	bool MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
+
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+	{
+		return MoveToWorld(a_World, a_NewPosition, false, a_ShouldSendRespawn);
+	}
 
 	/** Moves entity to specified world, taking a world pointer */
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
@@ -459,7 +495,11 @@ public:
 
 	// tolua_end
 
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	/** Returns true if a world change is scheduled to happen. */
+	bool IsWorldChangeScheduled() const
+	{
+		return (m_WorldChangeInfo.load() != nullptr);
+	}
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -564,13 +604,16 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
-	/** Adds a mob to the leashed list of mobs */
+	/** Adds a mob to the leashed list of mobs. */
 	void AddLeashedMob(cMonster * a_Monster);
 
-	/** Removes a mob from the leashed list of mobs */
+	/** Removes a mob from the leashed list of mobs. */
 	void RemoveLeashedMob(cMonster * a_Monster);
 
-	/** Returs whether the entity has any mob leashed to */
+	/** Removes all mobs from the leashed list of mobs. */
+	void RemoveAllLeashedMobs();
+
+	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
 	/** a lightweight calculation approach to get explosion exposure rate
@@ -579,7 +622,9 @@ public:
 	@return exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
+
 protected:
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -590,6 +635,7 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
+
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
@@ -631,18 +677,18 @@ protected:
 	Data: https://minecraft.gamepedia.com/Entity#Motion_of_entities */
 	float m_AirDrag;
 
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastSentPosition;
+
 	Vector3d m_LastPosition;
 
 	eEntityType m_EntityType;
 
 	cWorld * m_World;
 
-	/** State variables for ScheduleMoveToWorld. */
-	bool m_IsWorldChangeScheduled;
-	bool m_WorldChangeSetPortalCooldown;
-	bool m_WorldChangeSendRespawn;
-	cWorld * m_NewWorld;
-	Vector3d m_NewWorldPosition;
+	/** If not nullptr, a world change is scheduled and a task is queued in the current world. */
+	cAtomicUniquePtr<sWorldChangeInfo> m_WorldChangeInfo;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
@@ -689,6 +735,10 @@ protected:
 	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 
+	/** Handles the moving of this entity between worlds.
+	Should handle degenerate cases such as moving to the same world. */
+	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
+
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
 	/** Applies friction to an entity
@@ -707,6 +757,9 @@ protected:
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
 	virtual void ResetPosition(Vector3d a_NewPos);
 
+	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
+	void BroadcastLeashedMobs();
+
 private:
 
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
@@ -723,10 +776,6 @@ private:
 
 	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Position;
-
-	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
-	Only updated if cEntity::BroadcastMovementUpdate() is called! */
-	Vector3d m_LastSentPosition;
 
 	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;

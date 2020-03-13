@@ -83,6 +83,52 @@ BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, ASt
 
 
 
+bool BlockState::operator <(const BlockState & aOther) const
+{
+	// Fast-return this using checksum
+	if (mChecksum != aOther.mChecksum)
+	{
+		return (mChecksum < aOther.mChecksum);
+	}
+
+	// Can fast-return this due to how comparison works
+	if (mState.size() != aOther.mState.size())
+	{
+		return (mState.size() < aOther.mState.size());
+	}
+
+	auto itA = mState.begin();
+	auto itOther = aOther.mState.begin();
+
+	// don't need to check itOther, size checks above ensure size(A) == size(O)
+	while (itA != mState.end())
+	{
+		{
+			const auto cmp = itA->first.compare(itOther->first);
+			if (cmp != 0)
+			{
+				return (cmp < 0);
+			}
+		}
+		{
+			const auto cmp = itA->second.compare(itOther->second);
+			if (cmp != 0)
+			{
+				return (cmp < 0);
+			}
+		}
+
+		++itA;
+		++itOther;
+	}
+
+	return false;
+}
+
+
+
+
+
 bool BlockState::operator ==(const BlockState & aOther) const
 {
 	// Fast-fail if the checksums differ or differrent counts:

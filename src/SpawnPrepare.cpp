@@ -21,9 +21,9 @@ protected:
 
 	std::shared_ptr<cSpawnPrepare> m_SpawnPrepare;
 
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 	{
-		m_SpawnPrepare->PreparedChunkCallback(a_ChunkX, a_ChunkZ);
+		m_SpawnPrepare->PreparedChunkCallback(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 	}
 };
 

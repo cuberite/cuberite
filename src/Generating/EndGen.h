@@ -46,23 +46,22 @@ protected:
 	int m_MinChunkZ, m_MaxChunkZ;
 
 	// Noise array for the last chunk (in the noise range)
-	int m_LastChunkX;
-	int m_LastChunkZ;
+	cChunkCoords m_LastChunkCoords;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
 
 
 	/** Unless the LastChunk coords are equal to coords given, prepares the internal state (noise array) */
-	void PrepareState(int a_ChunkX, int a_ChunkZ);
+	void PrepareState(cChunkCoords a_ChunkCoords);
 
 	/** Generates the m_NoiseArray array for the current chunk */
 	void GenerateNoiseArray(void);
 
 	/** Returns true if the chunk is outside of the island's dimensions */
-	bool IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ);
+	bool IsChunkOutsideRange(cChunkCoords a_ChunkCoords);
 
 
 	// cTerrainShapeGen overrides:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 
 
 	// cTerrainCompositionGen overrides:

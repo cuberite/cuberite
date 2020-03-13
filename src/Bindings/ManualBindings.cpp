@@ -3477,14 +3477,13 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	}
 
 	NIBBLETYPE a_BlockMeta = static_cast<NIBBLETYPE>(tolua_tonumber(tolua_S, 2, 0));
-	int a_OutputX, a_OutputY, a_OutputZ;
-	bool res = self->GetOutputBlockPos(a_BlockMeta, a_OutputX, a_OutputY, a_OutputZ);
-	tolua_pushboolean(tolua_S, res);
-	if (res)
+	auto res = self->GetOutputBlockPos(a_BlockMeta);
+	tolua_pushboolean(tolua_S, res.first);
+	if (res.first)
 	{
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputX));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputY));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputZ));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.x));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.y));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.z));
 		return 4;
 	}
 	return 1;

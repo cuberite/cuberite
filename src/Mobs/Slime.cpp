@@ -19,7 +19,7 @@ cSlime::cSlime(int a_Size) :
 	),
 	m_Size(a_Size)
 {
-	SetMaxHealth(a_Size * a_Size);
+	SetMaxHealth(static_cast<float>(a_Size * a_Size));
 	SetAttackDamage(a_Size);
 }
 

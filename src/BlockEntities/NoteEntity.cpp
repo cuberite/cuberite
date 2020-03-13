@@ -9,8 +9,8 @@
 
 
 
-cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Pitch(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
@@ -22,7 +22,7 @@ cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Bl
 
 void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cNoteEntity &>(a_Src);
 	m_Pitch = src.m_Pitch;
 }
@@ -48,7 +48,7 @@ void cNoteEntity::MakeSound(void)
 	char instrument;
 	AString sampleName;
 
-	switch (m_World->GetBlock(m_PosX, m_PosY - 1, m_PosZ))
+	switch (m_World->GetBlock(m_Pos.addedY(-1)))
 	{
 		case E_BLOCK_ACACIA_DOOR:
 		case E_BLOCK_ACACIA_FENCE:
@@ -243,13 +243,13 @@ void cNoteEntity::MakeSound(void)
 		}
 	}
 
-	m_World->BroadcastBlockAction({m_PosX, m_PosY, m_PosZ}, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
+	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
 
 	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
 	float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
 	m_World->BroadcastSoundEffect(
 		sampleName,
-		Vector3d(m_PosX, m_PosY, m_PosZ),
+		m_Pos,
 		3.0f,
 		calcPitch
 	);

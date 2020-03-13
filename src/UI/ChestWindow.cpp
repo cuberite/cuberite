@@ -13,7 +13,7 @@
 
 
 
-cChestWindow::cChestWindow(cChestEntity * a_Chest) :
+cChestWindow::cChestWindow(cChestEntity * a_Chest):
 	cWindow(wtChest, (a_Chest->GetBlockType() == E_BLOCK_CHEST) ? "Chest" : "Trapped Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockPos(a_Chest->GetPos()),

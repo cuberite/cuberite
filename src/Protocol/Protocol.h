@@ -56,77 +56,90 @@ public:
 
 	virtual ~cProtocol() {}
 
-	/** A list of all outgoing packets */
-	enum eOutgoingPackets
+
+	/** Called after construction so that the protocol class can initialize itself.
+	Throws a std::exception descendant on failure; the client is kicked
+	with the exception's message as a result. */
+	virtual void Initialize(cClientHandle & a_Client) {}
+
+	/** Logical types of outgoing packets.
+	These values get translated to on-wire packet IDs in GetPacketID(), specific for each protocol.
+	This is mainly useful for protocol sub-versions that re-number the packets while using mostly the same packet layout. */
+	enum ePacketType
 	{
-		sendAttachEntity = 0,
-		sendBlockAction,
-		sendBlockBreakAnim,
-		sendBlockChange,
-		sendBlockChanges,
-		sendCameraSetTo,
-		sendChatRaw,
-		sendCollectEntity,
-		sendDestroyEntity,
-		sendDifficulty,
-		sendDisconnectDuringLogin,
-		sendDisconnectDuringGame,
-		sendDisplayObjective,
-		sendEditSign,
-		sendEntityAnimation,
-		sendEntityEffect,
-		sendEntityEquipment,
-		sendEntityHeadLook,
-		sendEntityLook,
-		sendEntityMeta,
-		sendEntityProperties,
-		sendEntityRelMove,
-		sendEntityRelMoveLook,
-		sendEntityStatus,
-		sendEntityVelocity,
-		sendExperience,
-		sendExperienceOrb,
-		sendExplosion,
-		sendGameMode,
-		sendHealth,
-		sendHeldItemChange,
-		sendInventorySlot,
-		sendJoinGame,
-		sendKeepAlive,
-		sendLeashEntity,
-		sendMapData,
-		sendPaintingSpawn,
-		sendParticleEffect,
-		sendPlayerAbilities,
-		sendPlayerList,
-		sendPlayerMaxSpeed,
-		sendPlayerMoveLook,
-		sendPlayerSpawn,
-		sendPluginMessage,
-		sendRemoveEntityEffect,
-		sendRespawn,
-		sendScoreboardObjective,
-		sendScoreUpdate,
-		sendSpawnObject,
-		sendSoundEffect,
-		sendSoundParticleEffect,
-		sendSpawnGlobalEntity,
-		sendSpawnMob,
-		sendSpawnPosition,
-		sendStatistics,
-		sendTabCompletion,
-		sendTeleportEntity,
-		sendTimeUpdate,
-		sendTitle,
-		sendUnloadChunk,
-		sendUpdateBlockEntity,
-		sendUpdateSign,
-		sendUseBed,
-		sendWeather,
-		sendWindowItems,
-		sendWindowClose,
-		sendWindowOpen,
-		sendWindowProperty
+		pktAttachEntity = 0,
+		pktBlockAction,
+		pktBlockBreakAnim,
+		pktBlockChange,
+		pktBlockChanges,
+		pktCameraSetTo,
+		pktChatRaw,
+		pktCollectEntity,
+		pktDestroyEntity,
+		pktDifficulty,
+		pktDisconnectDuringLogin,
+		pktDisconnectDuringGame,
+		pktDisplayObjective,
+		pktEditSign,
+		pktEncryptionRequest,
+		pktEntityAnimation,
+		pktEntityEffect,
+		pktEntityEquipment,
+		pktEntityHeadLook,
+		pktEntityLook,
+		pktEntityMeta,
+		pktEntityProperties,
+		pktEntityRelMove,
+		pktEntityRelMoveLook,
+		pktEntityStatus,
+		pktEntityVelocity,
+		pktExperience,
+		pktExplosion,
+		pktGameMode,
+		pktHeldItemChange,
+		pktInventorySlot,
+		pktJoinGame,
+		pktKeepAlive,
+		pktLeashEntity,
+		pktLoginSuccess,
+		pktMapData,
+		pktParticleEffect,
+		pktPingResponse,
+		pktPlayerAbilities,
+		pktPlayerList,
+		pktPlayerMaxSpeed,
+		pktPlayerMoveLook,
+		pktPluginMessage,
+		pktRemoveEntityEffect,
+		pktRespawn,
+		pktScoreboardObjective,
+		pktSpawnObject,
+		pktSoundEffect,
+		pktSoundParticleEffect,
+		pktSpawnExperienceOrb,
+		pktSpawnGlobalEntity,
+		pktSpawnMob,
+		pktSpawnOtherPlayer,
+		pktSpawnPainting,
+		pktSpawnPosition,
+		pktStartCompression,
+		pktStatistics,
+		pktStatusResponse,
+		pktTabCompletionResults,
+		pktTeleportEntity,
+		pktTimeUpdate,
+		pktTitle,
+		pktUnloadChunk,
+		pktUpdateBlockEntity,
+		pktUpdateHealth,
+		pktUpdateScore,
+		pktUpdateSign,
+		pktUseBed,
+		pktWeather,
+		pktWindowItems,
+		pktWindowClose,
+		pktWindowOpen,
+		pktWindowProperty
 	};
 
 	/** Called when client sends some data */
@@ -223,7 +236,9 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
+
 protected:
+
 	friend class cPacketizer;
 
 	cClientHandle * m_Client;
@@ -239,8 +254,8 @@ protected:
 	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
 	cByteBuffer m_OutPacketLenBuffer;
 
-	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum (see PacketID.cpp for implementations) */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) = 0;
+	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
+	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

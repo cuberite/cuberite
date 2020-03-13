@@ -9,11 +9,14 @@
 
 
 class cBlockRedstoneHandler :
-	public cBlockHandler
+	public cClearMetaOnDrop<cBlockHandler>
 {
+	using super = cClearMetaOnDrop<cBlockHandler>;
+
 public:
-	cBlockRedstoneHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockRedstoneHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
@@ -41,12 +44,6 @@ public:
 			}
 		}
 		return false;
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_DUST, 1, 0));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

@@ -190,7 +190,7 @@ public:
 		int ChunkX, ChunkZ;
 		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		cNoise noise(m_Seed);
 		int rel = m_MinRelHeight + (noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7) % m_RelHeightRange + 1;
 		return cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width) + rel;
@@ -244,7 +244,7 @@ public:
 		int ChunkX, ChunkZ;
 		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		int terrainHeight = static_cast<int>(cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width));
 		terrainHeight = std::max(1 + terrainHeight, m_SeaLevel);
 		cNoise noise(m_Seed);

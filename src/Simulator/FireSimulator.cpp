@@ -102,40 +102,38 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 	int NumMSecs = static_cast<int>(a_Dt.count());
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
-		int x = itr->x;
-		int y = itr->y;
-		int z = itr->z;
-		auto AbsPos = cChunkDef::RelativeToAbsolute({x, y, z}, a_Chunk->GetPosX(), a_Chunk->GetPosZ());
-		BLOCKTYPE BlockType = a_Chunk->GetBlock(x, y, z);
+		Vector3i relPos(itr->x, itr->y, itr->z);
+		auto absPos = a_Chunk->RelativeToAbsolute(relPos);
+		auto blockType = a_Chunk->GetBlock(relPos);
 
-		if (!IsAllowedBlock(BlockType))
+		if (!IsAllowedBlock(blockType))
 		{
 			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
-			FIRE_FLOG("FS: Removing block {0}", AbsPos);
+			FIRE_FLOG("FS: Removing block {0}", absPos);
 			itr = Data.erase(itr);
 			continue;
 		}
 
-		auto BurnsForever = ((y > 0) && DoesBurnForever(a_Chunk->GetBlock(x, (y - 1), z)));
-		auto BlockMeta = a_Chunk->GetMeta(x, y, z);
+		auto BurnsForever = ((relPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
+		auto BlockMeta = a_Chunk->GetMeta(relPos);
 
 		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
-			[this, AbsPos](Vector3i cc)
+			[this, absPos](Vector3i cc)
 			{
-				return (m_World.IsWeatherWetAtXYZ(AbsPos + cc));
+				return (m_World.IsWeatherWetAtXYZ(absPos + cc));
 			}
 		);
 
 		// Randomly burn out the fire if it is raining:
 		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
-			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
 			itr = Data.erase(itr);
 			continue;
 		}
 
 		// Try to spread the fire:
-		TrySpreadFire(a_Chunk, x, y, z);
+		TrySpreadFire(a_Chunk, relPos);
 
 		itr->Data -= NumMSecs;
 		if (itr->Data >= 0)
@@ -145,20 +143,15 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		/*
-		FIRE_FLOG("FS: Fire at {0} is stepping",
-			a_Chunk->PositionToWorldPosition(itr->x, itr->y, itr->z)
-		);
-		*/
+		// FIRE_FLOG("FS: Fire at {0} is stepping", absPos);
+
 		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
 			// The fire burnt out completely
-			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block",
-				a_Chunk->PositionToWorldPosition({itr->x, itr->y, itr->z})
-			);
-			a_Chunk->SetBlock(x, y, z, E_BLOCK_AIR, 0);
-			RemoveFuelNeighbors(a_Chunk, x, y, z);
+			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block", absPos);
+			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+			RemoveFuelNeighbors(a_Chunk, relPos);
 			itr = Data.erase(itr);
 			continue;
 		}
@@ -166,10 +159,10 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		// Burn out the fire one step by increasing the meta:
 		if (!BurnsForever)
 		{
-			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
+			a_Chunk->SetMeta(relPos, BlockMeta + 1);
 		}
 
-		itr->Data = GetBurnStepTime(a_Chunk, x, y, z);  // TODO: Add some randomness into this
+		itr->Data = GetBurnStepTime(a_Chunk, relPos);  // TODO: Add some randomness into this
 		++itr;
 	}  // for itr - Data[]
 }
@@ -278,12 +271,12 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 
 
 
-int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 {
 	bool IsBlockBelowSolid = false;
-	if (a_RelY > 0)
+	if (a_RelPos.y > 0)
 	{
-		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelPos.addedY(-1));
 		if (DoesBurnForever(BlockBelow))
 		{
 			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
@@ -296,11 +289,11 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	for (const auto & cross: gCrossCoords)
 	{
 		BLOCKTYPE  BlockType;
 		NIBBLETYPE BlockMeta;
-		if (a_Chunk->UnboundedRelGetBlock(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockType, BlockMeta))
+		if (a_Chunk->UnboundedRelGetBlock(a_RelPos + cross, BlockType, BlockMeta))
 		{
 			if (IsFuel(BlockType))
 			{
@@ -314,7 +307,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
 		// SetBlock just to make sure fire doesn't spawn
-		a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+		a_Chunk->SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 		return 0;
 	}
 	return static_cast<int>(m_BurnStepTimeNonfuel);
@@ -324,7 +317,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 
 
 
-void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 {
 	/*
 	if (GetRandomProvider().RandBool(0.99))
@@ -334,11 +327,11 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 	}
 	*/
 
-	for (int x = a_RelX - 1; x <= a_RelX + 1; x++)
+	for (int x = -1; x <= 1; x++)
 	{
-		for (int z = a_RelZ - 1; z <= a_RelZ + 1; z++)
+		for (int z = -1; z <= 1; z++)
 		{
-			for (int y = a_RelY - 1; y <= a_RelY + 2; y++)  // flames spread up one more block than around
+			for (int y = 1; y <= 2; y++)  // flames spread up one more block than around
 			{
 				// No need to check the coords for equality with the parent block,
 				// it cannot catch fire anyway (because it's not an air block)
@@ -348,24 +341,18 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 					continue;
 				}
 
-				// Start the fire in the neighbor {x, y, z}
-				/*
-				FIRE_LOG("FS: Trying to start fire at {0}.",
-					a_Chunk->PositionToWorldPosition(x, y, z)
-				);
-				*/
-				if (CanStartFireInBlock(a_Chunk, x, y, z))
+				// Start the fire in the neighbor a_RelPos + {x, y, z}
+				auto dstRelPos = a_RelPos + Vector3i{x, y, z};
+				if (CanStartFireInBlock(a_Chunk, dstRelPos))
 				{
-					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
-					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
-
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
+					auto dstAbsPos = a_Chunk->RelativeToAbsolute(dstRelPos);
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos.x, dstAbsPos.y, dstAbsPos.z, ssFireSpread))
 					{
 						return;
 					}
 
-					FIRE_FLOG("FS: Starting new fire at {0}.", Vector3i{a_PosX, y, a_PosZ});
-					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
+					FIRE_FLOG("FS: Starting new fire at {0}.", dstAbsPos);
+					a_Chunk->UnboundedRelSetBlock(dstRelPos, E_BLOCK_FIRE, 0);
 				}
 			}  // for y
 		}  // for z
@@ -376,45 +363,40 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 
 
-void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 {
-	for (auto & Coord : gNeighborCoords)
+	for (auto & coord : gNeighborCoords)
 	{
 		BLOCKTYPE  BlockType;
-		int X = a_RelX + Coord.x;
-		int Z = a_RelZ + Coord.z;
-
-		cChunkPtr Neighbour = a_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
-		if (Neighbour == nullptr)
+		auto relPos = a_RelPos + coord;
+		auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
+		if (neighbor == nullptr)
 		{
 			continue;
 		}
-		BlockType = Neighbour->GetBlock(X, a_RelY + Coord.y, Z);
+		BlockType = neighbor->GetBlock(relPos);
 
 		if (!IsFuel(BlockType))
 		{
 			continue;
 		}
 
-		int AbsX = (Neighbour->GetPosX() * cChunkDef::Width) + X;
-		int Y = a_RelY + Coord.y;
-		int AbsZ = (Neighbour->GetPosZ() * cChunkDef::Width) + Z;
-
+		auto absPos = neighbor->RelativeToAbsolute(relPos);
 		if (BlockType == E_BLOCK_TNT)
 		{
-			m_World.SpawnPrimedTNT({static_cast<double>(AbsX), static_cast<double>(Y), static_cast<double>(AbsZ)}, 0);
-			Neighbour->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
+			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
+			m_World.SpawnPrimedTNT(absPos, 0);
 			return;
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, absPos.x, absPos.y, absPos.z, ssFireSpread))
 		{
-			Neighbour->SetBlock(X, Y, Z, E_BLOCK_FIRE, 0);
+			neighbor->SetBlock(relPos, E_BLOCK_FIRE, 0);
 		}
 		else
 		{
-			Neighbour->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
+			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
 		}
 	}  // for i - Coords[]
 }
@@ -423,11 +405,11 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 
 
 
-bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ)
+bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos)
 {
 	BLOCKTYPE  BlockType;
 	NIBBLETYPE BlockMeta;
-	if (!a_NearChunk->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+	if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos, BlockType, BlockMeta))
 	{
 		// The chunk is not accessible
 		return false;
@@ -439,9 +421,9 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a
 		return false;
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	for (const auto & neighbor: gNeighborCoords)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos + neighbor, BlockType, BlockMeta))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;
