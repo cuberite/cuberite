@@ -101,15 +101,14 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 			a_Monster->SetSightDistance     (itr->m_SightDistance);
 			a_Monster->SetAttackRate        (static_cast<float>(itr->m_AttackRate));
 			a_Monster->SetMaxHealth         (static_cast<float>(itr->m_MaxHealth));
-			a_Monster->SetRelativeWalkSpeed (static_cast<float>(itr->m_RelativeWalkSpeed));
-			a_Monster->SetRelativeRunSpeed  (static_cast<float>(itr->m_RelativeRunSpeed));
+			a_Monster->SetRelativeWalkSpeed (itr->m_RelativeWalkSpeed);
+			a_Monster->SetRelativeRunSpeed  (itr->m_RelativeRunSpeed);
 			a_Monster->SetIsFireproof       (itr->m_IsFireproof);
 			a_Monster->SetBurnsInDaylight   (itr->m_BurnsInDaylight);
 			return;
 		}
 	}  // for itr - m_pState->AttributesList[]
 }
-
 
 
 
