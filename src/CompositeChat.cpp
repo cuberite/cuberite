@@ -120,38 +120,59 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 		switch (a_ParseText[i])
 		{
 			case '@':
+			case '&':
 			{
-				// Color code
+				// Formatting code
 				i++;
 				if (i >= len)
 				{
 					// Not enough following text
 					break;
 				}
-				if (a_ParseText[i] == '@')
+				switch (a_ParseText[i])
 				{
-					// "@@" escape, just put a "@" into the current text and keep parsing as text
-					if (i > first + 1)
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
 					{
-						CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
+						// True formatting code. Create a part for the CurrentText and start parsing anew:
+						if (i >= first)
+						{
+							CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
+							first = i + 1;
+						}
+						if (!CurrentText.empty())
+						{
+							m_Parts.push_back(new cTextPart(CurrentText, CurrentStyle));
+							CurrentText.clear();
+						}
+						AddStyle(CurrentStyle, a_ParseText.substr(i - 1, 2));
+						break;
 					}
-					first = i + 1;
-					continue;
-				}
-				else
-				{
-					// True color code. Create a part for the CurrentText and start parsing anew:
-					if (i >= first)
+					default:
 					{
-						CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
-						first = i + 1;
+						// Not a valid formatting code. Go back.
+						i--;
+						break;
 					}
-					if (!CurrentText.empty())
-					{
-						m_Parts.push_back(new cTextPart(CurrentText, CurrentStyle));
-						CurrentText.clear();
-					}
-					AddStyle(CurrentStyle, a_ParseText.substr(i - 1, 2));
 				}
 				break;
 			}
@@ -226,7 +247,7 @@ void cCompositeChat::UnderlineUrls(void)
 	{
 		if ((*itr)->m_PartType == ptUrl)
 		{
-			(*itr)->m_Style.append("u");
+			(*itr)->m_Style.append("@n");
 		}
 	}  // for itr - m_Parts[]
 }
@@ -296,16 +317,6 @@ void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 {
 	if (a_AddStyle.empty())
 	{
-		return;
-	}
-	if (a_AddStyle[0] == '@')
-	{
-		size_t idx = a_Style.find('@');
-		if ((idx != AString::npos) && (idx != a_Style.length()))
-		{
-			a_Style.erase(idx, 2);
-		}
-		a_Style.append(a_AddStyle);
 		return;
 	}
 	a_Style.append(a_AddStyle);
@@ -425,73 +436,50 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 	size_t len = a_PartStyle.length();
 	for (size_t i = 0; i < len; i++)
 	{
+		// Text formatting or color, specified by the next char:
+		i++;
+		if (i >= len)
+		{
+			// String too short, didn't contain a formatting code
+			break;
+		}
 		switch (a_PartStyle[i])
 		{
-			case 'b':
+			case '0': a_Value["color"] = Json::Value("black");        break;
+			case '1': a_Value["color"] = Json::Value("dark_blue");    break;
+			case '2': a_Value["color"] = Json::Value("dark_green");   break;
+			case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
+			case '4': a_Value["color"] = Json::Value("dark_red");     break;
+			case '5': a_Value["color"] = Json::Value("dark_purple");  break;
+			case '6': a_Value["color"] = Json::Value("gold");         break;
+			case '7': a_Value["color"] = Json::Value("gray");         break;
+			case '8': a_Value["color"] = Json::Value("dark_gray");    break;
+			case '9': a_Value["color"] = Json::Value("blue");         break;
+			case 'a': a_Value["color"] = Json::Value("green");        break;
+			case 'b': a_Value["color"] = Json::Value("aqua");         break;
+			case 'c': a_Value["color"] = Json::Value("red");          break;
+			case 'd': a_Value["color"] = Json::Value("light_purple"); break;
+			case 'e': a_Value["color"] = Json::Value("yellow");       break;
+			case 'f': a_Value["color"] = Json::Value("white");        break;
+
+			case 'k': a_Value["obfuscated"]    = Json::Value(true);   break;
+			case 'l': a_Value["bold"]          = Json::Value(true);   break;
+			case 'm': a_Value["strikethrough"] = Json::Value(true);   break;
+			case 'n': a_Value["underlined"]    = Json::Value(true);   break;
+			case 'o': a_Value["italic"]        = Json::Value(true);   break;
+
+			// Reset text style
+			case 'r':
 			{
-				// bold
-				a_Value["bold"] = Json::Value(true);
+				a_Value["color"]         = Json::Value("reset");
+				a_Value["obfuscated"]    = Json::Value(false);
+				a_Value["bold"]          = Json::Value(false);
+				a_Value["strikethrough"] = Json::Value(false);
+				a_Value["underlined"]    = Json::Value(false);
+				a_Value["italic"]        = Json::Value(false);
 				break;
 			}
-
-			case 'i':
-			{
-				// italic
-				a_Value["italic"] = Json::Value(true);
-				break;
-			}
-
-			case 'u':
-			{
-				// Underlined
-				a_Value["underlined"] = Json::Value(true);
-				break;
-			}
-
-			case 's':
-			{
-				// strikethrough
-				a_Value["strikethrough"] = Json::Value(true);
-				break;
-			}
-
-			case 'o':
-			{
-				// obfuscated
-				a_Value["obfuscated"] = Json::Value(true);
-				break;
-			}
-
-			case '@':
-			{
-				// Color, specified by the next char:
-				i++;
-				if (i >= len)
-				{
-					// String too short, didn't contain a color
-					break;
-				}
-				switch (a_PartStyle[i])
-				{
-					case '0': a_Value["color"] = Json::Value("black");        break;
-					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
-					case '2': a_Value["color"] = Json::Value("dark_green");   break;
-					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
-					case '4': a_Value["color"] = Json::Value("dark_red");     break;
-					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
-					case '6': a_Value["color"] = Json::Value("gold");         break;
-					case '7': a_Value["color"] = Json::Value("gray");         break;
-					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
-					case '9': a_Value["color"] = Json::Value("blue");         break;
-					case 'a': a_Value["color"] = Json::Value("green");        break;
-					case 'b': a_Value["color"] = Json::Value("aqua");         break;
-					case 'c': a_Value["color"] = Json::Value("red");          break;
-					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
-					case 'e': a_Value["color"] = Json::Value("yellow");       break;
-					case 'f': a_Value["color"] = Json::Value("white");        break;
-				}  // switch (color)
-			}  // case '@'
-		}  // switch (Style[i])
+		}  // switch (formatting code)
 	}  // for i - a_PartStyle[]
 }
 
