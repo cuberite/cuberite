@@ -178,6 +178,12 @@ void cCommandBlockEntity::Execute()
 		}
 	} CmdBlockOutCb(this);
 
+	// Remove trailing slash if it exists, since console commands don't use them
+	if (m_Command[0] == '/')
+	{
+		m_Command = m_Command.substr(1, m_Command.length());
+	}
+
 	// Administrator commands are not executable by command blocks:
 	if (
 		(m_Command != "stop") &&
