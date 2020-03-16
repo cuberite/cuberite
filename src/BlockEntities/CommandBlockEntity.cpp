@@ -178,7 +178,7 @@ void cCommandBlockEntity::Execute()
 		}
 	} CmdBlockOutCb(this);
 
-	// Remove trailing slash if it exists, since console commands don't use them
+	// Remove leading slash if one exists, since console commands don't use them
 	if (m_Command[0] == '/')
 	{
 		m_Command = m_Command.substr(1, m_Command.length());
