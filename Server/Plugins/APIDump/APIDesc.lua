@@ -8912,17 +8912,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
-				},
-				GetRelativeRunSpeed =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the relative run speed of this mob. Standard is 1.0",
+					Notes = "Returns the walk speed multiplier of this mob. Base is set in monsters.ini.",
 				},
 				GetSpawnDelay =
 				{
@@ -9104,18 +9094,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Sets the relative walk speed of this mob. The default relative speed is 1.0.",
-				},
-				SetRelativeRunSpeed =
-				{
-					Params =
-					{
-						{
-							Name = "RelativeRunSpeed",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the relative run speed of this mob. The default relative speed is 1.0.",
+					Notes = "Sets the walk speed multiplier of this mob. Base is set in monsters.ini.",
 				},
 				StringToMobType =
 				{
