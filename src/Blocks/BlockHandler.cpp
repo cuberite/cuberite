@@ -40,6 +40,7 @@
 #include "BlockFurnace.h"
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
+#include "BlockGrass.h"
 #include "BlockGravel.h"
 #include "BlockMobHead.h"
 #include "BlockHopper.h"
@@ -246,7 +247,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS_PANE:                    return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GLOWSTONE:                     return new cBlockGlowstoneHandler       (a_BlockType);
 		case E_BLOCK_GOLD_ORE:                      return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_GRASS:                         return new cBlockDirtHandler            (a_BlockType);
+		case E_BLOCK_GRASS:                         return new cBlockGrassHandler           (a_BlockType);
 		case E_BLOCK_GRAVEL:                        return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HAY_BALE:                      return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                          return new cBlockMobHeadHandler         (a_BlockType);
