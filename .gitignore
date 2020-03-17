@@ -104,6 +104,7 @@ ReleaseProfile/
 *.dir/
 CPackConfig.cmake
 CPackSourceConfig.cmake
+cmake-build-debug
 
 # APIDump-generated status files:
 Server/cuberite_api.lua

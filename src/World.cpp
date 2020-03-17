@@ -2201,7 +2201,8 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
 {
 	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
-	if (!DigBlock(a_BlockPos))
+	bool CanHarvestBlock {a_Tool->GetHandler()->CanHarvestBlock(GetBlock(a_BlockPos))};
+	if (!CanHarvestBlock || !DigBlock(a_BlockPos))
 	{
 		return false;
 	}
