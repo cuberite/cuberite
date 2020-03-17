@@ -783,18 +783,12 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Default knockback for entities
-	double Knockback = 8;
+	double Knockback = 10;
 
 	// If we're sprinting, bump up the knockback
 	if (IsSprinting())
 	{
-		Knockback = 13;
-	}
-
-	// Apply more knockback for players
-	if (a_Receiver.IsPlayer())
-	{
-		Knockback += 2;
+		Knockback = 15;
 	}
 
 	// Check for knockback enchantments (punch only applies to shot arrows)
