@@ -1319,7 +1319,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				DistanceFromExplosion.Normalize();
 				DistanceFromExplosion *= Impact;
 
-				a_Entity.AddSpeed(DistanceFromExplosion);
+				a_Entity.SetSpeed(DistanceFromExplosion);
 			}
 
 			return false;

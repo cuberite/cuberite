@@ -102,7 +102,7 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 
 	// Setting this higher gives us more wiggle room for attackrate
 	ResetAttackCooldown();
-	
+
 	double KnockbackAmount = 9;
 	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, KnockbackAmount);
 

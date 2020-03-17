@@ -345,12 +345,12 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	}
 
 	int KnockbackHeight = 3;
-	
+
 	if (IsPlayer())
 	{
 		KnockbackHeight = 8;
 	}
-	
+
 	// Apply slight height to knockback
 	Vector3d FinalKnockback = Vector3d(Heading.x * a_KnockbackAmount, Heading.y + KnockbackHeight, Heading.z * a_KnockbackAmount);
 
@@ -784,7 +784,7 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
 	// Default knockback for entities
 	double Knockback = 8;
-	
+
 	// If we're sprinting, bump up the knockback
 	if (IsSprinting())
 	{
