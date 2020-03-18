@@ -163,6 +163,11 @@ void cCommandBlockEntity::Execute()
 		return;
 	}
 
+	if (m_Command.empty())
+	{
+		return;
+	}
+
 	class CommandBlockOutCb :
 		public cCommandOutputCallback
 	{
@@ -175,27 +180,29 @@ void cCommandBlockEntity::Execute()
 		{
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
+			m_CmdBlock->GetWorld()->BroadcastBlockEntity(m_CmdBlock->GetPos());
 		}
 	} CmdBlockOutCb(this);
 
+	AString RealCommand = m_Command;
+
 	// Remove trailing slash if it exists, since console commands don't use them
-	if (m_Command[0] == '/')
-	{
-		m_Command = m_Command.substr(1, m_Command.length());
+	if (RealCommand[0] == '/') {
+		RealCommand = RealCommand.substr(1, RealCommand.length());
 	}
 
 	// Administrator commands are not executable by command blocks:
 	if (
-		(m_Command != "stop") &&
-		(m_Command != "restart") &&
-		(m_Command != "kick") &&
-		(m_Command != "ban") &&
-		(m_Command != "ipban")
+		(RealCommand != "stop") &&
+		(RealCommand != "restart") &&
+		(RealCommand != "kick") &&
+		(RealCommand != "ban") &&
+		(RealCommand != "ipban")
 	)
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+		Server->ExecuteConsoleCommand(RealCommand, CmdBlockOutCb);
 	}
 	else
 	{
