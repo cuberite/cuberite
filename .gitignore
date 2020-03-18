@@ -26,6 +26,7 @@ cloc.xsl
 /EveryNight.cmd
 /UploadLuaAPI.cmd
 AllFiles.lst
+GPUCache
 
 # IDE Stuff
 ## Sublime Text
@@ -104,6 +105,7 @@ ReleaseProfile/
 *.dir/
 CPackConfig.cmake
 CPackSourceConfig.cmake
+cmake-build-debug
 
 # APIDump-generated status files:
 Server/cuberite_api.lua
