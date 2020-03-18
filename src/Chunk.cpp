@@ -197,7 +197,7 @@ void cChunk::MarkRegenerating(void)
 bool cChunk::HasPlayerEntities()
 {
 	return std::any_of(m_Entities.begin(), m_Entities.end(),
-		[](cEntity * Entity)
+		[](std::unique_ptr<cEntity>& Entity)
 		{
 			return Entity->IsPlayer();
 		}
