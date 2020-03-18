@@ -197,7 +197,8 @@ void cChunk::MarkRegenerating(void)
 bool cChunk::HasPlayerEntities()
 {
 	return std::any_of(m_Entities.begin(), m_Entities.end(),
-		[](cEntitiy * Entity) {
+		[](cEntity * Entity)
+		{
 			return Entity->IsPlayer();
 		}
 	);
@@ -225,6 +226,7 @@ bool cChunk::CanUnloadAfterSaving(void)
 {
 	return
 		m_LoadedByClient.empty() &&  // The chunk is not used by any client
+		!HasPlayerEntities() &&      // Ensure not only the absence of ClientHandlers, but also of cPlayer objects
 		m_IsDirty &&                 // The chunk is dirty
 		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
 		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
