@@ -331,6 +331,12 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 		TDI.Attacker = nullptr;
 	}
 	TDI.RawDamage = a_RawDamage;
+
+	if (a_FinalDamage <= 0)
+	{
+		a_FinalDamage = 1;
+	}
+
 	TDI.FinalDamage = a_FinalDamage;
 
 	Vector3d Heading(0, 0, 0);
