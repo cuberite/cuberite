@@ -793,7 +793,9 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 
 	// Check for knockback enchantments (punch only applies to shot arrows)
 	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
-	Knockback += 8 * KnockbackLevel;
+	int KnockbackLevelMultiplier = 8;
+
+	Knockback += KnockbackLevelMultiplier * KnockbackLevel;
 
 	return Knockback;
 }

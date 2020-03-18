@@ -115,9 +115,13 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 		Damage += ExtraDamage;
 	}
 
+	double Knockback = 10;
+
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
-	double KnockbackAmount = 10 + 8 * PunchLevel;
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
+	int PunchLevelMultiplier = 8;
+
+	Knockback += PunchLevelMultiplier * PunchLevel;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, Knockback);
 
 	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
