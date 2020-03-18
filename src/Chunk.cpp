@@ -118,6 +118,7 @@ cChunk::~cChunk()
 
 	// Remove and destroy all entities that are not players:
 	cEntityList Entities;
+
 	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
 	for (auto & Entity : Entities)
 	{
@@ -150,6 +151,7 @@ cChunk::~cChunk()
 	m_LavaSimulatorData = nullptr;
 	delete m_RedstoneSimulatorData;
 	m_RedstoneSimulatorData = nullptr;
+
 }
 
 
@@ -194,10 +196,28 @@ void cChunk::MarkRegenerating(void)
 
 
 
+bool cChunk::HasPlayerEntities()
+{
+	bool hasPlayerEntities {false};
+	for (auto & Entity: m_Entities)
+	{
+		if (Entity->IsPlayer())
+		{
+			hasPlayerEntities = true;
+		}
+	}
+	return hasPlayerEntities;
+}
+
+
+
+
+
 bool cChunk::CanUnload(void)
 {
 	return
 		m_LoadedByClient.empty() &&  // The chunk is not used by any client
+		!HasPlayerEntities() &&      // Ensure not only the absence of ClientHandlers, but also of cPlayer objects
 		!m_IsDirty &&                // The chunk has been saved properly or hasn't been touched since the load / gen
 		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
 		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
@@ -974,21 +994,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	GetBlockTypeMeta(a_RelPos, blockType, blockMeta);
 	auto blockHandler = cBlockInfo::GetHandler(blockType);
 	auto blockEntity = GetBlockEntityRel(a_RelPos);
-	cItems pickups (0);
-	bool canHarvestBlock;
-	if (a_Tool)
-	{
-		auto toolHandler = a_Tool->GetHandler();
-		canHarvestBlock = toolHandler->CanHarvestBlock(blockType);
-	}
-	else
-	{
-		canHarvestBlock = false;
-	}
-	if (canHarvestBlock)
-	{
-		pickups = blockHandler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
-	}
+	auto pickups = blockHandler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
 	auto absPos = RelativeToAbsolute(a_RelPos);
 	cRoot::Get()->GetPluginManager()->CallHookBlockToPickups(*m_World, absPos, blockType, blockMeta, blockEntity, a_Digger, a_Tool, pickups);
 	return pickups;
@@ -1772,7 +1778,7 @@ void cChunk::RemoveClient(cClientHandle * a_Client)
 		for (auto & Entity : m_Entities)
 		{
 			/*
-			// DEBUG:
+			DEBUG:
 			LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"",
 				m_PosX, m_PosZ,
 				(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
