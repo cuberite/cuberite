@@ -282,17 +282,12 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	int ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int EnchantmentCover = GetEnchantmentCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int FinalDamage = a_RawDamage - ArmorCover - EnchantmentCover;
-	if ((FinalDamage == 0) && (a_RawDamage > 0))
-	{
-		// Nobody's invincible
-		FinalDamage = 1;
-	}
+	float FinalDamage = a_RawDamage;
+	double ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+
 	ApplyArmorDamage(ArmorCover);
 
-	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, static_cast<float>(FinalDamage), a_KnockbackAmount);
+	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
 }
 
 
@@ -644,7 +639,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 
 
-int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+double cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	int TotalEPF = 0;
 
@@ -680,7 +675,7 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 		}
 	}
 	int CappedEPF = std::min(20, TotalEPF);
-	return static_cast<int>(a_Damage * CappedEPF / 25.0);
+	return (a_Damage * CappedEPF / 25.0);
 }
 
 
@@ -712,7 +707,7 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 
 
 
-int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+double cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 
@@ -763,7 +758,7 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
+	return (a_Damage * std::min(20.0, Reduction) / 25.0);
 }
 
 
