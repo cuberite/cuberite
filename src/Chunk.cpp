@@ -196,15 +196,11 @@ void cChunk::MarkRegenerating(void)
 
 bool cChunk::HasPlayerEntities()
 {
-	bool hasPlayerEntities {false};
-	for (auto & Entity: m_Entities)
-	{
-		if (Entity->IsPlayer())
-		{
-			hasPlayerEntities = true;
+	return std::any_of(m_Entities.begin(), m_Entities.end(),
+		[](cEntitiy * Entity) {
+			return Entity->IsPlayer();
 		}
-	}
-	return hasPlayerEntities;
+	);
 }
 
 
