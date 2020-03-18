@@ -973,10 +973,18 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	NIBBLETYPE blockMeta;
 	GetBlockTypeMeta(a_RelPos, blockType, blockMeta);
 	auto blockHandler = cBlockInfo::GetHandler(blockType);
-	auto toolHandler = a_Tool->GetHandler();
-	auto canHarvestBlock = toolHandler->CanHarvestBlock(blockType);
 	auto blockEntity = GetBlockEntityRel(a_RelPos);
 	cItems pickups (0);
+	bool canHarvestBlock;
+	if (a_Tool)
+	{
+		auto toolHandler = a_Tool->GetHandler();
+		canHarvestBlock = toolHandler->CanHarvestBlock(blockType);
+	}
+	else
+	{
+		canHarvestBlock = false;
+	}
 	if (canHarvestBlock)
 	{
 		pickups = blockHandler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
