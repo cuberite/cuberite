@@ -25,6 +25,7 @@ cloc.xsl
 *.sqlite
 /EveryNight.cmd
 /UploadLuaAPI.cmd
+GPUCache
 AllFiles.lst
 
 # IDE Stuff
