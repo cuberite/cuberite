@@ -187,7 +187,8 @@ void cCommandBlockEntity::Execute()
 	AString RealCommand = m_Command;
 
 	// Remove trailing slash if it exists, since console commands don't use them
-	if (RealCommand[0] == '/') {
+	if (RealCommand[0] == '/')
+	{
 		RealCommand = RealCommand.substr(1, RealCommand.length());
 	}
 
