@@ -683,6 +683,9 @@ private:
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);
+
+	/** Check m_Entities for cPlayer objects. */
+	bool HasPlayerEntities();
 };
 
 typedef cChunk * cChunkPtr;
