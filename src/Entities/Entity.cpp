@@ -330,11 +330,17 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	{
 		TDI.Attacker = nullptr;
 	}
-	TDI.RawDamage = a_RawDamage;
 
+	if (a_RawDamage <= 0)
+	{
+		a_RawDamage = 0;
+	}
+
+	TDI.RawDamage = a_RawDamage;
+	
 	if (a_FinalDamage <= 0)
 	{
-		a_FinalDamage = 1;
+		a_FinalDamage = 0;
 	}
 
 	TDI.FinalDamage = a_FinalDamage;
