@@ -17,6 +17,9 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	BlockState.cpp
+	BlockTypePalette.cpp
+	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
@@ -24,6 +27,7 @@ SET (SRCS
 	ChatColor.cpp
 	Chunk.cpp
 	ChunkData.cpp
+	ChunkGeneratorThread.cpp
 	ChunkMap.cpp
 	ChunkSender.cpp
 	ChunkStay.cpp
@@ -57,6 +61,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	NetherPortalScanner.cpp
 	OverridesSettingsRepository.cpp
+	PalettedBlockArea.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -83,11 +88,12 @@ SET (HDRS
 	BlockID.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
+	BlockState.h
 	BlockTracer.h
+	BlockTypePalette.h
+	BlockTypeRegistry.h
 	BrewingRecipes.h
-	Broadcaster.h
 	BoundingBox.h
-	BuildInfo.h
 	BuildInfo.h.cmake
 	ByteBuffer.h
 	ChatColor.h
@@ -95,6 +101,7 @@ SET (HDRS
 	ChunkData.h
 	ChunkDataCallback.h
 	ChunkDef.h
+	ChunkGeneratorThread.h
 	ChunkMap.h
 	ChunkSender.h
 	ChunkStay.h
@@ -136,7 +143,9 @@ SET (HDRS
 	MobSpawner.h
 	MonsterConfig.h
 	NetherPortalScanner.h
+	OpaqueWorld.h
 	OverridesSettingsRepository.h
+	PalettedBlockArea.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h
@@ -159,12 +168,15 @@ SET (HDRS
 	XMLParser.h
 )
 
-include_directories(".")
+file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
+	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/Globals.h\"\n")
+
+include_directories("${CMAKE_BINARY_DIR}/include")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 
-configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
+configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set_source_files_properties(BlockID.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
@@ -245,8 +257,6 @@ else ()
 	includefolder("Resources")
 	source_group("" FILES ${SOURCE})
 
-	include_directories("${PROJECT_SOURCE_DIR}")
-
 	# Precompiled headers (1st part)
 	SET_SOURCE_FILES_PROPERTIES(
 		Globals.cpp PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
@@ -313,25 +323,94 @@ if (MSVC)
 endif()
 
 
+
+
+
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE})
 
 # Output the executable into the $/Server folder, so that it has access to external resources:
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY                ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_SOURCE_DIR}/Server
-	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_SOURCE_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY                ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG          ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE        ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_DEBUGPROFILE   ${CMAKE_BINARY_DIR}/Server
+	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_BINARY_DIR}/Server
 )
 
-# Make the debug executable have a "_debug" suffix
-SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "_debug")
 
-# Make the profiled executables have a "_profile" postfix
-SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES DEBUGPROFILE_POSTFIX "_debug_profile")
-SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES RELEASEPROFILE_POSTFIX "_profile")
+
+
+
+# Create a symbolic link from ${orig} to ${link}
+# If the orig and link point to the same thing, does nothing (-> in-source build)
+# If ${link} already exists, does nothing.
+function(make_symlink orig link)
+	# If both are the same, or link already exists, bail out:
+	if ("${orig}" STREQUAL "${link}")
+		return()
+	endif()
+	if (EXISTS ${link})
+		return()
+	endif()
+
+	# Create the symlink (platform-dependent):
+	message("Creating symlink, orig = ${orig}; link = ${link}")
+	if (CMAKE_HOST_UNIX)
+		set(command ln -s ${orig} ${link})
+	else()
+		file(TO_NATIVE_PATH "${orig}" orig)
+		file(TO_NATIVE_PATH "${link}" link)
+		if (IS_DIRECTORY ${orig})
+			set(command cmd.exe /c mklink /j ${link} ${orig})
+		else()
+			set(command cmd.exe /c mklink /h ${link} ${orig})
+		endif()
+	endif()
+
+	execute_process(
+		COMMAND ${command}
+		RESULT_VARIABLE result
+		ERROR_VARIABLE stderr
+		OUTPUT_VARIABLE stdout
+	)
+
+	if (NOT ${result} EQUAL 0)
+		message(FATAL_ERROR "Could not create symbolic link for: ${link} --> ${orig}: ${stderr} ${stdout}")
+	endif()
+endfunction(make_symlink)
+
+
+
+
+
+# Populate the output folder with symlinks to the Server folder's internals:
+set(symlinks
+	Install
+	Plugins
+	Prefabs
+	Protocol
+	webadmin
+	brewing.txt
+	crafting.txt
+	favicon.png
+	furnace.txt
+	items.ini
+	monsters.ini
+	README.txt
+)
+message("Creating output folder and symlinks...")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+foreach (symlink ${symlinks})
+	make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/${symlink}" "${CMAKE_BINARY_DIR}/Server/${symlink}")
+endforeach(symlink)
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../BACKERS"                           "${CMAKE_BINARY_DIR}/Server/BACKERS")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../CONTRIBUTORS"                      "${CMAKE_BINARY_DIR}/Server/CONTRIBUTORS")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"                           "${CMAKE_BINARY_DIR}/Server/LICENSE")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/Install/ThirdPartyLicenses" "${CMAKE_BINARY_DIR}/Server/ThirdPartyLicenses")
+
+
 
 
 # Precompiled headers (2nd part)
@@ -365,3 +444,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls 
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")
+make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/Bindings/docs" "${CMAKE_BINARY_DIR}/Server/BindingsDocs")
+
+
+# For MSVC, set the startup project to Cuberite, and the debugger dir:
+if (MSVC)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
+	set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+endif()

@@ -283,7 +283,6 @@ protected:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cDungeonRoomsFinisher:
 
@@ -308,7 +307,6 @@ cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainShapeGenPtr a_ShapeGen, int
 
 
 
-
 cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Select a random room size in each direction:
@@ -323,7 +321,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	int RelX = a_OriginX, RelY = 0, RelZ = a_OriginZ;
 	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 	cChunkDesc::Shape shape;
-	m_ShapeGen->GenShape(ChunkX, ChunkZ, shape);
+	m_ShapeGen->GenShape({ChunkX, ChunkZ}, shape);
 	int height = 0;
 	int idx = RelX * 256 + RelZ * 16 * 256;
 	for (int y = 6; y < cChunkDef::Height; y++)

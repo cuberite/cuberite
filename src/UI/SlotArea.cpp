@@ -21,7 +21,7 @@
 #include "../BlockArea.h"
 #include "../EffectID.h"
 #include "../ClientHandle.h"
-#include "Mobs/Horse.h"
+#include "../Mobs/Horse.h"
 
 
 
@@ -587,7 +587,6 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-
 void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	// Update the recipe after setting the slot, if the slot is not the result slot:
@@ -610,6 +609,7 @@ void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player,
 	UNUSED(a_KeepEmptySlots);
 	UNUSED(a_BackFill);
 }
+
 
 
 
@@ -753,6 +753,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
+
 
 
 
@@ -993,15 +994,16 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
 
 	m_MaximumCost = 0;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
+	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
 
 	int PosX, PosY, PosZ;
-	reinterpret_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
+	static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
 	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
 
+	const Vector3i BlockPos{PosX, PosY, PosZ};
 	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
@@ -1012,18 +1014,18 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		{
 			// Anvil will break
 			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
 			a_Player.CloseWindow(false);
 		}
 		else
 		{
 			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
 		}
 	}
 	else
 	{
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, PosX, PosY, PosZ, 0);
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
 	}
 }
 
@@ -1142,7 +1144,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	int NameChangeExp = 0;
-	const AString & RepairedItemName = reinterpret_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
+	const AString & RepairedItemName = static_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
@@ -1221,6 +1223,7 @@ cSlotAreaBeacon::~cSlotAreaBeacon()
 {
 	m_Beacon->GetContents().RemoveListener(*this);
 }
+
 
 
 
@@ -1479,7 +1482,21 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();
+	if (a_SlotNum == 1)
+	{
+		// Lapis slot can have a full stack handle it normally, also check for empty hand
+		if ((DraggingItem.IsEmpty()) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
+		{
+			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		}
 
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
+	}
+	// Slot 0 is where the item to enhance goes.
 	if (DraggingItem.IsEmpty())
 	{
 		// DraggingItem is empty -> Switch draggingitem and slot
@@ -1518,6 +1535,28 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
 {
+	if ((a_ItemStack.m_ItemType == E_ITEM_DYE) && (a_ItemStack.m_ItemDamage == E_META_DYE_BLUE))
+	{
+		// It's lapis, put it in the lapis spot.
+		const cItem * Slot = GetSlot(1, a_Player);
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			return;
+		}
+		NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
+		if (a_Apply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(1, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		// Return so we don't put overflow into the enchantment slot
+		return;
+	}
 	const cItem * Slot = GetSlot(0, a_Player);
 	if (!Slot->IsEmpty())
 	{
@@ -1909,7 +1948,6 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	UNUSED(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
@@ -1932,6 +1970,12 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
 {
+	int Reward = m_Furnace->GetAndResetReward();
+	if (Reward > 0)
+	{
+		a_Player.GetWorld()->SpawnSplitExperienceOrbs(a_Player.GetPosX(), a_Player.GetPosY(), a_Player.GetPosZ(), Reward);
+	}
+
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
@@ -2184,6 +2228,9 @@ void cSlotAreaBrewingstand::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	m_ParentWindow.BroadcastWholeWindow();
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

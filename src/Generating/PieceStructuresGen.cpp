@@ -7,9 +7,8 @@
 #include "PieceStructuresGen.h"
 #include "PrefabStructure.h"
 #include "PieceGeneratorBFSTree.h"
-#include "IniFile.h"
+#include "../IniFile.h"
 #include "../Stopwatch.h"
-
 
 
 
@@ -114,7 +113,6 @@ protected:
 	/** Maximum depth of the generated piece tree. */
 	int m_MaxDepth;
 };
-
 
 
 

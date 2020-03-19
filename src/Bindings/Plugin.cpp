@@ -51,6 +51,7 @@ AString cPlugin::GetLocalFolder(void) const
 
 
 
+
 void cPlugin::SetLoadError(const AString & a_LoadError)
 {
 	m_Status = cPluginManager::psError;

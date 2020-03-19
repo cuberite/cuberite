@@ -60,11 +60,11 @@ protected:
 	{
 		/*
 		// DEBUG:
-		LOGD("Hit block %d:%d at {%d, %d, %d} face %d, %s (%s)",
+		FLOGD("Hit block {0}:{1} at {2} face {3}, {4} ({5})",
 			a_BlockType, a_BlockMeta,
-			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
+			Vector3i{a_BlockX, a_BlockY, a_BlockZ}, a_EntryFace,
 			cBlockInfo::IsSolid(a_BlockType) ? "solid" : "non-solid",
-			ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
+			ItemToString(cItem(a_BlockType, 1, a_BlockMeta))
 		);
 		*/
 
@@ -224,8 +224,8 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
-	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height):
+	super(etProjectile, a_Pos, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
 		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
@@ -242,8 +242,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 
 
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
-	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height):
+	super(etProjectile, a_Pos, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
 	m_IsInGround(false)
@@ -259,7 +259,13 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
+std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
+	eKind a_Kind,
+	cEntity * a_Creator,
+	Vector3d a_Pos,
+	const cItem * a_Item,
+	const Vector3d * a_Speed
+)
 {
 	Vector3d Speed;
 	if (a_Speed != nullptr)
@@ -269,15 +275,15 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(eKind a_Kind, cEnti
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return cpp14::make_unique<cArrowEntity>           (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEgg:           return cpp14::make_unique<cThrownEggEntity>       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkEnderPearl:    return cpp14::make_unique<cThrownEnderPearlEntity>(a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSnowball:      return cpp14::make_unique<cThrownSnowballEntity>  (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkGhastFireball: return cpp14::make_unique<cGhastFireballEntity>   (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkFireCharge:    return cpp14::make_unique<cFireChargeEntity>      (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkExpBottle:     return cpp14::make_unique<cExpBottleEntity>       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSplashPotion:  return cpp14::make_unique<cSplashPotionEntity>    (a_Creator, a_X, a_Y, a_Z, Speed, *a_Item);
-		case pkWitherSkull:   return cpp14::make_unique<cWitherSkullEntity>     (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkArrow:         return cpp14::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
+		case pkEgg:           return cpp14::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case pkEnderPearl:    return cpp14::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
+		case pkSnowball:      return cpp14::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
+		case pkGhastFireball: return cpp14::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
+		case pkFireCharge:    return cpp14::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
+		case pkExpBottle:     return cpp14::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
+		case pkSplashPotion:  return cpp14::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
+		case pkWitherSkull:   return cpp14::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
@@ -286,7 +292,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(eKind a_Kind, cEnti
 				return nullptr;
 			}
 
-			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_X, a_Y, a_Z, *a_Item);
+			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
 		}
 		case pkFishingFloat: break;
 	}
@@ -306,10 +312,8 @@ void cProjectileEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	SetSpeed(0, 0, 0);
 
 	// DEBUG:
-	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, hit solid block at face %d",
-		m_UniqueID,
-		a_HitPos.x, a_HitPos.y, a_HitPos.z,
-		a_HitFace
+	FLOGD("Projectile {0}: pos {1:.02f}, hit solid block at face {2}",
+		m_UniqueID, a_HitPos, a_HitFace
 	);
 
 	m_IsInGround = true;
@@ -401,11 +405,11 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
 
 		// DEBUG:
-		LOGD("Projectile %d has hit an entity %d (%s) at {%.02f, %.02f, %.02f} (coeff %.03f)",
+		FLOGD("Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f})",
 			m_UniqueID,
 			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
 			EntityCollisionCallback.GetHitEntity()->GetClass(),
-			HitPos.x, HitPos.y, HitPos.z,
+			HitPos,
 			EntityCollisionCallback.GetMinCoeff()
 		);
 
@@ -438,11 +442,8 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 	SetPitchFromSpeed();
 
 	/*
-	LOGD("Projectile %d: pos {%.02f, %.02f, %.02f}, speed {%.02f, %.02f, %.02f}, rot {%.02f, %.02f}",
-		m_UniqueID,
-		GetPosX(), GetPosY(), GetPosZ(),
-		GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		GetYaw(), GetPitch()
+	FLOGD("Projectile {0}: pos {1:.02f}, speed {2:.02f}, rot {{{3:.02f}, {4:.02f}}}",
+		m_UniqueID, GetPos(), GetSpeed(), GetYaw(), GetPitch()
 	);
 	*/
 }

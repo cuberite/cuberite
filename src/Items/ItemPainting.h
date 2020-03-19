@@ -70,7 +70,7 @@ public:
 				{ "BurningSkull" }
 			};
 
-			auto Painting = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
+			auto Painting = cpp14::make_unique<cPainting>(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, a_BlockFace, Vector3i{a_BlockX, a_BlockY, a_BlockZ});
 			auto PaintingPtr = Painting.get();
 			if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 			{

@@ -11,7 +11,7 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
@@ -132,12 +132,12 @@ cMonster::~cMonster()
 
 
 
-void cMonster::Destroy(bool a_ShouldBroadcast)
+void cMonster::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
-		Unleash(false, a_ShouldBroadcast);
+		Unleash(false, true);
 
 		// Remove leash knot if there are no more mobs leashed to
 		if (!LeashedTo->HasAnyMobLeashed() && LeashedTo->IsLeashKnot())
@@ -146,7 +146,7 @@ void cMonster::Destroy(bool a_ShouldBroadcast)
 		}
 	}
 
-	super::Destroy(a_ShouldBroadcast);
+	super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -282,7 +282,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_DestroyTimer += a_Dt;
 		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
-			Destroy(true);
+			Destroy();
 		}
 		return;
 	}
@@ -590,6 +590,20 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
+{
+	// Stop all mobs from targeting this entity
+	// Stop this entity from targeting other mobs
+	SetTarget(nullptr);
+	StopEveryoneFromTargetingMe();
+
+	super::DoMoveToWorld(a_WorldChangeInfo);
+}
+
+
+
+
+
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
@@ -660,7 +674,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	}
 	if ((a_TDI.Attacker != nullptr) && (!IsBaby()))
 	{
-		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
+		m_World->SpawnSplitExperienceOrbs(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
 	m_DestroyTimer = std::chrono::milliseconds(0);
 }
@@ -712,13 +726,11 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	// TODO: Rewrite this to use cWorld's DoWithPlayers()
-	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance), false);
-
-	if (Closest != nullptr)
+	m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 	{
-		EventSeePlayer(Closest, a_Chunk);
-	}
+		EventSeePlayer(&a_Player, a_Chunk);
+		return true;
+	}, false);
 }
 
 
@@ -1079,7 +1091,6 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-
 /** Sets the target. */
 void cMonster::SetTarget (cPawn * a_NewTarget)
 {
@@ -1343,6 +1354,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 		StartBurning(100);
 	}
 }
+
 
 
 

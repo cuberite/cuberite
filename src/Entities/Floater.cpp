@@ -6,7 +6,6 @@
 #include "Floater.h"
 #include "Player.h"
 #include "../ClientHandle.h"
-#include "Broadcaster.h"
 
 
 
@@ -74,9 +73,9 @@ protected:
 
 
 
-cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
-	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
-	m_BitePos(Vector3d(a_X, a_Y, a_Z)),
+cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
+	super(etFloater, a_Pos, 0.2, 0.2),
+	m_BitePos(a_Pos),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
@@ -123,12 +122,12 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
 				m_ParticlePos.Set(GetPosX() + Random.RandInt(-4, 4), GetPosY(), GetPosZ() + Random.RandInt(-4, 4));
-				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
 			else if (m_CountDownTime < 20)
 			{
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
-				m_World->GetBroadcaster().BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
 			}
 
 			m_CountDownTime--;
@@ -147,6 +146,11 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 			}
 		}
+	}
+
+	// Check water at the top of floater otherwise it floats into the air above the water
+	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, FloorC(GetPosY() + GetHeight()), POSZ_TOINT)))
+	{
 		SetSpeedY(0.7);
 	}
 
@@ -175,7 +179,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
-		Destroy(true);
+		Destroy();
 	}
 
 	if (m_AttachedMobID != cEntity::INVALID_ID)

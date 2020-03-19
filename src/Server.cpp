@@ -260,6 +260,7 @@ void cServer::UnregisterForgeMod(const AString & a_ModName, UInt32 a_ProtocolVer
 
 
 
+
 AStringMap & cServer::RegisteredForgeMods(const UInt32 a_Protocol)
 {
 	auto it = m_ForgeModsByVersion.find(a_Protocol);
@@ -277,10 +278,12 @@ AStringMap & cServer::RegisteredForgeMods(const UInt32 a_Protocol)
 
 
 
+
 const AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 {
 	return RegisteredForgeMods(a_Protocol);
 }
+
 
 
 
@@ -320,7 +323,7 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return NewHandle;
+	return std::move(NewHandle);
 }
 
 

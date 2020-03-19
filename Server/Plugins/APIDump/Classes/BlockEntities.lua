@@ -275,6 +275,16 @@ return
 				},
 				Notes = "Returns the block Z-coord of the block entity's block",
 			},
+			GetRelPos =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns the relative coords of the block entity's block within its chunk",
+			},
 			GetRelX =
 			{
 				Returns =
@@ -963,6 +973,16 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					},
 				},
 				Notes = "Returns true if there's time before the current fuel is depleted",
+			},
+			GetAndResetReward =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Calculates, resets, and returns the experience reward in this furnace",
 			},
 			SetFuelSlot =
 			{

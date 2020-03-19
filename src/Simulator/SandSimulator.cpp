@@ -55,9 +55,9 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			Pos.y = itr->y;
 			Pos.z = itr->z + BaseZ;
 			/*
-			LOGD(
-				"Creating a falling block at {%d, %d, %d} of type %s, block below: %s",
-				Pos.x, Pos.y, Pos.z, ItemTypeToString(BlockType).c_str(), ItemTypeToString(BlockBelow).c_str()
+			FLOGD(
+				"Creating a falling block at {0} of type {1}, block below: {2}",
+				Pos, ItemTypeToString(BlockType), ItemTypeToString(BlockBelow)
 			);
 			*/
 
@@ -67,7 +67,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			{
 				continue;
 			}
-			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock({itr->x, itr->y, itr->z}, E_BLOCK_AIR, 0);
 		}
 	}
 	m_TotalBlocks -= static_cast<int>(ChunkData.size());
@@ -276,7 +276,7 @@ void cSandSimulator::FinishFalling(
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
 		if (a_FallingBlockType == E_BLOCK_ANVIL)
 		{
-			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, a_BlockX, a_BlockY, a_BlockZ, 0);
+			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		}
 		return;
 	}
@@ -302,7 +302,7 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 	BLOCKTYPE  FallingBlockType;
 	NIBBLETYPE FallingBlockMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, FallingBlockType, FallingBlockMeta);
-	a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+	a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0);
 
 	// Search for a place to put it:
 	for (int y = a_RelY - 1; y >= 0; y--)

@@ -71,6 +71,9 @@ public:
 	/** Returns the currently equipped boots; empty item if none */
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
+	/** Returns the currently offhand equipped item; empty item if none */
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
@@ -142,9 +145,6 @@ public:
 	bool IsClimbing(void) const;
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
-
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
 
 	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
 	void SetCapabilities();
@@ -387,10 +387,6 @@ public:
 	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
-
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
 
@@ -422,7 +418,14 @@ public:
 	is damaged by when used for a_Action */
 	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
 
+	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseItem(int a_SlotNumber, short a_Damage = 1);
+
 	void SendHealth(void);
+
+	// Send current active hotbar slot
+	void SendHotbarActiveSlot(void);
 
 	void SendExperience(void);
 
@@ -728,6 +731,8 @@ protected:
 	/** The main hand of the player */
 	eMainHand m_MainHand;
 
+	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
+
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
@@ -752,6 +757,8 @@ protected:
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
 
+	/** get player explosion exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.

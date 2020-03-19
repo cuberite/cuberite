@@ -5,16 +5,16 @@
 #include "Player.h"
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
-#include "EffectID.h"
+#include "../EffectID.h"
 #include "../Mobs/Monster.h"
 
 
 
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
-	super(a_EntityType, 0, 0, 0, a_Width, a_Height),
+	super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),
 	m_bTouchGround(false)
@@ -193,7 +193,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 
 	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
 	cEntityEffect * Effect = Res.first->second.get();
 	Effect->OnActivate(*this);
 }
@@ -425,12 +425,17 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
 			// Fall particles
-			// TODO: Re-enable this when effects in 1.9 aren't broken (right now this uses the wrong effect ID in 1.9 and the right one in 1.8)
-			// int ParticleSize = static_cast<int>((std::min(15, Damage) - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f);
-			// GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_FALL_PARTICLES, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, ParticleSize);
+			GetWorld()->BroadcastParticleEffect(
+				"blockdust",
+				GetPosition(),
+				{ 0, 0, 0 },
+				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
+			);
 		}
 
 		m_bTouchGround = true;
@@ -485,4 +490,14 @@ cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 {
 	auto itr = m_EntityEffects.find(a_EffectType);
 	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;
+}
+
+
+
+
+
+void cPawn::ResetPosition(Vector3d a_NewPosition)
+{
+	super::ResetPosition(a_NewPosition);
+	m_LastGroundHeight = GetPosY();
 }

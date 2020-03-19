@@ -13,8 +13,8 @@
 
 
 
-cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World)
+cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World)
 {
 	ASSERT(a_BlockType == E_BLOCK_FLOWER_POT);
 }
@@ -31,7 +31,7 @@ void cFlowerPotEntity::Destroy(void)
 		ASSERT(m_World != nullptr);
 		cItems Pickups;
 		Pickups.Add(m_Item);
-		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);
+		m_World->SpawnItemPickups(Pickups, Vector3d(0.5, 0.5, 0.5) + m_Pos);
 
 		m_Item.Empty();
 	}
@@ -43,8 +43,8 @@ void cFlowerPotEntity::Destroy(void)
 
 void cFlowerPotEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cFlowerPotEntity &>(a_Src);
+	super::CopyFrom(a_Src);
+	auto & src = static_cast<const cFlowerPotEntity &>(a_Src);
 	m_Item = src.m_Item;
 }
 

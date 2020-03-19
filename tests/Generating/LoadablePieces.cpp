@@ -11,6 +11,7 @@
 	#include <unistd.h>
 	#define GetCurrentFolder getcwd
 #endif
+#include "../TestHelpers.h"
 #include "Generating/PrefabPiecePool.h"
 
 
@@ -29,8 +30,8 @@ static int DoLoaderTest(void)
 	LOG("Loaded %u regular pieces and %u starting pieces", static_cast<unsigned>(test.GetAllPiecesCount()), static_cast<unsigned>(test.GetStartingPiecesCount()));
 
 	// Check that we loaded all the pieces:
-	testassert(test.GetAllPiecesCount() == 1);
-	testassert(test.GetStartingPiecesCount() == 1);
+	TEST_EQUAL(test.GetAllPiecesCount(), 1);
+	TEST_EQUAL(test.GetStartingPiecesCount(), 1);
 
 	return 0;
 }

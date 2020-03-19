@@ -2,8 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Slime.h"
-#include "FastRandom.h"
-#include "World.h"
+#include "../FastRandom.h"
+#include "../World.h"
 
 
 
@@ -19,7 +19,7 @@ cSlime::cSlime(int a_Size) :
 	),
 	m_Size(a_Size)
 {
-	SetMaxHealth(a_Size * a_Size);
+	SetMaxHealth(static_cast<float>(a_Size * a_Size));
 	SetAttackDamage(a_Size);
 }
 

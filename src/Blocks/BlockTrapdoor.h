@@ -2,31 +2,35 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "../EffectID.h"
 
 
 
 
 class cBlockTrapdoorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+
 public:
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>(a_BlockType)
+
+	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
@@ -39,7 +43,7 @@ public:
 		// Flip the ON bit on / off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}) ^ 0x04);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player.GetClientHandle());
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0, a_Player.GetClientHandle());
 
 		return true;
 	}

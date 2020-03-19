@@ -25,7 +25,9 @@ cloc.xsl
 *.sqlite
 /EveryNight.cmd
 /UploadLuaAPI.cmd
+GPUCache
 AllFiles.lst
+GPUCache
 
 # IDE Stuff
 ## Sublime Text
@@ -40,6 +42,8 @@ AllFiles.lst
 .cproject
 .project
 *.cbp
+## KDevelop
+*.kdev*
 
 # world inside source
 ChunkWorx.ini
@@ -69,7 +73,6 @@ Makefile
 *.d
 *.so
 tests/*/*-exe
-BuildInfo.h
 CMakeCache.txt
 CMakeFiles
 Makefile
@@ -103,12 +106,18 @@ ReleaseProfile/
 *.dir/
 CPackConfig.cmake
 CPackSourceConfig.cmake
+cmake-build-debug
 
 # APIDump-generated status files:
 Server/cuberite_api.lua
 Server/official_undocumented.lua
 Server/NewlyUndocumented.lua
 Server/.luacheckrc
+compile_commands.json
 
 # compile.sh folder
 build-cuberite
+
+# clang-tidy
+tidy-build
+run-clang-tidy.py

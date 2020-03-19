@@ -2,7 +2,7 @@
 #pragma once
 
 #include "PassiveMonster.h"
-#include "Blocks/ChunkInterface.h"
+#include "../Blocks/ChunkInterface.h"
 
 
 

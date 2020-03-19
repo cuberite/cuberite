@@ -36,7 +36,6 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
-
 void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	if (!a_Player->CanMobsTarget())
@@ -103,7 +102,9 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 
 	// Setting this higher gives us more wiggle room for attackrate
 	ResetAttackCooldown();
-	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+
+	double KnockbackAmount = 9;
+	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, KnockbackAmount);
 
 	return true;
 }

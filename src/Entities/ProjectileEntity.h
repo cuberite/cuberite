@@ -20,9 +20,15 @@
 class cProjectileEntity :
 	public cEntity
 {
-	typedef cEntity super;
+	// tolua_end
+
+	using super = cEntity;
+
+	// tolua_begin
+
 
 public:
+
 	/** The kind of the projectile. The numbers correspond to the network type ID used for spawning them in the protocol. */
 	enum eKind
 	{
@@ -43,10 +49,32 @@ public:
 
 	CLASS_PROTODEF(cProjectileEntity)
 
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height);
 
-	static std::unique_ptr<cProjectileEntity> Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed = nullptr);
+	/** Creates a new instance of the specified projectile entity.
+	a_Item is the item from which the projectile originated (such as firework or arrow). */
+	static std::unique_ptr<cProjectileEntity> Create(
+		eKind a_Kind,
+		cEntity * a_Creator,
+		Vector3d a_Pos,
+		const cItem * a_Item,
+		const Vector3d * a_Speed = nullptr
+	);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Creates a new instance of the specified projectile entity.
+	a_Item is the item from which the projectile originated (such as firework or arrow). */
+	static std::unique_ptr<cProjectileEntity> Create(
+		eKind a_Kind,
+		cEntity * a_Creator,
+		double a_PosX, double a_PosY, double a_PosZ,
+		const cItem * a_Item,
+		const Vector3d * a_Speed = nullptr
+	)
+	{
+		return Create(a_Kind, a_Creator, {a_PosX, a_PosY, a_PosZ}, a_Item, a_Speed);
+	}
 
 	/** Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given */
 	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace);

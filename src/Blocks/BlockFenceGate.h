@@ -2,24 +2,22 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "../EffectID.h"
 
 
 
 
 class cBlockFenceGateHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>>
 {
-public:
-	cBlockFenceGateHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
-	{
-	}
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>>;
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+public:
+
+	cBlockFenceGateHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
-		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta to zero
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -50,7 +48,7 @@ public:
 			// Standing aside - use last direction
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
 		}
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player.GetClientHandle());
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0, a_Player.GetClientHandle());
 		return true;
 	}
 

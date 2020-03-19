@@ -18,11 +18,16 @@ public:
 	}
 
 	/** Portal boundary and direction variables */
-	// 2014_03_30 _X: What are these used for? Why do we need extra variables?
+	// TODO: These need to be removed, BlockHandler instances are shared for all blocks in all worlds on the server
+	// and are not supposed to have any data in them.
 	int XZP, XZM;
 	NIBBLETYPE Dir;
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
 		/*
 		PORTAL FINDING ALGORITH
@@ -38,13 +43,22 @@ public:
 		*/
 
 		// a_BlockY - 1: Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY - 1, a_BlockZ, a_ChunkInterface, a_WorldInterface);
+		FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// No pickups from this block
+		return {};
 	}
+
+
+
+
 
 	virtual bool IsClickedThrough(void) override
 	{
@@ -101,6 +115,10 @@ public:
 		// Everything was obsidian, found a border!
 		return true;
 	}
+
+
+
+
 
 	/** Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE) */
 	void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)

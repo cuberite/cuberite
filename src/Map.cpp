@@ -199,7 +199,6 @@ eDimension cMap::GetDimension(void) const
 
 
 
-
 void cMap::Resize(unsigned int a_Width, unsigned int a_Height)
 {
 	if ((m_Width == a_Width) && (m_Height == a_Height))
@@ -300,11 +299,6 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 	}
 	else
 	{
-		if ((PixelX > 320.0) || (PixelZ > 320.0))
-		{
-			;
-		}
-
 		Rot = 0;
 		Type = cMapDecorator::eType::E_TYPE_PLAYER_OUTSIDE;
 
@@ -329,6 +323,7 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 
 	return {Type, static_cast<unsigned>(2 * PixelX + 1), static_cast<unsigned>(2 * PixelZ + 1), Rot};
 }
+
 
 
 

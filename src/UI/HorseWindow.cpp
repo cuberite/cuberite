@@ -4,9 +4,9 @@
 // Representing the UI window for a horse entity
 
 #include "Globals.h"
-#include "Mobs/Horse.h"
-#include "UI/HorseWindow.h"
-#include "UI/SlotArea.h"
+#include "../Mobs/Horse.h"
+#include "../UI/HorseWindow.h"
+#include "../UI/SlotArea.h"
 
 
 

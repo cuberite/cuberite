@@ -2,15 +2,15 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ItemFrame.h"
-#include "ClientHandle.h"
 #include "Player.h"
+#include "../ClientHandle.h"
 
 
 
 
 
-cItemFrame::cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z) :
-	cHangingEntity(etItemFrame, a_BlockFace, a_X, a_Y, a_Z),
+cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
+	super(etItemFrame, a_BlockFace, a_Pos),
 	m_Item(E_BLOCK_AIR),
 	m_ItemRotation(0)
 {
@@ -47,7 +47,6 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 }
-
 
 
 

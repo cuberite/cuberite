@@ -18,9 +18,14 @@ class cClientHandle;
 class cBrewingstandEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		bsLeftBottle        = 0,  // Left bottle slot number
@@ -38,7 +43,7 @@ public:
 	BLOCKENTITY_PROTODEF(cBrewingstandEntity)
 
 	/** Constructor used for normal operation */
-	cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cBrewingstandEntity() override;
 

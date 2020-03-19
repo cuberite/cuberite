@@ -33,6 +33,7 @@ bool cMemorySettingsRepository::HasValue(const AString & a_KeyName, const AStrin
 
 
 
+
 int cMemorySettingsRepository::AddKeyName(const AString & a_keyname)
 {
 	m_Map.emplace(a_keyname, std::unordered_multimap<AString, sValue>{});
@@ -70,7 +71,6 @@ bool cMemorySettingsRepository::DeleteKeyComment(const AString & keyname, const 
 
 
 
-
 void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value)
 {
 	if (m_Writable)
@@ -78,6 +78,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 		m_Map[a_KeyName].emplace(a_ValueName, sValue(a_Value));
 	}
 }
+
 
 
 
@@ -201,6 +202,7 @@ Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const A
 
 
 
+
 bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
@@ -249,6 +251,7 @@ bool cMemorySettingsRepository::SetValue (const AString & a_KeyName, const AStri
 	iter->second = sValue(a_Value);
 	return true;
 }
+
 
 
 
@@ -304,6 +307,10 @@ bool cMemorySettingsRepository::DeleteValue(const AString & a_KeyName, const ASt
 	outerIter->second.erase(iter);
 	return true;
 }
+
+
+
+
 
 bool cMemorySettingsRepository::Flush()
 {

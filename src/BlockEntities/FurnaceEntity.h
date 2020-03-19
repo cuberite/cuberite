@@ -18,9 +18,14 @@ class cClientHandle;
 class cFurnaceEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		fsInput  = 0,  // Input slot number
@@ -36,7 +41,7 @@ public:
 	BLOCKENTITY_PROTODEF(cFurnaceEntity)
 
 	/** Constructor used for normal operation */
-	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cFurnaceEntity() override;
 
@@ -84,6 +89,9 @@ public:
 	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
+	/** Calculates, resets, and returns the experience reward in this furnace */
+	int GetAndResetReward(void);
+
 	// tolua_end
 
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)
@@ -129,6 +137,9 @@ protected:
 
 	/** Amount of ticks that the current fuel has been burning */
 	int m_TimeBurned;
+
+	/** Running total of experience that can be picked up */
+	float m_RewardCounter;
 
 	/** Is the block currently being loaded into the world? */
 	bool m_IsLoading;

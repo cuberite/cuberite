@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Witch.h"
-#include "FastRandom.h"
+#include "../FastRandom.h"
 
 
 

@@ -17,14 +17,20 @@
 
 
 class cBlockFarmlandHandler :
-	public cBlockHandler
+	public cClearMetaOnDrop<cBlockHandler>
 {
+	using super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
-	cBlockFarmlandHandler(BLOCKTYPE a_BlockType) :
-		cBlockHandler(a_BlockType)
+
+	cBlockFarmlandHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
@@ -60,14 +66,17 @@ public:
 			}
 			default:
 			{
-				a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+				a_Chunk.SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_DIRT, 0);
 				break;
 			}
 		}
 	}
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
+
+
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
 	{
 		// Don't care about any neighbor but the one above us (fix recursion loop in #2213):
 		if (a_WhichNeighbor != BLOCK_FACE_YP)
@@ -76,24 +85,21 @@ public:
 		}
 
 		// Don't care about anything if we're at the top of the world:
-		if (a_BlockY >= cChunkDef::Height)
+		if (a_BlockPos.y >= cChunkDef::Height)
 		{
 			return;
 		}
 
 		// Check whether we should revert to dirt:
-		BLOCKTYPE UpperBlock = a_ChunkInterface.GetBlock({a_BlockX, a_BlockY + 1, a_BlockZ});
-		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
+		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
+		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
+			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
 		}
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.Add(E_BLOCK_DIRT, 1, 0);  // Reset meta
-	}
+
 
 
 	bool IsWaterInNear(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)

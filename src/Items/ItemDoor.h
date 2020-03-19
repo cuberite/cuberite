@@ -89,10 +89,10 @@ public:
 		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
 		/*
 		// DEBUG:
-		LOGD("Door being placed at {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
-		LOGD("RelDirToOutside: {%d, %d, %d}", RelDirToOutside.x, RelDirToOutside.y, RelDirToOutside.z);
-		LOGD("Left neighbor at {%d, %d, %d}: %d (%s)", LeftNeighborPos.x, LeftNeighborPos.y, LeftNeighborPos.z, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock).c_str());
-		LOGD("Right neighbor at {%d, %d, %d}: %d (%s)", RightNeighborPos.x, RightNeighborPos.y, RightNeighborPos.z, RightNeighborBlock, ItemTypeToString(RightNeighborBlock).c_str());
+		FLOGD("Door being placed at {0}", Vector3i{a_BlockX, a_BlockY, a_BlockZ});
+		FLOGD("RelDirToOutside: {0}", RelDirToOutside);
+		FLOGD("Left neighbor at {0}: {1} ({2})", LeftNeighborPos, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock));
+		FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos, RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
 		*/
 		if (
 			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block

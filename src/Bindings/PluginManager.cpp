@@ -248,14 +248,18 @@ bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_B
 
 
 bool cPluginManager::CallHookBlockToPickups(
-	cWorld & a_World, cEntity * a_Digger,
-	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
 	cItems & a_Pickups
 )
 {
 	return GenericCallHook(HOOK_BLOCK_TO_PICKUPS, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups);
+			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_BlockType, a_BlockMeta, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
 		}
 	);
 }
@@ -479,6 +483,7 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
+
 bool cPluginManager::CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_World)
 {
 	return GenericCallHook(HOOK_ENTITY_CHANGING_WORLD, [&](cPlugin * a_Plugin)
@@ -491,6 +496,7 @@ bool cPluginManager::CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_
 
 
 
+
 bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
 {
 	return GenericCallHook(HOOK_ENTITY_CHANGED_WORLD, [&](cPlugin * a_Plugin)
@@ -499,6 +505,7 @@ bool cPluginManager::CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_W
 		}
 	);
 }
+
 
 
 
@@ -639,6 +646,7 @@ bool cPluginManager::CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVe
 		}
 	);
 }
+
 
 
 
@@ -1068,6 +1076,7 @@ bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 
 
 
+
 bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	return GenericCallHook(HOOK_SPAWNED_MONSTER, [&](cPlugin * a_Plugin)
@@ -1076,6 +1085,7 @@ bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monst
 		}
 	);
 }
+
 
 
 

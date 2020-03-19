@@ -49,6 +49,6 @@ public:
 		UNUSED(a_World);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());;
+		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
 	}
 };

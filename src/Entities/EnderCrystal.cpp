@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "EnderCrystal.h"
-#include "ClientHandle.h"
+#include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../World.h"
 
@@ -10,8 +10,8 @@
 
 
 
-cEnderCrystal::cEnderCrystal(double a_X, double a_Y, double a_Z)
-	: cEntity(etEnderCrystal, a_X, a_Y, a_Z, 1.0, 1.0)
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos):
+	super(etEnderCrystal, a_Pos, 1.0, 1.0)
 {
 	SetMaxHealth(5);
 }

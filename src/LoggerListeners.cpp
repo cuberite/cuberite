@@ -9,7 +9,7 @@
 #endif
 
 
-#if defined(_WIN32) || defined (__linux)
+#if defined(_WIN32) || defined (__linux) || defined (__APPLE__)
 	class cColouredConsoleListener
 		: public cLogger::cListener
 	{
@@ -101,11 +101,11 @@
 
 
 
-#elif defined (__linux)
+#elif defined (__linux) || defined (__APPLE__)
 
 
 
-	class cLinuxConsoleListener
+	class cANSIConsoleListener
 		: public cColouredConsoleListener
 	{
 	public:
@@ -145,6 +145,7 @@
 		{
 			// Whatever the console default is
 			printf("\x1b[0m");
+			fflush(stdout);
 		}
 	};
 
@@ -227,11 +228,11 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 		{
 			return cpp14::make_unique<cVanillaCPPConsoleListener>();
 		}
-	#elif defined (__linux) && !defined(ANDROID)
+	#elif (defined (__linux) && !defined(ANDROID)) || defined (__APPLE__)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
 		{
-			return cpp14::make_unique<cLinuxConsoleListener>();
+			return cpp14::make_unique<cANSIConsoleListener>();
 		}
 		else
 		{

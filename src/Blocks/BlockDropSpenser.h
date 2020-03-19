@@ -6,7 +6,8 @@
 #pragma once
 
 #include "../Blocks/BlockPiston.h"
-#include "MetaRotator.h"
+#include "../BlockEntities/DropSpenserEntity.h"
+#include "Mixins.h"
 
 
 
@@ -15,11 +16,18 @@
 class cBlockDropSpenserHandler :
 	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
+	using super = cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>;
+
 public:
-	cBlockDropSpenserHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+
+	cBlockDropSpenserHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -35,11 +43,30 @@ public:
 		return true;
 	}
 
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		cItems res(cItem(m_BlockType, 1));
+		if (a_BlockEntity != nullptr)
+		{
+			auto be = static_cast<cDropSpenserEntity *>(a_BlockEntity);
+			res.AddItemGrid(be->GetContents());
+		}
+		return res;
+	}
+
+
+
+
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
-		// Bit 0x08 is a flag. Lowest three bits are position. 0x08 == 1000
+		// Bit 0x08 is a flag. Lowest three bits are position.
 		NIBBLETYPE OtherMeta = a_Meta & 0x08;
-		// Mirrors defined by by a table. (Source, mincraft.gamepedia.com) 0x07 == 0111
+		// Mirrors defined by a table. (Source, minecraft.gamepedia.com)
 		switch (a_Meta & 0x07)
 		{
 			case 0x00: return 0x01 + OtherMeta;  // Down -> Up
@@ -48,6 +75,10 @@ public:
 		// Not Facing Up or Down; No change.
 		return a_Meta;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

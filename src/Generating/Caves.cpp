@@ -609,7 +609,6 @@ cStructGenWormNestCaves::cCaveSystem::~cCaveSystem()
 
 
 
-
 void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
@@ -696,7 +695,6 @@ cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_Gri
 {
 	return cStructurePtr(new cCaveSystem(a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxOffset, m_Size, m_Noise));
 }
-
 
 
 

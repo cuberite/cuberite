@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "Blocks/BlockPiston.h"
+#include "../../Blocks/BlockPiston.h"
 
 
 
@@ -36,38 +36,24 @@ public:
 	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
 
-		// Delay is used here to prevent an infinite loop (#3168)
-		if (DelayInfo == nullptr)
+		bool ShouldBeExtended = (a_PoweringData.PowerLevel != 0);
+		if (ShouldBeExtended == cBlockPistonHandler::IsExtended(a_Meta))
 		{
-			bool ShouldBeExtended = (a_PoweringData.PowerLevel != 0);
-			if (ShouldBeExtended != cBlockPistonHandler::IsExtended(a_Meta))
-			{
-				Data->m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeExtended);
-			}
+			return {};
+		}
+
+		if (ShouldBeExtended)
+		{
+			cBlockPistonHandler::ExtendPiston(a_Position, a_World);
 		}
 		else
 		{
-			int DelayTicks;
-			bool ShouldBeExtended;
-			std::tie(DelayTicks, ShouldBeExtended) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				if (ShouldBeExtended)
-				{
-					cBlockPistonHandler::ExtendPiston(a_Position, a_World);
-				}
-				else
-				{
-					cBlockPistonHandler::RetractPiston(a_Position, a_World);
-				}
-
-				Data->m_MechanismDelays.erase(a_Position);
-			}
+			cBlockPistonHandler::RetractPiston(a_Position, a_World);
 		}
+
+		// It is necessary to delay after a signal to prevent an infinite loop (#3168)
+		// However, that is present as a side effect of the implementation of piston animation in Blocks\BlockPiston.cpp
 
 		return {};
 	}

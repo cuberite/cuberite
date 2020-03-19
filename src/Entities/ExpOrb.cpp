@@ -5,28 +5,15 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
-	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0)
+cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
+	super(etExpOrb, a_Pos, 0.98, 0.98),  // TODO: Check size
+	m_Reward(a_Reward),
+	m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetGravity(0);
-}
-
-
-
-
-
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
-	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0)
-{
-	SetMaxHealth(5);
-	SetHealth(5);
-	SetGravity(0);
+	SetGravity(-16);
+	SetAirDrag(0.02f);
 }
 
 
@@ -47,48 +34,98 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	DetectCacti();
+	m_TicksAlive++;
 
-	// Check player proximity no more than twice per second
-	if ((m_TicksAlive % 10) == 0)
+	// Find closest player within 6.5 meter (slightly increase detect range to have same effect in client)
+	bool FoundPlayer = m_World->DoWithNearestPlayer(GetPosition(), 6.5, [&](cPlayer & a_Player) -> bool
 	{
-		cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5, false));
-		if ((a_ClosestPlayer != nullptr) && (!a_ClosestPlayer->IsGameModeSpectator()))
+		Vector3f a_PlayerPos(a_Player.GetPosition());
+		a_PlayerPos.y += 0.8f;
+		Vector3f a_Distance = a_PlayerPos - GetPosition();
+		double Distance = a_Distance.Length();
+
+		if (Distance < 0.7f)
 		{
-			Vector3f a_PlayerPos(a_ClosestPlayer->GetPosition());
-			a_PlayerPos.y++;
-			Vector3f a_Distance(a_PlayerPos - GetPosition());
-			double Distance(a_Distance.Length());
-			if (Distance < 0.5f)
-			{
-				LOGD("Player %s picked up an ExpOrb. His reward is %i", a_ClosestPlayer->GetName().c_str(), m_Reward);
-				a_ClosestPlayer->DeltaExperience(m_Reward);
+			a_Player.DeltaExperience(m_Reward);
 
-				m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-
-				Destroy(true);
-				return;
-			}
-			SetSpeedX((a_PlayerPos.x - GetPosition().x) * 2.0);
-			SetSpeedY((a_PlayerPos.y - GetPosition().y) * 2.0);
-			SetSpeedZ((a_PlayerPos.z - GetPosition().z) * 2.0);
+			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+			Destroy();
+			return true;
 		}
+
+		// Experience orb will "float" or glide toward the player up to a distance of 6 blocks.
+		// speeding up as they get nearer to the player, Speed range 6 - 12 m per second, accelerate 60 m per second^2
+		Vector3d SpeedDelta(a_Distance);
+		SpeedDelta.Normalize();
+		SpeedDelta *= 3;
+
+		Vector3d CurrentSpeed = GetSpeed();
+		CurrentSpeed += SpeedDelta;
+		if (CurrentSpeed.Length() > 12)
+		{
+			CurrentSpeed.Normalize();
+			CurrentSpeed *= 12;
+		}
+
+		SetSpeed(CurrentSpeed);
+		m_Gravity = 0;
+
+		return true;
+	}, false, true);  // Don't check line of sight, ignore spectator mode player
+
+	if (!FoundPlayer)
+	{
+		m_Gravity = -16;
 	}
+
 	HandlePhysics(a_Dt, a_Chunk);
+	BroadcastMovementUpdate();
 
 	m_Timer += a_Dt;
 	if (m_Timer >= std::chrono::minutes(5))
 	{
-		Destroy(true);
+		Destroy();
 	}
 }
+
+
+
+
 
 bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtCactusContact)
 	{
-		Destroy(true);
+		Destroy();
 		return true;
 	}
 
 	return super::DoTakeDamage(a_TDI);
 }
+
+
+
+
+
+std::vector<int> cExpOrb::Split(int a_Reward)
+{
+	const static std::array<int, 11> BaseValue = {{1, 3, 7, 17, 37, 73, 149, 307, 617, 1237, 2477}};
+
+	std::vector<int> Rewards;
+	size_t Index = BaseValue.size() - 1;  // Last one
+
+	while (a_Reward > 0)
+	{
+		while (a_Reward < BaseValue[Index])
+		{
+			Index--;
+		}
+
+		a_Reward -= BaseValue[Index];
+		Rewards.push_back(BaseValue[Index]);
+	}
+
+	return Rewards;
+}
+
+

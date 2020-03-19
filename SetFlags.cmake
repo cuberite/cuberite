@@ -26,7 +26,7 @@ macro(get_clang_version)
 	execute_process(
 		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
 		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
-	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
+	string(REGEX MATCH "version ([0-9]+\\.[0-9]+)" x ${CLANG_VERSION_OUTPUT})
 	set(CLANG_VERSION ${CMAKE_MATCH_1})
 endmacro()
 
@@ -91,7 +91,7 @@ macro(set_flags)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
 		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
 		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-		
+
 		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:

@@ -12,7 +12,6 @@
 
 
 
-
 /** Chunk data callback that takes the chunk data and puts them into cLightingThread's m_BlockTypes[] / m_HeightMap[]: */
 class cReader :
 	public cChunkDataCallback
@@ -140,7 +139,7 @@ void cLightingThread::Stop(void)
 	m_ShouldTerminate = true;
 	m_evtItemAdded.Set();
 
-	Wait();
+	super::Stop();
 }
 
 
@@ -231,7 +230,6 @@ void cLightingThread::Execute(void)
 
 
 
-
 void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 {
 	// If the chunk is already lit, skip it (report as success):
@@ -239,7 +237,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		if (a_Item.m_CallbackAfter != nullptr)
 		{
-			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+			a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 		}
 		return;
 	}
@@ -320,7 +318,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{
-		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+		a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 	}
 }
 
@@ -338,7 +336,7 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 3; x++)
 		{
 			Reader.m_ReadingChunkX = x;
-			VERIFY(m_World.GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader));
+			VERIFY(m_World.GetChunkData({a_ChunkX + x - 1, a_ChunkZ + z - 1}, Reader));
 		}  // for z
 	}  // for x
 

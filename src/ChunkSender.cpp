@@ -27,11 +27,11 @@
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 	{
 		cChunkSender & ChunkSender = m_ChunkSender;
 		m_World.DoWithChunk(
-			a_ChunkX, a_ChunkZ,
+			a_Coords.m_ChunkX, a_Coords.m_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
 				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MIDHIGH, a_Chunk.GetAllClients());
@@ -51,7 +51,6 @@ public:
 	{
 	}
 };
-
 
 
 
@@ -79,21 +78,11 @@ cChunkSender::~cChunkSender()
 
 
 
-bool cChunkSender::Start()
-{
-	m_ShouldTerminate = false;
-	return super::Start();
-}
-
-
-
-
-
 void cChunkSender::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_evtQueue.Set();
-	Wait();
+	super::Stop();
 }
 
 
@@ -132,8 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 
 
 
-
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, std::list<cClientHandle *> a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -253,7 +241,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	}
 
 	// Query and prepare chunk data:
-	if (!m_World.GetChunkData(a_ChunkX, a_ChunkZ, *this))
+	if (!m_World.GetChunkData({a_ChunkX, a_ChunkZ}, *this))
 	{
 		return;
 	}
@@ -285,6 +273,7 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
 	m_BlockEntities.push_back(a_Entity->GetPos());
 }
+
 
 
 
