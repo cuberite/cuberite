@@ -198,7 +198,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		auto relPos = a_Chunk.RelativeToAbsolute(m_HitBlockPos);
+		auto relPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
 		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 
 		if (chunk == nullptr)
