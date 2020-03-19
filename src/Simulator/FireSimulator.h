@@ -46,19 +46,19 @@ protected:
 	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
-	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	int GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Tries to spread fire to a neighborhood of the specified block */
-	void TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	void TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Removes all burnable blocks neighboring the specified block */
-	void RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	void RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Returns true if a fire can be started in the specified block,
 	that is, it is an air block and has fuel next to it.
 	Note that a_NearChunk may be a chunk neighbor to the block specified!
 	The coords are relative to a_NearChunk but not necessarily in it. */
-	bool CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ);
+	bool CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos);
 } ;
 
 

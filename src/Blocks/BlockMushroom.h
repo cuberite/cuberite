@@ -7,22 +7,19 @@
 
 
 
-class cBlockMushroomHandler :
-	public cBlockHandler
+class cBlockMushroomHandler:
+	public cClearMetaOnDrop<cBlockHandler>
 {
+	using super = cClearMetaOnDrop<cBlockHandler>;
+
 public:
-	cBlockMushroomHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockMushroomHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
 	// TODO: Add Mushroom Spread
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{

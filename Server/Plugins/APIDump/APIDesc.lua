@@ -4014,7 +4014,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions).",
 					},
 					{
 						Params =
@@ -4035,7 +4035,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions).",
 					},
 					{
 						Params =
@@ -4059,7 +4059,37 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world. <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
+							{
+								Name = "ShouldSetPortalCooldown",
+								Type = "boolean",
+								IsOptional = true,
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
 					},
 				},
 				ScheduleMoveToWorld =
@@ -4085,7 +4115,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							IsOptional  = true,
 						},
 					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false (default), no respawn packet is sent, if it is true then a respawn packet is sent to the client.",
+					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false (default), no respawn packet is sent, if it is true then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
 				},
 				SetGravity =
 				{
@@ -7927,6 +7957,17 @@ end
 						Notes = "Adds a new item to the end of the collection",
 					},
 				},
+				AddItemGrid =
+				{
+					Params =
+					{
+						{
+							Name = "ItemGrid",
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Adds a copy of each item in the specified {{cItemGrid|ItemGrid}}.",
+				},
 				Clear =
 				{
 					Notes = "Removes all items from the collection",
@@ -7939,7 +7980,7 @@ end
 							Type = "cItems",
 						},
 					},
-					Notes = "Creates a new cItems object",
+					Notes = "Creates a new empty cItems object",
 				},
 				Contains =
 				{
@@ -8789,6 +8830,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+                                BurnsInDaylight =
+                                {
+                                        Returns =
+                                        {
+                                                {
+                                                        Type = "boolean",
+                                                },
+                                        },
+                                        Notes = "Returns whether the mob burns in daylight.",
+                                },
 				CanBeLeashed =
 				{
 					Returns =
@@ -9007,6 +9058,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the age of the monster",
+				},
+				SetBurnsInDaylight =
+				{
+					Params =
+					{
+						{
+							Name = "BurnsInDaylight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick",
 				},
 				SetCanBeLeashed =
 				{
@@ -15299,6 +15361,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15322,6 +15388,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
@@ -16515,6 +16585,46 @@ end
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
 				},
+				E_META_END_PORTAL_FRAME_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_NO_EYE =
+				{
+					Notes = "The lack of the flag in the metadata of end portal frames indicating that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction.",
+				},
+				E_META_END_PORTAL_FRAME_XP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_XM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction and has an ender eye in it.",
+				},
 				E_META_HEAD_CREEPER =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a creeper head.",
@@ -16538,6 +16648,14 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				},
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
 				esBed =
 				{
@@ -17648,6 +17766,7 @@ end
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",
 		"Globals.esMax",
+		"Globals.E_BLOCK_*",
 	},
 	IgnoreVariables =
 	{

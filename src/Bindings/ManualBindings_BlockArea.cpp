@@ -129,7 +129,7 @@ static int tolua_cBlockArea_Create(lua_State * a_LuaState)
 	// Create the area:
 	if ((size.x <= 0) || (size.y <= 0) || (size.z <= 0))
 	{
-		return L.ApiParamError("Invalid sizes, must be greater than zero, got {%d, %d, %d}", size.x, size.y, size.z);
+		return L.FApiParamError("Invalid sizes, must be greater than zero, got {0}", size);
 	}
 	ASSERT(self != nullptr);
 	self->Create(size, dataTypes);
@@ -216,10 +216,8 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("Coords ({%d, %d, %d}) out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("Coords ({0}) out of range ({1} - {2}).",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	BLOCKTYPE blockType;
@@ -368,9 +366,8 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range (max {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX() - 1, self->GetSizeY() - 1, self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range (max {1}).",
+			coords, self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	BLOCKTYPE blockType;
@@ -518,32 +515,32 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 	bounds.Sort();
 	if (bounds.p1.y < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p1.y = 0;
 	}
 	else if (bounds.p1.y >= cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p1.y = cChunkDef::Height - 1;
 	}
 	if (bounds.p2.y < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p2.y = 0;
 	}
 	else if (bounds.p2.y > cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p2.y = cChunkDef::Height;
@@ -789,10 +786,8 @@ static int GetBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2}).",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -842,9 +837,8 @@ static int GetRelBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.ApiParamError("The coords ({0}) are out of range ({1}).",
+			coords, self->GetSize()
 		);
 	}
 
@@ -894,10 +888,8 @@ static int SetBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2}).",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	DataType data;
@@ -949,9 +941,8 @@ static int SetRelBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.FApiParamError("The coords ({0}) are out of range ({1}).",
+			coords, self->GetSize()
 		);
 	}
 	DataType data;
@@ -993,10 +984,8 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2}).",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -1043,9 +1032,8 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.FApiParamError("The coords ({0}) are out of range ({1}).",
+			coords, self->GetSize()
 		);
 	}
 

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Chunk.h"
+#include "../Chunk.h"
 #include "BlockFence.h"
 #include "BlockFenceGate.h"
 #include "BlockGlass.h"
@@ -12,21 +12,29 @@
 
 
 
-class cBlockSignPostHandler :
+class cBlockSignPostHandler:
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using super = cBlockHandler;
 
 public:
-	cBlockSignPostHandler(BLOCKTYPE a_BlockType) :
+
+	cBlockSignPostHandler(BLOCKTYPE a_BlockType):
 		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
+		return cItem(E_ITEM_SIGN, 1, 0);
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{

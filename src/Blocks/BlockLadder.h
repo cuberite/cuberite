@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "ClearMetaOnDrop.h"
+#include "Mixins.h"
 
 
 
@@ -11,12 +11,18 @@
 class cBlockLadderHandler :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
 {
-	typedef cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> > super;
+	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;
+
 public:
-	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: super(a_BlockType)
+
+	cBlockLadderHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -60,10 +66,9 @@ public:
 		}
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta
-	}
+
+
+
 
 	static bool IsValidDirection(eBlockFace a_Direction)
 	{
@@ -101,6 +106,10 @@ public:
 		UNREACHABLE("Unsupported block face");
 	}
 
+
+
+
+
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
@@ -113,6 +122,10 @@ public:
 		}
 	}
 
+  
+  
+  
+  
 	/** Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_NONE on failure */
 	eBlockFace FindSuitableBlockFace(cWorld * World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
@@ -137,6 +150,10 @@ public:
 		return BLOCK_FACE_NONE;
 	}
 
+  
+  
+  
+  
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		// Can only place at side of block
@@ -172,6 +189,10 @@ public:
 			}
 		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

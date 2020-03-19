@@ -1,0 +1,209 @@
+<html>
+<head>
+<title>Cuberite - Exporting symbols from C++ to Lua API</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="content">
+<h1>Exporting symbols from C++ to Lua API</h1>
+<p>
+Cuberite has a powerful plugin system which makes available hundreds of functions, variables and constants (symbols). When adding or removing functionality, these need to be taken into account - do we want to make this function available to the plugins? Did we remove a function that plugins could have used in the past?</p>
+<p>
+The API maintenance is pretty straightforward once you figure out how to do it. This text will guide you through the process.</p>
+<ul>
+	<li><a href="#toluaintro">Introduction to ToLua++</a></li>
+	<ul>
+		<li><a href="#autoexport">Auto-export</a></li>
+		<li><a href="#manualexport">Exporting manually</a></li>
+	</ul>
+	<li><a href="#conventions">Cuberite conventions</a></li>
+	<ul>
+		<li><a href="#newsymbols">New symbols</a></li>
+		<li><a href="#delsymbols">Removing symbols</a></li>
+		<li><a href="#zbsapi">ZeroBrane Studio API description</a></li>
+		<li><a href="#pluginchecker">Plugin Checker</a></li>
+	</ul>
+</ul>
+
+<hr />
+<a name="toluaintro"><h2>Introduction to ToLua++</h2></a>
+<p>
+Cuberite uses ToLua++ for handling bindings. Unfortunately this tool is no longer maintained, so we had to hack it ourselves whenever we needed a specific feature that it didn't support. Luckily, it turns out ToLua++ is greatly extensible and can quite easily be made to do our bidding.</p>
+<p>
+This tool consists of a Lua script to parse C++ code and generate the glue code, and a runtime library providing support for the generated code. The C++ code parser doesn't implement full C++ syntax, just a reasonable subset that most if not all source files can be made to fit. Since it parses the C++ code using Lua patterns, it is only expected that some wild corner cases will confuse the parser. Therefore, all files that are to be processed by the parser need to be written in a simple subset of C++.</p>
+<p>
+Once run, the tool generates a giant C++ source code file, src/Bindings/Bindings.cpp, which implements all the glue code needed for Lua plugins to interface with the C++ code.</p>
+
+<a name="autoexport"><h3>Auto-export</h3></a>
+<p>
+The simplest way to export a symbol is to mark it for exporting and let ToLua++ do all the work. Basically, when ToLua++ parses files, it ignores everything that is not in between special comments, // tolua_begin and // tolua_end . There's a special comment, // tolua_export , that says "consider this single line". So adding new symbols in between existing tolua_begin / tolua_end comment pair, or marking them with tolua_export, is the simplest way to export them. However, since ToLua++ is limited, this works only for simple things: variables, constants and (overloaded) (member) functions, all of which must use only numbers, strings or enums or classes known to ToLua++. Note that this means that arrays, vectors, lists and callbacks are not supported by this simple export, all of those need to be exported manually. Based on experience, about 90 % of API functions can be exported this way.</p>
+<p>
+The following piece of code shows how to export a class with some of its functions:</p>
+<pre>
+// tolua_begin
+class ExportedClass
+{
+public:
+	// tolua_end
+
+	ExportedClass();  // NOT exported
+	void notExported();
+	void exported(int a_Param1);  // tolua_export
+	void anotherNotExported();
+
+	// tolua_begin
+
+	void exported(int a_Param1, int a_Param2);  // Note that overloads are supported
+	void anotherExported(const AString &amp; a_Text);
+};
+// tolua_end
+</pre>
+<p>
+From this input, the ToLua++ sees the following "preprocessed" code, for which it will generate the bindings:</p>
+<pre>
+class ExportedClass
+{
+public:
+	void exported(int a_Param1);
+	void exported(int a_Param1, int a_Param2);
+	void anotherExported(const AString &amp; a_Text);
+};
+</pre>
+
+<a name="manualexport"><h3>Manual export</h3></a>
+<p>
+First, a quick primer on binding Lua in general. You can have a look at the <a href="http://www.lua.org/manual/5.3/manual.html#4">Lua manual</a> for details, since this is only a summary.</p>
+<p>
+Lua uses a concept of stack. It keeps a stack through the lifetime of program, and calling a function means that under the hood the parameters are first pushed onto the stack, then the function implementation is called, it can read the values on the stack and it can push return values onto the same stack, and when it returns, Lua reads the return values from the top of that stack. This allows Lua to have functions that take a variable amount of parameters, return any number of values, and all of these parameters / values can be of any Lua-supported type. If you consider the datatype a "variant", it's good enough.</p>
+<p>
+The signature for a function call, therefore, is simple - it takes an opaque pointer to a Lua engine (struct lua_State *), and it returns a single number that specifies how many return values there are on the stack. In C/C++ terms:
+<pre>
+static int fnImplementation(lua_State * a_LuaState)
+{
+	// ...
+
+	// Push return values onto the stack
+
+	return numReturnValues;
+}
+</pre>
+</p>
+<p>
+Although it is referred to as The Stack, it can be manipulated in any way - a value can be read from any position, and it supports insertion to and deletion from any position.</p>
+<p>
+A typical API function should do these actions:
+<ul>
+	<li>Check that parameter types are correct</li>
+	<li>Read the parameter values</li>
+	<li>Execute the C++ function</li>
+	<li>Publish any return values</li>
+</ul>
+</p>
+<p>
+Cuberite wraps the lua_State pointer into a nice interface, cLuaState, that (among other things) provides easy functions for interfacing with Lua. Checking parameter types is done using the cLuaState::CheckParam...() family of functions. Each of these functions checks the type of the specified parameter / parameter range, returns true if the parameters are okay, or logs an error message to console and returns false if they aren't. Note that this is not usable for overloaded functions, they need to use tolua_is...() functions for checking.</p>
+<p>
+Example code doing the parameter check:</p>
+<pre>
+static int tolua_cRoot_DoWithPlayerByUUID(lua_State * tolua_S)
+{
+	// Function signature: cRoot:DoWithPlayerByUUID(cUUID, function)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cRoot") ||
+		!L.CheckParamUUID(2) ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+</pre>
+<p>
+This code checks that the API function is called on a cRoot instance (first hidden parameter) and has a UUID and a callback function as its parameters. It also checks that there are no more parameters on the stack. </p>
+<p>
+Reading the parameter values is rather simple: Declare variables to hold the parameter values, then use cLuaState::GetStackValues() to read them all at once. This function will return true if successful, false on an error. The return value should be checked even if parameter types were correct, because a failure can be due to other means as well - the number in Lua might be too large to fit the C++ datatype, or the enum value is out of range. Note that GetStackValues() doesn't report which parameter failed, so it should not be used for reporting problems to the user (plugin dev).</p>
+<p>
+The following example is a continuation of the previous example function that reads the parameters into local variables:</p>
+<pre>
+	// Get parameters:
+	cRoot * Self;
+	cUUID PlayerUUID;
+	cLuaState::cRef FnRef;  // Holds a Lua function (callback)
+	L.GetStackValues(1, Self, PlayerUUID, FnRef);
+
+	// Check parameters validity:
+	if (PlayerUUID.IsNil())
+	{
+		return L.ApiParamError("Expected a non-nil UUID for parameter #1");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #2");
+	}
+</pre>
+<p>
+After executing the C++ function, if there are any return values, they should be pushed onto the Lua stack using the cLuaState::Push() function, and finally the returned number should indicate the number of return values. Note that it is up to you to keep the stack counts. If your code pushes more values onto the stack than it reports as return values, it will cause a memory leak.</p>
+<p>
+The following example contains the rest of the previous example function, it executes the C++ code and gives the return value back to Lua:</p>
+<pre>
+	// Call the function:
+	bool res = Self->DoWithPlayerByUUID(PlayerUUID, [&amp;](cPlayer &amp; a_Player)
+		{
+			bool ret = false;
+			L.Call(FnRef, &amp;a_Player, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+</pre>
+<p>
+The manual API function export glue should be written into one of src/Bindings/ManualBindings*.cpp files, based on the group it belongs to (or into src/Bindings/DeprecatedBindings.cpp if it is an obsolete function, see the <a href="#delsymbol">Removing a symbol</a> chapter). There are a lot of examples already in those files. Note that there was some development in the process of writing manual bindings, and some of the manual bindings use old code. Do not copy code that makes use of tolua_Error struct, or tolua_push...() or tolua_to...() functions.</p>
+<p>
+Finally, after writing the API function, it needs to be registered ("bound" in our terminology). Each of the CPP files has a cManualBindings::Bind...() function at the bottom for this purpose. The function first registers classes (tolua_usertype(), tolua_cclass()) and then fills each class with manually-exported functions. A call to tolua_beginmodule() signifies start of class, tolua_endmodule() ends the class. In between, calls to tolua_function() register the API functions. It is good practice to keep the classes and the sybmols within classes alpha-sorted and tabulated.</p>
+<p>
+The following code is an example of binding our previous example function:</p>
+<pre>
+	tolua_beginmodule(tolua_S, "cRoot");
+		// ...
+		tolua_function(tolua_S, "DoWithPlayerByUUID",  tolua_cRoot_DoWithPlayerByUUID);
+		// ...
+	tolua_endmodule(tolua_S);
+</pre>
+
+<hr />
+<a name="conventions"><h2>Cuberite conventions</h2></a>
+<p>
+Specifically for Cuberite, we've built some conventions over the years. They are in place for good reasons - to make the API well documented, somewhat stable and reasonably fool-proof</p>
+
+<a name="newsymbols"><h3>New symbols</h3></a>
+<p>
+When adding a new symbol to the API, there's no version number to bump up to indicate this. Plugins can simply check the symbol's existence in the runtime, if they wish to do so. However, it is necessary to properly document the symbol, so that the automatically-generated documentation stays up to date.</p>
+<p>
+The API documentation is handled by the APIDump plugin, contained in the main repository in the Server/Plugins/APIDump folder. It can automatically generate the HTML API documentation locally, based on the actual API that it detects Cuberite is giving it, and joins it with developer-provided per-symbol descriptions. Most of the description is in the Server/Plugins/APIDump/APIDesc.lua file, but some well-defined groups of symbols have been pulled out into separate files in the Server/Plugins/APIDump/Classes folder and Server/Plugins/APIDump/Hooks folder. The format of the files is pretty self-explanatory - they each return a Lua table containing the descriptions, organized in sub-tables.</p>
+<p>
+To generate the documentation locally, start up Cuberite, load the APIDump plugin (if not already enabled) and execute the "api" command. It will create an API subfolder next to the Cuberite executable and write the HTML files into it.
+<p>
+The APIDump plugin can also check the difference between official documentation and local documentation, and can report if any symbol is new locally, without proper description. Execute the "apicheck" command to do that; note that this requires "wget" to be installed, since the official API description needs to be downloaded from the Internet. This command is used as part of Cuberite CI builds to detect any forgotten API description.</p>
+
+<a name="delsymbols"><h3>Removing a symbol</h3></a>
+<p>
+To keep the API from changing too much under plugin devs' hands, the recommendation is not to remove API symbols, but rather mark them as obsolete, while keeping the functionality (possibly emulating it through a new API, if the old symbol was replaced with a new way of doing things). The preffered way is to export the old symbol mnually in a specific file, src/Bindings/DeprecatedBindings.cpp, and add a warning message to the function implementation, together with the Lua stacktrace, to aid plugin authors with the migration. It is always a good idea to add a hint as to what the developers should use instead ("Warning in function call 'StringToMobType': StringToMobType() is deprecated. Please use cMonster:StringToMobType()").</p>
+<p>
+After a reasonable amount of time (typically, on the order of a year) the removed symbol can be considered unused and will be removed from the API. Usually this happens in batches as a cleanup of the codebase.</p>
+
+<a name="zbsapi"><h3>ZeroBrane Studio API description</h3></a>
+<p>
+The APIDump plugin also outputs API description for the ZeroBrane Studio IDE. It is written into the cuberite_api.lua file next to the Cuberite executable. See the <a href="http://xoft.cz/cuberite/LuaAPI/SettingUpZeroBrane.html">Docs article about ZBS</a> for details on how to use that file.</p>
+
+<a name="pluginchecker"><h3>Plugin Checker</h3></a>
+<p>
+There is a <a href="https://github.com/cuberite/CuberitePluginChecker">CuberitePluginChecker</a> project that aims to provide automatic testing to plugins. It uses the APIDump's descriptions to provide dummy implementations for all API functions. See the project page for details.</p>
+</div>
+</body>
+</html>

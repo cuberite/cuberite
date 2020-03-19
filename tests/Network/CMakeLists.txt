@@ -60,8 +60,10 @@ add_library(Network
 )
 
 target_link_libraries(Network event_core event_extra fmt::fmt mbedtls)
-if (MSVC)
+if (WIN32)
 	target_link_libraries(Network ws2_32.lib)
+else()
+	target_link_libraries(Network event_pthreads_static)
 endif()
 
 

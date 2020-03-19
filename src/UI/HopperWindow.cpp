@@ -13,7 +13,7 @@
 
 
 
-cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
+cHopperWindow::cHopperWindow(cHopperEntity * a_Hopper):
 	super(wtHopper, "Hopper")
 {
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));

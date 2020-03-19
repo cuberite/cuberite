@@ -2004,7 +2004,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
+int cLuaState::ApiParamError(fmt::StringRef a_Msg)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -2012,8 +2012,7 @@ int cLuaState::ApiParamError(const char * a_MsgFormat, fmt::ArgList argp)
 	VERIFY(lua_getinfo(m_LuaState, "n", &entry));
 
 	// Compose the error message:
-	AString msg = Printf(a_MsgFormat, argp);
-	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", msg);
+	AString errorMsg = fmt::format("{0}: {1}", (entry.name != nullptr) ? entry.name : "<unknown function>", a_Msg);
 
 	// Log everything into the console:
 	LOGWARNING("%s", errorMsg.c_str());

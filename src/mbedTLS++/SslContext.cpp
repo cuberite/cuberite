@@ -4,8 +4,8 @@
 // Implements the cSslContext class that holds everything a single SSL context needs to function
 
 #include "Globals.h"
-#include "mbedTLS++/SslContext.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/SslContext.h"
+#include "../mbedTLS++/SslConfig.h"
 
 
 

@@ -28,7 +28,7 @@ public:
 		m_Pos = Floater.GetPosition();
 		m_BitePos = Floater.GetBitePos();
 		m_AttachedMobID = Floater.GetAttachedMobID();
-		Floater.Destroy(true);
+		Floater.Destroy();
 		return true;
 	}
 
@@ -228,9 +228,9 @@ public:
 				FloaterPos.y += 0.5f;
 				const float FISH_SPEED_MULT = 2.25f;
 
-				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
-				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x * FISH_SPEED_MULT, (FlyDirection.y + 1.0f) * FISH_SPEED_MULT, FlyDirection.z * FISH_SPEED_MULT);
-				a_World->SpawnExperienceOrb(a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), Random.RandInt(1, 6));
+				Vector3d FlyDirection = (a_Player->GetEyePosition() - FloaterPos).addedY(1.0f) * FISH_SPEED_MULT;
+				a_World->SpawnItemPickups(Drops, FloaterPos, FlyDirection);
+				a_World->SpawnExperienceOrb(a_Player->GetPosition(), Random.RandInt(1, 6));
 				a_Player->UseEquippedItem(1);
 				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
 			}
@@ -245,7 +245,7 @@ public:
 		}
 		else
 		{
-			auto Floater = cpp14::make_unique<cFloater>(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
+			auto Floater = cpp14::make_unique<cFloater>(a_Player->GetEyePosition(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), (Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100)));
 			auto FloaterPtr = Floater.get();
 			if (!FloaterPtr->Initialize(std::move(Floater), *a_World))
 			{

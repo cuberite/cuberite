@@ -16,21 +16,8 @@ Declares the 1.8 protocol classes:
 #include "Protocol.h"
 #include "../ByteBuffer.h"
 
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
-
-#include "mbedTLS++/AesCfb128Decryptor.h"
-#include "mbedTLS++/AesCfb128Encryptor.h"
+#include "../mbedTLS++/AesCfb128Decryptor.h"
+#include "../mbedTLS++/AesCfb128Encryptor.h"
 
 
 
@@ -64,7 +51,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
+	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
 	virtual void SendEntityLook                 (const cEntity & a_Entity) override;
@@ -175,11 +162,7 @@ protected:
 	void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Nobody inherits 1.8, so it doesn't use this method */
-	virtual UInt32 GetPacketId(eOutgoingPackets a_Packet) override
-	{
-		ASSERT(!"GetPacketId for cProtocol_1_8_0 is not implemented.");
-		return 0;
-	}
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -262,6 +245,3 @@ protected:
 	/** Writes the block entity data for the specified block entity into the packet. */
 	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 } ;
-
-
-

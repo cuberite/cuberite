@@ -143,7 +143,7 @@ cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a
 	cCSLock Lock(m_CSConnections);
 	m_Connections.push_back(res);
 
-	return res;
+	return std::move(res);
 }
 
 

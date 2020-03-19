@@ -2,7 +2,7 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "BlockSlab.h"
 #include "BlockStairs.h"
 
@@ -10,13 +10,18 @@
 class cBlockLeverHandler :
 	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
-	typedef cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false> super;
+	using super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
 
 public:
+
 	cBlockLeverHandler(BLOCKTYPE a_BlockType) :
 		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
@@ -30,16 +35,28 @@ public:
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(E_BLOCK_LEVER, 1, 0));
+		// Reset meta to zero:
+		return cItem(E_BLOCK_LEVER, 1, 0);
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -53,6 +70,10 @@ public:
 
 		return true;
 	}
+
+
+
+
 
 	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
 	{
@@ -69,6 +90,10 @@ public:
 		}
 		UNREACHABLE("Unsupported block face");
 	}
+
+
+
+
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -89,6 +114,10 @@ public:
 			}
 		}
 	}
+  
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
@@ -121,6 +150,10 @@ public:
 		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
 	}
 
+
+
+
+
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		switch (a_Meta)
@@ -134,6 +167,10 @@ public:
 			default:  return super::MetaRotateCCW(a_Meta);  // Wall Rotation
 		}
 	}
+
+
+
+
 
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
@@ -149,11 +186,19 @@ public:
 		}
 	}
 
+
+
+
+
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
 		return 0;
 	}
+
+
+
+
 
 	/** Extracts the ON bit from metadata and returns if true if it is set */
 	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)

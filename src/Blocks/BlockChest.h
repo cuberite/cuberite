@@ -1,23 +1,30 @@
 
 #pragma once
 
-#include "BlockEntity.h"
+#include "../BlockEntities/ChestEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 
 
 
 
 
 class cBlockChestHandler :
-	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
+	using super = cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>;
+
 public:
-	cBlockChestHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+
+	cBlockChestHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -65,12 +72,20 @@ public:
 		return true;
 	}
 
+
+
+
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		return CanBeAt(a_ChunkInterface, BlockX, a_RelY, BlockZ);
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
@@ -137,6 +152,10 @@ public:
 		return (NumChestNeighbors < 2);
 	}
 
+
+
+
+
 	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
 	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
@@ -164,6 +183,10 @@ public:
 		}
 	}
 
+
+
+
+
 	/** If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true. */
 	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta)
 	{
@@ -175,10 +198,9 @@ public:
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

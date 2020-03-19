@@ -289,6 +289,30 @@ public:
 		);
 	}
 
+	/** Returns a copy of this vector moved by the specified amount on the X axis. */
+	inline Vector3<T> addedX(T a_AddX) const
+	{
+		return Vector3<T>(x + a_AddX, y, z);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the y axis. */
+	inline Vector3<T> addedY(T a_AddY) const
+	{
+		return Vector3<T>(x, y + a_AddY, z);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the Z axis. */
+	inline Vector3<T> addedZ(T a_AddZ) const
+	{
+		return Vector3<T>(x, y, z + a_AddZ);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the X and Z axes. */
+	inline Vector3<T> addedXZ(T a_AddX, T a_AddZ) const
+	{
+		return Vector3<T>(x + a_AddX, y, z + a_AddZ);
+	}
+
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Z coord.
 	The result satisfies the following equation:
 	(*this + Result * (a_OtherEnd - *this)).z = a_Z
@@ -349,6 +373,22 @@ public:
 		std::swap(x, z);
 		z = -z;
 	}
+
+	// tolua_end
+
+	/** Allows formatting a Vector<T> using the same format specifiers as for T
+	e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
+	template <typename ArgFormatter>
+	friend void format_arg(fmt::BasicFormatter<char, ArgFormatter> & a_Formatter, const char *& a_FormatStr, Vector3 a_Vec)
+	{
+		std::array<T, 3> Data{{a_Vec.x, a_Vec.y, a_Vec.z}};
+
+		a_Formatter.writer() << '{';
+		fmt::format_arg(a_Formatter, a_FormatStr, fmt::join(Data.cbegin(), Data.cend(), ", "));
+		a_Formatter.writer() << '}';
+	}
+
+	// tolua_begin
 
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;

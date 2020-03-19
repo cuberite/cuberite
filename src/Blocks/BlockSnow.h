@@ -70,10 +70,32 @@ public:
 		return false;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 1, 0));
+		// No drop unless dug up with a shovel
+		if ((a_Tool == nullptr) || !ItemCategory::IsShovel(a_Tool->m_ItemType))
+		{
+			return {};
+		}
+
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(m_BlockType, 1, 0);
+		}
+		else
+		{
+			// Drop as many snowballs as there were "layers" of snow:
+			return cItem(E_ITEM_SNOWBALL, 1 + (a_BlockMeta & 0x07), 0);
+		}
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{

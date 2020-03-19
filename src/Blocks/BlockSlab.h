@@ -18,16 +18,28 @@
 class cBlockSlabHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
-	cBlockSlabHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockSlabHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta & 0x7));
+		// Reset the "top half" flag:
+		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -84,6 +96,10 @@ public:
 		return true;
 	}
 
+
+
+
+
 	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
@@ -95,11 +111,19 @@ public:
 		);
 	}
 
+
+
+
+
 	/** Return if slab is upside down */
 	static bool IsUpsideDown(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x8) != 0);
 	}
+
+
+
+
 
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
@@ -111,6 +135,10 @@ public:
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
 		a_Player.GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
+
+
+
+
 
 	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */
 	static BLOCKTYPE GetDoubleSlabType(BLOCKTYPE a_SingleSlabBlockType)
@@ -126,11 +154,19 @@ public:
 		return E_BLOCK_AIR;
 	}
 
+
+
+
+
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle the 4th bit - up / down:
 		return (a_Meta ^ 0x08);
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -190,6 +226,10 @@ public:
 		}
 	}
 
+
+
+
+
 	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
 	{
 		if (a_BlockMeta & 0x8)  // top half
@@ -207,30 +247,45 @@ public:
 class cBlockDoubleSlabHandler :
 	public cBlockHandler
 {
+	using super = cBlockHandler;
+
 public:
-	cBlockDoubleSlabHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockDoubleSlabHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
-		a_Pickups.push_back(cItem(Block, 2, a_BlockMeta & 0x7));
+		return cItem(Block, 2, a_BlockMeta & 0x7);
 	}
+
+
+
+
 
 	inline static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
 		{
-			case E_BLOCK_DOUBLE_STONE_SLAB: return E_BLOCK_STONE_SLAB;
-			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
+			case E_BLOCK_DOUBLE_STONE_SLAB:         return E_BLOCK_STONE_SLAB;
+			case E_BLOCK_DOUBLE_WOODEN_SLAB:        return E_BLOCK_WOODEN_SLAB;
 			case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB: return E_BLOCK_RED_SANDSTONE_SLAB;
-			case E_BLOCK_PURPUR_DOUBLE_SLAB: return E_BLOCK_PURPUR_SLAB;
+			case E_BLOCK_PURPUR_DOUBLE_SLAB:        return E_BLOCK_PURPUR_SLAB;
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

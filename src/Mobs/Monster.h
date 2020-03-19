@@ -43,7 +43,7 @@ public:
 
 	virtual ~cMonster() override;
 
-	virtual void Destroy(bool a_ShouldBroadcast = true) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	virtual void Destroyed() override;
 
@@ -136,8 +136,8 @@ public:
 	void SetCanPickUpLoot(bool a_CanPickUpLoot) { m_CanPickUpLoot = a_CanPickUpLoot; }
 	void ResetAttackCooldown();
 
-	/** Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick */
-	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }
+	void SetBurnsInDaylight(bool a_BurnsInDaylight) { m_BurnsInDaylight = a_BurnsInDaylight; }  // tolua_export
+	bool BurnsInDaylight() const { return m_BurnsInDaylight; }  // tolua_export
 
 	double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
@@ -318,6 +318,8 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
+
+	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach.

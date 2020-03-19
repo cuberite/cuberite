@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "Blocks/BlockComparator.h"
+#include "../../Blocks/BlockComparator.h"
 
 
 

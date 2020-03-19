@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 #include "FireworksSerializer.h"
-#include "WorldStorage/FastNBT.h"
+#include "../WorldStorage/FastNBT.h"
 
 
 

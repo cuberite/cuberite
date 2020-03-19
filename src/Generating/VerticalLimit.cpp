@@ -10,10 +10,12 @@
 
 // Emit a warning if the first param is true
 #define CONDWARNING(ShouldLog, Fmt, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(Fmt, __VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(Fmt, __VA_ARGS__); \
+		} \
+	} while (false)
 
 
 

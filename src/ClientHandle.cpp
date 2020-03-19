@@ -189,7 +189,7 @@ void cClientHandle::Destroy(void)
 				// If ownership was transferred, our own smart pointer should be unset
 				ASSERT(!m_PlayerPtr);
 
-				m_PlayerPtr = world->RemovePlayer(*player, true);
+				m_PlayerPtr = world->RemovePlayer(*player);
 
 				// And RemovePlayer should have returned a valid smart pointer
 				ASSERT(m_PlayerPtr);
@@ -1059,8 +1059,8 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 
 void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status)
 {
-	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
+	FLOGD("HandleLeftClick: {0}; Face: {1}; Stat: {2}",
+		Vector3i{a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, a_Status
 	);
 
 	m_NumBlockChangeInteractionsThisTick++;
@@ -1298,9 +1298,9 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		(m_LastDigBlockZ != a_BlockZ)
 	)
 	{
-		LOGD("Prevented a dig / aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
-			a_BlockX, a_BlockY, a_BlockZ,
-			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
+		FLOGD("Prevented a dig / aim bug in the client (finish {0} vs start {1}, HSD: {2})",
+			Vector3i{a_BlockX, a_BlockY, a_BlockZ},
+			Vector3i{m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ},
 			(m_HasStartedDigging ? "True" : "False")
 		);
 		return;
@@ -1339,7 +1339,6 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	cWorld * World = m_Player->GetWorld();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
@@ -1352,22 +1351,29 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
-		LOGD("Dug air - what the function?");
 		return;
 	}
 
 	m_Player->AddFoodExhaustion(0.025);
-	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
-	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ);
-	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, {a_BlockX, a_BlockY, a_BlockZ}, a_OldBlock, this);
-	// This call would remove the water, placed from the ice block handler
-	if (!((a_OldBlock == E_BLOCK_ICE) && (ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}) == E_BLOCK_WATER)))
+	auto blockHandler = BlockHandler(a_OldBlock);
+	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
+	blockHandler->OnPlayerBreakingBlock(ChunkInterface, *World, *m_Player, absPos);
+	if (m_Player->IsGameModeSurvival())
 	{
-		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+		World->DropBlockAsPickups(absPos, m_Player, &m_Player->GetEquippedItem());
+	}
+	else
+	{
+		World->DigBlock(absPos);
 	}
 
+	// Damage the tool:
+	auto dlAction = (cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+	m_Player->UseEquippedItem(dlAction);
+
+	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
+	blockHandler->OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
@@ -1424,8 +1430,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
 	// Distance from the block's center to the player's eye height
 	double Dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
-	LOGD("HandleRightClick: {%d, %d, %d}, face %d, Hand: %d, HeldItem: %s; Dist: %.02f",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Hand, ItemToFullString(HeldItem).c_str(), Dist
+	FLOGD("HandleRightClick: {0}, face {1}, Hand: {2}, HeldItem: {3}; Dist: {4:.02f}",
+		Vector3i{a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, a_Hand, ItemToFullString(HeldItem), Dist
 	);
 
 	// Check the reach distance:
@@ -1446,7 +1452,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
-		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeSpectator();
+		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
 		bool BlockUsable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
@@ -1460,6 +1466,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 					Success = true;
+				}
+
+				// Check if the item is place able, for example a torch on a fence
+				if (!Success && Placeable)
+				{
+					// place a block
+					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 				}
 			}
 			else
@@ -2517,7 +2530,7 @@ void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+void cClientHandle::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration)
 {
 	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
 }
@@ -2789,8 +2802,8 @@ void cClientHandle::SendPlayerMaxSpeed(void)
 void cClientHandle::SendPlayerMoveLook(void)
 {
 	/*
-	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
-		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
+	FLOGD("Sending PlayerMoveLook: {0:0.2f}, stance {1:0.2f}, OnGround: {2}",
+		m_Player->GetPosition(), m_Player->GetStance(), m_Player->IsOnGround()
 	);
 	*/
 	m_Protocol->SendPlayerMoveLook();

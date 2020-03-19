@@ -161,7 +161,7 @@ public:  // tolua_export
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
-	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
+	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);

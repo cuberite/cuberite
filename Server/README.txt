@@ -11,6 +11,6 @@
  - For information about adding plugins to your server, visit
    https://cuberite.org/plugins/
 
- - For additional support, visit https://cuberite.org/support/
+ - For additional support, visit https://cuberite.org/discuss/
 
 --------------------------------------------------------------------------------

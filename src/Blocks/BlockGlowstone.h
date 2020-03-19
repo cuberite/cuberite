@@ -16,11 +16,27 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		// Add more than one dust
-		a_Pickups.emplace_back(E_ITEM_GLOWSTONE_DUST, GetRandomProvider().RandInt<char>(2, 4), 0);
+		// Drop self only when using silk-touch:
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(E_BLOCK_GLOWSTONE, 1, 0);
+		}
+		else
+		{
+			// TODO: Handle the Fortune enchantment here
+			return cItem(E_ITEM_GLOWSTONE_DUST, GetRandomProvider().RandInt<char>(2, 4), 0);
+		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

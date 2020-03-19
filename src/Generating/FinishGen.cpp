@@ -12,7 +12,6 @@
 #include "FinishGen.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
-#include "../World.h"
 #include "../IniFile.h"
 #include "../MobSpawner.h"
 
@@ -1548,7 +1547,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
-	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+	FLOGD("Spawning {0} #{1} at {2:.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), NewMob->GetPosition());
 	a_ChunkDesc.GetEntities().emplace_back(std::move(NewMob));
 
 	return true;
@@ -1988,7 +1987,7 @@ void cFinishGenOrePockets::imprintSphere(
 		(blockZ >= baseZ) && (blockZ < baseZ + cChunkDef::Width)
 	)
 	{
-		// LOGD("Imprinting a sphere center at {%d, %d, %d}", blockX, blockY, blockZ);
+		// FLOGD("Imprinting a sphere center at {0}", Vector3i{blockX, blockY, blockZ});
 		a_ChunkDesc.SetBlockTypeMeta(blockX - baseX, blockY, blockZ - baseZ, a_OreType, a_OreMeta);
 	}
 	return;

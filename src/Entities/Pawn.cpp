@@ -5,16 +5,16 @@
 #include "Player.h"
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
-#include "BoundingBox.h"
+#include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
-#include "EffectID.h"
+#include "../EffectID.h"
 #include "../Mobs/Monster.h"
 
 
 
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
-	super(a_EntityType, 0, 0, 0, a_Width, a_Height),
+	super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),
 	m_bTouchGround(false)
@@ -193,7 +193,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 
 	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, static_cast<short>(a_Duration));
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
 	cEntityEffect * Effect = Res.first->second.get();
 	Effect->OnActivate(*this);
 }
@@ -425,7 +425,7 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
-			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
 			// Fall particles
 			GetWorld()->BroadcastParticleEffect(

@@ -246,6 +246,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_ENCHANTMENT_TABLE            ].m_Transparent = true;
 	Info[E_BLOCK_END_PORTAL                   ].m_Transparent = true;
 	Info[E_BLOCK_END_PORTAL_FRAME             ].m_Transparent = true;
+	Info[E_BLOCK_END_ROD                      ].m_Transparent = true;
 	Info[E_BLOCK_ENDER_CHEST                  ].m_Transparent = true;
 	Info[E_BLOCK_FARMLAND                     ].m_Transparent = true;
 	Info[E_BLOCK_FENCE                        ].m_Transparent = true;
@@ -256,11 +257,13 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_GLASS_PANE                   ].m_Transparent = true;
 	Info[E_BLOCK_GLOWSTONE                    ].m_Transparent = true;
 	Info[E_BLOCK_GRAY_SHULKER_BOX             ].m_Transparent = true;
+	Info[E_BLOCK_GREEN_SHULKER_BOX            ].m_Transparent = true;
 	Info[E_BLOCK_HEAD                         ].m_Transparent = true;
 	Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_Transparent = true;
 	Info[E_BLOCK_HOPPER                       ].m_Transparent = true;
 	Info[E_BLOCK_ICE                          ].m_Transparent = true;
 	Info[E_BLOCK_INACTIVE_COMPARATOR          ].m_Transparent = true;
+	Info[E_BLOCK_INVERTED_DAYLIGHT_SENSOR     ].m_Transparent = true;
 	Info[E_BLOCK_IRON_BARS                    ].m_Transparent = true;
 	Info[E_BLOCK_IRON_DOOR                    ].m_Transparent = true;
 	Info[E_BLOCK_IRON_TRAPDOOR                ].m_Transparent = true;
@@ -316,6 +319,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_REDSTONE_WIRE                ].m_Transparent = true;
 	Info[E_BLOCK_SANDSTONE_STAIRS             ].m_Transparent = true;
 	Info[E_BLOCK_SAPLING                      ].m_Transparent = true;
+	Info[E_BLOCK_SEA_LANTERN                  ].m_Transparent = true;
 	Info[E_BLOCK_SIGN_POST                    ].m_Transparent = true;
 	Info[E_BLOCK_SNOW                         ].m_Transparent = true;
 	Info[E_BLOCK_SPRUCE_DOOR                  ].m_Transparent = true;
@@ -594,6 +598,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BROWN_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GREEN_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_BLACK_GLAZED_TERRACOTTA      ].m_FullyOccupiesVoxel = true;
+	Info[E_BLOCK_RED_GLAZED_TERRACOTTA        ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GRASS                        ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_GRAVEL                       ].m_FullyOccupiesVoxel = true;
 	Info[E_BLOCK_HARDENED_CLAY                ].m_FullyOccupiesVoxel = true;

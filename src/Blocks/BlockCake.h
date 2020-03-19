@@ -6,14 +6,19 @@
 
 
 
-class cBlockCakeHandler :
+class cBlockCakeHandler:
 	public cBlockHandler
 {
+	using super = cBlockHandler;
 public:
-	cBlockCakeHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockCakeHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
@@ -26,19 +31,28 @@ public:
 
 		if (Meta >= 5)
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			a_ChunkInterface.DigBlock(a_WorldInterface, {a_BlockX, a_BlockY, a_BlockZ});
 		}
 		else
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta + 1);
+			a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta + 1);
 		}
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// Give nothing
+		return {};
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{

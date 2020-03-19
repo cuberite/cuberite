@@ -493,20 +493,15 @@ echo
 #=================== Print success message ===================
 
 
-cd ../Server
+cd Server
 echo
 echo "-----------------"
 echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
+echo "$PWD/Cuberite"
 
-if [ "$CHOICE_BUILDTYPE" = "Debug" ]; then
-	echo "$PWD/Cuberite_debug"
-else
-	echo "$PWD/Cuberite"
-fi
-
-cd ..
+cd ../..
 echo "
 You can always update Cuberite by executing:
 $PWD/compile.sh

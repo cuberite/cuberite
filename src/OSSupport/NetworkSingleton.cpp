@@ -6,7 +6,7 @@
 
 #include "Globals.h"
 #include "NetworkSingleton.h"
-#include "OSSupport/Network.h"
+#include "Network.h"
 #include <event2/thread.h>
 #include <event2/bufferevent.h>
 #include <event2/listener.h>

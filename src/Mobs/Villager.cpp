@@ -169,11 +169,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 		{
-			cBlockHandler * Handler = cBlockInfo::GetHandler(CropBlock);
-			cChunkInterface ChunkInterface(m_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*m_World);
-			Handler->DropBlock(ChunkInterface, *m_World, PluginInterface, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-			m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
+			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
 		}
 	}
