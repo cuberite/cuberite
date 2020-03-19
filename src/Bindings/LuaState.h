@@ -295,7 +295,7 @@ public:
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore. */
 		template <typename... Args>
-bool Call(Args &&... args)
+		bool Call(Args &&... args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
