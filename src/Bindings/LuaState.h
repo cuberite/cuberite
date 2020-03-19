@@ -295,7 +295,7 @@ public:
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore. */
 		template <typename... Args>
-		bool Call(Args &&... args)
+bool Call(Args &&... args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -623,7 +623,7 @@ public:
 
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
-	void Push(cEntity * a_Entity);
+	void Push(const cEntity * a_Entity);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);

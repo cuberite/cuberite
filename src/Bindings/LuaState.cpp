@@ -949,7 +949,7 @@ void cLuaState::Push(bool a_Value)
 
 
 
-void cLuaState::Push(cEntity * a_Entity)
+void cLuaState::Push(const cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
@@ -995,7 +995,7 @@ void cLuaState::Push(cEntity * a_Entity)
 				}  // switch (EntityType)
 				UNREACHABLE("Unsupported entity type");
 			}();
-		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
+		tolua_pushusertype(m_LuaState, (void *) a_Entity, ClassName);
 	}
 }
 
