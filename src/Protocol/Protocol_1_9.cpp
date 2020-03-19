@@ -2527,7 +2527,7 @@ void cProtocol_1_9_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 	if ((Message.size()/8) > MAX_CHAT_MSG_LENGTH)
 	{
 		m_Client->Kick(std::string("Please don't exceed the maximum message length of ")
-		+ std::to_string(MAX_CHAT_MSG_LENGTH/8));
+		+ std::to_string(MAX_CHAT_MSG_LENGTH));
 	}
 	else
 	{
