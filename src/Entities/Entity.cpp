@@ -283,7 +283,7 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
 	float FinalDamage = a_RawDamage;
-	double ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	float ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
 
 	ApplyArmorDamage(static_cast<int>(ArmorCover));
 
@@ -651,7 +651,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 
 
-double cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	int TotalEPF = 0;
 
@@ -719,7 +719,7 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 
 
 
-double cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 
@@ -769,8 +769,8 @@ double cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_D
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return (a_Damage * std::min(20.0, Reduction) / 25.0);
+	float Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
+	return (a_Damage * std::min(20.0f, Reduction) / 25.0);
 }
 
 
