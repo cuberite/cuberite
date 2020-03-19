@@ -22,7 +22,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 	SetSpeed(a_Speed);
 	SetMass(0.1);
 	SetGravity(-20.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
