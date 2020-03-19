@@ -1430,14 +1430,14 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
 	auto ParticleFormula = a_ExplosionSize * 0.33f;
 	float Spread = ParticleFormula * 0.5f;
-	auto ParticleCount = std::min((ParticleFormula * 125), 600);
+	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
 
-	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, Spread, ParticleCount);
+	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, Spread, static_cast<int>(ParticleCount));
 
 	Spread = ParticleFormula * 0.35f;
-	ParticleCount = std::min((ParticleFormula * 125), 1800);
+	ParticleCount = std::min((ParticleFormula * 125), 1800.0);
 
-	BroadcastParticleEffect("explode", Position, Vector3f{}, Spread, ParticleCount);
+	BroadcastParticleEffect("explode", Position, Vector3f{}, Spread, static_cast<int>(ParticleCount));
 
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
