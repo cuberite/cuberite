@@ -122,7 +122,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_TRAPPED_CHEST:      return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_WOODEN_SLAB:        return new cItemSlabHandler(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB);
 		case E_BLOCK_WOOL:               return new cItemClothHandler(a_ItemType);
-		case E_ITEM_ARMOR_STAND:         return new cItemAmorStandHandler(a_ItemType);
+		case E_ITEM_ARMOR_STAND:         return new cItemArmorStandHandler(a_ItemType);
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();

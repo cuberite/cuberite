@@ -9,10 +9,10 @@
 
 
 
-class cItemAmorStandHandler : public cItemHandler
+class cItemArmorStandHandler : public cItemHandler
 {
 public:
-	cItemAmorStandHandler(int a_ItemType) :
+	cItemArmorStandHandler(int a_ItemType) :
 		cItemHandler(a_ItemType)
 	{
 
