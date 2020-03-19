@@ -54,7 +54,7 @@ Implements the 1.9 protocol classes:
 #include "../Bindings/PluginManager.h"
 
 
-#define MAX_CHAT_MSG_LENGTH 256
+#define MAX_CHAT_MSG_LENGTH 1024
 
 
 /** The slot number that the client uses to indicate "outside the window". */
@@ -2524,7 +2524,7 @@ void cProtocol_1_9_0::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
-	if ((Message.size()/8) > MAX_CHAT_MSG_LENGTH)
+	if ((Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
 		m_Client->Kick(std::string("Please don't exceed the maximum message length of ")
 		+ std::to_string(MAX_CHAT_MSG_LENGTH));
