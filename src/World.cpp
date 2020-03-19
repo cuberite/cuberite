@@ -1408,7 +1408,9 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 
+	auto & Random = GetRandomProvider();
 	auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
 	{
@@ -1427,13 +1429,13 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
 	auto ParticleFormula = a_ExplosionSize * 0.33f;
-	auto Spread = ParticleFormula * 0.5f;
-	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
+	float Spread = ParticleFormula * 0.5f;
+	auto ParticleCount = std::min((ParticleFormula * 125), 600);
 
 	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, Spread, ParticleCount);
 
 	Spread = ParticleFormula * 0.35f;
-	ParticleCount = std::min((ParticleFormula * 125), 1800.0);
+	ParticleCount = std::min((ParticleFormula * 125), 1800);
 
 	BroadcastParticleEffect("explode", Position, Vector3f{}, Spread, ParticleCount);
 
