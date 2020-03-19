@@ -122,10 +122,10 @@ public:
 		}
 	}
 
-  
-  
-  
-  
+
+
+
+
 	/** Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_NONE on failure */
 	eBlockFace FindSuitableBlockFace(cWorld * World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
@@ -150,10 +150,10 @@ public:
 		return BLOCK_FACE_NONE;
 	}
 
-  
-  
-  
-  
+
+
+
+
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
 	{
 		// Can only place at side of block
