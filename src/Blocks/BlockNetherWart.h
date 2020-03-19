@@ -42,14 +42,6 @@ public:
 
 		return true;
 	}
-  
-  
-  
-  
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
-	{
-		auto & rand = GetRandomProvider();
 
 
 
