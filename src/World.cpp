@@ -1427,12 +1427,12 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 	float ParticleFormula = static_cast<float>(a_ExplosionSize) * 0.33f;
 	float Spread = ParticleFormula * 0.5f;
-	float ParticleCount = ParticleFormula * 125;
+	float ParticleCount = std::min((ParticleFormula * 125), 600);
 
 	BroadcastParticleEffect("largesmoke", Vector3f(a_BlockX, a_BlockY - 0.5f, a_BlockZ), Vector3f{}, Spread, ParticleCount);
 
 	Spread = ParticleFormula * 0.35f;
-	ParticleCount = ParticleFormula * 550;
+	ParticleCount = std::min((ParticleFormula * 550), 1800);
 
 	BroadcastParticleEffect("explode", Vector3f(a_BlockX, a_BlockY - 0.5f, a_BlockZ), Vector3f{}, Spread, ParticleCount);
 
