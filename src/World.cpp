@@ -1407,7 +1407,9 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	// TODO: Implement block hardiness
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
+
+	float SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -1422,6 +1424,17 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
+
+	float ParticleFormula = static_cast<float>(a_ExplosionSize) * 0.33f;
+	float Spread = ParticleFormula * 0.5f;
+	float ParticleCount = ParticleFormula * 125;
+
+	BroadcastParticleEffect("largesmoke", Vector3f(a_BlockX, a_BlockY - 0.5f, a_BlockZ), Vector3f{}, Spread, ParticleCount);
+
+	Spread = ParticleFormula * 0.35f;
+	ParticleCount = ParticleFormula * 550;
+
+	BroadcastParticleEffect("explode", Vector3f(a_BlockX, a_BlockY - 0.5f, a_BlockZ), Vector3f{}, Spread, ParticleCount);
 
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
