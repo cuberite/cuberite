@@ -3,8 +3,8 @@
 
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
-#include "Mixins.h"
 #include "BlockStairs.h"
+#include "Mixins.h"
 
 
 
