@@ -13,7 +13,7 @@ cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
 	m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);
-	SetAirDrag(0.4f);
+	SetAirDrag(0.02f);
 }
 
 
