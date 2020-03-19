@@ -687,7 +687,7 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 		}
 	}
 	int CappedEPF = std::min(20, TotalEPF);
-	return (a_Damage * CappedEPF / 25.0);
+	return (a_Damage * CappedEPF / 25.0f);
 }
 
 
@@ -769,8 +769,8 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	float Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return (a_Damage * std::min(20.0f, Reduction) / 25.0);
+	float Reduction = std::max(ArmorValue / 5.0f, ArmorValue - a_Damage / (2.0f + Toughness / 4.0f));
+	return (a_Damage * std::min(20.0f, Reduction) / 25.0f);
 }
 
 
