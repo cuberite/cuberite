@@ -841,6 +841,12 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	Vector3d OldPosition = GetPlayer()->GetPosition();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
+	if ((OldPosition == NewPosition) && (OldStance == a_Stance))
+	{
+		// Nothing changed, no need to do anything
+		return;
+	}
+
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
 	{
