@@ -1407,7 +1407,11 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	// TODO: Implement block hardiness
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
+
+	auto & Random = GetRandomProvider();
+	auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+
+	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -1422,6 +1426,18 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
+
+	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
+	auto ParticleFormula = a_ExplosionSize * 0.33f;
+	auto Spread = ParticleFormula * 0.5f;
+	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
+
+	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
+
+	Spread = ParticleFormula * 0.35f;
+	ParticleCount = std::min((ParticleFormula * 550), 1800.0);
+
+	BroadcastParticleEffect("explode", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
 
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
