@@ -43,6 +43,9 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
+/** Maximum number of bytes that a chat message sent by a player may consist of */
+#define MAX_CHAT_MSG_LENGTH 1024
+
 /** The interval for sending pings to clients.
 Vanilla sends one ping every 1 second. */
 static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
@@ -1529,34 +1532,42 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 void cClientHandle::HandleChat(const AString & a_Message)
 {
-	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
-
-	// If a command, perform it:
-	AString Message(a_Message);
-	if (cRoot::Get()->GetServer()->Command(*this, Message))
+	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
-		return;
-	}
-
-	// Not a command, broadcast as a message:
-	cCompositeChat Msg;
-	AString Color = m_Player->GetColor();
-	if (Color.length() == 3)
-	{
-		Color = AString("@") + Color[2];
+		this->Kick(std::string("Please don't exceed the maximum message length of ")
+		+ std::to_string(MAX_CHAT_MSG_LENGTH));
 	}
 	else
 	{
-		Color.clear();
+		// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
+
+		// If a command, perform it:
+		AString Message(a_Message);
+		if (cRoot::Get()->GetServer()->Command(*this, Message))
+		{
+			return;
+		}
+
+		// Not a command, broadcast as a message:
+		cCompositeChat Msg;
+		AString Color = m_Player->GetColor();
+		if (Color.length() == 3)
+		{
+			Color = AString("@") + Color[2];
+		}
+		else
+		{
+			Color.clear();
+		}
+		Msg.AddTextPart("<");
+		Msg.ParseText(m_Player->GetPrefix());
+		Msg.AddTextPart(m_Player->GetName(), Color);
+		Msg.ParseText(m_Player->GetSuffix());
+		Msg.AddTextPart("> ");
+		Msg.ParseText(Message);
+		Msg.UnderlineUrls();
+		cRoot::Get()->BroadcastChat(Msg);
 	}
-	Msg.AddTextPart("<");
-	Msg.ParseText(m_Player->GetPrefix());
-	Msg.AddTextPart(m_Player->GetName(), Color);
-	Msg.ParseText(m_Player->GetSuffix());
-	Msg.AddTextPart("> ");
-	Msg.ParseText(Message);
-	Msg.UnderlineUrls();
-	cRoot::Get()->BroadcastChat(Msg);
 }
 
 
