@@ -1536,38 +1536,37 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	{
 		this->Kick(std::string("Please don't exceed the maximum message length of ")
 		+ std::to_string(MAX_CHAT_MSG_LENGTH));
+		return;
+	}
+	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
+
+	// If a command, perform it:
+	AString Message(a_Message);
+	if (cRoot::Get()->GetServer()->Command(*this, Message))
+	{
+		return;
+	}
+
+	// Not a command, broadcast as a message:
+	cCompositeChat Msg;
+	AString Color = m_Player->GetColor();
+	if (Color.length() == 3)
+	{
+		Color = AString("@") + Color[2];
 	}
 	else
 	{
-		// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
-
-		// If a command, perform it:
-		AString Message(a_Message);
-		if (cRoot::Get()->GetServer()->Command(*this, Message))
-		{
-			return;
-		}
-
-		// Not a command, broadcast as a message:
-		cCompositeChat Msg;
-		AString Color = m_Player->GetColor();
-		if (Color.length() == 3)
-		{
-			Color = AString("@") + Color[2];
-		}
-		else
-		{
-			Color.clear();
-		}
-		Msg.AddTextPart("<");
-		Msg.ParseText(m_Player->GetPrefix());
-		Msg.AddTextPart(m_Player->GetName(), Color);
-		Msg.ParseText(m_Player->GetSuffix());
-		Msg.AddTextPart("> ");
-		Msg.ParseText(Message);
-		Msg.UnderlineUrls();
-		cRoot::Get()->BroadcastChat(Msg);
+		Color.clear();
 	}
+	Msg.AddTextPart("<");
+	Msg.ParseText(m_Player->GetPrefix());
+	Msg.AddTextPart(m_Player->GetName(), Color);
+	Msg.ParseText(m_Player->GetSuffix());
+	Msg.AddTextPart("> ");
+	Msg.ParseText(Message);
+	Msg.UnderlineUrls();
+	cRoot::Get()->BroadcastChat(Msg);
+
 }
 
 
