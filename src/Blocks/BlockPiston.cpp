@@ -142,7 +142,7 @@ bool cBlockPistonHandler::CanPushBlock(
 	NIBBLETYPE currMeta;
 	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
 
-	if ((currBlock == E_BLOCK_AIR) && (a_BlockPos.y <= cChunkDef::Height - 1) && (a_BlockPos.y >= 0))
+	if ((currBlock == E_BLOCK_AIR) && cChunkDef::IsValidHeight(a_BlockPos.y))
 	{
 		// Air can be pushed, as long as it's inside the chunk height limits
 		return true;
@@ -356,7 +356,6 @@ void cBlockPistonHeadHandler::OnBroken(
 		a_ChunkInterface.DropBlockAsPickups(basePos);
 	}
 }
-
 
 
 
