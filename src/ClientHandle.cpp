@@ -839,6 +839,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
+	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
 	if ((OldPosition == NewPosition) && (OldStance == a_Stance))
