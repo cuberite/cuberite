@@ -166,6 +166,9 @@ public:
 	*/
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
+	/** Spectates the target entity */
+	void SpectateEntity(cEntity * a_Target);
+
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
 

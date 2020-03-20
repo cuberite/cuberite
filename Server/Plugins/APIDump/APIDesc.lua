@@ -11132,6 +11132,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the player visibility to other players",
 				},
+				SpectateEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Allows the player to spectate the target entity. Does not change the player's gamemode to spectator mode.",
+				},
 				TossEquippedItem =
 				{
 					Params =

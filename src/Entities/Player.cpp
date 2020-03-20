@@ -1703,6 +1703,23 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 
 
 
+void cPlayer::SpectateEntity(cEntity * a_Target)
+{
+	if (static_cast<cPlayer *>(a_Target) == this)
+	{
+		GetClientHandle()->SendCameraSetTo(*this);
+		m_AttachedTo = nullptr;
+		return;
+	}
+
+	m_AttachedTo = a_Target;
+	GetClientHandle()->SendCameraSetTo(*m_AttachedTo);
+}
+
+
+
+
+
 Vector3d cPlayer::GetThrowStartPos(void) const
 {
 	Vector3d res = GetEyePosition();
@@ -2838,8 +2855,7 @@ void cPlayer::AttachTo(cEntity * a_AttachTo)
 	// Different attach, if this is a spectator
 	if (IsGameModeSpectator())
 	{
-		m_AttachedTo = a_AttachTo;
-		GetClientHandle()->SendCameraSetTo(*m_AttachedTo);
+		SpectateEntity(a_AttachTo);
 		return;
 	}
 
