@@ -160,7 +160,8 @@ bool cBlockPistonHandler::CanPushBlock(
 		return !a_RequirePushable;
 	}
 
-	if ((a_BlockPos.y >= cChunkDef::Height - 1) || (a_BlockPos.y <= 0)) {
+	if ((a_BlockPos.y >= cChunkDef::Height - 1) || (a_BlockPos.y <= 0))
+	{
 		// Don't push blocks out of the chunk height limits
 		return false;
 	}
