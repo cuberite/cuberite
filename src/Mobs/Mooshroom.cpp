@@ -46,7 +46,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			if (!a_Player.IsGameModeCreative())
 			{
 				a_Player.GetInventory().RemoveOneEquippedItem();
-				a_Player.GetInventory().AddItem(E_ITEM_MILK);
+				a_Player.GetInventory().AddItem(cItem(E_ITEM_MILK));
 			}
 		} break;
 		case E_ITEM_BOWL:
@@ -54,7 +54,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			if (!a_Player.IsGameModeCreative())
 			{
 				a_Player.GetInventory().RemoveOneEquippedItem();
-				a_Player.GetInventory().AddItem(E_ITEM_MUSHROOM_SOUP);
+				a_Player.GetInventory().AddItem(cItem(E_ITEM_MUSHROOM_SOUP));
 			}
 		} break;
 		case E_ITEM_SHEARS:
