@@ -389,7 +389,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	BroadcastMovementUpdate();
 
 	// Ambient mob sounds
-	if (!m_SoundAmbient.empty() && (--m_AmbientSoundTimer <= 0)) {
+	if (!m_SoundAmbient.empty() && (--m_AmbientSoundTimer <= 0))
+	{
 		auto & Random = GetRandomProvider();
 		auto ShouldPlaySound = Random.RandBool();
 		if (ShouldPlaySound) {
