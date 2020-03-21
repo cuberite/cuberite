@@ -158,6 +158,12 @@ bool cBlockPistonHandler::CanPushBlock(
 		return true;
 	}
 
+	if (!CanPush(currBlock, currMeta))
+	{
+		// When it's not required to push this block, don't fail
+		return !a_RequirePushable;
+	}
+
 	if (a_BlocksPushed.size() >= PISTON_MAX_PUSH_DISTANCE)
 	{
 		// Do not allow to push too much blocks
