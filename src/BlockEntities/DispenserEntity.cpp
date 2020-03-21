@@ -126,7 +126,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			// Spawn a primed TNT entity, if space allows:
 			if (!cBlockInfo::IsSolid(dispBlock))
 			{
-				a_World->BroadcastSoundEffect("entity.tnt.primed", dispAbsCoord, 1.0f, 1.0f);
+				m_World->BroadcastSoundEffect("entity.tnt.primed", dispAbsCoord, 1.0f, 1.0f);
 				m_World->SpawnPrimedTNT(Vector3d(0.5, 0.5, 0.5) + dispAbsCoord, 80, 0);  // 80 ticks fuse, no initial velocity
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
