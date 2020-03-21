@@ -867,21 +867,21 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 void cPlayer::SetCrouch(bool a_IsCrouched)
 {
 	// Set the crouch status, broadcast to all visible players
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerCrouching(*this, a_IsCrouched))
-	{
+	
 		if (a_IsCrouched == m_IsCrouched)
 		{
 			// No change
 			return;
 		}
+		
+		if (a_IsCrouched)
+		{
+			cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
+		}
 		m_IsCrouched = a_IsCrouched;
 		m_World->BroadcastEntityMetadata(*this);
-	}
-	else
-	{
-		m_IsCrouched != a_IsCrouched;
-		m_World->BroadcastEntityMetadata(*this);
-	}
+	
+
 }
 
 
@@ -1007,6 +1007,10 @@ void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 
 bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	SetSpeed(0, 0, 0);
+	// Prevents knocking the player in the wrong direction due to
+	// the speed vector problems, see #2865
+	// In the future, the speed vector should be fixed
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative() || IsGameModeSpectator())

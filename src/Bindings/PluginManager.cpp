@@ -846,11 +846,11 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 
 
 
-bool cPluginManager::CallHookPlayerCrouching(cPlayer & a_Player, bool a_IsCrouched)
+bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
 {
-	return GenericCallHook(HOOK_PLAYER_CROUCHING, [&](cPlugin * a_Plugin)
+	return GenericCallHook(HOOK_PLAYER_CROUCHED, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerCrouching(a_Player, a_IsCrouched);
+			return a_Plugin->OnPlayerCrouched(a_Player);
 		}
 	);
 }

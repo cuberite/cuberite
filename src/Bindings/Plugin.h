@@ -84,7 +84,7 @@ public:
 	virtual bool OnPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window) = 0;
 	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
-	virtual bool OnPlayerCrouching	        (cPlayer & a_Player, bool a_IsCrouched) = 0;
+	virtual bool OnPlayerCrouched           (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) = 0;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) = 0;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) = 0;

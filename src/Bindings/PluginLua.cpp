@@ -718,10 +718,10 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 
 
 
-bool cPluginLua::OnPlayerCrouching(cPlayer & a_Player, bool a_IsCrouched)
+bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHING,
-		&a_Player, a_IsCrouched);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED,
+		&a_Player);
 }
 
 
@@ -1103,7 +1103,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
-		case cPluginManager::HOOK_PLAYER_CROUCHING:        		return "OnPlayerCrouching";
+		case cPluginManager::HOOK_PLAYER_CROUCHED:        		return "OnPlayerCrouched";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
