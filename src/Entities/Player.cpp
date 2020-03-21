@@ -867,21 +867,18 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 void cPlayer::SetCrouch(bool a_IsCrouched)
 {
 	// Set the crouch status, broadcast to all visible players
-	
-		if (a_IsCrouched == m_IsCrouched)
-		{
-			// No change
-			return;
-		}
-		
-		if (a_IsCrouched)
-		{
-			cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
-		}
-		m_IsCrouched = a_IsCrouched;
-		m_World->BroadcastEntityMetadata(*this);
-	
+	if (a_IsCrouched == m_IsCrouched)
+	{
+		// No change
+		return;
+	}
+	if (a_IsCrouched)
+	{
+		cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
+	}
 
+	m_IsCrouched = a_IsCrouched;
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
