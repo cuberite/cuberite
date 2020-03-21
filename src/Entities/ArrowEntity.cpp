@@ -22,7 +22,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 	SetSpeed(a_Speed);
 	SetMass(0.1);
 	SetGravity(-20.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
@@ -115,9 +115,13 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 		Damage += ExtraDamage;
 	}
 
+	double Knockback = 10;
+
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
-	double KnockbackAmount = 11 + 10 * PunchLevel;
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
+	unsigned int PunchLevelMultiplier = 8;
+
+	Knockback += PunchLevelMultiplier * PunchLevel;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, Knockback);
 
 	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
@@ -198,7 +202,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		auto relPos = a_Chunk.RelativeToAbsolute(m_HitBlockPos);
+		auto relPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
 		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 
 		if (chunk == nullptr)
