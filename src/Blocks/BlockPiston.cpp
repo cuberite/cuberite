@@ -142,9 +142,13 @@ bool cBlockPistonHandler::CanPushBlock(
 	NIBBLETYPE currMeta;
 	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
 
-	if ((currBlock == E_BLOCK_AIR) && cChunkDef::IsValidHeight(a_BlockPos.y))
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y)) {
+		return !a_RequirePushable;
+	}
+
+	if (currBlock == E_BLOCK_AIR)
 	{
-		// Air can be pushed, as long as it's inside the chunk height limits
+		// Air can be pushed
 		return true;
 	}
 
@@ -152,18 +156,6 @@ bool cBlockPistonHandler::CanPushBlock(
 	{
 		// Block should not be broken, when it's not in the pushing direction
 		return true;
-	}
-
-	if (!CanPush(currBlock, currMeta))
-	{
-		// When it's not required to push this block, don't fail
-		return !a_RequirePushable;
-	}
-
-	if (!cChunkDef::IsValidHeight(a_BlockPos.y + a_PushDir.y))
-	{
-		// Don't push blocks out of the chunk height limits
-		return false;
 	}
 
 	if (a_BlocksPushed.size() >= PISTON_MAX_PUSH_DISTANCE)
