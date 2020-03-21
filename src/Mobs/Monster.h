@@ -288,7 +288,7 @@ protected:
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
 
-	int m_AmbientSoundTimer;
+	int m_AmbientSoundTimer = GetRandomProvider().RandInt(0, 100);
 
 	int m_Age;
 	int m_AgingTimer;

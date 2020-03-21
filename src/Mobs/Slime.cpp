@@ -14,7 +14,7 @@ cSlime::cSlime(int a_Size) :
 		mtSlime,
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
-		"entity.slime.ambient",
+		"",
 		0.6 * a_Size,
 		0.6 * a_Size
 	),
