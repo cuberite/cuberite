@@ -11141,7 +11141,7 @@ a_Player:OpenWindow(Window);
 							Type = "cEntity",
 						},
 					},
-					Notes = "Allows the player to spectate the target entity. Does not change the player's gamemode to spectator mode.",
+					Notes = "Spectates the target entity. Does not change the player's gamemode to spectator mode. Self-spectating resets the spectation.",
 				},
 				TossEquippedItem =
 				{
