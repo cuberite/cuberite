@@ -391,9 +391,11 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		--m_AmbientSoundTimer;
 
 		if (m_AmbientSoundTimer <= 0) {
-			auto ShouldPlaySound = GetRandomProvider().RandBool();
+			auto & Random = GetRandomProvider();
+			auto ShouldPlaySound = Random.RandBool();
 			if (ShouldPlaySound) {
-				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, 1.0f);
+				auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
 			}
 			m_AmbientSoundTimer = 100;
 		}
