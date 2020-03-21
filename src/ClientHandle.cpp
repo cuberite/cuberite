@@ -842,7 +842,11 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
-	if ((OldPosition == NewPosition) && (OldStance == a_Stance))
+	if (
+	    (OldPosition == NewPosition) &&
+	    (OldStance == a_Stance) &&
+	    (PreviousIsOnGround == a_IsOnGround)
+	)
 	{
 		// Nothing changed, no need to do anything
 		return;
