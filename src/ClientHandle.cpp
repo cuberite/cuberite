@@ -842,6 +842,11 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
+	#ifdef __clang__
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wfloat-equal"
+	#endif
+
 	if (
 	    (OldPosition == NewPosition) &&
 	    (OldStance == a_Stance) &&
@@ -851,6 +856,10 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		// Nothing changed, no need to do anything
 		return;
 	}
+
+	#ifdef __clang__
+		#pragma clang diagnostic pop
+	#endif
 
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
