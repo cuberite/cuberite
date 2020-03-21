@@ -848,9 +848,9 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	#endif
 
 	if (
-	    (OldPosition == NewPosition) &&
-	    (OldStance == a_Stance) &&
-	    (PreviousIsOnGround == a_IsOnGround)
+		(OldPosition == NewPosition) &&
+		(OldStance == a_Stance) &&
+		(PreviousIsOnGround == a_IsOnGround)
 	)
 	{
 		// Nothing changed, no need to do anything
