@@ -306,7 +306,7 @@ Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 
 bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType)
 {
-	cItem LiquidBucket(a_ResultingBucketItemType, 1);
+	cItem LiquidBucket(a_ResultingBucketItemType);
 	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
 	{
 		// Special case: replacing one empty bucket with one full bucket
