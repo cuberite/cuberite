@@ -1965,7 +1965,6 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3i a_BlockPos, dou
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
 {
 	auto & Random = GetRandomProvider();
-	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
@@ -1974,9 +1973,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 			continue;
 		}
 
-		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
-		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
-		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
+		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandReal(-2.0, 2.0));
+		float SpeedY = static_cast<float>(a_FlyAwaySpeed * 5.0);
+		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandReal(-2.0, 2.0));
 
 		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
