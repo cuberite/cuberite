@@ -292,7 +292,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		++m_TicksSinceLastDamaged;
 	}
-	
 	if ((GetTarget() != nullptr))
 	{
 		ASSERT(GetTarget()->IsTicking());
@@ -385,15 +384,18 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	CalcLeashActions(a_Dt);
 
 	BroadcastMovementUpdate();
-	
+
 	// Ambient mob sounds
-	if (!m_SoundAmbient.empty()) {
+	if (!m_SoundAmbient.empty())
+	{
 		--m_AmbientSoundTimer;
 
-		if (m_AmbientSoundTimer <= 0) {
+		if (m_AmbientSoundTimer <= 0)
+		{
 			auto & Random = GetRandomProvider();
 			auto ShouldPlaySound = Random.RandBool();
-			if (ShouldPlaySound) {
+			if (ShouldPlaySound)
+			{
 				auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
 				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
 			}
