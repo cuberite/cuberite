@@ -118,6 +118,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	{
 		GetMonsterConfig(a_ConfigName);
 	}
+
+	// Prevent mobs spawning at the same time from making sounds simultaneously
+	m_AmbientSoundTimer = GetRandomProvider().RandInt(0, 100);
 }
 
 
@@ -396,8 +399,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			auto ShouldPlaySound = Random.RandBool();
 			if (ShouldPlaySound)
 			{
-				auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+				auto SoundPitch = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitch);
 			}
 			m_AmbientSoundTimer = 100;
 		}
