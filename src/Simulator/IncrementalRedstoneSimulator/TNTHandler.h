@@ -39,7 +39,7 @@ public:
 		{
 			a_World.BroadcastSoundEffect("entity.tnt.primed", a_Position, 0.5f, 0.6f);
 			a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, E_BLOCK_AIR, 0);
-			a_World.SpawnPrimedTNT(Vector3d(a_Position.x + 0.5, a_Position.y + 0.5, a_Position.z + 0.5));  // 80 ticks to boom
+			a_World.SpawnPrimedTNT(Vector3d(a_Position) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 		}
 		return {};
 	}
