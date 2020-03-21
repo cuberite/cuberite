@@ -102,11 +102,6 @@ public:
 		{
 			return false;
 		}
-		
-		if (!a_Player->IsGameModeCreative())
-		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
-		}
 
 		if (!a_Player->IsGameModeCreative())
 		{
