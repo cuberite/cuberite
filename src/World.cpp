@@ -2153,7 +2153,7 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 	{
 		return cEntity::INVALID_ID;
 	}
-	
+
 	if (a_ShouldPlayFuseSound)
 	{
 		BroadcastSoundEffect("entity.tnt.primed", a_Pos, 1.0f, 1.0f);
