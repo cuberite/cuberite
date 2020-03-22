@@ -624,6 +624,7 @@ public:
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
 	void Push(cEntity * a_Entity);
+	void Push(const cEntity * a_Entity);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);

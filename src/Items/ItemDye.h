@@ -167,8 +167,6 @@ public:
 
 			case E_BLOCK_TALL_GRASS:
 			case E_BLOCK_COCOA_POD:
-			case E_BLOCK_SUGARCANE:
-			case E_BLOCK_CACTUS:
 			{
 				// Always try to grow 1 stage:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
