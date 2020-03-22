@@ -12,7 +12,7 @@ return
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has crouched." },
 		},
 		Returns = [[
-			<p>If the function returns false or no value, other plugins callbacks are called and the position of the player is broadcasted.</p>
+			If the function returns false or no value, other plugins callbacks are called.</p>
 		]],
 	},  -- HOOK_PLAYER_CROUCHED  
 }
