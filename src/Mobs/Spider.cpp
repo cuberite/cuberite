@@ -9,7 +9,7 @@
 
 
 cSpider::cSpider(void) :
-	super("Spider", mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9)
+	super("Spider", mtSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 1.4, 0.9)
 {
 }
 

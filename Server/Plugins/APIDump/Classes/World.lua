@@ -3548,6 +3548,10 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Name = "InitialVelocityCoeff",
 							Type = "number",
 						},
+						{
+							Name = "ShouldPlayFuseSound",
+							Type = "boolean",
+						},
 					},
 					Returns =
 					{

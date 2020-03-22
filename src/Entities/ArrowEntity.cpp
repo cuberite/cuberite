@@ -145,7 +145,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		// Do not add the arrow to the inventory when the player is in creative:
 		if (!a_Dest.IsGameModeCreative())
 		{
-			int NumAdded = a_Dest.GetInventory().AddItem(E_ITEM_ARROW);
+			int NumAdded = a_Dest.GetInventory().AddItem(cItem(E_ITEM_ARROW));
 			if (NumAdded == 0)
 			{
 				// No space in the inventory

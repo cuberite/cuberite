@@ -9,7 +9,7 @@
 
 
 cWitch::cWitch(void) :
-	super("Witch", mtWitch, "entity.witch.hurt", "entity.witch.death", 0.6, 1.8)
+	super("Witch", mtWitch, "entity.witch.hurt", "entity.witch.death", "entity.witch.ambient", 0.6, 1.8)
 {
 }
 

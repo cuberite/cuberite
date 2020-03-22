@@ -76,7 +76,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -90,6 +90,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
+	, m_SoundAmbient(a_SoundAmbient)
 	, m_AttackRate(3)
 	, m_AttackDamage(1)
 	, m_AttackRange(1)
@@ -117,6 +118,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	{
 		GetMonsterConfig(a_ConfigName);
 	}
+
+	// Prevent mobs spawning at the same time from making sounds simultaneously
+	m_AmbientSoundTimer = GetRandomProvider().RandInt(0, 100);
 }
 
 
@@ -383,6 +387,19 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	CalcLeashActions(a_Dt);
 
 	BroadcastMovementUpdate();
+
+	// Ambient mob sounds
+	if (!m_SoundAmbient.empty() && (--m_AmbientSoundTimer <= 0))
+	{
+		auto & Random = GetRandomProvider();
+		auto ShouldPlaySound = Random.RandBool();
+		if (ShouldPlaySound)
+		{
+			auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+			m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+		}
+		m_AmbientSoundTimer = 100;
+	}
 
 	if (m_AgingTimer > 0)
 	{
