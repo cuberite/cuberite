@@ -103,6 +103,11 @@ public:
 			return false;
 		}
 
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
 		switch (m_ItemType)
 		{
 			case E_ITEM_BEETROOT_SOUP:
