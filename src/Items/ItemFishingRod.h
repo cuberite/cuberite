@@ -114,7 +114,7 @@ public:
 						}
 						case 1:
 						{
-							cItem Book(E_ITEM_ENCHANTED_BOOK);
+							cItem Book(E_ITEM_BOOK);
 							Book.EnchantByXPLevels(30);
 							Drops.Add(Book);
 							break;
