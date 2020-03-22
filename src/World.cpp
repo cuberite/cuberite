@@ -2145,7 +2145,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 
 
-UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff, bool a_ShouldPlayFuseSound)
 {
 	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
@@ -2154,11 +2154,16 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 		return cEntity::INVALID_ID;
 	}
 
+	if (a_ShouldPlayFuseSound)
+	{
+		BroadcastSoundEffect("entity.tnt.primed", a_Pos, 1.0f, 1.0f);
+	}
+
 	auto & Random = GetRandomProvider();
 	TNTPtr->SetSpeed(
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1),
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f),
 		a_InitialVelocityCoeff * 2,
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1)
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f)
 	);
 	return TNTPtr->GetUniqueID();
 }

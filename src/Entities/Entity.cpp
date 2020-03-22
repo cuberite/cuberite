@@ -972,7 +972,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
-	else
+	else if (!(IsMinecart() || IsTNT()))
 	{
 		// Push out entity.
 		BLOCKTYPE GotBlock;
