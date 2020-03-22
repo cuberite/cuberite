@@ -373,7 +373,7 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 	}
 
 	// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
-	int frequency = FloorC(50.0 / std::min(static_cast<double>(m_Intensity + 1), 50.0));
+	int frequency = std::max(1, FloorC(50.0 / static_cast<double>(m_Intensity + 1)));
 
 	if ((m_Ticks % frequency) != 0)
 	{
@@ -462,7 +462,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 	}
 
 	// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
-	int frequency = FloorC(25.0 / std::min(static_cast<double>(m_Intensity + 1), 25.0));
+	int frequency = std::max(1, FloorC(25.0 / static_cast<double>(m_Intensity + 1)));
 
 	if ((m_Ticks % frequency) == 0)
 	{
@@ -486,7 +486,7 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 	super::OnTick(a_Target);
 
 	// Damage frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
-	int frequency = FloorC(40.0 / std::min(static_cast<double>(m_Intensity + 1), 40.0));
+	int frequency = std::max(1, FloorC(40.0 / static_cast<double>(m_Intensity + 1)));
 
 	if ((m_Ticks % frequency) == 0)
 	{
