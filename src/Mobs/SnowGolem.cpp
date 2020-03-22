@@ -9,7 +9,7 @@
 
 
 cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", 0.4, 1.8)
+	super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", "entity.snowman.ambient", 0.4, 1.8)
 {
 }
 

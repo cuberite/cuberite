@@ -21,7 +21,7 @@
 */
 
 cOcelot::cOcelot(void) :
-	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", 0.6, 0.8),
+	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6, 0.8),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
