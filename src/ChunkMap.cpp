@@ -1303,7 +1303,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				}
 
 				// Ensure that the damage dealt is inversely proportional to the distance to the TNT centre - the closer a player is, the harder they are hit
-				a_Entity.TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / DistanceFromExplosion.Length()) * 6 * ExplosionSizeInt), 0);
+				a_Entity.TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / std::max(1.0, DistanceFromExplosion.Length())) * 8 * ExplosionSizeInt), 0);
 			}
 
 			double Length = DistanceFromExplosion.Length();
