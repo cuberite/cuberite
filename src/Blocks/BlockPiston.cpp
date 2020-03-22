@@ -142,6 +142,11 @@ bool cBlockPistonHandler::CanPushBlock(
 	NIBBLETYPE currMeta;
 	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
 
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return !a_RequirePushable;
+	}
+
 	if (currBlock == E_BLOCK_AIR)
 	{
 		// Air can be pushed

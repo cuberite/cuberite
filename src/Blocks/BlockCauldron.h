@@ -32,8 +32,7 @@ public:
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
-						cItem NewItem(E_ITEM_BUCKET, 1);
-						a_Player.GetInventory().AddItem(NewItem);
+						a_Player.GetInventory().AddItem(cItem(E_ITEM_BUCKET));
 					}
 				}
 				break;
@@ -44,8 +43,7 @@ public:
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
 					a_Player.GetInventory().RemoveOneEquippedItem();
-					cItem NewItem(E_ITEM_POTIONS, 1, 0);
-					a_Player.GetInventory().AddItem(NewItem);
+					a_Player.GetInventory().AddItem(cItem(E_ITEM_POTION));
 				}
 				break;
 			}
