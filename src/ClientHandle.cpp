@@ -168,10 +168,7 @@ void cClientHandle::Destroy(void)
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
 	auto player = m_Player;
 	m_Self.reset();
-	{
-		cCSLock lock(m_CSState);
-		m_State = csDestroyed;  // Tick thread is allowed to call destructor async at any time after this
-	}
+	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
 
 	if (player != nullptr)
 	{
@@ -430,7 +427,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
-		m_State = csAuthenticated;
+		SetState(csAuthenticated);
 	}
 
 	// Query player team
@@ -2532,7 +2529,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		// csKicked means m_Link will be shut down on the next tick. The
 		// disconnect packet data is sent in the tick thread so the connection
 		// is closed there after the data is sent.
-		m_State = csKicked;
+		SetState(csKicked);
 	}
 }
 
@@ -3329,8 +3326,7 @@ void cClientHandle::SocketClosed(void)
 	}
 
 	// Queue self for destruction:
-	cCSLock lock(m_CSState);
-	m_State = csQueuedForDestruction;
+	SetState(csQueuedForDestruction);
 }
 
 
@@ -3341,6 +3337,21 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
 	ASSERT(m_Self == nullptr);
 	m_Self = a_Self;
+}
+
+
+
+
+
+bool cClientHandle::SetState(eState a_NewState)
+{
+	cCSLock Lock(m_CSState);
+	if (a_NewState < m_State)
+	{
+		return false;  // Can only advance the state machine
+	}
+	m_State = a_NewState;
+	return true;
 }
 
 
