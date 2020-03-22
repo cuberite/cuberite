@@ -113,13 +113,6 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 
 	ASSERT(Callback.GetPlayer() != nullptr);
 
-	if (!CheckLight())
-	{
-		// Insufficient light for enderman to become aggravated
-		// TODO: Teleport to a suitable location
-		return;
-	}
-
 	if (!Callback.GetPlayer()->CanMobsTarget())
 	{
 		return;
@@ -139,10 +132,7 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 void cEnderman::CheckEventLostPlayer(void)
 {
 	super::CheckEventLostPlayer();
-	if (!CheckLight())
-	{
-		EventLosePlayer();
-	}
+	EventLosePlayer();
 }
 
 
@@ -154,31 +144,6 @@ void cEnderman::EventLosePlayer()
 	super::EventLosePlayer();
 	m_bIsScreaming = false;
 	GetWorld()->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-bool cEnderman::CheckLight()
-{
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
-
-	// Check if the chunk the enderman is in is lit
-	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
-	{
-		m_World->QueueLightChunk(ChunkX, ChunkZ);
-		return true;
-	}
-
-	// Enderman only attack if the skylight is lower or equal to 8
-	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) - GetWorld()->GetSkyDarkness() > 8)
-	{
-		return false;
-	}
-
-	return true;
 }
 
 
