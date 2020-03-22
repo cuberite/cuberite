@@ -206,7 +206,7 @@ public:
 					}
 					else if (FishType <= 12)  // Pufferfish has a 13% chance of spawning
 					{
-						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
+						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_PUFFERFISH));
 					}
 					else if (FishType <= 24)  // Raw salmon has a 25% chance of spawning
 					{
