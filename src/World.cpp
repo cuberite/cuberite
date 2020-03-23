@@ -1974,9 +1974,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 			continue;
 		}
 
-		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
-		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
-		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
+		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
+		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
+		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
 		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
@@ -2226,7 +2226,7 @@ bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, c
 	{
 		return false;
 	}
-	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos);
+	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos, 10);
 	return true;
 }
 
