@@ -9,9 +9,9 @@
 
 
 class cBlockFurnaceHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>
+	public cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;
+	using super = cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>;
 
 public:
 
