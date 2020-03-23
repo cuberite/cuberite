@@ -45,7 +45,7 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		cItems res(cItem(E_BLOCK_FURNACE, 1)); // We can't drop a lit furnace
+		cItems res(cItem(E_BLOCK_FURNACE, 1));  // We can't drop a lit furnace
 		if (a_BlockEntity != nullptr)
 		{
 			auto be = static_cast<cFurnaceEntity *>(a_BlockEntity);
