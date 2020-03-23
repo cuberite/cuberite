@@ -45,6 +45,7 @@
 #include "BlockMobHead.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
+#include "BlockJukebox.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
 #include "BlockLilypad.h"
@@ -259,7 +260,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_IRON_ORE:                      return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_IRON_TRAPDOOR:                 return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:                return new cBlockPumpkinHandler         (a_BlockType);
-		case E_BLOCK_JUKEBOX:                       return new cBlockEntityHandler          (a_BlockType);
+		case E_BLOCK_JUKEBOX:                       return new cBlockJukeboxHandler         (a_BlockType);
 		case E_BLOCK_JUNGLE_DOOR:                   return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_JUNGLE_FENCE:                  return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_JUNGLE_FENCE_GATE:             return new cBlockFenceGateHandler       (a_BlockType);

@@ -23,6 +23,8 @@ cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 cJukeboxEntity::~cJukeboxEntity()
 {
+	// Stop playing if jukebox was broken
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 }
 
 
