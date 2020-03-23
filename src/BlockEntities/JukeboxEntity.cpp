@@ -26,7 +26,7 @@ cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 cJukeboxEntity::~cJukeboxEntity()
 {
-	if (m_World)
+	if (m_World && IsPlayingRecord())
 	{
 		// Stop playing music when destroyed by any means
 		m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
