@@ -24,12 +24,23 @@ cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
+cJukeboxEntity::~cJukeboxEntity()
+{
+	if (m_World)
+	{
+		// Stop playing music when destroyed by any means
+		m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
+	}
+}
+
+
+
+
+
 void cJukeboxEntity::Destroy(void)
 {
-	if (IsPlayingRecord())
-	{
-		EjectRecord();
-	}
+	ASSERT(m_World != nullptr);
+	EjectRecord();
 }
 
 
@@ -57,7 +68,7 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 	else
 	{
 		const cItem & HeldItem = a_Player->GetEquippedItem();
-		if (PlayRecord(HeldItem.m_ItemType))
+		if (PlayRecord(HeldItem.m_ItemType) && !a_Player->IsGameModeCreative())
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 			return true;
@@ -104,8 +115,8 @@ bool cJukeboxEntity::EjectRecord(void)
 	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
 	m_Record = 0;
 	m_World->SpawnItemPickups(Drops, Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
-	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_OFF);
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 	return true;
 }
 

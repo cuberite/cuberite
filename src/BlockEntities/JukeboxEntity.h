@@ -21,6 +21,7 @@ public:  // tolua_export
 	BLOCKENTITY_PROTODEF(cJukeboxEntity)
 
 	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	virtual ~cJukeboxEntity() override;
 
 	// tolua_begin
 
