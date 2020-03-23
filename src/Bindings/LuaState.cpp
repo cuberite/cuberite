@@ -951,6 +951,16 @@ void cLuaState::Push(bool a_Value)
 
 void cLuaState::Push(const cEntity * a_Entity)
 {
+	// Once we can make Lua understand constness, this function shall receive a corresponding function body
+	Push(const_cast<cEntity * >(a_Entity));
+}
+
+
+
+
+
+void cLuaState::Push(cEntity * a_Entity)
+{
 	ASSERT(IsValid());
 
 	if (a_Entity == nullptr)

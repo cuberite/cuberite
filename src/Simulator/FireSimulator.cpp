@@ -385,7 +385,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		if (BlockType == E_BLOCK_TNT)
 		{
 			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
-			m_World.SpawnPrimedTNT(absPos, 0);
+			m_World.SpawnPrimedTNT(Vector3d(absPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 			return;
 		}
 

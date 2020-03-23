@@ -163,8 +163,7 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return false;
 			}
-			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item))
+			if (!a_Player->GetInventory().AddItem(cItem(E_ITEM_BUCKET)))
 			{
 				return false;
 			}

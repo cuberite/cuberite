@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", 0.9, 0.9),
+	super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9, 0.9),
 	m_bIsSaddled(false)
 {
 }
