@@ -1347,7 +1347,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetLegacyMobID(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobID(a_Mob.GetMobType())));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
@@ -1827,7 +1827,7 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_8_0::GetLegacyMobID(char a_MobType)
+UInt32 cProtocol_1_8_0::GetProtocolMobID(char a_MobType)
 {
 	switch (a_MobType)
 	{

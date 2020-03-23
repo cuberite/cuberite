@@ -1408,7 +1408,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetLegacyMobID(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobID(a_Mob.GetMobType())));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -1883,7 +1883,7 @@ int cProtocol_1_9_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_9_0::GetLegacyMobID(char a_MobType)
+UInt32 cProtocol_1_9_0::GetProtocolMobID(char a_MobType)
 {
 	switch (a_MobType)
 	{
