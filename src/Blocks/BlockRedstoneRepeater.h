@@ -54,7 +54,7 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
 		{
@@ -65,32 +65,19 @@ public:
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		// A repeater can only be placed on top of opaque blocks (dirt, stone, etc., but not glass, leaves, etc.),
-		// or on top of upside-down slabs, upside-down stairs, and hoppers.
-		if (BelowBlock == E_BLOCK_HOPPER)
+		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
 			return true;
 		}
-
-		if (BelowBlock == E_BLOCK_TNT)
-		{
-			return false;
-		}
-
-		// On the top of an upside-down slab
-		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
 			// Check if the slab is turned up side down
-			return (cBlockSlabHandler::IsUpsideDown(BelowBlockMeta));
+			if ((BelowBlockMeta & 0x08) == 0x08)
+			{
+				return true;
+			}
 		}
-
-		// On the top of an upside-down stairs
-		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
-		{
-			return (cBlockStairsHandler::IsUpsideDown(BelowBlockMeta));
-		}
-
-		return cBlockInfo::IsFullSolidOpaqueBlock(BelowBlock);
+		return false;
 	}
 	
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override

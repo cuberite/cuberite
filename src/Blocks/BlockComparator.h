@@ -41,33 +41,9 @@ public:
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk, NIBBLETYPE a_BlockMeta) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if (a_RelY <= 0)
-		{
-			return false;
-		}
-
-		BLOCKTYPE BlockIsOnType;
-		NIBBLETYPE BlockIsOnMeta;
-		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockIsOnType, BlockIsOnMeta);
-
-		if (BlockIsOnType == E_BLOCK_TNT)
-		{
-			return false;
-		}
-
-		if (cBlockSlabHandler::IsAnySlabType(BlockIsOnType))
-		{
-			return (cBlockSlabHandler::IsUpsideDown(BlockIsOnMeta));
-		}
-
-		if (cBlockStairsHandler::IsAnyStairType(BlockIsOnType))
-		{
-			return (cBlockStairsHandler::IsUpsideDown(BlockIsOnMeta));
-		}
-
-		return cBlockInfo::IsFullSolidOpaqueBlock(BlockIsOnType);
+		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
 	
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
@@ -84,7 +60,6 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player.GetYaw());
-
 		return true;
 	}
 
