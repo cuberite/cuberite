@@ -48,7 +48,7 @@ public:
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
 					a_Player.GetInventory().RemoveOneEquippedItem();
-					a_Player.GetInventory().AddItem(cItem(E_ITEM_BUCKET));
+					a_Player.GetInventory().AddItem(cItem(E_ITEM_POTION));
 				}
 				break;
 			}
