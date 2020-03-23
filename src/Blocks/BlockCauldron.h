@@ -18,7 +18,7 @@ public:
 		super(a_BlockType)
 	{
 	}
-	
+
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		return cItem(E_ITEM_CAULDRON, 1, 0);

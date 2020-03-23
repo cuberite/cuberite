@@ -5,7 +5,6 @@
 #include "Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
-#include "BlockStairs.h"
 #include "../Chunk.h"
 
 
@@ -79,7 +78,7 @@ public:
 		}
 		return false;
 	}
-	
+
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
