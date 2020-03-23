@@ -56,6 +56,7 @@ Implements the 1.9 protocol classes:
 
 
 
+
 /** The slot number that the client uses to indicate "outside the window". */
 static const Int16 SLOT_NUM_OUTSIDE = -999;
 

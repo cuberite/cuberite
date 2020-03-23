@@ -1586,7 +1586,6 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.ParseText(Message);
 	Msg.UnderlineUrls();
 	cRoot::Get()->BroadcastChat(Msg);
-
 }
 
 

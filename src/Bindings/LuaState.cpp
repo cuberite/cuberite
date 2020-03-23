@@ -1005,7 +1005,7 @@ void cLuaState::Push(cEntity * a_Entity)
 				}  // switch (EntityType)
 				UNREACHABLE("Unsupported entity type");
 			}();
-		tolua_pushusertype(m_LuaState, const_cast<void*>(reinterpret_cast<const void*>(a_Entity)), ClassName);
+		tolua_pushusertype(m_LuaState, a_Entity, ClassName);
 	}
 }
 
