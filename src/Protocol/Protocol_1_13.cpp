@@ -395,6 +395,34 @@ void cProtocol_1_13::SendSoundEffect(const AString & a_SoundName, double a_X, do
 
 
 
+void cProtocol_1_13::SendSpawnMob(const cMonster & a_Mob)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSpawnMob);
+	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
+	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Mob.GetPitch());
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
+	Pkt.WriteByteAngle(a_Mob.GetYaw());
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
+	WriteEntityMetadata(Pkt, a_Mob);
+	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
+}
+
+
+
+
+
 void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
 {
 	// TODO

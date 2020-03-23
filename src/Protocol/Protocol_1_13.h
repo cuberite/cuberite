@@ -71,6 +71,7 @@ protected:
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
+	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;

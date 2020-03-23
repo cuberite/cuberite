@@ -1347,7 +1347,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(GetLegacyMobID(a_Mob.GetMobType())));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
@@ -1821,6 +1821,50 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 	}
 
 	return ParticleMap[ParticleName];
+}
+
+
+
+
+
+UInt32 cProtocol_1_8_0::GetLegacyMobID(char a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtBat:                   return 65;
+		case mtBlaze:                 return 61;
+		case mtCaveSpider:            return 59;
+		case mtChicken:               return 93;
+		case mtCow:                   return 92;
+		case mtCreeper:               return 50;
+		case mtEnderDragon:           return 63;
+		case mtEnderman:              return 58;
+		case mtGhast:                 return 56;
+		case mtGiant:                 return 53;
+		case mtGuardian:              return 68;
+		case mtHorse:                 return 100;
+		case mtIronGolem:             return 99;
+		case mtMagmaCube:             return 62;
+		case mtMooshroom:             return 96;
+		case mtOcelot:                return 98;
+		case mtPig:                   return 90;
+		case mtRabbit:                return 101;
+		case mtSheep:                 return 91;
+		case mtSilverfish:            return 60;
+		case mtSkeleton:              return 51;
+		case mtSlime:                 return 55;
+		case mtSnowGolem:             return 97;
+		case mtSpider:                return 52;
+		case mtSquid:                 return 94;
+		case mtVillager:              return 120;
+		case mtWitch:                 return 66;
+		case mtWither:                return 64;
+		case mtWolf:                  return 95;
+		case mtZombie:                return 54;
+		case mtZombiePigman:          return 57;
+		case mtMax:                   return 120;
+		default:                      return a_MobType;
+	}
 }
 
 
@@ -2595,7 +2639,7 @@ void cProtocol_1_8_0::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
-	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
+	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround, false);
 }
 
 

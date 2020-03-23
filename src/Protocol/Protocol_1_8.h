@@ -130,6 +130,9 @@ public:
 	If compression fails, the function returns false. */
 	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
 
+	/** Mob IDs changed in Minecraft 1.13, remap for older versions */
+	static UInt32 GetLegacyMobID(char a_MobType);
+
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
 
