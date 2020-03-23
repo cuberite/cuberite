@@ -8,15 +8,20 @@
 
 
 class cBlockCauldronHandler :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using super = cClearMetaOnDrop<cBlockHandler>;
+	using super = cBlockHandler;
 
 public:
 
 	cBlockCauldronHandler(BLOCKTYPE a_BlockType):
 		super(a_BlockType)
 	{
+	}
+	
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		return cItem(E_ITEM_CAULDRON, 1, 0);
 	}
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
@@ -32,7 +37,8 @@ public:
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
-						a_Player.GetInventory().AddItem(cItem(E_ITEM_BUCKET));
+						cItem NewItem(E_ITEM_BUCKET, 1);
+						a_Player.GetInventory().AddItem(NewItem);
 					}
 				}
 				break;
@@ -43,7 +49,8 @@ public:
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
 					a_Player.GetInventory().RemoveOneEquippedItem();
-					a_Player.GetInventory().AddItem(cItem(E_ITEM_POTION));
+					cItem NewItem(E_ITEM_POTIONS, 1, 0);
+					a_Player.GetInventory().AddItem(NewItem);
 				}
 				break;
 			}
