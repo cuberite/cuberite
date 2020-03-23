@@ -869,7 +869,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition, PreviousIsOnGround))
 	{
 		SendPlayerMoveLook();
 		return;
