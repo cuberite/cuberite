@@ -2727,8 +2727,7 @@ void cProtocol_1_9_0::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
-	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround, false);
-	LOG("LOOKSENT");
+	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
 }
 
 
