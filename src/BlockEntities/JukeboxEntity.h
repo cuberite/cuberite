@@ -21,7 +21,6 @@ public:  // tolua_export
 	BLOCKENTITY_PROTODEF(cJukeboxEntity)
 
 	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	virtual ~cJukeboxEntity() override;
 
 	// tolua_begin
 
@@ -46,6 +45,7 @@ public:  // tolua_export
 	// tolua_end
 
 	// cBlockEntity overrides:
+	virtual void Destroy(void) override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
