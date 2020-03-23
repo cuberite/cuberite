@@ -294,17 +294,12 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	int ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int EnchantmentCover = GetEnchantmentCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int FinalDamage = a_RawDamage - ArmorCover - EnchantmentCover;
-	if ((FinalDamage == 0) && (a_RawDamage > 0))
-	{
-		// Nobody's invincible
-		FinalDamage = 1;
-	}
-	ApplyArmorDamage(ArmorCover);
+	float FinalDamage = a_RawDamage;
+	float ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
 
-	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, static_cast<float>(FinalDamage), a_KnockbackAmount);
+	ApplyArmorDamage(static_cast<int>(ArmorCover));
+
+	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
 }
 
 
@@ -347,7 +342,19 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	{
 		TDI.Attacker = nullptr;
 	}
+
+	if (a_RawDamage <= 0)
+	{
+		a_RawDamage = 0;
+	}
+
 	TDI.RawDamage = a_RawDamage;
+
+	if (a_FinalDamage <= 0)
+	{
+		a_FinalDamage = 0;
+	}
+
 	TDI.FinalDamage = a_FinalDamage;
 
 	Vector3d Heading(0, 0, 0);
@@ -666,7 +673,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 
 
-int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	int TotalEPF = 0;
 
@@ -702,7 +709,7 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 		}
 	}
 	int CappedEPF = std::min(20, TotalEPF);
-	return static_cast<int>(a_Damage * CappedEPF / 25.0);
+	return (a_Damage * CappedEPF / 25.0f);
 }
 
 
@@ -734,7 +741,7 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 
 
 
-int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 
@@ -784,8 +791,8 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
+	float Reduction = std::max(ArmorValue / 5.0f, ArmorValue - a_Damage / (2.0f + Toughness / 4.0f));
+	return (a_Damage * std::min(20.0f, Reduction) / 25.0f);
 }
 
 
@@ -977,7 +984,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
-	else
+	else if (!(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
 	{
 		// Push out entity.
 		BLOCKTYPE GotBlock;
@@ -2289,8 +2296,16 @@ Vector3d cEntity::GetLookVector(void) const
 // Set position
 void cEntity::SetPosition(const Vector3d & a_Position)
 {
+	// Clamp the positions to exactly representable single-precision floating point values
+	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
+	const double MaxFloat = std::pow(2, std::numeric_limits<float>().digits);
+
+	const double ClampedPosX = Clamp(a_Position.x, -MaxFloat, MaxFloat);
+	const double ClampedPosY = Clamp(a_Position.y, -MaxFloat, MaxFloat);
+	const double ClampedPosZ = Clamp(a_Position.z, -MaxFloat, MaxFloat);
+
 	m_LastPosition = m_Position;
-	m_Position = a_Position;
+	m_Position = {ClampedPosX, ClampedPosY, ClampedPosZ};
 }
 
 

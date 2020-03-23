@@ -1407,7 +1407,11 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	// TODO: Implement block hardiness
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
+
+	auto & Random = GetRandomProvider();
+	auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
+
+	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -1422,6 +1426,18 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
 		}
 	}
+
+	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
+	auto ParticleFormula = a_ExplosionSize * 0.33f;
+	auto Spread = ParticleFormula * 0.5f;
+	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
+
+	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
+
+	Spread = ParticleFormula * 0.35f;
+	ParticleCount = std::min((ParticleFormula * 550), 1800.0);
+
+	BroadcastParticleEffect("explode", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
 
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
@@ -1958,9 +1974,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 			continue;
 		}
 
-		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
-		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
-		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
+		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
+		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
+		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
 		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
@@ -2144,7 +2160,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 
 
-UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff, bool a_ShouldPlayFuseSound)
 {
 	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
@@ -2153,11 +2169,16 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 		return cEntity::INVALID_ID;
 	}
 
+	if (a_ShouldPlayFuseSound)
+	{
+		BroadcastSoundEffect("entity.tnt.primed", a_Pos, 1.0f, 1.0f);
+	}
+
 	auto & Random = GetRandomProvider();
 	TNTPtr->SetSpeed(
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1),
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f),
 		a_InitialVelocityCoeff * 2,
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1)
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f)
 	);
 	return TNTPtr->GetUniqueID();
 }
@@ -2220,7 +2241,7 @@ bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, c
 	{
 		return false;
 	}
-	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos);
+	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos, 10);
 	return true;
 }
 

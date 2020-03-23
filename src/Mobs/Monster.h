@@ -39,7 +39,7 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height);
 
 	virtual ~cMonster() override;
 
@@ -267,6 +267,7 @@ protected:
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
+	AString m_SoundAmbient;
 
 	float m_AttackRate;
 	int m_AttackDamage;
@@ -286,6 +287,8 @@ protected:
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
+
+	int m_AmbientSoundTimer;
 
 	int m_Age;
 	int m_AgingTimer;

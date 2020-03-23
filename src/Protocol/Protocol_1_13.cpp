@@ -350,24 +350,6 @@ void cProtocol_1_13::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
-{
-	// TODO
-}
-
-
-
-
-
 void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
 	// TODO
@@ -378,15 +360,6 @@ void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString 
 
 
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	// TODO
 }

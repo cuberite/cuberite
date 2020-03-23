@@ -29,7 +29,7 @@ public:
 		if (!a_Player->IsGameModeCreative())
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
-			a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
+			a_Player->GetInventory().AddItem(cItem(E_ITEM_BUCKET));
 		}
 		return true;
 	}

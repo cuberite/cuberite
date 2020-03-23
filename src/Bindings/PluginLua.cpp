@@ -665,9 +665,9 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 }
 
 
@@ -712,6 +712,16 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
 		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
 	);
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED,
+		&a_Player);
 }
 
 
@@ -1102,6 +1112,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
+		case cPluginManager::HOOK_PLAYER_CROUCHED:        		return "OnPlayerCrouched";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
 		case cPluginManager::HOOK_PLAYER_CLICKING_AT_ENTITY:    return "OnPlayerClickingAtEntity";

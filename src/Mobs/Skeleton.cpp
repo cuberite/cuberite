@@ -10,7 +10,7 @@
 
 
 cSkeleton::cSkeleton(bool IsWither) :
-	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
+	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6, 1.8),
 	m_bIsWither(IsWither)
 {
 }

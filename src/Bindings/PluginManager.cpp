@@ -794,11 +794,11 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
 	return GenericCallHook(HOOK_PLAYER_MOVING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition);
+			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 		}
 	);
 }
@@ -838,6 +838,19 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 	return GenericCallHook(HOOK_PLAYER_PLACING_BLOCK, [&](cPlugin * a_Plugin)
 		{
 			return a_Plugin->OnPlayerPlacingBlock(a_Player, a_BlockChange);
+		}
+	);
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
+{
+	return GenericCallHook(HOOK_PLAYER_CROUCHED, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerCrouched(a_Player);
 		}
 	);
 }

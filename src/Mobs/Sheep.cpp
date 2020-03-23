@@ -12,7 +12,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
+	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
