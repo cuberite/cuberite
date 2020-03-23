@@ -26,7 +26,7 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		cItems res(cItem(E_ITEM_BREWING_STAND, 1)); // We have to drop the item form of a brewing stand
+		cItems res(cItem(E_ITEM_BREWING_STAND, 1));  // We have to drop the item form of a brewing stand
 		if (a_BlockEntity != nullptr)
 		{
 			auto be = static_cast<cBrewingstandEntity *>(a_BlockEntity);
