@@ -30,13 +30,13 @@ class cPacketizer
 public:
 	/** Starts serializing a new packet into the protocol's m_OutPacketBuffer.
 	Locks the protocol's m_CSPacket to avoid multithreading issues. */
-	cPacketizer(cProtocol & a_Protocol, UInt32 a_PacketType) :
+	cPacketizer(cProtocol & a_Protocol, cProtocol::ePacketType a_PacketType) :
 		m_Protocol(a_Protocol),
 		m_Out(a_Protocol.m_OutPacketBuffer),
 		m_Lock(a_Protocol.m_CSPacket),
 		m_PacketType(a_PacketType)  // Used for logging purposes
 	{
-		m_Out.WriteVarInt32(a_PacketType);
+		m_Out.WriteVarInt32(m_Protocol.GetPacketID(a_PacketType));
 	}
 
 	/** Sends the packet via the contained protocol's SendPacket() function. */
@@ -140,7 +140,11 @@ public:
 	/** Writes the specified UUID as a 128-bit BigEndian integer. */
 	void WriteUUID(const cUUID & a_UUID);
 
-	UInt32 GetPacketType(void) const { return m_PacketType; }
+	cProtocol::ePacketType GetPacketType() const { return m_PacketType; }
+
+	/** Returns the human-readable representation of the packet type.
+	Used for logging the packets. */
+	static AString PacketTypeToStr(cProtocol::ePacketType a_PacketType);
 
 protected:
 	/** The protocol instance in which the packet is being constructed. */
@@ -154,7 +158,7 @@ protected:
 
 	/** Type of the contained packet.
 	Used for logging purposes, the packet type is encoded into m_Out immediately in constructor. */
-	UInt32 m_PacketType;
+	cProtocol::ePacketType m_PacketType;
 } ;
 
 

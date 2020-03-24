@@ -39,6 +39,8 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
+#include "BlockTypePalette.h"
+#include "Protocol/ProtocolPalettes.h"
 
 
 
@@ -61,6 +63,7 @@ cRoot::cRoot(void) :
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
 {
+	Temporary::RegisterAllBlockHandlers(m_BlockTypeRegistry);
 	s_Root = this;
 	m_InputThreadRunFlag.clear();
 }
@@ -190,6 +193,8 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 	// cClientHandle::FASTBREAK_PERCENTAGE = settingsRepo->GetValueSetI("AntiCheat", "FastBreakPercentage", 97) / 100.0f;
 	cClientHandle::FASTBREAK_PERCENTAGE = 0;  // AntiCheat disabled due to bugs. We will enabled it once they are fixed. See #3506.
+
+	LoadPalettes(settingsRepo->GetValueSet("Folders", "ProtocolPalettes", "Protocol"));
 
 	m_MojangAPI = new cMojangAPI;
 	bool ShouldAuthenticate = settingsRepo->GetValueSetB("Authentication", "Authenticate", true);
@@ -390,6 +395,48 @@ void cRoot::StopServer()
 void cRoot::LoadGlobalSettings()
 {
 	// Nothing needed yet
+}
+
+
+
+
+
+void cRoot::LoadPalettes(const AString & aProtocolFolder)
+{
+	LOG("Loading UpgradeBlockTypePalette...");
+	try
+	{
+		auto paletteStr = cFile::ReadWholeFile(aProtocolFolder + cFile::PathSeparator() + "UpgradeBlockTypePalette.txt");
+		if (paletteStr.empty())
+		{
+			throw std::runtime_error("File is empty");
+		}
+		m_UpgradeBlockTypePalette.reset(new BlockTypePalette);
+		m_UpgradeBlockTypePalette->loadFromString(paletteStr);
+	}
+	catch (const std::exception & exc)
+	{
+		LOGERROR("Failed to load the Upgrade block type palette from %s/UpgradeBlockTypePalette.txt: %s\nAborting",
+			aProtocolFolder, exc.what()
+		);
+		throw;
+	}
+
+	// Note: This can take a lot of time in MSVC debug builds
+	// If impatient, edit the settings.ini: [Folders] ProtocolPalettes=DummyDir; copy only one palette to DummyDir
+	LOG("Loading per-protocol palettes...");
+	m_ProtocolPalettes.reset(new ProtocolPalettes);
+	m_ProtocolPalettes->load(aProtocolFolder);
+	auto versions = m_ProtocolPalettes->protocolVersions();
+	if (versions.empty())
+	{
+		LOGWARNING("No per-protocol palettes were loaded");
+	}
+	else
+	{
+		std::sort(versions.begin(), versions.end());
+		LOG("Loaded palettes for protocol versions: %s", StringJoin(versions, ", "));
+	}
 }
 
 
@@ -711,7 +758,7 @@ int cRoot::GetTotalChunkCount(void)
 	int res = 0;
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		res += itr->second->GetNumChunks();
+		res += static_cast<int>(itr->second->GetNumChunks());
 	}
 	return res;
 }

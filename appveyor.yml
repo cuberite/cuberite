@@ -1,15 +1,120 @@
 version: 1.0.{build}
-configuration: Debug
+image: Visual Studio 2015
 clone_depth: 50
 
-before_build:
+# Set up environment variables for build info
+environment:
+  CUBERITE_BUILD_SERIES_NAME: AppVeyor
+  CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
+  CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
+
+  matrix:
+  - job_name: Windows-x64-debug
+    configuration: Debug
+    BUILD_DIR: Debug-x64
+
+  - job_name: Windows-x86
+    configuration: Release
+    BUILD_DIR: Release-x86
+
+  - job_name: Windows-x64
+    configuration: Release
+    BUILD_DIR: Release-x64
+
+install:
 - echo %TIME%
 - git submodule update --init
-- echo %TIME%
-- cmake -G "Visual Studio 12" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- echo %TIME%
 
-build:
-  project: Cuberite.sln
-  parallel: true
-  verbosity: minimal
+for:
+##############################
+# Windows 64-bit debug build #
+##############################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64-debug
+
+  before_build:
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Debug-x64\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+################################
+# Windows 32-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x86
+
+  branches:
+    only:
+      - master
+
+  before_build:
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015" ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Release-x86\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+################################
+# Windows 64-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64
+
+  branches:
+    only:
+      - master
+
+  before_build:
+  - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
+  - cd %BUILD_DIR%
+  - echo %TIME%
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - echo %TIME%
+  - cd ..
+
+  build:
+    project: Release-x64\Cuberite.sln
+    parallel: true
+    verbosity: minimal
+
+###########################################
+# Cache for speeding up subsequent builds #
+###########################################
+cache:
+  - Debug-x64\CMakeCache.txt
+  - Release-x86\CMakeCache.txt
+  - Release-x64\CMakeCache.txt
+
+#####################
+# Package artifacts #
+#####################
+
+after_build:
+- cd %BUILD_DIR%\Server
+- echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>buildinfo.txt
+- Install\PackWindowsExecutables.cmd
+- appveyor PushArtifact Cuberite.zip -FileName Cuberite.zip
+- appveyor PushArtifact PDBs.zip -FileName PDBs.zip
+- appveyor PushArtifact AutoAPI.zip -FileName AutoAPI.zip
+- appveyor PushArtifact ManualAPI.zip -FileName ManualAPI.zip
+- appveyor PushArtifact .luacheckrc -FileName .luacheckrc

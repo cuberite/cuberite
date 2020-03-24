@@ -8,14 +8,13 @@ add_definitions(-DTEST_GLOBALS=1)
 
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/ByteBuffer.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
+	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
 set (SHARED_HDRS
+	../TestHelpers.h
 	${CMAKE_SOURCE_DIR}/src/ByteBuffer.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
+	${CMAKE_SOURCE_DIR}/src/StringUtils.h
 )
 
 set (SRCS

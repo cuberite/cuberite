@@ -54,7 +54,7 @@ namespace
 					{
 						a_Func(*Client);
 					}
-				};
+				}
 				return true;
 			}
 		);

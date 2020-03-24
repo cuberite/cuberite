@@ -9,7 +9,7 @@
 
 
 cCow::cCow(void) :
-	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
+	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9, 1.3)
 {
 }
 
@@ -47,7 +47,7 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MILK);
+			a_Player.GetInventory().AddItem(cItem(E_ITEM_MILK));
 		}
 	}
 }

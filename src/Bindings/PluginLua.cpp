@@ -227,9 +227,24 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 
 
 
-bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
+	cItems & a_Pickups
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_BLOCK_TO_PICKUPS, &a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups);
+	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make breaking API changes
+	return CallSimpleHooks(
+		cPluginManager::HOOK_BLOCK_TO_PICKUPS,
+		&a_World,
+		a_Digger,
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		a_BlockType, a_BlockMeta, &a_Pickups
+	);
 }
 
 
@@ -650,9 +665,9 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 }
 
 
@@ -697,6 +712,16 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
 		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
 	);
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED,
+		&a_Player);
 }
 
 
@@ -1078,6 +1103,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
+		case cPluginManager::HOOK_PLAYER_CROUCHED:        		return "OnPlayerCrouched";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";

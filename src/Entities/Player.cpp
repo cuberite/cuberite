@@ -193,9 +193,6 @@ bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
-	// Spawn the entity on the clients:
-	GetWorld()->BroadcastSpawnEntity(*this);
-
 	return true;
 }
 
@@ -243,6 +240,9 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
+
+	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
+
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
 	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
@@ -712,10 +712,6 @@ void cPlayer::FinishEating(void)
 	{
 		return;
 	}
-	if (!IsGameModeCreative())
-	{
-		GetInventory().RemoveOneEquippedItem();
-	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
 
@@ -867,12 +863,17 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 void cPlayer::SetCrouch(bool a_IsCrouched)
 {
 	// Set the crouch status, broadcast to all visible players
-
 	if (a_IsCrouched == m_IsCrouched)
 	{
 		// No change
 		return;
 	}
+
+	if (a_IsCrouched)
+	{
+		cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
+	}
+
 	m_IsCrouched = a_IsCrouched;
 	m_World->BroadcastEntityMetadata(*this);
 }
@@ -1000,10 +1001,6 @@ void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 
 bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	SetSpeed(0, 0, 0);
-	// Prevents knocking the player in the wrong direction due to
-	// the speed vector problems, see #2865
-	// In the future, the speed vector should be fixed
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative() || IsGameModeSpectator())
@@ -1225,7 +1222,7 @@ void cPlayer::Respawn(void)
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		ScheduleMoveToWorld(m_SpawnWorld, GetLastBedPos(), false);
+		MoveToWorld(m_SpawnWorld, GetLastBedPos(), false, false);
 	}
 	else
 	{
@@ -1295,7 +1292,7 @@ bool cPlayer::IsGameModeSpectator(void) const
 
 bool cPlayer::CanMobsTarget(void) const
 {
-	return IsGameModeSurvival() || IsGameModeAdventure();
+	return (IsGameModeSurvival() || IsGameModeAdventure()) && (m_Health > 0);
 }
 
 
@@ -2003,92 +2000,73 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 {
-	ASSERT(a_World != nullptr);
-	ASSERT(IsTicking());
+	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
-	if (GetWorld() == a_World)
+	// Reset portal cooldown
+	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
-		// Don't move to same world
-		return false;
+		m_PortalCooldownData.m_TicksDelayed = 0;
+		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	//  Ask the plugins if the player is allowed to change the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	if (m_World == a_WorldChangeInfo.m_NewWorld)
 	{
-		// A Plugin doesn't allow the player to change the world
-		return false;
+		// Moving to same world, don't need to remove from world
+		SetPosition(a_WorldChangeInfo.m_NewPosition);
+		return;
 	}
 
-	GetWorld()->QueueTask([this, a_World, a_ShouldSendRespawn, a_NewPosition](cWorld & a_OldWorld)
+	LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetName(), GetWorld()->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(), GetChunkZ()
+	);
+
+	// Stop all mobs from targeting this player
+	StopEveryoneFromTargetingMe();
+
+	// If player is attached to entity, detach, to prevent client side effects
+	Detach();
+
+	// Prevent further ticking in this world
+	SetIsTicking(false);
+
+	// Remove from the old world
+	auto & OldWorld = *GetWorld();
+	auto Self = OldWorld.RemovePlayer(*this);
+
+	ResetPosition(a_WorldChangeInfo.m_NewPosition);
+	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
+	SetWorld(a_WorldChangeInfo.m_NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+
+	// Set capabilities based on new world
+	SetCapabilities();
+
+	cClientHandle * ch = GetClientHandle();
+	if (ch != nullptr)
 	{
 		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-		GetClientHandle()->InvalidateCachedSentChunk();
+		ch->InvalidateCachedSentChunk();
 
-		// Prevent further ticking in this world
-		SetIsTicking(false);
-
-		// Tell others we are gone
-		GetWorld()->BroadcastDestroyEntity(*this);
-
-		// Remove player from world
-		// Make sure that RemovePlayer didn't return a valid smart pointer, due to the second parameter being false
-		// We remain valid and not destructed after this call
-		VERIFY(!GetWorld()->RemovePlayer(*this, false));
-
-		// Set position to the new position
-		ResetPosition(a_NewPosition);
-		FreezeInternal(a_NewPosition, false);
-
-		// Stop all mobs from targeting this player
-		StopEveryoneFromTargetingMe();
-
-		// Deal with new world
-		SetWorld(a_World);
-
-		// Set capabilities based on new world
-		SetCapabilities();
-
-		cClientHandle * ch = this->GetClientHandle();
-		if (ch != nullptr)
+		// Send the respawn packet:
+		if (a_WorldChangeInfo.m_SendRespawn)
 		{
-			// Send the respawn packet:
-			if (a_ShouldSendRespawn)
-			{
-				m_ClientHandle->SendRespawn(a_World->GetDimension());
-			}
-
-			// Update the view distance.
-			ch->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
-
-			// Send current weather of target world to player
-			if (a_World->GetDimension() == dimOverworld)
-			{
-				ch->SendWeather(a_World->GetWeather());
-			}
+			ch->SendRespawn(a_WorldChangeInfo.m_NewWorld->GetDimension());
 		}
 
-		// Broadcast the player into the new world.
-		a_World->BroadcastSpawnEntity(*this);
+		// Update the view distance.
+		ch->SetViewDistance(ch->GetRequestedViewDistance());
 
-		// Queue add to new world and removal from the old one
+		// Send current weather of target world to player
+		if (a_WorldChangeInfo.m_NewWorld->GetDimension() == dimOverworld)
+		{
+			ch->SendWeather(a_WorldChangeInfo.m_NewWorld->GetWeather());
+		}
+	}
 
-		// Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-		cChunk * ParentChunk = this->GetParentChunk();
-
-		LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetName().c_str(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			ParentChunk->GetPosX(), ParentChunk->GetPosZ()
-		);
-
-		// New world will take over and announce client at its next tick
-		auto PlayerPtr = static_cast<cPlayer *>(ParentChunk->RemoveEntity(*this).release());
-		a_World->AddPlayer(std::unique_ptr<cPlayer>(PlayerPtr), &a_OldWorld);
-	});
-
-	return true;
+	// New world will take over and announce client at its next tick
+	a_WorldChangeInfo.m_NewWorld->AddPlayer(std::move(Self), &OldWorld);
 }
 
 
@@ -2209,7 +2187,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		SetRoll     (static_cast<float>(JSON_PlayerRotation[2].asDouble()));
 	}
 
-	m_Health              = root.get("health",         0).asInt();
+	m_Health              = root.get("health",         0).asFloat();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
@@ -2515,7 +2493,7 @@ void cPlayer::HandleFloater()
 	}
 	m_World->DoWithEntityByID(m_FloaterID, [](cEntity & a_Entity)
 		{
-			a_Entity.Destroy(true);
+			a_Entity.Destroy();
 			return true;
 		}
 	);
@@ -2689,8 +2667,8 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 			for (int x = a_BlockX - a_Range + 1; x < a_BlockX + a_Range; x++)
 			{
 				blks.emplace_back(x, y, z, E_BLOCK_AIR, 0);  // Use fake blocktype, it will get set later on.
-			};
-		};
+			}
+		}
 	}  // for y
 
 	// Get the values of all the blocks:

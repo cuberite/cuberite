@@ -84,8 +84,7 @@ public:
 		}
 
 		a_Player->GetInventory().RemoveOneEquippedItem();
-		cItem NewItem(E_ITEM_POTION, 1, 0);
-		a_Player->GetInventory().AddItem(NewItem);
+		a_Player->GetInventory().AddItem(cItem(E_ITEM_POTION));
 		return true;
 	}
 } ;

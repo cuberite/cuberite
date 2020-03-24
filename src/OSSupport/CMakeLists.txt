@@ -19,6 +19,7 @@ SET (SRCS
 )
 
 SET (HDRS
+	AtomicUniquePtr.h
 	CriticalSection.h
 	Errors.h
 	Event.h
@@ -46,4 +47,8 @@ endif()
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
 	target_link_libraries(OSSupport fmt::fmt)
+
+	if(NOT WIN32)
+		target_link_libraries(OSSupport event_pthreads_static)
+	endif()
 endif()

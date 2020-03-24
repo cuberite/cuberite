@@ -12,16 +12,15 @@
 
 
 
-cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
 {
-	int ChunkX = 0, ChunkZ = 0;
-	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
+	auto chunkCoord = cChunkDef::BlockToChunk(a_Pos);
 	if (
 		(m_World != nullptr) &&
-		m_World->IsChunkValid(ChunkX, ChunkZ)
+		m_World->IsChunkValid(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ)
 	)
 	{
 		ScanNeighbours();
@@ -50,7 +49,7 @@ cChestEntity::~cChestEntity()
 
 void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cChestEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 
@@ -66,7 +65,7 @@ void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 void cChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_PosX, m_PosY, m_PosZ, 1, 0, m_BlockType);
+	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_BlockType);
 }
 
 
@@ -126,9 +125,8 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
 	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
 	// The few false positives aren't much to worry about
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	auto chunkCoords = cChunkDef::BlockToChunk(m_Pos);
+	m_World->MarkChunkDirty(chunkCoords.m_ChunkX, chunkCoords.m_ChunkZ);
 	return true;
 }
 
@@ -152,10 +150,10 @@ void cChestEntity::ScanNeighbours()
 
 	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
 	if (
-		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     FindNeighbour) ||
-		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     FindNeighbour) ||
-		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, FindNeighbour) ||
-		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, FindNeighbour)
+		m_World->DoWithChestAt(m_Pos.x - 1, m_Pos.y, m_Pos.z,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_Pos.x + 1, m_Pos.y, m_Pos.z,     FindNeighbour) ||
+		m_World->DoWithChestAt(m_Pos.x,     m_Pos.y, m_Pos.z - 1, FindNeighbour) ||
+		m_World->DoWithChestAt(m_Pos.x,     m_Pos.y, m_Pos.z + 1, FindNeighbour)
 	)
 	{
 		m_Neighbour->m_Neighbour = this;

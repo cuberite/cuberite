@@ -4,6 +4,7 @@
 // Tests the randomness of cFastRandom
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "FastRandom.h"
 
 
@@ -20,8 +21,8 @@ static void TestInts(void)
 	for (int i = 0; i < ITER; i++)
 	{
 		int v = rnd.RandInt(1000);
-		assert_test(v >= 0);
-		assert_test(v <= 1000);
+		TEST_GREATER_THAN_OR_EQUAL(v, 0);
+		TEST_LESS_THAN_OR_EQUAL(v, 1000);
 		Counts[v % BUCKETS]++;
 		sum += v;
 	}
@@ -47,8 +48,8 @@ static void TestFloats(void)
 	for (int i = 0; i < ITER; i++)
 	{
 		float v = rnd.RandReal(1000.0f);
-		assert_test(v >= 0);
-		assert_test(v <= 1000);
+		TEST_GREATER_THAN_OR_EQUAL(v, 0);
+		TEST_LESS_THAN_OR_EQUAL(v, 1000);
 		Counts[static_cast<int>(v) % BUCKETS]++;
 		sum += v;
 	}
@@ -100,18 +101,8 @@ static void TestReCreation(void)
 
 
 
-int main(void)
-{
-	LOG("FastRandom Test started");
-
-	LOG("Testing ints");
+IMPLEMENT_TEST_MAIN("FastRandom",
 	TestInts();
-
-	LOG("Testing floats");
 	TestFloats();
-
-	LOG("Testing re-creation");
 	TestReCreation();
-
-	LOG("FastRandom test finished");
-}
+)

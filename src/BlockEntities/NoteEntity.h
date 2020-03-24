@@ -30,15 +30,16 @@ enum ENUM_NOTE_INSTRUMENTS
 class cNoteEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-public:
-
 	// tolua_end
+
+	using super = cBlockEntity;
+
+public:  // tolua_export
 
 	BLOCKENTITY_PROTODEF(cNoteEntity)
 
 	/** Creates a new note entity. a_World may be nullptr */
-	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 	virtual ~cNoteEntity() override {}
 
 	// tolua_begin

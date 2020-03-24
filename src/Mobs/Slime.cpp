@@ -14,12 +14,13 @@ cSlime::cSlime(int a_Size) :
 		mtSlime,
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
+		"",
 		0.6 * a_Size,
 		0.6 * a_Size
 	),
 	m_Size(a_Size)
 {
-	SetMaxHealth(a_Size * a_Size);
+	SetMaxHealth(static_cast<float>(a_Size * a_Size));
 	SetAttackDamage(a_Size);
 }
 

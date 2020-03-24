@@ -487,6 +487,11 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
 	L.GetStackValues(1, Self, Position, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
 
+	if (Position == nullptr)
+	{
+		return L.ApiParamError("Expected a non-nil Vector3d for parameter #2");
+	}
+
 	if (!FnRef.IsValid())
 	{
 		return L.ApiParamError("Expected a valid callback function for parameter #3");
@@ -722,9 +727,9 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	{
 	public:
 		// cChunkCoordCallback override:
-		virtual void Call(int a_CBChunkX, int a_CBChunkZ, bool a_IsSuccess) override
+		virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 		{
-			m_LuaCallback.Call(a_CBChunkX, a_CBChunkZ, a_IsSuccess);
+			m_LuaCallback.Call(a_Coords.m_ChunkX, a_Coords.m_ChunkZ, a_IsSuccess);
 		}
 
 		cLuaState::cOptionalCallback m_LuaCallback;
@@ -890,12 +895,17 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 	}
 
 	cWorld * self = nullptr;
-	Vector3d * Position;
+	Vector3d * Position = nullptr;
 	int Reward;
 	L.GetStackValues(1, self, Position, Reward);
 	if (self == nullptr)
 	{
 		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
+		return 0;
+	}
+	if (Position == nullptr)
+	{
+		tolua_error(tolua_S, "Error in function 'SpawnSplitExperienceOrbs' arg #2. Value must not be nil.", nullptr);
 		return 0;
 	}
 

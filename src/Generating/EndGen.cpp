@@ -44,8 +44,7 @@ cEndGen::cEndGen(int a_Seed) :
 	m_MaxChunkX(0),
 	m_MinChunkZ(0),
 	m_MaxChunkZ(0),
-	m_LastChunkX(0x7fffffff),  // Use dummy coords that won't ever be used by real chunks
-	m_LastChunkZ(0x7fffffff)
+	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Use dummy coords that won't ever be used by real chunks
 {
 	m_Perlin.AddOctave(1, 1);
 	m_Perlin.AddOctave(2, 0.5);
@@ -77,17 +76,16 @@ void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
 
 
 
-void cEndGen::PrepareState(int a_ChunkX, int a_ChunkZ)
+void cEndGen::PrepareState(cChunkCoords a_ChunkCoords)
 {
-	ASSERT(!IsChunkOutsideRange(a_ChunkX, a_ChunkZ));  // Should be filtered before calling this function
+	ASSERT(!IsChunkOutsideRange(a_ChunkCoords));  // Should be filtered before calling this function
 
-	if ((m_LastChunkX == a_ChunkX) && (m_LastChunkZ == a_ChunkZ))
+	if (m_LastChunkCoords == a_ChunkCoords)
 	{
 		return;
 	}
 
-	m_LastChunkX = a_ChunkX;
-	m_LastChunkZ = a_ChunkZ;
+	m_LastChunkCoords = a_ChunkCoords;
 
 	GenerateNoiseArray();
 }
@@ -102,10 +100,10 @@ void cEndGen::GenerateNoiseArray(void)
 	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
 
 	// Generate the downscaled noise:
-	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_LastChunkX       * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_LastChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkZ       * cChunkDef::Width) / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkX       * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkZ       * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(257) / m_FrequencyY;
 	m_Perlin.Generate3D(NoiseData, DIM_X, DIM_Z, DIM_Y, StartX, EndX, StartZ, EndZ, StartY, EndY, Workspace);
@@ -118,12 +116,12 @@ void cEndGen::GenerateNoiseArray(void)
 		ValY = ValY * ValY;
 		for (int z = 0; z < DIM_Z; z++)
 		{
-			NOISE_DATATYPE ValZ = static_cast<NOISE_DATATYPE>(m_LastChunkZ * cChunkDef::Width + (z * cChunkDef::Width / (DIM_Z - 1))) / m_IslandSizeZ;
+			NOISE_DATATYPE ValZ = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkZ * cChunkDef::Width + (z * cChunkDef::Width / (DIM_Z - 1))) / m_IslandSizeZ;
 			ValZ = ValZ * ValZ;
 			for (int x = 0; x < DIM_X; x++)
 			{
 				// NOISE_DATATYPE ValX = StartX + (EndX - StartX) * x / (DIM_X - 1);
-				NOISE_DATATYPE ValX = static_cast<NOISE_DATATYPE>(m_LastChunkX * cChunkDef::Width + (x * cChunkDef::Width / (DIM_X - 1))) / m_IslandSizeX;
+				NOISE_DATATYPE ValX = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkX * cChunkDef::Width + (x * cChunkDef::Width / (DIM_X - 1))) / m_IslandSizeX;
 				ValX = ValX * ValX;
 				NoiseData[idx++] += ValX + ValZ + ValY;
 			}  // for x
@@ -138,11 +136,11 @@ void cEndGen::GenerateNoiseArray(void)
 
 
 
-bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
+bool cEndGen::IsChunkOutsideRange(cChunkCoords a_ChunkCoords)
 {
 	return (
-		(a_ChunkX < m_MinChunkX) || (a_ChunkX > m_MaxChunkX) ||
-		(a_ChunkZ < m_MinChunkZ) || (a_ChunkZ > m_MaxChunkZ)
+		(a_ChunkCoords.m_ChunkX < m_MinChunkX) || (a_ChunkCoords.m_ChunkX > m_MaxChunkX) ||
+		(a_ChunkCoords.m_ChunkZ < m_MinChunkZ) || (a_ChunkCoords.m_ChunkZ > m_MaxChunkZ)
 	);
 }
 
@@ -150,10 +148,10 @@ bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
+void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
 	// If the chunk is outside out range, fill the shape with zeroes:
-	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
+	if (IsChunkOutsideRange(a_ChunkCoords))
 	{
 		for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
 		{
@@ -162,7 +160,7 @@ void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 		return;
 	}
 
-	PrepareState(a_ChunkX, a_ChunkZ);
+	PrepareState(a_ChunkCoords);
 
 	int MaxY = std::min(static_cast<int>(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
 	for (int z = 0; z < cChunkDef::Width; z++)

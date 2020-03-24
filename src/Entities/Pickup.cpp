@@ -93,20 +93,23 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
-	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer(0)
-	, m_Item(a_Item)
-	, m_bCollected(false)
-	, m_bIsPlayerCreated(IsPlayerCreated)
-	, m_bCanCombine(a_CanCombine)
-	, m_Lifetime(cTickTime(a_LifetimeTicks))
+////////////////////////////////////////////////////////////////////////////////
+// cPickup:
+
+cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
+	super(etPickup, a_Pos, 0.2, 0.2),
+	m_Timer(0),
+	m_Item(a_Item),
+	m_bCollected(false),
+	m_bIsPlayerCreated(IsPlayerCreated),
+	m_bCanCombine(a_CanCombine),
+	m_Lifetime(cTickTime(a_LifetimeTicks))
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
 	SetMaxHealth(5);
 	SetHealth(5);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	SetSpeed(a_Speed);
 }
 
 
@@ -143,7 +146,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
 		{
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
-			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)
+			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ);
 
 			// Destroy the pickup if it is on fire:
 			if (IsOnFire())
@@ -153,7 +156,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
 				if (m_Timer > std::chrono::milliseconds(500))
 				{
-					Destroy(true);
+					Destroy();
 					return;
 				}
 			}
@@ -177,14 +180,14 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_Timer > std::chrono::milliseconds(500))  // 0.5 second
 		{
-			Destroy(true);
+			Destroy();
 			return;
 		}
 	}
 
 	if (m_Timer > m_Lifetime)
 	{
-		Destroy(true);
+		Destroy();
 		return;
 	}
 }
@@ -197,7 +200,7 @@ bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtCactusContact)
 	{
-		Destroy(true);
+		Destroy();
 		return true;
 	}
 

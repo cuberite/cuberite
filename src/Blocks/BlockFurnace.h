@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "BlockEntity.h"
 #include "../Blocks/BlockPiston.h"
-#include "MetaRotator.h"
+#include "../BlockEntities/FurnaceEntity.h"
+#include "Mixins.h"
 
 
 
@@ -11,16 +11,18 @@
 class cBlockFurnaceHandler :
 	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
+	using super = cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>;
+
 public:
-	cBlockFurnaceHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+
+	cBlockFurnaceHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_BLOCK_FURNACE, 1, 0));
-	}
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -36,6 +38,25 @@ public:
 
 		return true;
 	}
+
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		cItems res(cItem(E_BLOCK_FURNACE, 1));  // We can't drop a lit furnace
+		if (a_BlockEntity != nullptr)
+		{
+			auto be = static_cast<cFurnaceEntity *>(a_BlockEntity);
+			res.AddItemGrid(be->GetContents());
+		}
+		return res;
+	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

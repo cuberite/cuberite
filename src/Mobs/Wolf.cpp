@@ -11,7 +11,7 @@
 
 
 cWolf::cWolf(void) :
-	super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", 0.6, 0.8),
+	super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6, 0.8),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),

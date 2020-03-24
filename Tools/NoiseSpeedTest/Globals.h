@@ -62,6 +62,14 @@
 
 
 
+#ifndef TOLUA_TEMPLATE_BIND
+	#define TOLUA_TEMPLATE_BIND(x)
+#endif
+
+
+
+
+
 // Integral types with predefined sizes:
 typedef long long Int64;
 typedef int       Int32;
@@ -225,3 +233,10 @@ public:
 
 
 
+
+/** Clamps the value into the specified range. */
+template <typename T>
+T Clamp(T a_Value, T a_Min, T a_Max)
+{
+	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}

@@ -142,7 +142,8 @@ The order of items doesn't change, only the duplicates are removed.
 If a_Strings1 contains duplicates, the result will still contain those duplicates. */
 extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AStringVector & a_Strings2);
 
-/** Concatenates the specified strings into a single string, separated by the specified separator. */
+/** Concatenates the specified strings into a single string, separated by the specified separator character.
+Use StringJoin() if you need multiple separator characters. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 
 /** Converts a string into a float. Returns false if the conversion fails. */

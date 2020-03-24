@@ -2,19 +2,24 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
 #include "../Chunk.h"
 
 
 
-class cBlockRedstoneRepeaterHandler :
+
+
+class cBlockRedstoneRepeaterHandler:
 	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
+	using super = cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>;
+
 public:
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
+
+	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType):
+		super(a_BlockType)
 	{
 	}
 
@@ -27,6 +32,7 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
+
 		return true;
 	}
 
@@ -40,12 +46,6 @@ public:
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	}
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
 	}
 
 	virtual bool IsUseable(void) override
@@ -77,6 +77,11 @@ public:
 			}
 		}
 		return false;
+	}
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
 	}
 
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)

@@ -1,10 +1,3 @@
-
-// ChunkDataSerializer.cpp
-
-// Implements the cChunkDataSerializer class representing the object that can:
-//  - serialize chunk data to different protocol versions
-//  - cache such serialized data for multiple clients
-
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
@@ -52,7 +45,7 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
+const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
 {
 	Serializations::const_iterator itr = m_Serializations.find(a_Version);
 	if (itr != m_Serializations.end())
@@ -63,10 +56,10 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 	AString data;
 	switch (a_Version)
 	{
-		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
+		case RELEASE_1_8_0: Serialize47 (data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_0: Serialize107(data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_4: Serialize110(data, a_ChunkX, a_ChunkZ); break;
-		// TODO: Other protocol versions may serialize the data differently; implement here
+		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ, a_BlockTypeMap); break;
 
 		default:
 		{
@@ -211,7 +204,7 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(BitsPerEntry);
+			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 
@@ -344,7 +337,7 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(BitsPerEntry);
+			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 
@@ -440,3 +433,135 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 
 
 
+
+void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
+{
+	// This function returns the fully compressed packet (including packet size), not the raw packet!
+
+	ASSERT(!a_BlockTypeMap.empty());  // We need a protocol-specific translation map
+
+	// Create the packet:
+	cByteBuffer Packet(512 KiB);
+	Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
+	Packet.WriteBEInt32(a_ChunkX);
+	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
+	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
+
+	// Write the chunk size in bytes:
+	const size_t BitsPerEntry = 14;
+	const size_t Mask = (1 << BitsPerEntry) - 1;
+	const size_t ChunkSectionDataArraySize = (cChunkData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	size_t ChunkSectionSize = (
+		1 +  // Bits per entry, BEUInt8, 1 byte
+		Packet.GetVarIntSize(static_cast<UInt32>(ChunkSectionDataArraySize)) +  // Field containing "size of whole section", VarInt32, variable size
+		ChunkSectionDataArraySize * 8 +  // Actual section data, lots of bytes (multiplier 1 long = 8 bytes)
+		cChunkData::SectionBlockCount / 2  // Size of blocklight which is always sent
+	);
+
+	if (m_Dimension == dimOverworld)
+	{
+		// Sky light is only sent in the overworld.
+		ChunkSectionSize += cChunkData::SectionBlockCount / 2;
+	}
+
+	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	size_t ChunkSize = (
+		ChunkSectionSize * m_Data.NumPresentSections() +
+		BiomeDataSize * 4  // Biome data now BE ints
+	);
+	Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
+
+	// Write each chunk section...
+	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
+		{
+			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
+			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+
+			UInt64 TempLong = 0;  // Temporary value that will be stored into
+			UInt64 CurrentlyWrittenIndex = 0;  // "Index" of the long that would be written to
+
+			for (size_t Index = 0; Index < cChunkData::SectionBlockCount; Index++)
+			{
+				UInt32 blockType = a_Section.m_BlockTypes[Index];
+				UInt32 blockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
+				auto itr = a_BlockTypeMap.find(blockType * 16 | blockMeta);
+				UInt64 Value = (itr == a_BlockTypeMap.end()) ? 0 :itr->second;
+				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
+
+				// Painful part where we write data into the long array.  Based off of the normal code.
+				size_t BitPosition = Index * BitsPerEntry;
+				size_t FirstIndex = BitPosition / 64;
+				size_t SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
+				size_t BitOffset = BitPosition % 64;
+
+				if (FirstIndex != CurrentlyWrittenIndex)
+				{
+					// Write the current data before modifiying it.
+					Packet.WriteBEUInt64(TempLong);
+					TempLong = 0;
+					CurrentlyWrittenIndex = FirstIndex;
+				}
+
+				TempLong |= (Value << BitOffset);
+
+				if (FirstIndex != SecondIndex)
+				{
+					// Part of the data is now in the second long; write the first one first
+					Packet.WriteBEUInt64(TempLong);
+					CurrentlyWrittenIndex = SecondIndex;
+
+					TempLong = (Value >> (64 - BitOffset));
+				}
+			}
+			// The last long will generally not be written
+			Packet.WriteBEUInt64(TempLong);
+
+			// Write lighting:
+			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
+			if (m_Dimension == dimOverworld)
+			{
+				// Skylight is only sent in the overworld; the nether and end do not use it
+				Packet.WriteBuf(a_Section.m_BlockSkyLight, sizeof(a_Section.m_BlockSkyLight));
+			}
+		}
+	);
+
+	// Write the biome data
+	for (size_t i = 0; i != BiomeDataSize; i++)
+	{
+		Packet.WriteBEUInt32(static_cast<UInt32>(m_BiomeData[i]) & 0xff);
+	}
+
+	// Identify 1.9.4's tile entity list as empty
+	Packet.WriteVarInt32(0);
+
+	AString PacketData;
+	Packet.ReadAll(PacketData);
+	Packet.CommitRead();
+
+	if (PacketData.size() >= 256)
+	{
+		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
+		{
+			ASSERT(!"Packet compression failed.");
+			a_Data.clear();
+			return;
+		}
+	}
+	else
+	{
+		cByteBuffer Buffer(20);
+		AString PostData;
+
+		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
+		Buffer.WriteVarInt32(0);
+		Buffer.ReadAll(PostData);
+		Buffer.CommitRead();
+
+		a_Data.clear();
+		a_Data.reserve(PostData.size() + PacketData.size());
+		a_Data.append(PostData.data(), PostData.size());
+		a_Data.append(PacketData.data(), PacketData.size());
+	}
+}

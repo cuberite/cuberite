@@ -9,11 +9,11 @@
 
 
 cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
-	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
+	super(etTNT, a_Pos, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);
-	SetAirDrag(0.4f);
+	SetAirDrag(0.02f);
 }
 
 
@@ -34,9 +34,9 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 void cTNTEntity::Explode(void)
 {
 	m_FuseTicks = 0;
-	Destroy(true);
+	Destroy();
 	FLOGD("BOOM at {0}", GetPosition());
-	m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
+	m_World->DoExplosionAt(4.0, GetPosX(), GetPosY(), GetPosZ(), true, esPrimedTNT, this);
 }
 
 

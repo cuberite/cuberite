@@ -30,22 +30,34 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// No pickups
+		return {};
 	}
 
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+
+
+
+	virtual void OnPlayerBrokeBlock(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override
 	{
-		cItemHandler * Handler = a_Player.GetEquippedItem().GetHandler();
-		if (a_Player.IsGameModeCreative() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		auto handler = a_Player.GetEquippedItem().GetHandler();
+		if (!a_Player.IsGameModeSurvival() || !handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
 		{
 			return;
 		}
 
-		auto & Random = GetRandomProvider();
-		int Reward = 15 + Random.RandInt(14) + Random.RandInt(14);
-		a_WorldInterface.SpawnSplitExperienceOrbs(static_cast<double>(a_BlockX), static_cast<double>(a_BlockY + 1), static_cast<double>(a_BlockZ), Reward);
+		auto & random = GetRandomProvider();
+		int reward = 15 + random.RandInt(14) + random.RandInt(14);
+		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
 	}
 } ;

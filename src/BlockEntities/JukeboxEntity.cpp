@@ -1,6 +1,9 @@
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+// JukeboxEntity.cpp
 
+// Implements the cJukeboxEntity class representing a single jukebox in the world
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "JukeboxEntity.h"
 #include "../World.h"
 #include "../EffectID.h"
@@ -10,8 +13,8 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Record(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_JUKEBOX);
@@ -23,6 +26,21 @@ cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 
 cJukeboxEntity::~cJukeboxEntity()
 {
+	if (m_World && IsPlayingRecord())
+	{
+		// Stop playing music when destroyed by any means
+		m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
+	}
+}
+
+
+
+
+
+void cJukeboxEntity::Destroy(void)
+{
+	ASSERT(m_World != nullptr);
+	EjectRecord();
 }
 
 
@@ -31,7 +49,7 @@ cJukeboxEntity::~cJukeboxEntity()
 
 void cJukeboxEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	Super::CopyFrom(a_Src);
+	super::CopyFrom(a_Src);
 	auto & src = static_cast<const cJukeboxEntity &>(a_Src);
 	m_Record = src.m_Record;
 }
@@ -50,7 +68,7 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 	else
 	{
 		const cItem & HeldItem = a_Player->GetEquippedItem();
-		if (PlayRecord(HeldItem.m_ItemType))
+		if (PlayRecord(HeldItem.m_ItemType) && !a_Player->IsGameModeCreative())
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 			return true;
@@ -77,7 +95,7 @@ bool cJukeboxEntity::PlayRecord(int a_Record)
 	}
 	m_Record = a_Record;
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), m_Record);
-	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_ON);
+	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_ON);
 	return true;
 }
 
@@ -96,9 +114,9 @@ bool cJukeboxEntity::EjectRecord(void)
 	cItems Drops;
 	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
 	m_Record = 0;
-	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
+	m_World->SpawnItemPickups(Drops, Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
+	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_OFF);
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
-	m_World->SetBlockMeta(m_PosX, m_PosY, m_PosZ, E_META_JUKEBOX_OFF);
 	return true;
 }
 

@@ -73,9 +73,9 @@ protected:
 
 
 
-cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
-	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
-	m_BitePos(Vector3d(a_X, a_Y, a_Z)),
+cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
+	super(etFloater, a_Pos, 0.2, 0.2),
+	m_BitePos(a_Pos),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
@@ -179,7 +179,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
-		Destroy(true);
+		Destroy();
 	}
 
 	if (m_AttachedMobID != cEntity::INVALID_ID)

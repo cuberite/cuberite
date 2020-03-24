@@ -46,6 +46,12 @@ public:
 
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
+		// Players can't pick up fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -114,11 +120,19 @@ public:
 
 
 
+
+
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
 	)
 	{
+		// Players can't place fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -149,8 +163,7 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return false;
 			}
-			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item))
+			if (!a_Player->GetInventory().AddItem(cItem(E_ITEM_BUCKET)))
 			{
 				return false;
 			}
@@ -164,19 +177,15 @@ public:
 				// Plugin disagrees with the washing-away
 				return false;
 			}
-
-			cBlockHandler * Handler = BlockHandler(CurrentBlockType);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				Handler->DropBlock(ChunkInterface, *a_World, a_PluginInterface, a_Player, BlockPos.x, BlockPos.y, BlockPos.z);
-			}
+			a_World->DropBlockAsPickups(BlockPos, a_Player, nullptr);
 			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
 		// Place the actual fluid block:
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
+
+
 
 
 

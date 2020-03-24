@@ -8,8 +8,8 @@
 
 
 
-cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
+cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+	super(pkArrow, a_Creator, a_Pos, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
@@ -22,7 +22,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	SetSpeed(a_Speed);
 	SetMass(0.1);
 	SetGravity(-20.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
@@ -115,9 +115,13 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 		Damage += ExtraDamage;
 	}
 
+	double Knockback = 10;
+
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
-	double KnockbackAmount = 11 + 10 * PunchLevel;
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
+	unsigned int PunchLevelMultiplier = 8;
+
+	Knockback += PunchLevelMultiplier * PunchLevel;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, Knockback);
 
 	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
@@ -125,7 +129,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	}
 
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("entity.arrow.hit_player", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("entity.arrow.hit", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	Destroy();
 }
@@ -141,7 +145,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		// Do not add the arrow to the inventory when the player is in creative:
 		if (!a_Dest.IsGameModeCreative())
 		{
-			int NumAdded = a_Dest.GetInventory().AddItem(E_ITEM_ARROW);
+			int NumAdded = a_Dest.GetInventory().AddItem(cItem(E_ITEM_ARROW));
 			if (NumAdded == 0)
 			{
 				// No space in the inventory
@@ -198,17 +202,16 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		int RelPosX = m_HitBlockPos.x - a_Chunk.GetPosX() * cChunkDef::Width;
-		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
-		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
+		auto relPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
+		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 
-		if (Chunk == nullptr)
+		if (chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;
 		}
 
-		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		if (chunk->GetBlock(relPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}

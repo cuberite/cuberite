@@ -73,14 +73,6 @@ public:
 	}
 
 
-	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		BLOCKTYPE Block;
-		NIBBLETYPE BlockMeta;
-		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
-
-		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
-	}
 
 
 

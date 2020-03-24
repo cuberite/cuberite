@@ -83,6 +83,12 @@ return
 			IsLoaded =
 			{
 				Notes = "",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
 			},
 			SetName =
 			{
@@ -811,6 +817,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			HOOK_PLAYER_BROKEN_BLOCK =
 			{
 				Notes = "Called after a player has broken a block.",
+			},
+			HOOK_PLAYER_CROUCHED =
+			{
+				Notes = "Called when a player crouches.",
 			},
 			HOOK_PLAYER_DESTROYED =
 			{
