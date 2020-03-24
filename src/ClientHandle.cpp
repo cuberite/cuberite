@@ -1555,7 +1555,8 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
 		this->Kick(std::string("Please don't exceed the maximum message length of ")
-		+ std::to_string(MAX_CHAT_MSG_LENGTH));
+			+ std::to_string(MAX_CHAT_MSG_LENGTH)
+		);
 		return;
 	}
 	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
