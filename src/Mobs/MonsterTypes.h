@@ -42,7 +42,7 @@ enum eMonsterType
 	mtWolf         = 86,
 	mtZombie       = 87,
 	mtZombiePigman = 53,
-	mtMax          = 120,  // This is just a hotfix for https://forum.cuberite.org/thread-1616.html. Tolua is too bad to find the highest value, so this is needed.
+	mtMax          = 87,  // This is just a hotfix for https://forum.cuberite.org/thread-1616.html. Tolua is too bad to find the highest value, so this is needed.
 } ;
 
 // tolua_end
