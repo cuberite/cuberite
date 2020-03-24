@@ -163,35 +163,37 @@ void cClientHandle::Destroy(void)
 	m_Self.reset();
 	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
 
-	if (player != nullptr)
+	if (player == nullptr)
 	{
-		// Atomically decrement player count (in world or server thread)
-		cRoot::Get()->GetServer()->PlayerDestroyed();
-
-		auto world = player->GetWorld();
-		if (world != nullptr)
-		{
-			player->StopEveryoneFromTargetingMe();
-			player->SetIsTicking(false);
-
-			if (!m_PlayerPtr)
-			{
-				// If our own smart pointer is unset, player has been transferred to world
-        ASSERT(world->IsPlayerReferencedInWorldOrChunk(*player));
-
-				m_PlayerPtr = world->RemovePlayer(*player);
-
-				// And RemovePlayer should have returned a valid smart pointer
-				ASSERT(m_PlayerPtr);
-			}
-			else
-			{
-				// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
-				ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
-			}
-		}
-		player->RemoveClientHandle();
+		return;
 	}
+
+	// Atomically decrement player count (in world or server thread)
+	cRoot::Get()->GetServer()->PlayerDestroyed();
+
+	auto world = player->GetWorld();
+	if (world != nullptr)
+	{
+		player->StopEveryoneFromTargetingMe();
+		player->SetIsTicking(false);
+
+		if (!m_PlayerPtr)
+		{
+			// If our own smart pointer is unset, player has been transferred to world
+			ASSERT(world->IsPlayerReferencedInWorldOrChunk(*player));
+
+			m_PlayerPtr = world->RemovePlayer(*player);
+
+			// And RemovePlayer should have returned a valid smart pointer
+			ASSERT(m_PlayerPtr);
+		}
+		else
+		{
+			// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
+			ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
+		}
+	}
+	player->RemoveClientHandle();
 }
 
 
