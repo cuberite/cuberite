@@ -377,7 +377,7 @@ void cProtocol_1_13::SendSpawnMob(const cMonster & a_Mob)
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
+	Pkt.WriteVarInt32(GetProtocolMobID(a_Mob.GetMobType()));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -417,6 +417,49 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
 void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	// TODO
+}
+
+
+
+
+
+UInt32 cProtocol_1_13::GetProtocolMobID(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtBat:                   return 3;
+		case mtBlaze:                 return 4;
+		case mtCaveSpider:            return 6;
+		case mtChicken:               return 7;
+		case mtCow:                   return 9;
+		case mtCreeper:               return 10;
+		case mtEnderDragon:           return 17;
+		case mtEnderman:              return 18;
+		case mtGhast:                 return 26;
+		case mtGiant:                 return 27;
+		case mtGuardian:              return 28;
+		case mtHorse:                 return 29;
+		case mtIronGolem:             return 80;
+		case mtMagmaCube:             return 38;
+		case mtMooshroom:             return 47;
+		case mtOcelot:                return 48;
+		case mtPig:                   return 51;
+		case mtRabbit:                return 56;
+		case mtSheep:                 return 58;
+		case mtSilverfish:            return 61;
+		case mtSkeleton:              return 62;
+		case mtSlime:                 return 64;
+		case mtSnowGolem:             return 66;
+		case mtSpider:                return 69;
+		case mtSquid:                 return 70;
+		case mtVillager:              return 79;
+		case mtWitch:                 return 82;
+		case mtWither:                return 83;
+		case mtWolf:                  return 86;
+		case mtZombie:                return 87;
+		case mtZombiePigman:          return 53;
+	}
+	UNREACHABLE("Unsupported mob type");
 }
 
 

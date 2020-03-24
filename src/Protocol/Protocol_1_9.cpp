@@ -1883,7 +1883,7 @@ int cProtocol_1_9_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_9_0::GetProtocolMobID(int a_MobType)
+UInt32 cProtocol_1_9_0::GetProtocolMobID(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
@@ -1918,8 +1918,8 @@ UInt32 cProtocol_1_9_0::GetProtocolMobID(int a_MobType)
 		case mtWolf:                  return 95;
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
-		default:                      return a_MobType;
 	}
+	UNREACHABLE("Unsupported mob type");
 }
 
 
