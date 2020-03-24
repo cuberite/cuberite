@@ -139,8 +139,8 @@ public:
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
 
-	/** Mob IDs changed in Minecraft 1.13, remap for older versions */
-	static UInt32 GetProtocolMobID(int a_MobType);
+	/** Converts eMonsterType to protocol-specific mob IDs */
+	static UInt32 GetProtocolMobID(eMonsterType a_MobType);
 
 	/** Minecraft 1.8 use other locations to spawn the item frame. This function converts the 1.7 positions to 1.8 positions. */
 	static void FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw);
