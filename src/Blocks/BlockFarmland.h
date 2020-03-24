@@ -17,15 +17,24 @@
 
 
 class cBlockFarmlandHandler :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using super = cClearMetaOnDrop<cBlockHandler>;
+	using super = cBlockHandler;
 
 public:
 
 	cBlockFarmlandHandler(BLOCKTYPE a_BlockType):
 		super(a_BlockType)
 	{
+	}
+
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		return cItem(E_BLOCK_DIRT, 1, 0);
 	}
 
 

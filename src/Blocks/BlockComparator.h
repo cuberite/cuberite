@@ -10,9 +10,9 @@
 
 
 class cBlockComparatorHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>
+	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>;
+	using super = cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>;
 
 public:
 
@@ -43,6 +43,11 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+	}
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		return cItem(E_ITEM_COMPARATOR, 1, 0);
 	}
 
 	virtual bool GetPlacementBlockTypeMeta(
