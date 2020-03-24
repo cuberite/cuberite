@@ -1,17 +1,17 @@
 
 #pragma once
 
-#include "BlockEntity.h"
 #include "../Blocks/BlockPiston.h"
+#include "../BlockEntities/FurnaceEntity.h"
 #include "Mixins.h"
 
 
 
 
 class cBlockFurnaceHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>
+	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;
+	using super = cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>;
 
 public:
 
@@ -37,6 +37,21 @@ public:
 		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player.GetYaw(), 0);
 
 		return true;
+	}
+
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		cItems res(cItem(E_BLOCK_FURNACE, 1));  // We can't drop a lit furnace
+		if (a_BlockEntity != nullptr)
+		{
+			auto be = static_cast<cFurnaceEntity *>(a_BlockEntity);
+			res.AddItemGrid(be->GetContents());
+		}
+		return res;
 	}
 
 
