@@ -12,9 +12,9 @@
 
 
 class cBlockRedstoneRepeaterHandler:
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>
+	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>>;
+	using super = cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>;
 
 public:
 
@@ -32,6 +32,7 @@ public:
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
+
 		return true;
 	}
 
@@ -76,6 +77,11 @@ public:
 			}
 		}
 		return false;
+	}
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	{
+		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
 	}
 
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
