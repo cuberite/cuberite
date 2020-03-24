@@ -151,18 +151,11 @@ void cClientHandle::Destroy(void)
 		m_Link.reset();
 	}
 
-	// Temporary (#3115-will-fix): variable to keep track of whether the client authenticated and had the opportunity to have ownership transferred to the world
-	bool WasAddedToWorld = false;
+	if (!SetState(csDestroying))
 	{
-		cCSLock Lock(m_CSState);
-		WasAddedToWorld = (m_State >= csAuthenticated);
-		if (m_State >= csDestroying)
-		{
-			// Already called
-			LOGD("%s: client %p, \"%s\" already destroyed, bailing out", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
-			return;
-		}
-		m_State = csDestroying;
+		// Already called
+		LOGD("%s: client %p, \"%s\" already destroyed, bailing out", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
+		return;
 	}
 
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
@@ -181,10 +174,10 @@ void cClientHandle::Destroy(void)
 			player->StopEveryoneFromTargetingMe();
 			player->SetIsTicking(false);
 
-			if (WasAddedToWorld)
+			if (!m_PlayerPtr)
 			{
-				// If ownership was transferred, our own smart pointer should be unset
-				ASSERT(!m_PlayerPtr);
+				// If our own smart pointer is unset, player has been transferred to world
+        ASSERT(world->IsPlayerReferencedInWorldOrChunk(*player));
 
 				m_PlayerPtr = world->RemovePlayer(*player);
 
@@ -194,7 +187,6 @@ void cClientHandle::Destroy(void)
 			else
 			{
 				// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
-				ASSERT(m_PlayerPtr);
 				ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
 			}
 		}
