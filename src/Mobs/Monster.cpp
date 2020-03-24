@@ -883,7 +883,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::ResetAttackCooldown()
 {
-	m_AttackCoolDownTicksLeft = static_cast<int>(3 * 20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every 3 seconds
+	m_AttackCoolDownTicksLeft = static_cast<int>(20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every second
 }
 
 
