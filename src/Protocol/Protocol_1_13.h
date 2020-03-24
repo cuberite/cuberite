@@ -15,6 +15,7 @@ Declares the 1.13 protocol classes:
 #pragma once
 
 #include "Protocol_1_12.h"
+#include "../World.h"
 
 
 

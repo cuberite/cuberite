@@ -26,6 +26,7 @@ Implements the 1.13 protocol classes:
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
+#include "../World.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -427,6 +428,7 @@ UInt32 cProtocol_1_13::GetProtocolMobID(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
+		case mtInvalidType:           return -1;
 		case mtBat:                   return 3;
 		case mtBlaze:                 return 4;
 		case mtCaveSpider:            return 6;

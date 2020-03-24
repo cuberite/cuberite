@@ -23,6 +23,7 @@ Implements the 1.8 protocol classes:
 #include "../CompositeChat.h"
 #include "../Statistics.h"
 #include "../UUID.h"
+#include "../World.h"
 
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
