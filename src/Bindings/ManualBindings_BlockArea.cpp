@@ -164,6 +164,17 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	// Check and get the overloaded params:
 	cCuboid bounds;
 	auto nextIdx = readCuboidOverloadParams(L, 2, bounds);
+	bounds.Sort();
+	if (!(self->IsValidRelCoords(bounds.p1) && self->IsValidRelCoords(bounds.p2)))
+	{
+		return L.FApiParamError(
+			"The bounds ({0} - {1}) are out of range ({2} - {3})",
+			bounds.p1,
+			bounds.p2,
+			Vector3i(0, 0, 0),
+			(self->GetSize() - Vector3i{1, 1, 1})
+		);
+	}
 	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta = 0, blockLight = 0, blockSkyLight = 0x0f;
@@ -176,12 +187,6 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	{
 		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
-
-	// Check the coords, shift if needed:
-	bounds.Sort();
-	bounds.ClampX(0, self->GetSizeX()-1);
-	bounds.ClampY(0, self->GetSizeY()-1);
-	bounds.ClampZ(0, self->GetSizeZ()-1);
 
 	// Do the actual Fill:
 	self->FillRelCuboid(bounds, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
