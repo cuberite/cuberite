@@ -111,19 +111,37 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 	switch (a_MobType)
 	{
-		case mtGuardian:
-		{
-			return IsBlockWater(targetBlock) && IsBlockWater(blockBelow) && (a_RelPos.y >= 45) && (a_RelPos.y <= 62);
-		}
-
-		case mtSquid:
-		{
-			return IsBlockWater(targetBlock) && (a_RelPos.y >= 45) && (a_RelPos.y <= 62);
-		}
-
 		case mtBat:
 		{
-			return (a_RelPos.y <= 63) && (blockLight <= 4) && (skyLight <= 4) && (targetBlock == E_BLOCK_AIR) && !cBlockInfo::IsTransparent(blockAbove);
+			return (
+				(a_RelPos.y <= 63) &&
+				(blockLight <= 4) &&
+				(skyLight <= 4) &&
+				(targetBlock == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(blockAbove))
+			);
+		}
+
+		case mtBlaze:
+		case mtGhast:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
+				(random.RandBool())
+			);
+		}
+
+		case mtCaveSpider:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
+				(skyLight <= 7) &&
+				(blockLight <= 7) &&
+				(random.RandBool())
+			);
 		}
 
 		case mtChicken:
@@ -136,22 +154,22 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
 				(blockBelow == E_BLOCK_GRASS) &&
 				(skyLight >= 9)
 			);
 		}
 
-		case mtOcelot:
+		case mtCreeper:
+		case mtSkeleton:
+		case mtZombie:
 		{
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(
-					(blockBelow == E_BLOCK_GRASS) || (blockBelow == E_BLOCK_LEAVES) || (blockBelow == E_BLOCK_NEW_LEAVES)
-				) &&
-				(a_RelPos.y >= 62) &&
-				(random.RandBool(2.0 / 3.0))
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
+				(skyLight <= 7) &&
+				(blockLight <= 7) &&
+				(random.RandBool())
 			);
 		}
 
@@ -174,6 +192,55 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 				}
 			}
 			break;
+		}
+
+		case mtGuardian:
+		{
+			return (
+				IsBlockWater(targetBlock) &&
+				IsBlockWater(blockBelow) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
+			);
+		}
+
+		case mtMagmaCube:
+		case mtSlime:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
+				(
+					(a_RelPos.y <= 40) || (a_Biome == biSwampland)
+				)
+			);
+		}
+
+		case mtMooshroom:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(blockBelow == E_BLOCK_MYCELIUM) &&
+				(
+					(a_Biome == biMushroomShore) ||
+					(a_Biome == biMushroomIsland)
+				)
+			);
+		}
+
+		case mtOcelot:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(
+					(blockBelow == E_BLOCK_GRASS) || (blockBelow == E_BLOCK_LEAVES) || (blockBelow == E_BLOCK_NEW_LEAVES)
+				) &&
+				(a_RelPos.y >= 62) &&
+				(random.RandBool(2.0 / 3.0))
+			);
 		}
 
 		case mtSpider:
@@ -202,52 +269,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return canSpawn && hasFloor && (skyLight <= 7) && (blockLight <= 7);
 		}
 
-		case mtCaveSpider:
+		case mtSquid:
 		{
 			return (
-				(targetBlock == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
-				(skyLight <= 7) &&
-				(blockLight <= 7) &&
-				(random.RandBool())
-			);
-		}
-
-		case mtCreeper:
-		case mtSkeleton:
-		case mtZombie:
-		{
-			return (
-				(targetBlock == E_BLOCK_AIR) &&
-				(blockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
-				(skyLight <= 7) &&
-				(blockLight <= 7) &&
-				(random.RandBool())
-			);
-		}
-
-		case mtMagmaCube:
-		case mtSlime:
-		{
-			return (
-				(targetBlock == E_BLOCK_AIR) &&
-				(blockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
-				(
-					(a_RelPos.y <= 40) || (a_Biome == biSwampland)
-				)
-			);
-		}
-
-		case mtGhast:
-		case mtZombiePigman:
-		{
-			return (
-				(targetBlock == E_BLOCK_AIR) &&
-				(blockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
-				(random.RandBool(0.05))
+				IsBlockWater(targetBlock) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
 			);
 		}
 
@@ -270,16 +297,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtMooshroom:
+		case mtZombiePigman:
 		{
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(blockBelow == E_BLOCK_MYCELIUM) &&
-				(
-					(a_Biome == biMushroomShore) ||
-					(a_Biome == biMushroomIsland)
-				)
+				(!cBlockInfo::IsTransparent(blockBelow))
 			);
 		}
 
@@ -302,23 +325,6 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	// Check biomes first to get a list of animals
 	switch (a_Biome)
 	{
-		// Nether mobs and endermen only - no other mobs in the nether
-		case biNether:
-		{
-			ListOfSpawnables.insert(mtGhast);
-			ListOfSpawnables.insert(mtMagmaCube);
-			ListOfSpawnables.insert(mtZombiePigman);
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
-		// Endermen only - no other mobs in the end
-		case biEnd:
-		{
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
 		// Mooshroom only - no other mobs on mushroom islands
 		case biMushroomIsland:
 		case biMushroomShore:
@@ -400,6 +406,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		}
 	}
 
+	// Overworld
 	if (
 		(a_Biome != biDesertHills) &&
 		(a_Biome != biDesert) &&
@@ -422,6 +429,12 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	ListOfSpawnables.insert(mtSkeleton);
 	ListOfSpawnables.insert(mtCreeper);
 	ListOfSpawnables.insert(mtSquid);
+
+	// Nether
+	ListOfSpawnables.insert(mtBlaze);
+	ListOfSpawnables.insert(mtGhast);
+	ListOfSpawnables.insert(mtMagmaCube);
+	ListOfSpawnables.insert(mtZombiePigman);
 
 	return ListOfSpawnables;
 }
