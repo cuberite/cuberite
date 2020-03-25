@@ -179,9 +179,9 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 
 	// Check the coords, shift if needed:
 	bounds.Sort();
-	bounds.ClampX(0, self->GetSizeX());
-	bounds.ClampY(0, self->GetSizeY());
-	bounds.ClampZ(0, self->GetSizeZ());
+	bounds.ClampX(0, self->GetSizeX()-1);
+	bounds.ClampY(0, self->GetSizeY()-1);
+	bounds.ClampZ(0, self->GetSizeZ()-1);
 
 	// Do the actual Fill:
 	self->FillRelCuboid(bounds, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
