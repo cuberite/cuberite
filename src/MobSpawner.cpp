@@ -87,9 +87,6 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
 
-	auto & random = GetRandomProvider();
-	auto targetBlock = a_Chunk->GetBlock(a_RelPos);
-
 	// If too close to any player, don't spawn anything
 	auto absPos = a_Chunk->RelativeToAbsolute(a_RelPos);
 	static const double rangeLimit = 24;
@@ -101,6 +98,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 	{
 		return false;
 	}
+
+	auto & random = GetRandomProvider();
+	auto targetBlock = a_Chunk->GetBlock(a_RelPos);
 
 	auto blockLight = a_Chunk->GetBlockLight(a_RelPos);
 	auto skyLight = a_Chunk->GetSkyLight(a_RelPos);
@@ -240,14 +240,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
+		case mtBlaze:
 		case mtGhast:
 		case mtZombiePigman:
 		{
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(blockBelow)) &&
-				(random.RandBool(0.05))
+				(!cBlockInfo::IsTransparent(blockBelow))
 			);
 		}
 
@@ -302,23 +302,6 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	// Check biomes first to get a list of animals
 	switch (a_Biome)
 	{
-		// Nether mobs and endermen only - no other mobs in the nether
-		case biNether:
-		{
-			ListOfSpawnables.insert(mtGhast);
-			ListOfSpawnables.insert(mtMagmaCube);
-			ListOfSpawnables.insert(mtZombiePigman);
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
-		// Endermen only - no other mobs in the end
-		case biEnd:
-		{
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
 		// Mooshroom only - no other mobs on mushroom islands
 		case biMushroomIsland:
 		case biMushroomShore:
@@ -400,6 +383,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		}
 	}
 
+	// Overworld
 	if (
 		(a_Biome != biDesertHills) &&
 		(a_Biome != biDesert) &&
@@ -422,6 +406,12 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	ListOfSpawnables.insert(mtSkeleton);
 	ListOfSpawnables.insert(mtCreeper);
 	ListOfSpawnables.insert(mtSquid);
+
+	// Nether
+	ListOfSpawnables.insert(mtBlaze);
+	ListOfSpawnables.insert(mtGhast);
+	ListOfSpawnables.insert(mtMagmaCube);
+	ListOfSpawnables.insert(mtZombiePigman);
 
 	return ListOfSpawnables;
 }
