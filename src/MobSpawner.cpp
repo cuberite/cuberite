@@ -87,6 +87,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
 
+	auto & random = GetRandomProvider();
+	auto targetBlock = a_Chunk->GetBlock(a_RelPos);
+
 	// If too close to any player, don't spawn anything
 	auto absPos = a_Chunk->RelativeToAbsolute(a_RelPos);
 	static const double rangeLimit = 24;
@@ -98,9 +101,6 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 	{
 		return false;
 	}
-
-	auto & random = GetRandomProvider();
-	auto targetBlock = a_Chunk->GetBlock(a_RelPos);
 
 	auto blockLight = a_Chunk->GetBlockLight(a_RelPos);
 	auto skyLight = a_Chunk->GetSkyLight(a_RelPos);
