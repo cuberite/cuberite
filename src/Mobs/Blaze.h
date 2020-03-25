@@ -22,6 +22,9 @@ public:
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
 private:
+	// Specifies whether or not the blaze has started shooting fireballs
 	bool m_bIsCharging;
+
+	// Used for timing when shooting three fireballs in a row
 	int m_ChargeTimer;
 } ;

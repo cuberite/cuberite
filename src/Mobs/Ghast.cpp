@@ -81,13 +81,6 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		ResetAttackCooldown();
 	}
-
-	// Primitive way to fly
-	if (GetPosY() < GetRandomProvider().RandInt(60, 80)) {
-		AddSpeedY(1);
-	} else {
-		AddSpeedY(-1);
-	}
 }
 
 
