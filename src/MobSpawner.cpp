@@ -123,7 +123,6 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		}
 
 		case mtBlaze:
-		case mtGhast:
 		{
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
@@ -192,6 +191,15 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 				}
 			}
 			break;
+		}
+
+		case mtGhast:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(random.RandBool())
+			);
 		}
 
 		case mtGuardian:
