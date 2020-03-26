@@ -619,6 +619,7 @@ void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a
 	if ((chunk != nullptr) && chunk->IsValid())
 	{
 		chunk->SetMeta(relPos, a_BlockMeta, a_ShouldMarkDirty, a_ShouldInformClients);
+		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
 	}
 }
 
