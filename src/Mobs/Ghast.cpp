@@ -56,6 +56,26 @@ bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 
 
 
+bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	// No fall damage
+	if (a_TDI.DamageType == dtFalling)
+	{
+		return false;
+	}
+
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
+
+
+
 void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
@@ -88,11 +108,11 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_FlightCooldown = 5;
 		auto & Random = GetRandomProvider();
-		auto SpeedVector = Vector3d(Random.RandReal(-0.05, 0.05), Random.RandReal(-0.3, 0.3), Random.RandReal(-0.05, 0.05));
+		auto SpeedVector = Vector3d(Random.RandReal(-0.3, 0.3), Random.RandReal(-0.4, 0.4), Random.RandReal(-0.3, 0.3));
 
 		if (GetPosY() > 120)
 		{
-			SpeedVector = Vector3d(Random.RandReal(-0.1, 0.1), Random.RandReal(-0.35, 0.3), Random.RandReal(-0.1, 0.1));
+			SpeedVector = Vector3d(Random.RandReal(-0.4, 0.4), Random.RandReal(-0.45, 0.4), Random.RandReal(-0.4, 0.4));
 		}
 
 		AddSpeed(SpeedVector);
