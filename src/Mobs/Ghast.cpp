@@ -13,6 +13,8 @@ cGhast::cGhast(void) :
 	m_IsCharging(false),
 	m_TicksUntilShot(10)
 {
+	SetGravity(0);
+	SetAirDrag(0);
 }
 
 
@@ -78,6 +80,18 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
 
 		ResetAttackCooldown();
+	}
+	
+	// TODO: Better flying
+	auto & Random = GetRandomProvider();
+
+	if (GetPosY() > 120)
+	{
+		AddSpeed(Vector3d(Random.RandReal(-0.1, 0.1), Random.RandReal(-0.35, 0.3), Random.RandReal(-0.1, 0.1)));
+	}
+	else
+	{
+		AddSpeed(Vector3d(Random.RandReal(-0.05, 0.05), Random.RandReal(-0.3, 0.3), Random.RandReal(-0.05, 0.05)));
 	}
 }
 
