@@ -106,7 +106,7 @@ class cItemBottleOEnchantingHandler :
 	typedef cItemThrowableHandler super;
 public:
 	cItemBottleOEnchantingHandler(void) :
-		super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 10)
+		super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 14)
 	{
 	}
 };

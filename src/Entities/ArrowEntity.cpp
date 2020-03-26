@@ -115,9 +115,13 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 		Damage += ExtraDamage;
 	}
 
+	double Knockback = 10;
+
 	unsigned int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
-	double KnockbackAmount = 11 + 10 * PunchLevel;
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, KnockbackAmount);
+	unsigned int PunchLevelMultiplier = 8;
+
+	Knockback += PunchLevelMultiplier * PunchLevel;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, Knockback);
 
 	if (IsOnFire() && !a_EntityHit.IsInWater())
 	{
@@ -141,7 +145,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		// Do not add the arrow to the inventory when the player is in creative:
 		if (!a_Dest.IsGameModeCreative())
 		{
-			int NumAdded = a_Dest.GetInventory().AddItem(E_ITEM_ARROW);
+			int NumAdded = a_Dest.GetInventory().AddItem(cItem(E_ITEM_ARROW));
 			if (NumAdded == 0)
 			{
 				// No space in the inventory
@@ -198,7 +202,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		auto relPos = a_Chunk.RelativeToAbsolute(m_HitBlockPos);
+		auto relPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
 		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 
 		if (chunk == nullptr)

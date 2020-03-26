@@ -117,6 +117,7 @@ public:
 		HOOK_PLAYER_OPENING_WINDOW,
 		HOOK_PLAYER_PLACED_BLOCK,
 		HOOK_PLAYER_PLACING_BLOCK,
+		HOOK_PLAYER_CROUCHED,
 		HOOK_PLAYER_RIGHT_CLICK,
 		HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
 		HOOK_PLAYER_SHOOTING,
@@ -261,10 +262,11 @@ public:
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
+	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround);
 	bool CallHookPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window);
 	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
+	bool CallHookPlayerCrouched           (cPlayer & a_Player);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);

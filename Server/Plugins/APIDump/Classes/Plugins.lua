@@ -818,6 +818,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called after a player has broken a block.",
 			},
+			HOOK_PLAYER_CROUCHED =
+			{
+				Notes = "Called when a player crouches.",
+			},
 			HOOK_PLAYER_DESTROYED =
 			{
 				Notes = "Called when the {{cPlayer}} object is destroyed - a player has disconnected.",

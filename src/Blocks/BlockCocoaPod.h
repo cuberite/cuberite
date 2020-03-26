@@ -67,11 +67,11 @@ public:
 		auto typeMeta = meta & 0x03;
 		auto growState = meta >> 2;
 
-		if (growState >= 3)
+		if (growState >= 2)
 		{
 			return 0;
 		}
-		auto newState = std::min(growState + a_NumStages, 3);
+		auto newState = std::min(growState + a_NumStages, 2);
 		a_Chunk.SetMeta(a_RelPos, static_cast<NIBBLETYPE>(newState << 2 | typeMeta));
 		return newState - growState;
 	}

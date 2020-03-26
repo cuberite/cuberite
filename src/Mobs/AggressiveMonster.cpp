@@ -11,8 +11,8 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
-	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height)
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height) :
+	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
 }
@@ -102,7 +102,9 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 
 	// Setting this higher gives us more wiggle room for attackrate
 	ResetAttackCooldown();
-	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+
+	double KnockbackAmount = 9;
+	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, KnockbackAmount);
 
 	return true;
 }

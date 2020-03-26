@@ -43,6 +43,9 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
+/** Maximum number of bytes that a chat message sent by a player may consist of */
+#define MAX_CHAT_MSG_LENGTH 1024
+
 /** The interval for sending pings to clients.
 Vanilla sends one ping every 1 second. */
 static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
@@ -839,7 +842,27 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
+	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
+
+	#ifdef __clang__
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wfloat-equal"
+	#endif
+
+	if (
+		(OldPosition == NewPosition) &&
+		(OldStance == a_Stance) &&
+		(PreviousIsOnGround == a_IsOnGround)
+	)
+	{
+		// Nothing changed, no need to do anything
+		return;
+	}
+
+	#ifdef __clang__
+		#pragma clang diagnostic pop
+	#endif
 
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
@@ -849,7 +872,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition, PreviousIsOnGround))
 	{
 		SendPlayerMoveLook();
 		return;
@@ -1529,6 +1552,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 void cClientHandle::HandleChat(const AString & a_Message)
 {
+	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
+	{
+		this->Kick(std::string("Please don't exceed the maximum message length of ")
+			+ std::to_string(MAX_CHAT_MSG_LENGTH)
+		);
+		return;
+	}
 	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
 
 	// If a command, perform it:

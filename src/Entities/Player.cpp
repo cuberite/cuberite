@@ -712,10 +712,6 @@ void cPlayer::FinishEating(void)
 	{
 		return;
 	}
-	if (!IsGameModeCreative())
-	{
-		GetInventory().RemoveOneEquippedItem();
-	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 }
 
@@ -867,12 +863,17 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 void cPlayer::SetCrouch(bool a_IsCrouched)
 {
 	// Set the crouch status, broadcast to all visible players
-
 	if (a_IsCrouched == m_IsCrouched)
 	{
 		// No change
 		return;
 	}
+
+	if (a_IsCrouched)
+	{
+		cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
+	}
+
 	m_IsCrouched = a_IsCrouched;
 	m_World->BroadcastEntityMetadata(*this);
 }
@@ -1000,10 +1001,6 @@ void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 
 bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	SetSpeed(0, 0, 0);
-	// Prevents knocking the player in the wrong direction due to
-	// the speed vector problems, see #2865
-	// In the future, the speed vector should be fixed
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
 		if (IsGameModeCreative() || IsGameModeSpectator())
@@ -1225,7 +1222,7 @@ void cPlayer::Respawn(void)
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		MoveToWorld(m_SpawnWorld, GetLastBedPos(), false);
+		MoveToWorld(m_SpawnWorld, GetLastBedPos(), false, false);
 	}
 	else
 	{

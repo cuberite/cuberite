@@ -8,7 +8,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.4, 0.7),
+	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", "entity.chicken.ambient", 0.4, 0.7),
 	m_EggDropTimer(0)
 {
 	SetGravity(-2.0f);
