@@ -37,7 +37,7 @@ void cBlockPistonHandler::OnBroken(
 		auto extPos = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
 		if (a_ChunkInterface.GetBlock(extPos) == E_BLOCK_PISTON_EXTENSION)
 		{
-			a_ChunkInterface.DropBlockAsPickups(extPos);
+			a_ChunkInterface.SetBlock(extPos.x, extPos.y, extPos.z, E_BLOCK_AIR, 0);
 		}
 	}
 }
@@ -141,6 +141,11 @@ bool cBlockPistonHandler::CanPushBlock(
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
 	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
+
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return !a_RequirePushable;
+	}
 
 	if (currBlock == E_BLOCK_AIR)
 	{
@@ -292,8 +297,8 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 			}
 
 			// Remove extension, update base state
-			World.FastSetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
-			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
+			World.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonMeta & ~(8));
+			World.SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
 
 			// (Retraction is always successful, but play in the task for consistency)
 			World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
@@ -345,12 +350,11 @@ void cBlockPistonHeadHandler::OnBroken(
 {
 	// Drop the base of the piston:
 	auto basePos = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
-	if (cChunkDef::IsValidHeight(basePos.y))
+	if (cChunkDef::IsValidHeight(basePos.y) && cBlockPistonHandler::IsExtended(a_ChunkInterface.GetBlockMeta(basePos)))
 	{
 		a_ChunkInterface.DropBlockAsPickups(basePos);
 	}
 }
-
 
 
 
