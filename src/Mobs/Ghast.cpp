@@ -86,7 +86,7 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// TODO: Better flying
 	if (m_FlightCooldown-- == 0)
 	{
-		m_FlightCooldown = 10;
+		m_FlightCooldown = 5;
 		auto & Random = GetRandomProvider();
 		auto SpeedVector = Vector3d(Random.RandReal(-0.05, 0.05), Random.RandReal(-0.3, 0.3), Random.RandReal(-0.05, 0.05));
 
