@@ -64,12 +64,7 @@ bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if (!super::DoTakeDamage(a_TDI))
-	{
-		return false;
-	}
-
-	return true;
+	return super::DoTakeDamage(a_TDI);
 }
 
 
@@ -118,6 +113,5 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		AddSpeed(SpeedVector);
 	}
 }
-
 
 
