@@ -10,11 +10,9 @@
 
 cGhast::cGhast(void) :
 	super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
-	m_bIsCharging(false),
-	m_ChargeTimer(0)
+	m_IsCharging(false),
+	m_TicksUntilShot(10)
 {
-	SetGravity(0);
-	SetAirDrag(0.1f);
 }
 
 
@@ -38,13 +36,13 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 {
-	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_bIsCharging))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_IsCharging))
 	{
 		auto & Random = GetRandomProvider();
 		auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
 
 		m_World->BroadcastSoundEffect("entity.ghast.warn", GetPosition(), 4.0f, SoundPitchMultiplier * 0.9f);
-		m_bIsCharging = true;
+		m_IsCharging = true;
 		m_World->BroadcastEntityMetadata(*this);
 		return true;
 	}
@@ -64,10 +62,10 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if ((m_bIsCharging) && (m_ChargeTimer++ == 10))
+	if ((m_IsCharging) && (m_TicksUntilShot-- == 0))
 	{
-		m_ChargeTimer = 0;
-		m_bIsCharging = false;
+		m_TicksUntilShot = 10;
+		m_IsCharging = false;
 		m_World->BroadcastEntityMetadata(*this);
 
 		Vector3d Speed = GetLookVector() * 20;

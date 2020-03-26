@@ -21,14 +21,15 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
-	bool IsCharging(void) const { return m_bIsCharging; }
+	bool IsCharging(void) const { return m_IsCharging; }
 
 private:
-	// Specifies whether or not the ghast has started shooting a fireball
-	bool m_bIsCharging;
+	/** Specifies whether or not the ghast has started shooting a fireball. */
+	bool m_IsCharging;
 	
-	// Used to determine when to shoot a fireball, from the moment the ghast started charging
-	int m_ChargeTimer;
+	/** Number of ticks until a projectile is created.
+	Only used while m_IsCharging is true. */
+	int m_TicksUntilShot;
 } ;
 
 

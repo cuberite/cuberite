@@ -10,7 +10,7 @@
 
 cBlaze::cBlaze(void) :
 	super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6, 1.8),
-	m_bIsCharging(false),
+	m_IsCharging(false),
 	m_ChargeTimer(0)
 {
 	SetGravity(-8.0f);
@@ -36,9 +36,9 @@ void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 {
-	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_bIsCharging))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_IsCharging))
 	{
-		m_bIsCharging = true;
+		m_IsCharging = true;
 		return true;
 	}
 	return false;
@@ -58,7 +58,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_bIsCharging)
+	if (m_IsCharging)
 	{
 		m_ChargeTimer++;
 		if (
@@ -78,10 +78,10 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 	
-	if ((m_bIsCharging) && (m_ChargeTimer > 15))
+	if ((m_IsCharging) && (m_ChargeTimer > 15))
 	{
 		m_ChargeTimer = 0;
-		m_bIsCharging = false;
+		m_IsCharging = false;
 		ResetAttackCooldown();
 	}
 }
