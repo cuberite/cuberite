@@ -26,7 +26,7 @@ public:
 private:
 	/** Specifies whether or not the ghast has started shooting a fireball. */
 	bool m_IsCharging;
-	
+
 	/** Number of ticks until a projectile is created.
 	Only used while m_IsCharging is true. */
 	int m_TicksUntilShot;

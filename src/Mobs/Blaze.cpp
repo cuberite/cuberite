@@ -48,7 +48,6 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 
 
 
-
 void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
@@ -77,7 +76,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
 		}
 	}
-	
+
 	if ((m_IsCharging) && (m_ChargeTimer > 15))
 	{
 		m_ChargeTimer = 0;

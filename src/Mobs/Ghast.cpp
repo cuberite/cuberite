@@ -81,7 +81,7 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		ResetAttackCooldown();
 	}
-	
+
 	// TODO: Better flying
 	auto & Random = GetRandomProvider();
 	auto SpeedVector = Vector3d(Random.RandReal(-0.05, 0.05), Random.RandReal(-0.3, 0.3), Random.RandReal(-0.05, 0.05));
@@ -90,7 +90,7 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		SpeedVector = Vector3d(Random.RandReal(-0.1, 0.1), Random.RandReal(-0.35, 0.3), Random.RandReal(-0.1, 0.1));
 	}
-	
+
 	AddSpeed(SpeedVector);
 }
 
