@@ -396,7 +396,14 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (ShouldPlaySound)
 		{
 			auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-			m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			auto SoundVolume = 1.0f;
+
+			if (GetMobType() == mtGhast) {
+				// Ghasts are loud...
+				SoundVolume = 10.0f;
+			}
+
+			m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), SoundVolume, SoundPitchMultiplier * 1.0f);
 		}
 		m_AmbientSoundTimer = 100;
 	}
