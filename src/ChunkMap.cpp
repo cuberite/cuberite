@@ -639,7 +639,14 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 		NIBBLETYPE blockMeta;
 		GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
 		cChunkInterface ChunkInterface(this);
-		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
+
+		// Hotfix for https://github.com/cuberite/cuberite/issues/4468
+		// Should be removed when a proper fix is found.
+		if ((blockType != E_BLOCK_PISTON) && (blockType != E_BLOCK_STICKY_PISTON) && (blockType != E_BLOCK_PISTON_EXTENSION))
+		{
+			BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
+		}
+
 		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
 		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
