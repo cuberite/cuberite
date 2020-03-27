@@ -104,7 +104,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
-		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSX_TOINT) == 0))
+		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSZ_TOINT) == 0))
 	{
 		if ((!m_CanPickupItem) && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
