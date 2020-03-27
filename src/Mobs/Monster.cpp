@@ -660,6 +660,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtSkeleton:
 		case mtSpider:
 		case mtWitch:
+		case mtWitherSkeleton:
 		case mtZombie:
 		case mtZombiePigman:
 		case mtSlime:
