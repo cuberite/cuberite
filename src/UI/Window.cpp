@@ -21,7 +21,7 @@
 
 
 
-char cWindow::m_WindowIDCounter = 1;
+Byte cWindow::m_WindowIDCounter = 1;
 
 
 

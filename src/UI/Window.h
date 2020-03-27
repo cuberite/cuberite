@@ -192,7 +192,7 @@ protected:
 
 	cWindowOwner * m_Owner;
 
-	static char m_WindowIDCounter;
+	static Byte m_WindowIDCounter;
 
 	/** Sets the internal flag as "destroyed"; notifies the owner that the window is destroying */
 	virtual void Destroy(void);
