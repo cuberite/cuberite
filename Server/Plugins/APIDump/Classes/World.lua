@@ -939,6 +939,35 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "If there is a furnace at the specified coords, calls the CallbackFunction with the {{cFurnaceEntity}} parameter representing the furnace. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}})</pre> The function returns false if there is no furnace, or if there is, it returns the bool value that the callback has returned.",
 			},
+			DoWithHopperAt =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "If there is a hopper at the specified coords, calls the CallbackFunction with the {{cHopperEntity}} parameter representing the hopper. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cHopperEntity|cHopperEntity}})</pre> The function returns false if there is no hopper, or if there is, it returns the bool value that the callback has returned.",
+			},
 			DoWithMobHeadAt =
 			{
 				Params =
