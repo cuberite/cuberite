@@ -292,7 +292,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(blockBelow == E_BLOCK_NETHER_BRICK) &&
+				//(blockBelow == E_BLOCK_NETHER_BRICK) &&
 				(skyLight <= 7) &&
 				(blockLight <= 7) &&
 				(random.RandBool())
@@ -478,7 +478,7 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 		{
 			a_MaxPackSize = 5;
 		}
-		if (m_MobType == mtWolf)
+		else if (m_MobType == mtWolf)
 		{
 			a_MaxPackSize = 8;
 		}
