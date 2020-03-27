@@ -474,6 +474,10 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 		{
 			return nullptr;
 		}
+		if (m_MobType == mtWitherSkeleton)
+		{
+			a_MaxPackSize = 5;
+		}
 		if (m_MobType == mtWolf)
 		{
 			a_MaxPackSize = 8;
