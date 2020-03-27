@@ -230,7 +230,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		else
 		{
 			// Don't let the mob move too much if he's falling.
-			Distance *= 2.25f;
+			Distance *= 0.25f;
 		}
 		// Apply walk speed:
 		Distance *= m_RelativeWalkSpeed;
@@ -315,7 +315,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 
 	bool a_IsFollowingPath = false;
-	if (m_PathfinderActivated)
+	if (m_PathfinderActivated && (GetMobType() != mtGhast))  // Pathfinder is currently disabled for ghasts, which have their own flying mechanism
 	{
 		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 		{
@@ -872,8 +872,6 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d newloc = GetPosition();
 		newloc.x = (GetTarget()->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
 		newloc.z = (GetTarget()->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
-		SetSpeedX(GetSpeedX() * 1.2);
-		SetSpeedZ(GetSpeedZ() * 1.2);
 		MoveToPosition(newloc);
 	}
 	else
