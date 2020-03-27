@@ -39,7 +39,7 @@ void cWitherSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
 	AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
-	AddRandomUncommonDropItem(a_Drops, 8.5f, E_ITEM_STONE_SWORD, Random.RandInt<short>(50));
+	AddRandomUncommonDropItem(a_Drops, 8.5f, E_ITEM_STONE_SWORD, GetRandomProvider().RandInt<short>(50));
 
 	cItems RareDrops;
 	RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));

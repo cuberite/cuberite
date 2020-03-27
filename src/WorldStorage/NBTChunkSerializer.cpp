@@ -870,11 +870,6 @@ public:
 					mWriter.AddInt("Size", static_cast<const cSlime *>(a_Monster)->GetSize());
 					break;
 				}
-				case mtSkeleton:
-				{
-					mWriter.AddByte("SkeletonType", (static_cast<const cSkeleton *>(a_Monster)->IsWither() ? 1 : 0));
-					break;
-				}
 				case mtVillager:
 				{
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
@@ -928,6 +923,7 @@ public:
 				case mtIronGolem:
 				case mtMooshroom:
 				case mtSilverfish:
+				case mtSkeleton:
 				case mtSnowGolem:
 				case mtSpider:
 				case mtSquid:

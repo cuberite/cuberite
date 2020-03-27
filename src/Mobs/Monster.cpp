@@ -87,7 +87,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
-	, m_EscapeTimer(0)
 	, m_MobType(a_MobType)
 	, m_CustomName("")
 	, m_CustomNameAlwaysVisible(false)
@@ -868,8 +867,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 
-	//if (GetTarget() != nullptr)
-	if (m_EscapeTimer++ < 60)
+	if (GetTarget() != nullptr)
 	{
 		Vector3d newloc = GetPosition();
 		newloc.x = (GetTarget()->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
@@ -880,7 +878,6 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		m_EscapeTimer = 0;
 		m_EMState = IDLE;  // This shouldnt be required but just to be safe
 	}
 }
@@ -1181,11 +1178,6 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		{
 			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtSkeleton:
-		{
-			// TODO: Actual detection of spawning in Nether
-			return cpp14::make_unique<cSkeleton>(false);
-		}
 		case mtVillager:
 		{
 			int VillagerType = Random.RandInt(6);
@@ -1232,6 +1224,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtRabbit:         return cpp14::make_unique<cRabbit>();
 		case mtSheep:          return cpp14::make_unique<cSheep>();
 		case mtSilverfish:     return cpp14::make_unique<cSilverfish>();
+		case mtSkeleton:       return cpp14::make_unique<cSkeleton>();
 		case mtSnowGolem:      return cpp14::make_unique<cSnowGolem>();
 		case mtSpider:         return cpp14::make_unique<cSpider>();
 		case mtSquid:          return cpp14::make_unique<cSquid>();

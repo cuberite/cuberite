@@ -889,15 +889,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -939,6 +930,14 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			// TODO: Use boss bar packet for health
 			break;
 		}  // case mtWither
+
+		case mtWitherSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);  // Is wither skeleton
+			break;
+		}  // case mtWitherSkeleton
 
 		case mtWolf:
 		{

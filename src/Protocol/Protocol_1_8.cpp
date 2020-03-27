@@ -3714,14 +3714,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtRabbit
 
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -3757,6 +3749,13 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
 			break;
 		}  // case mtWither
+
+		case mtWitherSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(0x0d);
+			a_Pkt.WriteBEUInt8(1);  // Is wither skeleton
+			break;
+		}  // case mtWitherSkeleton
 
 		case mtWolf:
 		{

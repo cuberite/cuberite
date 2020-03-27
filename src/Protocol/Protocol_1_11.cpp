@@ -1094,17 +1094,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			// XXX Skeletons are separate entities; all skeletons are currently treated as regular ones
-
-			// auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			// a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			// a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);

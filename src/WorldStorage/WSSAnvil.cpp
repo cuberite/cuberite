@@ -2665,15 +2665,7 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
-	if (TypeIdx < 0)
-	{
-		return;
-	}
-
-	bool Type = ((a_NBT.GetByte(TypeIdx) == 1) ? true : false);
-
-	std::unique_ptr<cSkeleton> Monster = cpp14::make_unique<cSkeleton>(Type);
+	std::unique_ptr<cSkeleton> Monster = cpp14::make_unique<cSkeleton>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
