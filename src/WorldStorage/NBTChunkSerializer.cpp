@@ -738,6 +738,7 @@ public:
 			case mtVillager:      EntityClass = "Villager";       break;
 			case mtWitch:         EntityClass = "Witch";          break;
 			case mtWither:        EntityClass = "WitherBoss";     break;
+			case mtWitherSkeleton:        EntityClass = "WitherSkeleton";     break;
 			case mtWolf:          EntityClass = "Wolf";           break;
 			case mtZombie:        EntityClass = "Zombie";         break;
 			case mtZombiePigman:  EntityClass = "PigZombie";      break;
@@ -931,6 +932,7 @@ public:
 				case mtSpider:
 				case mtSquid:
 				case mtWitch:
+				case mtWitherSkeleton:
 				{
 					// Other mobs have no special tags.
 					break;

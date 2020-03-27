@@ -227,6 +227,7 @@ protected:
 	void LoadVillagerFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWitchFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWitherFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadWitherSkeletonFromNBT  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWolfFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);

@@ -33,6 +33,7 @@ SET (SRCS
 	Villager.cpp
 	Witch.cpp
 	Wither.cpp
+	WitherSkeleton.cpp
 	Wolf.cpp
 	Zombie.cpp
 	ZombiePigman.cpp)
@@ -74,6 +75,7 @@ SET (HDRS
 	Villager.h
 	Witch.h
 	Wither.h
+	WitherSkeleton.h
 	Wolf.h
 	Zombie.h
 	ZombiePigman.h)

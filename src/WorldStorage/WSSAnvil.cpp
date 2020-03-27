@@ -1563,6 +1563,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
 		{ "WitherBoss",                    &cWSSAnvil::LoadWitherFromNBT },
 		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
+		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherFromNBT },
+		{ "minecraft:wither_skeleton",     &cWSSAnvil::LoadWitherSkeletonFromNBT },
 		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
 		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },
 		{ "Zombie",                        &cWSSAnvil::LoadZombieFromNBT },
@@ -2857,6 +2859,26 @@ void cWSSAnvil::LoadWitherFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (CurrLine > 0)
 	{
 		Monster->SetWitherInvulnerableTicks(static_cast<unsigned int>(a_NBT.GetInt(CurrLine)));
+	}
+
+	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadWitherSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::unique_ptr<cWitherSkeleton> Monster = cpp14::make_unique<cWitherSkeleton>();
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
