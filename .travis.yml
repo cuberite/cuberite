@@ -19,16 +19,15 @@ matrix:
     # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
     - os: osx
       compiler: clang
-      addons: &ccache_macos
-        homebrew:
-          packages:
-            - ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Release
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE
     - os: osx
       compiler: clang
-      addons: *ccache_macos
       env: *Debug
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
     # Default clang
     - compiler: clang
       env: *Release
