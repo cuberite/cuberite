@@ -295,7 +295,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 				(!cBlockInfo::IsTransparent(blockBelow)) &&
 				(skyLight <= 7) &&
 				(blockLight <= 7) &&
-				(random.RandBool())
+				(random.RandBool(0.6))
 			);
 		}
 
