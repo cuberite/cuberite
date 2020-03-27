@@ -943,7 +943,9 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtSquid:
+		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;

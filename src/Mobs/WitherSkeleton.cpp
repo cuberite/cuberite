@@ -19,12 +19,13 @@ cWitherSkeleton::cWitherSkeleton(void) :
 
 bool cWitherSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
-	if (GetTarget() != nullptr)
+	if (GetTarget() == nullptr)
 	{
-		GetTarget()->AddEntityEffect(cEntityEffect::effWither, 200, 0);
-		return true;
+		return false;
 	}
-	return false;
+
+	GetTarget()->AddEntityEffect(cEntityEffect::effWither, 200, 0);
+	return super::Attack(a_Dt);
 }
 
 
