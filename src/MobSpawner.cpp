@@ -198,7 +198,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				(random.RandBool())
+				(random.RandBool(0.1))
 			);
 		}
 
