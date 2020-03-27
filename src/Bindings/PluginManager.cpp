@@ -154,8 +154,9 @@ void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
 	a_Settings.AddKeyName("Plugins");
-	a_Settings.AddValue("Plugins", "Plugin", "Core");
-	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddValue("Plugins", "Core", "1");
+	a_Settings.AddValue("Plugins", "ChatLog", "1");
+	a_Settings.AddValue("Plugins", "ProtectionAreas", "0");
 }
 
 
@@ -1733,19 +1734,37 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 		InsertDefaultPlugins(a_Settings);
 	}
 
-	// Get the list of plugins to load:
 	AStringVector res;
-	auto Values = a_Settings.GetValues("Plugins");
-	for (auto NameValue : Values)
+
+	// Get the old format plugin list, and migrate it.
+	// Upgrade path added on 2020-03-27
+	auto OldValues = a_Settings.GetValues("Plugins");
+	for (auto NameValue : OldValues)
 	{
 		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
 		{
 			AString PluginFile = NameValue.second;
-			if (!PluginFile.empty())
+			if (
+				!PluginFile.empty() &&
+				(PluginFile != "0") &&
+				(PluginFile != "1")
+			)
 			{
-				res.push_back(PluginFile);
+				a_Settings.DeleteValue("Plugins", ValueName);
+				a_Settings.SetValue("Plugins", PluginFile, "1");
 			}
+		}
+	}  // for i - ini values
+
+	// Get the list of plugins to load:
+	auto Values = a_Settings.GetValues("Plugins");
+	for (auto NameValue : Values)
+	{
+		AString Enabled = NameValue.second;
+		if (Enabled == "1")
+		{
+			res.push_back(NameValue.first);
 		}
 	}  // for i - ini values
 
