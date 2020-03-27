@@ -292,7 +292,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return (
 				(targetBlock == E_BLOCK_AIR) &&
 				(blockAbove == E_BLOCK_AIR) &&
-				//(blockBelow == E_BLOCK_NETHER_BRICK) &&
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
 				(skyLight <= 7) &&
 				(blockLight <= 7) &&
 				(random.RandBool())
