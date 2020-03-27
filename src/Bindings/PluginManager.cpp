@@ -1736,7 +1736,8 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 
 	AStringVector res;
 
-	// Get the old format plugin list, and migrate it:
+	// Get the old format plugin list, and migrate it.
+	// Upgrade path added on 27/03/2020
 	auto OldValues = a_Settings.GetValues("Plugins");
 	for (auto NameValue : OldValues)
 	{
@@ -1744,7 +1745,11 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 		if (ValueName.compare("Plugin") == 0)
 		{
 			AString PluginFile = NameValue.second;
-			if (!PluginFile.empty())
+			if (
+				!PluginFile.empty() &&
+				(PluginFile != "0") &&
+				(PluginFile != "1")
+			)
 			{
 				a_Settings.DeleteValue("Plugins", ValueName);
 				a_Settings.SetValue("Plugins", PluginFile, "1");
