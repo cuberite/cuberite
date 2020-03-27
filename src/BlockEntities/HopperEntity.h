@@ -33,6 +33,8 @@ public:
 		TICKS_PER_TRANSFER = 8,  ///< How many ticks at minimum between two item transfers to or from the hopper
 	} ;
 
+
+
 	// tolua_end
 
 	BLOCKENTITY_PROTODEF(cHopperEntity)
@@ -44,6 +46,8 @@ public:
 	Returns <false, undefined> if unattached.
 	Exported in ManualBindings.cpp. */
 	std::pair<bool, Vector3i> GetOutputBlockPos(NIBBLETYPE a_BlockMeta);
+
+	void SetLocked(bool a_Value);
 
 protected:
 
@@ -91,6 +95,10 @@ protected:
 
 	/** Moves one piece to the specified entity's contents' slot. Returns true if contents have changed. */
 	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
+
+private:
+
+	bool m_Locked;
 } ;  // tolua_export
 
 

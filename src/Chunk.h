@@ -27,6 +27,7 @@ class cChunkDataCallback;
 class cCommandBlockEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
+class cHopperEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
@@ -331,6 +332,9 @@ public:
 
 	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
+	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Lua-accessible
 
 	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);
