@@ -1686,7 +1686,7 @@ void cProtocol_1_9_0::SendWholeInventory(const cWindow & a_Window)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowItems);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(a_Window.GetWindowID());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
@@ -1705,7 +1705,7 @@ void cProtocol_1_9_0::SendWindowClose(const cWindow & a_Window)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowClose);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(a_Window.GetWindowID());
 }
 
 
@@ -1723,7 +1723,7 @@ void cProtocol_1_9_0::SendWindowOpen(const cWindow & a_Window)
 	}
 
 	cPacketizer Pkt(*this, pktWindowOpen);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(a_Window.GetWindowID());
 	Pkt.WriteString(a_Window.GetWindowTypeName());
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
 
@@ -1733,12 +1733,12 @@ void cProtocol_1_9_0::SendWindowOpen(const cWindow & a_Window)
 		case cWindow::wtEnchantment:
 		case cWindow::wtAnvil:
 		{
-			Pkt.WriteBEInt8(0);
+			Pkt.WriteBEUInt8(0);
 			break;
 		}
 		default:
 		{
-			Pkt.WriteBEInt8(static_cast<Int8>(a_Window.GetNumNonInventorySlots()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetNumNonInventorySlots()));
 			break;
 		}
 	}
@@ -1759,7 +1759,7 @@ void cProtocol_1_9_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(a_Window.GetWindowID());
 	Pkt.WriteBEInt16(a_Property);
 	Pkt.WriteBEInt16(a_Value);
 }
