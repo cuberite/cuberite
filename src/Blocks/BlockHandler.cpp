@@ -8,6 +8,7 @@
 #include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
+#include "BlockBookShelf.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
@@ -202,6 +203,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BIRCH_FENCE:                   return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_BIRCH_FENCE_GATE:              return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:             return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BOOKCASE:                      return new cBlockBookShelfHandler       (a_BlockType);
 		case E_BLOCK_BREWING_STAND:                 return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:                  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:                return new cBlockMushroomHandler        (a_BlockType);
