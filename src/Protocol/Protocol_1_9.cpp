@@ -1888,6 +1888,7 @@ UInt32 cProtocol_1_9_0::GetProtocolMobID(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
+		case mtInvalidType:           return -1;
 		case mtBat:                   return 65;
 		case mtBlaze:                 return 61;
 		case mtCaveSpider:            return 59;
