@@ -9290,6 +9290,10 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "",
 				},
+				mtWitherSkeleton =
+				{
+					Notes = "",
+				},
 				mtWolf =
 				{
 					Notes = "",
@@ -17049,6 +17053,7 @@ end
 						"mtVillager",
 						"mtWitch",
 						"mtWither",
+						"mtWitherSkeleton",
 						"mtWolf",
 						"mtZombie",
 						"mtZombiePigman",
