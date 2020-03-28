@@ -28,15 +28,13 @@ Byte cWindow::m_WindowIDCounter = 0;
 
 
 cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
-	m_WindowID(static_cast<char>((++m_WindowIDCounter) % 127)),
+	m_WindowID(((++m_WindowIDCounter) % 127) + 1),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
 	m_IsDestroyed(false),
 	m_Owner(nullptr)
 {
-	// The window ID is signed in protocol 1.7, unsigned in protocol 1.8. Keep out of trouble by using only 7 bits:
-	// Ref.: https://forum.cuberite.org/thread-1876.html
-	ASSERT((m_WindowID >= 0) && (m_WindowID < 127));
+	ASSERT((m_WindowID > 0) && (m_WindowID <= 127));
 
 	if (a_WindowType == wtInventory)
 	{
@@ -765,7 +763,6 @@ void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
-
 
 
 
