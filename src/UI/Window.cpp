@@ -34,7 +34,7 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_IsDestroyed(false),
 	m_Owner(nullptr)
 {
-	ASSERT((m_WindowID > 0) && (m_WindowID < 127));
+	ASSERT((m_WindowID > 0) && (m_WindowID <= 127));
 
 	if (a_WindowType == wtInventory)
 	{
@@ -763,7 +763,6 @@ void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
-
 
 
 
