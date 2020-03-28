@@ -16690,6 +16690,10 @@ end
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
 				},
+				E_META_SPAWN_EGG_WITHER_SKELETON =
+				{
+					Notes = ""
+				},
 				E_META_SPONGE_DRY =
 				{
 					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
@@ -16793,6 +16797,10 @@ end
 				mtWarning =
 				{
 					Notes = "Something concerning (i.e. reload) is about to happen",
+				},
+				mtWitherSkeleton =
+				{
+					Notes = ""
 				},
 				hMain =
 				{
