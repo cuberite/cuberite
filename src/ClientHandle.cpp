@@ -154,58 +154,49 @@ void cClientHandle::Destroy(void)
 		m_Link.reset();
 	}
 
-	// Temporary (#3115-will-fix): variable to keep track of whether the client authenticated and had the opportunity to have ownership transferred to the world
-	bool WasAddedToWorld = false;
+	if (!SetState(csDestroying))
 	{
-		cCSLock Lock(m_CSState);
-		WasAddedToWorld = (m_State >= csAuthenticated);
-		if (m_State >= csDestroying)
-		{
-			// Already called
-			LOGD("%s: client %p, \"%s\" already destroyed, bailing out", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
-			return;
-		}
-		m_State = csDestroying;
+		// Already called
+		LOGD("%s: client %p, \"%s\" already destroyed, bailing out", __FUNCTION__, static_cast<void *>(this), m_Username.c_str());
+		return;
 	}
 
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
 	auto player = m_Player;
 	m_Self.reset();
+	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
+
+	if (player == nullptr)
 	{
-		cCSLock lock(m_CSState);
-		m_State = csDestroyed;  // Tick thread is allowed to call destructor async at any time after this
+		return;
 	}
 
-	if (player != nullptr)
-	{
-		// Atomically decrement player count (in world or server thread)
-		cRoot::Get()->GetServer()->PlayerDestroyed();
+	// Atomically decrement player count (in world or server thread)
+	cRoot::Get()->GetServer()->PlayerDestroyed();
 
-		auto world = player->GetWorld();
-		if (world != nullptr)
+	auto world = player->GetWorld();
+	if (world != nullptr)
+	{
+		player->StopEveryoneFromTargetingMe();
+		player->SetIsTicking(false);
+
+		if (!m_PlayerPtr)
 		{
-			player->StopEveryoneFromTargetingMe();
-			player->SetIsTicking(false);
+			// If our own smart pointer is unset, player has been transferred to world
+			ASSERT(world->IsPlayerReferencedInWorldOrChunk(*player));
 
-			if (WasAddedToWorld)
-			{
-				// If ownership was transferred, our own smart pointer should be unset
-				ASSERT(!m_PlayerPtr);
+			m_PlayerPtr = world->RemovePlayer(*player);
 
-				m_PlayerPtr = world->RemovePlayer(*player);
-
-				// And RemovePlayer should have returned a valid smart pointer
-				ASSERT(m_PlayerPtr);
-			}
-			else
-			{
-				// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
-				ASSERT(m_PlayerPtr);
-				ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
-			}
+			// And RemovePlayer should have returned a valid smart pointer
+			ASSERT(m_PlayerPtr);
 		}
-		player->RemoveClientHandle();
+		else
+		{
+			// If ownership was not transferred, our own smart pointer should be valid and RemovePlayer's should not
+			ASSERT(!world->IsPlayerReferencedInWorldOrChunk(*player));
+		}
 	}
+	player->RemoveClientHandle();
 }
 
 
@@ -433,7 +424,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
-		m_State = csAuthenticated;
+		SetState(csAuthenticated);
 	}
 
 	// Query player team
@@ -2542,7 +2533,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 		// csKicked means m_Link will be shut down on the next tick. The
 		// disconnect packet data is sent in the tick thread so the connection
 		// is closed there after the data is sent.
-		m_State = csKicked;
+		SetState(csKicked);
 	}
 }
 
@@ -3339,8 +3330,7 @@ void cClientHandle::SocketClosed(void)
 	}
 
 	// Queue self for destruction:
-	cCSLock lock(m_CSState);
-	m_State = csQueuedForDestruction;
+	SetState(csQueuedForDestruction);
 }
 
 
@@ -3351,6 +3341,21 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
 	ASSERT(m_Self == nullptr);
 	m_Self = a_Self;
+}
+
+
+
+
+
+bool cClientHandle::SetState(eState a_NewState)
+{
+	cCSLock Lock(m_CSState);
+	if (a_NewState < m_State)
+	{
+		return false;  // Can only advance the state machine
+	}
+	m_State = a_NewState;
+	return true;
 }
 
 

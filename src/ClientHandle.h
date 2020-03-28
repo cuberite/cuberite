@@ -591,6 +591,10 @@ private:
 	/** Called right after the instance is created to store its SharedPtr inside. */
 	void SetSelf(cClientHandlePtr a_Self);
 
+	/** Called to update m_State.
+	Only succeeds if a_NewState > m_State, otherwise returns false. */
+	bool SetState(eState a_NewState);
+
 	/** Processes the data in the network input and output buffers.
 	Called by both Tick() and ServerTick(). */
 	void ProcessProtocolInOut(void);
