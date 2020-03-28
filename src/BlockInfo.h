@@ -37,6 +37,38 @@ public:
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
 	}
+	
+	inline static bool IsSingleSlab               (BLOCKTYPE a_Type)
+	{
+		return (
+			(a_Type == E_BLOCK_WOODEN_SLAB) ||
+			(a_Type == E_BLOCK_STONE_SLAB) ||
+			(a_Type == E_BLOCK_RED_SANDSTONE_SLAB) ||
+			(a_Type == E_BLOCK_PURPUR_SLAB)
+		);
+	}
+	
+	inline static bool IsDoubleSlab               (BLOCKTYPE a_Type)
+	{
+		return (
+			(a_Type == E_BLOCK_DOUBLE_STONE_SLAB) ||
+			(a_Type == E_BLOCK_DOUBLE_WOODEN_SLAB) ||
+			(a_Type == E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB) ||
+			(a_Type == E_BLOCK_PURPUR_DOUBLE_SLAB)
+		);
+	}
+	inline static bool IsSnowable                 (BLOCKTYPE a_Type, NIBBLETYPE a_Meta)
+	{
+		return (
+			(a_Type == E_BLOCK_ICE) ||
+			(a_Type == E_BLOCK_LEAVES) ||
+			(!IsTransparent(a_Type) && (a_Type != E_BLOCK_PACKED_ICE)) ||
+			((IsSingleSlab(a_Type)) && (a_Meta | 0x08))
+		);
+	}
+
+	/** This version of IsSnowable doesn't take care about TOP SINGLE SLAB
+	It will return false for TOP SINGLE SLABS which is snowable, but it's used to keep compatibility with LUA Layer and plugins */ 
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type)
 	{
 		return (
