@@ -28,7 +28,7 @@ Byte cWindow::m_WindowIDCounter = 0;
 
 
 cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
-	m_WindowID((++m_WindowIDCounter) % 127),
+	m_WindowID(((++m_WindowIDCounter) % 127) + 1),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
 	m_IsDestroyed(false),
