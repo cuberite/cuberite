@@ -37,19 +37,12 @@ public:
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
 	}
-	inline static bool IsSnowable                 (BLOCKTYPE a_Type, NIBBLETYPE a_Meta)
+	inline static bool IsSnowable                 (BLOCKTYPE a_Type)
 	{
 		return (
 			(a_Type == E_BLOCK_ICE) ||
 			(a_Type == E_BLOCK_LEAVES) ||
-			(!IsTransparent(a_Type) && (a_Type != E_BLOCK_PACKED_ICE)) ||
-			(	
-				((a_Type == E_BLOCK_WOODEN_SLAB) ||
-				(a_Type == E_BLOCK_STONE_SLAB) ||
-				(a_Type == E_BLOCK_RED_SANDSTONE_SLAB) ||
-				(a_Type == E_BLOCK_PURPUR_SLAB)) &&
-				((a_Meta | 0x08))
-			)
+			(!IsTransparent(a_Type) && (a_Type != E_BLOCK_PACKED_ICE))
 		);
 	}
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }

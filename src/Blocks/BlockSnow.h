@@ -133,7 +133,7 @@ private:
 	{
 		// If block below is snowable, or it is a thin slow block and is a full thin snow block, say yay
 		return (
-			cBlockInfo::IsSnowable(a_BlockType, a_BlockMeta) ||
+			cBlockInfo::IsSnowable(a_BlockType) ||
 			(
 				(a_BlockType == E_BLOCK_SNOW) &&
 				(a_BlockMeta == FullBlockMeta)
