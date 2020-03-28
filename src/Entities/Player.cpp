@@ -1222,7 +1222,7 @@ void cPlayer::Respawn(void)
 
 	if (GetWorld() != m_SpawnWorld)
 	{
-		MoveToWorld(m_SpawnWorld, GetLastBedPos(), false);
+		MoveToWorld(m_SpawnWorld, GetLastBedPos(), false, false);
 	}
 	else
 	{

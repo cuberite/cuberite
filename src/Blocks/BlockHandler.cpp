@@ -741,7 +741,7 @@ void Temporary::RegisterAllBlockHandlers(BlockTypeRegistry & aRegistry)
 		{"minecraft:coal_ore",                       E_BLOCK_COAL_ORE},
 		{"minecraft:coarse_dirt",                    E_BLOCK_DIRT},
 		{"minecraft:cobblestone",                    E_BLOCK_COBBLESTONE},
-		{"minecraft:cobblestone_slab",               E_BLOCK_WOODEN_SLAB},
+		{"minecraft:cobblestone_slab",               E_BLOCK_STONE_SLAB},
 		{"minecraft:cobblestone_stairs",             E_BLOCK_COBBLESTONE_STAIRS},
 		{"minecraft:cobblestone_wall",               E_BLOCK_COBBLESTONE_WALL},
 		{"minecraft:cobweb",                         E_BLOCK_COBWEB},

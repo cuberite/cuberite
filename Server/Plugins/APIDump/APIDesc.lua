@@ -4097,7 +4097,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							IsOptional  = true,
 						},
 					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false (default), no respawn packet is sent, if it is true then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
+					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false, no respawn packet is sent, if it is true (default) then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
 				},
 				SetGravity =
 				{

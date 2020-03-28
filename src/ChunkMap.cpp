@@ -639,7 +639,14 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 		NIBBLETYPE blockMeta;
 		GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
 		cChunkInterface ChunkInterface(this);
-		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
+
+		// Hotfix for https://github.com/cuberite/cuberite/issues/4468
+		// Should be removed when a proper fix is found.
+		if ((blockType != E_BLOCK_PISTON) && (blockType != E_BLOCK_STICKY_PISTON) && (blockType != E_BLOCK_PISTON_EXTENSION))
+		{
+			BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
+		}
+
 		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
 		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
@@ -1616,6 +1623,24 @@ bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurna
 		return false;
 	}
 	return Chunk->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cChunkMap::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
+{
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSChunks);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithHopperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

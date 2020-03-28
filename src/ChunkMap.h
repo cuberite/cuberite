@@ -29,6 +29,7 @@ class cDispenserEntity;
 class cDropperEntity;
 class cDropSpenserEntity;
 class cFurnaceEntity;
+class cHopperEntity;
 class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
@@ -53,6 +54,7 @@ using cDispenserCallback    = cFunctionRef<bool(cDispenserEntity    &)>;
 using cDropperCallback      = cFunctionRef<bool(cDropperEntity      &)>;
 using cDropSpenserCallback  = cFunctionRef<bool(cDropSpenserEntity  &)>;
 using cFurnaceCallback      = cFunctionRef<bool(cFurnaceEntity      &)>;
+using cHopperCallback       = cFunctionRef<bool(cHopperEntity       &)>;
 using cNoteBlockCallback    = cFunctionRef<bool(cNoteEntity         &)>;
 using cCommandBlockCallback = cFunctionRef<bool(cCommandBlockEntity &)>;
 using cMobHeadCallback      = cFunctionRef<bool(cMobHeadEntity      &)>;
@@ -301,6 +303,10 @@ public:
 	/** Calls the callback for the furnace at the specified coords.
 	Returns false if there's no furnace at those coords or callback returns true, returns true if found. */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the hopper at the specified coords.
+	Returns false if there's no hopper at those coords or callback returns true, returns true if found. */
+	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Lua-accessible
 
 	/** Calls the callback for the noteblock at the specified coords.
 	Returns false if there's no noteblock at those coords or callback returns true, returns true if found. */

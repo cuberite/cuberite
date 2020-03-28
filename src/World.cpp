@@ -193,6 +193,7 @@ cWorld::cWorld(
 	m_MinThunderStormTicks(3600),   // 3 real-world minutes   -+
 	m_MaxCactusHeight(3),
 	m_MaxSugarcaneHeight(4),
+	/* TODO: Enable when functionality exists again
 	m_IsBeetrootsBonemealable(true),
 	m_IsCactusBonemealable(false),
 	m_IsCarrotsBonemealable(true),
@@ -207,6 +208,7 @@ cWorld::cWorld(
 	m_IsSugarcaneBonemealable(false),
 	m_IsBigFlowerBonemealable(true),
 	m_IsTallGrassBonemealable(true),
+	*/
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
@@ -282,6 +284,7 @@ cWorld::cWorld(
 	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
 	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
 	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	/* TODO: Enable when functionality exists again
 	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
 	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
 	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
@@ -296,6 +299,7 @@ cWorld::cWorld(
 	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
 	m_IsBigFlowerBonemealable     = IniFile.GetValueSetB("Plants",        "IsBigFlowerBonemealable",     true);
 	m_IsTallGrassBonemealable     = IniFile.GetValueSetB("Plants",        "IsTallGrassBonemealable",     true);
+	*/
 	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
 	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
 	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
@@ -890,7 +894,7 @@ void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	switch (m_Dimension)
 	{
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, guardian, horse, mooshroom, ocelot, pig, rabbit, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;  // TODO Re-add Enderman when bugs are fixed
-		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
+		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = ""; break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNotSet:    ASSERT(!"Dimension not set"); break;
 	}
@@ -1521,6 +1525,15 @@ bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDrop
 bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
 {
 	return m_ChunkMap->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
+{
+	return m_ChunkMap->DoWithHopperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
