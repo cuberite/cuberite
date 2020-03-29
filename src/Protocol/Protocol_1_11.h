@@ -37,6 +37,9 @@ public:
 
 protected:
 
+	/** Converts eMonsterType to protocol-specific mob IDs */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
+
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 

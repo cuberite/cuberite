@@ -21,6 +21,7 @@ Declares the 1.9 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../World.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -173,6 +174,9 @@ protected:
 
 	/** Get the packet ID for a given packet */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+
+	/** Converts eMonsterType to protocol-specific mob IDs */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
