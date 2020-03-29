@@ -141,10 +141,6 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
-	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
-
-
 protected:
 
 	/** The recognized protocol */
@@ -158,6 +154,9 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
+
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
 	void HandlePacketStatusRequest();
