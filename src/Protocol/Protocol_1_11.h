@@ -36,7 +36,7 @@ public:
 	virtual void SendTitleTimes   (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 
 	/** Converts eMonsterType to protocol-specific mob IDs */
-	virtual Int32 GetProtocolMobType(eMonsterType a_MobType) override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 protected:
 

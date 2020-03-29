@@ -388,7 +388,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -539,11 +539,11 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 
 
 
-Int32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtInvalidType:           return -1;
+		case mtInvalidType:           return 0;
 		case mtBat:                   return 65;
 		case mtBlaze:                 return 61;
 		case mtCaveSpider:            return 59;

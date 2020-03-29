@@ -1010,9 +1010,9 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
-Int32 cProtocolRecognizer::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocolRecognizer::GetProtocolMobType(eMonsterType a_MobType)
 {
-	return -1;
+	return 0;
 }
 
 

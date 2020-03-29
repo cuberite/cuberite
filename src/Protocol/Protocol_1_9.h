@@ -141,7 +141,7 @@ public:
 	static int GetParticleID(const AString & a_ParticleName);
 
 	/** Converts eMonsterType to protocol-specific mob IDs */
-	virtual Int32 GetProtocolMobType(eMonsterType a_MobType) override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	/** Minecraft 1.8 use other locations to spawn the item frame. This function converts the 1.7 positions to 1.8 positions. */
 	static void FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw);
