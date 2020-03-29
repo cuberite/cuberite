@@ -163,8 +163,6 @@ void cClientHandle::Destroy(void)
 
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
 	auto player = m_Player;
-	m_Self.reset();
-	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
 
 	if (player == nullptr)
 	{
@@ -197,6 +195,8 @@ void cClientHandle::Destroy(void)
 		}
 	}
 	player->RemoveClientHandle();
+	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
+	m_Self.reset();
 }
 
 
@@ -3350,7 +3350,7 @@ void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 bool cClientHandle::SetState(eState a_NewState)
 {
 	cCSLock Lock(m_CSState);
-	if (a_NewState < m_State)
+	if (a_NewState <= m_State)
 	{
 		return false;  // Can only advance the state machine
 	}
