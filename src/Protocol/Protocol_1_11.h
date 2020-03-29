@@ -35,6 +35,9 @@ public:
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
 	virtual void SendTitleTimes   (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 
+	/** Converts eMonsterType to protocol-specific mob IDs */
+	virtual Int32 GetProtocolMobType(eMonsterType a_MobType) override;
+
 protected:
 
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
