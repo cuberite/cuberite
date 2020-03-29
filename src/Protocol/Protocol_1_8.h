@@ -131,9 +131,6 @@ public:
 	If compression fails, the function returns false. */
 	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
 
-	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
-
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
 
@@ -167,6 +164,9 @@ protected:
 
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet

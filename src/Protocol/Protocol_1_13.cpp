@@ -369,34 +369,6 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 
 
 
-void cProtocol_1_13::SendSpawnMob(const cMonster & a_Mob)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnMob);
-	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
-	Vector3d LastSentPos = a_Mob.GetLastSentPos();
-	Pkt.WriteBEDouble(LastSentPos.x);
-	Pkt.WriteBEDouble(LastSentPos.y);
-	Pkt.WriteBEDouble(LastSentPos.z);
-	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
-	Pkt.WriteByteAngle(a_Mob.GetYaw());
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
-	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
-}
-
-
-
-
-
 void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
 {
 	// TODO
@@ -428,7 +400,8 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtInvalidType:           return 0;
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 27;
 		case mtBat:                   return 3;
 		case mtBlaze:                 return 4;
 		case mtCaveSpider:            return 6;
