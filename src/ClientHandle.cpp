@@ -163,6 +163,8 @@ void cClientHandle::Destroy(void)
 
 	LOGD("%s: destroying client %p, \"%s\" @ %s", __FUNCTION__, static_cast<void *>(this), m_Username.c_str(), m_IPString.c_str());
 	auto player = m_Player;
+	auto Self = std::move(m_Self);  // Keep ourself alive for at least as long as this function
+	SetState(csDestroyed);
 
 	if (player == nullptr)
 	{
@@ -195,8 +197,6 @@ void cClientHandle::Destroy(void)
 		}
 	}
 	player->RemoveClientHandle();
-	SetState(csDestroyed);  // Tick thread is allowed to call destructor async at any time after this
-	m_Self.reset();
 }
 
 
