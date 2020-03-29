@@ -1884,7 +1884,7 @@ int cProtocol_1_9_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
+Int32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{

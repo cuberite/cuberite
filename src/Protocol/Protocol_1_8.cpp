@@ -1828,11 +1828,11 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
+Int32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtInvalidType:           return -1;
+		case mtInvalidType:           return 0;
 		case mtBat:                   return 65;
 		case mtBlaze:                 return 61;
 		case mtCaveSpider:            return 59;

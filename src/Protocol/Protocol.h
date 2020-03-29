@@ -238,7 +238,7 @@ public:
 	virtual AString GetAuthServerID(void) = 0;
 
 	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) = 0;
+	virtual Int32 GetProtocolMobType(eMonsterType a_MobType) = 0;
 
 protected:
 
