@@ -71,6 +71,7 @@ public:
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	Fills existing stacks first and fills the hotbar before the main inventory.
 	Returns the number of items that fit.
 	*/
 	int AddItem(const cItem & a_ItemStack, bool a_AllowNewStacks = true);

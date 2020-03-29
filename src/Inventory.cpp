@@ -121,35 +121,38 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 		}
 	}
 
-	for (int SlotIdx = 0; SlotIdx < m_InventorySlots.GetNumSlots(); ++SlotIdx)
-	{
-		auto & Slot = m_InventorySlots.GetSlot(SlotIdx);
-		if (Slot.IsEqual(a_Item))
-		{
-			cItemHandler Handler(Slot.m_ItemType);
-			int AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - Slot.m_ItemCount), ToAdd.m_ItemCount);
-			res += AmountToAdd;
-
-			cItem SlotAdjusted(Slot);
-			SlotAdjusted.m_ItemCount += AmountToAdd;
-			m_InventorySlots.SetSlot(SlotIdx, SlotAdjusted);
-
-			ToAdd.m_ItemCount -= AmountToAdd;
-			if (ToAdd.m_ItemCount == 0)
-			{
-				return res;
-			}
-		}
-	}
-
-	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
+	// Add to existing stacks in the hotbar.
+	res += m_HotbarSlots.AddItem(ToAdd, false);
 	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;
 	}
 
-	res += m_InventorySlots.AddItem(ToAdd, a_AllowNewStacks);
+	// Add to existing stacks in main inventory.
+	res += m_InventorySlots.AddItem(ToAdd, false);
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
+	if (ToAdd.m_ItemCount == 0)
+	{
+		return res;
+	}
+
+	// All existing stacks are now filled.
+	if (!a_AllowNewStacks)
+	{
+		return res;
+	}
+
+	// Try adding new stacks to the hotbar.
+	res += m_HotbarSlots.AddItem(ToAdd, true);
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
+	if (ToAdd.m_ItemCount == 0)
+	{
+		return res;
+	}
+
+	// Try adding new stacks to the main inventory.
+	res += m_InventorySlots.AddItem(ToAdd, true);
 	return res;
 }
 

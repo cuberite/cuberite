@@ -6223,7 +6223,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "number",
 						},
 					},
-					Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added",
+					Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Fills existing stacks first and fills the hotbar before the main inventory. Returns the number of items added",
 				},
 				AddItems =
 				{
