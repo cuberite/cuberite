@@ -1010,6 +1010,15 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 
 
 
+UInt32 cProtocolRecognizer::GetProtocolMobType(eMonsterType a_MobType)
+{
+	return -1;
+}
+
+
+
+
+
 void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 {
 	// This is used only when handling the server ping

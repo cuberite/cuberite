@@ -14,6 +14,7 @@
 #include "../Scoreboard.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
+#include "../World.h"
 
 
 
@@ -236,6 +237,8 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) = 0;
 
 protected:
 

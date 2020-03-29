@@ -141,6 +141,9 @@ public:
 
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
+
 
 protected:
 
