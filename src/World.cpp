@@ -2543,9 +2543,13 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
 #ifdef _DEBUG
 bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 {
-	if (m_ChunkMap->RemoveEntity(a_Player) != nullptr)
 	{
-		return true;
+		cLock lock(*this);
+		auto * Chunk = a_Player.GetParentChunk();
+		if (Chunk && Chunk->HasEntity(a_Player.GetUniqueID()))
+		{
+			return true;
+		}
 	}
 
 	{
