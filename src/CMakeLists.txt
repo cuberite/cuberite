@@ -429,6 +429,7 @@ if (NOT MSVC)
 		Mobs Entities Simulator IncrementalRedstoneSimulator
 		BlockEntities UI mbedTLS++
 	)
+	target_link_libraries(${CMAKE_PROJECT_NAME} m) # libm math library
 endif ()
 
 if (WIN32)
