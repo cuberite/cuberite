@@ -415,6 +415,12 @@ public:
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
+	/** Get the maximum of natural and artificial light illuminating the block (0 - 15). */
+	inline NIBBLETYPE GetLight(Vector3i a_RelPos) const { return std::max(GetBlockLight(a_RelPos), GetSkyLight(a_RelPos)); }
+
+	/** Get the maximum of natural and artificial light illuminating the block (0 - 15), taking daytime into account. */
+	inline NIBBLETYPE GetLightAltered(Vector3i a_RelPos) const { return std::max(GetBlockLight(a_RelPos), GetSkyLightAltered(a_RelPos)); }
+
 	/** Get the level of artificial light illuminating the block (0 - 15) */
 	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_ChunkData.GetBlockLight(a_RelPos); }
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }

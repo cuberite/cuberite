@@ -60,9 +60,8 @@ public:
 				return;
 			}
 
-			NIBBLETYPE light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ)));
 			// Source block is not bright enough to spread
-			if (light < 9)
+			if (a_Chunk.GetLightAltered(Vector3i(a_RelX, a_RelY + 1, a_RelZ)) < 9)
 			{
 				return;
 			}
@@ -99,8 +98,7 @@ public:
 			}
 			auto abovePos = pos.addedY(1);
 			BLOCKTYPE above = chunk->GetBlock(abovePos);
-			NIBBLETYPE light = std::max(chunk->GetBlockLight(abovePos), chunk->GetTimeAlteredLight(chunk->GetSkyLight(abovePos)));
-			if ((light > 4)  &&
+			if ((a_Chunk.GetLightAltered(abovePos) > 4)  &&
 				cBlockInfo::IsTransparent(above) &&
 				(!IsBlockLava(above)) &&
 				(!IsBlockWaterOrIce(above))

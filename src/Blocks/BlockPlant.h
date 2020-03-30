@@ -77,26 +77,19 @@ protected:
 		{
 			return paGrowth;
 		}
-		NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelPos);
-		NIBBLETYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
-		NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
-
-		// If the amount of light provided by blocks is greater than the sky light, use it instead
-		if (Blocklight > Light)
-		{
-			Light = Blocklight;
-		}
 
 		// Based on light levels, decide between growth, stay and death:
-		if (Light > 8)
+		// Grow if the combined adjusted light above is bright enough.
+		if (a_Chunk.GetLightAltered(a_RelPos + Vector3i(0, 1, 0)) > 8)
 		{
 			return paGrowth;
 		}
-		else if ((Blocklight < 9) && (SkyLight < 9))
+		// Die if the combined non-adjusted light inside is dark enough.
+		if (a_Chunk.GetLight(a_RelPos) < 8)
 		{
 			return paDeath;
 		}
-
+		// Otherwise stay the same.
 		return paStay;
 	}
 

@@ -50,7 +50,7 @@ void cSpider::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 	if (
 		a_Player->CanMobsTarget() &&
-		!((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) > 11) || (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) > 11))
+		!(Chunk->GetLightAltered(Rel) > 11)
 	)
 	{
 		super::EventSeePlayer(a_Player, a_Chunk);
