@@ -6617,6 +6617,28 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Removes one item from the hotbar's currently selected slot. Returns true on success.",
 				},
+				ReplaceOneEquippedItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+						{
+							Name = "TryOtherSlots",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Removes one item from the the current equipped item stack, and attempts to add the specified item stack back to the same slot. If it is not possible to place the item in the same slot, optionally (default true) tries to place the specified item elsewhere in the inventory. Returns the number of items successfully added. Assumes that the currently equipped slot contains at least one item, behaviour is not defined in the case that it does not.",
+				},
 				SendEquippedSlot =
 				{
 					Notes = "Sends the equipped item slot to the client",
@@ -6662,17 +6684,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified hotbar slot contents",
 				},
-				SetShieldSlot =
-				{
-					Params =
-					{
-						{
-							Name = "Item",
-							Type = "cItem",
-						},
-					},
-					Notes = "Sets the shield slot content",
-				},
 				SetInventorySlot =
 				{
 					Params =
@@ -6688,6 +6699,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified main inventory slot contents",
 				},
+				SetShieldSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the shield slot content",
+				},
 				SetSlot =
 				{
 					Params =
@@ -6702,6 +6724,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						},
 					},
 					Notes = "Sets the specified slot contents",
+				},
+				SetEquippedItem = 
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets current item in the equipped hotbar slot",
 				},
 			},
 			Constants =
