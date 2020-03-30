@@ -312,8 +312,8 @@ public:
 
 	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
 	back to the same slot. If it is not possible to place the item in the same slot, tries to place the specified
-	item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. Assumes that
-	the currently equipped slot contains at least one item, behaviour is not defined in the case that it does not.
+	item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. If the
+	currently equipped slot is empty, this is ignored.
 	*/
 	void ReplaceOneEquippedItemTossRest(const cItem &);
 
