@@ -1213,7 +1213,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 			cInventory & Inventory = m_Player->GetInventory();
 			Inventory.SetShieldSlot(EquippedItem);
-			Inventory.SetHotbarSlot(Inventory.GetEquippedSlotNum(), OffhandItem);
+			Inventory.SetEquippedItem(OffhandItem);
 
 			return;
 		}

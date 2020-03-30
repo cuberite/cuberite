@@ -61,7 +61,7 @@ public:
 		{
 			Item.Empty();
 		}
-		a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), Item);
+		a_Player->GetInventory().SetEquippedItem(Item);
 		return true;
 	}
 
