@@ -1313,21 +1313,14 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				a_Entity.TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / std::max(1.0, DistanceFromExplosion.Length())) * 8 * ExplosionSizeInt), 0);
 			}
 
-			double Length = DistanceFromExplosion.Length();
-			if (Length <= ExplosionSizeInt)  // Entity is impacted by explosion
-			{
-				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize));
+			// Hotfix for #4575
+			// TODO: Enhance knockback to be more vanilla-like. Reapply blast reduction.
+			auto Knockback = (1 / std::max(1.0, DistanceFromExplosion.Length())) * 6 * ExplosionSizeInt;
 
-				// Exposure reduced by armor
-				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
+			DistanceFromExplosion.Normalize();
+			DistanceFromExplosion = Vector3d(DistanceFromExplosion.x * Knockback, DistanceFromExplosion.y + (Knockback * 0.3), DistanceFromExplosion.z * Knockback);
 
-				double Impact = (1 - ((Length / ExplosionSizeInt) / 2)) * EntityExposure;
-
-				DistanceFromExplosion.Normalize();
-				DistanceFromExplosion *= Impact;
-
-				a_Entity.SetSpeed(DistanceFromExplosion);
-			}
+			a_Entity.SetSpeed(DistanceFromExplosion);
 
 			return false;
 		}
