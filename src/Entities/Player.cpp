@@ -1944,17 +1944,16 @@ void cPlayer::TossEquippedItem(char a_Amount)
 
 void cPlayer::ReplaceOneEquippedItemTossRest(const cItem & a_Item)
 {
-	auto Placed = GetInventory().ReplaceOneEquippedItem(a_Item);
+	auto PlacedCount = GetInventory().ReplaceOneEquippedItem(a_Item);
+	char ItemCountToToss = a_Item.m_ItemCount - static_cast<char>(PlacedCount);
 
-	char ItemsToToss = a_Item.m_ItemCount - static_cast<char>(Placed);
-
-	if (ItemsToToss == 0)
+	if (ItemCountToToss == 0)
 	{
 		return;
 	}
 
 	cItem Pickup = a_Item;
-	Pickup.m_ItemCount = ItemsToToss;
+	Pickup.m_ItemCount = ItemCountToToss;
 	TossPickup(Pickup);
 }
 
