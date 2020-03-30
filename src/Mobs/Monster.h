@@ -140,7 +140,10 @@ public:
 	bool BurnsInDaylight() const { return m_BurnsInDaylight; }  // tolua_export
 
 	double GetRelativeWalkSpeed(void) const { return m_RelativeWalkSpeed; }  // tolua_export
-	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
+	void SetRelativeWalkSpeed(double a_Speed) { m_RelativeWalkSpeed = a_Speed; }  // tolua_export
+
+	void SetDefaultWalkSpeed(double a_Speed) { m_DefaultWalkSpeed = a_Speed; }
+	void SetDefaultRunSpeed(double a_Speed) { m_DefaultRunSpeed = a_Speed; }
 
 	// Overridables to handle ageable mobs
 	virtual bool IsTame    (void) const { return false; }
@@ -287,6 +290,8 @@ protected:
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;
+	double m_DefaultWalkSpeed;
+	double m_DefaultRunSpeed;
 
 	int m_AmbientSoundTimer;
 

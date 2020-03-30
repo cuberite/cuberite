@@ -230,8 +230,18 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 			// Don't let the mob move too much if he's falling.
 			Distance *= 0.25f;
 		}
-		// Apply walk speed:
-		Distance *= m_RelativeWalkSpeed;
+
+		if ((m_EMState == CHASING) || (m_EMState == ESCAPING))
+		{
+			// Apply run speed:
+			Distance *= m_DefaultRunSpeed * m_RelativeWalkSpeed;
+		}
+		else
+		{
+			// Apply walk speed:
+			Distance *= m_DefaultWalkSpeed * m_RelativeWalkSpeed;
+		}
+
 		/* Reduced default speed.
 		Close to Vanilla, easier for mobs to follow m_NextWayPointPositions, hence
 		better pathfinding. */
