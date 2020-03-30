@@ -108,7 +108,7 @@ Then just open the solution file in MSVC and build. Note that the first time aft
 How to Run
 ----------
 
-The server can be run (on *nix) by a simple `./Cuberite` in the `Server` directory. On first run it will generate the world and start a server on the default port (configurable in `settings.ini`) so you can connect in Minecraft via `localhost`. Note that if you build a debug version, the executable will be named `Cuberite_debug` instead
+The server can be run (on *nix) by a simple `./Cuberite` in the `Server` directory. On first run it will generate the world and start a server on the default port (configurable in `settings.ini`) so you can connect in Minecraft via `localhost`.
 
 Where to Get Started
 --------------------
