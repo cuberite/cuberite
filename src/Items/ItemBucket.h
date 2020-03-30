@@ -101,13 +101,7 @@ public:
 		// Give new bucket, filled with fluid when the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			auto & Inventory = a_Player->GetInventory();
-			auto NewItem = cItem(NewItemType);
-			if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
-			{
-				// The bucket didn't fit, toss it as a pickup:
-				a_Player->TossPickup(NewItem);
-			}
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(NewItemType));
 		}
 
 		return true;
@@ -149,10 +143,10 @@ public:
 			return false;
 		}
 
+		// Give back an empty bucket if the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			// Remove fluid bucket, add empty bucket:
-			a_Player->GetInventory().SetEquippedItem(cItem(E_ITEM_BUCKET));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 		}
 
 		// Wash away anything that was there prior to placing:

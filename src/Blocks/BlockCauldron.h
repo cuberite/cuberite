@@ -38,13 +38,7 @@ public:
 					// Give new bucket, filled with fluid when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						auto & Inventory = a_Player.GetInventory();
-						auto NewItem = cItem(E_ITEM_WATER_BUCKET);
-						if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
-						{
-							// The bucket didn't fit, toss it as a pickup:
-							a_Player.TossPickup(NewItem);
-						}
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_WATER_BUCKET));
 					}
 				}
 				break;
@@ -54,10 +48,10 @@ public:
 				if (Meta < 3)
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 3);
+					// Give empty bucket back when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						// Remove water bucket, add empty bucket.
-						a_Player.GetInventory().SetEquippedItem(cItem(E_ITEM_BUCKET));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 					}
 				}
 				break;
@@ -70,13 +64,7 @@ public:
 					// Give new potion when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						auto & Inventory = a_Player.GetInventory();
-						auto NewItem = cItem(E_ITEM_POTION);
-						if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
-						{
-							// The potion didn't fit, toss it as a pickup:
-							a_Player.TossPickup(NewItem);
-						}
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
 					}
 				}
 				break;
@@ -87,10 +75,10 @@ public:
 				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
 				{
 					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ), ++Meta);
+					// Give empty bottle when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						// Remove water bucket, add empty bucket.
-						a_Player.GetInventory().SetEquippedItem(cItem(E_ITEM_GLASS_BOTTLE));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
 					}
 				}
 			}

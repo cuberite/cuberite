@@ -46,13 +46,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			// Milk the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				auto & Inventory = a_Player.GetInventory();
-				auto NewItem = cItem(E_ITEM_MILK);
-				if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
-				{
-					// The bucket didn't fit, toss it as a pickup:
-					a_Player.TossPickup(NewItem);
-				}
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
 			}
 		} break;
 		case E_ITEM_BOWL:
@@ -60,13 +54,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			// Soup the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				auto & Inventory = a_Player.GetInventory();
-				auto NewItem = cItem(E_ITEM_MUSHROOM_SOUP);
-				if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
-				{
-					// The bucket didn't fit, toss it as a pickup:
-					a_Player.TossPickup(NewItem);
-				}
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MUSHROOM_SOUP));
 			}
 		} break;
 		case E_ITEM_SHEARS:
