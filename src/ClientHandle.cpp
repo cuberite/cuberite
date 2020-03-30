@@ -2902,6 +2902,7 @@ void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimen
 		m_Protocol->SendRespawn(TemporaryDimension);
 	}
 	m_Protocol->SendRespawn(a_Dimension);
+	m_Protocol->SendExperience();
 	m_LastSentDimension = a_Dimension;
 }
 
