@@ -4081,6 +4081,32 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 
 
 
+static int tolua_cEntity_Destroy(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cEntity"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cEntity * self = nullptr;
+	L.GetStackValue(1, self);
+
+	if (self->IsPlayer())
+	{
+		return L.ApiParamError("Cannot destroy a player");
+	}
+
+	self->Destroy();
+	return 0;
+}
+
+
+
+
+
 static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 {
 	// Check the params:
@@ -4256,6 +4282,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cEntity");
 			tolua_constant(tolua_S, "INVALID_ID", cEntity::INVALID_ID);
+			tolua_function(tolua_S, "Destroy", tolua_cEntity_Destroy);
 			tolua_function(tolua_S, "IsSubmerged", tolua_cEntity_IsSubmerged);
 			tolua_function(tolua_S, "IsSwimming", tolua_cEntity_IsSwimming);
 			tolua_function(tolua_S, "GetPosition", tolua_cEntity_GetPosition);
