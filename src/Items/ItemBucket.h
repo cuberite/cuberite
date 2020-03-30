@@ -102,21 +102,8 @@ public:
 		if (!a_Player->IsGameModeCreative())
 		{
 			auto & Inventory = a_Player->GetInventory();
-			// Remove the bucket from the inventory
-			if (!Inventory.RemoveOneEquippedItem())
-			{
-				LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return true;
-			}
-
 			auto NewItem = cItem(NewItemType);
-			if (Inventory.GetEquippedItem().IsEmpty())
-			{
-				// Try to place item in currently selected slot
-				Inventory.SetHotbarSlot(Inventory.GetEquippedSlotNum(), NewItem);
-			}
-			else if (Inventory.AddItem(NewItem) != 1)  // Try and place bucket elsewhere in the inventory
+			if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
 			{
 				// The bucket didn't fit, toss it as a pickup:
 				a_Player->TossPickup(NewItem);
@@ -164,19 +151,8 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			auto & Inventory = a_Player->GetInventory();
 			// Remove fluid bucket, add empty bucket:
-			if (!Inventory.RemoveOneEquippedItem())
-			{
-				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return false;
-			}
-
-			// Buckets do not stack, there should never be anything left in the equipped slot.
-			ASSERT(Inventory.GetEquippedItem().IsEmpty());
-
-			Inventory.SetHotbarSlot(Inventory.GetEquippedSlotNum(), cItem(E_ITEM_BUCKET));
+			a_Player->GetInventory().SetEquippedItem(cItem(E_ITEM_BUCKET));
 		}
 
 		// Wash away anything that was there prior to placing:

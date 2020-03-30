@@ -44,10 +44,16 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
 	if (HeldItem == E_ITEM_BUCKET)
 	{
+		// Milk the cow.
 		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(cItem(E_ITEM_MILK));
+			auto & Inventory = a_Player.GetInventory();
+			auto NewItem = cItem(E_ITEM_MILK);
+			if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
+			{
+				// The bucket didn't fit, toss it as a pickup:
+				a_Player.TossPickup(NewItem);
+			}
 		}
 	}
 }

@@ -27,8 +27,28 @@ public:
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-		switch (a_Player.GetEquippedItem().m_ItemType)
+		auto EquippedItem = a_Player.GetEquippedItem();
+		switch (EquippedItem.m_ItemType)
 		{
+			case E_ITEM_BUCKET:
+			{
+				if (Meta == 3)
+				{
+					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+					// Give new bucket, filled with fluid when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						auto & Inventory = a_Player.GetInventory();
+						auto NewItem = cItem(E_ITEM_WATER_BUCKET);
+						if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
+						{
+							// The bucket didn't fit, toss it as a pickup:
+							a_Player.TossPickup(NewItem);
+						}
+					}
+				}
+				break;
+			}
 			case E_ITEM_WATER_BUCKET:
 			{
 				if (Meta < 3)
@@ -36,8 +56,8 @@ public:
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 3);
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.GetInventory().RemoveOneEquippedItem();
-						a_Player.GetInventory().AddItem(cItem(E_ITEM_BUCKET));
+						// Remove water bucket, add empty bucket.
+						a_Player.GetInventory().SetEquippedItem(cItem(E_ITEM_BUCKET));
 					}
 				}
 				break;
@@ -47,10 +67,32 @@ public:
 				if (Meta > 0)
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
-					a_Player.GetInventory().RemoveOneEquippedItem();
-					a_Player.GetInventory().AddItem(cItem(E_ITEM_POTION));
+					// Give new potion when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						auto & Inventory = a_Player.GetInventory();
+						auto NewItem = cItem(E_ITEM_POTION);
+						if (Inventory.ReplaceOneEquippedItem(NewItem) == 0)
+						{
+							// The potion didn't fit, toss it as a pickup:
+							a_Player.TossPickup(NewItem);
+						}
+					}
 				}
 				break;
+			}
+			case E_ITEM_POTION:
+			{
+				// Refill cauldron with water bottles.
+				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
+				{
+					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ), ++Meta);
+					if (!a_Player.IsGameModeCreative())
+					{
+						// Remove water bucket, add empty bucket.
+						a_Player.GetInventory().SetEquippedItem(cItem(E_ITEM_GLASS_BOTTLE));
+					}
+				}
 			}
 		}
 		return true;
