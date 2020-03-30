@@ -310,6 +310,13 @@ public:
 	/** tosses the item in the selected hotbar slot */
 	void TossEquippedItem(char a_Amount = 1);
 
+	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
+	back to the same slot. If it is not possible to place the item in the same slot, tries to place the specified
+	item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. Assumes that
+	the currently equipped slot contains at least one item, behaviour is not defined in the case that it does not.
+	*/
+	void ReplaceOneEquippedItemTossRest(const cItem &);
+
 	/** tosses the item held in hand (when in UI windows) */
 	void TossHeldItem(char a_Amount = 1);
 
