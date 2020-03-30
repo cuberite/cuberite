@@ -1321,11 +1321,14 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			auto Impact = std::pow(std::max(0.2, DistanceFromExplosion.Length()), -1);
 			Impact *= EntityExposure * ExplosionSizeInt / 5.0;
 
-			DistanceFromExplosion.Normalize();
-			DistanceFromExplosion *= Vector3d{Impact, 0.0, Impact};
-			DistanceFromExplosion.y += 0.3 * Impact;
+			if (Impact > 0.0)
+			{
+				DistanceFromExplosion.Normalize();
+				DistanceFromExplosion *= Vector3d{Impact, 0.0, Impact};
+				DistanceFromExplosion.y += 0.3 * Impact;
 
-			a_Entity.SetSpeed(DistanceFromExplosion);
+				a_Entity.SetSpeed(DistanceFromExplosion);
+			}
 
 			return false;
 		}
@@ -2313,8 +2316,3 @@ void cChunkMap::DelChunkStay(cChunkStay & a_ChunkStay)
 	}  // for itr - Chunks[]
 	a_ChunkStay.OnDisabled();
 }
-
-
-
-
-
