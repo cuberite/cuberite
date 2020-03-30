@@ -2665,7 +2665,34 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
+	// Wither skeleton is a separate mob in Minecraft 1.11+, but
+	// we need this to load them from older worlds
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
+	if (TypeIdx < 0)
+	{
+		return;
+	}
+
+	if (a_NBT.GetByte(TypeIdx) == 1)
+	{
+		std::unique_ptr<cWitherSkeleton> Monster = cpp14::make_unique<cWitherSkeleton>();
+
+		if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+		{
+			return;
+		}
+
+		if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+		{
+			return;
+		}
+
+		a_Entities.emplace_back(std::move(Monster));
+		return;
+	}
+
 	std::unique_ptr<cSkeleton> Monster = cpp14::make_unique<cSkeleton>();
+
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
