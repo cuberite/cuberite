@@ -1319,7 +1319,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
 
 			auto Impact = std::pow(std::max(0.2, DistanceFromExplosion.Length()), -1);
-			Impact *= EntityExposure * ExplosionSizeInt / 5.0;
+			Impact *= EntityExposure * ExplosionSizeInt * 6.0;
 
 			if (Impact > 0.0)
 			{
