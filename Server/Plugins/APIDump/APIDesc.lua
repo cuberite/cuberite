@@ -11137,11 +11137,11 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "Entity",
+							Name = "Target",
 							Type = "cEntity",
 						},
 					},
-					Notes = "Spectates the target entity. Does not change the player's gamemode to spectator mode. Self-spectating resets the spectation.",
+					Notes = "Spectates the target entity. Does not change the player's gamemode to spectator mode. When called with self or nil as the target, resets the spectation.",
 				},
 				TossEquippedItem =
 				{

@@ -1705,7 +1705,7 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 
 void cPlayer::SpectateEntity(cEntity * a_Target)
 {
-	if (static_cast<cPlayer *>(a_Target) == this)
+	if ((a_Target == nullptr) || (static_cast<cEntity *>(this) == a_Target))
 	{
 		GetClientHandle()->SendCameraSetTo(*this);
 		m_AttachedTo = nullptr;

@@ -166,7 +166,7 @@ public:
 	*/
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
-	/** Spectates the target entity */
+	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
 	void SpectateEntity(cEntity * a_Target);
 
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
