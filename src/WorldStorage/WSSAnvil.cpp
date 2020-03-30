@@ -1563,7 +1563,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
 		{ "WitherBoss",                    &cWSSAnvil::LoadWitherFromNBT },
 		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
-		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherFromNBT },
+		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherSkeletonFromNBT },
 		{ "minecraft:wither_skeleton",     &cWSSAnvil::LoadWitherSkeletonFromNBT },
 		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
 		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },

@@ -1918,6 +1918,7 @@ UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtVillager:              return 120;
 		case mtWitch:                 return 66;
 		case mtWither:                return 64;
+		case mtWitherSkeleton:        return 51;
 		case mtWolf:                  return 95;
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
