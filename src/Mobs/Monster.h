@@ -116,9 +116,9 @@ public:
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
-	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
-	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
-	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
+	double GetAttackRate() { return m_AttackRate; }
+	void SetAttackRate(double a_AttackRate) { m_AttackRate = a_AttackRate; }
+	void SetAttackRange(double a_AttackRange) { m_AttackRange = a_AttackRange; }
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 
@@ -269,9 +269,9 @@ protected:
 	AString m_SoundDeath;
 	AString m_SoundAmbient;
 
-	float m_AttackRate;
+	double m_AttackRate;
 	int m_AttackDamage;
-	int m_AttackRange;
+	double m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
 
