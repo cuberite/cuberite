@@ -292,12 +292,6 @@ public:
 	// tolua_end
 	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
 	virtual void Destroy();
-
-	OBSOLETE void Destroy(bool a_ShouldBroadcast)
-	{
-		LOGWARNING("cEntity:Destroy(bool) is deprecated, use cEntity:Destroy() instead.");
-		Destroy();
-	}
 	// tolua_begin
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */

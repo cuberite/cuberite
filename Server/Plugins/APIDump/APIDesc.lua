@@ -3138,7 +3138,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					Params =
 					{
 						{
-							Name = "ShouldBroadcast <B>(DEPRECATED)</b>",
+							Name = "ShouldBroadcast <b>(DEPRECATED)</b>",
 							Type = "boolean",
 							IsOptional = true,
 						},
