@@ -94,7 +94,7 @@ public:
 	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
 	back to the same slot. If it is not possible to place the item in the same slot, optionally (default true) tries to
 	place the specified item elsewhere in the inventory. Returns the number of items successfully added. If the
-	currently equipped slot is empty, this is ignored.
+	currently equipped slot is empty, its contents are simply set to the given Item.
 	*/
 	int ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlots = true);
 
