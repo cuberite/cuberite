@@ -222,6 +222,50 @@ bool cInventory::RemoveOneEquippedItem(void)
 
 
 
+int cInventory::ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlots)
+{
+	// Ignore whether there was an item in the slot to remove.
+	RemoveOneEquippedItem();
+
+	auto EquippedItem = GetEquippedItem();
+	if (EquippedItem.IsEmpty())
+	{
+		SetEquippedItem(a_Item);
+		return a_Item.m_ItemCount;
+	}
+
+	// Handle case when equipped item is the same as the replacement item.
+	cItem ItemsToAdd = a_Item;
+	if (EquippedItem.IsEqual(ItemsToAdd))
+	{
+		cItemHandler Handler(ItemsToAdd.m_ItemType);
+		auto AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
+
+		EquippedItem.m_ItemCount += AmountToAdd;
+		SetEquippedItem(EquippedItem);
+		ItemsToAdd.m_ItemCount -= AmountToAdd;
+	}
+
+	auto ItemsAdded = a_Item.m_ItemCount - ItemsToAdd.m_ItemCount;
+
+	if (ItemsToAdd.m_ItemCount == 0)
+	{
+		return ItemsAdded;
+	}
+
+	if (!a_TryOtherSlots)
+	{
+		return ItemsAdded;
+	}
+
+	// Try the rest of the inventory.
+	return AddItem(ItemsToAdd) + ItemsAdded;
+}
+
+
+
+
+
 int cInventory::HowManyItems(const cItem & a_Item)
 {
 	return
@@ -297,6 +341,15 @@ void cInventory::SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item)
 void cInventory::SetShieldSlot(const cItem & a_Item)
 {
 	m_ShieldSlots.SetSlot(0, a_Item);
+}
+
+
+
+
+
+void cInventory::SetEquippedItem(const cItem & a_Item)
+{
+	SetHotbarSlot(GetEquippedSlotNum(), a_Item);
 }
 
 

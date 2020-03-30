@@ -91,6 +91,13 @@ public:
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
 
+	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
+	back to the same slot. If it is not possible to place the item in the same slot, optionally (default true) tries to
+	place the specified item elsewhere in the inventory. Returns the number of items successfully added. Assumes that
+	the currently equipped slot contains at least one item, behaviour is not defined in the case that it does not.
+	*/
+	int ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlots = true);
+
 	/** Returns the number of items of type a_Item that are stored */
 	int HowManyItems(const cItem & a_Item);
 
@@ -144,6 +151,8 @@ public:
 	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
 	/** Sets current item in shield slot */
 	void          SetShieldSlot(const cItem & a_Item);
+	/** Sets current item in the equipped hotbar slot */
+	void          SetEquippedItem(const cItem & a_Item);
 	/** Sets equiped item to the a_SlotNum slot number */
 	void          SetEquippedSlotNum(int a_SlotNum);
 	/** Returns slot number of equiped item */
