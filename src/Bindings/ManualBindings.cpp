@@ -4094,9 +4094,14 @@ static int tolua_cEntity_Destroy(lua_State * tolua_S)
 	cEntity * self = nullptr;
 	L.GetStackValue(1, self);
 
+	if (lua_gettop(L) == 2)
+	{
+		LOGWARNING("cEntity:Destroy(bool) is deprecated, use cEntity:Destroy() instead.");
+	}
+
 	if (self->IsPlayer())
 	{
-		return L.ApiParamError("Cannot destroy a player");
+		return L.ApiParamError("Cannot call cEntity:Destroy() on a cPlayer, use cClientHandle:Kick() instead.");
 	}
 
 	self->Destroy();
