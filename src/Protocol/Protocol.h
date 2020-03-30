@@ -14,6 +14,7 @@
 #include "../Scoreboard.h"
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
+#include "../World.h"
 
 
 
@@ -236,7 +237,6 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
-
 protected:
 
 	friend class cPacketizer;
@@ -256,6 +256,9 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
+
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

@@ -14,6 +14,7 @@ SET (HDRS
 	BlockAnvil.h
 	BlockBed.h
 	BlockBigFlower.h
+	BlockBookShelf.h
 	BlockBrewingStand.h
 	BlockButton.h
 	BlockCactus.h

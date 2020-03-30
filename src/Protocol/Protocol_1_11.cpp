@@ -388,7 +388,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
+	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -533,6 +533,51 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 	Pkt.WriteBEInt32(a_FadeInTicks);
 	Pkt.WriteBEInt32(a_DisplayTicks);
 	Pkt.WriteBEInt32(a_FadeOutTicks);
+}
+
+
+
+
+
+UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 52;
+		case mtBat:                   return 65;
+		case mtBlaze:                 return 61;
+		case mtCaveSpider:            return 59;
+		case mtChicken:               return 93;
+		case mtCow:                   return 92;
+		case mtCreeper:               return 50;
+		case mtEnderDragon:           return 63;
+		case mtEnderman:              return 58;
+		case mtGhast:                 return 56;
+		case mtGiant:                 return 53;
+		case mtGuardian:              return 68;
+		case mtHorse:                 return 100;
+		case mtIronGolem:             return 99;
+		case mtMagmaCube:             return 62;
+		case mtMooshroom:             return 96;
+		case mtOcelot:                return 98;
+		case mtPig:                   return 90;
+		case mtRabbit:                return 101;
+		case mtSheep:                 return 91;
+		case mtSilverfish:            return 60;
+		case mtSkeleton:              return 51;
+		case mtSlime:                 return 55;
+		case mtSnowGolem:             return 97;
+		case mtSpider:                return 52;
+		case mtSquid:                 return 94;
+		case mtVillager:              return 120;
+		case mtWitch:                 return 66;
+		case mtWither:                return 64;
+		case mtWolf:                  return 95;
+		case mtZombie:                return 54;
+		case mtZombiePigman:          return 57;
+	}
+	UNREACHABLE("Unsupported mob type");
 }
 
 

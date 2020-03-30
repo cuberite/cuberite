@@ -23,6 +23,7 @@ Implements the 1.8 protocol classes:
 #include "../CompositeChat.h"
 #include "../Statistics.h"
 #include "../UUID.h"
+#include "../World.h"
 
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
@@ -1347,7 +1348,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(a_Mob.GetMobType()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
 	Vector3d LastSentPos = a_Mob.GetLastSentPos();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
@@ -1630,7 +1631,7 @@ void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowItems);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
@@ -1649,7 +1650,7 @@ void cProtocol_1_8_0::SendWindowClose(const cWindow & a_Window)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowClose);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 }
 
 
@@ -1667,7 +1668,7 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 	}
 
 	cPacketizer Pkt(*this, pktWindowOpen);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteString(a_Window.GetWindowTypeName());
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
 
@@ -1677,12 +1678,12 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 		case cWindow::wtEnchantment:
 		case cWindow::wtAnvil:
 		{
-			Pkt.WriteBEInt8(0);
+			Pkt.WriteBEUInt8(0);
 			break;
 		}
 		default:
 		{
-			Pkt.WriteBEInt8(static_cast<Int8>(a_Window.GetNumNonInventorySlots()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetNumNonInventorySlots()));
 			break;
 		}
 	}
@@ -1703,7 +1704,7 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
-	Pkt.WriteBEInt8(a_Window.GetWindowID());
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteBEInt16(a_Property);
 	Pkt.WriteBEInt16(a_Value);
 }
@@ -1821,6 +1822,51 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 	}
 
 	return ParticleMap[ParticleName];
+}
+
+
+
+
+
+UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 52;
+		case mtBat:                   return 65;
+		case mtBlaze:                 return 61;
+		case mtCaveSpider:            return 59;
+		case mtChicken:               return 93;
+		case mtCow:                   return 92;
+		case mtCreeper:               return 50;
+		case mtEnderDragon:           return 63;
+		case mtEnderman:              return 58;
+		case mtGhast:                 return 56;
+		case mtGiant:                 return 53;
+		case mtGuardian:              return 68;
+		case mtHorse:                 return 100;
+		case mtIronGolem:             return 99;
+		case mtMagmaCube:             return 62;
+		case mtMooshroom:             return 96;
+		case mtOcelot:                return 98;
+		case mtPig:                   return 90;
+		case mtRabbit:                return 101;
+		case mtSheep:                 return 91;
+		case mtSilverfish:            return 60;
+		case mtSkeleton:              return 51;
+		case mtSlime:                 return 55;
+		case mtSnowGolem:             return 97;
+		case mtSpider:                return 52;
+		case mtSquid:                 return 94;
+		case mtVillager:              return 120;
+		case mtWitch:                 return 66;
+		case mtWither:                return 64;
+		case mtWolf:                  return 95;
+		case mtZombie:                return 54;
+		case mtZombiePigman:          return 57;
+	}
+	UNREACHABLE("Unsupported mob type");
 }
 
 

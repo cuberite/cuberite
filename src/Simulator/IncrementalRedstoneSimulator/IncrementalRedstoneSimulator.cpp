@@ -25,6 +25,7 @@
 #include "DropSpenserHandler.h"
 #include "RedstoneComparatorHandler.h"
 #include "TrappedChestHandler.h"
+#include "HopperHandler.h"
 
 
 
@@ -98,6 +99,7 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 
 		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>();
 		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>();
+		case E_BLOCK_HOPPER: return cpp14::make_unique<cHopperHandler>();
 		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>();
 		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>();
 		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>();

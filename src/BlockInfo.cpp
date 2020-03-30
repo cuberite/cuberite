@@ -335,6 +335,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_STONE_BRICK_STAIRS           ].m_Transparent = true;
 	Info[E_BLOCK_STONE_BUTTON                 ].m_Transparent = true;
 	Info[E_BLOCK_STONE_PRESSURE_PLATE         ].m_Transparent = true;
+	Info[E_BLOCK_STONE_SLAB                   ].m_Transparent = true;
 	Info[E_BLOCK_SUGARCANE                    ].m_Transparent = true;
 	Info[E_BLOCK_TALL_GRASS                   ].m_Transparent = true;
 	Info[E_BLOCK_TORCH                        ].m_Transparent = true;

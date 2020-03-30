@@ -45,6 +45,7 @@ class cCuboid;
 class cDispenserEntity;
 class cFlowerPotEntity;
 class cFurnaceEntity;
+class cHopperEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
@@ -769,6 +770,9 @@ public:
 	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
 
+	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
+	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Exported in ManualBindings.cpp
+
 	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);  // Exported in ManualBindings.cpp
 
@@ -1213,6 +1217,7 @@ private:
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
+	/* TODO: Enable when functionality exists again
 	bool m_IsBeetrootsBonemealable;
 	bool m_IsCactusBonemealable;
 	bool m_IsCarrotsBonemealable;
@@ -1227,6 +1232,7 @@ private:
 	bool m_IsSugarcaneBonemealable;
 	bool m_IsBigFlowerBonemealable;
 	bool m_IsTallGrassBonemealable;
+	*/
 
 	/** Whether command blocks are enabled or not */
 	bool m_bCommandBlocksEnabled;

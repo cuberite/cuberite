@@ -1590,8 +1590,8 @@ void cSlotAreaEnchanting::OnPlayerAdded(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 {
-	// Toss the item in the enchanting slot
-	TossItems(a_Player, 0, 1);
+	// Toss the item in the enchanting slot, as well as lapis
+	TossItems(a_Player, 0, m_NumSlots);
 
 	super::OnPlayerRemoved(a_Player);
 }

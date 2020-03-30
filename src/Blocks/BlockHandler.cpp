@@ -8,6 +8,7 @@
 #include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
+#include "BlockBookShelf.h"
 #include "BlockBrewingStand.h"
 #include "BlockButton.h"
 #include "BlockCactus.h"
@@ -202,6 +203,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BIRCH_FENCE:                   return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_BIRCH_FENCE_GATE:              return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:             return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BOOKCASE:                      return new cBlockBookShelfHandler       (a_BlockType);
 		case E_BLOCK_BREWING_STAND:                 return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:                  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:                return new cBlockMushroomHandler        (a_BlockType);
@@ -741,7 +743,7 @@ void Temporary::RegisterAllBlockHandlers(BlockTypeRegistry & aRegistry)
 		{"minecraft:coal_ore",                       E_BLOCK_COAL_ORE},
 		{"minecraft:coarse_dirt",                    E_BLOCK_DIRT},
 		{"minecraft:cobblestone",                    E_BLOCK_COBBLESTONE},
-		{"minecraft:cobblestone_slab",               E_BLOCK_WOODEN_SLAB},
+		{"minecraft:cobblestone_slab",               E_BLOCK_STONE_SLAB},
 		{"minecraft:cobblestone_stairs",             E_BLOCK_COBBLESTONE_STAIRS},
 		{"minecraft:cobblestone_wall",               E_BLOCK_COBBLESTONE_WALL},
 		{"minecraft:cobweb",                         E_BLOCK_COBWEB},
