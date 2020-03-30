@@ -11132,6 +11132,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the player visibility to other players",
 				},
+				SpectateEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Target",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Spectates the target entity. Does not change the player's gamemode to spectator mode. When called with self or nil as the target, resets the spectation.",
+				},
 				TossEquippedItem =
 				{
 					Params =
