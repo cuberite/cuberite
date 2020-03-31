@@ -289,14 +289,10 @@ public:
 	If this returns false, you must stop using the cEntity pointer you have. */
 	bool IsTicking(void) const;
 
+	// tolua_end
 	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
 	virtual void Destroy();
-
-	OBSOLETE void Destroy(bool a_ShouldBroadcast)
-	{
-		LOGWARNING("cEntity:Destory(bool) is deprecated, use cEntity:Destroy() instead.");
-		Destroy();
-	}
+	// tolua_begin
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);

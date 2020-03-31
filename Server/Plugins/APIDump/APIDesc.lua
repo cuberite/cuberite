@@ -3138,12 +3138,12 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					Params =
 					{
 						{
-							Name = "ShouldBroadcast",
+							Name = "ShouldBroadcast <b>(DEPRECATED)</b>",
 							Type = "boolean",
 							IsOptional = true,
 						},
 					},
-					Notes = "Schedules the entity to be destroyed; if ShouldBroadcast is not present or set to true, broadcasts the DestroyEntity packet",
+					Notes = "Schedules the entity to be destroyed; broadcasts the DestroyEntity packet",
 				},
 				DoesPreventBlockPlacement =
 				{
