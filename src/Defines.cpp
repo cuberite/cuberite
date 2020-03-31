@@ -422,17 +422,6 @@ void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace
 
 
 
-void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false)
-{
-	int Y = a_BlockY;
-	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	a_BlockY = Clamp<unsigned char>(static_cast<unsigned char>(Y), 0, cChunkDef::Height - 1);
-}
-
-
-
-
-
 bool ItemCategory::IsPickaxe(short a_ItemType)
 {
 	switch (a_ItemType)
