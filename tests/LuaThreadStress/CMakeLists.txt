@@ -12,7 +12,6 @@ set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
-	${CMAKE_SOURCE_DIR}/src/ChunkDef.cpp
 	${CMAKE_SOURCE_DIR}/src/StringCompression.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 
