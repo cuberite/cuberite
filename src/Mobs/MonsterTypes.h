@@ -42,8 +42,6 @@ enum eMonsterType
 	mtWolf,
 	mtZombie,
 	mtZombiePigman,
-
-	mtMax,  // The maximum value of the mob type, used for ToLua range-checks
 } ;
 
 // tolua_end
