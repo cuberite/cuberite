@@ -4,7 +4,7 @@
 // tolua_begin
 
 
-enum ENUM_BLOCK_ID : BLOCKTYPE
+enum ENUM_BLOCK_TYPE : BLOCKTYPE
 {
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
@@ -290,7 +290,7 @@ enum ENUM_BLOCK_ID : BLOCKTYPE
 
 
 
-enum ENUM_ITEM_ID : short
+enum ENUM_ITEM_TYPE : short
 {
 	E_ITEM_EMPTY = -1,
 
@@ -1119,124 +1119,6 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_ENDER_CRYSTAL    = 200,
 } ;
 
-
-
-
-
-/** Dimension of a world */
-enum eDimension
-{
-	dimNether    = -1,
-	dimOverworld = 0,
-	dimEnd       = 1,
-	dimNotSet    = 255,  // For things that need an "indeterminate" state, such as cProtocol's LastSentDimension
-} ;
-
-
-
-
-
-/** Damage type, used in the TakeDamageInfo structure and related functions */
-enum eDamageType
-{
-	// Canonical names for the types (as documented in the plugin wiki):
-	dtAttack,           // Being attacked by a mob
-	dtRangedAttack,     // Being attacked by a projectile, possibly from a mob
-	dtLightning,        // Hit by a lightning strike
-	dtFalling,          // Falling down; dealt when hitting the ground
-	dtDrowning,         // Drowning in water / lava
-	dtSuffocating,      // Suffocating inside a block
-	dtStarving,         // Hunger
-	dtCactusContact,    // Contact with a cactus block
-	dtLavaContact,      // Contact with a lava block
-	dtPoisoning,        // Having the poison effect
-	dtWithering,        // Having the wither effect
-	dtOnFire,           // Being on fire
-	dtFireContact,      // Standing inside a fire block
-	dtInVoid,           // Falling into the Void (Y < 0)
-	dtPotionOfHarming,
-	dtEnderPearl,       // Thrown an ender pearl, teleported by it
-	dtAdmin,            // Damage applied by an admin command
-	dtExplosion,        // Damage applied by an explosion
-
-	// Some common synonyms:
-	dtPawnAttack   = dtAttack,
-	dtEntityAttack = dtAttack,
-	dtMob          = dtAttack,
-	dtMobAttack    = dtAttack,
-	dtArrowAttack  = dtRangedAttack,
-	dtArrow        = dtRangedAttack,
-	dtProjectile   = dtRangedAttack,
-	dtFall         = dtFalling,
-	dtDrown        = dtDrowning,
-	dtSuffocation  = dtSuffocating,
-	dtStarvation   = dtStarving,
-	dtHunger       = dtStarving,
-	dtCactus       = dtCactusContact,
-	dtCactuses     = dtCactusContact,
-	dtCacti        = dtCactusContact,
-	dtLava         = dtLavaContact,
-	dtPoison       = dtPoisoning,
-	dtWither       = dtWithering,
-	dtBurning      = dtOnFire,
-	dtInFire       = dtFireContact,
-	dtPlugin       = dtAdmin,
-} ;
-
-
-
-
-
-/** The source of an explosion.
-Also dictates the type of the additional data passed to the explosion handlers:
-| esBed           | Vector3i *             | Bed exploding in the Nether or in the End
-| esEnderCrystal  | cEnderCrystal *        |
-| esGhastFireball | cGhastFireballEntity * |
-| esMonster       | cMonster *             |
-| esOther         | nullptr                | Any other explosion unaccounted for
-| esPlugin        | nullptr                | Explosion primarily attributed to a plugin
-| esPrimedTNT     | cTNTEntity *           |
-| esWitherBirth   | cMonster *             |
-| esWitherSkull   | cProjectileEntity *    |
-*/
-enum eExplosionSource
-{
-	esBed,
-	esEnderCrystal,
-	esGhastFireball,
-	esMonster,
-	esOther,
-	esPlugin,
-	esPrimedTNT,
-	esWitherBirth,
-	esWitherSkull,
-	esMax,
-} ;
-
-
-
-
-
-enum eShrapnelLevel
-{
-	slNone,
-	slGravityAffectedOnly,
-	slAll
-} ;
-
-
-
-
-
-enum eSpreadSource
-{
-	ssFireSpread,
-	ssGrassSpread,
-	ssMushroomSpread,
-	ssMycelSpread,
-	ssVineSpread,
-} ;
-
 // tolua_end
 
 
@@ -1266,19 +1148,6 @@ extern AString ItemTypeToString(short a_ItemType);
 
 /** Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string. */
 extern AString ItemToFullString(const cItem & a_Item);
-
-/** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
-extern eDimension StringToDimension(const AString & a_DimensionString);
-
-/** Translates a dimension enum to dimension string.
-Takes an eDimension enum value and returns "Overworld" on failure. */
-extern AString DimensionToString(eDimension a_Dimension);
-
-/** Translates damage type constant to a string representation (built-in). */
-extern AString DamageTypeToString(eDamageType a_DamageType);
-
-/** Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure */
-extern eDamageType StringToDamageType(const AString & a_DamageString);
 
 /** Returns a cItem representing the item described in an IniFile's value; if the value doesn't exist, creates it with the provided default. */
 extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default);

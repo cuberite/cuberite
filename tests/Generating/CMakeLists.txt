@@ -11,9 +11,11 @@ add_definitions(-DTEST_GLOBALS=1)
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BiomeDef.cpp
 	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
-	${CMAKE_SOURCE_DIR}/src/BlockID.cpp
+	${CMAKE_SOURCE_DIR}/src/BlockInfo.cpp
+	${CMAKE_SOURCE_DIR}/src/BlockType.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
 	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
+	${CMAKE_SOURCE_DIR}/src/Defines.cpp
 	${CMAKE_SOURCE_DIR}/src/Enchantments.cpp
 	${CMAKE_SOURCE_DIR}/src/FastRandom.cpp
 	${CMAKE_SOURCE_DIR}/src/IniFile.cpp
@@ -71,10 +73,12 @@ set (GENERATING_SRCS
 set (SHARED_HDRS
 	${CMAKE_SOURCE_DIR}/src/BiomeDef.h
 	${CMAKE_SOURCE_DIR}/src/BlockArea.h
-	${CMAKE_SOURCE_DIR}/src/BlockID.h
+	${CMAKE_SOURCE_DIR}/src/BlockInfo.h
+	${CMAKE_SOURCE_DIR}/src/BlockType.h
 	${CMAKE_SOURCE_DIR}/src/Cuboid.h
 	${CMAKE_SOURCE_DIR}/src/ChunkData.h
 	${CMAKE_SOURCE_DIR}/src/ChunkDef.h
+	${CMAKE_SOURCE_DIR}/src/Defines.h
 	${CMAKE_SOURCE_DIR}/src/Enchantments.h
 	${CMAKE_SOURCE_DIR}/src/FastRandom.h
 	${CMAKE_SOURCE_DIR}/src/Globals.h
@@ -157,7 +161,7 @@ add_library(GeneratorTestingSupport STATIC
 	${GENERATING_HDRS}
 	${STUBS}
 )
-target_link_libraries(GeneratorTestingSupport tolualib zlib fmt::fmt)
+target_link_libraries(GeneratorTestingSupport tolualib zlib fmt::fmt jsoncpp_lib_static)
 source_group("Stubs" FILES ${STUBS})
 source_group("Generating" FILES ${GENERATING_HDRS} ${GENERATING_SRCS})
 

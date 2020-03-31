@@ -15,9 +15,9 @@ set(FOLDERS
 SET (SRCS
 	BiomeDef.cpp
 	BlockArea.cpp
-	BlockID.cpp
 	BlockInfo.cpp
 	BlockState.cpp
+	BlockType.cpp
 	BlockTypePalette.cpp
 	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
@@ -38,6 +38,7 @@ SET (SRCS
 	CraftingRecipes.cpp
 	Cuboid.cpp
 	DeadlockDetect.cpp
+	Defines.cpp
 	Enchantments.cpp
 	FastRandom.cpp
 	FurnaceRecipe.cpp
@@ -85,11 +86,11 @@ SET (HDRS
 	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
-	BlockID.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockState.h
 	BlockTracer.h
+	BlockType.h
 	BlockTypePalette.h
 	BlockTypeRegistry.h
 	BrewingRecipes.h

@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "DungeonRoomsFinisher.h"
+#include "../BlockInfo.h"
 #include "../FastRandom.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"

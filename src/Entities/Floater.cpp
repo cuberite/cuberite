@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 
+#include "../BlockInfo.h"
 #include "../BoundingBox.h"
 #include "../Chunk.h"
 #include "Floater.h"

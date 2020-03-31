@@ -15,6 +15,7 @@
 #include "../StringCompression.h"
 #include "../SetChunkData.h"
 #include "../Root.h"
+#include "../BlockType.h"
 
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
@@ -363,10 +364,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	cChunkDef::BlockNibbles BlockLight;
 	cChunkDef::BlockNibbles SkyLight;
 
-	memset(BlockTypes, E_BLOCK_AIR, sizeof(BlockTypes));
-	memset(MetaData,   0,           sizeof(MetaData));
-	memset(SkyLight,   0xff,        sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
-	memset(BlockLight, 0x00,        sizeof(BlockLight));
+	memset(BlockTypes, 0,    sizeof(BlockTypes));
+	memset(MetaData,   0,    sizeof(MetaData));
+	memset(SkyLight,   0xff, sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
+	memset(BlockLight, 0x00, sizeof(BlockLight));
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -779,7 +780,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Explosion" : "Fireworks"));
 	if (FireworksTag > 0)
 	{
-		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
+		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}
 
 	return true;

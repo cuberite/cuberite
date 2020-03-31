@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ChunkData.h"
+#include "../Defines.h"
 
 
 

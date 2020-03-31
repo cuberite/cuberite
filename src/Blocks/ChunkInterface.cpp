@@ -6,6 +6,7 @@
 #include "WorldInterface.h"
 #include "../ChunkMap.h"
 #include "../World.h"
+#include "../BlockInfo.h"
 
 
 

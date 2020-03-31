@@ -7,6 +7,7 @@
 
 #include "../Bindings/PluginManager.h"
 #include "ProjectileEntity.h"
+#include "../BlockInfo.h"
 #include "../ClientHandle.h"
 #include "../LineBlockTracer.h"
 #include "../BoundingBox.h"

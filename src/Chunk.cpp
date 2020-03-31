@@ -7,6 +7,7 @@
 
 
 #include "Chunk.h"
+#include "BlockInfo.h"
 #include "World.h"
 #include "ClientHandle.h"
 #include "Server.h"

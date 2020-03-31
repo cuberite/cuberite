@@ -15,7 +15,8 @@
 
 
 
-// fwd: ItemGrid.h
+// fwd:
+class cItem;
 class cItemGrid;
 class cMonster;
 class cProjectileEntity;

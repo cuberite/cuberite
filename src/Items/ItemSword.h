@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 
 
 
@@ -12,8 +13,8 @@ class cItemSwordHandler :
 {
 	typedef cItemHandler super;
 public:
-	cItemSwordHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
+	cItemSwordHandler(int a_ItemType):
+		cItemHandler(a_ItemType)
 	{
 	}
 
@@ -66,7 +67,6 @@ public:
 			if (
 				IsBlockMaterialPlants(a_Block) ||
 				IsBlockMaterialVine(a_Block)   ||
-				IsBlockMaterialCoral(a_Block)  ||
 				IsBlockMaterialLeaves(a_Block) ||
 				IsBlockMaterialGourd(a_Block)
 			)

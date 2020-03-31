@@ -10,6 +10,7 @@
 #include "../Entities/Player.h"
 #include "LuaState.h"
 #include "../Tracer.h"
+#include "../BlockInfo.h"
 
 
 

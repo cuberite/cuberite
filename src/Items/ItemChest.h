@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 #include "../Blocks/BlockChest.h"
 
 

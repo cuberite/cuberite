@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Simulator.h"
+#include "../IniFile.h"
 
 
 

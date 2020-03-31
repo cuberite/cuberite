@@ -7,6 +7,7 @@
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
 #include "Noise/Noise.h"
+#include "BlockType.h"
 
 
 

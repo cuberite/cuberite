@@ -5,9 +5,16 @@
 
 
 
+
+// fwd:
+class cItem;
 class cChunkMap;
 class cWorldInterface;
 class cPlayer;
+
+
+
+
 
 class cChunkInterface:
 	public cForEachChunkProvider

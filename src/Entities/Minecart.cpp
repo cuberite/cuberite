@@ -7,6 +7,7 @@
 
 #include "Globals.h"
 #include "Minecart.h"
+#include "../BlockInfo.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "Player.h"

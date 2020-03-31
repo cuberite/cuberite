@@ -1,7 +1,438 @@
-
 #include "Globals.h"
 
+#include "BlockInfo.h"
+#include "BlockType.h"
 #include "Blocks/BlockHandler.h"
+
+
+
+
+
+bool IsBlockWater(BLOCKTYPE a_BlockType)
+{
+	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
+}
+
+
+
+
+
+bool IsBlockIce(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ICE:
+		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_FROSTED_ICE:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
+{
+	return (IsBlockWater(a_BlockType) || IsBlockIce(a_BlockType));
+}
+
+
+
+
+
+bool IsBlockLava(BLOCKTYPE a_BlockType)
+{
+	return ((a_BlockType == E_BLOCK_LAVA) || (a_BlockType == E_BLOCK_STATIONARY_LAVA));
+}
+
+
+
+
+
+bool IsBlockLiquid(BLOCKTYPE a_BlockType)
+{
+	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
+}
+
+
+
+
+
+bool IsBlockRail(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_RAIL:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_POWERED_RAIL:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
+bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_DIRT:
+		case E_BLOCK_GRASS:
+		case E_BLOCK_FARMLAND:
+		case E_BLOCK_GRASS_PATH:
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool IsBlockFence(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ACACIA_FENCE:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_BIRCH_FENCE:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_DARK_OAK_FENCE:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_FENCE:
+		case E_BLOCK_JUNGLE_FENCE:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_OAK_FENCE_GATE:
+		case E_BLOCK_SPRUCE_FENCE:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_PLANKS:
+		case E_BLOCK_LOG:
+		case E_BLOCK_NOTE_BLOCK:
+		case E_BLOCK_BOOKCASE:
+		case E_BLOCK_OAK_WOOD_STAIRS:
+		case E_BLOCK_CHEST:
+		case E_BLOCK_CRAFTING_TABLE:
+		case E_BLOCK_SIGN_POST:
+		case E_BLOCK_OAK_DOOR:
+		case E_BLOCK_WALLSIGN:
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		case E_BLOCK_JUKEBOX:
+		case E_BLOCK_FENCE:
+		case E_BLOCK_TRAPDOOR:
+		case E_BLOCK_HUGE_BROWN_MUSHROOM:
+		case E_BLOCK_HUGE_RED_MUSHROOM:
+		case E_BLOCK_OAK_FENCE_GATE:
+		case E_BLOCK_DOUBLE_WOODEN_SLAB:
+		case E_BLOCK_WOODEN_SLAB:
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:
+		case E_BLOCK_BIRCH_WOOD_STAIRS:
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:
+		case E_BLOCK_TRAPPED_CHEST:
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_NEW_LOG:
+		case E_BLOCK_ACACIA_WOOD_STAIRS:
+		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_SPRUCE_FENCE:
+		case E_BLOCK_BIRCH_FENCE:
+		case E_BLOCK_JUNGLE_FENCE:
+		case E_BLOCK_DARK_OAK_FENCE:
+		case E_BLOCK_ACACIA_FENCE:
+		case E_BLOCK_SPRUCE_DOOR:
+		case E_BLOCK_BIRCH_DOOR:
+		case E_BLOCK_JUNGLE_DOOR:
+		case E_BLOCK_ACACIA_DOOR:
+		case E_BLOCK_DARK_OAK_DOOR:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_SAPLING:
+		case E_BLOCK_DANDELION:
+		case E_BLOCK_FLOWER:
+		case E_BLOCK_BROWN_MUSHROOM:
+		case E_BLOCK_RED_MUSHROOM:
+		case E_BLOCK_CROPS:
+		case E_BLOCK_REEDS:
+		case E_BLOCK_PUMPKIN_STEM:
+		case E_BLOCK_MELON_STEM:
+		case E_BLOCK_LILY_PAD:
+		case E_BLOCK_NETHER_WART:
+		case E_BLOCK_COCOA_POD:
+		case E_BLOCK_CARROTS:
+		case E_BLOCK_POTATOES:
+		case E_BLOCK_CHORUS_PLANT:
+		case E_BLOCK_CHORUS_FLOWER:
+		case E_BLOCK_BEETROOTS:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_TALL_GRASS:
+		case E_BLOCK_DEAD_BUSH:
+		case E_BLOCK_VINES:
+		case E_BLOCK_BIG_FLOWER:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_LAPIS_BLOCK:
+		case E_BLOCK_GOLD_BLOCK:
+		case E_BLOCK_IRON_BLOCK:
+		case E_BLOCK_DIAMOND_BLOCK:
+		case E_BLOCK_IRON_DOOR:
+		case E_BLOCK_IRON_BARS:
+		case E_BLOCK_BREWING_STAND:
+		case E_BLOCK_CAULDRON:
+		case E_BLOCK_EMERALD_BLOCK:
+		case E_BLOCK_COMMAND_BLOCK:
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_IRON_TRAPDOOR:
+		case E_BLOCK_REPEATING_COMMAND_BLOCK:
+		case E_BLOCK_CHAIN_COMMAND_BLOCK:
+		case E_BLOCK_STRUCTURE_BLOCK:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
+{
+	return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES);
+}
+
+
+
+
+
+bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_PUMPKIN:
+		case E_BLOCK_JACK_O_LANTERN:
+		case E_BLOCK_MELON:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_STONE:
+		case E_BLOCK_COBBLESTONE:
+		case E_BLOCK_BEDROCK:
+		case E_BLOCK_GOLD_ORE:
+		case E_BLOCK_IRON_ORE:
+		case E_BLOCK_COAL_ORE:
+		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_SANDSTONE:
+		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_STONE_SLAB:
+		case E_BLOCK_BRICK:
+		case E_BLOCK_MOSSY_COBBLESTONE:
+		case E_BLOCK_OBSIDIAN:
+		case E_BLOCK_MOB_SPAWNER:
+		case E_BLOCK_DIAMOND_ORE:
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_COBBLESTONE_STAIRS:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_REDSTONE_ORE:
+		case E_BLOCK_REDSTONE_ORE_GLOWING:
+		case E_BLOCK_NETHERRACK:
+		case E_BLOCK_STONE_BRICKS:
+		case E_BLOCK_BRICK_STAIRS:
+		case E_BLOCK_STONE_BRICK_STAIRS:
+		case E_BLOCK_NETHER_BRICK:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_PORTAL_FRAME:
+		case E_BLOCK_END_STONE:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_EMERALD_ORE:
+		case E_BLOCK_ENDER_CHEST:
+		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_NETHER_QUARTZ_ORE:
+		case E_BLOCK_QUARTZ_BLOCK:
+		case E_BLOCK_QUARTZ_STAIRS:
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_STAINED_CLAY:
+		case E_BLOCK_PRISMARINE_BLOCK:
+		case E_BLOCK_HARDENED_CLAY:
+		case E_BLOCK_BLOCK_OF_COAL:
+		case E_BLOCK_RED_SANDSTONE:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
+		case E_BLOCK_RED_SANDSTONE_SLAB:
+		case E_BLOCK_PURPUR_BLOCK:
+		case E_BLOCK_PURPUR_PILLAR:
+		case E_BLOCK_PURPUR_STAIRS:
+		case E_BLOCK_PURPUR_DOUBLE_SLAB:
+		case E_BLOCK_PURPUR_SLAB:
+		case E_BLOCK_END_BRICKS:
+		case E_BLOCK_MAGMA:
+		case E_BLOCK_RED_NETHER_BRICK:
+		case E_BLOCK_BONE_BLOCK:
+		case E_BLOCK_OBSERVER:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBlockInfo:
+
+cBlockInfo::cBlockInfo():
+	m_BlockType(E_BLOCK_STONE),
+	m_LightValue(0x00),
+	m_SpreadLightFalloff(0x0f),
+	m_Transparent(false),
+	m_OneHitDig(false),
+	m_PistonBreakable(false),
+	m_IsRainBlocker(false),
+	m_IsSkylightDispersant(false),
+	m_IsSolid(true),
+	m_UseableBySpectator(false),
+	m_FullyOccupiesVoxel(false),
+	m_CanBeTerraformed(false),
+	m_BlockHeight(1.0),
+	m_Hardness(0.0f),
+	m_Handler()
+{
+}
+
+
+
+
+
+bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
+{
+	return (
+		(a_BlockType == E_BLOCK_ICE) ||
+		(a_BlockType == E_BLOCK_LEAVES) ||
+		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
+	);
+}
+
+
 
 
 

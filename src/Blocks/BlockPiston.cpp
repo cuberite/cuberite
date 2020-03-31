@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockPiston.h"
+#include "../BlockInfo.h"
 #include "../Item.h"
 #include "../World.h"
 #include "../Entities/Player.h"

@@ -37,17 +37,7 @@ class cItem
 {
 public:
 	/** Creates an empty item */
-	cItem(void) :
-		m_ItemType(E_ITEM_EMPTY),
-		m_ItemCount(0),
-		m_ItemDamage(0),
-		m_CustomName(""),
-		m_RepairCost(0),
-		m_FireworkItem(),
-		m_ItemColor()
-	{
-	}
-
+	cItem(void);
 
 	/** Creates an item of the specified type, by default 1 piece with no damage and no enchantments */
 	cItem(
@@ -57,27 +47,7 @@ public:
 		const AString & a_Enchantments = "",
 		const AString & a_CustomName = "",
 		const AStringVector & a_LoreTable = {}
-	) :
-		m_ItemType    (a_ItemType),
-		m_ItemCount   (a_ItemCount),
-		m_ItemDamage  (a_ItemDamage),
-		m_Enchantments(a_Enchantments),
-		m_CustomName  (a_CustomName),
-		m_LoreTable   (a_LoreTable),
-		m_RepairCost  (0),
-		m_FireworkItem(),
-		m_ItemColor()
-	{
-		if (!IsValidItem(m_ItemType))
-		{
-			if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
-			{
-				LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
-			}
-			Empty();
-		}
-	}
-
+	);
 
 	// The constructor is disabled in code, because the compiler generates it anyway,
 	// but it needs to stay because ToLua needs to generate the binding for it
@@ -88,31 +58,14 @@ public:
 
 	#endif
 
+	/** Empties the item and frees up any dynamic storage used by the internals. */
+	void Empty(void);
 
-	void Empty(void)
-	{
-		m_ItemType = E_ITEM_EMPTY;
-		m_ItemCount = 0;
-		m_ItemDamage = 0;
-		m_Enchantments.Clear();
-		m_CustomName = "";
-		m_LoreTable.clear();
-		m_RepairCost = 0;
-		m_FireworkItem.EmptyData();
-		m_ItemColor.Clear();
-	}
+	/** Empties the item and frees up any dynamic storage used by the internals.
+	TODO: What is the usage difference? Merge with Empty()? */
+	void Clear(void);
 
-
-	void Clear(void)
-	{
-		m_ItemType = E_ITEM_EMPTY;
-		m_ItemCount = 0;
-		m_ItemDamage = 0;
-		m_RepairCost = 0;
-		m_ItemColor.Clear();
-	}
-
-
+	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
 	bool IsEmpty(void) const
 	{
 		return ((m_ItemType <= 0) || (m_ItemCount <= 0));

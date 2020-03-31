@@ -175,7 +175,18 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 			{
 				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, Printf("Bedrock floor at {%d, 0, %d}", x, z));
 				auto y = chd.GetHeight(x, z);
-				TEST_EQUAL(y, prevHeight);  // Same height across the entire chunk
+				auto topBlockType = chd.GetBlockType(x, y, z);
+				// Skip the mushrooms generated on the top bedrock layer:
+				if (
+					(topBlockType == E_BLOCK_BROWN_MUSHROOM) ||
+					(topBlockType == E_BLOCK_RED_MUSHROOM)
+				)
+				{
+					y -= 1;
+				}
+				TEST_EQUAL_MSG(y, prevHeight, Printf("Failed: Same height across the entire chunk, at {%d, %d}: exp %d, got %d; top block: %d",
+					x, z, prevHeight, y, chd.GetBlockType(x, y, z)
+				))
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(blockType, E_BLOCK_BEDROCK,
 					Printf("Bedrock ceiling at {%d, %d, %d}: %d", x, y, z, blockType)

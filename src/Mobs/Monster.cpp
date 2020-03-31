@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
+#include "../BlockInfo.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
