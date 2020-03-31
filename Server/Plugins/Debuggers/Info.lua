@@ -22,12 +22,21 @@ g_PluginInfo =
 			Handler = HandleArrowCmd,
 			HelpString = "Creates an arrow going away from the player"
 		},
+
 		["/blk"] =
 		{
 			Permission = "debuggers",
 			Handler = HandleBlkCmd,
 			HelpString = "Gets info about the block you are looking at"
 		},
+
+		["/boom"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBoomCmd,
+			HelpString = "Playes a sound and displays an effect at the player's position",
+		},
+
 		["/clientversion"] =
 		{
 			Permission = "debuggers",
