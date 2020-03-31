@@ -321,7 +321,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	m_IsLightValid = a_SetChunkData.IsLightValid();
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
-	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities())
+	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG

@@ -18,6 +18,7 @@
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
 #include "FunctionRef.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 

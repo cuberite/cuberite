@@ -925,7 +925,7 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
 	}
 
-	return OwnedBlockEntity{ Beacon.release() };
+	return Beacon;
 }
 
 
@@ -951,7 +951,7 @@ OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	}
 
 	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
-	return OwnedBlockEntity{ Bed.release() };
+	return Bed;
 }
 
 
@@ -1009,7 +1009,7 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 	// Restart brewing:
 	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
-	return OwnedBlockEntity{ Brewingstand.release() };
+	return Brewingstand;
 }
 
 
@@ -1033,7 +1033,7 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	auto Chest = cpp14::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
-	return OwnedBlockEntity{ Chest.release() };
+	return Chest;
 }
 
 
@@ -1071,7 +1071,7 @@ OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, in
 
 	// TODO 2014-01-18 xdot: Figure out what TrackOutput is and parse it.
 
-	return OwnedBlockEntity{ CmdBlock.release() };
+	return CmdBlock;
 }
 
 
@@ -1094,7 +1094,7 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 	}
 	auto Dispenser = cpp14::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
-	return OwnedBlockEntity{ Dispenser.release() };
+	return Dispenser;
 }
 
 
@@ -1117,7 +1117,7 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 	auto Dropper = cpp14::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
-	return OwnedBlockEntity{ Dropper.release() };
+	return Dropper;
 }
 
 
@@ -1156,7 +1156,7 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 	}
 
 	FlowerPot->SetItem(Item);
-	return OwnedBlockEntity{ FlowerPot.release() };
+	return FlowerPot;
 }
 
 
@@ -1216,7 +1216,7 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	Furnace->SetLoading(false);
-	return OwnedBlockEntity{ Furnace.release() };
+	return Furnace;
 }
 
 
@@ -1239,7 +1239,7 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	}
 	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
-	return OwnedBlockEntity{ Hopper.release() };
+	return Hopper;
 }
 
 
@@ -1261,7 +1261,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		Jukebox->SetRecord(a_NBT.GetInt(Record));
 	}
-	return OwnedBlockEntity{ Jukebox.release() };
+	return Jukebox;
 }
 
 
@@ -1310,7 +1310,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
 	}
 
-	return OwnedBlockEntity{ MobSpawner.release() };
+	return MobSpawner;
 }
 
 
@@ -1384,7 +1384,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 		MobHead->SetOwner(OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
 	}
 
-	return OwnedBlockEntity{ MobHead.release() };
+	return MobHead;
 }
 
 
@@ -1406,7 +1406,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 	{
 		NoteBlock->SetPitch(static_cast<char>(a_NBT.GetByte(note)));
 	}
-	return OwnedBlockEntity{ NoteBlock.release() };
+	return NoteBlock;
 }
 
 
@@ -1448,7 +1448,7 @@ OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagI
 		Sign->SetLine(3, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
-	return OwnedBlockEntity{ Sign.release() };
+	return Sign;
 }
 
 

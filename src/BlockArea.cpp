@@ -2702,7 +2702,7 @@ cBlockEntity * cBlockArea::GetBlockEntityRel(Vector3i a_RelPos)
 		return nullptr;
 	}
 	auto itr = m_BlockEntities->find(MakeIndex(a_RelPos));
-	return (itr == m_BlockEntities->end()) ? nullptr : itr->second;
+	return (itr == m_BlockEntities->end()) ? nullptr : itr->second.get();
 }
 
 

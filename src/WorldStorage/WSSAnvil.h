@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "../BlockEntities/BlockEntity.h"
 #include "WorldStorage.h"
 #include "FastNBT.h"
 

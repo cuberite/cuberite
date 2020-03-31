@@ -31,6 +31,10 @@
 class cChunk;
 class cPlayer;
 class cWorld;
+class cBlockEntity;
+
+using OwnedBlockEntity = std::unique_ptr<cBlockEntity>;
+using cBlockEntities = std::map<size_t, OwnedBlockEntity>;
 
 
 
