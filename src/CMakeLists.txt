@@ -74,7 +74,6 @@ SET (SRCS
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
-	Tracer.cpp
 	UUID.cpp
 	VoronoiMap.cpp
 	WebAdmin.cpp
@@ -160,7 +159,6 @@ SET (HDRS
 	Stopwatch.h
 	StringCompression.h
 	StringUtils.h
-	Tracer.h
 	UUID.h
 	Vector3.h
 	VoronoiMap.h
