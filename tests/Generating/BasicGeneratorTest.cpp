@@ -256,6 +256,11 @@ static void checkChunkChecksums(
 	{
 		cChunkDesc chd(coords.mCoords);
 		aGenerator.Generate(chd);
+		/*
+		cFile f(Printf("Repeatability_%s-%02d-%02d.raw", aDimension, coords.mCoords.m_ChunkX, coords.mCoords.m_ChunkZ), cFile::fmWrite);
+		f.Write(chd.GetBlockTypes(), sizeof(chd.GetBlockTypes()));
+		f.Close();
+		*/
 		auto checksum = chunkSHA1(chd);
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
 			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
@@ -286,11 +291,11 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 	// Test the default Nether generator:
 	std::vector<CoordsWithChecksum> netherChecksums =
 	{
-		{ 0,    0, "-25231a9ce4bc57eaeaf1f4ad01c32ddd5b2293e5"},
-		{ 1,    0, "-61ef8824b6b241b4f0e28c09505bad5d7898a8a4"},
-		{ 1,    1, "6b3ba6dcb18568e21b3a5aae9ea58368079fbaf8"},
-		{17,    0, "1acc3a28eb1be66b3e4a256f0712a48f96085a39"},
-		{ 8, 1024, "6f9b96e0613ca2fd879dbb53634b511e5649627a"},
+		{ 0,    0, "-487001a1ada9cdd7c8b557d3ff7081881f57c660"},
+		{ 1,    0, "a074ac7a1f2fbf4173324e5edd792197d6a29c2"},
+		{ 1,    1, "5867c5121f2a259ebc2aa53ecafed93dd3d6de95"},
+		{17,    0, "-300191cee5b30592f7b61cd22ea08669eba3f569"},
+		{ 8, 1024, "69bbda09be981f5e3adc53d0a49995aff43f1290"},
 	};
 	checkChunkChecksums(aDefaultNetherGenerator, netherChecksums, "Nether");
 }
