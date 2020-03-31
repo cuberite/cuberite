@@ -423,5 +423,5 @@ void cItem::Empty()
 
 cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
-	return nullptr;
+	return new cBlockHandler(a_BlockType);
 }
