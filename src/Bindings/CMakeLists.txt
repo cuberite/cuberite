@@ -79,7 +79,7 @@ set(BINDING_DEPENDENCIES
 	../BlockEntities/SignEntity.h
 	../BlockEntities/MobHeadEntity.h
 	../BlockEntities/FlowerPotEntity.h
-	../BlockID.h
+	../BlockType.h
 	../BlockInfo.h
 	../BoundingBox.h
 	../ChatColor.h
