@@ -77,7 +77,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().SetEquippedItem(cItem(E_ITEM_GLASS_BOTTLE));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
 		}
 		return true;
 	}
