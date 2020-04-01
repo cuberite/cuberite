@@ -56,7 +56,7 @@ export CUBERITE_BUILD_SERIES_NAME="$SERVERNAME $TARGET $COMPILEMODE ($BRANCH)"
 export CUBERITE_BUILD_ID="$BUILDID"
 export CUBERITE_BUILD_DATETIME="`date`"
 
-if ! [ -x "$(command -v ccache)" ]
+if [ -x "$(command -v ccache)" ]
 then
 	export CCACHE_CPP2=true
 	CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
