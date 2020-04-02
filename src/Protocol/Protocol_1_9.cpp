@@ -3264,19 +3264,13 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 						continue;
 					}
 
-					if (PotionEffect.find("water") != AString::npos)
-					{
-						a_Item.m_ItemDamage = 0;
-						// Water bottles shouldn't have other bits set on them; exit early.
-						continue;
-					}
 					if (PotionEffect.find("empty") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
 					}
 					else if (PotionEffect.find("mundane") != AString::npos)
 					{
-						a_Item.m_ItemDamage = 0;
+						a_Item.m_ItemDamage = 64;
 					}
 					else if (PotionEffect.find("thick") != AString::npos)
 					{
@@ -3337,6 +3331,12 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 					else if (PotionEffect.find("invisibility") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 14;
+					}
+					else if (PotionEffect.find("water") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 0;
+						// Water bottles shouldn't have other bits set on them; exit early.
+						continue;
 					}
 					else
 					{
