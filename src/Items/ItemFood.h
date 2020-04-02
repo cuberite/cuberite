@@ -98,10 +98,7 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
-		{
-			return false;
-		}
+		super::EatItem(a_Player, a_Item);
 
 		if (!a_Player->IsGameModeCreative())
 		{
