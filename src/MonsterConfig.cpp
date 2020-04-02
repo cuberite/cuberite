@@ -14,7 +14,7 @@ struct cMonsterConfig::sAttributesStruct
 	AString m_Name;
 	int     m_SightDistance;
 	int     m_AttackDamage;
-	int     m_AttackRange;
+	double  m_AttackRange;
 	double  m_AttackRate;
 	double  m_MaxHealth;
 	bool    m_IsFireproof;
@@ -71,7 +71,7 @@ void cMonsterConfig::Initialize()
 		AString Name = MonstersIniFile.GetKeyName(i);
 		Attributes.m_Name = Name;
 		Attributes.m_AttackDamage    = MonstersIniFile.GetValueI(Name, "AttackDamage",    0);
-		Attributes.m_AttackRange     = MonstersIniFile.GetValueI(Name, "AttackRange",     0);
+		Attributes.m_AttackRange     = MonstersIniFile.GetValueF(Name, "AttackRange",     0);
 		Attributes.m_SightDistance   = MonstersIniFile.GetValueI(Name, "SightDistance",   0);
 		Attributes.m_AttackRate      = MonstersIniFile.GetValueF(Name, "AttackRate",      0);
 		Attributes.m_MaxHealth       = MonstersIniFile.GetValueF(Name, "MaxHealth",       1);

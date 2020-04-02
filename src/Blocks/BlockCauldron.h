@@ -27,17 +27,31 @@ public:
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-		switch (a_Player.GetEquippedItem().m_ItemType)
+		auto EquippedItem = a_Player.GetEquippedItem();
+		switch (EquippedItem.m_ItemType)
 		{
+			case E_ITEM_BUCKET:
+			{
+				if (Meta == 3)
+				{
+					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+					// Give new bucket, filled with fluid when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_WATER_BUCKET));
+					}
+				}
+				break;
+			}
 			case E_ITEM_WATER_BUCKET:
 			{
 				if (Meta < 3)
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 3);
+					// Give empty bucket back when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.GetInventory().RemoveOneEquippedItem();
-						a_Player.GetInventory().AddItem(cItem(E_ITEM_BUCKET));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 					}
 				}
 				break;
@@ -47,10 +61,26 @@ public:
 				if (Meta > 0)
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
-					a_Player.GetInventory().RemoveOneEquippedItem();
-					a_Player.GetInventory().AddItem(cItem(E_ITEM_POTION));
+					// Give new potion when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+					}
 				}
 				break;
+			}
+			case E_ITEM_POTION:
+			{
+				// Refill cauldron with water bottles.
+				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
+				{
+					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ), ++Meta);
+					// Give empty bottle when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
+					}
+				}
 			}
 		}
 		return true;

@@ -1959,6 +1959,25 @@ void cPlayer::TossEquippedItem(char a_Amount)
 
 
 
+void cPlayer::ReplaceOneEquippedItemTossRest(const cItem & a_Item)
+{
+	auto PlacedCount = GetInventory().ReplaceOneEquippedItem(a_Item);
+	char ItemCountToToss = a_Item.m_ItemCount - static_cast<char>(PlacedCount);
+
+	if (ItemCountToToss == 0)
+	{
+		return;
+	}
+
+	cItem Pickup = a_Item;
+	Pickup.m_ItemCount = ItemCountToToss;
+	TossPickup(Pickup);
+}
+
+
+
+
+
 void cPlayer::TossHeldItem(char a_Amount)
 {
 	cItems Drops;
@@ -3080,7 +3099,7 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;  // No impact from explosion
 	}
 
-	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
 }
 
 

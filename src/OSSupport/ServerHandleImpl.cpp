@@ -205,7 +205,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		evutil_closesocket(MainSock);
 		return false;
 	}
-	if (listen(MainSock, 0) != 0)
+	if (listen(MainSock, SOMAXCONN) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
 		Printf(m_ErrorMsg, "Cannot listen on port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
@@ -263,7 +263,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		return true;  // Report as success, the primary socket is working
 	}
 
-	if (listen(SecondSock, 0) != 0)
+	if (listen(SecondSock, SOMAXCONN) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Cannot listen on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));

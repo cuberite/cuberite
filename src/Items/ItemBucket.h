@@ -71,15 +71,15 @@ public:
 		}
 
 		BLOCKTYPE Block = a_World->GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
-		ENUM_ITEM_TYPE NewItem;
+		ENUM_ITEM_TYPE NewItemType;
 
 		if (IsBlockWater(Block))
 		{
-			NewItem = E_ITEM_WATER_BUCKET;
+			NewItemType = E_ITEM_WATER_BUCKET;
 		}
 		else if (IsBlockLava(Block))
 		{
-			NewItem = E_ITEM_LAVA_BUCKET;
+			NewItemType = E_ITEM_LAVA_BUCKET;
 		}
 		else
 		{
@@ -102,18 +102,7 @@ public:
 		// Give new bucket, filled with fluid when the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			// Remove the bucket from the inventory
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
-			{
-				LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return true;
-			}
-			if (a_Player->GetInventory().AddItem(cItem(NewItem)) != 1)
-			{
-				// The bucket didn't fit, toss it as a pickup:
-				a_Player->TossPickup(cItem(NewItem));
-			}
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(NewItemType));
 		}
 
 		return true;
@@ -155,19 +144,10 @@ public:
 			return false;
 		}
 
+		// Give back an empty bucket if the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			// Remove fluid bucket, add empty bucket:
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
-			{
-				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return false;
-			}
-			if (!a_Player->GetInventory().AddItem(cItem(E_ITEM_BUCKET)))
-			{
-				return false;
-			}
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 		}
 
 		// Wash away anything that was there prior to placing:

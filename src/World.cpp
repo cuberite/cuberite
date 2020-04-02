@@ -1418,17 +1418,20 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
+	Vector3d ExplosionPos(a_BlockX, a_BlockY, a_BlockZ);
 	{
 		cCSLock Lock(m_CSPlayers);
-		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+		for (auto Player : m_Players)
 		{
-			cClientHandle * ch = (*itr)->GetClientHandle();
+			cClientHandle * ch = Player->GetClientHandle();
 			if (ch == nullptr)
 			{
 				continue;
 			}
 
-			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
+			bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
+			auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
+			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
 		}
 	}
 

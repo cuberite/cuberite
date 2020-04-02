@@ -2679,6 +2679,18 @@ end
 
 
 
+function HandleBoomCmd(a_Split, a_Player)
+	local playerPos = a_Player:GetPosition()
+	a_Player:GetWorld():BroadcastParticleEffect("smoke", Vector3f(playerPos), Vector3f(), 0, 900)
+	a_Player:GetWorld():BroadcastSoundEffect("entity.firework.large_blast", playerPos, 1, 1)
+	a_Player:SendMessage("BOOM!")
+	return true
+end
+
+
+
+
+
 function HandleTeamsCmd(a_Split, a_Player)
 	local Scoreboard = a_Player:GetWorld():GetScoreBoard()
 

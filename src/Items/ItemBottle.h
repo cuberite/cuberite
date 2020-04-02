@@ -84,8 +84,11 @@ public:
 			return false;  // Nothing in range.
 		}
 
-		a_Player->GetInventory().RemoveOneEquippedItem();
-		a_Player->GetInventory().AddItem(cItem(E_ITEM_POTION));
+		// Give back a filled water bottle if gamemode is not creative:
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+		}
 		return true;
 	}
 } ;
