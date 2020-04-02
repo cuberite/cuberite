@@ -1211,9 +1211,9 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			cItem EquippedItem = m_Player->GetEquippedItem();
 			cItem OffhandItem = m_Player->GetOffHandEquipedItem();
 
-			cInventory & Intentory = m_Player->GetInventory();
-			Intentory.SetShieldSlot(EquippedItem);
-			Intentory.SetHotbarSlot(Intentory.GetEquippedSlotNum(), OffhandItem);
+			cInventory & Inventory = m_Player->GetInventory();
+			Inventory.SetShieldSlot(EquippedItem);
+			Inventory.SetEquippedItem(OffhandItem);
 
 			return;
 		}
