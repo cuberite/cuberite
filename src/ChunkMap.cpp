@@ -1313,18 +1313,19 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 				a_Entity.TakeDamage(dtExplosion, nullptr, static_cast<int>((1 / std::max(1.0, DistanceFromExplosion.Length())) * 8 * ExplosionSizeInt), 0);
 			}
 
-			double Length = DistanceFromExplosion.Length();
-			if (Length <= ExplosionSizeInt)  // Entity is impacted by explosion
+			float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize));
+
+			// Exposure reduced by armor
+			EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
+
+			auto Impact = std::pow(std::max(0.2, DistanceFromExplosion.Length()), -1);
+			Impact *= EntityExposure * ExplosionSizeInt * 6.0;
+
+			if (Impact > 0.0)
 			{
-				float EntityExposure = a_Entity.GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize));
-
-				// Exposure reduced by armor
-				EntityExposure = EntityExposure * (1.0f - a_Entity.GetEnchantmentBlastKnockbackReduction());
-
-				double Impact = (1 - ((Length / ExplosionSizeInt) / 2)) * EntityExposure;
-
 				DistanceFromExplosion.Normalize();
-				DistanceFromExplosion *= Impact;
+				DistanceFromExplosion *= Vector3d{Impact, 0.0, Impact};
+				DistanceFromExplosion.y += 0.3 * Impact;
 
 				a_Entity.SetSpeed(DistanceFromExplosion);
 			}
@@ -2315,8 +2316,3 @@ void cChunkMap::DelChunkStay(cChunkStay & a_ChunkStay)
 	}  // for itr - Chunks[]
 	a_ChunkStay.OnDisabled();
 }
-
-
-
-
-

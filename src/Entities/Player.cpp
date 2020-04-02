@@ -3080,7 +3080,7 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;  // No impact from explosion
 	}
 
-	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower);
+	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
 }
 
 
