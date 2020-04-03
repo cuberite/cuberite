@@ -71,7 +71,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 <body>
 <div class="header color-background">
 	<div class="wrapper">
-		<a href="]] .. BaseURL .. [[" class="logo">WebAdmin</a>
+		<a href="]] .. BaseURL .. [[" class="logo">Cuberite</a>
 	</div>
 </div>
 <div class="panel">
