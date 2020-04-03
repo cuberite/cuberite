@@ -131,7 +131,7 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 {
 	for (cBlockEntities::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
-		cBlockEntity * BlockEntity = itr->second;
+		auto & BlockEntity = itr->second;
 		BLOCKTYPE EntityBlockType = BlockEntity->GetBlockType();
 		BLOCKTYPE WorldBlockType = m_ChunkData.GetBlock({BlockEntity->GetRelX(), BlockEntity->GetPosY(), BlockEntity->GetRelZ()});
 		if (EntityBlockType != WorldBlockType)
@@ -142,7 +142,6 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 				ItemTypeToString(EntityBlockType), EntityBlockType,
 				ItemTypeToString(WorldBlockType),  WorldBlockType
 			);
-			delete BlockEntity;
 			itr = m_BlockEntities.erase(itr);
 		}
 		else

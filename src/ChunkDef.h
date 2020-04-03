@@ -31,7 +31,6 @@ class cChunkCoords;
 
 using OwnedEntity = std::unique_ptr<cEntity>;
 using cEntityList = std::vector<OwnedEntity>;
-using cBlockEntities = std::map<size_t, cBlockEntity *>;
 
 
 

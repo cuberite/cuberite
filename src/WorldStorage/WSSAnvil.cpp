@@ -612,17 +612,15 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		// Load the proper BlockEntity type based on the block type:
 		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, relPos);
 		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, relPos);
-		std::unique_ptr<cBlockEntity> be(LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta));
-		if (be.get() == nullptr)
+		auto be = LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta);
+		if (be == nullptr)
 		{
 			continue;
 		}
 
 		// Add the BlockEntity to the loaded data:
 		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
-		a_BlockEntities.insert({ Idx, be.get() });
-		// Release after inserting in case it throws.
-		be.release();
+		a_BlockEntities.emplace(Idx, std::move(be));
 	}  // for Child - tag children
 }
 
@@ -630,7 +628,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 
 
-cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	ASSERT((a_Pos.y >= 0) && (a_Pos.y < cChunkDef::Height));
 
@@ -892,7 +890,7 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 
 
-cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({"Beacon", "minecraft:beacon"});
@@ -928,14 +926,14 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
 	}
 
-	return Beacon.release();
+	return std::move(Beacon);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Bed", "minecraft:bed" });
@@ -953,15 +951,14 @@ cBlockEntity * cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx,
 		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
 	}
 
-	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
-	return Bed.release();
+	return cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Brewingstand", "minecraft:brewing_stand" });
@@ -1012,14 +1009,14 @@ cBlockEntity * cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int 
 	// Restart brewing:
 	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
-	return Brewingstand.release();
+	return std::move(Brewingstand);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	// Note that older Cuberite code used "TrappedChest" for trapped chests; new code mimics vanilla and uses "Chest" throughout, but we allow migration here:
@@ -1036,14 +1033,14 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	}
 	auto Chest = cpp14::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
-	return Chest.release();
+	return std::move(Chest);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Control", "minecraft:command_block" });
@@ -1074,14 +1071,14 @@ cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int 
 
 	// TODO 2014-01-18 xdot: Figure out what TrackOutput is and parse it.
 
-	return CmdBlock.release();
+	return std::move(CmdBlock);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Trap", "minecraft:dispenser" });
@@ -1097,14 +1094,14 @@ cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 	auto Dispenser = cpp14::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
-	return Dispenser.release();
+	return std::move(Dispenser);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Dropper", "minecraft:dropper" });
@@ -1120,14 +1117,14 @@ cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	auto Dropper = cpp14::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
-	return Dropper.release();
+	return std::move(Dropper);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "FlowerPot", "minecraft:flower_pot" });
@@ -1159,14 +1156,14 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 
 	FlowerPot->SetItem(Item);
-	return FlowerPot.release();
+	return std::move(FlowerPot);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Furnace", "minecraft:furnace" });
@@ -1219,14 +1216,14 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	Furnace->SetLoading(false);
-	return Furnace.release();
+	return std::move(Furnace);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Hopper", "minecraft:hopper" });
@@ -1242,14 +1239,14 @@ cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagI
 	}
 	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
-	return Hopper.release();
+	return std::move(Hopper);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "RecordPlayer", "minecraft:jukebox" });
@@ -1264,14 +1261,14 @@ cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	{
 		Jukebox->SetRecord(a_NBT.GetInt(Record));
 	}
-	return Jukebox.release();
+	return std::move(Jukebox);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "MobSpawner", "minecraft:mob_spawner" });
@@ -1313,14 +1310,14 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
 	}
 
-	return MobSpawner.release();
+	return std::move(MobSpawner);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Skull", "minecraft:skull" });
@@ -1387,14 +1384,14 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 		MobHead->SetOwner(OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
 	}
 
-	return MobHead.release();
+	return std::move(MobHead);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Music", "minecraft:noteblock" });
@@ -1409,14 +1406,14 @@ cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		NoteBlock->SetPitch(static_cast<char>(a_NBT.GetByte(note)));
 	}
-	return NoteBlock.release();
+	return std::move(NoteBlock);
 }
 
 
 
 
 
-cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Sign", "minecraft:sign" });
@@ -1451,7 +1448,7 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 		Sign->SetLine(3, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
-	return Sign.release();
+	return std::move(Sign);
 }
 
 

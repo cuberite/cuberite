@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <unordered_map>
 
 
 
@@ -31,6 +32,10 @@
 class cChunk;
 class cPlayer;
 class cWorld;
+class cBlockEntity;
+
+using OwnedBlockEntity = std::unique_ptr<cBlockEntity>;
+using cBlockEntities = std::unordered_map<size_t, OwnedBlockEntity>;
 
 
 
@@ -73,11 +78,11 @@ public:
 	/** Creates a new block entity for the specified block type at the specified absolute pos.
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
-	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
+	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
 
 	/** Makes an exact copy of this block entity, except for its m_World (set to nullptr), and at a new position.
 	Uses CopyFrom() to copy the properties. */
-	cBlockEntity * Clone(Vector3i a_Pos);
+	OwnedBlockEntity Clone(Vector3i a_Pos);
 
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
 	Each non-abstract descendant should override to copy its specific properties, and call
