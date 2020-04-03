@@ -296,7 +296,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 				return;
 			}
 
-			// Remove extension, update base state
+			// Remove extension, update base state. Calling FastSetBlock inhibits OnBroken being called by SetBlock.
 			World.FastSetBlock(extensionPos, E_BLOCK_AIR, 0);
 			World.SetBlock(extensionPos, E_BLOCK_AIR, 0);
 			World.SetBlock(a_BlockPos, pistonBlock, pistonMeta & ~(8));
