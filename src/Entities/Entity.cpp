@@ -154,9 +154,6 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
 	a_EntityWorld.AddEntity(std::move(a_Self));
-	ASSERT(m_World != nullptr);
-
-	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
 
 	return true;
 }
