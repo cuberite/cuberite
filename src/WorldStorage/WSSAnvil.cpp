@@ -2668,13 +2668,9 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	// Wither skeleton is a separate mob in Minecraft 1.11+, but we need this to
 	// load them from older worlds where wither skeletons were only a skeleton with a flag
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
-	if (TypeIdx < 0)
-	{
-		return;
-	}
 
 	std::unique_ptr<cMonster> Monster;
-	if (a_NBT.GetByte(TypeIdx) == 1)
+	if ((TypeIdx > 0) && (a_NBT.GetByte(TypeIdx) == 1))
 	{
 		Monster.reset(new cWitherSkeleton);
 	}
