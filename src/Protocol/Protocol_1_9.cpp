@@ -3238,7 +3238,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 							AString NBTName = NBT.GetString(entitytag);
 							ReplaceString(NBTName, "minecraft:", "");
 							eMonsterType MonsterType = cMonster::StringToMobType(NBTName);
-							a_Item.m_ItemDamage = static_cast<short>(MonsterType);
+							a_Item.m_ItemDamage = static_cast<short>(GetProtocolMobType(MonsterType));
 
 						}
 					}
