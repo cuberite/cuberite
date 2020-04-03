@@ -2072,6 +2072,12 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 	auto & OldWorld = *GetWorld();
 	auto Self = OldWorld.RemovePlayer(*this);
 
+	cClientHandle * ch = GetClientHandle();
+	if (ch == nullptr)
+	{
+		return;  // Client handle was removed, bail out
+	}
+
 	ResetPosition(a_WorldChangeInfo.m_NewPosition);
 	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
 	SetWorld(a_WorldChangeInfo.m_NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
@@ -2079,26 +2085,22 @@ void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
 	// Set capabilities based on new world
 	SetCapabilities();
 
-	cClientHandle * ch = GetClientHandle();
-	if (ch != nullptr)
+	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+	ch->InvalidateCachedSentChunk();
+
+	// Send the respawn packet:
+	if (a_WorldChangeInfo.m_SendRespawn)
 	{
-		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-		ch->InvalidateCachedSentChunk();
+		ch->SendRespawn(a_WorldChangeInfo.m_NewWorld->GetDimension());
+	}
 
-		// Send the respawn packet:
-		if (a_WorldChangeInfo.m_SendRespawn)
-		{
-			ch->SendRespawn(a_WorldChangeInfo.m_NewWorld->GetDimension());
-		}
+	// Update the view distance.
+	ch->SetViewDistance(ch->GetRequestedViewDistance());
 
-		// Update the view distance.
-		ch->SetViewDistance(ch->GetRequestedViewDistance());
-
-		// Send current weather of target world to player
-		if (a_WorldChangeInfo.m_NewWorld->GetDimension() == dimOverworld)
-		{
-			ch->SendWeather(a_WorldChangeInfo.m_NewWorld->GetWeather());
-		}
+	// Send current weather of target world to player
+	if (a_WorldChangeInfo.m_NewWorld->GetDimension() == dimOverworld)
+	{
+		ch->SendWeather(a_WorldChangeInfo.m_NewWorld->GetWeather());
 	}
 
 	// New world will take over and announce client at its next tick
