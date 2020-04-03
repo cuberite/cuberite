@@ -54,6 +54,8 @@ public:
 		auto blockTypeBelow = a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1));
 		if (cBlockInfo::FullyOccupiesVoxel(blockTypeBelow) || IsBlockLiquid(blockTypeBelow))
 		{
+			// Setting air with FastSetBlock prevents SetBlock recursively calling OnBroken.
+			a_ChunkInterface.FastSetBlock(a_BlockPos, E_BLOCK_AIR, 0);
 			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_WATER, 0);
 		}
 	}

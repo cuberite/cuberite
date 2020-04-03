@@ -21,27 +21,27 @@ void cBlockBedHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterf
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
 		// Was pillow
-		if (a_ChunkInterface.GetBlock(a_BlockPos - Direction) == E_BLOCK_BED)
+		Vector3i FootPos(a_BlockPos - Direction);
+		if (a_ChunkInterface.GetBlock(FootPos) == E_BLOCK_BED)
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(a_BlockPos - Direction, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(FootPos, E_BLOCK_AIR, 0);
 
 			// Then destroy the bed entity
-			Vector3i PillowPos(a_BlockPos - Direction);
-			a_ChunkInterface.SetBlock(PillowPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.SetBlock(FootPos, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
 		// Was foot end
-		if (a_ChunkInterface.GetBlock(a_BlockPos + Direction) == E_BLOCK_BED)
+		Vector3i PillowPos(a_BlockPos + Direction);
+		if (a_ChunkInterface.GetBlock(PillowPos) == E_BLOCK_BED)
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(a_BlockPos + Direction, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(PillowPos, E_BLOCK_AIR, 0);
 
 			// Then destroy the bed entity
-			Vector3i FootPos(a_BlockPos + Direction);
-			a_ChunkInterface.SetBlock(FootPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.SetBlock(PillowPos, E_BLOCK_AIR, 0);
 		}
 	}
 }

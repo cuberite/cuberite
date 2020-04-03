@@ -297,9 +297,10 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 				return;
 			}
 
-			// Remove extension, update base state
-			World.SetBlock(extensionPos.x, extensionPos.y, extensionPos.z, E_BLOCK_AIR, 0);
-			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta & ~(8));
+			// Remove extension, update base state. Calling FastSetBlock inhibits OnBroken being called by SetBlock.
+			World.FastSetBlock(extensionPos, E_BLOCK_AIR, 0);
+			World.SetBlock(extensionPos, E_BLOCK_AIR, 0);
+			World.SetBlock(a_BlockPos, pistonBlock, pistonMeta & ~(8));
 
 			// (Retraction is always successful, but play in the task for consistency)
 			World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
