@@ -248,8 +248,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled separately as they're both seed and food)
-
 		case E_ITEM_BAKED_POTATO:     return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
 		case E_ITEM_BEETROOT:         return new cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
 		case E_ITEM_BREAD:            return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
@@ -269,12 +267,13 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RAW_RABBIT:       return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
 		case E_ITEM_STEAK:            return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
 
+		// Special-case food with their own handler
+		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
 		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();
-		case E_ITEM_SPIDER_EYE: return new cItemSpiderEyeHandler();
-		case E_ITEM_ROTTEN_FLESH: return new cItemRottenFleshHandler();
 		case E_ITEM_RAW_CHICKEN: return new cItemRawChickenHandler();
 		case E_ITEM_RAW_FISH: return new cItemRawFishHandler();
-		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
+		case E_ITEM_ROTTEN_FLESH: return new cItemRottenFleshHandler();
+		case E_ITEM_SPIDER_EYE: return new cItemSpiderEyeHandler();
 
 		// Soup:
 		case E_ITEM_BEETROOT_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
