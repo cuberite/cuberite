@@ -3088,7 +3088,6 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 void cWorld::AddEntity(OwnedEntity a_Entity)
 {
-	a_Entity->SetWorld(this);
 	cCSLock Lock(m_CSEntitiesToAdd);
 	m_EntitiesToAdd.emplace_back(std::move(a_Entity));
 }
