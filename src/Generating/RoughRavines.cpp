@@ -6,6 +6,7 @@
 #include "Globals.h"
 
 #include "RoughRavines.h"
+#include "../BlockInfo.h"
 
 
 

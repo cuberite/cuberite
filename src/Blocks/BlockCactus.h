@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BlockPlant.h"
+#include "../BlockInfo.h"
 
 
 

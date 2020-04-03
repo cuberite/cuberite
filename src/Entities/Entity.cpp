@@ -3,6 +3,7 @@
 
 #include "Entity.h"
 #include "Player.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Root.h"
 #include "../Matrix4.h"

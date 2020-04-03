@@ -10,6 +10,7 @@ uses a prefabricate in a cBlockArea for drawing itself.
 #include "Prefab.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "ChunkDesc.h"
+#include "../BlockInfo.h"
 
 
 

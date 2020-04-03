@@ -93,30 +93,6 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
-{
-	delete a_Handler;
-}
-
-
-
-
-
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
-{
-	cBlockInfoArray & BlockInfos = *this;
-	// The piece-loading code uses the handlers for rotations, so we need valid handlers
-	// Insert dummy handlers:
-	for (size_t i = 0; i < BlockInfos.size(); i++)
-	{
-		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
-	}
-}
-
-
-
-
-
 cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 {
 }
@@ -408,4 +384,44 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 {
 	return {};
+}
+
+
+
+
+
+cItem::cItem()
+{
+}
+
+
+
+
+
+cItem::cItem(
+	short a_ItemType,
+	char a_ItemCount,
+	short a_ItemDamage,
+	const AString & a_Enchantments,
+	const AString & a_CustomName,
+	const AStringVector & a_LoreTable
+)
+{
+}
+
+
+
+
+
+void cItem::Empty()
+{
+}
+
+
+
+
+
+cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
+{
+	return new cBlockHandler(a_BlockType);
 }

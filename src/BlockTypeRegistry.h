@@ -12,6 +12,7 @@
 
 
 // fwd:
+class cBlockHandler;
 class BlockState;
 
 

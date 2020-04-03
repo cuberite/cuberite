@@ -322,7 +322,7 @@ public:
 
 				if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 				{
-					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, static_cast<ENUM_ITEM_ID>(a_Item.m_ItemType));
+					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 				}
 
 				if (!a_Item.m_Enchantments.IsEmpty())

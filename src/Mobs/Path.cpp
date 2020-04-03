@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "Path.h"
+#include "../BlockInfo.h"
 #include "../Chunk.h"
 
 #define JUMP_G_COST 20

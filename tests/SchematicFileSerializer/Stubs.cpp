@@ -13,10 +13,9 @@
 
 
 
-class cItems
+cBlockInfo::cBlockInfo()
 {
-	// Empty class placeholder
-};
+}
 
 
 

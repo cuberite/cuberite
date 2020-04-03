@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
@@ -70,7 +71,7 @@ public:
 		}
 
 		BLOCKTYPE Block = a_World->GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
-		ENUM_ITEM_ID NewItemType;
+		ENUM_ITEM_TYPE NewItemType;
 
 		if (IsBlockWater(Block))
 		{

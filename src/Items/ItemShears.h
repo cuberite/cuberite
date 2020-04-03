@@ -78,11 +78,11 @@ public:
 
 	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
 	{
-		if (IsBlocksWeb(a_Block) || IsBlockMaterialLeaves(a_Block))
+		if ((a_Block == E_BLOCK_COBWEB) || IsBlockMaterialLeaves(a_Block))
 		{
 			return 15.0f;
 		}
-		else if (IsBlocksWool(a_Block))
+		else if (a_Block == E_BLOCK_WOOL)
 		{
 			return 5.0f;
 		}

@@ -30,6 +30,7 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 #include "Globals.h"
 #include "Caves.h"
+#include "../BlockInfo.h"
 
 
 

@@ -2,11 +2,89 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Item.h"
+#include "BlockType.h"
 #include "ItemGrid.h"
 #include "json/json.h"
 #include "Items/ItemHandler.h"
 
 #include "FastRandom.h"
+
+
+
+
+
+cItem::cItem():
+	m_ItemType(E_ITEM_EMPTY),
+	m_ItemCount(0),
+	m_ItemDamage(0),
+	m_CustomName(""),
+	m_RepairCost(0),
+	m_FireworkItem(),
+	m_ItemColor()
+{
+}
+
+
+
+
+
+cItem::cItem(
+	short a_ItemType,
+	char a_ItemCount,
+	short a_ItemDamage,
+	const AString & a_Enchantments,
+	const AString & a_CustomName,
+	const AStringVector & a_LoreTable
+):
+	m_ItemType    (a_ItemType),
+	m_ItemCount   (a_ItemCount),
+	m_ItemDamage  (a_ItemDamage),
+	m_Enchantments(a_Enchantments),
+	m_CustomName  (a_CustomName),
+	m_LoreTable   (a_LoreTable),
+	m_RepairCost  (0),
+	m_FireworkItem(),
+	m_ItemColor()
+{
+	if (!IsValidItem(m_ItemType))
+	{
+		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
+		{
+			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
+		}
+		Empty();
+	}
+}
+
+
+
+
+
+void cItem::Empty()
+{
+	m_ItemType = E_ITEM_EMPTY;
+	m_ItemCount = 0;
+	m_ItemDamage = 0;
+	m_Enchantments.Clear();
+	m_CustomName = "";
+	m_LoreTable.clear();
+	m_RepairCost = 0;
+	m_FireworkItem.EmptyData();
+	m_ItemColor.Clear();
+}
+
+
+
+
+
+void cItem::Clear()
+{
+	m_ItemType = E_ITEM_EMPTY;
+	m_ItemCount = 0;
+	m_ItemDamage = 0;
+	m_RepairCost = 0;
+	m_ItemColor.Clear();
+}
 
 
 
@@ -196,7 +274,7 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = static_cast<ENUM_ITEM_ID>(a_Value.get("ID", -1).asInt());
+	m_ItemType = static_cast<ENUM_ITEM_TYPE>(a_Value.get("ID", -1).asInt());
 	if (m_ItemType > 0)
 	{
 		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());

@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "Boat.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "Player.h"

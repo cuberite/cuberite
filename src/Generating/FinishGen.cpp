@@ -14,6 +14,7 @@
 #include "../Simulator/FireSimulator.h"
 #include "../IniFile.h"
 #include "../MobSpawner.h"
+#include "../BlockInfo.h"
 
 
 

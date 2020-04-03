@@ -4,7 +4,7 @@
 #include "Globals.h"
 
 #include "Map.h"
-
+#include "BlockInfo.h"
 #include "World.h"
 #include "Chunk.h"
 #include "Entities/Player.h"

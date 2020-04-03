@@ -3,6 +3,7 @@
 
 #include "Pawn.h"
 #include "Player.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BoundingBox.h"

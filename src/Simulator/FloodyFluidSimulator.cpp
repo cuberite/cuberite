@@ -7,6 +7,7 @@
 #include "Globals.h"
 
 #include "FloodyFluidSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Chunk.h"
 #include "../BlockArea.h"

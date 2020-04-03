@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "ChunkData.h"
+#include "BlockType.h"
 
 
 

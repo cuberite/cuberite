@@ -154,7 +154,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, a_Dest, 1);
-		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }

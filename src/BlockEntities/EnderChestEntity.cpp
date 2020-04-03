@@ -3,6 +3,7 @@
 
 #include "EnderChestEntity.h"
 #include "json/json.h"
+#include "../BlockInfo.h"
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/EnderChestWindow.h"

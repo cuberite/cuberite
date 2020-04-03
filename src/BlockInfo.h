@@ -37,14 +37,7 @@ public:
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
 	}
-	inline static bool IsSnowable                 (BLOCKTYPE a_Type)
-	{
-		return (
-			(a_Type == E_BLOCK_ICE) ||
-			(a_Type == E_BLOCK_LEAVES) ||
-			(!IsTransparent(a_Type) && (a_Type != E_BLOCK_PACKED_ICE))
-		);
-	}
+	static bool IsSnowable(BLOCKTYPE a_Type);
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool IsUseableBySpectator       (BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
@@ -57,24 +50,8 @@ public:
 	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler.get();       }
 
 	/** Creates a default BlockInfo structure, initializes all values to their defaults */
-	cBlockInfo():
-		m_BlockType(E_BLOCK_STONE),
-		m_LightValue(0x00),
-		m_SpreadLightFalloff(0x0f),
-		m_Transparent(false),
-		m_OneHitDig(false),
-		m_PistonBreakable(false),
-		m_IsRainBlocker(false),
-		m_IsSkylightDispersant(false),
-		m_IsSolid(true),
-		m_UseableBySpectator(false),
-		m_FullyOccupiesVoxel(false),
-		m_CanBeTerraformed(false),
-		m_BlockHeight(1.0),
-		m_Hardness(0.0f),
-		m_Handler()
-	{
-	}
+	cBlockInfo();
+
 
 private:
 	/** Storage for all the BlockInfo structures. */
@@ -128,6 +105,40 @@ private:
 	/** Associated block handler. */
 	std::unique_ptr<cBlockHandler, sHandlerDeleter> m_Handler;
 };  // tolua_export
+
+
+
+
+
+bool IsBlockWater(BLOCKTYPE a_BlockType);
+
+bool IsBlockIce(BLOCKTYPE a_BlockType);
+
+bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType);
+
+bool IsBlockLava(BLOCKTYPE a_BlockType);
+
+bool IsBlockLiquid(BLOCKTYPE a_BlockType);
+
+bool IsBlockRail(BLOCKTYPE a_BlockType);
+
+bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType);
+
+bool IsBlockFence(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialWood(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialVine(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialIron(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType);
+
+bool IsBlockMaterialRock(BLOCKTYPE a_BlockType);
 
 
 

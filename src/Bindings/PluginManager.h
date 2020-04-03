@@ -2,6 +2,7 @@
 #pragma once
 
 
+#include "../BlockType.h"
 #include "../Defines.h"
 #include "../FunctionRef.h"
 

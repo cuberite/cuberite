@@ -9,7 +9,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "LuaState.h"
-#include "../Tracer.h"
+#include "../BlockInfo.h"
 
 
 
@@ -469,47 +469,6 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 
 
 
-/* method: Trace of class  cTracer */
-static int tolua_cTracer_Trace(lua_State * a_LuaState)
-{
-	// Log a deprecation warning with stacktrace:
-	cLuaState S(a_LuaState);
-	LOGWARNING("The function cTracer:Trace is obsolete, use the cLineBlockTracer instead");
-	S.LogStackTrace();
-
-	// Check params:
-	if (
-		!S.CheckParamUserType(1, "cTracer") ||
-		!S.CheckParamUserType(2, "const Vector3<float>", 3) ||
-		!S.CheckParamNumber  (4)
-	)
-	{
-		return 0;
-	}
-
-	// Read params:
-	cTracer * self;
-	Vector3d * start;
-	Vector3d * direction;
-	int distance;
-	bool lineOfSight = false;
-	if (!S.GetStackValues(1, self, start, direction, distance))
-	{
-		LOGWARNING("Cannot retrieve parameters for cTracer::Trace. Expected a cTracer (self), Vector3d, Vector3d, number and optional boolean.");
-		S.LogStackValues();
-		return 0;
-	}
-	S.GetStackValue(5, lineOfSight);
-
-	// Call and push the result:
-	S.Push(self->Trace(*start, *direction, distance, lineOfSight));
-	return 1;
-}
-
-
-
-
-
 /** function: cWorld:SetSignLines */
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
@@ -639,10 +598,6 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 
 	tolua_beginmodule(tolua_S, "cItem");
 		tolua_variable(tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "cTracer");
-		tolua_function(tolua_S, "Trace", tolua_cTracer_Trace);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cWorld");

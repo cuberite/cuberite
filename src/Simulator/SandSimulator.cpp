@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SandSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Defines.h"
 #include "../Entities/FallingBlock.h"
@@ -283,7 +284,7 @@ void cSandSimulator::FinishFalling(
 
 	// Create a pickup instead:
 	cItems Pickups;
-	Pickups.Add(static_cast<ENUM_ITEM_ID>(a_FallingBlockType), 1, a_FallingBlockMeta);
+	Pickups.Add(static_cast<ENUM_ITEM_TYPE>(a_FallingBlockType), 1, a_FallingBlockMeta);
 	a_World->SpawnItemPickups(
 		Pickups,
 		static_cast<double>(a_BlockX) + 0.5,

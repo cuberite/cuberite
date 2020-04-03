@@ -15,6 +15,8 @@
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
 #include "Item.h"
+#include "BlockInfo.h"
+
 
 
 

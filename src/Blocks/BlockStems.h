@@ -10,7 +10,7 @@
 /** Handler for stems from which produce grows in an adjacent block (melon, pumpkin) after it becomes ripe (meta == 7).
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
-template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_ID StemPickupType>
+template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
 class cBlockStemsHandler:
 	public cBlockPlant<true>
 {

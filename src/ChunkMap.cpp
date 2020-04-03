@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChunkMap.h"
+#include "BlockInfo.h"
 #include "World.h"
 #include "Root.h"
 #include "Entities/Player.h"
