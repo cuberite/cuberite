@@ -133,7 +133,6 @@ set(BINDING_DEPENDENCIES
 	../Server.h
 	../Statistics.h
 	../StringUtils.h
-	../Tracer.h
 	../UI/Window.h
 	../UUID.h
 	../Vector3.h

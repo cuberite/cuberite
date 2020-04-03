@@ -2,7 +2,7 @@
 -- Geometry.lua
 
 -- Defines the documentation for geometry-related classes:
--- cBoundingBox, cCuboid, cLineBlockTracer, cTracer, Vector3X
+-- cBoundingBox, cCuboid, cLineBlockTracer, Vector3X
 
 
 
@@ -1115,20 +1115,6 @@ end
 </pre>
 </p>
 				]],
-			},
-		},
-	},
-	cTracer =
-	{
-		Desc = [[
-			This class is <b>OBSOLETE</b>, do not use it.
-			See the {{cLineBlockTracer}} class for the replacement.
-		]],
-		Functions =
-		{
-			Trace =
-			{
-				Notes = "<b>OBSOLETE</b>, use the {{cLineBlockTracer}} class instead.",
 			},
 		},
 	},
