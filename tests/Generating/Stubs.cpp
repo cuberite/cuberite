@@ -278,7 +278,7 @@ bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockTy
 
 OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
 {
-	return {};
+	return nullptr;
 }
 
 
@@ -320,7 +320,7 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 
 OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 {
-	return {};
+	return nullptr;
 }
 
 

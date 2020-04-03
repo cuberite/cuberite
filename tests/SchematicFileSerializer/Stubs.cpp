@@ -224,7 +224,7 @@ void cBlockEntity::SetPos(Vector3i a_NewPos)
 
 OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 {
-	return {};
+	return nullptr;
 }
 
 
@@ -233,5 +233,5 @@ OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 
 OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
 {
-	return {};
+	return nullptr;
 }
