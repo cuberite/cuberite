@@ -925,7 +925,7 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
 	}
 
-	return Beacon;
+	return std::move(Beacon);
 }
 
 
@@ -950,8 +950,7 @@ OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagId
 		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
 	}
 
-	auto Bed = cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
-	return Bed;
+	return cpp14::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
 }
 
 
@@ -1009,7 +1008,7 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 	// Restart brewing:
 	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
-	return Brewingstand;
+	return std::move(Brewingstand);
 }
 
 
@@ -1033,7 +1032,7 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	auto Chest = cpp14::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
-	return Chest;
+	return std::move(Chest);
 }
 
 
@@ -1071,7 +1070,7 @@ OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, in
 
 	// TODO 2014-01-18 xdot: Figure out what TrackOutput is and parse it.
 
-	return CmdBlock;
+	return std::move(CmdBlock);
 }
 
 
@@ -1094,7 +1093,7 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 	}
 	auto Dispenser = cpp14::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
-	return Dispenser;
+	return std::move(Dispenser);
 }
 
 
@@ -1117,7 +1116,7 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 	auto Dropper = cpp14::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
-	return Dropper;
+	return std::move(Dropper);
 }
 
 
@@ -1156,7 +1155,7 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 	}
 
 	FlowerPot->SetItem(Item);
-	return FlowerPot;
+	return std::move(FlowerPot);
 }
 
 
@@ -1216,7 +1215,7 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	Furnace->SetLoading(false);
-	return Furnace;
+	return std::move(Furnace);
 }
 
 
@@ -1239,7 +1238,7 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	}
 	auto Hopper = cpp14::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
-	return Hopper;
+	return std::move(Hopper);
 }
 
 
@@ -1261,7 +1260,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		Jukebox->SetRecord(a_NBT.GetInt(Record));
 	}
-	return Jukebox;
+	return std::move(Jukebox);
 }
 
 
@@ -1310,7 +1309,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
 	}
 
-	return MobSpawner;
+	return std::move(MobSpawner);
 }
 
 
@@ -1384,7 +1383,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 		MobHead->SetOwner(OwnerUUID, OwnerName, OwnerTexture, OwnerTextureSignature);
 	}
 
-	return MobHead;
+	return std::move(MobHead);
 }
 
 
@@ -1406,7 +1405,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 	{
 		NoteBlock->SetPitch(static_cast<char>(a_NBT.GetByte(note)));
 	}
-	return NoteBlock;
+	return std::move(NoteBlock);
 }
 
 
@@ -1448,7 +1447,7 @@ OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagI
 		Sign->SetLine(3, DecodeSignLine(a_NBT.GetString(currentLine)));
 	}
 
-	return Sign;
+	return std::move(Sign);
 }
 
 
