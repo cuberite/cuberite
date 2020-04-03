@@ -147,7 +147,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
-		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
 		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
@@ -269,6 +268,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 		// Special-case food with their own handler
 		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
+		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();
 		case E_ITEM_RAW_CHICKEN: return new cItemRawChickenHandler();
 		case E_ITEM_RAW_FISH: return new cItemRawFishHandler();
