@@ -5,6 +5,7 @@ SET (SRCS
 
 SET (HDRS
 	ItemArmor.h
+	ItemAxe.h
 	ItemBed.h
 	ItemBigFlower.h
 	ItemBoat.h
@@ -17,12 +18,14 @@ SET (HDRS
 	ItemChest.h
 	ItemCloth.h
 	ItemComparator.h
+	ItemCookedFish.h
 	ItemDoor.h
 	ItemDye.h
 	ItemEmptyMap.h
 	ItemFishingRod.h
 	ItemFlowerPot.h
 	ItemFood.h
+	ItemFoodSeeds.h
 	ItemGoldenApple.h
 	ItemHandler.h
 	ItemHoe.h
@@ -37,22 +40,27 @@ SET (HDRS
 	ItemNetherWart.h
 	ItemPainting.h
 	ItemPickaxe.h
+	ItemPoisonousPotato.h
 	ItemPotion.h
 	ItemPumpkin.h
+	ItemRawChicken.h
+	ItemRawFish.h
 	ItemRedstoneDust.h
 	ItemRedstoneRepeater.h
+	ItemRottenFlesh.h
 	ItemSapling.h
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
 	ItemSign.h
 	ItemSlab.h
+	ItemSoup.h
 	ItemSpawnEgg.h
+	ItemSpiderEye.h
 	ItemString.h
 	ItemSugarcane.h
 	ItemSword.h
 	ItemThrowable.h
-	ItemAxe.h
 )
 
 if(NOT MSVC)
