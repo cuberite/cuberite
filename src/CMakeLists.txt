@@ -15,9 +15,9 @@ set(FOLDERS
 SET (SRCS
 	BiomeDef.cpp
 	BlockArea.cpp
-	BlockID.cpp
 	BlockInfo.cpp
 	BlockState.cpp
+	BlockType.cpp
 	BlockTypePalette.cpp
 	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
@@ -38,6 +38,7 @@ SET (SRCS
 	CraftingRecipes.cpp
 	Cuboid.cpp
 	DeadlockDetect.cpp
+	Defines.cpp
 	Enchantments.cpp
 	FastRandom.cpp
 	FurnaceRecipe.cpp
@@ -85,11 +86,11 @@ SET (HDRS
 	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
-	BlockID.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockState.h
 	BlockTracer.h
+	BlockType.h
 	BlockTypePalette.h
 	BlockTypeRegistry.h
 	BrewingRecipes.h
@@ -179,7 +180,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(BlockID.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
+	set_source_files_properties(BlockType.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
 	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors ")
 	set_source_files_properties(Statistics.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")

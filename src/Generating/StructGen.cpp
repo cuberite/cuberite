@@ -6,6 +6,7 @@
 #include "Trees.h"
 #include "../BlockArea.h"
 #include "../LinearUpscale.h"
+#include "../BlockInfo.h"
 
 
 

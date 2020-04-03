@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
+#include "../BlockInfo.h"
 #include "../Items/ItemHandler.h"
 
 

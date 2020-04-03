@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "Mixins.h"
 

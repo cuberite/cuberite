@@ -14,6 +14,7 @@
 
 
 // fwd:
+class cItem;
 class cMonsterConfig;
 class cBrewingRecipes;
 class cCraftingRecipes;

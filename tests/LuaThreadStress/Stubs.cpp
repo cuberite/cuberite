@@ -35,15 +35,6 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState);
 
 
 
-class cItems
-{
-	// Empty class placeholder
-};
-
-
-
-
-
 void cManualBindings::Bind(lua_State * a_LuaState)
 {
 }
@@ -98,6 +89,14 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 {
 	delete a_Handler;
+}
+
+
+
+
+
+cBlockInfo::cBlockInfo()
+{
 }
 
 

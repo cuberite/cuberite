@@ -7,6 +7,7 @@
 #include "LightingThread.h"
 #include "ChunkMap.h"
 #include "World.h"
+#include "BlockInfo.h"
 
 
 
@@ -534,6 +535,33 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 		// Skip into the next y-level in the 3x3 chunk blob; each level has cChunkDef::Width * 9 rows
 		// We've already walked cChunkDef::Width * 3 in the "for z" cycle, that makes cChunkDef::Width * 6 rows left to skip
 		InIdx += cChunkDef::Width * cChunkDef::Width * 6;
+	}
+}
+
+
+
+
+
+void cLightingThread::PropagateLight(
+	NIBBLETYPE * a_Light,
+	unsigned int a_SrcIdx, unsigned int a_DstIdx,
+	size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+)
+{
+	ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
+	ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
+
+	if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
+	{
+		// We're not offering more light than the dest block already has
+		return;
+	}
+
+	a_Light[a_DstIdx] = a_Light[a_SrcIdx] - cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]);
+	if (!a_IsSeedOut[a_DstIdx])
+	{
+		a_IsSeedOut[a_DstIdx] = true;
+		a_SeedIdxOut[a_NumSeedsOut++] = a_DstIdx;
 	}
 }
 

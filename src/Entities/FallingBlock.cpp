@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "FallingBlock.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "../Simulator/SandSimulator.h"

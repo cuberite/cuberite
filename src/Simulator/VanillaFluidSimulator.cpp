@@ -4,6 +4,7 @@
 #include "Globals.h"
 
 #include "VanillaFluidSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Chunk.h"
 #include "../BlockArea.h"

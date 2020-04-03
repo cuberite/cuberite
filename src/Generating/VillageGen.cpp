@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "VillageGen.h"
 #include "PieceGeneratorBFSTree.h"
+#include "../BlockInfo.h"
 
 
 

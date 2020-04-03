@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "LineBlockTracer.h"
+#include "BlockInfo.h"
 #include "World.h"
 #include "Chunk.h"
 #include "BoundingBox.h"

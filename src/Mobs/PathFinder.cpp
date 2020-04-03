@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "PathFinder.h"
+#include "../BlockInfo.h"
 #include "../Chunk.h"
 
 

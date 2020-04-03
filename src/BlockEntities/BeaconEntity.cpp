@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+#include "../BlockInfo.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"

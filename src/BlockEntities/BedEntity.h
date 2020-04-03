@@ -4,6 +4,7 @@
 #pragma once
 
 #include "BlockEntity.h"
+#include "../BlockType.h"
 
 
 

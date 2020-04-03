@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "BlockType.h"
 #include "ForEachChunkProvider.h"
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
@@ -24,6 +25,7 @@
 
 // fwd:
 class cCuboid;
+class cItem;
 class cItems;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
