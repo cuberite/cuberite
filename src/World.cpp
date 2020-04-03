@@ -1032,6 +1032,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		EntityPtr->OnAddToWorld(*this);
 		ASSERT(!EntityPtr->IsTicking());
 		EntityPtr->SetIsTicking(true);
+		cPluginManager::Get()->CallHookSpawnedEntity(*this, *Entity);
 	}
 	EntitiesToAdd.clear();
 
