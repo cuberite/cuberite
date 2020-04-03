@@ -78,9 +78,21 @@ a:hover, a:active {
 	padding: 13px 0;
 }
 
+.header a {
+	color: #fff;
+	text-decoration: none;
+}
+
 .header svg {
-	fill: #fff;
 	vertical-align: top;
+}
+
+.logo {
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M6 3.04l-6 3v11.92l6 3 6 3 6-3 6-3V6.03l-6-3-6.02-3-6 3zm5.05 4.58l.96.47.96-.5.96-.47V5.96c0-.64.02-1.18.05-1.2.08-.03 4.24 2.12 4.24 2.2 0 .03-1.4.76-3.1 1.63L12 10.14 9.05 8.67C7.4 7.85 5.98 7.13 5.87 7.05l-.2-.12 2.18-1.1 2.2-1.1.02 1.2v1.2zm-4.08 3.72l3.1 1.58v6.34l-2.2-1.1c-1.2-.6-2.2-1.1-2.2-1.13 0-.02.57-.3 1.25-.65l1.25-.6v-1.75l-1-.5-1-.5-1.16.6-1.2.58c-.02 0-.04-1-.04-2.23s.02-2.24.05-2.24c.03 0 1.45.7 3.17 1.58zm13.23.68l-.06 2.2-1.15-.58-1.18-.58-1 .5-1 .5v.74c0 .4.04.8.06.9.03.08.34.28.94.57.5.25 1 .53 1.14.65l.24.2-2.15 1.08-2.13 1.08v-6.4l3.14-1.54c1.73-.86 3.16-1.55 3.16-1.54.02 0 0 1-.02 2.22z'/%3E%3C/svg%3E") no-repeat left center;
+	font-size: 32px;
+	font-weight: bold;
+	padding: 6px 6px 6px 56px;
+	text-transform: uppercase;
 }
 
 .panel {
