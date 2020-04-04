@@ -2672,11 +2672,11 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	std::unique_ptr<cMonster> Monster;
 	if ((TypeIdx > 0) && (a_NBT.GetByte(TypeIdx) == 1))
 	{
-		Monster.reset(new cWitherSkeleton);
+		Monster = cpp14::make_unique<cWitherSkeleton>();
 	}
 	else
 	{
-		Monster.reset(new cSkeleton);
+		Monster = cpp14::make_unique<cSkeleton>();
 	}
 
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
