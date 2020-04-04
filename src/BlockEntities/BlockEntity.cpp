@@ -77,6 +77,7 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETY
 {
 	switch (a_BlockType)
 	{
+		case E_BLOCK_BEACON:        return cpp14::make_unique<cBeaconEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_BED:           return cpp14::make_unique<cBedEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_BREWING_STAND: return cpp14::make_unique<cBrewingstandEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_CHEST:         return cpp14::make_unique<cChestEntity       >(a_BlockType, a_BlockMeta, a_Pos, a_World);
