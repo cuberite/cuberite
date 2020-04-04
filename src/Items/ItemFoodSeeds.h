@@ -1,22 +1,24 @@
 
 #pragma once
 
-#include "ItemHandler.h"
+#include "ItemSeeds.h"
+#include "../World.h"
 
 
 
 
 
-class cItemFoodHandler :
-	public cItemHandler
+class cItemFoodSeedsHandler :
+	public cItemSeedsHandler
 {
-	typedef cItemHandler super;
+	typedef cItemSeedsHandler super;
 
 public:
-	cItemFoodHandler(int a_ItemType, FoodInfo a_FoodInfo)
-		: super(a_ItemType),
+	cItemFoodSeedsHandler(int a_ItemType, FoodInfo a_FoodInfo) :
+		cItemSeedsHandler(a_ItemType),
 		m_FoodInfo(a_FoodInfo)
 	{
+
 	}
 
 
@@ -50,7 +52,3 @@ protected:
 	FoodInfo m_FoodInfo;
 
 };
-
-
-
-

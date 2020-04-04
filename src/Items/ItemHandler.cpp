@@ -9,6 +9,7 @@
 
 // Handlers:
 #include "ItemArmor.h"
+#include "ItemAxe.h"
 #include "ItemBed.h"
 #include "ItemBigFlower.h"
 #include "ItemBoat.h"
@@ -21,6 +22,7 @@
 #include "ItemChest.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
+#include "ItemCookedFish.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
@@ -28,6 +30,7 @@
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemFoodSeeds.h"
 #include "ItemGoldenApple.h"
 #include "ItemHoe.h"
 #include "ItemItemFrame.h"
@@ -41,22 +44,27 @@
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
+#include "ItemPoisonousPotato.h"
 #include "ItemPotion.h"
 #include "ItemPumpkin.h"
+#include "ItemRawChicken.h"
+#include "ItemRawFish.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
+#include "ItemRottenFlesh.h"
 #include "ItemSapling.h"
 #include "ItemSeeds.h"
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
 #include "ItemSlab.h"
+#include "ItemSoup.h"
 #include "ItemSpawnEgg.h"
+#include "ItemSpiderEye.h"
 #include "ItemString.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
 #include "ItemThrowable.h"
-#include "ItemAxe.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -139,7 +147,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
-		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
 		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
@@ -209,14 +216,15 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_CARROT:
 		case E_ITEM_MELON_SEEDS:
-		case E_ITEM_POTATO:
 		case E_ITEM_PUMPKIN_SEEDS:
 		case E_ITEM_SEEDS:
 		{
 			return new cItemSeedsHandler(a_ItemType);
 		}
+
+		case E_ITEM_POTATO: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(1, 0.6));
+		case E_ITEM_CARROT: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(3, 6.6));
 
 		case E_ITEM_ACACIA_DOOR:
 		case E_ITEM_BIRCH_DOOR:
@@ -239,37 +247,38 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
-		case E_ITEM_BAKED_POTATO:
-		case E_ITEM_BEETROOT:
-		case E_ITEM_BEETROOT_SOUP:
-		case E_ITEM_BREAD:
-		case E_ITEM_CHORUS_FRUIT:
-		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_COOKED_FISH:
-		case E_ITEM_COOKED_MUTTON:
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_COOKED_RABBIT:
-		case E_ITEM_COOKIE:
-		case E_ITEM_GOLDEN_CARROT:
-		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_POISONOUS_POTATO:
-		case E_ITEM_PUMPKIN_PIE:
-		case E_ITEM_RABBIT_STEW:
-		case E_ITEM_RAW_BEEF:
-		case E_ITEM_RAW_CHICKEN:
-		case E_ITEM_RAW_FISH:
-		case E_ITEM_RAW_MUTTON:
-		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_RAW_RABBIT:
-		case E_ITEM_RED_APPLE:
-		case E_ITEM_ROTTEN_FLESH:
-		case E_ITEM_SPIDER_EYE:
-		case E_ITEM_STEAK:
-		{
-			return new cItemFoodHandler(a_ItemType);
-		}
+		case E_ITEM_BAKED_POTATO:     return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_BEETROOT:         return new cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
+		case E_ITEM_BREAD:            return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_CHORUS_FRUIT:     return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
+		case E_ITEM_COOKED_CHICKEN:   return new cItemFoodHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_COOKED_MUTTON:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
+		case E_ITEM_COOKED_PORKCHOP:  return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+		case E_ITEM_COOKED_RABBIT:    return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_COOKIE:           return new cItemFoodHandler(a_ItemType, FoodInfo(2, 0.5));
+		case E_ITEM_GOLDEN_CARROT:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 14.4));
+		case E_ITEM_MELON_SLICE:      return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case E_ITEM_PUMPKIN_PIE:      return new cItemFoodHandler(a_ItemType, FoodInfo(8, 4.8));
+		case E_ITEM_RED_APPLE:        return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
+		case E_ITEM_RAW_BEEF:         return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_RAW_MUTTON:       return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case E_ITEM_RAW_PORKCHOP:     return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_RAW_RABBIT:       return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_STEAK:            return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+
+		// Special-case food with their own handler
+		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
+		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
+		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();
+		case E_ITEM_RAW_CHICKEN: return new cItemRawChickenHandler();
+		case E_ITEM_RAW_FISH: return new cItemRawFishHandler();
+		case E_ITEM_ROTTEN_FLESH: return new cItemRottenFleshHandler();
+		case E_ITEM_SPIDER_EYE: return new cItemSpiderEyeHandler();
+
+		// Soup:
+		case E_ITEM_BEETROOT_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_MUSHROOM_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_RABBIT_STEW: return new cItemSoupHandler(a_ItemType, FoodInfo(10, 12));
 
 		// Armor:
 		case E_ITEM_LEATHER_CAP:
