@@ -3626,9 +3626,10 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	if (a_Item.m_Enchantments.IsEmpty() &&
 		a_Item.IsBothNameAndLoreEmpty() &&
 		(ItemType != E_ITEM_FIREWORK_ROCKET) &&
-		(ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() &&
-		(ItemType != E_ITEM_POTION)
-		&& (ItemType != E_ITEM_SPAWN_EGG) &&
+		(ItemType != E_ITEM_FIREWORK_STAR) &&
+		!a_Item.m_ItemColor.IsValid() &&
+		(ItemType != E_ITEM_POTION) &&
+		(ItemType != E_ITEM_SPAWN_EGG) &&
 		(ItemType != E_ITEM_WRITTEN_BOOK) && (ItemType != E_ITEM_BOOK_AND_QUILL))
 	{
 		a_Pkt.WriteBEInt8(0);

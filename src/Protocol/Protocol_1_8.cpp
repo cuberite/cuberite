@@ -2980,6 +2980,65 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		m_Client->HandleNPCTrade(SlotNum);
 		return;
 	}
+	else if ((a_Channel == "MC|BSign") || (a_Channel == "MC|BEdit"))
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemID);
+		// In 1.8 the item id is 387 for a signed book, instead of 386
+		if ((ItemID != E_ITEM_WRITTEN_BOOK) && (ItemID != E_ITEM_BOOK_AND_QUILL))
+		{
+			// Item is not a writeable book
+			return;
+		}
+
+		cPlayer & Player = *m_Client->GetPlayer();
+		if (Player.GetEquippedItem().m_ItemType != E_ITEM_BOOK_AND_QUILL)
+		{
+			// Equipped item is not a writeable book
+			return;
+		}
+
+		// Skip item count (1 byte) and item damage (2 bytes)
+		a_ByteBuffer.SkipRead(3);
+
+		// Read nbt content
+		AString BookData;
+		a_ByteBuffer.ReadString(BookData, a_ByteBuffer.GetReadableSpace() - 1);
+		cParsedNBT NBT(BookData.c_str(), BookData.size());
+
+		cItem BookItem;
+		bool IsSigned = true;
+		if (a_Channel == "MC|BSign")
+		{
+			BookItem = cItem(E_ITEM_WRITTEN_BOOK);
+			// Add the text to a json string
+			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT, true);
+		}
+		else
+		{
+			IsSigned = false;
+			BookItem = cItem(E_ITEM_BOOK_AND_QUILL);
+			cBookContent::ParseFromNBT(0, BookItem.m_BookContent, NBT);
+		}
+		BookItem.m_BookContent.SetIsSigned(IsSigned);
+
+		// The equipped item contains the old book content
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, Player.GetEquippedItem().m_BookContent, BookItem.m_BookContent, IsSigned))
+		{
+			// Plugin denied the player to edit the book
+			cInventory & inv = Player.GetInventory();
+			inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
+			Player.GetInventory().SendEquippedSlot();
+			return;
+		}
+
+		cInventory & inv = Player.GetInventory();
+		inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
+		Player.GetInventory().SendEquippedSlot();
+
+		// Book has been edited by player, inform plugins
+		cRoot::Get()->GetPluginManager()->CallHookPlayerEditedBook(Player, BookItem.m_BookContent, IsSigned);
+		return;
+	}
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
 
 	// Read the payload and send it through to the clienthandle:
@@ -3062,6 +3121,12 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 		LOGWARNING("Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
 			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
 		);
+		return;
+	}
+
+	if ((a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL))
+	{
+		cBookContent::ParseFromNBT(0, a_Item.m_BookContent, NBT);
 		return;
 	}
 
@@ -3249,8 +3314,21 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() &&
+		a_Item.IsBothNameAndLoreEmpty() &&
+		(ItemType != E_ITEM_FIREWORK_ROCKET) &&
+		(ItemType != E_ITEM_FIREWORK_STAR) &&
+		!a_Item.m_ItemColor.IsValid() &&
+		(ItemType != E_ITEM_WRITTEN_BOOK) && (ItemType != E_ITEM_BOOK_AND_QUILL))
 	{
+		a_Pkt.WriteBEInt8(0);
+		return;
+	}
+
+	if ((ItemType == E_ITEM_BOOK_AND_QUILL) && a_Item.m_BookContent.GetPages().empty())
+	{
+		// Don't send any nbt tag if the book is not signed and has no pages
+		// If a tag with a empty pages list is send, the player can't enter anything
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
@@ -3296,6 +3374,33 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	{
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}
+
+	if ((a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL))
+	{
+		if (a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK)
+		{
+			// Only send author and title if the book is signed
+			Writer.AddString("author", a_Item.m_BookContent.GetAuthor());
+			Writer.AddString("title", a_Item.m_BookContent.GetTitle());
+		}
+		if (a_Item.m_BookContent.GetPages().empty())
+		{
+			// A signed book, has a empty page
+			Writer.BeginList("pages", TAG_String);
+			Writer.AddString("", "");
+			Writer.EndList();
+		}
+		else
+		{
+			Writer.BeginList("pages", TAG_String);
+			for (const auto & Page : a_Item.m_BookContent.GetPages())
+			{
+				Writer.AddString("", Page);
+			}
+			Writer.EndList();
+		}
+	}
+
 	Writer.Finish();
 
 	AString Result = Writer.GetResult();
