@@ -1567,6 +1567,25 @@ end
 
 
 
+function HandleCakeCmd(a_Split, a_Player)
+	local lookVector = a_Player:GetLookVector()
+	local pos = a_Player:GetEyePosition() + lookVector
+	local world = a_Player:GetWorld()
+	local speed = lookVector * 10
+	local cakeID = world:SpawnFallingBlock(pos, E_BLOCK_CAKE, 0)
+	world:DoWithEntityByID(cakeID,
+		function(a_CBCake)
+			a_CBCake:SetSpeed(speed)
+		end
+	)
+	a_Player:SendMessage("Your cake is served")
+	return true
+end
+
+
+
+
+
 function HandleClientVersionCmd(a_Split, a_Player)
 	a_Player:SendMessage("Your client version number is " .. a_Player:GetClientHandle():GetProtocolVersion() ..".")
 	return true

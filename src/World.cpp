@@ -2039,7 +2039,7 @@ UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_
 
 
 
-UInt32 cWorld::SpawnFallingBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	auto fallingBlock = cpp14::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
 	auto fallingBlockPtr = fallingBlock.get();

@@ -37,6 +37,13 @@ g_PluginInfo =
 			HelpString = "Playes a sound and displays an effect at the player's position",
 		},
 
+		["/cake"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleCakeCmd,
+			HelpString = "Throws a cake in the direction the player's looking, in a slow arc.",
+		},
+
 		["/clientversion"] =
 		{
 			Permission = "debuggers",

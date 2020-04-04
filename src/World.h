@@ -564,14 +564,22 @@ public:
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	UInt32 SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** OBSOLETE, use the Vector3i-based overload instead.
+	/** Spawns an falling block entity at the given position.
+	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnFallingBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		// When creating from a block position (Vector3i), move the spawn point to the middle of the block by adding (0.5, 0.5, 0.5)
+		return SpawnFallingBlock(Vector3d(0.5, 0, 0.5) + a_BlockPos, a_BlockType, a_BlockMeta);
+	}
+
+	/** OBSOLETE, use the Vector3-based overload instead.
 	Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		return SpawnFallingBlock({a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
+		return SpawnFallingBlock(Vector3i{a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
 	}
 
 	/** Spawns an minecart at the given coordinates.
