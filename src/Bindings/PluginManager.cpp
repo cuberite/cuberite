@@ -730,6 +730,32 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerEditedBook(cPlayer & a_Player, const cBookContent & a_NewContent, bool a_IsSigned)
+{
+	return GenericCallHook(HOOK_PLAYER_EDITED_BOOK, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerEditedBook(a_Player, a_NewContent, a_IsSigned);
+		}
+	);
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerEditingBook(cPlayer & a_Player, const cBookContent & a_OriginalContent, cBookContent & a_NewContent, bool a_IsSigned)
+{
+	return GenericCallHook(HOOK_PLAYER_EDITING_BOOK, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerEditingBook(a_Player, a_OriginalContent, a_NewContent, a_IsSigned);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 {
 	return GenericCallHook(HOOK_PLAYER_FOOD_LEVEL_CHANGE, [&](cPlugin * a_Plugin)

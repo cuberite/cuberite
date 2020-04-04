@@ -81,6 +81,7 @@ set(BINDING_DEPENDENCIES
 	../BlockEntities/FlowerPotEntity.h
 	../BlockType.h
 	../BlockInfo.h
+	../BookContent.h
 	../BoundingBox.h
 	../ChatColor.h
 	../ChunkDef.h

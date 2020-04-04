@@ -71,6 +71,7 @@ void cItem::Empty()
 	m_RepairCost = 0;
 	m_FireworkItem.EmptyData();
 	m_ItemColor.Clear();
+	m_BookContent.Clear();
 }
 
 
@@ -84,6 +85,7 @@ void cItem::Clear()
 	m_ItemDamage = 0;
 	m_RepairCost = 0;
 	m_ItemColor.Clear();
+	m_BookContent.Clear();
 }
 
 
@@ -264,6 +266,27 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 			a_OutValue["FadeColours"] = m_FireworkItem.FadeColoursToString(m_FireworkItem);
 		}
 
+		if (!m_BookContent.IsEmpty() &&
+			((m_ItemType == E_ITEM_WRITTEN_BOOK) || (m_ItemType == E_ITEM_BOOK_AND_QUILL)))
+		{
+			if (!m_BookContent.GetAuthor().empty())
+			{
+				a_OutValue["author"] = m_BookContent.GetAuthor();
+			}
+			if (!m_BookContent.GetTitle().empty())
+			{
+				a_OutValue["title"] = m_BookContent.GetTitle();
+			}
+			if (!m_BookContent.GetPages().empty())
+			{
+				a_OutValue["pages"] = Json::Value(Json::arrayValue);
+				for (const auto & Page : m_BookContent.GetPages())
+				{
+					a_OutValue["pages"].append(Page);
+				}
+			}
+		}
+
 		a_OutValue["RepairCost"] = m_RepairCost;
 	}
 }
@@ -308,6 +331,23 @@ void cItem::FromJson(const Json::Value & a_Value)
 			m_FireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
 			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
+		}
+
+		if ((m_ItemType == E_ITEM_WRITTEN_BOOK) || (m_ItemType == E_ITEM_BOOK_AND_QUILL))
+		{
+			m_BookContent.SetAuthor(a_Value.get("author", "").asString());
+			m_BookContent.SetTitle(a_Value.get("title", "").asString());
+			if (m_ItemType == E_ITEM_WRITTEN_BOOK)
+			{
+				m_BookContent.SetIsSigned(true);
+			}
+			if (a_Value.isMember("pages"))
+			{
+				for (Json::Value::ArrayIndex i = 0; i != a_Value["pages"].size(); i++)
+				{
+					m_BookContent.AddPage(a_Value["pages"][i].asString());
+				}
+			}
 		}
 
 		m_RepairCost = a_Value.get("RepairCost", 0).asInt();

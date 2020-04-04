@@ -12,6 +12,7 @@
 
 // fwd:
 class cBlockEntityWithItems;
+class cBookContent;
 class cBrewingstandEntity;
 class cChunkDesc;
 class cClientHandle;
@@ -109,6 +110,8 @@ public:
 		HOOK_PLAYER_BROKEN_BLOCK,
 		HOOK_PLAYER_DESTROYED,
 		HOOK_PLAYER_EATING,
+		HOOK_PLAYER_EDITED_BOOK,
+		HOOK_PLAYER_EDITING_BOOK,
 		HOOK_PLAYER_FISHED,
 		HOOK_PLAYER_FISHING,
 		HOOK_PLAYER_FOOD_LEVEL_CHANGE,
@@ -249,7 +252,7 @@ public:
 	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
 	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilled		      (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
+	bool CallHookKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
 	bool CallHookLoginForge               (cClientHandle & a_Client, AStringMap & a_Mods);
@@ -258,6 +261,8 @@ public:
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
+	bool CallHookPlayerEditedBook         (cPlayer & a_Player, const cBookContent & a_NewContent, bool a_IsSigned);
+	bool CallHookPlayerEditingBook        (cPlayer & a_Player, const cBookContent & a_OriginalContent, cBookContent & a_NewContent, bool a_IsSigned);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);

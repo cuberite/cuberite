@@ -872,6 +872,17 @@ void cLuaState::Push(const AStringVector & a_Vector)
 
 
 
+void cLuaState::Push(const cBookContent & a_Content)
+{
+	ASSERT(IsValid());
+	auto c = new cBookContent(a_Content);
+	tolua_pushusertype_and_takeownership(m_LuaState, c, "cBookContent");
+}
+
+
+
+
+
 void cLuaState::Push(const char * a_Value)
 {
 	ASSERT(IsValid());

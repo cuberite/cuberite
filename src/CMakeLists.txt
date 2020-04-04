@@ -23,6 +23,7 @@ SET (SRCS
 	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
+	BookContent.cpp
 	ByteBuffer.cpp
 	ChatColor.cpp
 	Chunk.cpp
@@ -93,6 +94,7 @@ SET (HDRS
 	BlockTypePalette.h
 	BlockTypeRegistry.h
 	BrewingRecipes.h
+	BookContent.h
 	BoundingBox.h
 	BuildInfo.h.cmake
 	ByteBuffer.h

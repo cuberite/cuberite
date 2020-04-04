@@ -284,10 +284,11 @@ public:
 			mWriter.AddByte ("Slot", static_cast<unsigned char>(a_Slot));
 		}
 
-		// Write the tag compound (for enchantment, firework, custom name and repair cost):
+		// Write the tag compound (for enchantment, firework, custom name, repair cost and books):
 		if (
 			(!a_Item.m_Enchantments.IsEmpty()) ||
 			((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
+			(a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL) ||
 			(a_Item.m_RepairCost > 0) ||
 			(a_Item.m_CustomName != "") ||
 			(!a_Item.m_LoreTable.empty())
@@ -329,6 +330,11 @@ public:
 				{
 					const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
+				}
+
+				if ((a_Item.m_ItemType == E_ITEM_WRITTEN_BOOK) || (a_Item.m_ItemType == E_ITEM_BOOK_AND_QUILL))
+				{
+					cBookContent::WriteToNBTCompound(a_Item.m_BookContent, mWriter);
 				}
 			mWriter.EndCompound();
 		}

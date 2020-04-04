@@ -65,6 +65,7 @@
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
 #include "ItemThrowable.h"
+#include "ItemWrittenBook.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -116,6 +117,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
+		case E_ITEM_BOOK_AND_QUILL:      return new cItemWrittenBookHandler(a_ItemType);
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
@@ -162,6 +164,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
+		case E_ITEM_WRITTEN_BOOK:        return new cItemWrittenBookHandler(a_ItemType);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:

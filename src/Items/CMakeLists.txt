@@ -61,6 +61,7 @@ SET (HDRS
 	ItemSugarcane.h
 	ItemSword.h
 	ItemThrowable.h
+	ItemWrittenBook.h
 )
 
 if(NOT MSVC)

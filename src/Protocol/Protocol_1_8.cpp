@@ -256,6 +256,17 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 
 
 
+void cProtocol_1_8_0::SendOpenBook(const short a_Hand)
+{
+	cPacketizer Pkt(*this, pktPluginMessage);  // Plugin Channel
+	Pkt.WriteString("MC|BOpen");
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Hand));
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendCameraSetTo(const cEntity & a_Entity)
 {
 	cPacketizer Pkt(*this, pktCameraSetTo);
