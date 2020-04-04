@@ -599,7 +599,10 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		ASSERT(TryY > 0);
 		ASSERT(TryY < cChunkDef::Height - 1);
 
-		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(TryX, TryZ);
+		int WorldX, WorldY, WorldZ;
+		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
+
+		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(WorldX, WorldZ);
 		// MG TODO :
 		// Moon cycle (for slime)
 		// check player and playerspawn presence < 24 blocks
@@ -624,8 +627,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		{
 			continue;
 		}
-		int WorldX, WorldY, WorldZ;
-		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
 		double ActualX = WorldX + 0.5;
 		double ActualZ = WorldZ + 0.5;
 		newMob->SetPosition(ActualX, WorldY, ActualZ);

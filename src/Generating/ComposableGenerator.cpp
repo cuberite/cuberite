@@ -225,8 +225,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"BottomLava, "
 				"DeadBushes, "
 				"NaturalPatches, "
-				"PreSimulator, "
-				"Animals"
+				"PreSimulator"
 			);
 			break;
 		}  // dimOverworld
@@ -387,11 +386,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		const auto & finisher = split[0];
 		// Finishers, alpha-sorted:
-		if (NoCaseCompare(finisher, "Animals") == 0)
-		{
-			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPassiveMobs(m_Seed, a_IniFile, m_Dimension)));
-		}
-		else if (NoCaseCompare(finisher, "BottomLava") == 0)
+		if (NoCaseCompare(finisher, "BottomLava") == 0)
 		{
 			int DefaultBottomLavaLevel = (m_Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);

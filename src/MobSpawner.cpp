@@ -152,8 +152,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtSheep:
 		{
 			return (
-				(targetBlock == E_BLOCK_AIR) &&
-				(blockAbove == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(targetBlock)) &&
+				(!cBlockInfo::IsTransparent(blockAbove)) &&
 				(blockBelow == E_BLOCK_GRASS) &&
 				(skyLight >= 9)
 			);
