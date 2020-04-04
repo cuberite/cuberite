@@ -62,7 +62,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			);
 			*/
 
-			auto FallingBlock = cpp14::make_unique<cFallingBlock>(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
+			auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3d(0.5, 0, 0.5) + Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
 			auto FallingBlockPtr = FallingBlock.get();
 			if (!FallingBlockPtr->Initialize(std::move(FallingBlock), m_World))
 			{
