@@ -430,6 +430,7 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		case mtVillager:              return 79;
 		case mtWitch:                 return 82;
 		case mtWither:                return 83;
+		case mtWitherSkeleton:        return 84;
 		case mtWolf:                  return 86;
 		case mtZombie:                return 87;
 		case mtZombiePigman:          return 53;

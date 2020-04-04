@@ -1063,6 +1063,7 @@ enum ENUM_ITEM_META : short
 	// See also cMonster::eType, since monster type and spawn egg meta are the same
 	E_META_SPAWN_EGG_PICKUP           = 1,
 	E_META_SPAWN_EGG_EXPERIENCE_ORB   = 2,
+	E_META_SPAWN_EGG_WITHER_SKELETON  = 5,
 	E_META_SPAWN_EGG_LEASH_KNOT       = 8,
 	E_META_SPAWN_EGG_PAINTING         = 9,
 	E_META_SPAWN_EGG_ARROW            = 10,

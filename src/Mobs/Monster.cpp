@@ -37,37 +37,38 @@ static const struct
 	const char * m_VanillaNameNBT;
 } g_MobTypeNames[] =
 {
-	{mtBat,          "bat",          "Bat",             "bat"},
-	{mtBlaze,        "blaze",        "Blaze",           "blaze"},
-	{mtCaveSpider,   "cavespider",   "CaveSpider",      "cave_spider"},
-	{mtChicken,      "chicken",      "Chicken",         "chicken"},
-	{mtCow,          "cow",          "Cow",             "cow"},
-	{mtCreeper,      "creeper",      "Creeper",         "creeper"},
-	{mtEnderman,     "enderman",     "Enderman",        "enderman"},
-	{mtEnderDragon,  "enderdragon",  "EnderDragon",     "ender_dragon"},
-	{mtGhast,        "ghast",        "Ghast",           "ghast"},
-	{mtGiant,        "giant",        "Giant",           "giant"},
-	{mtGuardian,     "guardian",     "Guardian",        "guardian"},
-	{mtHorse,        "horse",        "EntityHorse",     "horse"},
-	{mtIronGolem,    "irongolem",    "VillagerGolem",   "iron_golem"},
-	{mtMagmaCube,    "magmacube",    "LavaSlime",       "magma_cube"},
-	{mtMooshroom,    "mooshroom",    "MushroomCow",     "mooshroom"},
-	{mtOcelot,       "ocelot",       "Ozelot",          "ocelot"},
-	{mtPig,          "pig",          "Pig",             "pig"},
-	{mtRabbit,       "rabbit",       "Rabbit",          "rabbit"},
-	{mtSheep,        "sheep",        "Sheep",           "sheep"},
-	{mtSilverfish,   "silverfish",   "Silverfish",      "silverfish"},
-	{mtSkeleton,     "skeleton",     "Skeleton",        "skeleton"},
-	{mtSlime,        "slime",        "Slime",           "slime"},
-	{mtSnowGolem,    "snowgolem",    "SnowMan",         "snow_golem"},
-	{mtSpider,       "spider",       "Spider",          "spider"},
-	{mtSquid,        "squid",        "Squid",           "squid"},
-	{mtVillager,     "villager",     "Villager",        "villager"},
-	{mtWitch,        "witch",        "Witch",           "witch"},
-	{mtWither,       "wither",       "WitherBoss",      "wither"},
-	{mtWolf,         "wolf",         "Wolf",            "wolf"},
-	{mtZombie,       "zombie",       "Zombie",          "zombie"},
-	{mtZombiePigman, "zombiepigman", "PigZombie",       "zombie_pigman"},
+	{mtBat,            "bat",            "Bat",            "bat"},
+	{mtBlaze,          "blaze",          "Blaze",          "blaze"},
+	{mtCaveSpider,     "cavespider",     "CaveSpider",     "cave_spider"},
+	{mtChicken,        "chicken",        "Chicken",        "chicken"},
+	{mtCow,            "cow",            "Cow",            "cow"},
+	{mtCreeper,        "creeper",        "Creeper",        "creeper"},
+	{mtEnderman,       "enderman",       "Enderman",       "enderman"},
+	{mtEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
+	{mtGhast,          "ghast",          "Ghast",          "ghast"},
+	{mtGiant,          "giant",          "Giant",          "giant"},
+	{mtGuardian,       "guardian",       "Guardian",       "guardian"},
+	{mtHorse,          "horse",          "EntityHorse",    "horse"},
+	{mtIronGolem,      "irongolem",      "VillagerGolem",  "iron_golem"},
+	{mtMagmaCube,      "magmacube",      "LavaSlime",      "magma_cube"},
+	{mtMooshroom,      "mooshroom",      "MushroomCow",    "mooshroom"},
+	{mtOcelot,         "ocelot",         "Ozelot",         "ocelot"},
+	{mtPig,            "pig",            "Pig",            "pig"},
+	{mtRabbit,         "rabbit",         "Rabbit",         "rabbit"},
+	{mtSheep,          "sheep",          "Sheep",          "sheep"},
+	{mtSilverfish,     "silverfish",     "Silverfish",     "silverfish"},
+	{mtSkeleton,       "skeleton",       "Skeleton",       "skeleton"},
+	{mtSlime,          "slime",          "Slime",          "slime"},
+	{mtSnowGolem,      "snowgolem",      "SnowMan",        "snow_golem"},
+	{mtSpider,         "spider",         "Spider",         "spider"},
+	{mtSquid,          "squid",          "Squid",          "squid"},
+	{mtVillager,       "villager",       "Villager",       "villager"},
+	{mtWitch,          "witch",          "Witch",          "witch"},
+	{mtWither,         "wither",         "WitherBoss",     "wither"},
+	{mtWitherSkeleton, "witherskeleton", "WitherSkeleton", "wither_skeleton"},
+	{mtWolf,           "wolf",           "Wolf",           "wolf"},
+	{mtZombie,         "zombie",         "Zombie",         "zombie"},
+	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
 } ;
 
 
@@ -658,6 +659,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtSkeleton:
 		case mtSpider:
 		case mtWitch:
+		case mtWitherSkeleton:
 		case mtZombie:
 		case mtZombiePigman:
 		case mtSlime:
@@ -1044,37 +1046,38 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 
 	switch (a_Type)
 	{
-		case mtBat:          return mfAmbient;
-		case mtBlaze:        return mfHostile;
-		case mtCaveSpider:   return mfHostile;
-		case mtChicken:      return mfPassive;
-		case mtCow:          return mfPassive;
-		case mtCreeper:      return mfHostile;
-		case mtEnderDragon:  return mfNoSpawn;
-		case mtEnderman:     return mfHostile;
-		case mtGhast:        return mfHostile;
-		case mtGiant:        return mfNoSpawn;
-		case mtGuardian:     return mfWater;  // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
-		case mtHorse:        return mfPassive;
-		case mtIronGolem:    return mfPassive;
-		case mtMagmaCube:    return mfHostile;
-		case mtMooshroom:    return mfHostile;
-		case mtOcelot:       return mfPassive;
-		case mtPig:          return mfPassive;
-		case mtRabbit:       return mfPassive;
-		case mtSheep:        return mfPassive;
-		case mtSilverfish:   return mfHostile;
-		case mtSkeleton:     return mfHostile;
-		case mtSlime:        return mfHostile;
-		case mtSnowGolem:    return mfNoSpawn;
-		case mtSpider:       return mfHostile;
-		case mtSquid:        return mfWater;
-		case mtVillager:     return mfPassive;
-		case mtWitch:        return mfHostile;
-		case mtWither:       return mfNoSpawn;
-		case mtWolf:         return mfHostile;
-		case mtZombie:       return mfHostile;
-		case mtZombiePigman: return mfHostile;
+		case mtBat:            return mfAmbient;
+		case mtBlaze:          return mfHostile;
+		case mtCaveSpider:     return mfHostile;
+		case mtChicken:        return mfPassive;
+		case mtCow:            return mfPassive;
+		case mtCreeper:        return mfHostile;
+		case mtEnderDragon:    return mfNoSpawn;
+		case mtEnderman:       return mfHostile;
+		case mtGhast:          return mfHostile;
+		case mtGiant:          return mfNoSpawn;
+		case mtGuardian:       return mfWater;  // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
+		case mtHorse:          return mfPassive;
+		case mtIronGolem:      return mfPassive;
+		case mtMagmaCube:      return mfHostile;
+		case mtMooshroom:      return mfHostile;
+		case mtOcelot:         return mfPassive;
+		case mtPig:            return mfPassive;
+		case mtRabbit:         return mfPassive;
+		case mtSheep:          return mfPassive;
+		case mtSilverfish:     return mfHostile;
+		case mtSkeleton:       return mfHostile;
+		case mtSlime:          return mfHostile;
+		case mtSnowGolem:      return mfNoSpawn;
+		case mtSpider:         return mfHostile;
+		case mtSquid:          return mfWater;
+		case mtVillager:       return mfPassive;
+		case mtWitch:          return mfHostile;
+		case mtWither:         return mfNoSpawn;
+		case mtWitherSkeleton: return mfHostile;
+		case mtWolf:           return mfHostile;
+		case mtZombie:         return mfHostile;
+		case mtZombiePigman:   return mfHostile;
 
 		default:
 		{
@@ -1173,11 +1176,6 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		{
 			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtSkeleton:
-		{
-			// TODO: Actual detection of spawning in Nether
-			return cpp14::make_unique<cSkeleton>(false);
-		}
 		case mtVillager:
 		{
 			int VillagerType = Random.RandInt(6);
@@ -1206,32 +1204,34 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 			return cpp14::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
 
-		case mtBat:           return cpp14::make_unique<cBat>();
-		case mtBlaze:         return cpp14::make_unique<cBlaze>();
-		case mtCaveSpider:    return cpp14::make_unique<cCaveSpider>();
-		case mtChicken:       return cpp14::make_unique<cChicken>();
-		case mtCow:           return cpp14::make_unique<cCow>();
-		case mtCreeper:       return cpp14::make_unique < cCreeper>();
-		case mtEnderDragon:   return cpp14::make_unique<cEnderDragon>();
-		case mtEnderman:      return cpp14::make_unique<cEnderman>();
-		case mtGhast:         return cpp14::make_unique<cGhast>();
-		case mtGiant:         return cpp14::make_unique<cGiant>();
-		case mtGuardian:      return cpp14::make_unique<cGuardian>();
-		case mtIronGolem:     return cpp14::make_unique<cIronGolem>();
-		case mtMooshroom:     return cpp14::make_unique<cMooshroom>();
-		case mtOcelot:        return cpp14::make_unique<cOcelot>();
-		case mtPig:           return cpp14::make_unique<cPig>();
-		case mtRabbit:        return cpp14::make_unique<cRabbit>();
-		case mtSheep:         return cpp14::make_unique<cSheep>();
-		case mtSilverfish:    return cpp14::make_unique<cSilverfish>();
-		case mtSnowGolem:     return cpp14::make_unique<cSnowGolem>();
-		case mtSpider:        return cpp14::make_unique<cSpider>();
-		case mtSquid:         return cpp14::make_unique<cSquid>();
-		case mtWitch:         return cpp14::make_unique<cWitch>();
-		case mtWither:        return cpp14::make_unique<cWither>();
-		case mtWolf:          return cpp14::make_unique<cWolf>();
-		case mtZombie:        return cpp14::make_unique<cZombie>(false);  // TODO: Infected zombie parameter
-		case mtZombiePigman:  return cpp14::make_unique<cZombiePigman>();
+		case mtBat:            return cpp14::make_unique<cBat>();
+		case mtBlaze:          return cpp14::make_unique<cBlaze>();
+		case mtCaveSpider:     return cpp14::make_unique<cCaveSpider>();
+		case mtChicken:        return cpp14::make_unique<cChicken>();
+		case mtCow:            return cpp14::make_unique<cCow>();
+		case mtCreeper:        return cpp14::make_unique<cCreeper>();
+		case mtEnderDragon:    return cpp14::make_unique<cEnderDragon>();
+		case mtEnderman:       return cpp14::make_unique<cEnderman>();
+		case mtGhast:          return cpp14::make_unique<cGhast>();
+		case mtGiant:          return cpp14::make_unique<cGiant>();
+		case mtGuardian:       return cpp14::make_unique<cGuardian>();
+		case mtIronGolem:      return cpp14::make_unique<cIronGolem>();
+		case mtMooshroom:      return cpp14::make_unique<cMooshroom>();
+		case mtOcelot:         return cpp14::make_unique<cOcelot>();
+		case mtPig:            return cpp14::make_unique<cPig>();
+		case mtRabbit:         return cpp14::make_unique<cRabbit>();
+		case mtSheep:          return cpp14::make_unique<cSheep>();
+		case mtSilverfish:     return cpp14::make_unique<cSilverfish>();
+		case mtSkeleton:       return cpp14::make_unique<cSkeleton>();
+		case mtSnowGolem:      return cpp14::make_unique<cSnowGolem>();
+		case mtSpider:         return cpp14::make_unique<cSpider>();
+		case mtSquid:          return cpp14::make_unique<cSquid>();
+		case mtWitch:          return cpp14::make_unique<cWitch>();
+		case mtWither:         return cpp14::make_unique<cWither>();
+		case mtWitherSkeleton: return cpp14::make_unique<cWitherSkeleton>();
+		case mtWolf:           return cpp14::make_unique<cWolf>();
+		case mtZombie:         return cpp14::make_unique<cZombie>(false);  // TODO: Infected zombie parameter
+		case mtZombiePigman:   return cpp14::make_unique<cZombiePigman>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");

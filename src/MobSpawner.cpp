@@ -287,6 +287,18 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
+		case mtWitherSkeleton:
+		{
+			return (
+				(targetBlock == E_BLOCK_AIR) &&
+				(blockAbove == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(blockBelow)) &&
+				(skyLight <= 7) &&
+				(blockLight <= 7) &&
+				(random.RandBool(0.6))
+			);
+		}
+
 		case mtWolf:
 		{
 			return (
@@ -443,6 +455,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	ListOfSpawnables.insert(mtBlaze);
 	ListOfSpawnables.insert(mtGhast);
 	ListOfSpawnables.insert(mtMagmaCube);
+	ListOfSpawnables.insert(mtWitherSkeleton);
 	ListOfSpawnables.insert(mtZombiePigman);
 
 	return ListOfSpawnables;
@@ -461,7 +474,11 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 		{
 			return nullptr;
 		}
-		if (m_MobType == mtWolf)
+		if (m_MobType == mtWitherSkeleton)
+		{
+			a_MaxPackSize = 5;
+		}
+		else if (m_MobType == mtWolf)
 		{
 			a_MaxPackSize = 8;
 		}

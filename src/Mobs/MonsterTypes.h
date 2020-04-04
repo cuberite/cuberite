@@ -39,6 +39,7 @@ enum eMonsterType
 	mtVillager,
 	mtWitch,
 	mtWither,
+	mtWitherSkeleton,
 	mtWolf,
 	mtZombie,
 	mtZombiePigman,

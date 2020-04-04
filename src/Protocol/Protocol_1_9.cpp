@@ -1918,6 +1918,7 @@ UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtVillager:              return 120;
 		case mtWitch:                 return 66;
 		case mtWither:                return 64;
+		case mtWitherSkeleton:        return 51;
 		case mtWolf:                  return 95;
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
@@ -4201,15 +4202,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Type
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -4251,6 +4243,14 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			// TODO: Use boss bar packet for health
 			break;
 		}  // case mtWither
+
+		case mtWitherSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(11);  // Index 11: Type
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);  // Is wither skeleton
+			break;
+		}  // case mtWitherSkeleton
 
 		case mtWolf:
 		{
