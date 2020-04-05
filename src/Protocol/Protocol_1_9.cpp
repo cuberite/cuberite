@@ -1235,7 +1235,7 @@ void cProtocol_1_9_0::SendResetTitle(void)
 
 
 
-void cProtocol_1_9_0::SendResourcePack(AString a_ResourcePackUrl)
+void cProtocol_1_9_0::SendResourcePack(const AString & a_ResourcePackUrl)
 {
 	cPacketizer Pkt(*this, pktResourcePack);
 	const unsigned char * ResourcePackUrl = reinterpret_cast<const unsigned char *>(a_ResourcePackUrl.c_str());

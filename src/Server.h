@@ -94,7 +94,6 @@ public:
 
 	// tolua_end
 
-	// Returns the resource pack URL, if one is specified:
 	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
 
 	bool Start(void);

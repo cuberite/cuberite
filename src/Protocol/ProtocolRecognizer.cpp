@@ -700,7 +700,7 @@ void cProtocolRecognizer::SendResetTitle(void)
 
 
 
-void cProtocolRecognizer::SendResourcePack(AString a_ResourcePackUrl)
+void cProtocolRecognizer::SendResourcePack(const AString & a_ResourcePackUrl)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendResourcePack(a_ResourcePackUrl);
