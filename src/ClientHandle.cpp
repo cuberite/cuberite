@@ -428,7 +428,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		// Send resource pack
 		if (!cRoot::Get()->GetServer()->GetResourcePackUrl().empty())
 		{
-			m_Protocol->SendResourcePack(cRoot::Get()->GetServer()->GetResourcePackUrl());
+			SendResourcePack(cRoot::Get()->GetServer()->GetResourcePackUrl());
 		}
 
 		SetState(csAuthenticated);
@@ -2234,7 +2234,10 @@ void cClientHandle::ServerTick(float a_Dt)
 
 	{
 		cCSLock lock(m_CSState);
-		if (m_State == csAuthenticated)
+		if (
+			(m_State == csAuthenticated) &&
+			(m_ResourcePackStatus != -1)
+		)
 		{
 			StreamNextChunk();
 
@@ -2244,6 +2247,7 @@ void cClientHandle::ServerTick(float a_Dt)
 			// Add the player to the world (start ticking from there):
 			m_State = csDownloadingWorld;
 			m_Player->Initialize(std::move(m_PlayerPtr), *(m_Player->GetWorld()));
+
 			return;
 		}
 	}  // lock(m_CSState)
@@ -2929,6 +2933,15 @@ void cClientHandle::SendExperience(void)
 void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
+}
+
+
+
+
+
+void cClientHandle::SendResourcePack(const AString & a_ResourcePackUrl)
+{
+	m_Protocol->SendResourcePack(a_ResourcePackUrl);
 }
 
 

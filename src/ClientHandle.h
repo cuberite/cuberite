@@ -114,6 +114,8 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
+	void SetResourcePackStatus(int a_ResourcePackStatus) { m_ResourcePackStatus = a_ResourcePackStatus; }
+
 	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
 	bool StreamNextChunk();
 
@@ -197,6 +199,7 @@ public:  // tolua_export
 	void SendPlayerSpawn                (const cPlayer & a_Player);
 	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
+	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
@@ -417,6 +420,8 @@ private:
 
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
 	int m_RequestedViewDistance;
+	
+	int m_ResourcePackStatus = -1;
 
 	AString m_IPString;
 
