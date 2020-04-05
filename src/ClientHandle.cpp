@@ -2152,7 +2152,7 @@ void cClientHandle::Tick(float a_Dt)
 		cCSLock lock(m_CSState);
 		if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 		{
-			//m_Protocol->SendPlayerMoveLook();
+			m_Protocol->SendPlayerMoveLook();
 			m_State = csPlaying;
 		}
 	}  // lock(m_CSState)
