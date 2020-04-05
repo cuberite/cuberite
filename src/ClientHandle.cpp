@@ -2247,7 +2247,6 @@ void cClientHandle::ServerTick(float a_Dt)
 			// Add the player to the world (start ticking from there):
 			m_State = csDownloadingWorld;
 			m_Player->Initialize(std::move(m_PlayerPtr), *(m_Player->GetWorld()));
-
 			return;
 		}
 	}  // lock(m_CSState)
