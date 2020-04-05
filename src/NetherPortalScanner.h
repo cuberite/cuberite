@@ -15,7 +15,7 @@ class cWorld;
 class cNetherPortalScanner : public cChunkStay
 {
 public:
-	cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY);
+	cNetherPortalScanner(cEntity & a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY);
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkY) override;
 	virtual bool OnAllChunksAvailable(void) override;
 	virtual void OnDisabled(void) override;
@@ -48,8 +48,11 @@ private:
 	/** Whether the given location is a valid location to build a portal. */
 	bool IsValidBuildLocation(Vector3i a_BlockPosition);
 
-	/** The entity that's being moved. */
-	cEntity * m_Entity;
+	/** The ID of the entity that's being moved. */
+	UInt32 m_EntityID;
+
+	/** The world we're moving the entity from, used to query the entity ID. */
+	cWorld & m_SourceWorld;
 
 	/** The world we're moving the entity to. */
 	cWorld * m_World;

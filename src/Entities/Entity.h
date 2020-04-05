@@ -489,7 +489,7 @@ public:
 	/** Returns true if a world change is scheduled to happen. */
 	bool IsWorldChangeScheduled() const
 	{
-		return (m_WorldChangeInfo.load() != nullptr);
+		return (m_WorldChangeInfo.m_NewWorld != nullptr);
 	}
 
 	/** Updates clients of changes in the entity. */
@@ -662,8 +662,8 @@ protected:
 
 	cWorld * m_World;
 
-	/** If not nullptr, a world change is scheduled and a task is queued in the current world. */
-	cAtomicUniquePtr<sWorldChangeInfo> m_WorldChangeInfo;
+	/** If field m_NewWorld not nullptr, a world change is scheduled and a task is queued in the current world. */
+	sWorldChangeInfo m_WorldChangeInfo;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
