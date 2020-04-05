@@ -2828,8 +2828,6 @@ void cProtocol_1_9_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Hash);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
-
-	m_Client->SetResourcePackStatus(Status);
 }
 
 

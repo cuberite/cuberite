@@ -114,9 +114,6 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
-	/** Sets the resource pack status received from the client */
-	void SetResourcePackStatus(int a_ResourcePackStatus) { m_ResourcePackStatus = a_ResourcePackStatus; }
-
 	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
 	bool StreamNextChunk();
 
@@ -427,19 +424,6 @@ private:
 	AString m_Username;
 	AString m_Password;
 	Json::Value m_Properties;
-
-	enum eResourcePackStatus
-	{
-		rpWaiting = -1,
-		rpSuccessfullyLoaded = 0,
-		rpDeclined = 1,
-		rpFailedDownload = 2,
-		rpAccepted = 3,
-	} ;
-
-	/** The resource pack status sent from the client
-	Reference: https://wiki.vg/Protocol#Resource_Pack_Status */
-	int m_ResourcePackStatus = rpWaiting;
 
 	cCriticalSection                                   m_CSChunkLists;
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_LoadedChunks;  // Chunks that the player belongs to
