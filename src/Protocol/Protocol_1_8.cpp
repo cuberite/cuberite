@@ -1156,10 +1156,7 @@ void cProtocol_1_8_0::SendResourcePack(const AString & a_ResourcePackUrl)
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	AString Sha1Output;
-	for (size_t i = 0; i < ARRAYCOUNT(Digest); i++)
-	{
-		AppendPrintf(Sha1Output, "", Digest[i]);
-	}
+	cSha1Checksum::DigestToHex(Digest, Sha1Output);
 
 	Pkt.WriteString(a_ResourcePackUrl);
 	Pkt.WriteString(Sha1Output);

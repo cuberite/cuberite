@@ -2237,7 +2237,7 @@ void cClientHandle::ServerTick(float a_Dt)
 		cCSLock lock(m_CSState);
 		if (
 			(m_State == csAuthenticated) &&
-			(cRoot::Get()->GetServer()->GetResourcePackUrl().empty() || (m_ResourcePackStatus != -1))
+			(cRoot::Get()->GetServer()->GetResourcePackUrl().empty() || (m_ResourcePackStatus != rpWaiting))
 		)
 		{
 			StreamNextChunk();

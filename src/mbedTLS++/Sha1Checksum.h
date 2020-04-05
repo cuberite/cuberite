@@ -32,6 +32,9 @@ public:
 	/** Returns true if the object is accepts more input data, false if Finalize()-d (need to Restart()) */
 	bool DoesAcceptInput(void) const { return m_DoesAcceptInput; }
 
+	/** Converts a SHA1 digest into hex */
+	static void DigestToHex(const Checksum & a_Digest, AString & a_JavaOut);
+
 	/** Converts a raw 160-bit SHA1 digest into a Java Hex representation
 	According to http://wiki.vg/Protocol_Encryption
 	*/

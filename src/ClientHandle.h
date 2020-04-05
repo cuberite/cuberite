@@ -428,10 +428,18 @@ private:
 	AString m_Password;
 	Json::Value m_Properties;
 
+	enum eResourcePackStatus
+	{
+		rpWaiting = -1,
+		rpSuccessfullyLoaded = 0,
+		rpDeclined = 1,
+		rpFailedDownload = 2,
+		rpAccepted = 3,
+	} ;
+
 	/** The resource pack status sent from the client
-	Possible values are; 0: successfully loaded, 1: declined, 2: failed download, 3: accepted
 	Reference: https://wiki.vg/Protocol#Resource_Pack_Status */
-	int m_ResourcePackStatus = -1;
+	int m_ResourcePackStatus = rpWaiting;
 
 	cCriticalSection                                   m_CSChunkLists;
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_LoadedChunks;  // Chunks that the player belongs to
