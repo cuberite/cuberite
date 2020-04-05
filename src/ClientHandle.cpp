@@ -425,13 +425,6 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
-		// Send resource pack
-		auto ResourcePackUrl = cRoot::Get()->GetServer()->GetResourcePackUrl();
-		if (!ResourcePackUrl.empty())
-		{
-			SendResourcePack(ResourcePackUrl);
-		}
-
 		SetState(csAuthenticated);
 	}
 
@@ -2159,7 +2152,7 @@ void cClientHandle::Tick(float a_Dt)
 		cCSLock lock(m_CSState);
 		if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 		{
-			m_Protocol->SendPlayerMoveLook();
+			//m_Protocol->SendPlayerMoveLook();
 			m_State = csPlaying;
 		}
 	}  // lock(m_CSState)
@@ -2235,10 +2228,7 @@ void cClientHandle::ServerTick(float a_Dt)
 
 	{
 		cCSLock lock(m_CSState);
-		if (
-			(m_State == csAuthenticated) &&
-			(cRoot::Get()->GetServer()->GetResourcePackUrl().empty() || (m_ResourcePackStatus != rpWaiting))
-		)
+		if (m_State == csAuthenticated)
 		{
 			StreamNextChunk();
 

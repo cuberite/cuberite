@@ -3561,6 +3561,13 @@ void cWorld::AddQueuedPlayers(void)
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*Player->GetWindow());
+			
+			// Send resource pack
+			auto ResourcePackUrl = cRoot::Get()->GetServer()->GetResourcePackUrl();
+			if (!ResourcePackUrl.empty())
+			{
+				Client->SendResourcePack(ResourcePackUrl);
+			}
 		}
 	}  // for itr - PlayersToAdd[]
 
