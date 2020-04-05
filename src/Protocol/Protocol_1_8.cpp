@@ -1152,22 +1152,21 @@ void cProtocol_1_8_0::SendResetTitle(void)
 void cProtocol_1_8_0::SendResourcePack(const AString & a_ResourcePackUrl)
 {
 	cPacketizer Pkt(*this, pktResourcePack);
+
 	const unsigned char * ResourcePackUrl = reinterpret_cast<const unsigned char *>(a_ResourcePackUrl.c_str());
 	size_t Length = a_ResourcePackUrl.size();
 	unsigned char Sha1Output[20];
 	mbedtls_sha1(ResourcePackUrl, Length, Sha1Output);
 
-	std::stringstream Output;
-	Output << std::hex << std::setfill('0');
+	std::stringstream Sha1OutputHex;
+	Sha1OutputHex << std::hex << std::setfill('0');
 	for (size_t i = 0; i < ARRAYCOUNT(Sha1Output); i++)
 	{
-		Output << std::setw(2) << static_cast<unsigned short>(Sha1Output[i]);  // Need to cast to a number, otherwise a char is output
+		Sha1OutputHex << std::setw(2) << Sha1Output[i];
 	}
 
-	LOG("%s", a_ResourcePackUrl);
-	Pkt.WriteString(a_ResourcePackUrl.c_str());
-	LOG(Output.str().c_str());
-	Pkt.WriteString(Output.str().c_str());
+	Pkt.WriteString(a_ResourcePackUrl);
+	Pkt.WriteString(Sha1OutputHex.str().c_str());
 }
 
 

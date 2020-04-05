@@ -45,6 +45,36 @@ Implements the 1.10 protocol classes:
 
 
 
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
+
+
+
+
+
+#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		{ \
+			if (!ByteBuf.Proc(Var)) \
+			{ \
+				ByteBuf.CheckValid(); \
+				return false; \
+			} \
+			ByteBuf.CheckValid(); \
+		} \
+	} while (false)
+
+
+
+
+
 // The disabled error is intended, since the Metadata have overlapping indexes
 // based on the type of the Entity.
 //
@@ -312,6 +342,17 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 	Pkt.WriteBEInt32(FloorC(a_Z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEFloat(a_Pitch);
+}
+
+
+
+
+
+void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
+	
+	m_Client->SetResourcePackStatus(Status);
 }
 
 
