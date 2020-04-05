@@ -114,6 +114,7 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
+	/** Sets the resource pack status received from the client */
 	void SetResourcePackStatus(int a_ResourcePackStatus) { m_ResourcePackStatus = a_ResourcePackStatus; }
 
 	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
@@ -420,14 +421,17 @@ private:
 
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
 	int m_RequestedViewDistance;
-	
-	int m_ResourcePackStatus = -1;
 
 	AString m_IPString;
 
 	AString m_Username;
 	AString m_Password;
 	Json::Value m_Properties;
+
+	/** The resource pack status sent from the client
+	Possible values are; 0: successfully loaded, 1: declined, 2: failed download, 3: accepted
+	Reference: https://wiki.vg/Protocol#Resource_Pack_Status */
+	int m_ResourcePackStatus = -1;
 
 	cCriticalSection                                   m_CSChunkLists;
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_LoadedChunks;  // Chunks that the player belongs to
