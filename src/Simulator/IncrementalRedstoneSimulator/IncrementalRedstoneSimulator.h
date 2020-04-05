@@ -31,10 +31,7 @@ public:
 		return IsRedstone(a_BlockType);
 	}
 
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override
-	{
-		m_Data.WakeUp(a_Block);
-	}
+	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)
 	Used by torches to determine if they will power a block

@@ -150,6 +150,7 @@ public:
 
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosZ(void) const { return m_PosZ; }
+	cChunkCoords GetPos() const { return {m_PosX, m_PosZ}; }
 
 	cWorld * GetWorld(void) const { return m_World; }
 
