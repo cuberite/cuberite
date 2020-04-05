@@ -157,8 +157,7 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
 		{
 			// Clean up cached PowerData for CurrentPosition
-			static_cast<cIncrementalRedstoneSimulator *>(m_World.GetRedstoneSimulator())->GetChunkData()->ErasePowerData(CurrentLocation);
-
+			GetChunkData()->ErasePowerData(CurrentLocation);
 			continue;
 		}
 
@@ -190,6 +189,66 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 		if (IsAlwaysTicked(CurrentBlock))
 		{
 			m_Data.GetActiveBlocks().emplace_back(CurrentLocation);
+		}
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+{
+	// Can't inspect block, so queue update anyway
+	if (a_Chunk == nullptr)
+	{
+		m_Data.WakeUp(a_Block);
+		return;
+	}
+
+	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
+	const auto CurBlock = a_Chunk->GetBlock(RelPos);
+
+	// Always update redstone devices
+	if (IsRedstone(CurBlock))
+	{
+		m_Data.WakeUp(a_Block);
+		return;
+	}
+
+	// Never update blocks without a handler
+	if (GetComponentHandler(CurBlock) == nullptr)
+	{
+		GetChunkData()->ErasePowerData(a_Block);
+		return;
+	}
+
+	// Only update others if there is a redstone device nearby
+	for (int x = -1; x < 2; ++x)
+	{
+		for (int y = -1; y < 2; ++y)
+		{
+			if (!cChunkDef::IsValidHeight(RelPos.y + y))
+			{
+				continue;
+			}
+
+			for (int z = -1; z < 2; ++z)
+			{
+				auto CheckPos = RelPos + Vector3i{x, y, z};
+				BLOCKTYPE Block;
+				NIBBLETYPE Meta;
+
+				// If we can't read the block, assume it is a mechanism
+				if (
+					!a_Chunk->UnboundedRelGetBlock(CheckPos, Block, Meta) ||
+					IsRedstone(Block)
+				)
+				{
+					m_Data.WakeUp(a_Block);
+					return;
+				}
+			}
 		}
 	}
 }
