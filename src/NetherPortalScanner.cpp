@@ -17,8 +17,9 @@ const double cNetherPortalScanner::AcrossOffset = 0.5;
 
 
 
-cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
-	m_Entity(a_MovingEntity),
+cNetherPortalScanner::cNetherPortalScanner(cEntity & a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
+	m_EntityID(a_MovingEntity.GetUniqueID()),
+	m_SourceWorld(*a_MovingEntity.GetWorld()),
 	m_World(a_DestinationWorld),
 	m_FoundPortal(false),
 	m_BuildPlatform(true),
@@ -296,8 +297,18 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
-	FLOGD("Placing player at {0}", Position);
-	m_Entity->MoveToWorld(m_World, Position, true, false);
+	// Lookup our warping entity by ID
+	// Necessary as they may have been destroyed in the meantime (#4582)
+	m_SourceWorld.DoWithEntityByID(
+		m_EntityID,
+		[this, &Position](cEntity & a_Entity)
+		{
+			FLOGD("Placing player at {0}", Position);
+			a_Entity.MoveToWorld(m_World, Position, true, false);
+			return true;
+		}
+	);
+
 	delete this;
 }
 
