@@ -209,8 +209,8 @@ void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
 	const auto CurBlock = a_Chunk->GetBlock(RelPos);
 
-	// Always update mechanisms
-	if (IsMechanism(CurBlock))
+	// Always update redstone devices
+	if (IsRedstone(CurBlock))
 	{
 		m_Data.WakeUp(a_Block);
 		return;
@@ -223,7 +223,7 @@ void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 		return;
 	}
 
-	// Only update others if there is a mechanism nearby
+	// Only update others if there is a redstone device nearby
 	for (int x = -1; x < 2; ++x)
 	{
 		for (int y = -1; y < 2; ++y)
@@ -242,7 +242,7 @@ void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 				// If we can't read the block, assume it is a mechanism
 				if (
 					!a_Chunk->UnboundedRelGetBlock(CheckPos, Block, Meta) ||
-					IsMechanism(Block)
+					IsRedstone(Block)
 				)
 				{
 					m_Data.WakeUp(a_Block);
