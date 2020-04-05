@@ -33,12 +33,12 @@ public:
 	bool DoesAcceptInput(void) const { return m_DoesAcceptInput; }
 
 	/** Converts a SHA1 digest into hex */
-	static void DigestToHex(const Checksum & a_Digest, AString & a_JavaOut);
+	static void DigestToHex(const Checksum & a_Digest, AString & a_Out);
 
 	/** Converts a raw 160-bit SHA1 digest into a Java Hex representation
 	According to http://wiki.vg/Protocol_Encryption
 	*/
-	static void DigestToJava(const Checksum & a_Digest, AString & a_JavaOut);
+	static void DigestToJava(const Checksum & a_Digest, AString & a_Out);
 
 	/** Clears the current context and start a new checksum calculation */
 	void Restart(void);
