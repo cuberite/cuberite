@@ -209,6 +209,7 @@ protected:
 	virtual void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);

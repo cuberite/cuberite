@@ -198,6 +198,7 @@ protected:
 	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);

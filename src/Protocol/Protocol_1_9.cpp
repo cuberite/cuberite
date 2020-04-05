@@ -14,6 +14,8 @@ Implements the 1.9 protocol classes:
 */
 
 #include "Globals.h"
+#include <iomanip>
+#include <sstream>
 #include "json/json.h"
 #include "Protocol_1_9.h"
 #include "ChunkDataSerializer.h"
