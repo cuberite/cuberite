@@ -58,23 +58,6 @@ Implements the 1.10 protocol classes:
 
 
 
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 // The disabled error is intended, since the Metadata have overlapping indexes
 // based on the type of the Entity.
 //
