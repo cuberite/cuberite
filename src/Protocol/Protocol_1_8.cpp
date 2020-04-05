@@ -8,8 +8,6 @@ Implements the 1.8 protocol classes:
 */
 
 #include "Globals.h"
-#include <iomanip>
-#include <sstream>
 #include "json/json.h"
 #include "Protocol_1_8.h"
 #include "ChunkDataSerializer.h"
@@ -1153,20 +1151,18 @@ void cProtocol_1_8_0::SendResourcePack(const AString & a_ResourcePackUrl)
 {
 	cPacketizer Pkt(*this, pktResourcePack);
 
-	const unsigned char * ResourcePackUrl = reinterpret_cast<const unsigned char *>(a_ResourcePackUrl.c_str());
-	size_t Length = a_ResourcePackUrl.size();
-	unsigned char Sha1Output[20];
-	mbedtls_sha1(ResourcePackUrl, Length, Sha1Output);
-
-	std::stringstream Sha1OutputHex;
-	Sha1OutputHex << std::hex << std::setfill('0');
-	for (size_t i = 0; i < ARRAYCOUNT(Sha1Output); i++)
+	cSha1Checksum Checksum;
+	Checksum.Update(reinterpret_cast<const Byte *>(a_ResourcePackUrl.c_str()), a_ResourcePackUrl.size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	AString Sha1Output;
+	for (size_t i = 0; i < ARRAYCOUNT(Digest); i++)
 	{
-		Sha1OutputHex << std::setw(2) << Sha1Output[i];
+		AppendPrintf(Sha1Output, "", Digest[i]);
 	}
 
 	Pkt.WriteString(a_ResourcePackUrl);
-	Pkt.WriteString(Sha1OutputHex.str().c_str());
+	Pkt.WriteString(Sha1Output);
 }
 
 
