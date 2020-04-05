@@ -101,6 +101,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktPlayerMoveLook:        return "pktPlayerMoveLook";
 		case cProtocol::pktPluginMessage:         return "pktPluginMessage";
 		case cProtocol::pktRemoveEntityEffect:    return "pktRemoveEntityEffect";
+		case cProtocol::pktResourcePack:          return "pktResourcePack";
 		case cProtocol::pktRespawn:               return "pktRespawn";
 		case cProtocol::pktScoreboardObjective:   return "pktScoreboardObjective";
 		case cProtocol::pktSpawnObject:           return "pktSpawnObject";
