@@ -351,8 +351,6 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
-
-	m_Client->SetResourcePackStatus(Status);
 }
 
 
