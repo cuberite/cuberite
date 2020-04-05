@@ -38,7 +38,8 @@ public:
 
 	// tolua_end
 
-	/** Required in ManualBindings to save the page as simple string or json string */
+	/** If the book is a E_ITEM_WRITTEN_BOOK the pages are stored as json string.
+		If the book is a E_ITEM_BOOK_AND_QUILL the pages are stored as simple string */
 	void SetIsSigned(bool a_IsSigned) { m_IsSigned = a_IsSigned; }
 
 	/** Returns true if the book is signed */

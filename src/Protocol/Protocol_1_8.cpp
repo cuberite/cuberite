@@ -3025,15 +3025,11 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		if (cRoot::Get()->GetPluginManager()->CallHookPlayerEditingBook(Player, Player.GetEquippedItem().m_BookContent, BookItem.m_BookContent, IsSigned))
 		{
 			// Plugin denied the player to edit the book
-			cInventory & inv = Player.GetInventory();
-			inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
 			Player.GetInventory().SendEquippedSlot();
 			return;
 		}
 
-		cInventory & inv = Player.GetInventory();
-		inv.SetHotbarSlot(inv.GetEquippedSlotNum(), BookItem);
-		Player.GetInventory().SendEquippedSlot();
+		Player.GetInventory().SetEquippedItem(BookItem);
 
 		// Book has been edited by player, inform plugins
 		cRoot::Get()->GetPluginManager()->CallHookPlayerEditedBook(Player, BookItem.m_BookContent, IsSigned);
