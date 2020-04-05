@@ -425,6 +425,12 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		cRoot::Get()->BroadcastPlayerListsAddPlayer(*m_Player);
 		cRoot::Get()->SendPlayerLists(m_Player);
 
+		// Send resource pack
+		if (!cRoot::Get()->GetServer()->GetResourcePackUrl().empty())
+		{
+			m_Protocol->SendResourcePack(cRoot::Get()->GetServer()->GetResourcePackUrl());
+		}
+
 		SetState(csAuthenticated);
 	}
 

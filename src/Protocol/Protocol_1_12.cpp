@@ -986,6 +986,7 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktLeashEntity:         return 0x3c;
 		case pktPlayerMaxSpeed:      return 0x4d;
 		case pktRemoveEntityEffect:  return 0x32;
+		case pktResourcePack:        return 0x33;
 		case pktRespawn:             return 0x34;
 		case pktScoreboardObjective: return 0x41;
 		case pktSpawnPosition:       return 0x45;
@@ -1079,7 +1080,7 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
 				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-				case 0x18: break;  // Resource pack status - not yet implemented
+				case 0x18: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
@@ -1151,6 +1152,7 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 		case pktPlayerMaxSpeed:      return 0x4e;
 		case pktPlayerMoveLook:      return 0x2f;
 		case pktRemoveEntityEffect:  return 0x33;
+		case pktResourcePack:        return 0x34;
 		case pktRespawn:             return 0x35;
 		case pktScoreboardObjective: return 0x42;
 		case pktSpawnPosition:       return 0x46;
@@ -1268,7 +1270,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
 				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-				case 0x18: break;  // Resource pack status - not yet implemented
+				case 0x18: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;

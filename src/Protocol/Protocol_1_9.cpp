@@ -1233,6 +1233,31 @@ void cProtocol_1_9_0::SendResetTitle(void)
 
 
 
+void cProtocol_1_9_0::SendResourcePack(AString a_ResourcePackUrl)
+{
+	cPacketizer Pkt(*this, pktResourcePack);
+	const unsigned char * ResourcePackUrl = reinterpret_cast<const unsigned char *>(a_ResourcePackUrl.c_str());
+	size_t Length = a_ResourcePackUrl.size();
+	unsigned char Sha1Output[20];
+	mbedtls_sha1(ResourcePackUrl, Length, Sha1Output);
+
+	std::stringstream Output;
+	Output << std::hex << std::setfill('0');
+	for (size_t i = 0; i < ARRAYCOUNT(Sha1Output); i++)
+	{
+		Output << std::setw(2) << static_cast<unsigned short>(Sha1Output[i]);  // Need to cast to a number, otherwise a char is output
+	}
+
+	LOG("%s", a_ResourcePackUrl);
+	Pkt.WriteString(a_ResourcePackUrl.c_str());
+	LOG(Output.str().c_str());
+	Pkt.WriteString(Output.str().c_str());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
@@ -2209,6 +2234,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktPlayerMoveLook:        return 0x2e;
 		case pktPluginMessage:         return 0x18;
 		case pktRemoveEntityEffect:    return 0x31;
+		case pktResourcePack:          return 0x32;
 		case pktRespawn:               return 0x33;
 		case pktScoreboardObjective:   return 0x3f;
 		case pktSpawnExperienceOrb:    return 0x01;
@@ -2299,7 +2325,7 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x13: HandlePacketBlockDig               (a_ByteBuffer); return true;
 				case 0x14: HandlePacketEntityAction           (a_ByteBuffer); return true;
 				case 0x15: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
-				case 0x16: break;  // Resource pack status - not yet implemented
+				case 0x16: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
 				case 0x17: HandlePacketSlotSelect             (a_ByteBuffer); return true;
 				case 0x18: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x19: HandlePacketUpdateSign             (a_ByteBuffer); return true;
@@ -2798,6 +2824,16 @@ void cProtocol_1_9_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
+}
+
+
+
+
+
+void cProtocol_1_9_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Hash);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 }
 
 
