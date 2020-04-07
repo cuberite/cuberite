@@ -669,7 +669,7 @@ void Temporary::RegisterAllBlockHandlers(BlockTypeRegistry & aRegistry)
 		{"minecraft:black_carpet",                   E_BLOCK_CARPET},
 		{"minecraft:black_concrete",                 E_BLOCK_CONCRETE},
 		{"minecraft:black_concrete_powder",          E_BLOCK_CONCRETE_POWDER},
-		{"minecraft:black_glazed_terracotta",        E_BLOCK_UNFINISHED},
+		{"minecraft:black_glazed_terracotta",        E_BLOCK_BLACK_GLAZED_TERRACOTTA},
 		{"minecraft:black_shulker_box",              E_BLOCK_BLACK_SHULKER_BOX},
 		{"minecraft:black_stained_glass",            E_BLOCK_STAINED_GLASS},
 		{"minecraft:black_stained_glass_pane",       E_BLOCK_STAINED_GLASS_PANE},
