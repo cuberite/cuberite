@@ -47,6 +47,7 @@ public:
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
+		// NOTICE: Make sure to update cItemHandler::CanHarvestBlock() if adding new blocks here!
 		switch (a_BlockType)
 		{
 			case E_BLOCK_OBSIDIAN:
