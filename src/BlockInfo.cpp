@@ -1288,7 +1288,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_QUARTZ_STAIRS                ].m_Hardness = 0.8f;
 	Info[E_BLOCK_ACTIVATOR_RAIL               ].m_Hardness = 0.7f;
 	Info[E_BLOCK_DROPPER                      ].m_Hardness = 3.5f;
-	Info[E_BLOCK_STAINED_CLAY                 ].m_Hardness = 1.25f;
+	Info[E_BLOCK_STAINED_CLAY                 ].m_Hardness = 4.2f;
 	Info[E_BLOCK_STAINED_GLASS_PANE           ].m_Hardness = 0.3f;
 	Info[E_BLOCK_NEW_LEAVES                   ].m_Hardness = 0.2f;
 	Info[E_BLOCK_NEW_LOG                      ].m_Hardness = 2.0f;
