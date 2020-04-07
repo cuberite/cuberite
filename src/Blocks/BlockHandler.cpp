@@ -40,6 +40,7 @@
 #include "BlockFluid.h"
 #include "BlockFurnace.h"
 #include "BlockGlass.h"
+#include "BlockGlazedTerracotta.h"
 #include "BlockGlowstone.h"
 #include "BlockGrass.h"
 #include "BlockGravel.h"
@@ -203,9 +204,12 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_BIRCH_FENCE:                   return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_BIRCH_FENCE_GATE:              return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:             return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:       return new cBlockGlazedTerracottaHandler(a_BlockType);
+		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_BOOKCASE:                      return new cBlockBookShelfHandler       (a_BlockType);
 		case E_BLOCK_BREWING_STAND:                 return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:                  return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:       return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:                return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                        return new cBlockCactusHandler          (a_BlockType);
 		case E_BLOCK_CAKE:                          return new cBlockCakeHandler            (a_BlockType);
@@ -223,6 +227,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COMMAND_BLOCK:                 return new cBlockCommandBlockHandler    (a_BlockType);
 		case E_BLOCK_CONCRETE_POWDER:               return new cBlockConcretePowderHandler  (a_BlockType);
 		case E_BLOCK_CROPS:                         return new cBlockCropsHandler<7>        (a_BlockType);  // 8 stages of growth
+		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_DARK_OAK_DOOR:                 return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_DARK_OAK_FENCE:                return new cBlockFenceHandler           (a_BlockType);
 		case E_BLOCK_DARK_OAK_FENCE_GATE:           return new cBlockFenceGateHandler       (a_BlockType);
@@ -252,6 +257,8 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GOLD_ORE:                      return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_GRASS:                         return new cBlockGrassHandler           (a_BlockType);
 		case E_BLOCK_GRAVEL:                        return new cBlockGravelHandler          (a_BlockType);
+		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);
+		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:       return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_HAY_BALE:                      return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                          return new cBlockMobHeadHandler         (a_BlockType);
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler   (a_BlockType);
@@ -272,10 +279,14 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAVA:                          return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                        return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_LEVER:                         return new cBlockLeverHandler           (a_BlockType);
+		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:  return new cBlockGlazedTerracottaHandler(a_BlockType);
+		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:  return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler   (a_BlockType);
 		case E_BLOCK_LILY_PAD:                      return new cBlockLilypadHandler         (a_BlockType);
+		case E_BLOCK_LIME_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_LIT_FURNACE:                   return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_LOG:                           return new cBlockSidewaysHandler        (a_BlockType);
+		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:     return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_MELON:                         return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:                    return new cBlockMelonStemHandler       (a_BlockType);
 		case E_BLOCK_MOB_SPAWNER:                   return new cBlockMobSpawnerHandler      (a_BlockType);
@@ -292,7 +303,9 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_OAK_DOOR:                      return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_OAK_FENCE_GATE:                return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_OAK_WOOD_STAIRS:               return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:      return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_PACKED_ICE:                    return new cBlockIceHandler             (a_BlockType);
+		case E_BLOCK_PINK_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_PISTON:                        return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:              return new cBlockPistonHeadHandler;
 		case E_BLOCK_PLANKS:                        return new cBlockPlanksHandler          (a_BlockType);
@@ -300,6 +313,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_POWERED_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN:                       return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:                  return new cBlockPumpkinStemHandler     (a_BlockType);
+		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:      return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_PURPUR_DOUBLE_SLAB:            return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_PURPUR_SLAB:                   return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_PURPUR_STAIRS:                 return new cBlockStairsHandler          (a_BlockType);
@@ -314,6 +328,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_REDSTONE_TORCH_OFF:            return new cBlockRedstoneTorchHandler   (a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_ON:             return new cBlockRedstoneTorchHandler   (a_BlockType);
 		case E_BLOCK_REDSTONE_WIRE:                 return new cBlockRedstoneHandler        (a_BlockType);
+		case E_BLOCK_RED_GLAZED_TERRACOTTA:         return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_RED_MUSHROOM:                  return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:                      return new cBlockFlowerHandler          (a_BlockType);
 		case E_BLOCK_RED_SANDSTONE_SLAB:            return new cBlockSlabHandler            (a_BlockType);
@@ -352,12 +367,14 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_VINES:                         return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:                      return new cBlockWallSignHandler        (a_BlockType);
 		case E_BLOCK_WATER:                         return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:       return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_WOODEN_BUTTON:                 return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:         return new cBlockPressurePlateHandler   (a_BlockType);
 		case E_BLOCK_WOODEN_SLAB:                   return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_WOOL:                          return new cBlockClothHandler           (a_BlockType);
 		case E_BLOCK_WORKBENCH:                     return new cBlockWorkbenchHandler       (a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:                 return new cBlockFlowerHandler          (a_BlockType);
+		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:      return new cBlockGlazedTerracottaHandler(a_BlockType);
 
 		default: return new cBlockHandler(a_BlockType);
 	}
