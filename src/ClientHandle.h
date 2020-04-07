@@ -197,6 +197,7 @@ public:  // tolua_export
 	void SendPlayerSpawn                (const cPlayer & a_Player);
 	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
+	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);

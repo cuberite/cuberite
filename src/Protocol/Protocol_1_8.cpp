@@ -1147,6 +1147,25 @@ void cProtocol_1_8_0::SendResetTitle(void)
 
 
 
+void cProtocol_1_8_0::SendResourcePack(const AString & a_ResourcePackUrl)
+{
+	cPacketizer Pkt(*this, pktResourcePack);
+
+	cSha1Checksum Checksum;
+	Checksum.Update(reinterpret_cast<const Byte *>(a_ResourcePackUrl.c_str()), a_ResourcePackUrl.size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	AString Sha1Output;
+	cSha1Checksum::DigestToHex(Digest, Sha1Output);
+
+	Pkt.WriteString(a_ResourcePackUrl);
+	Pkt.WriteString(Sha1Output);
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendRespawn(eDimension a_Dimension)
 {
 
@@ -2152,6 +2171,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 		case pktPlayerMoveLook:        return 0x08;
 		case pktPluginMessage:         return 0x3f;
 		case pktRemoveEntityEffect:    return 0x1e;
+		case pktResourcePack:          return 0x48;
 		case pktRespawn:               return 0x07;
 		case pktScoreboardObjective:   return 0x3b;
 		case pktSoundEffect:           return 0x29;
@@ -2250,6 +2270,7 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
 				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
 				case 0x18: HandlePacketSpectate               (a_ByteBuffer); return true;
+				case 0x19: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2702,6 +2723,16 @@ void cProtocol_1_8_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Hash);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 }
 
 

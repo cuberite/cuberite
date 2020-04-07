@@ -94,6 +94,8 @@ public:
 
 	// tolua_end
 
+	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
+
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
@@ -214,6 +216,7 @@ private:
 	AString m_FaviconData;
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
+	AString m_ResourcePackUrl;
 
 	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;

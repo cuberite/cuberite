@@ -99,6 +99,7 @@ public:
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
+	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
@@ -208,6 +209,7 @@ protected:
 	virtual void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);

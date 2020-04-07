@@ -104,6 +104,7 @@ public:
 	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
+	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;

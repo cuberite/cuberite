@@ -29,6 +29,7 @@ public:
 
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 
+	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 protected:
