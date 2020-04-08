@@ -9,9 +9,9 @@
 
 
 class cBlockBrewingStandHandler :
-	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cBlockEntityHandler
 {
-	using super = cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>;
+	using super = cBlockEntityHandler;
 
 public:
 
