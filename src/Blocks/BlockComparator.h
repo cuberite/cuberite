@@ -10,9 +10,9 @@
 
 
 class cBlockComparatorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
-	using super = cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>;
+	using super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
 
 public:
 
@@ -48,18 +48,6 @@ public:
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		return cItem(E_ITEM_COMPARATOR, 1, 0);
-	}
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-		) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player.GetYaw());
-		return true;
 	}
 
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)

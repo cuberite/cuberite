@@ -58,6 +58,7 @@
 #include "BlockMycelium.h"
 #include "BlockNetherrack.h"
 #include "BlockNetherWart.h"
+#include "BlockObserver.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
@@ -303,6 +304,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_OAK_DOOR:                      return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_OAK_FENCE_GATE:                return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_OAK_WOOD_STAIRS:               return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_OBSERVER:                      return new cBlockObserverHandler        (a_BlockType);
 		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:      return new cBlockGlazedTerracottaHandler(a_BlockType);
 		case E_BLOCK_PACKED_ICE:                    return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_PINK_GLAZED_TERRACOTTA:        return new cBlockGlazedTerracottaHandler(a_BlockType);

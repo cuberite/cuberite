@@ -11,9 +11,9 @@
 
 
 class cBlockChestHandler :
-	public cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cYawRotator<cContainerEntityHandler<cBlockEntityHandler>>
 {
-	using super = cMetaRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x02, 0x05, 0x03, 0x04>;
+	using super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>>;
 
 public:
 
@@ -33,8 +33,6 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-
 		// Is there a doublechest already next to this block?
 		if (!CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ))
 		{
@@ -42,12 +40,20 @@ public:
 			return false;
 		}
 
-		// Check if this forms a doublechest, if so, need to adjust the meta:
+		// Try to read double-chest information:
 		cBlockArea Area;
 		if (!Area.Read(a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
 		{
 			return false;
 		}
+
+		// Get meta as if this was a single-chest:
+		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		{
+			return false;
+		}
+
+		// Check if this forms a doublechest, if so, need to adjust the meta:
 		double yaw = a_Player.GetYaw();
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
@@ -58,17 +64,15 @@ public:
 			return true;
 		}
 		if (
-			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
-			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
+			(Area.GetRelBlockType(1, 0, 0) == m_BlockType) ||
+			(Area.GetRelBlockType(1, 0, 2) == m_BlockType)
 		)
 		{
-			// FIXME: This is unreachable, as the condition is the same as the above one
 			a_BlockMeta = (yaw < 0) ? 4 : 5;
 			return true;
 		}
 
-		// Single chest, get meta from rotation only
-		a_BlockMeta = PlayerYawToMetaData(yaw);
+
 		return true;
 	}
 

@@ -39,7 +39,7 @@ public:
 		}
 
 		// The "foot" block:
-		NIBBLETYPE BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player.GetYaw());
+		NIBBLETYPE BlockMeta = cBlockBedHandler::YawToMetaData(a_Player.GetYaw());
 		a_BlocksToPlace.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
 
 		// Check if there is empty space for the "head" block:
