@@ -30,7 +30,7 @@ public:
 	) override
 	{
 		a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
+		a_BlockMeta = cBlockRedstoneRepeaterHandler::YawToMetaData(a_Player->GetYaw());
 		return true;
 	}
 } ;

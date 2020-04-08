@@ -12,9 +12,9 @@
 
 
 class cBlockDoorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
+	public cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>
 {
-	using super = cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>;
+	using super = cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x03, 0x00, true>;
 
 public:
 
@@ -50,9 +50,7 @@ public:
 			return false;
 		}
 
-		a_BlockType = m_BlockType;
-		a_BlockMeta = PlayerYawToMetaData(a_Player.GetYaw());
-		return true;
+		return super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
 	}
 
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override;
@@ -140,38 +138,6 @@ public:
 			}
 		}
 		return false;
-	}
-
-
-
-
-
-	/** Converts the player's yaw to placed door's blockmeta */
-	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
-	{
-		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
-
-		a_Yaw += 90 + 45;
-		if (a_Yaw > 360)
-		{
-			a_Yaw -= 360;
-		}
-		if ((a_Yaw >= 0) && (a_Yaw < 90))
-		{
-			return 0x00;
-		}
-		else if ((a_Yaw >= 180) && (a_Yaw < 270))
-		{
-			return 0x02;
-		}
-		else if ((a_Yaw >= 90) && (a_Yaw < 180))
-		{
-			return 0x01;
-		}
-		else
-		{
-			return 0x03;
-		}
 	}
 
 

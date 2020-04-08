@@ -12,28 +12,15 @@
 
 
 class cBlockRedstoneRepeaterHandler:
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
-	using super = cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>;
+	using super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
 
 public:
 
 	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType):
 		super(a_BlockType)
 	{
-	}
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
-
-		return true;
 	}
 
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
@@ -82,32 +69,6 @@ public:
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
-	}
-
-	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
-
-		if ((a_Rotation >= 0) && (a_Rotation < 90))
-		{
-			return 0x1;
-		}
-		else if ((a_Rotation >= 180) && (a_Rotation < 270))
-		{
-			return 0x3;
-		}
-		else if ((a_Rotation >= 90) && (a_Rotation < 180))
-		{
-			return 0x2;
-		}
-		else
-		{
-			return 0x0;
-		}
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override

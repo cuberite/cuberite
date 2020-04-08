@@ -63,6 +63,7 @@ SET (HDRS
 	BlockMycelium.h
 	BlockNetherrack.h
 	BlockNetherWart.h
+	BlockObserver.h
 	BlockOre.h
 	BlockPiston.h
 	BlockPlanks.h
