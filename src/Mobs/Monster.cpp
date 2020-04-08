@@ -1060,7 +1060,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtHorse:          return mfPassive;
 		case mtIronGolem:      return mfPassive;
 		case mtMagmaCube:      return mfHostile;
-		case mtMooshroom:      return mfHostile;
+		case mtMooshroom:      return mfPassive;
 		case mtOcelot:         return mfPassive;
 		case mtPig:            return mfPassive;
 		case mtRabbit:         return mfPassive;
@@ -1075,7 +1075,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtWitch:          return mfHostile;
 		case mtWither:         return mfNoSpawn;
 		case mtWitherSkeleton: return mfHostile;
-		case mtWolf:           return mfHostile;
+		case mtWolf:           return mfPassive;
 		case mtZombie:         return mfHostile;
 		case mtZombiePigman:   return mfHostile;
 
