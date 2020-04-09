@@ -606,14 +606,10 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_BRICK_STAIRS                 ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_COBBLESTONE_STAIRS           ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_DARK_OAK_WOOD_STAIRS         ].m_SpreadLightFalloff = 15;
-	Info[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB    ].m_SpreadLightFalloff = 15;
-	Info[E_BLOCK_DOUBLE_STONE_SLAB            ].m_SpreadLightFalloff = 15;
-	Info[E_BLOCK_DOUBLE_WOODEN_SLAB           ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_FARMLAND                     ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_JUNGLE_WOOD_STAIRS           ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_NETHER_BRICK_STAIRS          ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_OAK_WOOD_STAIRS              ].m_SpreadLightFalloff = 15;
-	Info[E_BLOCK_PURPUR_DOUBLE_SLAB           ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_PURPUR_SLAB                  ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_PURPUR_STAIRS                ].m_SpreadLightFalloff = 15;
 	Info[E_BLOCK_QUARTZ_STAIRS                ].m_SpreadLightFalloff = 15;
@@ -670,9 +666,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_DAYLIGHT_SENSOR              ].m_Transparent = true;
 	Info[E_BLOCK_DEAD_BUSH                    ].m_Transparent = true;
 	Info[E_BLOCK_DETECTOR_RAIL                ].m_Transparent = true;
-	Info[E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB    ].m_Transparent = true;
-	Info[E_BLOCK_DOUBLE_STONE_SLAB            ].m_Transparent = true;
-	Info[E_BLOCK_DOUBLE_WOODEN_SLAB           ].m_Transparent = true;
 	Info[E_BLOCK_DRAGON_EGG                   ].m_Transparent = true;
 	Info[E_BLOCK_ENCHANTMENT_TABLE            ].m_Transparent = true;
 	Info[E_BLOCK_END_PORTAL                   ].m_Transparent = true;
@@ -733,7 +726,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_POWERED_RAIL                 ].m_Transparent = true;
 	Info[E_BLOCK_PUMPKIN_STEM                 ].m_Transparent = true;
 	Info[E_BLOCK_PURPLE_SHULKER_BOX           ].m_Transparent = true;
-	Info[E_BLOCK_PURPUR_DOUBLE_SLAB           ].m_Transparent = true;
 	Info[E_BLOCK_PURPUR_SLAB                  ].m_Transparent = true;
 	Info[E_BLOCK_PURPUR_STAIRS                ].m_Transparent = true;
 	Info[E_BLOCK_QUARTZ_STAIRS                ].m_Transparent = true;
