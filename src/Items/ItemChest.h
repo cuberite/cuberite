@@ -28,13 +28,15 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
+		Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
+
 		if (a_BlockFace < 0)
 		{
 			// Clicked in air
 			return false;
 		}
 
-		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		if (!cChunkDef::IsValidHeight(absPos.y))
 		{
 			// The clicked block is outside the world, ignore this call altogether (#128)
 			return false;
@@ -43,19 +45,19 @@ public:
 		// Check if the block ignores build collision (water, grass etc.):
 		BLOCKTYPE clickedBlock;
 		NIBBLETYPE clickedBlockMeta;
-		Vector3i blockPos(a_BlockX, a_BlockY, a_BlockZ);
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, clickedBlock, clickedBlockMeta);
+		a_World.GetBlockTypeMeta(absPos.x, absPos.y, absPos.z, clickedBlock, clickedBlockMeta);
+
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		auto blockHandler = BlockHandler(clickedBlock);
-		if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, blockPos, a_Player, clickedBlockMeta))
+		// Check if the block ignores build collision (water, grass etc.):
+		if (BlockHandler(clickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, clickedBlockMeta))
 		{
-			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, blockPos);
+			a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
 		}
 		else
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			AddFaceDirection(absPos.x, absPos.y, absPos.z, a_BlockFace);
 
-			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+			if (!cChunkDef::IsValidHeight(absPos.y))
 			{
 				// The block is being placed outside the world, ignore this packet altogether (#128)
 				return false;
@@ -63,16 +65,17 @@ public:
 
 			NIBBLETYPE PlaceMeta;
 			BLOCKTYPE PlaceBlock;
-			a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
+			a_World.GetBlockTypeMeta(absPos.x, absPos.y, absPos.z, PlaceBlock, PlaceMeta);
 
-			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
-			// No need to do combinability (dblslab) checks, client will do that here.
-			if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, blockPos, a_Player, clickedBlockMeta))
+			// Check for another block here, remove it if appropriate.
+			if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, clickedBlockMeta))
 			{
 				// Tried to place a block into another?
 				// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 				return false;
 			}
+
+			a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
 		}
 
 		// Check that there is at most one single neighbor of the same chest type:
@@ -86,7 +89,7 @@ public:
 		int NeighborIdx = -1;
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
-			if (a_World.GetBlock(a_BlockX + CrossCoords[i].x, a_BlockY, a_BlockZ + CrossCoords[i].z) != m_ItemType)
+			if (a_World.GetBlock(absPos + CrossCoords[i]) != m_ItemType)
 			{
 				continue;
 			}
@@ -98,11 +101,9 @@ public:
 			NeighborIdx = static_cast<int>(i);
 
 			// Check that this neighbor is a single chest:
-			int bx = a_BlockX + CrossCoords[i].x;
-			int bz = a_BlockZ + CrossCoords[i].z;
 			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
 			{
-				if (a_World.GetBlock(bx + CrossCoords[j].x, a_BlockY, bz + CrossCoords[j].z) == m_ItemType)
+				if (a_World.GetBlock(absPos + CrossCoords[i] + CrossCoords[j]) == m_ItemType)
 				{
 					return false;
 				}
@@ -137,7 +138,7 @@ public:
 		}  // switch (NeighborIdx)
 
 		// Place the new chest:
-		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, ChestBlockType, Meta))
+		if (!a_Player.PlaceBlock(absPos.x, absPos.y, absPos.z, ChestBlockType, Meta))
 		{
 			return false;
 		}
@@ -145,7 +146,7 @@ public:
 		// Adjust the existing chest, if any:
 		if (NeighborIdx != -1)
 		{
-			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
+			a_World.FastSetBlock(absPos + CrossCoords[NeighborIdx], ChestBlockType, Meta);
 		}
 
 		// Remove the "placed" item:

@@ -351,13 +351,15 @@ bool cItemHandler::OnPlayerPlace(
 	int a_CursorX, int a_CursorY, int a_CursorZ
 )
 {
+	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
+
 	if (a_BlockFace < 0)
 	{
 		// Clicked in air
 		return false;
 	}
 
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(absPos.y))
 	{
 		// The clicked block is outside the world, ignore this call altogether (#128)
 		return false;
@@ -365,22 +367,19 @@ bool cItemHandler::OnPlayerPlace(
 
 	BLOCKTYPE ClickedBlock;
 	NIBBLETYPE ClickedBlockMeta;
+	a_World.GetBlockTypeMeta(absPos.x, absPos.y, absPos.z, ClickedBlock, ClickedBlockMeta);
 
-	a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
-
 	// Check if the block ignores build collision (water, grass etc.):
-	auto blockHandler = BlockHandler(ClickedBlock);
-	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
-	if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, ClickedBlockMeta))
+	if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, ClickedBlockMeta))
 	{
 		a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		AddFaceDirection(absPos.x, absPos.y, absPos.z, a_BlockFace);
 
-		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		if (!cChunkDef::IsValidHeight(absPos.y))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (#128)
 			return false;
@@ -388,28 +387,29 @@ bool cItemHandler::OnPlayerPlace(
 
 		NIBBLETYPE PlaceMeta;
 		BLOCKTYPE PlaceBlock;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
+		a_World.GetBlockTypeMeta(absPos.x, absPos.y, absPos.z, PlaceBlock, PlaceMeta);
 
-		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
-		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, PlaceMeta))
+		// Check for another block here, remove it if appropriate.
+		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, PlaceMeta))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 			return false;
 		}
+
+		a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
 	}
 
 	// Get all the blocks to place:
 	sSetBlockVector blocks;
-	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
+	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, absPos.x, absPos.y, absPos.z, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
 	{
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
 			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), a_Player);
 		}
-		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_World.SendBlockTo(absPos.x, absPos.y, absPos.z, a_Player);
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
