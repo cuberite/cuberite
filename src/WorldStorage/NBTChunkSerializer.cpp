@@ -738,17 +738,11 @@ public:
 			case mtVillager:       EntityClass = "Villager";       break;
 			case mtWitch:          EntityClass = "Witch";          break;
 			case mtWither:         EntityClass = "WitherBoss";     break;
-<<<<<<< HEAD
 			case mtWitherSkeleton: EntityClass = "WitherSkeleton"; break;
 			case mtWolf:           EntityClass = "Wolf";           break;
 			case mtZombie:         EntityClass = "Zombie";         break;
 			case mtZombiePigman:   EntityClass = "PigZombie";      break;
-=======
-			case mtWolf:           EntityClass = "Wolf";           break;
-			case mtZombie:         EntityClass = "Zombie";         break;
-			case mtZombiePigman:   EntityClass = "PigZombie";      break;
 			case mtZombieVillager: EntityClass = "ZombieVillager"; break;
->>>>>>> Add Zombie Villagers
 			default:
 			{
 				ASSERT(!"Unhandled monster type");
