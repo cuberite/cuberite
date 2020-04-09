@@ -3319,37 +3319,89 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			SpawnFallingBlock =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "X",
-						Type = "number",
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
 					},
+					Returns =
 					{
-						Name = "Y",
-						Type = "number",
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
 					},
-					{
-						Name = "Z",
-						Type = "number",
-					},
-					{
-						Name = "BlockType",
-						Type = "number",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
+					Notes = "OBSOLETE, use the Vector3-based overloads instead. Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta. Returns the EntityID of the new falling block, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no falling block was created.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Name = "EntityID",
-						Type = "number",
+						{
+							Name = "BlockPos",
+							Type = "Vector3i",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
 					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cFallingBlock|Falling Block}} entity in the middle of the specified block, with the given block type/meta. Returns the EntityID of the new falling block, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no falling block was created.",
 				},
-				Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta. Returns the EntityID of the new falling block, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no falling block was created.",
+				{
+					Params =
+					{
+						{
+							Name = "Pos",
+							Type = "Vector3d",
+						},
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+						{
+							Name = "BlockMeta",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Spawns a {{cFallingBlock|Falling Block}} entity at exactly the specified coords, with the given block type/meta. Returns the EntityID of the new falling block, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no falling block was created.",
+				},
 			},
 			SpawnItemPickup =
 			{
