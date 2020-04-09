@@ -22,8 +22,9 @@ if [ "$KERNEL" = "Linux" ]; then
 		# Assume that all arm devices are a raspi for now.
 		arm*) DOWNLOADURL="https://download.cuberite.org/linux-armhf-raspbian/Cuberite.tar.gz"
 	esac
-#elif [ "$KERNEL" = "Darwin" ]; then
-#	DOWNLOADURL="https://builds.cuberite.org/job/Cuberite%20OSX%20x64%20Master/lastSuccessfulBuild/artifact/Cuberite.tar.gz"
+elif [ "$KERNEL" = "Darwin" ]; then
+	# All Darwins we care about are x86_64
+	DOWNLOADURL="https://download.cuberite.org/darwin-x86_64/Cuberite.tar.gz"
 #elif [ "$KERNEL" = "FreeBSD" ]; then
 #	DOWNLOADURL="https://builds.cuberite.org/job/Cuberite%20FreeBSD%20x64%20Master/lastSuccessfulBuild/artifact/Cuberite.tar.gz"
 else
