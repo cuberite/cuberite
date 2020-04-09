@@ -201,7 +201,8 @@ public:
 
 
 
-
+	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
+	value for a block placed by a player facing that way */
 	static NIBBLETYPE YawToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
@@ -279,7 +280,8 @@ public:
 
 
 
-
+	/** Converts the rotation and pitch values as returned by cPlayer::GetYaw() and cPlayer::GetPitch()
+	respectively to the appropriate metadata value for a block placed by a player facing that way */
 	static NIBBLETYPE PitchYawToMetaData(double a_Rotation, double a_Pitch)
 	{
 		if (a_Pitch >= 50)
