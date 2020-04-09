@@ -167,6 +167,9 @@ public:
 };
 
 
+
+
+
 /** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
 template <class Base, NIBBLETYPE BitMask = 0x7, NIBBLETYPE North = 0x2, NIBBLETYPE East = 0x5, NIBBLETYPE South = 0x3, NIBBLETYPE West = 0x4, bool AssertIfNotMatched = false>
@@ -201,6 +204,7 @@ public:
 
 
 
+
 	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
 	value for a block placed by a player facing that way */
 	static NIBBLETYPE YawToMetaData(double a_Rotation)
@@ -229,6 +233,10 @@ public:
 		}
 	}
 };
+
+
+
+
 
 /** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
@@ -276,6 +284,7 @@ public:
 		// Not Facing Up or Down; No change.
 		return a_Meta;
 	}
+
 
 
 
