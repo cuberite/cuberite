@@ -172,7 +172,15 @@ public:
 
 /** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
-template <class Base, NIBBLETYPE BitMask = 0x7, NIBBLETYPE North = 0x2, NIBBLETYPE East = 0x5, NIBBLETYPE South = 0x3, NIBBLETYPE West = 0x4, bool AssertIfNotMatched = false>
+template <
+	class Base,
+	NIBBLETYPE BitMask = 0x7,
+	NIBBLETYPE North = 0x2,
+	NIBBLETYPE East = 0x5,
+	NIBBLETYPE South = 0x3,
+	NIBBLETYPE West = 0x4,
+	bool AssertIfNotMatched = false
+>
 class cYawRotator:
 	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
 {
@@ -240,7 +248,16 @@ public:
 
 /** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
-template <class Base, NIBBLETYPE BitMask = 0x7, NIBBLETYPE North = 0x2, NIBBLETYPE East = 0x5, NIBBLETYPE South = 0x3, NIBBLETYPE West = 0x4, NIBBLETYPE Up = 0x1, NIBBLETYPE Down = 0x0>
+template <
+	class Base,
+	NIBBLETYPE BitMask = 0x7,
+	NIBBLETYPE North = 0x2,
+	NIBBLETYPE East = 0x5,
+	NIBBLETYPE South = 0x3,
+	NIBBLETYPE West = 0x4,
+	NIBBLETYPE Up = 0x1,
+	NIBBLETYPE Down = 0x0
+>
 class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
 {
