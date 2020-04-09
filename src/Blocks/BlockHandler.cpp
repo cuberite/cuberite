@@ -40,7 +40,6 @@
 #include "BlockFluid.h"
 #include "BlockFurnace.h"
 #include "BlockGlass.h"
-#include "BlockGlazedTerracotta.h"
 #include "BlockGlowstone.h"
 #include "BlockGrass.h"
 #include "BlockGravel.h"
@@ -93,6 +92,12 @@
 #include "BlockVine.h"
 #include "BlockWallSign.h"
 #include "BlockWorkbench.h"
+
+
+
+
+
+using cBlockGlazedTerracottaHandler = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x3, 0x1, 0x3, 0x0, 0x2>>;
 
 
 
