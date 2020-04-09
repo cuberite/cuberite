@@ -167,9 +167,8 @@ public:
 };
 
 
-/** Mixin for rotations and reflections following the standard pattern of "apply mask, then use a switch".
-Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in North, East, South, West.
-There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
+/** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
+selects the direction bits from the block's meta values. */
 template <class Base, NIBBLETYPE BitMask = 0x7, NIBBLETYPE North = 0x2, NIBBLETYPE East = 0x5, NIBBLETYPE South = 0x3, NIBBLETYPE West = 0x4, bool AssertIfNotMatched = false>
 class cYawRotator:
 	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
@@ -230,9 +229,8 @@ public:
 	}
 };
 
-/** Mixin for rotations and reflections following the standard pattern of "apply mask, then use a switch".
-Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in North, East, South, West.
-There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
+/** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
+selects the direction bits from the block's meta values. */
 template <class Base, NIBBLETYPE BitMask = 0x7, NIBBLETYPE North = 0x2, NIBBLETYPE East = 0x5, NIBBLETYPE South = 0x3, NIBBLETYPE West = 0x4, NIBBLETYPE Up = 0x1, NIBBLETYPE Down = 0x0>
 class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
@@ -268,9 +266,7 @@ public:
 
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
-		// Bit 0x08 is a flag. Lowest three bits are position.
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
-		// Mirrors defined by a table. (Source, minecraft.gamepedia.com)
 		switch (a_Meta & BitMask)
 		{
 			case Down: return Up | OtherMeta;  // Down -> Up
