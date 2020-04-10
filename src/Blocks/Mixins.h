@@ -217,27 +217,21 @@ public:
 	value for a block placed by a player facing that way */
 	static NIBBLETYPE YawToMetaData(double a_Rotation)
 	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
-
-		if (a_Rotation >= 360)
-		{
-			a_Rotation -= 360;
-		}
-		if ((a_Rotation >= 0) && (a_Rotation < 90))
-		{
-			return West;
-		}
-		else if ((a_Rotation >= 90) && (a_Rotation < 180))
-		{
-			return North;
-		}
-		else if ((a_Rotation >= 180) && (a_Rotation < 270))
+		if ((a_Rotation >= -135) && (a_Rotation < -45))
 		{
 			return East;
 		}
-		else  // (a_Rotation >= 270) && (a_Rotation < 360)
+		else if ((a_Rotation >= -45) && (a_Rotation < 45))
 		{
 			return South;
+		}
+		else if ((a_Rotation >= 45) && (a_Rotation < 135))
+		{
+			return West;
+		}
+		else  // degrees jumping from 180 to -180
+		{
+			return North;
 		}
 	}
 };
