@@ -6725,7 +6725,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified slot contents",
 				},
-				SetEquippedItem = 
+				SetEquippedItem =
 				{
 					Params =
 					{
@@ -9181,134 +9181,6 @@ a_Player:OpenWindow(Window);
 				mfWater =
 				{
 					Notes = "Family: water (squid)",
-				},
-				mtBat =
-				{
-					Notes = "",
-				},
-				mtBlaze =
-				{
-					Notes = "",
-				},
-				mtCaveSpider =
-				{
-					Notes = "",
-				},
-				mtChicken =
-				{
-					Notes = "",
-				},
-				mtCow =
-				{
-					Notes = "",
-				},
-				mtCreeper =
-				{
-					Notes = "",
-				},
-				mtEnderDragon =
-				{
-					Notes = "",
-				},
-				mtEnderman =
-				{
-					Notes = "",
-				},
-				mtGhast =
-				{
-					Notes = "",
-				},
-				mtGiant =
-				{
-					Notes = "",
-				},
-				mtHorse =
-				{
-					Notes = "",
-				},
-				mtInvalidType =
-				{
-					Notes = "Invalid monster type. Returned when monster type not recognized",
-				},
-				mtIronGolem =
-				{
-					Notes = "",
-				},
-				mtMagmaCube =
-				{
-					Notes = "",
-				},
-				mtMooshroom =
-				{
-					Notes = "",
-				},
-				mtOcelot =
-				{
-					Notes = "",
-				},
-				mtPig =
-				{
-					Notes = "",
-				},
-				mtSheep =
-				{
-					Notes = "",
-				},
-				mtSilverfish =
-				{
-					Notes = "",
-				},
-				mtSkeleton =
-				{
-					Notes = "",
-				},
-				mtSlime =
-				{
-					Notes = "",
-				},
-				mtSnowGolem =
-				{
-					Notes = "",
-				},
-				mtSpider =
-				{
-					Notes = "",
-				},
-				mtSquid =
-				{
-					Notes = "",
-				},
-				mtVillager =
-				{
-					Notes = "",
-				},
-				mtWitch =
-				{
-					Notes = "",
-				},
-				mtWither =
-				{
-					Notes = "",
-				},
-				mtWitherSkeleton =
-				{
-					Notes = "",
-				},
-				mtWolf =
-				{
-					Notes = "",
-				},
-				mtZombie =
-				{
-					Notes = "",
-				},
-				mtZombiePigman =
-				{
-					Notes = "",
-				},
-				mtZombieVillager =
-				{
-					Notes = "",
 				},
 			},
 			ConstantGroups =
@@ -16742,6 +16614,138 @@ end
 				{
 					Notes = "A wither skull explosion. The SourceData param is the {{cWitherSkullEntity|wither skull entity}} object.",
 				},
+
+				-- eMonsterType:
+				mtBat =
+				{
+					Notes = "",
+				},
+				mtBlaze =
+				{
+					Notes = "",
+				},
+				mtCaveSpider =
+				{
+					Notes = "",
+				},
+				mtChicken =
+				{
+					Notes = "",
+				},
+				mtCow =
+				{
+					Notes = "",
+				},
+				mtCreeper =
+				{
+					Notes = "",
+				},
+				mtEnderDragon =
+				{
+					Notes = "",
+				},
+				mtEnderman =
+				{
+					Notes = "",
+				},
+				mtGhast =
+				{
+					Notes = "",
+				},
+				mtGiant =
+				{
+					Notes = "",
+				},
+				mtHorse =
+				{
+					Notes = "",
+				},
+				mtInvalidType =
+				{
+					Notes = "Invalid monster type. Returned when monster type not recognized",
+				},
+				mtIronGolem =
+				{
+					Notes = "",
+				},
+				mtMagmaCube =
+				{
+					Notes = "",
+				},
+				mtMooshroom =
+				{
+					Notes = "",
+				},
+				mtOcelot =
+				{
+					Notes = "",
+				},
+				mtPig =
+				{
+					Notes = "",
+				},
+				mtSheep =
+				{
+					Notes = "",
+				},
+				mtSilverfish =
+				{
+					Notes = "",
+				},
+				mtSkeleton =
+				{
+					Notes = "",
+				},
+				mtSlime =
+				{
+					Notes = "",
+				},
+				mtSnowGolem =
+				{
+					Notes = "",
+				},
+				mtSpider =
+				{
+					Notes = "",
+				},
+				mtSquid =
+				{
+					Notes = "",
+				},
+				mtVillager =
+				{
+					Notes = "",
+				},
+				mtWitch =
+				{
+					Notes = "",
+				},
+				mtWither =
+				{
+					Notes = "",
+				},
+				mtWitherSkeleton =
+				{
+					Notes = "",
+				},
+				mtWolf =
+				{
+					Notes = "",
+				},
+				mtZombie =
+				{
+					Notes = "",
+				},
+				mtZombiePigman =
+				{
+					Notes = "",
+				},
+				mtZombieVillager =
+				{
+					Notes = "",
+				},
+
+				-- eMessageType:
 				mtCustom =
 				{
 					Notes = "Send raw data without any processing",
