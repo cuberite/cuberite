@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins.h"
 #include "../Entities/Player.h"
 #include "../UI/AnvilWindow.h"
 
@@ -10,11 +11,13 @@
 
 
 class cBlockAnvilHandler :
-	public cBlockHandler
+	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 public:
+	using super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
+
 	cBlockAnvilHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: super(a_BlockType)
 	{
 	}
 
@@ -45,21 +48,12 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
-		int Direction = static_cast<int>(floor(a_Player.GetYaw() * 4.0 / 360.0 + 1.5)) & 0x3;
-
-		switch (Direction)
+		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
 		{
-			case 0: a_BlockMeta = static_cast<NIBBLETYPE>(0x2 | Meta << 2); break;
-			case 1: a_BlockMeta = static_cast<NIBBLETYPE>(0x3 | Meta << 2); break;
-			case 2: a_BlockMeta = static_cast<NIBBLETYPE>(0x0 | Meta << 2); break;
-			case 3: a_BlockMeta = static_cast<NIBBLETYPE>(0x1 | Meta << 2); break;
-			default:
-			{
-				return false;
-			}
+			return false;
 		}
+
+		a_BlockMeta = a_BlockMeta | static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage << 2);
 		return true;
 	}
 

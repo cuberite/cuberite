@@ -11,9 +11,9 @@
 
 
 class cBlockChestHandler :
-	public cYawRotator<cContainerEntityHandler<cBlockEntityHandler>>
+	public cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
-	using super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>>;
+	using super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
 public:
 

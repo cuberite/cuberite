@@ -203,7 +203,10 @@ public:
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta);
+		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		{
+			return false;
+		}
 
 		a_BlockMeta = (BaseMeta & ~BitMask) | YawToMetaData(a_Player.GetYaw());
 		return true;
@@ -249,8 +252,8 @@ template <
 	NIBBLETYPE East = 0x05,
 	NIBBLETYPE South = 0x03,
 	NIBBLETYPE West = 0x04,
-	NIBBLETYPE Up = 0x01,
-	NIBBLETYPE Down = 0x00
+	NIBBLETYPE Up = 0x00,
+	NIBBLETYPE Down = 0x01
 >
 class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
@@ -274,7 +277,10 @@ public:
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta);
+		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		{
+			return false;
+		}
 
 		a_BlockMeta = (BaseMeta & ~BitMask) |  PitchYawToMetaData(a_Player.GetYaw(), a_Player.GetPitch());
 		return true;
