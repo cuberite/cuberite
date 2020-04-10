@@ -6,9 +6,9 @@
 
 
 class cBlockPumpkinHandler :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01>>
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
-	using super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01>>;
+	using super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 public:
 
 	cBlockPumpkinHandler(BLOCKTYPE a_BlockType) :
