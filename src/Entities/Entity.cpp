@@ -1407,7 +1407,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(*this, TargetWorld, TargetPos, cChunkDef::Height);
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
 				// Nether portal in the overworld
@@ -1439,7 +1439,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(*this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
 			}
@@ -1487,7 +1487,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 				// End portal in the overworld
 				else
@@ -1513,7 +1513,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 
 			}
@@ -1577,25 +1577,27 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
+bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
-	ASSERT(a_World != nullptr);
-
 	// Ask the plugins if the entity is allowed to change world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, a_World))
 	{
 		// A Plugin isn't allowing the entity to change world
 		return false;
 	}
 
-	if (m_WorldChangeInfo.m_NewWorld != nullptr)
-	{
-		// Avoid scheduling multiple warp tasks
-		return true;
-	}
+	const auto OldWorld = m_WorldChangeInfo.m_NewWorld;
 
 	// Create new world change info
-	m_WorldChangeInfo = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+	// (The last warp command always takes precedence)
+	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+
+	if (OldWorld != nullptr)
+	{
+		// Avoid scheduling multiple warp tasks
+		// Only move ahead if we came from a "not warping" state
+		return true;
+	}
 
 	// TODO: move to capture when C++14
 	const auto EntityID = GetUniqueID();
@@ -1636,9 +1638,9 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1654,7 +1656,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
