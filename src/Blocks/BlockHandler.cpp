@@ -97,7 +97,7 @@
 
 
 
-using cBlockGlazedTerracottaHandler = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x3, 0x1, 0x3, 0x0, 0x2>>;
+using cBlockGlazedTerracottaHandler = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x03, 0x00, 0x02>>;
 
 
 
