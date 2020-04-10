@@ -1226,7 +1226,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtWither:         return cpp14::make_unique<cWither>();
 		case mtWitherSkeleton: return cpp14::make_unique<cWitherSkeleton>();
 		case mtWolf:           return cpp14::make_unique<cWolf>();
-		case mtZombie:         return cpp14::make_unique<cZombie>(false);  // TODO: Infected zombie parameter
+		case mtZombie:         return cpp14::make_unique<cZombie>();
 		case mtZombiePigman:   return cpp14::make_unique<cZombiePigman>();
 		default:
 		{
