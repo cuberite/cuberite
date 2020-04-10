@@ -434,7 +434,7 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		case mtWolf:                  return 86;
 		case mtZombie:                return 87;
 		case mtZombiePigman:          return 53;
-		case mtZombieVillager:        return 27;
+		case mtZombieVillager:        return 89;
 	}
 	UNREACHABLE("Unsupported mob type");
 }
