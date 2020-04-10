@@ -174,11 +174,11 @@ public:
 selects the direction bits from the block's meta values. */
 template <
 	class Base,
-	NIBBLETYPE BitMask = 0x7,
-	NIBBLETYPE North = 0x2,
-	NIBBLETYPE East = 0x5,
-	NIBBLETYPE South = 0x3,
-	NIBBLETYPE West = 0x4,
+	NIBBLETYPE BitMask = 0x07,
+	NIBBLETYPE North = 0x02,
+	NIBBLETYPE East = 0x05,
+	NIBBLETYPE South = 0x03,
+	NIBBLETYPE West = 0x04,
 	bool AssertIfNotMatched = false
 >
 class cYawRotator:
@@ -250,13 +250,13 @@ public:
 selects the direction bits from the block's meta values. */
 template <
 	class Base,
-	NIBBLETYPE BitMask = 0x7,
-	NIBBLETYPE North = 0x2,
-	NIBBLETYPE East = 0x5,
-	NIBBLETYPE South = 0x3,
-	NIBBLETYPE West = 0x4,
-	NIBBLETYPE Up = 0x1,
-	NIBBLETYPE Down = 0x0
+	NIBBLETYPE BitMask = 0x07,
+	NIBBLETYPE North = 0x02,
+	NIBBLETYPE East = 0x05,
+	NIBBLETYPE South = 0x03,
+	NIBBLETYPE West = 0x04,
+	NIBBLETYPE Up = 0x01,
+	NIBBLETYPE Down = 0x00
 >
 class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
