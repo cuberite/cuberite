@@ -94,9 +94,16 @@ public:
 			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
 
 			// schedule locked state to be released after 1 sec
-			a_World.ScheduleTask(20, [a_Position](cWorld & a_World)
+			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, this](cWorld & a_World)
 			{
-				static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
+				auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+				if (this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0)
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
+				} else
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
+				}
 			});
 
 			// manage on-sounds
@@ -128,16 +135,28 @@ public:
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
 		}
 
+		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))
+		{
+			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
+		}
+
 		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
 
 			// schedule release after 0.5 sec
-			/* a_World.ScheduleTask(10, [a_Position](cWorld & a_World)
+			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, this](cWorld & a_World)
 			{
 				auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-				ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-			}); */
+				bool AlreadyReleased = (ChunkData->GetCachedPressurePlateState(a_Position) == E_PRESSURE_PLATE_RAISED);
+				if ((this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
+				} else if (!AlreadyReleased)
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
+				}
+			});
 		}
 
 		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))
