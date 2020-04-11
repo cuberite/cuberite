@@ -116,11 +116,6 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
-		if (PreviousPlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)
-		{
-			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-		}
-
 		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))  // Plate is still pressed, even though it COULD release now
 		{
 			// set state that indicates that power the as soon as it is not pressed anymore, it should last for 0.5 more sec in pressed state
@@ -130,6 +125,7 @@ public:
 		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
+			Power = PreviousPower.PowerLevel;  // Power should stay the same.
 
 			// schedule release after 0.5 sec
 			/* a_World.ScheduleTask(10, [a_Position](cWorld & a_World)
@@ -165,6 +161,7 @@ public:
 			}
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
+
 
 		if (NextPressurePlateState != PreviousPlateState)
 		{
