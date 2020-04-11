@@ -113,7 +113,7 @@ public:
 				if (seed.m_Depth > 0)
 				{
 					// If this block was water, and we haven't yet gone too far away,
-					// add itś neighbors to the queue to check.
+					// add its neighbors to the queue to check.
 					for (unsigned int i = 0; i < 6; i++)
 					{
 						Seeds.emplace(checkRel + WaterCheck[i], seed.m_Depth - 1);
