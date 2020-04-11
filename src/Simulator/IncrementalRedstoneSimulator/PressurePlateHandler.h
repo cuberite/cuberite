@@ -72,18 +72,22 @@ public:
 		UNUSED(a_PoweringData.PowerLevel);
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
 		cIncrementalRedstoneSimulatorChunkData *ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+
+		// get current states
 		auto PreviousPower = ChunkData->GetCachedPowerData(a_Position);
 		auto PreviousPlateState = ChunkData->GetCachedPressurePlateState(a_Position);
 
+		// initialise variables that should be realised in the world after this method exits
+		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
 		auto NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
 
 		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED))  // Plate is pressed initially
 		{
+			// Set plate to a "can not release"-state
 			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
 
-			ChunkData->SetCachedPressurePlateState(a_Position, NextPressurePlateState);
+			// schedule locked state to be released after 1 sec
 			/* a_World.ScheduleTask(20, [a_Position](cWorld & a_World)
 			{
 				static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
@@ -112,16 +116,26 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
-		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))  // Plate is still pressed, even though it COULD release now
+		if (PreviousPlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
 		}
 
-		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Schedule release
+		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))  // Plate is still pressed, even though it COULD release now
 		{
+			// set state that indicates that power the as soon as it is not pressed anymore, it should last for 0.5 more sec in pressed state
+			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
+		}
+
+		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
+		{
+			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
+
+			// schedule release after 0.5 sec
 			/* a_World.ScheduleTask(10, [a_Position](cWorld & a_World)
 			{
-				static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
+				auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+				ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
 			}); */
 		}
 
@@ -152,20 +166,26 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
+		if (NextPressurePlateState != PreviousPlateState)
+		{
+			ChunkData->SetCachedPressurePlateState(a_Position, NextPressurePlateState);
+		}
+
+		// Plate appears pressed for every state except E_PRESSURE_PLATE_RAISED
 		if ((NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED))
 		{
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
 		}
 
-
-		if ((Power != PreviousPower.PowerLevel))
-		{
-			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
-		}
-
-		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))
+		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))  // Plate is finally released
 		{
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
+		}
+
+		if ((Power != PreviousPower.PowerLevel))  // Power output changed
+		{
+			ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
 		}
 		return {};
 	}
