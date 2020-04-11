@@ -82,16 +82,22 @@ public:
 		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
 		auto NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
 
+
+		if (PreviousPlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)
+		{
+			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
+		}
+
 		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED))  // Plate is pressed initially
 		{
 			// Set plate to a "can not release"-state
 			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
 
 			// schedule locked state to be released after 1 sec
-			/* a_World.ScheduleTask(20, [a_Position](cWorld & a_World)
+			a_World.ScheduleTask(20, [a_Position](cWorld & a_World)
 			{
 				static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-			}); */
+			});
 
 			// manage on-sounds
 			AString soundToPlay = "";
@@ -125,7 +131,6 @@ public:
 		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-			Power = PreviousPower.PowerLevel;  // Power should stay the same.
 
 			// schedule release after 0.5 sec
 			/* a_World.ScheduleTask(10, [a_Position](cWorld & a_World)
@@ -162,6 +167,11 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
+
+		if ((Power == 0) && ((NextPressurePlateState == E_PRESSURE_PLATE_HELD_DOWN) || (NextPressurePlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)))
+		{
+			Power = PreviousPower.PowerLevel;  // Power should stay the same.
+		}
 
 		if (NextPressurePlateState != PreviousPlateState)
 		{
