@@ -94,10 +94,10 @@ public:
 			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
 
 			// schedule locked state to be released after 1 sec
-			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, this](cWorld & a_World)
+			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & aa_World)
 			{
-				auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-				if (this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0)
+				// auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+				if (this->GetPowerLevel(aa_World, a_Position, a_BlockType, a_Meta) == 0)
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
 				}
@@ -146,11 +146,11 @@ public:
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
 
 			// schedule release after 0.5 sec
-			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, this](cWorld & a_World)
+			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & aa_World)
 			{
-				auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+				// auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 				bool AlreadyReleased = (ChunkData->GetCachedPressurePlateState(a_Position) == E_PRESSURE_PLATE_RAISED);
-				if ((this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
+				if ((this->GetPowerLevel(aa_World, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
 				}
