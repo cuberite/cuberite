@@ -23,6 +23,17 @@ public:
 		return m_ActiveBlocks;
 	}
 
+	cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE GetCachedPressurePlateState(const Vector3i & a_Position)
+	{
+		auto Result = m_CachedPressurePlateStates.find(a_Position);
+		return (Result == m_CachedPressurePlateStates.end()) ? cRedstoneHandler::E_PRESSURE_PLATE_RAISED : Result->second;
+	}
+
+	void SetCachedPressurePlateState(const Vector3i & a_Position, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE a_PressurePlateState)
+	{
+		m_CachedPressurePlateStates[a_Position] = a_PressurePlateState;
+	}
+
 	const cRedstoneHandler::PoweringData GetCachedPowerData(const Vector3i & a_Position) const
 	{
 		auto Result = m_CachedPowerLevels.find(a_Position);
@@ -67,6 +78,7 @@ private:
 
 	// TODO: map<Vector3i, int> -> Position of torch + it's heat level
 
+	std::unordered_map<Vector3i, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE, VectorHasher<int>> m_CachedPressurePlateStates;
 	std::unordered_map<Vector3i, cRedstoneHandler::PoweringData, VectorHasher<int>> m_CachedPowerLevels;
 
 	friend class cRedstoneHandlerFactory;
