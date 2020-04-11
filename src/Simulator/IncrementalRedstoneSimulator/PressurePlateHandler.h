@@ -100,7 +100,8 @@ public:
 				if (this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0)
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-				} else
+				}
+				else
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
 				}
@@ -152,7 +153,8 @@ public:
 				if ((this->GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-				} else if (!AlreadyReleased)
+				}
+				else if (!AlreadyReleased)
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
 				}
