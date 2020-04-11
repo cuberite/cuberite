@@ -38,11 +38,17 @@ public:
 
 
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) override
 	{
 		if (GetRandomProvider().RandBool(0.20))
 		{
-			Grow(a_Chunk, {a_RelX, a_RelY, a_RelZ});
+			Grow(a_Chunk, a_RelPos);
 		}
 	}
 

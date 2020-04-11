@@ -71,9 +71,6 @@ cChunk::cChunk(
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
 	m_ChunkData(a_Pool),
-	m_BlockTickX(0),
-	m_BlockTickY(0),
-	m_BlockTickZ(0),
 	m_NeighborXM(a_NeighborXM),
 	m_NeighborXP(a_NeighborXP),
 	m_NeighborZM(a_NeighborZM),
@@ -724,13 +721,13 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 
 
-void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
+void cChunk::TickBlock(const Vector3i a_RelPos)
 {
-	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelX, a_RelY, a_RelZ));
+	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelPos));
 	ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelPos);
 }
 
 
@@ -839,43 +836,27 @@ void cChunk::CheckBlocks()
 
 void cChunk::TickBlocks(void)
 {
-	// Tick dem blocks
-	// _X: We must limit the random number or else we get a nasty int overflow bug - https://forum.cuberite.org/thread-457.html
-	int RandomX = m_World->GetTickRandomNumber(0x00ffffff);
-	int RandomY = m_World->GetTickRandomNumber(0x00ffffff);
-	int RandomZ = m_World->GetTickRandomNumber(0x00ffffff);
-	int TickX = m_BlockTickX;
-	int TickY = m_BlockTickY;
-	int TickZ = m_BlockTickZ;
-
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
 
-	// This for loop looks disgusting, but it actually does a simple thing - first processes m_BlockTick, then adds random to it
-	// This is so that SetNextBlockTick() works
-	for (int i = 0; i < 50; i++,
-
-		// This weird construct (*2, then /2) is needed,
-		// otherwise the blocktick distribution is too biased towards even coords!
-
-		TickX = (TickX + RandomX) % (Width * 2),
-		TickY = (TickY + RandomY) % (Height * 2),
-		TickZ = (TickZ + RandomZ) % (Width * 2),
-		m_BlockTickX = TickX / 2,
-		m_BlockTickY = TickY / 2,
-		m_BlockTickZ = TickZ / 2
-	)
+	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works)
+	auto Idx = cChunkDef::MakeIndexNoCheck(m_BlockToTick);
+	for (int i = 0; i < 50; ++i)
 	{
-
-		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
+		auto Pos = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
+		Idx = m_World->GetTickRandomNumber(cChunkDef::NumBlocks - 1);
+		if (Pos.y > cChunkDef::GetHeight(m_HeightMap, Pos.x, Pos.z))
 		{
 			continue;  // It's all air up here
 		}
 
-		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
+		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
 		ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-	}  // for i - tickblocks
+		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, Pos);
+	}  // for i
+
+	// Set a new random coord for the next tick:
+	m_BlockToTick = cChunkDef::IndexToCoordinate(Idx);
 }
 
 

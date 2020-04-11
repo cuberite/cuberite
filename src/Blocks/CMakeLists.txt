@@ -47,6 +47,7 @@ SET (HDRS
 	BlockFurnace.h
 	BlockGlass.h
 	BlockGlowstone.h
+	BlockGrass.h
 	BlockGravel.h
 	BlockHandler.h
 	BlockHopper.h

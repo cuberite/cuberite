@@ -580,7 +580,7 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 	if (HeldItemType == E_ITEM_STICK) then
 		-- Magic sTick of ticking: set the pointed block for ticking at the next tick
 		Player:SendMessage(cChatColor.LightGray .. "Setting next block tick to {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}")
-		Player:GetWorld():SetNextBlockTick(BlockX, BlockY, BlockZ);
+		Player:GetWorld():SetNextBlockToTick(Vector3i(BlockX, BlockY, BlockZ));
 		return true
 	elseif (HeldItemType == E_ITEM_BLAZE_ROD) then
 		return OnUsingBlazeRod(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ);

@@ -1043,11 +1043,9 @@ public:
 		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
 	}
 
-	/** Returns true if the specified location has wet weather (rain or storm),
-	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
-	above the specified position will block the precipitation and this function
-	will return false. */
-	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos);
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) override;
 
 	/** Returns the seed of the world. */
 	int GetSeed(void) { return m_Generator.GetSeed(); }
@@ -1058,8 +1056,9 @@ public:
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
 
-	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
-	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	/** Causes the specified block to be ticked on the next Tick() call.
+	Only one block coord per chunk may be set, a second call overwrites the first call */
+	void SetNextBlockToTick(const Vector3i a_BlockPos);  // tolua_export
 
 	int GetMaxSugarcaneHeight(void) const { return m_MaxSugarcaneHeight; }  // tolua_export
 	int GetMaxCactusHeight   (void) const { return m_MaxCactusHeight; }     // tolua_export

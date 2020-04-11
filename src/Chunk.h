@@ -147,7 +147,7 @@ public:
 	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
-	void TickBlock(int a_RelX, int a_RelY, int a_RelZ);
+	void TickBlock(const Vector3i a_RelPos);
 
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosZ(void) const { return m_PosZ; }
@@ -375,12 +375,12 @@ public:
 		m_IsSaving = false;
 	}
 
-	/** Sets the blockticking to start at the specified block. Only one blocktick may be set, second call overwrites the first call */
-	inline void SetNextBlockTick(int a_RelX, int a_RelY, int a_RelZ)
+	/** Causes the specified block to be ticked on the next Tick() call.
+	Plugins can use this via the cWorld:SetNextBlockToTick() API.
+	Only one block coord per chunk may be set, a second call overwrites the first call */
+	inline void SetNextBlockToTick(const Vector3i a_RelPos)
 	{
-		m_BlockTickX = a_RelX;
-		m_BlockTickY = a_RelY;
-		m_BlockTickZ = a_RelZ;
+		m_BlockToTick = a_RelPos;
 	}
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
@@ -629,7 +629,9 @@ private:
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;
 
-	int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
+	/** Relative coords of the block to tick first in the next Tick() call.
+	Plugins can use this to force a tick in a specific block, using cWorld:SetNextBlockToTick() API. */
+	Vector3i m_BlockToTick;
 
 	cChunk * m_NeighborXM;  // Neighbor at [X - 1, Z]
 	cChunk * m_NeighborXP;  // Neighbor at [X + 1, Z]
