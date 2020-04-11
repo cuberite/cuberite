@@ -79,7 +79,7 @@ public:
 
 		auto NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
 
-		if (Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED)  // Plate is pressed initially
+		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED))  // Plate is pressed initially
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
 
@@ -112,12 +112,12 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
-		if (Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE)  // Plate is still pressed, even though it COULD release now
+		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))  // Plate is still pressed, even though it COULD release now
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
 		}
 
-		if (Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN)  // Schedule release
+		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Schedule release
 		{
 			/* a_World.ScheduleTask(10, [a_Position](cWorld & a_World)
 			{
@@ -125,7 +125,7 @@ public:
 			}); */
 		}
 
-		if (Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE)
+		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))
 		{
 			NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
 
@@ -152,18 +152,18 @@ public:
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 		}
 
-		if (NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED)
+		if ((NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED))
 		{
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
 		}
 
 
-		if (Power != PreviousPower.PowerLevel)
+		if ((Power != PreviousPower.PowerLevel))
 		{
 			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
 		}
 
-		if (NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED)
+		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))
 		{
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
 		}
