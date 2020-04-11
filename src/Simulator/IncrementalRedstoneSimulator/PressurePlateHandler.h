@@ -79,25 +79,15 @@ public:
 		auto PreviousPlateState = ChunkData->GetCachedPressurePlateState(a_Position);
 
 		// initialise variables that should be realised in the world after this method exits
-		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
-		auto NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
-
-
-		if (PreviousPlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)
-		{
-			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
-		}
+		unsigned char Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
+		cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
 
 		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED))  // Plate is pressed initially
 		{
-			// Set plate to a "can not release"-state
-			NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
-
 			// schedule locked state to be released after 1 sec
-			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & aa_World)
+			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & a_aWorld)
 			{
-				// auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-				if (this->GetPowerLevel(aa_World, a_Position, a_BlockType, a_Meta) == 0)
+				if (this->GetPowerLevel(a_aWorld, a_Position, a_BlockType, a_Meta) == 0)
 				{
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
 				}
@@ -106,7 +96,34 @@ public:
 					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
 				}
 			});
+		}
 
+		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
+		{
+			// schedule release after 0.5 sec
+			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & a_aWorld)
+			{
+				bool AlreadyReleased = (ChunkData->GetCachedPressurePlateState(a_Position) == E_PRESSURE_PLATE_RAISED);
+				if ((this->GetPowerLevel(a_aWorld, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
+				}
+				else if (!AlreadyReleased)
+				{
+					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
+				}
+			});
+		}
+
+		DoPressurePlateStateTransition(PreviousPower, PreviousPlateState, &Power, &NextPressurePlateState);
+
+		if (NextPressurePlateState != PreviousPlateState)
+		{
+			ChunkData->SetCachedPressurePlateState(a_Position, NextPressurePlateState);
+		}
+
+		if ((NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED))  // Plate gets pressed
+		{
 			// manage on-sounds
 			AString soundToPlay = "";
 			switch (a_BlockType)
@@ -128,43 +145,11 @@ public:
 				}
 			}
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
+			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
 		}
 
-		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))  // Plate is still pressed, even though it COULD release now
+		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))  // Plate gets released
 		{
-			// set state that indicates that power the as soon as it is not pressed anymore, it should last for 0.5 more sec in pressed state
-			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-		}
-
-		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))
-		{
-			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-		}
-
-		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
-		{
-			NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-
-			// schedule release after 0.5 sec
-			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & aa_World)
-			{
-				// auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-				bool AlreadyReleased = (ChunkData->GetCachedPressurePlateState(a_Position) == E_PRESSURE_PLATE_RAISED);
-				if ((this->GetPowerLevel(aa_World, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-				}
-				else if (!AlreadyReleased)
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
-				}
-			});
-		}
-
-		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_WANTS_TO_RELEASE))
-		{
-			NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
-
 			// manage off-sounds
 			AString soundToPlay = "";
 			switch (a_BlockType)
@@ -186,31 +171,10 @@ public:
 				}
 			}
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
-		}
-
-
-		if ((Power == 0) && ((NextPressurePlateState == E_PRESSURE_PLATE_HELD_DOWN) || (NextPressurePlateState == E_PRESSURE_PLATE_INITIALLY_PRESSED)))
-		{
-			Power = PreviousPower.PowerLevel;  // Power should stay the same.
-		}
-
-		if (NextPressurePlateState != PreviousPlateState)
-		{
-			ChunkData->SetCachedPressurePlateState(a_Position, NextPressurePlateState);
-		}
-
-		// Plate appears pressed for every state except E_PRESSURE_PLATE_RAISED
-		if ((NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED))
-		{
-			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
-		}
-
-		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))  // Plate is finally released
-		{
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
 		}
 
-		if ((Power != PreviousPower.PowerLevel))  // Power output changed
+		if (Power != PreviousPower.PowerLevel)  // Power output changed
 		{
 			ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
 			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
@@ -225,5 +189,36 @@ public:
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		return {};
+	}
+
+private:
+	void DoPressurePlateStateTransition(cRedstoneHandler::PoweringData PreviousPower, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE PreviousPlateState, unsigned char * Power, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE* NextPressurePlateState) const
+	{
+		switch (PreviousPlateState)
+		{
+		case E_PRESSURE_PLATE_INITIALLY_PRESSED:
+			if (*Power == 0)
+			{
+				*Power = PreviousPower.PowerLevel;
+			}
+			*NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
+			break;
+		case E_PRESSURE_PLATE_HELD_DOWN:
+			if (*Power == 0)
+			{
+				*Power = PreviousPower.PowerLevel;
+			}
+			*NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
+			break;
+		case E_PRESSURE_PLATE_RAISED:
+			if (*Power != 0)
+			{
+				*NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
+			}
+			break;
+		case E_PRESSURE_PLATE_WANTS_TO_RELEASE:
+			*NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
+			break;
+		}
 	}
 };
