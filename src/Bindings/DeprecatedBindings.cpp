@@ -518,49 +518,6 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
-template <typename T>
-int tolua_Vector3_Abs(lua_State * a_LuaState)
-{
-	// Retrieve the params, including self:
-	cLuaState L(a_LuaState);
-	Vector3<T> * self;
-	if (!L.GetStackValues(1, self))
-	{
-		tolua_error(a_LuaState, "invalid 'self' in function 'Vector3<T>:Abs'", nullptr);
-		return 0;
-	}
-
-	// Absolutize the vector:
-	self->Abs();
-	return 0;
-}
-
-
-
-
-
-template <typename T>
-int tolua_Vector3_Clamp(lua_State * a_LuaState)
-{
-	// Retrieve the params, including self:
-	cLuaState L(a_LuaState);
-	Vector3<T> * self;
-	T min, max;
-	if (!L.GetStackValues(1, self, min, max))
-	{
-		tolua_error(a_LuaState, "invalid parameters for function 'Vector3<T>:Clamp', expected a Vector3 and two numbers", nullptr);
-		return 0;
-	}
-
-	// Clamp the vector:
-	self->Clamp(min, max);
-	return 0;
-}
-
-
-
-
-
 void DeprecatedBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -602,21 +559,6 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 
 	tolua_beginmodule(tolua_S, "cWorld");
 		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3i");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<int>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<int>);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3f");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<float>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<float>);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3d");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<double>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<double>);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);

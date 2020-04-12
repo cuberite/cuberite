@@ -1451,6 +1451,57 @@ bool cLuaState::GetStackValue(int a_StackPos, cUUID & a_Value)
 
 
 
+template <typename T>
+bool cLuaState::GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal)
+{
+	tolua_Error err;
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	if (tolua_isusertype(m_LuaState, a_StackPos, "Vector3<double>", 0, &err))
+	{
+		a_ReturnedVal = **(static_cast<const Vector3d **>(lua_touserdata(m_LuaState, a_StackPos)));
+		return true;
+	}
+	if (tolua_isusertype(m_LuaState, a_StackPos, "Vector3<float>", 0, &err))
+	{
+		a_ReturnedVal = **(static_cast<const Vector3f **>(lua_touserdata(m_LuaState, a_StackPos)));
+		return true;
+	}
+	if (tolua_isusertype(m_LuaState, a_StackPos, "Vector3<int>", 0, &err))
+	{
+		a_ReturnedVal = **(static_cast<const Vector3i **>(lua_touserdata(m_LuaState, a_StackPos)));
+		return true;
+	}
+
+	// Bonus: Allow simple tables to work as Vector3:
+	if (lua_istable(m_LuaState, a_StackPos))
+	{
+		lua_rawgeti(m_LuaState, a_StackPos, 1);
+		lua_rawgeti(m_LuaState, a_StackPos, 2);
+		lua_rawgeti(m_LuaState, a_StackPos, 3);
+		T x, y, z;
+		if (!GetStackValues(-3, x, y, z))
+		{
+			return false;
+		}
+		a_ReturnedVal = Vector3<T>(x, y, z);
+		return true;
+	}
+
+	return false;
+}
+
+// Instantiate the previous function for all 3 vector3 types:
+template bool cLuaState::GetStackValue(int a_StackPos, Vector3d & a_ReturnedVal);
+template bool cLuaState::GetStackValue(int a_StackPos, Vector3f & a_ReturnedVal);
+template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_ReturnedVal);
+
+
+
+
+
 cLuaState::cStackValue cLuaState::WalkToValue(const AString & a_Name)
 {
 	// There needs to be at least one value on the stack:

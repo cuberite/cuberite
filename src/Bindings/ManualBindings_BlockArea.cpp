@@ -48,14 +48,12 @@ static int readCuboidOverloadParams(cLuaState & a_LuaState, int a_StartParam, cC
 	else
 	{
 		// Assume the 2-Vector3i version:
-		Vector3i * p1;
-		Vector3i * p2;
-		if (!a_LuaState.GetStackValues(a_StartParam, p1, p2))
+		Vector3i p1;
+		Vector3i p2;
+		if (!a_LuaState.GetStackValues(a_StartParam, a_Cuboid.p1, a_Cuboid.p2))
 		{
 			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected two Vector3i instances");
 		}
-		a_Cuboid.p1 = *p1;
-		a_Cuboid.p2 = *p2;
 		return a_StartParam + 2;
 	}
 }
@@ -85,12 +83,10 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 	else
 	{
 		// Assume the Vector3i version:
-		Vector3i * c;
-		if (!a_LuaState.GetStackValues(a_StartParam, c))
+		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords))
 		{
 			return a_LuaState.ApiParamError("Cannot read the %s, expected a Vector3i instance", a_ParamName);
 		}
-		a_Coords = *c;
 		return a_StartParam + 1;
 	}
 }

@@ -696,6 +696,10 @@ public:
 		return GetStackValue(a_StackPos, a_ReturnedVal.GetDest());
 	}
 
+	/** Retrieves any Vector3 value and coerces it into a Vector3<T>. */
+	template <typename T>
+	bool GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal);
+
 	/** Pushes the named value in the table at the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
 	If the value is found, it is pushed on top of the stack and the returned cStackValue is valid.

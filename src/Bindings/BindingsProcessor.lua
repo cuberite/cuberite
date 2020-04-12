@@ -74,7 +74,20 @@ local access =
 -- Map of classname -> true
 local g_HasCustomPushImplementation =
 {
-	cEntity = true
+	cEntity = true,
+}
+
+
+
+
+
+--- Defines classes that have a custom manual GetStackValue() implementation and should not generate the automatic one
+-- Map of classname -> true
+local g_HasCustomGetImplementation =
+{
+	Vector3d = true,
+	Vector3f = true,
+	Vector3i = true,
 }
 
 
@@ -209,13 +222,15 @@ local function OutputLuaStateHelpers(a_Package)
 		f:write("// This file expects to be included form inside the cLuaState class definition\n")
 		f:write("\n\n\n\n\n")
 		for _, item in ipairs(types) do
-			if not(g_HasCustomPushImplementation[item.name]) then
+			if not(g_HasCustomPushImplementation[item.lname]) then
 				f:write("void Push(" .. item.name .. " * a_Value);\n")
 			end
 		end
 		for _, item in ipairs(types) do
-			f:write("bool GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal);\n")
-			f:write("bool GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal);\n")
+			if not(g_HasCustomGetImplementation[item.lname]) then
+				f:write("bool GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal);\n")
+				f:write("bool GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal);\n")
+			end
 		end
 		f:write("\n\n\n\n\n")
 		f:close()
@@ -231,38 +246,40 @@ local function OutputLuaStateHelpers(a_Package)
 		f:write("#include \"Globals.h\"\n#include \"LuaState.h\"\n#include \"tolua++/include/tolua++.h\"\n")
 		f:write("\n\n\n\n\n")
 		for _, item in ipairs(types) do
-			if not(g_HasCustomPushImplementation[item.name]) then
+			if not(g_HasCustomPushImplementation[item.lname]) then
 				f:write("void cLuaState::Push(" .. item.name .. " * a_Value)\n{\n\tASSERT(IsValid());\n")
 				f:write("\ttolua_pushusertype(m_LuaState, a_Value, \"" .. item.name .. "\");\n");
 				f:write("}\n\n\n\n\n\n")
 			end
 		end
 		for _, item in ipairs(types) do
-			f:write("bool cLuaState::GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
-			f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
-			f:write("\t\ta_ReturnedVal = nullptr;\n")
-			f:write("\t\treturn false;\n\t}\n")
-			f:write("\ttolua_Error err;\n")
-			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"" .. item.name .. "\", false, &err))\n")
-			f:write("\t{\n")
-			f:write("\t\ta_ReturnedVal = *(static_cast<" .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
-			f:write("\t\treturn true;\n");
-			f:write("\t}\n")
-			f:write("\treturn false;\n")
-			f:write("}\n\n\n\n\n\n")
+			if not(g_HasCustomGetImplementation[item.lname]) then
+				f:write("bool cLuaState::GetStackValue(int a_StackPos, Ptr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
+				f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
+				f:write("\t\ta_ReturnedVal = nullptr;\n")
+				f:write("\t\treturn false;\n\t}\n")
+				f:write("\ttolua_Error err;\n")
+				f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"" .. item.name .. "\", false, &err))\n")
+				f:write("\t{\n")
+				f:write("\t\ta_ReturnedVal = *(static_cast<" .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
+				f:write("\t\treturn true;\n");
+				f:write("\t}\n")
+				f:write("\treturn false;\n")
+				f:write("}\n\n\n\n\n\n")
 
-			f:write("bool cLuaState::GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
-			f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
-			f:write("\t\ta_ReturnedVal = nullptr;\n")
-			f:write("\t\treturn false;\n\t}\n")
-			f:write("\ttolua_Error err;\n")
-			f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"const " .. item.name .. "\", false, &err))\n")
-			f:write("\t{\n")
-			f:write("\t\ta_ReturnedVal = *(static_cast<const " .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
-			f:write("\t\treturn true;\n");
-			f:write("\t}\n")
-			f:write("\treturn false;\n")
-			f:write("}\n\n\n\n\n\n")
+				f:write("bool cLuaState::GetStackValue(int a_StackPos, ConstPtr" .. item.lname .. " & a_ReturnedVal)\n{\n\tASSERT(IsValid());\n")
+				f:write("\tif (lua_isnil(m_LuaState, a_StackPos))\n\t{\n")
+				f:write("\t\ta_ReturnedVal = nullptr;\n")
+				f:write("\t\treturn false;\n\t}\n")
+				f:write("\ttolua_Error err;\n")
+				f:write("\tif (tolua_isusertype(m_LuaState, a_StackPos, \"const " .. item.name .. "\", false, &err))\n")
+				f:write("\t{\n")
+				f:write("\t\ta_ReturnedVal = *(static_cast<const " .. item.name .. " **>(lua_touserdata(m_LuaState, a_StackPos)));\n")
+				f:write("\t\treturn true;\n");
+				f:write("\t}\n")
+				f:write("\treturn false;\n")
+				f:write("}\n\n\n\n\n\n")
+			end
 		end
 		f:close()
 	end

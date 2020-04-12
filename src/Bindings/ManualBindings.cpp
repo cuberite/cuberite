@@ -2975,8 +2975,8 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		}
 		// Get the params:
 		cWorld * world;
-		Vector3d * start;
-		Vector3d * end;
+		Vector3d start;
+		Vector3d end;
 		if (!L.GetStackValues(idx, world, start, end))
 		{
 			LOGWARNING("cLineBlockTracer:FirstSolidHitTrace(): Cannot read parameters, aborting the trace.");
@@ -2987,7 +2987,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		Vector3d hitCoords;
 		Vector3i hitBlockCoords;
 		eBlockFace hitBlockFace;
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, *start, *end, hitCoords, hitBlockCoords, hitBlockFace);
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
 		L.Push(isHit);
 		if (!isHit)
 		{
@@ -3074,8 +3074,8 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		}
 		// Get the params:
 		cWorld * world;
-		Vector3d * start;
-		Vector3d * end;
+		Vector3d start;
+		Vector3d end;
 		if (!L.GetStackValues(idx, world, start, end))
 		{
 			LOGWARNING("cLineBlockTracer:LineOfSightTrace(): Cannot read parameters, aborting the trace.");
@@ -3085,7 +3085,7 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		}
 		int lineOfSight = cLineBlockTracer::losAirWater;
 		L.GetStackValue(idx + 7, lineOfSight);
-		L.Push(cLineBlockTracer::LineOfSightTrace(*world, *start, *end, lineOfSight));
+		L.Push(cLineBlockTracer::LineOfSightTrace(*world, start, end, lineOfSight));
 		return 1;
 	}
 
@@ -3497,19 +3497,19 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 {
 	/* Function signatures:
 	bbox:CalcLineIntersection(pt1, pt2) -> bool, [number, blockface]
-	cBoundingBox:CalcLineIntersection(min, max, pt1, pt2) -> bool, [number, blockface]
+	cBoundingBox:CalcLineIntersection(min, max, pt1, pt2) -> bool, [number, blockface] (static)
 	*/
 	cLuaState L(a_LuaState);
-	const Vector3d * min;
-	const Vector3d * max;
-	const Vector3d * pt1;
-	const Vector3d * pt2;
+	Vector3d min;
+	Vector3d max;
+	Vector3d pt1;
+	Vector3d pt2;
 	double lineCoeff;
 	eBlockFace blockFace;
 	bool res;
 	if (L.GetStackValues(2, min, max, pt1, pt2))  // Try the static signature first
 	{
-		res = cBoundingBox::CalcLineIntersection(*min, *max, *pt1, *pt2, lineCoeff, blockFace);
+		res = cBoundingBox::CalcLineIntersection(min, max, pt1, pt2, lineCoeff, blockFace);
 	}
 	else
 	{
@@ -3520,7 +3520,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 			tolua_error(a_LuaState, "Invalid function params. Expected either bbox:CalcLineIntersection(pt1, pt2) or cBoundingBox:CalcLineIntersection(min, max, pt1, pt2).", nullptr);
 			return 0;
 		}
-		res = bbox->CalcLineIntersection(*pt1, *pt2, lineCoeff, blockFace);
+		res = bbox->CalcLineIntersection(pt1, pt2, lineCoeff, blockFace);
 	}
 	L.Push(res);
 	if (res)
@@ -3984,11 +3984,11 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 	}
 
 	// Try the (Vector3i, Vector3i) param version:
-	Vector3i * pt1 = nullptr;
-	Vector3i * pt2 = nullptr;
-	if (L.GetStackValues(2, pt1, pt2) && (pt1 != nullptr) && (pt2 != nullptr))
+	Vector3i pt1;
+	Vector3i pt2;
+	if (L.GetStackValues(2, pt1, pt2))
 	{
-		self->Assign(*pt1, *pt2);
+		self->Assign(pt1, pt2);
 		return 0;
 	}
 	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
@@ -4014,32 +4014,20 @@ static int tolua_cCuboid_IsInside(lua_State * tolua_S)
 	int x, y, z;
 	if (L.GetStackValues(2, x, y, z))
 	{
-		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3d) instead.");
+		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3) instead.");
 		L.LogStackTrace();
-		self->Move({x, y, z});
-		return 0;
+		L.Push(self->IsInside(Vector3i{x, y, z}));
+		return 1;
 	}
 
-	// Try the (Vector3i) param version:
+	// Try the Vector3 param version:
+	Vector3d pt;
+	if (L.GetStackValue(2, pt))
 	{
-		Vector3i * pt = nullptr;
-		if (L.GetStackValue(2, pt) && (pt != nullptr))
-		{
-			L.Push(self->IsInside(*pt));
-			return 1;
-		}
+		L.Push(self->IsInside(pt));
+		return 1;
 	}
-
-	// Try the (Vector3d) param version:
-	{
-		Vector3d * pt = nullptr;
-		if (L.GetStackValue(2, pt) && (pt != nullptr))
-		{
-			L.Push(self->IsInside(*pt));
-			return 1;
-		}
-	}
-	return L.ApiParamError("Invalid parameter #2, expected a Vector3i or a Vector3d.");
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
 }
 
 
@@ -4068,12 +4056,12 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 		return 0;
 	}
 
-	Vector3i * offset = nullptr;
-	if (!L.GetStackValue(2, offset) || (offset == nullptr))
+	Vector3i offset;
+	if (!L.GetStackValue(2, offset))
 	{
-		return L.ApiParamError("Invalid parameter #2, expected a Vector3i.");
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
 	}
-	self->Move(*offset);
+	self->Move(offset);
 	return 0;
 }
 

@@ -260,6 +260,14 @@ g_PluginInfo =
 			Handler = HandleTestWndCmd,
 			HelpString = "Opens up a window using plugin API"
 		},
+
+		["/vector"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleVectorCmd,
+			HelpString = "Tests the Vector3 API",
+		},
+
 		["/wesel"] =
 		{
 			Permission = "debuggers",
