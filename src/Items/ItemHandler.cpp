@@ -18,6 +18,7 @@
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
 #include "ItemCake.h"
+#include "ItemCactus.h"
 #include "ItemCauldron.h"
 #include "ItemChest.h"
 #include "ItemCloth.h"
@@ -216,6 +217,11 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		case E_ITEM_BEETROOT_SEEDS:
+		case E_ITEM_CACTUS:
+		{
+			return new cItemCactusHandler(a_ItemType);
+		}
+
 		case E_ITEM_MELON_SEEDS:
 		case E_ITEM_PUMPKIN_SEEDS:
 		case E_ITEM_SEEDS:
