@@ -38,7 +38,7 @@ public:
 		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 		if (a_PoweringData != Data->ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
 		{
-			a_World.SetBlockMeta(a_Position, (a_PoweringData.PowerLevel > 0) ? (a_Meta | 0x4) : (a_Meta & ~0x04));
+			a_World.SetBlockMeta(a_Position, (a_PoweringData.PowerLevel > 0) ? (a_Meta | 0x04) : (a_Meta & ~0x04));
 		}
 
 		return {};

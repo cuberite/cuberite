@@ -78,13 +78,13 @@ public:
 		// Determine lever direction:
 		switch (a_Dir)
 		{
-			case BLOCK_FACE_YP:   return 0x6;
-			case BLOCK_FACE_XP:   return 0x1;
-			case BLOCK_FACE_XM:   return 0x2;
-			case BLOCK_FACE_ZP:   return 0x3;
-			case BLOCK_FACE_ZM:   return 0x4;
-			case BLOCK_FACE_YM:   return 0x0;
-			case BLOCK_FACE_NONE: return 0x6;
+			case BLOCK_FACE_YP:   return 0x06;
+			case BLOCK_FACE_XP:   return 0x01;
+			case BLOCK_FACE_XM:   return 0x02;
+			case BLOCK_FACE_ZP:   return 0x03;
+			case BLOCK_FACE_ZM:   return 0x04;
+			case BLOCK_FACE_YM:   return 0x00;
+			case BLOCK_FACE_NONE: return 0x06;
 		}
 		UNREACHABLE("Unsupported block face");
 	}
@@ -95,16 +95,16 @@ public:
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x7)
+		switch (a_Meta & 0x07)
 		{
-			case 0x1: return BLOCK_FACE_XP;
-			case 0x2: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_ZM;
-			case 0x5:
-			case 0x6: return BLOCK_FACE_YP;
-			case 0x7:
-			case 0x0: return BLOCK_FACE_YM;
+			case 0x01: return BLOCK_FACE_XP;
+			case 0x02: return BLOCK_FACE_XM;
+			case 0x03: return BLOCK_FACE_ZP;
+			case 0x04: return BLOCK_FACE_ZM;
+			case 0x05:
+			case 0x06: return BLOCK_FACE_YP;
+			case 0x07:
+			case 0x00: return BLOCK_FACE_YM;
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");
@@ -203,7 +203,7 @@ public:
 	/** Extracts the ON bit from metadata and returns if true if it is set */
 	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
 	{
-		return ((a_BlockMeta & 0x8) == 0x8);
+		return ((a_BlockMeta & 0x08) == 0x08);
 	}
 } ;
 

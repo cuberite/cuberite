@@ -218,7 +218,7 @@ bool cChunkData::SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Nibble)
 	auto Idxs = IndicesFromRelPos(a_RelPos);
 	if (m_Sections[Idxs.Section] == nullptr)
 	{
-		if ((a_Nibble & 0xf) == 0x00)
+		if ((a_Nibble & 0x0f) == 0x00)
 		{
 			return false;
 		}
@@ -230,7 +230,7 @@ bool cChunkData::SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Nibble)
 		}
 		ZeroSection(m_Sections[Idxs.Section]);
 	}
-	NIBBLETYPE oldval = m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4) & 0xf;
+	NIBBLETYPE oldval = m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] >> ((Idxs.Index & 1) * 4) & 0x0f;
 	m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] = static_cast<NIBBLETYPE>(
 		(m_Sections[Idxs.Section]->m_BlockMetas[Idxs.Index / 2] & (0xf0 >> ((Idxs.Index & 1) * 4))) |  // The untouched nibble
 		((a_Nibble & 0x0f) << ((Idxs.Index & 1) * 4))  // The nibble being set
@@ -275,7 +275,7 @@ NIBBLETYPE cChunkData::GetSkyLight(Vector3i a_RelPos) const
 		}
 		else
 		{
-			return 0xF;
+			return 0x0f;
 		}
 	}
 	ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");

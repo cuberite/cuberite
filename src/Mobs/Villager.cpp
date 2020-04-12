@@ -163,7 +163,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			{
 				continue;
 			}
-			if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
+			if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x07)
 			{
 				continue;
 			}
@@ -187,7 +187,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
+		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x07)
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;

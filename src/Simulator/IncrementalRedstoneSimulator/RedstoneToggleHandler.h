@@ -20,16 +20,16 @@ public:
 		{
 			case E_BLOCK_LEVER:
 			{
-				switch (a_Meta & 0x7)
+				switch (a_Meta & 0x07)
 				{
-					case 0x0:
-					case 0x7: return { a_Position + Vector3i(0, 1, 0) };
-					case 0x1: return { a_Position + Vector3i(-1, 0, 0) };
-					case 0x2: return { a_Position + Vector3i(1, 0, 0) };
-					case 0x3: return { a_Position + Vector3i(0, 0, -1) };
-					case 0x4: return { a_Position + Vector3i(0, 0, 1) };
-					case 0x5:
-					case 0x6: return { a_Position + Vector3i(0, -1, 0) };
+					case 0x00:
+					case 0x07: return { a_Position + Vector3i(0, 1, 0) };
+					case 0x01: return { a_Position + Vector3i(-1, 0, 0) };
+					case 0x02: return { a_Position + Vector3i(1, 0, 0) };
+					case 0x03: return { a_Position + Vector3i(0, 0, -1) };
+					case 0x04: return { a_Position + Vector3i(0, 0, 1) };
+					case 0x05:
+					case 0x06: return { a_Position + Vector3i(0, -1, 0) };
 					default:
 					{
 						ASSERT(!"Unhandled lever metadata!");
@@ -40,14 +40,14 @@ public:
 			case E_BLOCK_STONE_BUTTON:
 			case E_BLOCK_WOODEN_BUTTON:
 			{
-				switch (a_Meta & 0x7)
+				switch (a_Meta & 0x07)
 				{
-					case 0x0: return { a_Position + Vector3i(0, 1, 0) };
-					case 0x1: return { a_Position + Vector3i(-1, 0, 0) };
-					case 0x2: return { a_Position + Vector3i(1, 0, 0) };
-					case 0x3: return { a_Position + Vector3i(0, 0, -1) };
-					case 0x4: return { a_Position + Vector3i(0, 0, 1) };
-					case 0x5: return { a_Position + Vector3i(0, -1, 0) };
+					case 0x00: return { a_Position + Vector3i(0, 1, 0) };
+					case 0x01: return { a_Position + Vector3i(-1, 0, 0) };
+					case 0x02: return { a_Position + Vector3i(1, 0, 0) };
+					case 0x03: return { a_Position + Vector3i(0, 0, -1) };
+					case 0x04: return { a_Position + Vector3i(0, 0, 1) };
+					case 0x05: return { a_Position + Vector3i(0, -1, 0) };
 					default:
 					{
 						ASSERT(!"Unhandled button metadata!");

@@ -2953,7 +2953,7 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 		return false;
 	}
 
-	return (Meta & 0x4) > 0;
+	return (Meta & 0x04) > 0;
 }
 
 
@@ -2970,10 +2970,10 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 		return false;
 	}
 
-	bool IsOpen = (Meta & 0x4) != 0;
+	bool IsOpen = (Meta & 0x04) != 0;
 	if (a_Open != IsOpen)
 	{
-		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
+		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x04);
 		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		return true;
 	}

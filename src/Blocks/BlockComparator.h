@@ -52,12 +52,12 @@ public:
 
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
 	{
-		return ((a_Meta & 0x4) == 0x4);
+		return ((a_Meta & 0x04) == 0x04);
 	}
 
 	inline static bool IsOn(NIBBLETYPE a_Meta)
 	{
-		return ((a_Meta & 0x8) == 0x8);
+		return ((a_Meta & 0x08) == 0x08);
 	}
 
 	inline static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
@@ -66,10 +66,10 @@ public:
 		{
 			switch (a_Meta)
 			{
-				case 0x0: a_Position.x++; break;
-				case 0x1: a_Position.z--; break;
-				case 0x2: a_Position.x--; break;
-				case 0x3: a_Position.z++; break;
+				case 0x00: a_Position.x++; break;
+				case 0x01: a_Position.z--; break;
+				case 0x02: a_Position.x--; break;
+				case 0x03: a_Position.z++; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -82,10 +82,10 @@ public:
 		{
 			switch (a_Meta)
 			{
-				case 0x0: a_Position.x--; break;
-				case 0x1: a_Position.z++; break;
-				case 0x2: a_Position.x++; break;
-				case 0x3: a_Position.z--; break;
+				case 0x00: a_Position.x--; break;
+				case 0x01: a_Position.z++; break;
+				case 0x02: a_Position.x++; break;
+				case 0x03: a_Position.z--; break;
 				default:
 				{
 					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -102,10 +102,10 @@ public:
 	{
 		switch (a_Meta)
 		{
-			case 0x0: a_Position.z++; break;
-			case 0x1: a_Position.x--; break;
-			case 0x2: a_Position.z--; break;
-			case 0x3: a_Position.x++; break;
+			case 0x00: a_Position.z++; break;
+			case 0x01: a_Position.x--; break;
+			case 0x02: a_Position.z--; break;
+			case 0x03: a_Position.x++; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -121,10 +121,10 @@ public:
 	{
 		switch (a_Meta)
 		{
-			case 0x0: a_Position.z--; break;
-			case 0x1: a_Position.x++; break;
-			case 0x2: a_Position.z++; break;
-			case 0x3: a_Position.x--; break;
+			case 0x00: a_Position.z--; break;
+			case 0x01: a_Position.x++; break;
+			case 0x02: a_Position.z++; break;
+			case 0x03: a_Position.x--; break;
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);

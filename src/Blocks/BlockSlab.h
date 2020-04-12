@@ -59,13 +59,13 @@ public:
 			case BLOCK_FACE_TOP:
 			{
 				// Bottom half slab block
-				a_BlockMeta = Meta & 0x7;
+				a_BlockMeta = Meta & 0x07;
 				break;
 			}
 			case BLOCK_FACE_BOTTOM:
 			{
 				// Top half slab block
-				a_BlockMeta = Meta | 0x8;
+				a_BlockMeta = Meta | 0x08;
 				break;
 			}
 			case BLOCK_FACE_EAST:
@@ -76,12 +76,12 @@ public:
 				if (a_CursorY > 7)
 				{
 					// Cursor at top half of block, place top slab
-					a_BlockMeta = Meta | 0x8; break;
+					a_BlockMeta = Meta | 0x08; break;
 				}
 				else
 				{
 					// Cursor at bottom half of block, place bottom slab
-					a_BlockMeta = Meta & 0x7; break;
+					a_BlockMeta = Meta & 0x07; break;
 				}
 			}
 			case BLOCK_FACE_NONE: return false;
@@ -92,7 +92,7 @@ public:
 		if (IsAnySlabType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})))
 		{
 			a_BlockType = GetDoubleSlabType(m_BlockType);
-			a_BlockMeta = a_BlockMeta & 0x7;
+			a_BlockMeta = a_BlockMeta & 0x07;
 		}
 
 		return true;
@@ -162,7 +162,7 @@ public:
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
-		a_Meta &= 0x7;
+		a_Meta &= 0x07;
 
 		switch (m_BlockType)
 		{
@@ -224,7 +224,7 @@ public:
 
 	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
 	{
-		if (a_BlockMeta & 0x8)  // top half
+		if (a_BlockMeta & 0x08)  // top half
 		{
 			return true;
 		}
@@ -255,7 +255,7 @@ public:
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
-		return cItem(Block, 2, a_BlockMeta & 0x7);
+		return cItem(Block, 2, a_BlockMeta & 0x07);
 	}
 
 

@@ -227,7 +227,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 			// Set the extension and the piston base correctly
 			Vector3i extensionPos = a_BlockPos + pushDir;
-			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta | 0x8);
+			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta | 0x08);
 			World.SetBlock(
 				extensionPos.x, extensionPos.y, extensionPos.z,
 				E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)

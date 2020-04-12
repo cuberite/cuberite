@@ -41,18 +41,10 @@ local g_ShouldProcessExt =
 --- The list of files not to be processed:
 local g_IgnoredFiles =
 {
-	"Bindings/Bindings.h",
-	"Bindings/Bindings.cpp",
-	"Bindings/LuaState_Implementation.cpp",
+	".*/Bindings/Bindings.h",
+	".*/Bindings/Bindings.cpp",
+	".*/Bindings/LuaState_Implementation.cpp",
 }
-
---- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
-local g_ShouldIgnoreFile = {}
-
--- Initialize the g_ShouldIgnoreFile map:
-for _, fnam in ipairs(g_IgnoredFiles) do
-	g_ShouldIgnoreFile[fnam] = true
-end
 
 --- Keeps track of the number of violations for this folder
 local g_NumViolations = 0
@@ -205,6 +197,12 @@ local g_ViolationPatterns =
 
 	-- Don't allow characters other than ASCII 0 - 127:
 	{"[" .. string.char(128) .. "-" .. string.char(255) .. "]", "Character in the extended ASCII range (128 - 255) not allowed"},
+
+	-- Don't allow odd-sized hex constants:
+	{"0x%x%X",             "Hex constant needs to be byte-sized"},
+	{"0x%x%x%x%X",         "Hex constant needs to be byte-sized"},
+	{"0x%x%x%x%x%x%X",     "Hex constant needs to be byte-sized"},
+	{"0x%x%x%x%x%x%x%x%X", "Hex constant needs to be byte-sized"},
 }
 
 
@@ -331,8 +329,10 @@ local function ProcessItem(a_ItemName)
 	assert(type(a_ItemName) == "string")
 
 	-- Skip files / folders that should be ignored
-	if (g_ShouldIgnoreFile[a_ItemName]) then
-		return
+	for _, pattern in ipairs(g_IgnoredFiles) do
+		if (string.match(a_ItemName, pattern)) then
+			return
+		end
 	end
 
 	local ext = a_ItemName:match("%.([^/%.]-)$")

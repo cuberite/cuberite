@@ -75,17 +75,17 @@ public:
 		NIBBLETYPE Meta;
 		if (Power == 0)
 		{
-			Meta = (a_Meta & 0x3);
+			Meta = (a_Meta & 0x03);
 		}
 		else if (Power == 1)
 		{
 			// Connected but not activated, AND away the highest bit
-			Meta = (a_Meta & 0x7) | 0x4;
+			Meta = (a_Meta & 0x07) | 0x04;
 		}
 		else if (Power == 15)
 		{
 			// Connected and activated, set the 3rd and 4th highest bits
-			Meta = (a_Meta | 0xC);
+			Meta = (a_Meta | 0x0c);
 		}
 		else
 		{

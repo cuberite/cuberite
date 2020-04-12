@@ -14,7 +14,7 @@ public:
 
 	static Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
 	{
-		switch (a_Meta & 0x7)
+		switch (a_Meta & 0x07)
 		{
 			case E_META_RAIL_ZM_ZP: return { 0, 0, 1 };
 			case E_META_RAIL_XM_XP: return { 1, 0, 0 };

@@ -62,7 +62,7 @@ public:
 		auto Meta = a_ChunkInterface.GetBlockMeta(a_BedPosition);
 		if (a_IsOccupied)
 		{
-			Meta |= 0x04;  // Where 0x4 = occupied bit
+			Meta |= 0x04;  // Where 0x04 = occupied bit
 		}
 		else
 		{

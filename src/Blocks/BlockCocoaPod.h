@@ -31,7 +31,7 @@ public:
 		NIBBLETYPE BlockMeta;
 		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta);
 
-		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x3) == E_META_LOG_JUNGLE));
+		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
 	}
 
 

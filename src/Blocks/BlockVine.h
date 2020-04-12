@@ -67,11 +67,11 @@ public:
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_NORTH: return 0x1;
-			case BLOCK_FACE_SOUTH: return 0x4;
-			case BLOCK_FACE_WEST:  return 0x8;
-			case BLOCK_FACE_EAST:  return 0x2;
-			default: return 0x0;
+			case BLOCK_FACE_NORTH: return 0x01;
+			case BLOCK_FACE_SOUTH: return 0x04;
+			case BLOCK_FACE_WEST:  return 0x08;
+			case BLOCK_FACE_EAST:  return 0x02;
+			default: return 0x00;
 		}
 	}
 
@@ -83,10 +83,10 @@ public:
 	{
 		switch (a_MetaData)
 		{
-			case 0x1: return BLOCK_FACE_NORTH;
-			case 0x4: return BLOCK_FACE_SOUTH;
-			case 0x8: return BLOCK_FACE_WEST;
-			case 0x2: return BLOCK_FACE_EAST;
+			case 0x01: return BLOCK_FACE_NORTH;
+			case 0x04: return BLOCK_FACE_SOUTH;
+			case 0x08: return BLOCK_FACE_WEST;
+			case 0x02: return BLOCK_FACE_EAST;
 			default:  return BLOCK_FACE_TOP;
 		}
 	}

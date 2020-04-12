@@ -33,14 +33,14 @@ public:
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
-		switch (a_MetaData & 0x7)  // We only want the bottom three bits (4th controls extended-ness))
+		switch (a_MetaData & 0x07)  // We only want the bottom three bits (4th controls extended-ness))
 		{
-			case 0x0: return BLOCK_FACE_YM;
-			case 0x1: return BLOCK_FACE_YP;
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_XM;
-			case 0x5: return BLOCK_FACE_XP;
+			case 0x00: return BLOCK_FACE_YM;
+			case 0x01: return BLOCK_FACE_YP;
+			case 0x02: return BLOCK_FACE_ZM;
+			case 0x03: return BLOCK_FACE_ZP;
+			case 0x04: return BLOCK_FACE_XM;
+			case 0x05: return BLOCK_FACE_XP;
 			default:
 			{
 				ASSERT(!"Invalid Metadata");
@@ -62,7 +62,7 @@ public:
 	}
 
 	/** Returns true if the piston (with the specified meta) is extended */
-	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
+	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x08) != 0x00); }
 
 private:
 

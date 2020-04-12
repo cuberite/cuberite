@@ -32,7 +32,7 @@ public:
 			a_BlockType, a_BlockMeta
 		);
 		// Only the lowest 3 bits are important
-		a_BlockMeta = a_BlockMeta & 0x7;
+		a_BlockMeta = a_BlockMeta & 0x07;
 		return res;
 	}
 } ;

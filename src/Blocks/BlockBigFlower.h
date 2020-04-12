@@ -114,7 +114,7 @@ public:
 
 	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override
 	{
-		if ((a_OldBlockMeta & 0x8) != 0)
+		if ((a_OldBlockMeta & 0x08) != 0)
 		{
 			// Was upper part of flower
 			auto lowerPartPos = a_BlockPos - Vector3i(0, 1, 0);

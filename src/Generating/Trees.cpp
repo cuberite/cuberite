@@ -421,7 +421,7 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 	for (int i = 0; i < 2; i++)
 	{
 		PushCoordBlocks (a_BlockPos.x, Hei, a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x5000000 - i * 0x10000000, a_OtherBlocks, 2, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x05000000 - i * 0x10000000, a_OtherBlocks, 2, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE));
 		Hei++;
 	}  // for i - 2*
@@ -430,7 +430,7 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 	if ((Random & 1) == 0)
 	{
 		PushCoordBlocks (a_BlockPos.x, Hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x6000000, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x06000000, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE));
 		Hei++;
 	}

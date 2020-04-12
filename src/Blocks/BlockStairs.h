@@ -38,7 +38,7 @@ public:
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_TOP:    break;
-			case BLOCK_FACE_BOTTOM: a_BlockMeta = a_BlockMeta | 0x4; break;  // When placing onto a bottom face, always place an upside-down stairs block
+			case BLOCK_FACE_BOTTOM: a_BlockMeta = a_BlockMeta | 0x04; break;  // When placing onto a bottom face, always place an upside-down stairs block
 			case BLOCK_FACE_EAST:
 			case BLOCK_FACE_NORTH:
 			case BLOCK_FACE_SOUTH:
@@ -47,7 +47,7 @@ public:
 				// When placing onto a sideways face, check cursor, if in top half, make it an upside-down stairs block
 				if (a_CursorY > 8)
 				{
-					a_BlockMeta |= 0x4;
+					a_BlockMeta |= 0x04;
 				}
 				break;
 			}
@@ -65,19 +65,19 @@ public:
 		}
 		if ((a_Rotation >= 0) && (a_Rotation < 90))
 		{
-			return 0x0;
+			return 0x00;
 		}
 		else if ((a_Rotation >= 180) && (a_Rotation < 270))
 		{
-			return 0x1;
+			return 0x01;
 		}
 		else if ((a_Rotation >= 90) && (a_Rotation < 180))
 		{
-			return 0x2;
+			return 0x02;
 		}
 		else
 		{
-			return 0x3;
+			return 0x03;
 		}
 	}
 
@@ -121,23 +121,23 @@ public:
 	#if 0
 	bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 	{
-		if (a_BlockMeta & 0x4)  // upside down
+		if (a_BlockMeta & 0x04)  // upside down
 		{
 			return true;
 		}
-		else if ((a_BlockMeta & 0x3) == 0)  // tall side is east (+X)
+		else if ((a_BlockMeta & 0x03) == 0)  // tall side is east (+X)
 		{
 			return a_Position.y < ((a_Position.x > 0.5) ? 1.0 : 0.5);
 		}
-		else if ((a_BlockMeta & 0x3) == 1)  // tall side is west (-X)
+		else if ((a_BlockMeta & 0x03) == 1)  // tall side is west (-X)
 		{
 			return a_Position.y < ((a_Position.x < 0.5) ? 1.0 : 0.5);
 		}
-		else if ((a_BlockMeta & 0x3) == 2)  // tall side is south (+Z)
+		else if ((a_BlockMeta & 0x03) == 2)  // tall side is south (+Z)
 		{
 			return a_Position.y < ((a_Position.z > 0.5) ? 1.0 : 0.5);
 		}
-		else if ((a_BlockMeta & 0x3) == 3)  // tall side is north (-Z)
+		else if ((a_BlockMeta & 0x03) == 3)  // tall side is north (-Z)
 		{
 			return a_Position.y < ((a_Position.z < 0.5) ? 1.0 : 0.5);
 		}

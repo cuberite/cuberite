@@ -80,12 +80,12 @@ public:
 
 	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		switch (a_Meta & 0x03)  // We only want the direction (bottom) bits
 		{
-			case 0x0: return {0, 0, 1};
-			case 0x1: return {-1, 0, 0};
-			case 0x2: return {0, 0, -1};
-			case 0x3: return {1, 0, 0};
+			case 0x00: return {0, 0, 1};
+			case 0x01: return {-1, 0, 0};
+			case 0x02: return {0, 0, -1};
+			case 0x03: return {1, 0, 0};
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
@@ -98,12 +98,12 @@ public:
 
 	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		switch (a_Meta & 0x03)  // We only want the direction (bottom) bits
 		{
-			case 0x0: return {0, 0, -1};
-			case 0x1: return {1, 0, 0};
-			case 0x2: return {0, 0, 1};
-			case 0x3: return {-1, 0, 0};
+			case 0x00: return {0, 0, -1};
+			case 0x01: return {1, 0, 0};
+			case 0x02: return {0, 0, 1};
+			case 0x03: return {-1, 0, 0};
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);

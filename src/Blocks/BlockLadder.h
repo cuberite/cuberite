@@ -54,15 +54,15 @@ public:
 	{
 		switch (a_Direction)
 		{
-			case BLOCK_FACE_ZM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x4;
-			case BLOCK_FACE_XP: return 0x5;
+			case BLOCK_FACE_ZM: return 0x02;
+			case BLOCK_FACE_ZP: return 0x03;
+			case BLOCK_FACE_XM: return 0x04;
+			case BLOCK_FACE_XP: return 0x05;
 			case BLOCK_FACE_NONE:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				return 0x2;
+				return 0x02;
 			}
 		}
 		UNREACHABLE("Unsupported block face");
@@ -76,10 +76,10 @@ public:
 	{
 		switch (a_MetaData)
 		{
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_XM;
-			case 0x5: return BLOCK_FACE_XP;
+			case 0x02: return BLOCK_FACE_ZM;
+			case 0x03: return BLOCK_FACE_ZP;
+			case 0x04: return BLOCK_FACE_XM;
+			case 0x05: return BLOCK_FACE_XP;
 			default:  return BLOCK_FACE_ZM;
 		}
 	}

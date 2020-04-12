@@ -48,13 +48,13 @@ public:
 			case BLOCK_FACE_ZP:
 			case BLOCK_FACE_ZM:
 			{
-				return 0x4;  // North or south
+				return 0x04;  // North or south
 			}
 
 			case BLOCK_FACE_XP:
 			case BLOCK_FACE_XM:
 			{
-				return 0x3;  // East or west
+				return 0x03;  // East or west
 			}
 
 			case BLOCK_FACE_NONE:

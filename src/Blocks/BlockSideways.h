@@ -66,19 +66,19 @@ public:
 			case BLOCK_FACE_ZP:
 			case BLOCK_FACE_ZM:
 			{
-				return a_Meta | 0x8;  // North or south
+				return a_Meta | 0x08;  // North or south
 			}
 
 			case BLOCK_FACE_XP:
 			case BLOCK_FACE_XM:
 			{
-				return a_Meta | 0x4;  // East or west
+				return a_Meta | 0x04;  // East or west
 			}
 
 			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
-				return a_Meta | 0xC;  // No idea, give a special meta
+				return a_Meta | 0x0c;  // No idea, give a special meta
 			}
 		}
 		UNREACHABLE("Unsupported block face");

@@ -371,7 +371,7 @@ AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
 	{
 		return AString{static_cast<char>(a_UnicodeChar)};
 	}
-	else if (a_UnicodeChar < 0x800)
+	else if (a_UnicodeChar < 0x0800)
 	{
 		return AString
 		{
@@ -379,12 +379,12 @@ AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
 			static_cast<char>(128 + a_UnicodeChar % 64),
 		};
 	}
-	else if (a_UnicodeChar - 0xd800 < 0x800)
+	else if (a_UnicodeChar - 0xd800 < 0x0800)
 	{
 		// Error
 		return AString();
 	}
-	else if (a_UnicodeChar < 0x10000)
+	else if (a_UnicodeChar < 0x010000)
 	{
 		return AString
 		{
@@ -531,8 +531,8 @@ std::u16string UTF8ToRawBEUTF16(const AString & a_UTF8)
 	const unsigned char * source    = reinterpret_cast<const unsigned char *>(a_UTF8.data());
 	const unsigned char * sourceEnd = source + a_UTF8.size();
 	const int halfShift  = 10;  // used for shifting by 10 bits
-	const unsigned int halfBase = 0x0010000UL;
-	const unsigned int halfMask = 0x3ffUL;
+	const unsigned int halfBase = 0x010000UL;
+	const unsigned int halfMask = 0x03ffUL;
 
 	while (source < sourceEnd)
 	{
@@ -650,7 +650,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		for (size_t j = 0; j < k; j++)
 		{
 			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
-			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
+			Hex << HEX(c >> 4) << HEX(c & 0x0f) << ' ';
 			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
 

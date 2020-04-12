@@ -1006,7 +1006,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	const Vector3i BlockPos{PosX, PosY, PosZ};
 	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
-		NIBBLETYPE Orientation = BlockMeta & 0x3;
+		NIBBLETYPE Orientation = BlockMeta & 0x03;
 		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
 		++AnvilDamage;
 

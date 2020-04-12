@@ -411,7 +411,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 {
 	// If the rail is powered set to speed up else slow down.
-	const bool IsRailPowered = ((a_RailMeta & 0x8) == 0x8);
+	const bool IsRailPowered = ((a_RailMeta & 0x08) == 0x08);
 	const double Acceleration = IsRailPowered ? 1.0 : -2.0;
 
 	switch (a_RailMeta & 0x07)

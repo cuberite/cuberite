@@ -557,7 +557,7 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_BIG_FLOWER_LARGE_FERN        = 3,
 	E_META_BIG_FLOWER_ROSE_BUSH         = 4,
 	E_META_BIG_FLOWER_PEONY             = 5,
-	// 0x8 is supposedly a bit flag but all vanilla plants have this value
+	// 0x08 is supposedly a bit flag but all vanilla plants have this value
 	E_META_BIG_FLOWER_TOP               = 10,
 
 	// E_BLOCK_BREWING_STAND metas

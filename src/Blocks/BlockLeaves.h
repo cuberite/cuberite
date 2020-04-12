@@ -96,7 +96,7 @@ public:
 		// Set bit 0x08, so this block gets checked for decay:
 		if ((meta & 0x08) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, meta | 0x8, true, false);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, meta | 0x08, true, false);
 		}
 	}
 
@@ -113,7 +113,7 @@ public:
 			return;
 		}
 
-		if ((Meta & 0x8) == 0)
+		if ((Meta & 0x08) == 0)
 		{
 			// These leaves have been checked for decay lately and nothing around them changed
 			return;

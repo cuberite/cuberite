@@ -330,13 +330,13 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	int MinHeight = std::max(a_MaxLakeHeight - 6, 2);
 	int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 128, a_ChunkZ) / 11;
 	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
-	int OffsetX = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
+	int OffsetX = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x01c0) >> 6) + ((Rnd & 0x0e00) >> 9)) / 7 - 8;
 	Rnd >>= 12;
 	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
-	int OffsetZ = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
+	int OffsetZ = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x01c0) >> 6) + ((Rnd & 0x0e00) >> 9)) / 7 - 8;
 	Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 512, a_ChunkZ) / 13;
 	// Random height [1 .. MinHeight] with preference to center heights
-	int HeightY = 1 + (((Rnd & 0x1ff) % MinHeight) + (((Rnd >> 9) & 0x1ff) % MinHeight)) / 2;
+	int HeightY = 1 + (((Rnd & 0x01ff) % MinHeight) + (((Rnd >> 9) & 0x01ff) % MinHeight)) / 2;
 
 	a_Lake.SetOrigin(OffsetX, HeightY, OffsetZ);
 

@@ -56,7 +56,7 @@ public:
 			a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 
 			// Check if the block that the player clicked is a jungle log.
-			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x3) != E_META_LOG_JUNGLE))
+			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
 			{
 				return false;
 			}

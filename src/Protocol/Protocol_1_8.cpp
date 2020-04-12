@@ -248,7 +248,7 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 	{
 		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType & 0xFFF) << 4 | (itr->m_BlockMeta & 0xF));
+		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType & 0x0fff) << 4 | (itr->m_BlockMeta & 0x0f));
 	}  // for itr - a_Changes[]
 }
 
@@ -768,7 +768,7 @@ void cProtocol_1_8_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 	for (const auto & Decorator : a_Map.GetDecorators())
 	{
-		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
+		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0x0f)));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 	}
@@ -2771,11 +2771,11 @@ void cProtocol_1_8_0::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Flags);
 
-	if ((Flags & 0x2) != 0)
+	if ((Flags & 0x02) != 0)
 	{
 		m_Client->HandleUnmount();
 	}
-	else if ((Flags & 0x1) != 0)
+	else if ((Flags & 0x01) != 0)
 	{
 		// jump
 	}
@@ -3796,15 +3796,15 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			Byte WolfStatus = 0;
 			if (Wolf.IsSitting())
 			{
-				WolfStatus |= 0x1;
+				WolfStatus |= 0x01;
 			}
 			if (Wolf.IsAngry())
 			{
-				WolfStatus |= 0x2;
+				WolfStatus |= 0x02;
 			}
 			if (Wolf.IsTame())
 			{
-				WolfStatus |= 0x4;
+				WolfStatus |= 0x04;
 			}
 			a_Pkt.WriteBEUInt8(0x10);
 			a_Pkt.WriteBEUInt8(WolfStatus);

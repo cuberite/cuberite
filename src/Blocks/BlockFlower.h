@@ -22,7 +22,7 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		NIBBLETYPE meta = a_BlockMeta & 0x7;
+		NIBBLETYPE meta = a_BlockMeta & 0x07;
 		return cItem(m_BlockType, 1, meta);
 	}
 

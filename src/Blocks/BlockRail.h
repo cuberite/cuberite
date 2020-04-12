@@ -553,7 +553,7 @@ public:
 
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
-		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
+		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x06--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
 			//  Save powered rail flag.

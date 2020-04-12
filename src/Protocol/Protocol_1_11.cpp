@@ -1030,11 +1030,11 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			Int8 OcelotStatus = 0;
 			if (Ocelot.IsSitting())
 			{
-				OcelotStatus |= 0x1;
+				OcelotStatus |= 0x01;
 			}
 			if (Ocelot.IsTame())
 			{
-				OcelotStatus |= 0x4;
+				OcelotStatus |= 0x04;
 			}
 			a_Pkt.WriteBEUInt8(TAMEABLE_ANIMAL_STATUS);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
@@ -1148,15 +1148,15 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			Int8 WolfStatus = 0;
 			if (Wolf.IsSitting())
 			{
-				WolfStatus |= 0x1;
+				WolfStatus |= 0x01;
 			}
 			if (Wolf.IsAngry())
 			{
-				WolfStatus |= 0x2;
+				WolfStatus |= 0x02;
 			}
 			if (Wolf.IsTame())
 			{
-				WolfStatus |= 0x4;
+				WolfStatus |= 0x04;
 			}
 			a_Pkt.WriteBEUInt8(TAMEABLE_ANIMAL_STATUS);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);

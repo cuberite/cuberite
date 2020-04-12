@@ -66,7 +66,7 @@ public:
 
 		if (a_CursorY > 7)
 		{
-			a_BlockMeta |= 0x8;
+			a_BlockMeta |= 0x08;
 		}
 		return true;
 	}
@@ -75,10 +75,10 @@ public:
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_ZP: return 0x1;
-			case BLOCK_FACE_ZM: return 0x0;
-			case BLOCK_FACE_XP: return 0x3;
-			case BLOCK_FACE_XM: return 0x2;
+			case BLOCK_FACE_ZP: return 0x01;
+			case BLOCK_FACE_ZM: return 0x00;
+			case BLOCK_FACE_XP: return 0x03;
+			case BLOCK_FACE_XM: return 0x02;
 			case BLOCK_FACE_NONE:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
@@ -92,12 +92,12 @@ public:
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x3)
+		switch (a_Meta & 0x03)
 		{
-			case 0x0: return BLOCK_FACE_ZM;
-			case 0x1: return BLOCK_FACE_ZP;
-			case 0x2: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_XP;
+			case 0x00: return BLOCK_FACE_ZM;
+			case 0x01: return BLOCK_FACE_ZP;
+			case 0x02: return BLOCK_FACE_XM;
+			case 0x03: return BLOCK_FACE_XP;
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");

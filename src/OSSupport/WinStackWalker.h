@@ -66,7 +66,7 @@ public:
 		RetrieveFileVersion = 8,
 
 		// Contains all the abouve
-		RetrieveVerbose = 0xF,
+		RetrieveVerbose = 0x0f,
 
 		// Generate a "good" symbol-search-path
 		SymBuildPath = 0x10,
@@ -78,7 +78,7 @@ public:
 		SymAll = 0x30,
 
 		// Contains all options (default)
-		OptionsAll = 0x3F
+		OptionsAll = 0x3f
 	};
 
 	WinStackWalker(

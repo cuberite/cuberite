@@ -68,7 +68,7 @@ public:
 
 		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
 		{
-			case 0x1:
+			case 0x01:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{
@@ -92,7 +92,7 @@ public:
 				}
 				break;
 			}
-			case 0x2:
+			case 0x02:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{

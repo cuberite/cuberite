@@ -8,15 +8,15 @@
 
 
 
-class cBlockTorchHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>
+class cBlockTorchHandler:
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02>>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>;
+	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02>>;
 
 public:
 
 	cBlockTorchHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 
@@ -66,7 +66,7 @@ public:
 				break;
 			}
 		}
-		return 0x0;
+		return 0;
 	}
 
 	inline static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)

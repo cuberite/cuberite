@@ -45,7 +45,7 @@ public:
 			bool ShouldBeOn = (a_PoweringData.PowerLevel != 0);
 			if (ShouldBeOn != IsOn(a_BlockType))
 			{
-				Data->m_MechanismDelays[a_Position] = std::make_pair((((a_Meta & 0xC) >> 0x2) + 1), ShouldBeOn);
+				Data->m_MechanismDelays[a_Position] = std::make_pair((((a_Meta & 0x0c) >> 0x02) + 1), ShouldBeOn);
 			}
 		}
 		else

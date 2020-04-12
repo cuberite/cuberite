@@ -289,7 +289,7 @@ foreach(folder ${FOLDERS})
 	endforeach(hdr)
 endforeach(folder)
 foreach(arg ${ALLFILES})
-	set(ALLFILESLINES "${ALLFILESLINES}${arg}\n")
+	set(ALLFILESLINES "${ALLFILESLINES}${CMAKE_CURRENT_SOURCE_DIR}/${arg}\n")
 endforeach()
 FILE(WRITE "AllFiles.lst" "${ALLFILESLINES}")
 

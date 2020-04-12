@@ -723,9 +723,9 @@ bool cByteBuffer::WritePosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ
 	CHECK_THREAD
 	CheckValid();
 	return WriteBEInt64(
-		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
-		(static_cast<Int64>(a_BlockY & 0xFFF) << 26) |
-		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF))
+		(static_cast<Int64>(a_BlockX & 0x03ffffff) << 38) |
+		(static_cast<Int64>(a_BlockY & 0x0fff) << 26) |
+		(static_cast<Int64>(a_BlockZ & 0x03ffffff))
 	);
 }
 

@@ -34,7 +34,7 @@ public:
 		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 
 		return (
-			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) == a_QueryPosition) ?
+			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x03) == a_QueryPosition) ?
 			ChunkData->GetCachedPowerData(a_Position).PowerLevel : 0
 		);
 	}
@@ -45,7 +45,7 @@ public:
 		UNUSED(a_BlockType);
 
 		UInt8 SignalStrength = 0;
-		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
+		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x03);
 		a_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, [&](cBlockEntity & a_BlockEntity)
 			{
 				// Skip BlockEntities that don't have slots
@@ -110,7 +110,7 @@ public:
 
 			if (DelayTicks == 0)
 			{
-				a_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x8) : (a_Meta & 0x7));
+				a_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x08) : (a_Meta & 0x07));
 				Data->m_MechanismDelays.erase(a_Position);
 
 				// Assume that an update (to front power) is needed.
@@ -128,6 +128,10 @@ public:
 	{
 		UNUSED(a_World);
 		UNUSED(a_BlockType);
-		return cVector3iArray {cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, false), cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, true)};
+		return cVector3iArray
+		{
+			cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x03, false),
+			cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x03, true)
+		};
 	}
 };
