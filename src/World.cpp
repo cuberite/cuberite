@@ -225,13 +225,15 @@ cWorld::cWorld(
 
 	cFile::CreateFolderRecursive(FILE_IO_PREFIX + m_DataPath);
 
+	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
+
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
 	Serializer.Load();
 
 	// Track the CSs used by this world in the deadlock detector:
 	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
-	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
 	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
 
 	// Load world settings from the ini file
@@ -411,9 +413,6 @@ cWorld::cWorld(
 
 	InitializeAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
-
-	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
-	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
@@ -968,7 +967,6 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 	m_Storage.Stop();
 
 	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
-	a_DeadlockDetect.UntrackCriticalSection(m_CSPlayers);
 	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
 	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
 }
@@ -1404,6 +1402,7 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
+	cLock Lock(*this);
 	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
 	{
 		return;
@@ -1419,20 +1418,17 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
 
 	Vector3d ExplosionPos(a_BlockX, a_BlockY, a_BlockZ);
+	for (auto Player : m_Players)
 	{
-		cCSLock Lock(m_CSPlayers);
-		for (auto Player : m_Players)
+		cClientHandle * ch = Player->GetClientHandle();
+		if (ch == nullptr)
 		{
-			cClientHandle * ch = Player->GetClientHandle();
-			if (ch == nullptr)
-			{
-				continue;
-			}
-
-			bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
-			auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
-			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
+			continue;
 		}
+
+		bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
+		auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
+		ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
 	}
 
 	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
@@ -2522,7 +2518,7 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
 
 	// Remove from the player list
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(&a_Player);
 	}
@@ -2568,7 +2564,7 @@ bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 	}
 
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		if (std::find(m_Players.begin(), m_Players.end(), &a_Player) != m_Players.end())
 		{
 			return true;
@@ -2603,7 +2599,7 @@ bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 {
 	// Calls the callback for each player in the list
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && a_Callback(*Player))
@@ -2621,7 +2617,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
 	// Calls the callback for the specified player in the list
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && (NoCaseCompare(Player->GetName(), a_PlayerName) == 0))
@@ -2643,7 +2639,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	size_t BestRating = 0;
 	size_t NameLength = a_PlayerNameHint.length();
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		if (!(*itr)->IsTicking())
@@ -2675,7 +2671,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
 {
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && (Player->GetUUID() == a_PlayerUUID))
@@ -2695,7 +2691,7 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 	double ClosestDistance = a_RangeLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		if (!(*itr)->IsTicking())
@@ -2747,7 +2743,7 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 {
 	// Sends the playerlist to a_DestPlayer
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
@@ -3345,7 +3341,7 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 
 	std::vector<pair_t> UsernamesByWeight;
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
 		AString PlayerName ((*itr)->GetName());
@@ -3517,7 +3513,7 @@ void cWorld::AddQueuedPlayers(void)
 
 	// Add all the players in the grabbed list:
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		for (auto & AwaitingPlayer : PlayersToAdd)
 		{
 			auto & Player = AwaitingPlayer.first;
@@ -3535,7 +3531,7 @@ void cWorld::AddQueuedPlayers(void)
 			PlayerPtr->SetIsTicking(true);
 			AddedPlayerPtrs.emplace_back(PlayerPtr, AwaitingPlayer.second);
 		}  // for itr - PlayersToAdd[]
-	}  // Lock(m_CSPlayers)
+	}  // cLock(*this)
 
 	// Add all the players' clienthandles:
 	{
