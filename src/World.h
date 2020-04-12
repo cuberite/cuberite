@@ -1205,7 +1205,7 @@ private:
 	std::unique_ptr<cFireSimulator>      m_FireSimulator;
 	cRedstoneSimulator * m_RedstoneSimulator;
 
-	cCriticalSection m_CSPlayers;
+	// Protect with chunk map CS
 	cPlayerList      m_Players;
 
 	cWorldStorage    m_Storage;
