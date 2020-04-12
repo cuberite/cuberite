@@ -18,7 +18,6 @@ public:
 	cItemLilypadHandler(int a_ItemType):
 		super(a_ItemType)
 	{
-		LOGD("Created Lilypad handler");
 	}
 
 
@@ -32,12 +31,9 @@ public:
         int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
     ) override
 	{
-		LOGD("Lilypad OnItemUse");
 		LOGD(BlockFaceToString(a_BlockFace).c_str());
 		if (a_BlockFace > BLOCK_FACE_NONE)
 		{
-			LOGD("Trying to place block normally");
-			// We clicked on a block; no need to trace, just use normal placement method
 			return OnPlayerPlace(*a_World, *a_Player, a_Item, 
 				a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 				0, 0, 0
@@ -85,8 +81,6 @@ public:
 			return false;
 		}
 		
-		LOGD("Found surface %s, trying to place normally", BlockFaceToString(Callbacks.m_BlockFace).c_str());
-
 		// Since we hit fluid, try placing the block on top of the fluid we found
 		// Mimick clicking on top of the fluid to do this
 		return OnPlayerPlace(*a_World, *a_Player, a_Item,
@@ -101,8 +95,6 @@ public:
         int a_CursorX, int a_CursorY, int a_CursorZ
     ) override
 	{
-		LOGD("Called onPlayerPlace");
-		
 		Vector3i PlacementPos = GetBlockNextTo(Vector3i(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace);
 		
 		// If the block where we are trying to place is a water block, try placing on top of the water block instead
@@ -158,7 +150,6 @@ public:
 		// Check for another block here, remove it if appropriate.
 		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, PlaceMeta))
 		{
-			LOGD("IgnoreBuildCollision Failed");
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 			return false;
@@ -170,7 +161,6 @@ public:
 		sSetBlockVector blocks;
 		if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, absPos.x, absPos.y, absPos.z, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
 		{
-			LOGD("GetBlocksToPlace Failed");
 			// Handler refused the placement, send that information back to the client:
 			for (const auto & blk: blocks)
 			{
@@ -184,7 +174,6 @@ public:
 		// Try to place the blocks:
 		if (!a_Player.PlaceBlocks(blocks))
 		{
-			LOGD("PlaceBlocks Failed");
 			// The placement failed, the blocks have already been re-sent, re-send inventory:
 			a_Player.GetInventory().SendEquippedSlot();
 			return false;
