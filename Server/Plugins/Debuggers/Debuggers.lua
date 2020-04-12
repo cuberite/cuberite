@@ -30,6 +30,7 @@ function Initialize(a_Plugin)
 	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
 	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
+	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICK,           OnPlayerRightClick)
 
 	-- _X: Disabled WECUI manipulation:
 	-- PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
@@ -708,6 +709,26 @@ end
 
 function OnChat(a_Player, a_Message)
 	return false, "blabla " .. a_Message;
+end
+
+
+
+
+
+function OnPlayerRightClick(a_Player)
+	-- If the player is holding a cake item, make them throw a cake block, using a FallingBlock entity:
+	if (a_Player:GetInventory():GetEquippedItem().m_ItemType == E_ITEM_CAKE) then
+		local World = a_Player:GetWorld()
+		local Position = a_Player:GetPosition() + Vector3d(0, 1.5, 0)
+		local EntityID = World:SpawnFallingBlock(Vector3i(Position), E_BLOCK_CAKE, 0)
+
+		World:DoWithEntityByID(EntityID,
+			function (Entity)
+				Entity:TeleportToCoords(Position.x, Position.y, Position.z)
+				Entity:SetSpeed(a_Player:GetLookVector() * 30)
+			end
+		)
+	end
 end
 
 

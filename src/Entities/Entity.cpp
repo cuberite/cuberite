@@ -1893,7 +1893,11 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		ResetPosition({a_PosX, a_PosY, a_PosZ});
-		m_World->BroadcastTeleportEntity(*this);
+		auto world = m_World;
+		if (world != nullptr)  // The entity might not be in a world yet (just spawned, in cWorld::m_EntitiesToAdd)
+		{
+			world->BroadcastTeleportEntity(*this);
+		}
 	}
 }
 
