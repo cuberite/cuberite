@@ -154,7 +154,7 @@ public:
 					}
 					else if (Junk < 12)  // 2 / 83 chance of spawning a fishing rod
 					{
-						// Fishing Rods caught from the Junk category will be 10%–100% damaged, and always unenchanted.
+						// Fishing Rods caught from the Junk category will be 10%-100% damaged, and always unenchanted.
 						Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(7, 65)));
 					}
 					else if (Junk < 22)  // 10 / 83 chance of spawning leather
@@ -163,7 +163,7 @@ public:
 					}
 					else if (Junk < 32)  // 10 / 83 chance of spawning leather boots
 					{
-						// Leather boots caught from the Junk category will be 10%–100% damaged, and always unenchanted.
+						// Leather boots caught from the Junk category will be 10%-100% damaged, and always unenchanted.
 						Drops.Add(cItem(E_ITEM_LEATHER_BOOTS, 1, Random.RandInt<short>(7, 66)));
 					}
 					else if (Junk < 42)  // 10 / 83 chance of spawning rotten flesh
