@@ -217,7 +217,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_CACTUS:
+		case E_BLOCK_CACTUS:
 		{
 			return new cItemCactusHandler(a_ItemType);
 		}
@@ -383,7 +383,7 @@ bool cItemHandler::OnPlayerPlace(
 	}
 	else
 	{
-		AddFaceDirection(absPos.x, absPos.y, absPos.z, a_BlockFace);
+		absPos = GetBlockNextTo(absPos, a_BlockFace);
 
 		if (!cChunkDef::IsValidHeight(absPos.y))
 		{
@@ -398,6 +398,7 @@ bool cItemHandler::OnPlayerPlace(
 		// Check for another block here, remove it if appropriate.
 		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, PlaceMeta))
 		{
+			LOGD("IgnoreBuildCollision Failed");
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 			return false;
@@ -410,6 +411,7 @@ bool cItemHandler::OnPlayerPlace(
 	sSetBlockVector blocks;
 	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, absPos.x, absPos.y, absPos.z, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
 	{
+		LOGD("GetBlocksToPlace Failed");
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
@@ -423,6 +425,7 @@ bool cItemHandler::OnPlayerPlace(
 	// Try to place the blocks:
 	if (!a_Player.PlaceBlocks(blocks))
 	{
+		LOGD("PlaceBlocks Failed");
 		// The placement failed, the blocks have already been re-sent, re-send inventory:
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;

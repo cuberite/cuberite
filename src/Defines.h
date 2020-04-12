@@ -5,7 +5,7 @@
 
 
 template <typename T> class Vector3;
-typedef Vector3i Vector3<int>;
+typedef Vector3<int> Vector3i;
 
 
 
