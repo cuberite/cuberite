@@ -57,7 +57,7 @@ public:
 			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{	
 				if((((a_CBBlockType == E_BLOCK_STATIONARY_WATER) || (a_CBBlockType == E_BLOCK_WATER)) && (a_CBBlockMeta == 0))
-			|| (Surface == E_BLOCK_ICE) || (Surface == E_BLOCK_FROSTED_ICE))                                     // Or (frosted) ice
+				|| (a_CBBlockType == E_BLOCK_ICE) || (a_CBBlockType == E_BLOCK_FROSTED_ICE))
 				{	
 					m_HasHitFluid = true;
 					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
