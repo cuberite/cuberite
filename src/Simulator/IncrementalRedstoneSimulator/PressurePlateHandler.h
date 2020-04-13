@@ -28,7 +28,7 @@ public:
 	{
 		UNUSED(a_Meta);
 
-		unsigned int NumberOfEntities = 0;
+		int NumberOfEntities = 0;
 		bool FoundPlayer = false;
 		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & a_Entity)
 			{
@@ -39,7 +39,7 @@ public:
 
 				if (a_Entity.IsPickup())
 				{
-					NumberOfEntities += dynamic_cast<cPickup*>(&a_Entity)->GetItem().m_ItemCount;
+					NumberOfEntities += static_cast<cPickup &>(a_Entity).GetItem().m_ItemCount;
 					return false;
 				}
 				NumberOfEntities++;
@@ -99,26 +99,7 @@ public:
 			// Schedule a minimum 0.5 second delay before even thinking about releasing
 			ChunkData->m_MechanismDelays[a_Position] = std::make_pair(5, true);
 
-			// manage on-sound
-			AString soundToPlay = "";
-			switch (a_BlockType)
-			{
-				case E_BLOCK_STONE_PRESSURE_PLATE:
-					soundToPlay = "block.wood_pressureplate.click_on";
-					break;
-				case E_BLOCK_WOODEN_PRESSURE_PLATE:
-					soundToPlay = "block.wood_pressureplate.click_on";
-					break;
-				case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-				case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-					soundToPlay = "block.metal_pressureplate.click_on";
-					break;
-				default:
-				{
-					ASSERT(!"Unhandled/unimplemented block in pressure plate handler!");
-					return {};
-				}
-			}
+			auto soundToPlay = GetClickOffSound(a_BlockType);
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.6f);
 
 			// Update power
@@ -138,6 +119,12 @@ public:
 		// Are we waiting for the initial delay or subsequent release delay?
 		if (DelayTicks > 0)
 		{
+			// Nothing changes, if there is nothing on it anymore, because the state is locked.
+			if (Power == 0)
+			{
+				return {};
+			}
+
 			// Yes. Are we waiting to release, and found that the player stepped on it again?
 			if (!HasExitedMinimumOnDelayPhase && (Power > 0))
 			{
@@ -164,10 +151,11 @@ public:
 			{
 				// Yes. Go into subsequent release delay, for a further 0.5 seconds
 				*DelayInfo = std::make_pair(5, false);
+				return {};
 			}
 
 			// Did the power level change and is still above zero?
-			if ((Power != PreviousPower.PowerLevel) && (Power > 0))
+			if (Power != PreviousPower.PowerLevel)
 			{
 				// Yes. Update power
 				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
@@ -181,7 +169,51 @@ public:
 		// Just got out of the subsequent release phase, reset everything and raise the plate
 		ChunkData->m_MechanismDelays.erase(a_Position);
 
-		// manage off-sound
+		auto soundToPlay = GetClickOffSound(a_BlockType);
+		a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
+		ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+
+		a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
+		return PlateUpdates;
+	}
+
+	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_World);
+		UNUSED(a_Position);
+		UNUSED(a_BlockType);
+		UNUSED(a_Meta);
+		return {};
+	}
+
+private:
+	static AString GetClickOnSound(BLOCKTYPE a_BlockType)
+	{
+		// manage on-sound
+		AString soundToPlay = "";
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+				soundToPlay = "block.wood_pressureplate.click_on";
+				break;
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+				soundToPlay = "block.wood_pressureplate.click_on";
+				break;
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+				soundToPlay = "block.metal_pressureplate.click_on";
+				break;
+			default:
+			{
+				ASSERT(!"No on sound fo this one!");
+			}
+		}
+		return soundToPlay;
+	}
+
+	static AString GetClickOffSound(BLOCKTYPE a_BlockType)
+	{
+		// manage on-sound
 		AString soundToPlay = "";
 		switch (a_BlockType)
 		{
@@ -197,23 +229,9 @@ public:
 				break;
 			default:
 			{
-				ASSERT(!"Unhandled/unimplemented block in pressure plate handler!");
-				return {};
+				ASSERT(!"No off sound fo this one!");
 			}
 		}
-		a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
-		ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
-
-		a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
-		return PlateUpdates;
-	}
-
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_World);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		return {};
+		return soundToPlay;
 	}
 };

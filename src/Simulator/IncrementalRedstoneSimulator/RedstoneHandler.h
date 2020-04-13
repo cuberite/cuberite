@@ -14,14 +14,6 @@ public:
 	cRedstoneHandler() = default;
 	DISALLOW_COPY_AND_ASSIGN(cRedstoneHandler);
 
-	enum ENUM_PRESSURE_PLATE_STATE
-	{
-		E_PRESSURE_PLATE_RAISED            = 0,
-		E_PRESSURE_PLATE_INITIALLY_PRESSED = 1,
-		E_PRESSURE_PLATE_HELD_DOWN         = 2,
-		E_PRESSURE_PLATE_WANTS_TO_RELEASE  = 3,
-	} ;
-
 	struct PoweringData
 	{
 	public:
