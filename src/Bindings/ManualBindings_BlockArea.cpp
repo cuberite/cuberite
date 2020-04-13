@@ -48,8 +48,6 @@ static int readCuboidOverloadParams(cLuaState & a_LuaState, int a_StartParam, cC
 	else
 	{
 		// Assume the 2-Vector3i version:
-		Vector3i p1;
-		Vector3i p2;
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Cuboid.p1, a_Cuboid.p2))
 		{
 			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected two Vector3i instances");
