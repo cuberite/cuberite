@@ -201,7 +201,7 @@ private:
 				return "block.metal_pressureplate.click_on";
 			default:
 			{
-				ASSERT(!"No on sound fo this one!");
+				ASSERT(!"No on sound for this one!");
 				return "";
 			}
 		}
@@ -221,7 +221,7 @@ private:
 				return "block.metal_pressureplate.click_off";
 			default:
 			{
-				ASSERT(!"No on sound fo this one!");
+				ASSERT(!"No on sound for this one!");
 				return "";
 			}
 		}
