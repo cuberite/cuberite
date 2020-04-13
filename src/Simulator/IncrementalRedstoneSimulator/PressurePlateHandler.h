@@ -221,7 +221,7 @@ private:
 				return "block.metal_pressureplate.click_off";
 			default:
 			{
-				ASSERT(!"No on sound for this one!");
+				ASSERT(!"No off sound for this one!");
 				return "";
 			}
 		}
