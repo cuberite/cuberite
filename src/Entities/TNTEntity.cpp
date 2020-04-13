@@ -9,7 +9,7 @@
 
 
 cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
-	super(etTNT, a_Pos, 0.98, 0.98),
+	Super(etTNT, a_Pos, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);
@@ -45,7 +45,7 @@ void cTNTEntity::Explode(void)
 
 void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

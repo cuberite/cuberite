@@ -16,12 +16,12 @@
 class cBlockDropSpenserHandler :
 	public cPitchYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>
 {
-	using super = cPitchYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>;
+	using Super = cPitchYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>;
 
 public:
 
 	cBlockDropSpenserHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

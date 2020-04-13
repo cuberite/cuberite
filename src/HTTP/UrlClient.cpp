@@ -243,9 +243,10 @@ class cHttpSchemeHandler:
 	public cSchemeHandler,
 	protected cHTTPMessageParser::cCallbacks
 {
-	typedef cSchemeHandler Super;
+	using Super = cSchemeHandler;
 
 public:
+
 	cHttpSchemeHandler(cUrlClientRequest & a_ParentRequest, bool a_IsTls):
 		Super(a_ParentRequest),
 		m_Parser(*this),

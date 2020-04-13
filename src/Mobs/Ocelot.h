@@ -8,10 +8,10 @@
 
 
 
-class cOcelot :
+class cOcelot:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
 

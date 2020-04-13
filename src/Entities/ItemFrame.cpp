@@ -10,7 +10,7 @@
 
 
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
-	super(etItemFrame, a_BlockFace, a_Pos),
+	Super(etItemFrame, a_BlockFace, a_Pos),
 	m_Item(E_BLOCK_AIR),
 	m_ItemRotation(0)
 {
@@ -22,7 +22,7 @@ cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 
 void cItemFrame::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (!m_Item.IsEmpty())
 	{
@@ -56,7 +56,7 @@ void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 {
 	if (m_Item.IsEmpty())
 	{
-		super::KilledBy(a_TDI);
+		Super::KilledBy(a_TDI);
 		Destroy();
 		return;
 	}
@@ -94,7 +94,7 @@ void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 
 void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }

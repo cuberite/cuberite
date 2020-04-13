@@ -6,12 +6,13 @@
 
 
 
-class cMagmaCube :
+class cMagmaCube:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	/** Creates a MagmaCube of the specified size; with 1 being the smallest */
 	cMagmaCube(int a_Size);
 

@@ -629,12 +629,13 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 class cHeiGenMinMax:
 	public cTerrainHeightGen
 {
-	typedef cTerrainHeightGen Super;
+	using Super = cTerrainHeightGen;
 
 	/** Size of the averaging process, in columns (for each direction). Must be less than 16. */
 	static const int AVERAGING_SIZE = 4;
 
 public:
+
 	cHeiGenMinMax(int a_Seed, cBiomeGenPtr a_BiomeGen):
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen),

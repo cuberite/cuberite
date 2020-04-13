@@ -14,7 +14,7 @@
 
 
 cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Color(a_Color)
 {
 	ASSERT(a_BlockType == E_BLOCK_BED);
@@ -26,7 +26,7 @@ cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 
 void cBedEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBedEntity &>(a_Src);
 	m_Color = src.m_Color;
 }

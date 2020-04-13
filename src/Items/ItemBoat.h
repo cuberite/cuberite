@@ -8,14 +8,15 @@
 
 
 
-class cItemBoatHandler :
+class cItemBoatHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemBoatHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemBoatHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 

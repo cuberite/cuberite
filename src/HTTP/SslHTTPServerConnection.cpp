@@ -12,7 +12,7 @@
 
 
 cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config):
-	super(a_HTTPServer),
+	Super(a_HTTPServer),
 	m_Ssl(64000)
 {
 	if (a_Config != nullptr)
@@ -59,7 +59,7 @@ void cSslHTTPServerConnection::OnReceivedData(const char * a_Data, size_t a_Size
 		int NumRead = m_Ssl.ReadPlain(Buffer, sizeof(Buffer));
 		if (NumRead > 0)
 		{
-			super::OnReceivedData(Buffer, static_cast<size_t>(NumRead));
+			Super::OnReceivedData(Buffer, static_cast<size_t>(NumRead));
 			// The link may have closed while processing the data, bail out:
 			return;
 		}

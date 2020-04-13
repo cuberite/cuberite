@@ -32,12 +32,14 @@
 
 
 #ifdef _WIN32
-	class cWindowsConsoleListener
-		: public cColouredConsoleListener
+	class cWindowsConsoleListener:
+		public cColouredConsoleListener
 	{
-		typedef cColouredConsoleListener super;
+		using Super = cColouredConsoleListener;
+
 	public:
-		cWindowsConsoleListener(HANDLE a_Console, WORD a_DefaultConsoleAttrib) :
+
+		cWindowsConsoleListener(HANDLE a_Console, WORD a_DefaultConsoleAttrib):
 			m_Console(a_Console),
 			m_DefaultConsoleAttrib(a_DefaultConsoleAttrib)
 		{
@@ -46,7 +48,7 @@
 		#ifdef _DEBUG
 			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 			{
-				super::Log(a_Message, a_LogLevel);
+				Super::Log(a_Message, a_LogLevel);
 				// In a Windows Debug build, output the log to debug console as well:
 				OutputDebugStringA(a_Message.c_str());
 			}

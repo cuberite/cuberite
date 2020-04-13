@@ -15,12 +15,13 @@
 
 
 
-class cAnvilWindow :
+class cAnvilWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
+
 	cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Gets the repaired item name. */

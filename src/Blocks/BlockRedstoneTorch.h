@@ -10,12 +10,12 @@
 class cBlockRedstoneTorchHandler :
 	public cBlockTorchHandler
 {
-	using super = cBlockTorchHandler;
+	using Super = cBlockTorchHandler;
 
 public:
 
 	cBlockRedstoneTorchHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

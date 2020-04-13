@@ -7,12 +7,13 @@
 
 
 
-class cGiant :
+class cGiant:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	cGiant(void);
 
 	CLASS_PROTODEF(cGiant)

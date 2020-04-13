@@ -13,13 +13,21 @@
 
 
 
-class cVanillaFluidSimulator :
+class cVanillaFluidSimulator:
 	public cFloodyFluidSimulator
 {
-	typedef cFloodyFluidSimulator super;
+	using Super = cFloodyFluidSimulator;
 
 public:
-	cVanillaFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
+
+	cVanillaFluidSimulator(
+		cWorld & a_World,
+		BLOCKTYPE a_Fluid,
+		BLOCKTYPE a_StationaryFluid,
+		NIBBLETYPE a_Falloff,
+		int a_TickDelay,
+		int a_NumNeighborsForSource
+	);
 
 protected:
 	// cFloodyFluidSimulator overrides:

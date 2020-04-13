@@ -13,7 +13,7 @@ class cDispenserEntity :
 {
 	// tolua_end
 
-	using super = cDropSpenserEntity;
+	using Super = cDropSpenserEntity;
 
 public:  // tolua_export
 

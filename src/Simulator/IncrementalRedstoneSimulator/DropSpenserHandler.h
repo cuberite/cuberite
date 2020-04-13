@@ -8,9 +8,11 @@
 
 
 
-class cDropSpenserHandler : public cRedstoneHandler
+class cDropSpenserHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	inline static bool IsActivated(NIBBLETYPE a_Meta)

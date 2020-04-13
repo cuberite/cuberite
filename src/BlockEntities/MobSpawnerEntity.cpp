@@ -14,7 +14,7 @@
 
 
 cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
 	m_IsActive(false)
@@ -28,7 +28,7 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 
 void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cMobSpawnerEntity &>(a_Src);
 	m_Entity = src.m_Entity;
 	m_IsActive = src.m_IsActive;

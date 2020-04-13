@@ -53,8 +53,10 @@ class cChunkSender:
 	public cIsThread,
 	public cChunkDataCopyCollector
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
+
 public:
+
 	cChunkSender(cWorld & a_World);
 	virtual ~cChunkSender() override;
 

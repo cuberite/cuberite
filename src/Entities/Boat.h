@@ -15,10 +15,14 @@
 
 // tolua_begin
 
-class cBoat :
+class cBoat:
 	public cEntity
 {
-	typedef cEntity super;
+	// tolua_end
+
+	using Super = cEntity;
+
+	// tolua_begin
 
 public:
 	enum eMaterial

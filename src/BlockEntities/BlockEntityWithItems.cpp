@@ -15,7 +15,7 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 	int a_ItemGridWidth, int a_ItemGridHeight,
 	cWorld * a_World
 ):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	cBlockEntityWindowOwner(this),
 	m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 {
@@ -28,7 +28,7 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBlockEntityWithItems &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 }

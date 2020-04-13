@@ -11,7 +11,7 @@
 
 
 cWither::cWither(void) :
-	super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9, 4.0),
+	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9, 4.0),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
@@ -48,7 +48,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }
 
 
@@ -57,7 +57,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -99,7 +99,7 @@ void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cWither::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 
 	Vector3d Pos = GetPosition();
 	m_World->ForEachPlayer([=](cPlayer & a_Player)

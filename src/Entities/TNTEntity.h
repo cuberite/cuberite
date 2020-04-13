@@ -7,13 +7,16 @@
 
 
 // tolua_begin
-class cTNTEntity :
+class cTNTEntity:
 	public cEntity
 {
-	typedef cEntity super;
 
-public:
 	// tolua_end
+
+	using Super = cEntity;
+
+public:  // tolua_export
+
 	CLASS_PROTODEF(cTNTEntity)
 
 	cTNTEntity(Vector3d a_Pos, int a_FuseTicks = 80);

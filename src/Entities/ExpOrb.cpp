@@ -6,7 +6,7 @@
 
 
 cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
-	super(etExpOrb, a_Pos, 0.98, 0.98),  // TODO: Check size
+	Super(etExpOrb, a_Pos, 0.98, 0.98),  // TODO: Check size
 	m_Reward(a_Reward),
 	m_Timer(0)
 {
@@ -100,7 +100,7 @@ bool cExpOrb::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return true;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }
 
 

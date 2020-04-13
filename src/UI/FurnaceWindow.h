@@ -18,7 +18,7 @@
 class cFurnaceWindow :
 	public cWindow
 {
-	using super = cWindow;
+	using Super = cWindow;
 
 public:
 	cFurnaceWindow(cFurnaceEntity * a_Furnace);

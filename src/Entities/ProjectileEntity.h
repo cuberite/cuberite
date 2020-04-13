@@ -22,7 +22,7 @@ class cProjectileEntity :
 {
 	// tolua_end
 
-	using super = cEntity;
+	using Super = cEntity;
 
 	// tolua_begin
 

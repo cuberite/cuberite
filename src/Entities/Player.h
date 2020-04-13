@@ -24,12 +24,18 @@ class cTeam;
 
 
 // tolua_begin
-class cPlayer :
+class cPlayer:
 	public cPawn
 {
-	typedef cPawn super;
+
+	// tolua_end
+
+	using Super = cPawn;
+
+	// tolua_begin
 
 public:
+
 	static const int MAX_HEALTH;
 
 	static const int MAX_FOOD_LEVEL;

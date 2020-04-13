@@ -15,7 +15,7 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	super(etBoat, a_Pos, 0.98, 0.7),
+	Super(etBoat, a_Pos, 0.98, 0.7),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -72,7 +72,7 @@ void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	m_LastDamage = 10;
-	if (!super::DoTakeDamage(TDI))
+	if (!Super::DoTakeDamage(TDI))
 	{
 		return false;
 	}
@@ -101,7 +101,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 void cBoat::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_Attachee != nullptr)
 	{
@@ -132,7 +132,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

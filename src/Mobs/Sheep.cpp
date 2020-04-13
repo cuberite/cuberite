@@ -12,7 +12,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
+	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -59,7 +59,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
@@ -91,7 +91,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

@@ -19,7 +19,7 @@ class cWorld;
 class cBlockPistonHandler:
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
 {
-	using super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
+	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
 
 public:
 
@@ -145,7 +145,7 @@ private:
 class cBlockPistonHeadHandler:
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 	cBlockPistonHeadHandler(void);

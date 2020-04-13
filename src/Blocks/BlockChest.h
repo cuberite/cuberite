@@ -13,12 +13,12 @@
 class cBlockChestHandler :
 	public cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
-	using super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
+	using Super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
 public:
 
 	cBlockChestHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 
@@ -48,7 +48,7 @@ public:
 		}
 
 		// Get meta as if this was a single-chest:
-		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
 		{
 			return false;
 		}

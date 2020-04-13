@@ -22,7 +22,7 @@ class cArrowEntity :
 {
 	// tolua_end
 
-	using super = cProjectileEntity;
+	using Super = cProjectileEntity;
 
 	// tolua_begin
 

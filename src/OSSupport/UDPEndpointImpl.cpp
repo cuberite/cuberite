@@ -182,7 +182,7 @@ protected:
 // cUDPEndpointImpl:
 
 cUDPEndpointImpl::cUDPEndpointImpl(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks):
-	super(a_Callbacks),
+	Super(a_Callbacks),
 	m_Port(0),
 	m_MainSock(-1),
 	m_IsMainSockIPv6(true),

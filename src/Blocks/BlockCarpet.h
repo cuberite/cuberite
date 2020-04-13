@@ -17,12 +17,12 @@
 class cBlockCarpetHandler :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
 	cBlockCarpetHandler(BLOCKTYPE a_BlockType) :
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

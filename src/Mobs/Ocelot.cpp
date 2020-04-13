@@ -21,7 +21,7 @@
 */
 
 cOcelot::cOcelot(void) :
-	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6, 0.8),
+	Super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6, 0.8),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -36,7 +36,7 @@ cOcelot::cOcelot(void) :
 
 void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -179,12 +179,12 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 		}
 		else
 		{
-			super::OnRightClicked(a_Player);
+			Super::OnRightClicked(a_Player);
 		}
 	}
 	else if (a_Player.GetUUID() == m_OwnerUUID)
 	{
-		super::OnRightClicked(a_Player);
+		Super::OnRightClicked(a_Player);
 		SetIsSitting(!IsSitting());
 	}
 	m_World->BroadcastEntityMetadata(*this);
@@ -220,5 +220,5 @@ bool cOcelot::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }

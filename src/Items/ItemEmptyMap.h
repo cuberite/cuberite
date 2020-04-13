@@ -7,16 +7,17 @@
 
 
 
-class cItemEmptyMapHandler :
+class cItemEmptyMapHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 	static const unsigned int DEFAULT_SCALE = 0;
 
 public:
-	cItemEmptyMapHandler() :
-		super(E_ITEM_EMPTY_MAP)
+
+	cItemEmptyMapHandler():
+		Super(E_ITEM_EMPTY_MAP)
 	{
 	}
 

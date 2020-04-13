@@ -16,12 +16,13 @@
 
 
 
-class cSslHTTPServerConnection :
+class cSslHTTPServerConnection:
 	public cHTTPServerConnection
 {
-	typedef cHTTPServerConnection super;
+	using Super = cHTTPServerConnection;
 
 public:
+
 	/** Creates a new connection on the specified server.
 	Sends the specified cert as the server certificate, uses the private key for decryption. */
 	cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config);

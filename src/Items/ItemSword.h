@@ -8,13 +8,15 @@
 
 
 
-class cItemSwordHandler :
+class cItemSwordHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
+
 	cItemSwordHandler(int a_ItemType):
-		cItemHandler(a_ItemType)
+		Super(a_ItemType)
 	{
 	}
 
@@ -25,7 +27,7 @@ public:
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 

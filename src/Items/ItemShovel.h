@@ -12,12 +12,15 @@
 
 
 
-class cItemShovelHandler : public cItemHandler
+class cItemShovelHandler:
+	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemShovelHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+
+	cItemShovelHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -44,7 +47,7 @@ public:
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
@@ -96,6 +99,6 @@ public:
 				break;
 			}
 		}
-		return super::GetBlockBreakingStrength(a_Block);
+		return Super::GetBlockBreakingStrength(a_Block);
 	}
 };

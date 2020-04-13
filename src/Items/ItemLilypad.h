@@ -9,14 +9,15 @@
 
 
 
-class cItemLilypadHandler :
+class cItemLilypadHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
+
 	cItemLilypadHandler(int a_ItemType):
-		super(a_ItemType)
+		Super(a_ItemType)
 	{
 
 	}

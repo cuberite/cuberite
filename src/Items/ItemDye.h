@@ -13,11 +13,11 @@
 class cItemDyeHandler :
 	public cItemHandler
 {
-	using super = cItemHandler;
+	using Super = cItemHandler;
 
 public:
 	cItemDyeHandler(int a_ItemType):
-		super(a_ItemType)
+		Super(a_ItemType)
 	{
 	}
 

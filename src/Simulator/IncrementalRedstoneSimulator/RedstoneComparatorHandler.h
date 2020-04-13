@@ -8,9 +8,11 @@
 
 
 
-class cRedstoneComparatorHandler : public cRedstoneHandler
+class cRedstoneComparatorHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	unsigned char GetFrontPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel) const

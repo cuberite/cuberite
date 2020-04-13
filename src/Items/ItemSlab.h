@@ -10,14 +10,14 @@
 class cItemSlabHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
 
 	/** Creates a new handler for the specified slab item type.
 	Sets the handler to use the specified doubleslab block type for combining self into doubleslabs. */
 	cItemSlabHandler(int a_ItemType, BLOCKTYPE a_DoubleSlabBlockType):
-		super(a_ItemType),
+		Super(a_ItemType),
 		m_DoubleSlabBlockType(a_DoubleSlabBlockType)
 	{
 	}
@@ -99,7 +99,7 @@ public:
 
 		// The slabs didn't combine, use the default handler to place the slab:
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
-		bool res = super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		bool res = Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 
 		/*
 		The client has a bug when a slab replaces snow and there's a slab above it.

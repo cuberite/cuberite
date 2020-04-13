@@ -7,12 +7,12 @@
 class cItemPotionHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
 
 	cItemPotionHandler():
-		super(E_ITEM_POTION)
+		Super(E_ITEM_POTION)
 	{
 	}
 

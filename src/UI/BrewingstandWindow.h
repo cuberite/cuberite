@@ -18,7 +18,7 @@
 class cBrewingstandWindow :
 	public cWindow
 {
-	using super = cWindow;
+	using Super = cWindow;
 
 public:
 

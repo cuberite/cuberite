@@ -9,13 +9,14 @@ class cEntity;
 
 
 
-class cWolf :
+class cWolf:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cWolf(void);
+
+	cWolf();
 
 	CLASS_PROTODEF(cWolf)
 

@@ -7,20 +7,21 @@
 
 
 
-class cItemRawChickenHandler :
+class cItemRawChickenHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemRawChickenHandler()
-		: super(E_ITEM_RAW_CHICKEN, FoodInfo(2, 1.2))
+
+	cItemRawChickenHandler():
+		Super(E_ITEM_RAW_CHICKEN, FoodInfo(2, 1.2))
 	{
 	}
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
+		if (!Super::EatItem(a_Player, a_Item))
 		{
 			return false;
 		}

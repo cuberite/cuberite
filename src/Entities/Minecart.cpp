@@ -95,7 +95,7 @@ protected:
 // cMinecart:
 
 cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
-	super(etMinecart, a_Pos, 0.98, 0.7),
+	Super(etMinecart, a_Pos, 0.98, 0.7),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
@@ -132,7 +132,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
 	{
 		// Outside the world, just process normal falling physics
-		super::HandlePhysics(a_Dt, a_Chunk);
+		Super::HandlePhysics(a_Dt, a_Chunk);
 		BroadcastMovementUpdate();
 		return;
 	}
@@ -192,7 +192,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
-		super::HandlePhysics(a_Dt, *chunk);
+		Super::HandlePhysics(a_Dt, *chunk);
 	}
 
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
@@ -1044,11 +1044,11 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 		Destroy();
 		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
 		SetInvulnerableTicks(0);
-		return super::DoTakeDamage(TDI);  // No drops for creative
+		return Super::DoTakeDamage(TDI);  // No drops for creative
 	}
 
 	m_LastDamage = static_cast<int>(TDI.FinalDamage);
-	if (!super::DoTakeDamage(TDI))
+	if (!Super::DoTakeDamage(TDI))
 	{
 		return false;
 	}
@@ -1145,7 +1145,7 @@ void cMinecart::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 		a_SpeedZ = MAX_SPEED_NEGATIVE;
 	}
 
-	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	Super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -1168,7 +1168,7 @@ void cMinecart::Destroyed()
 // cRideableMinecart:
 
 cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height):
-	super(mpNone, a_Pos),
+	Super(mpNone, a_Pos),
 	m_Content(a_Content),
 	m_Height(a_Height)
 {
@@ -1180,7 +1180,7 @@ cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, in
 
 void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_Attachee != nullptr)
 	{
@@ -1213,7 +1213,7 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 // cMinecartWithChest:
 
 cMinecartWithChest::cMinecartWithChest(Vector3d a_Pos):
-	super(mpChest, a_Pos),
+	Super(mpChest, a_Pos),
 	cEntityWindowOwner(this),
 	m_Contents(ContentsWidth, ContentsHeight)
 {
@@ -1287,7 +1287,7 @@ void cMinecartWithChest::Destroyed()
 // cMinecartWithFurnace:
 
 cMinecartWithFurnace::cMinecartWithFurnace(Vector3d a_Pos):
-	super(mpFurnace, a_Pos),
+	Super(mpFurnace, a_Pos),
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
@@ -1321,7 +1321,7 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 
 void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -1354,7 +1354,7 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 // cMinecartWithTNT:
 
 cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
-	super(mpTNT, a_Pos)
+	Super(mpTNT, a_Pos)
 {
 }
 
@@ -1368,7 +1368,7 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 // cMinecartWithHopper:
 
 cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
-	super(mpHopper, a_Pos)
+	Super(mpHopper, a_Pos)
 {
 }
 

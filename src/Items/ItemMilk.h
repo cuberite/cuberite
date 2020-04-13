@@ -8,10 +8,12 @@
 class cItemMilkHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
+
 	cItemMilkHandler():
-		super(E_ITEM_MILK)
+		Super(E_ITEM_MILK)
 	{
 	}
 

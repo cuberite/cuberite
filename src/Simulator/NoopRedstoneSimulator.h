@@ -7,14 +7,15 @@
 
 
 
-class cRedstoneNoopSimulator :
+class cRedstoneNoopSimulator:
 	public cRedstoneSimulator
 {
-	typedef cRedstoneSimulator super;
+	using Super = cRedstoneSimulator;
+
 public:
 
-	cRedstoneNoopSimulator(cWorld & a_World) :
-		super(a_World)
+	cRedstoneNoopSimulator(cWorld & a_World):
+		Super(a_World)
 	{
 	}
 

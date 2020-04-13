@@ -7,13 +7,14 @@
 
 
 
-class cEnderman :
+class cEnderman:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cEnderman(void);
+
+	cEnderman();
 
 	CLASS_PROTODEF(cEnderman)
 

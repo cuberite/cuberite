@@ -8,7 +8,7 @@
 
 
 cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType):
-	super(a_BlockType)
+	Super(a_BlockType)
 {
 }
 
@@ -123,7 +123,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 	else
 	{
 		// Rotate the bottom block
-		return super::MetaRotateCCW(a_Meta);
+		return Super::MetaRotateCCW(a_Meta);
 	}
 }
 
@@ -141,7 +141,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 	else
 	{
 		// Rotate the bottom block
-		return super::MetaRotateCW(a_Meta);
+		return Super::MetaRotateCW(a_Meta);
 	}
 }
 

@@ -9,7 +9,7 @@
 
 
 cWitherSkeleton::cWitherSkeleton(void) :
-	super("WitherSkeleton", mtWitherSkeleton, "entity.wither_skeleton.hurt", "entity.wither_skeleton.death", "entity.wither_skeleton.ambient", 0.7, 2.4)
+	Super("WitherSkeleton", mtWitherSkeleton, "entity.wither_skeleton.hurt", "entity.wither_skeleton.death", "entity.wither_skeleton.ambient", 0.7, 2.4)
 {
 }
 
@@ -25,7 +25,7 @@ bool cWitherSkeleton::Attack(std::chrono::milliseconds a_Dt)
 	}
 
 	GetTarget()->AddEntityEffect(cEntityEffect::effWither, 200, 0);
-	return super::Attack(a_Dt);
+	return Super::Attack(a_Dt);
 }
 
 
@@ -57,6 +57,6 @@ void cWitherSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cWitherSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_STONE_SWORD));
 }

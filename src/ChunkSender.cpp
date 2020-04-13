@@ -60,7 +60,7 @@ public:
 // cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
-	super("ChunkSender"),
+	Super("ChunkSender"),
 	m_World(a_World)
 {
 }
@@ -82,7 +82,7 @@ void cChunkSender::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_evtQueue.Set();
-	super::Stop();
+	Super::Stop();
 }
 
 

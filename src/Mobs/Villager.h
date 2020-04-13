@@ -7,10 +7,10 @@
 
 
 
-class cVillager :
+class cVillager:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
 

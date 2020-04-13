@@ -5,13 +5,15 @@
 
 
 
-class cItemPickaxeHandler :
+class cItemPickaxeHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemPickaxeHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
+
+	cItemPickaxeHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
@@ -150,7 +152,7 @@ public:
 				return PickaxeLevel() >= 1;
 			}
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
@@ -171,7 +173,7 @@ public:
 	{
 		if (!IsBlockMaterialIron(a_Block) && (a_Block != E_BLOCK_ANVIL) && !IsBlockMaterialRock(a_Block))
 		{
-			return super::GetBlockBreakingStrength(a_Block);
+			return Super::GetBlockBreakingStrength(a_Block);
 		}
 		else
 		{

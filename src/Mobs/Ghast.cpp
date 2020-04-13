@@ -9,7 +9,7 @@
 
 
 cGhast::cGhast(void) :
-	super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
+	Super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
 	m_IsCharging(false),
 	m_FlightCooldown(5),
 	m_TicksUntilShot(10)
@@ -64,7 +64,7 @@ bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }
 
 
@@ -73,7 +73,7 @@ bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

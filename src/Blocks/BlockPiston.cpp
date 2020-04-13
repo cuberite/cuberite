@@ -18,7 +18,7 @@
 
 
 cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType):
-	super(a_BlockType)
+	Super(a_BlockType)
 {
 }
 
@@ -320,7 +320,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 // cBlockPistonHeadHandler:
 
 cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
-	super(E_BLOCK_PISTON_EXTENSION)
+	Super(E_BLOCK_PISTON_EXTENSION)
 {
 }
 

@@ -23,10 +23,10 @@ class cChunkMap;
 
 
 
-class cLuaChunkStay
-	: public cChunkStay
+class cLuaChunkStay:
+	public cChunkStay
 {
-	typedef cChunkStay super;
+	using Super = cChunkStay;
 
 public:
 	cLuaChunkStay();

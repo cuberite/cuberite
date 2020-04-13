@@ -7,13 +7,14 @@
 
 
 
-class cGhast :
+class cGhast:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cGhast(void);
+
+	cGhast();
 
 	CLASS_PROTODEF(cGhast)
 

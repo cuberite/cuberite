@@ -26,7 +26,7 @@ class cSplashPotionEntity :
 {
 	// tolua_end
 
-	using super = cProjectileEntity;
+	using Super = cProjectileEntity;
 
 public:  // tolua_export
 
@@ -76,7 +76,7 @@ protected:
 		}
 		else
 		{
-			super::Tick(a_Dt, a_Chunk);
+			Super::Tick(a_Dt, a_Chunk);
 		}
 	}
 

@@ -19,15 +19,15 @@
 
 
 
-
 // tolua_begin
-class cPluginLua :
+class cPluginLua:
 	public cPlugin
 {
-	typedef cPlugin super;
+	// tolua_end
+
+	using Super = cPlugin;
 
 public:
-	// tolua_end
 
 	/** A RAII-style mutex lock for accessing the internal LuaState.
 	This will be the only way to retrieve the plugin's LuaState;
@@ -206,8 +206,4 @@ protected:
 		}
 		return false;
 	}
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

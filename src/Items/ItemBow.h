@@ -8,14 +8,15 @@
 
 
 
-class cItemBowHandler :
+class cItemBowHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemBowHandler(void) :
-		super(E_ITEM_BOW)
+
+	cItemBowHandler(void):
+		Super(E_ITEM_BOW)
 	{
 	}
 

@@ -18,9 +18,10 @@ class cChunkedTEParser:
 	public cTransferEncodingParser,
 	public cEnvelopeParser::cCallbacks
 {
-	typedef cTransferEncodingParser Super;
+	using Super = cTransferEncodingParser;
 
 public:
+
 	cChunkedTEParser(Super::cCallbacks & a_Callbacks):
 		Super(a_Callbacks),
 		m_State(psChunkLength),
@@ -318,9 +319,10 @@ protected:
 class cIdentityTEParser:
 	public cTransferEncodingParser
 {
-	typedef cTransferEncodingParser Super;
+	using Super = cTransferEncodingParser;
 
 public:
+
 	cIdentityTEParser(cCallbacks & a_Callbacks, size_t a_ContentLength):
 		Super(a_Callbacks),
 		m_BytesLeft(a_ContentLength)

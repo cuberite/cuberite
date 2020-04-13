@@ -22,7 +22,7 @@ class cFlowerPotEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
 

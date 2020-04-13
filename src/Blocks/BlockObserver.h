@@ -8,11 +8,11 @@
 class cBlockObserverHandler:
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>
 {
-	using super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;
+	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;
 
 public:
 
-	cBlockObserverHandler(BLOCKTYPE a_BlockType) : super(a_BlockType)
+	cBlockObserverHandler(BLOCKTYPE a_BlockType) : Super(a_BlockType)
 	{
 	}
 

@@ -7,14 +7,15 @@
 
 
 
-class cItemGoldenAppleHandler :
+class cItemGoldenAppleHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemGoldenAppleHandler()
-		: super(E_ITEM_GOLDEN_APPLE, FoodInfo(4, 9.6))
+
+	cItemGoldenAppleHandler():
+		Super(E_ITEM_GOLDEN_APPLE, FoodInfo(4, 9.6))
 	{
 	}
 

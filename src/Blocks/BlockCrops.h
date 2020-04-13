@@ -13,12 +13,12 @@ template <NIBBLETYPE RipeMeta>
 class cBlockCropsHandler:
 	public cBlockPlant<true>
 {
-	using super = cBlockPlant<true>;
+	using Super = cBlockPlant<true>;
 
 public:
 
 	cBlockCropsHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

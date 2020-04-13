@@ -8,13 +8,14 @@
 
 
 
-class cHorse :
+class cHorse:
 	public cPassiveMonster,
 	public cEntityWindowOwner
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
+
 	cHorse(int Type, int Color, int Style, int TameTimes);
 	virtual ~cHorse() override;
 

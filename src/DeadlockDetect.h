@@ -5,7 +5,7 @@
 
 /*
 This class simply monitors each world's m_WorldAge, which is expected to grow on each tick.
-If the world age doesn't grow for several seconds, it's either because the server is super-overloaded,
+If the world age doesn't grow for several seconds, it's either because the server is Super-overloaded,
 or because the world tick thread hangs in a deadlock. We presume the latter and therefore kill the server.
 Once we learn to write crashdumps programmatically, we should do so just before killing, to enable debugging.
 */
@@ -20,13 +20,14 @@ Once we learn to write crashdumps programmatically, we should do so just before 
 
 
 
-class cDeadlockDetect :
+class cDeadlockDetect:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
-	cDeadlockDetect(void);
+
+	cDeadlockDetect();
 	virtual ~cDeadlockDetect() override;
 
 	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */

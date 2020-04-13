@@ -8,13 +8,15 @@
 
 
 
-class cIncrementalRedstoneSimulator :
+class cIncrementalRedstoneSimulator:
 	public cRedstoneSimulator
 {
-	typedef cRedstoneSimulator super;
+	using Super = cRedstoneSimulator;
+
 public:
-	cIncrementalRedstoneSimulator(cWorld & a_World) :
-		super(a_World)
+
+	cIncrementalRedstoneSimulator(cWorld & a_World):
+		Super(a_World)
 	{
 	}
 

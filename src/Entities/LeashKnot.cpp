@@ -15,7 +15,7 @@
 
 
 cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos) :
-	super(etLeashKnot, a_BlockFace, a_Pos),
+	Super(etLeashKnot, a_BlockFace, a_Pos),
 	m_ShouldSelfDestroy(false),
 	m_TicksToSelfDestroy(20 * 1)
 {
@@ -27,7 +27,7 @@ cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos) :
 
 void cLeashKnot::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	TiePlayersLeashedMobs(a_Player, true);
 
@@ -82,7 +82,7 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 
 void cLeashKnot::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 	m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosition(), 1, 1);
 	Destroy();
 	return;
@@ -106,7 +106,7 @@ void cLeashKnot::GetDrops(cItems & a_Items, cEntity * a_Killer)
 
 void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnObject(*this, 77, GetProtocolFacing(), static_cast<Byte>(GetYaw()), static_cast<Byte>(GetPitch()));
 	a_ClientHandle.SendEntityMetadata(*this);
 }

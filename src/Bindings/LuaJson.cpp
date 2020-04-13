@@ -28,7 +28,8 @@ Keeps track of the error message and the problematic value's path in the table.
 class CannotSerializeException:
 	public std::runtime_error
 {
-	typedef std::runtime_error Super;
+	using Super = std::runtime_error;
+
 public:
 	/** Constructs a new instance of the exception based on the provided values directly. */
 	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg):

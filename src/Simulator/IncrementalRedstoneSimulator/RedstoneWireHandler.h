@@ -7,9 +7,11 @@
 
 
 
-class cRedstoneWireHandler : public cRedstoneHandler
+class cRedstoneWireHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block)

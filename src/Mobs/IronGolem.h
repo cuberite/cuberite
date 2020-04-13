@@ -7,13 +7,14 @@
 
 
 
-class cIronGolem :
+class cIronGolem:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cIronGolem(void);
+
+	cIronGolem();
 
 	CLASS_PROTODEF(cIronGolem)
 

@@ -12,7 +12,7 @@ class cEnderCrystal :
 	public cEntity
 {
 	// tolua_end
-	using super = cEntity;
+	using Super = cEntity;
 
 public:
 

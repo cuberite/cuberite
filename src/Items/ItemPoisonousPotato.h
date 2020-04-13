@@ -7,20 +7,21 @@
 
 
 
-class cItemPoisonousPotatoHandler :
+class cItemPoisonousPotatoHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemPoisonousPotatoHandler()
-		: super(E_ITEM_POISONOUS_POTATO, FoodInfo(2, 1.2))
+
+	cItemPoisonousPotatoHandler():
+		Super(E_ITEM_POISONOUS_POTATO, FoodInfo(2, 1.2))
 	{
 	}
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
+		if (!Super::EatItem(a_Player, a_Item))
 		{
 			return false;
 		}

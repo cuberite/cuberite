@@ -543,7 +543,7 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction 
 		return;
 	}
 
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	UpdateRecipe(a_Player);
 }
 
@@ -558,7 +558,7 @@ void cSlotAreaCrafting::DblClicked(cPlayer & a_Player, int a_SlotNum)
 		// Dbl-clicking the crafting result slot shouldn't collect items to hand
 		return;
 	}
-	super::DblClicked(a_Player, a_SlotNum);
+	Super::DblClicked(a_Player, a_SlotNum);
 }
 
 
@@ -590,7 +590,7 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	// Update the recipe after setting the slot, if the slot is not the result slot:
-	super::SetSlot(a_SlotNum, a_Player, a_Item);
+	Super::SetSlot(a_SlotNum, a_Player, a_Item);
 	if (a_SlotNum != 0)
 	{
 		UpdateRecipe(a_Player);
@@ -799,7 +799,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 	if (a_SlotNum != 2)
 	{
-		super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 		UpdateResult(a_Player);
 		return;
 	}
@@ -895,7 +895,7 @@ void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem
 {
 	if (a_SlotNum != 2)
 	{
-		super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		Super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 		UpdateResult(a_Player);
 		return;
 	}
@@ -1052,7 +1052,7 @@ bool cSlotAreaAnvil::CanTakeResultItem(cPlayer & a_Player)
 void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
 {
 	TossItems(a_Player, 0, 2);
-	super::OnPlayerRemoved(a_Player);
+	Super::OnPlayerRemoved(a_Player);
 }
 
 
@@ -1580,7 +1580,7 @@ void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Playe
 
 void cSlotAreaEnchanting::OnPlayerAdded(cPlayer & a_Player)
 {
-	super::OnPlayerAdded(a_Player);
+	Super::OnPlayerAdded(a_Player);
 	UpdateResult(a_Player);
 }
 
@@ -1593,7 +1593,7 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 	// Toss the item in the enchanting slot, as well as lapis
 	TossItems(a_Player, 0, m_NumSlots);
 
-	super::OnPlayerRemoved(a_Player);
+	Super::OnPlayerRemoved(a_Player);
 }
 
 
@@ -1602,7 +1602,7 @@ void cSlotAreaEnchanting::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaEnchanting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	super::SetSlot(a_SlotNum, a_Player, a_Item);
+	Super::SetSlot(a_SlotNum, a_Player, a_Item);
 	UpdateResult(a_Player);
 }
 
@@ -1878,7 +1878,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 }
 
 
@@ -2056,7 +2056,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 				{
 					HandleBrewedItem(a_Player, Slot);
 				}
-				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
 				break;
 			}
 			default:
@@ -2079,7 +2079,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 			case caShiftLeftClick:
 			case caShiftRightClick:
 			{
-				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
 				break;
 			}
 			default:
@@ -2102,7 +2102,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 			case caShiftLeftClick:
 			case caShiftRightClick:
 			{
-				super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
 				break;
 			}
 			default:
@@ -2117,7 +2117,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 		}
 	}
 
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 }
 
 
@@ -2296,7 +2296,7 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 	}
 
 	// Survival inventory and all other windows' inventory has the same handling as normal slot areas
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	return;
 }
 
@@ -2469,7 +2469,7 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 // cSlotAreaItemGrid:
 
 cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow) :
-	super(a_ItemGrid.GetNumSlots(), a_ParentWindow),
+	Super(a_ItemGrid.GetNumSlots(), a_ParentWindow),
 	m_ItemGrid(a_ItemGrid)
 {
 	m_ItemGrid.AddListener(*this);

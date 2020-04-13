@@ -7,13 +7,14 @@
 
 
 
-class cBlockOreHandler :
+class cBlockOreHandler:
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using Super = cBlockHandler;
+
 public:
-	cBlockOreHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockOreHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 

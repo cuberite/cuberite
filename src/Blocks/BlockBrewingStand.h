@@ -11,12 +11,12 @@
 class cBlockBrewingStandHandler :
 	public cBlockEntityHandler
 {
-	using super = cBlockEntityHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 
 	cBlockBrewingStandHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

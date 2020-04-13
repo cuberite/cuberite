@@ -20,7 +20,7 @@
 class cMinecart :
 	public cEntity
 {
-	using super = cEntity;
+	using Super = cEntity;
 
 public:
 	CLASS_PROTODEF(cMinecart)
@@ -97,7 +97,7 @@ protected:
 class cRideableMinecart :
 	public cMinecart
 {
-	using super = cMinecart;
+	using Super = cMinecart;
 
 public:
 
@@ -127,7 +127,7 @@ class cMinecartWithChest :
 	public cItemGrid::cListener,
 	public cEntityWindowOwner
 {
-	using super = cMinecart;
+	using Super = cMinecart;
 
 public:
 
@@ -178,7 +178,7 @@ protected:
 class cMinecartWithFurnace :
 	public cMinecart
 {
-	using super = cMinecart;
+	using Super = cMinecart;
 
 public:
 
@@ -211,7 +211,7 @@ private:
 class cMinecartWithTNT :
 	public cMinecart
 {
-	using super = cMinecart;
+	using Super = cMinecart;
 
 public:
 	CLASS_PROTODEF(cMinecartWithTNT)
@@ -226,7 +226,7 @@ public:
 class cMinecartWithHopper :
 	public cMinecart
 {
-	using super = cMinecart;
+	using Super = cMinecart;
 
 public:
 

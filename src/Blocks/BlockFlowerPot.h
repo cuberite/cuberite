@@ -10,12 +10,12 @@
 class cBlockFlowerPotHandler :
 	public cBlockEntityHandler
 {
-	using super = cBlockEntityHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 
 	cBlockFlowerPotHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

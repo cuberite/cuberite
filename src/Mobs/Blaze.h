@@ -7,13 +7,14 @@
 
 
 
-class cBlaze :
+class cBlaze:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cBlaze(void);
+
+	cBlaze();
 
 	CLASS_PROTODEF(cBlaze)
 

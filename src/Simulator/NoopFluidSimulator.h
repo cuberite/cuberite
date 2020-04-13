@@ -15,14 +15,15 @@
 
 
 
-class cNoopFluidSimulator :
+class cNoopFluidSimulator:
 	public cFluidSimulator
 {
-	typedef cFluidSimulator super;
+	using Super = cFluidSimulator;
 
 public:
-	cNoopFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
-		super(a_World, a_Fluid, a_StationaryFluid)
+
+	cNoopFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid):
+		Super(a_World, a_Fluid, a_StationaryFluid)
 	{
 	}
 

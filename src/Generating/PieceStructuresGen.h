@@ -21,12 +21,13 @@ cPieceGenerator instance.
 
 
 
-class cPieceStructuresGen :
+class cPieceStructuresGen:
 	public cFinishGen
 {
-	typedef cFinishGen Super;
+	using Super = cFinishGen;
 
 public:
+
 	cPieceStructuresGen(int a_Seed);
 
 	/** Initializes the generator based on the specified prefab sets.

@@ -16,12 +16,13 @@
 
 
 
-class cBufferedSslContext :
+class cBufferedSslContext:
 	public cSslContext
 {
-	typedef cSslContext super;
+	using Super = cSslContext;
 
 public:
+
 	/** Creates a new context with the buffers of specified size for the encrypted / decrypted data. */
 	cBufferedSslContext(size_t a_BufferSize = 64000);
 

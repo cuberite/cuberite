@@ -9,7 +9,7 @@
 
 
 cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	super(pkEnderPearl, a_Creator, a_Pos, 0.25, 0.25),
+	Super(pkEnderPearl, a_Creator, a_Pos, 0.25, 0.25),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
@@ -59,7 +59,7 @@ void cThrownEnderPearlEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Ch
 	}
 	else
 	{
-		super::Tick(a_Dt, a_Chunk);
+		Super::Tick(a_Dt, a_Chunk);
 	}
 }
 

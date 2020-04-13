@@ -16,15 +16,17 @@
 
 
 
-class cFloodyFluidSimulator :
+class cFloodyFluidSimulator:
 	public cDelayedFluidSimulator
 {
-	typedef cDelayedFluidSimulator super;
+	using Super = cDelayedFluidSimulator;
 
 public:
+
 	cFloodyFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
 
 protected:
+
 	NIBBLETYPE m_Falloff;
 	int        m_NumNeighborsForSource;
 

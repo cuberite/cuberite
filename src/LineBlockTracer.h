@@ -22,12 +22,13 @@ class cChunk;
 
 
 
-class cLineBlockTracer :
+class cLineBlockTracer:
 	public cBlockTracer
 {
-	typedef cBlockTracer super;
+	using Super = cBlockTracer;
 
 public:
+
 	enum eLineOfSight
 	{
 		// Bit flags used for LineOfSightTrace's Sight parameter:

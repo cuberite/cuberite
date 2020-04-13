@@ -7,14 +7,15 @@
 
 
 
-class cBlockFluidHandler :
+class cBlockFluidHandler:
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using Super = cBlockHandler;
 
 public:
-	cBlockFluidHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockFluidHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 
 	}
@@ -61,7 +62,7 @@ public:
 				break;
 			}
 		}
-		super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
+		Super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
 	}
 
 
@@ -96,14 +97,15 @@ public:
 
 
 
-class cBlockLavaHandler :
+class cBlockLavaHandler:
 	public cBlockFluidHandler
 {
-	typedef cBlockFluidHandler super;
+	using Super = cBlockFluidHandler;
+
 public:
 
-	cBlockLavaHandler(BLOCKTYPE a_BlockType) :
-		super(a_BlockType)
+	cBlockLavaHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 

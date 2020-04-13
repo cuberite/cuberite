@@ -7,20 +7,21 @@
 
 
 
-class cItemRottenFleshHandler :
+class cItemRottenFleshHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemRottenFleshHandler()
-		: super(E_ITEM_ROTTEN_FLESH, FoodInfo(4, 0.8))
+
+	cItemRottenFleshHandler():
+		Super(E_ITEM_ROTTEN_FLESH, FoodInfo(4, 0.8))
 	{
 	}
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		if (!super::EatItem(a_Player, a_Item))
+		if (!Super::EatItem(a_Player, a_Item))
 		{
 			return false;
 		}

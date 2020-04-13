@@ -17,8 +17,10 @@
 class cTwoHeights:
 	public cTerrainShapeGen
 {
-	typedef cTerrainShapeGen super;
+	using Super = cTerrainShapeGen;
+
 public:
+
 	cTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen):
 		m_Seed(a_Seed),
 		m_Choice(a_Seed),

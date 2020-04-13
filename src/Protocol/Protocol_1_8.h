@@ -24,10 +24,10 @@ Declares the 1.8 protocol classes:
 
 
 
-class cProtocol_1_8_0 :
+class cProtocol_1_8_0:
 	public cProtocol
 {
-	typedef cProtocol super;
+	using Super = cProtocol;
 
 public:
 

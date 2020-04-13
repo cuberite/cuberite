@@ -75,7 +75,7 @@ void cAnvilWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_
 		// Inventory or Hotbar
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Anvil */
 	}
-	super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+	Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 }
 
 

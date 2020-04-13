@@ -14,7 +14,7 @@
 
 
 cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
@@ -27,7 +27,7 @@ cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
 	m_OwnerName = src.m_OwnerName;
 	m_OwnerTexture = src.m_OwnerTexture;

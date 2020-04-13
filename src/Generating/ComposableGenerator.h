@@ -200,12 +200,13 @@ typedef std::list<cFinishGenPtr> cFinishGenList;
 
 
 
-class cComposableGenerator :
+class cComposableGenerator:
 	public cChunkGenerator
 {
-	typedef cChunkGenerator Super;
+	using Super = cChunkGenerator;
 
 public:
+
 	cComposableGenerator();
 
 	// cChunkGenerator::cGenerator overrides:
