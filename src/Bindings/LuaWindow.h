@@ -34,7 +34,7 @@ class cLuaWindow :
 	// tolua_end
 	, public cItemGrid::cListener
 {  // tolua_export
-	typedef cWindow Super;
+	using Super = cWindow;
 
 public:
 	/** Create a window of the specified type, with a slot grid of a_SlotsX * a_SlotsY size.

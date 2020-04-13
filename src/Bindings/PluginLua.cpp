@@ -187,7 +187,7 @@ bool cPluginLua::Load(void)
 void cPluginLua::Unload(void)
 {
 	ClearWebTabs();
-	super::Unload();
+	Super::Unload();
 	Close();
 }
 

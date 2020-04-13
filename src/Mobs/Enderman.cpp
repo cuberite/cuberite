@@ -73,7 +73,7 @@ protected:
 
 
 cEnderman::cEnderman(void) :
-	super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.5, 2.9),
+	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.5, 2.9),
 	m_bIsScreaming(false),
 	m_CarriedBlock(E_BLOCK_AIR),
 	m_CarriedMeta(0)
@@ -131,7 +131,7 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 
 void cEnderman::CheckEventLostPlayer(void)
 {
-	super::CheckEventLostPlayer();
+	Super::CheckEventLostPlayer();
 	EventLosePlayer();
 }
 
@@ -141,7 +141,7 @@ void cEnderman::CheckEventLostPlayer(void)
 
 void cEnderman::EventLosePlayer()
 {
-	super::EventLosePlayer();
+	Super::EventLosePlayer();
 	m_bIsScreaming = false;
 	GetWorld()->BroadcastEntityMetadata(*this);
 }
@@ -152,7 +152,7 @@ void cEnderman::EventLosePlayer()
 
 void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

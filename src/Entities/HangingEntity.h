@@ -13,7 +13,7 @@ class cHangingEntity :
 {
 	// tolua_end
 
-	using super = cEntity;
+	using Super = cEntity;
 
 public:  // tolua_export
 

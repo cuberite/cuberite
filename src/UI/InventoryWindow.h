@@ -15,12 +15,13 @@
 
 
 
-class cInventoryWindow :
+class cInventoryWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
+
 	cInventoryWindow(cPlayer & a_Player);
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;

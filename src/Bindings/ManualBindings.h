@@ -16,6 +16,7 @@
 
 // fwd:
 struct tolua_Error;
+class cPluginLua;
 
 
 

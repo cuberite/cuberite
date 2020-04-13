@@ -7,13 +7,14 @@
 
 
 
-class cCreeper :
+class cCreeper:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cCreeper(void);
+
+	cCreeper();
 
 	CLASS_PROTODEF(cCreeper)
 

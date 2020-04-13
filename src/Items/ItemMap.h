@@ -7,16 +7,17 @@
 
 
 
-class cItemMapHandler :
+class cItemMapHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 	static const unsigned int DEFAULT_RADIUS = 128;
 
 public:
-	cItemMapHandler() :
-		super(E_ITEM_MAP)
+
+	cItemMapHandler():
+		Super(E_ITEM_MAP)
 	{
 	}
 

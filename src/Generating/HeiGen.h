@@ -167,13 +167,14 @@ protected:
 
 
 
-class cHeiGenBiomal :
+class cHeiGenBiomal:
 	public cTerrainHeightGen
 {
-	typedef cTerrainHeightGen Super;
+	using Super = cTerrainHeightGen;
 
 public:
-	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+
+	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen):
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen)
 	{

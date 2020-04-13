@@ -7,13 +7,14 @@
 
 
 
-class cEnderDragon :
+class cEnderDragon:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cEnderDragon(void);
+
+	cEnderDragon();
 
 	CLASS_PROTODEF(cEnderDragon)
 

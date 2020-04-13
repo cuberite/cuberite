@@ -19,7 +19,7 @@
 class cBeaconWindow :
 	public cWindow
 {
-	using super = cWindow;
+	using Super = cWindow;
 
 public:
 	cBeaconWindow(cBeaconEntity * a_Beacon);

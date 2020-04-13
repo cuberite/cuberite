@@ -14,7 +14,7 @@
 
 
 cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Record(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_JUKEBOX);
@@ -49,7 +49,7 @@ void cJukeboxEntity::Destroy(void)
 
 void cJukeboxEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cJukeboxEntity &>(a_Src);
 	m_Record = src.m_Record;
 }

@@ -889,7 +889,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			return;
 		}
 
-		// Position changed -> super::Tick() called:
+		// Position changed -> Super::Tick() called:
 		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT);
 
 		// Set swim states (water, lava, and fire):
@@ -941,7 +941,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int BlockY = POSY_TOINT;
 	int BlockZ = POSZ_TOINT;
 
-	// Position changed -> super::HandlePhysics() called
+	// Position changed -> Super::HandlePhysics() called
 	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ);
 
 	// TODO Add collision detection with entities.

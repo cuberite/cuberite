@@ -27,9 +27,10 @@ typedef std::shared_ptr<cUDPEndpointImpl> cUDPEndpointImplPtr;
 class cUDPEndpointImpl:
 	public cUDPEndpoint
 {
-	typedef cUDPEndpoint super;
+	using Super = cUDPEndpoint;
 
 public:
+
 	/** Creates a new instance of the endpoint, with the specified callbacks.
 	Tries to open on the specified port; if it fails, the endpoint is left in the "closed" state.
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint. */

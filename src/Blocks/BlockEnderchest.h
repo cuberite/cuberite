@@ -10,12 +10,12 @@
 class cBlockEnderchestHandler :
 	public cYawRotator<cBlockEntityHandler>
 {
-	using super = cYawRotator<cBlockEntityHandler>;
+	using Super = cYawRotator<cBlockEntityHandler>;
 
 public:
 
 	cBlockEnderchestHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

@@ -25,7 +25,7 @@
 
 
 cAuthenticator::cAuthenticator(void) :
-	super("cAuthenticator"),
+	Super("cAuthenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
@@ -77,7 +77,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 {
 	ReadSettings(a_Settings);
-	super::Start();
+	Super::Start();
 }
 
 
@@ -88,7 +88,7 @@ void cAuthenticator::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_QueueNonempty.Set();
-	super::Stop();
+	Super::Stop();
 }
 
 

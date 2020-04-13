@@ -86,7 +86,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
-	super(etPlayer, 0.6, 1.8),
+	Super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
 	m_FoodSaturationLevel(5.0),
@@ -227,7 +227,7 @@ cPlayer::~cPlayer(void)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
-	super::Destroyed();
+	Super::Destroyed();
 }
 
 
@@ -306,7 +306,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	ASSERT(a_Chunk.IsValid());
 
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 
 	// Handle charging the bow:
 	if (m_IsChargingBow)
@@ -600,7 +600,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 void cPlayer::Heal(int a_Health)
 {
-	super::Heal(a_Health);
+	Super::Heal(a_Health);
 	SendHealth();
 }
 
@@ -1024,7 +1024,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	if (super::DoTakeDamage(a_TDI))
+	if (Super::DoTakeDamage(a_TDI))
 	{
 		// Any kind of damage adds food exhaustion
 		AddFoodExhaustion(0.3f);
@@ -1074,7 +1074,7 @@ void cPlayer::NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved)
 
 void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 
 	if (m_Health > 0)
 	{
@@ -1766,7 +1766,7 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 		// Do not set speed to a frozen client
 		return;
 	}
-	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	Super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
@@ -2878,7 +2878,7 @@ void cPlayer::AttachTo(cEntity * a_AttachTo)
 		return;
 	}
 
-	super::AttachTo(a_AttachTo);
+	Super::AttachTo(a_AttachTo);
 }
 
 
@@ -2902,7 +2902,7 @@ void cPlayer::Detach()
 		return;
 	}
 
-	super::Detach();
+	Super::Detach();
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT;
 	int PosZ = POSZ_TOINT;
@@ -3099,7 +3099,7 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;  // No impact from explosion
 	}
 
-	return super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
+	return Super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
 }
 
 

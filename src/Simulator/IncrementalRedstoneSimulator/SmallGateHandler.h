@@ -7,9 +7,11 @@
 
 
 
-class cSmallGateHandler : public cRedstoneHandler
+class cSmallGateHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override

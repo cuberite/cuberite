@@ -80,7 +80,7 @@ Since only the header is actually in the memory, this number can be high, but st
 // cWSSAnvil:
 
 cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
-	super(a_World),
+	Super(a_World),
 	m_CompressionFactor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:

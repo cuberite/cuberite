@@ -80,7 +80,7 @@ static const struct
 // cMonster:
 
 cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
-	: super(etMonster, a_Width, a_Height)
+	: Super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
 	, m_PathFinder(a_Width, a_Height)
@@ -153,7 +153,7 @@ void cMonster::OnRemoveFromWorld(cWorld & a_World)
 		}
 	}
 
-	super::OnRemoveFromWorld(a_World);
+	Super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -163,7 +163,7 @@ void cMonster::OnRemoveFromWorld(cWorld & a_World)
 void cMonster::Destroyed()
 {
 	SetTarget(nullptr);  // Tell them we're no longer targeting them.
-	super::Destroyed();
+	Super::Destroyed();
 }
 
 
@@ -269,7 +269,7 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -544,7 +544,7 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 void cMonster::HandleFalling()
 {
 	m_bTouchGround = IsOnGround();
-	super::HandleFalling();
+	Super::HandleFalling();
 }
 
 
@@ -582,7 +582,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 
 bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -617,7 +617,7 @@ void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo
 	SetTarget(nullptr);
 	StopEveryoneFromTargetingMe();
 
-	super::DoMoveToWorld(a_WorldChangeInfo);
+	Super::DoMoveToWorld(a_WorldChangeInfo);
 }
 
 
@@ -626,7 +626,7 @@ void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo
 
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 	if (m_SoundHurt != "")
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
@@ -707,7 +707,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 void cMonster::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())

@@ -7,10 +7,10 @@
 
 
 
-class cSheep :
+class cSheep:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
 

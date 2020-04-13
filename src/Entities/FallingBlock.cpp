@@ -12,7 +12,7 @@
 
 
 cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
-	super(etFallingBlock, a_Position, 0.98, 0.98),
+	Super(etFallingBlock, a_Position, 0.98, 0.98),
 	m_BlockType(a_BlockType),
 	m_BlockMeta(a_BlockMeta)
 {

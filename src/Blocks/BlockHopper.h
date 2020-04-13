@@ -10,12 +10,12 @@
 class cBlockHopperHandler :
 	public cPitchYawRotator<cContainerEntityHandler<cBlockEntityHandler>>
 {
-	using super = cPitchYawRotator<cContainerEntityHandler<cBlockEntityHandler>>;
+	using Super = cPitchYawRotator<cContainerEntityHandler<cBlockEntityHandler>>;
 
 public:
 
 	cBlockHopperHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

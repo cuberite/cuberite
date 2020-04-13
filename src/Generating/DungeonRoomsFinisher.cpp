@@ -24,10 +24,10 @@ static const int ROOM_HEIGHT = 4;
 ////////////////////////////////////////////////////////////////////////////////
 // cDungeonRoom:
 
-class cDungeonRoom :
+class cDungeonRoom:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
 
@@ -37,8 +37,8 @@ public:
 		int a_HalfSizeX, int a_HalfSizeZ,
 		int a_FloorHeight,
 		cNoise & a_Noise
-	) :
-		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+	):
+		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_StartX(a_OriginX - a_HalfSizeX),
 		m_EndX(a_OriginX + a_HalfSizeX),
 		m_StartZ(a_OriginZ - a_HalfSizeZ),
@@ -288,7 +288,7 @@ protected:
 // cDungeonRoomsFinisher:
 
 cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainShapeGenPtr a_ShapeGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib) :
-	super(a_Seed + 100, a_GridSize, a_GridSize, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 1024),
+	Super(a_Seed + 100, a_GridSize, a_GridSize, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 1024),
 	m_ShapeGen(a_ShapeGen),
 	m_MaxHalfSize((a_MaxSize + 1) / 2),
 	m_MinHalfSize((a_MinSize + 1) / 2),

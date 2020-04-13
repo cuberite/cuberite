@@ -129,7 +129,7 @@ void cBioGenCache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a
 
 void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	m_BioGenToCache->InitializeBiomeGen(a_IniFile);
 }
 
@@ -280,7 +280,7 @@ void cBioGenCheckerboard::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::Biome
 
 void cBioGenCheckerboard::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	AString Biomes = a_IniFile.GetValueSet ("Generator", "CheckerBoardBiomes",    "");
 	m_BiomeSize    = a_IniFile.GetValueSetI("Generator", "CheckerboardBiomeSize", 64);
 	m_BiomeSize = (m_BiomeSize < 8) ? 8 : m_BiomeSize;
@@ -315,7 +315,7 @@ void cBioGenVoronoi::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap &
 
 void cBioGenVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	int CellSize     = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 128);
 	int JitterSize   = a_IniFile.GetValueSetI("Generator", "VoronoiJitterSize", CellSize);
 	int OddRowOffset = a_IniFile.GetValueSetI("Generator", "VoronoiOddRowOffset", 0);
@@ -364,7 +364,7 @@ void cBioGenDistortedVoronoi::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::B
 
 void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	m_CellSize = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
 	m_Voronoi.SetCellSize(m_CellSize);
 	InitializeBiomes(a_IniFile.GetValueSet("Generator", "DistortedVoronoiBiomes", ""));

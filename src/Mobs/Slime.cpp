@@ -10,7 +10,7 @@
 
 
 cSlime::cSlime(int a_Size) :
-	super("Slime",
+	Super("Slime",
 		mtSlime,
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
@@ -52,7 +52,7 @@ bool cSlime::Attack(std::chrono::milliseconds a_Dt)
 	if (m_Size > 1)
 	{
 		// Only slimes larger than size 1 attack a player.
-		return super::Attack(a_Dt);
+		return Super::Attack(a_Dt);
 	}
 
 	return false;
@@ -85,7 +85,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 			m_World->SpawnMobFinalize(std::move(NewSlime));
 		}
 	}
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 }
 
 

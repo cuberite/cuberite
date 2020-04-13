@@ -8,14 +8,15 @@
 
 
 
-class cItemSoupHandler :
+class cItemSoupHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo) :
-		super(a_ItemType, a_FoodInfo)
+
+	cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo):
+		Super(a_ItemType, a_FoodInfo)
 	{
 
 	}

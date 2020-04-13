@@ -11,7 +11,7 @@
 
 
 cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height) :
-	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height),
+	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height),
 	m_LovePartner(nullptr),
 	m_LoveTimer(0),
 	m_LoveCooldown(0),
@@ -26,7 +26,7 @@ cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_Mo
 
 bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -72,7 +72,7 @@ void cPassiveMonster::Destroyed()
 	{
 		m_LovePartner->ResetLoveMode();
 	}
-	super::Destroyed();
+	Super::Destroyed();
 }
 
 
@@ -81,7 +81,7 @@ void cPassiveMonster::Destroyed()
 
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -206,7 +206,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 

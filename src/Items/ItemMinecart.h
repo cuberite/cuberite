@@ -7,14 +7,15 @@
 
 
 
-class cItemMinecartHandler :
+class cItemMinecartHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemMinecartHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemMinecartHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 

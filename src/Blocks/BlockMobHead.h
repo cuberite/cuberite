@@ -11,11 +11,11 @@
 class cBlockMobHeadHandler :
 	public cBlockEntityHandler
 {
-	using super = cBlockEntityHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 	cBlockMobHeadHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

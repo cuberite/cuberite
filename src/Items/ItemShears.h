@@ -9,13 +9,15 @@
 
 
 
-class cItemShearsHandler :
+class cItemShearsHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemShearsHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemShearsHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -57,7 +59,7 @@ public:
 				return true;
 			}
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
@@ -88,7 +90,7 @@ public:
 		}
 		else
 		{
-			return super::GetBlockBreakingStrength(a_Block);
+			return Super::GetBlockBreakingStrength(a_Block);
 		}
 	}
 

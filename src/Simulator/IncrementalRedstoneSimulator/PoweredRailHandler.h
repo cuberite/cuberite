@@ -7,9 +7,11 @@
 
 
 
-class cPoweredRailHandler : public cRedstoneHandler
+class cPoweredRailHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	static Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails

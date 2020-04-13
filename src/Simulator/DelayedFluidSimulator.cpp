@@ -66,7 +66,7 @@ cDelayedFluidSimulatorChunkData::~cDelayedFluidSimulatorChunkData()
 // cDelayedFluidSimulator:
 
 cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay) :
-	super(a_World, a_Fluid, a_StationaryFluid),
+	Super(a_World, a_Fluid, a_StationaryFluid),
 	m_TickDelay(a_TickDelay),
 	m_AddSlotNum(a_TickDelay - 1),
 	m_SimSlotNum(0),

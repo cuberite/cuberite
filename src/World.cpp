@@ -90,7 +90,7 @@ namespace World
 // cWorld::cLock:
 
 cWorld::cLock::cLock(cWorld & a_World) :
-	super(&(a_World.m_ChunkMap->GetCS()))
+	Super(&(a_World.m_ChunkMap->GetCS()))
 {
 }
 
@@ -102,7 +102,7 @@ cWorld::cLock::cLock(cWorld & a_World) :
 // cWorld::cTickThread:
 
 cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	Super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
 	m_World(a_World)
 {
 }

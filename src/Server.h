@@ -165,13 +165,16 @@ private:
 	friend class cRoot;  // so cRoot can create and destroy cServer
 	friend class cServerListenCallbacks;  // Accessing OnConnectionAccepted()
 
+
+
 	/** The server tick thread takes care of the players who aren't yet spawned in a world */
-	class cTickThread :
+	class cTickThread:
 		public cIsThread
 	{
-		typedef cIsThread super;
+		using Super = cIsThread;
 
 	public:
+
 		cTickThread(cServer & a_Server);
 
 	protected:
@@ -180,6 +183,7 @@ private:
 		// cIsThread overrides:
 		virtual void Execute(void) override;
 	} ;
+
 
 
 	/** The network sockets listening for client connections. */

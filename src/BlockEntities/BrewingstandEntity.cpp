@@ -12,7 +12,7 @@
 
 
 cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_IsDestroyed(false),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
@@ -42,7 +42,7 @@ cBrewingstandEntity::~cBrewingstandEntity()
 void cBrewingstandEntity::Destroy()
 {
 	m_IsDestroyed = true;
-	super::Destroy();
+	Super::Destroy();
 }
 
 
@@ -51,7 +51,7 @@ void cBrewingstandEntity::Destroy()
 
 void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
 	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
@@ -202,7 +202,7 @@ void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value
 
 void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
+	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
 	if (m_IsDestroyed)
 	{

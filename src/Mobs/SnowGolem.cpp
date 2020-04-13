@@ -10,7 +10,7 @@
 
 
 cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", "entity.snowman.ambient", 0.4, 1.8)
+	Super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", "entity.snowman.ambient", 0.4, 1.8)
 {
 }
 
@@ -30,7 +30,7 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

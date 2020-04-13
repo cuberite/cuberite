@@ -10,12 +10,12 @@
 class cBlockCommandBlockHandler :
 	public cBlockEntityHandler
 {
-	using super = cBlockEntityHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 
 	cBlockCommandBlockHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

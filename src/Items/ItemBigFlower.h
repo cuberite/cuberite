@@ -11,11 +11,12 @@
 class cItemBigFlowerHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
+
 	cItemBigFlowerHandler(void):
-		super(E_BLOCK_BIG_FLOWER)
+		Super(E_BLOCK_BIG_FLOWER)
 	{
 	}
 

@@ -101,7 +101,7 @@ void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnC
 	m_OnAllChunksAvailable = std::move(a_OnAllChunksAvailable);
 
 	// Enable the ChunkStay:
-	super::Enable(a_ChunkMap);
+	Super::Enable(a_ChunkMap);
 }
 
 

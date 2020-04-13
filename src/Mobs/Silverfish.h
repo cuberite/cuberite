@@ -7,14 +7,15 @@
 
 
 
-class cSilverfish :
+class cSilverfish:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cSilverfish(void) :
-		super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.3, 0.4)
+
+	cSilverfish():
+		Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.3, 0.4)
 	{
 	}
 

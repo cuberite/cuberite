@@ -34,12 +34,13 @@ public:
 
 
 
-class cFluidSimulator :
+class cFluidSimulator:
 	public cSimulator
 {
-	typedef cSimulator super;
+	using Super = cSimulator;
 
 public:
+
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
 	// cSimulator overrides:

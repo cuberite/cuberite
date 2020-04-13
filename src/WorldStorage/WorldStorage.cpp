@@ -38,7 +38,7 @@ protected:
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
-	super("cWorldStorage"),
+	Super("cWorldStorage"),
 	m_World(nullptr),
 	m_SaveSchema(nullptr)
 {
@@ -94,7 +94,7 @@ void cWorldStorage::WaitForFinish(void)
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
 	m_Event.Set();  // Wake up the thread if waiting
-	super::Stop();
+	Super::Stop();
 	LOGD("World storage thread finished");
 }
 

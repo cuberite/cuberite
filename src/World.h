@@ -73,14 +73,18 @@ class cWorld  // tolua_export
 public:
 	// tolua_end
 
+
+
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
-	class cLock :
+	class cLock:
 		public cCSLock
 	{
-		typedef cCSLock super;
+		using Super = cCSLock;
 	public:
 		cLock(cWorld & a_World);
 	};
+
+
 
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
@@ -1098,11 +1102,15 @@ private:
 
 	friend class cRoot;
 
-	class cTickThread :
+
+
+	class cTickThread:
 		public cIsThread
 	{
-		typedef cIsThread super;
+		using Super = cIsThread;
+
 	public:
+
 		cTickThread(cWorld & a_World);
 
 	protected:
@@ -1111,6 +1119,8 @@ private:
 		// cIsThread overrides:
 		virtual void Execute(void) override;
 	} ;
+
+
 
 	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	class cChunkGeneratorCallbacks :

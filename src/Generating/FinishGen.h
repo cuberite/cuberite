@@ -487,9 +487,10 @@ Note that this class uses the "Nest" terminology for individual packs of ore, it
 class cFinishGenOres:
 	public cFinishGen
 {
-	typedef cFinishGen Super;
+	using Super = cFinishGen;
 
 public:
+
 	struct OreInfo
 	{
 		BLOCKTYPE  m_BlockType;  // The type of the nest.
@@ -574,12 +575,13 @@ protected:
 
 
 
-class cFinishGenOreNests :
+class cFinishGenOreNests:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}
@@ -602,9 +604,10 @@ protected:
 class cFinishGenOrePockets:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}

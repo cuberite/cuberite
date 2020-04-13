@@ -9,14 +9,15 @@
 
 
 
-class cItemMobHeadHandler :
+class cItemMobHeadHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemMobHeadHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemMobHeadHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -46,7 +47,7 @@ public:
 		}
 
 		cItem itemCopy(a_EquippedItem);  // Make a copy in case this is the player's last head item and OnPlayerPlace removes it
-		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
 			return false;
 		}

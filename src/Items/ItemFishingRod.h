@@ -49,14 +49,15 @@ protected:
 
 
 
-class cItemFishingRodHandler :
+class cItemFishingRodHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemFishingRodHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemFishingRodHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 

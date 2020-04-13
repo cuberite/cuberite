@@ -42,10 +42,10 @@ protected:
 
 
 /** A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation */
-class cBioGenCache :
+class cBioGenCache:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
 
@@ -87,11 +87,10 @@ protected:
 
 
 
-class cBioGenMulticache :
+class cBioGenMulticache:
 	public cBiomeGen
 {
-
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
 	/* Creates a new multicache - a cache that divides the caching into several sub-caches based on the chunk coords.
@@ -120,12 +119,13 @@ protected:
 
 
 /** Base class for generators that use a list of available biomes. This class takes care of the list. */
-class cBiomeGenList :
+class cBiomeGenList:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 protected:
+
 	// List of biomes that the generator is allowed to generate:
 	typedef std::vector<EMCSBiome> EMCSBiomes;
 	EMCSBiomes m_Biomes;
@@ -139,12 +139,13 @@ protected:
 
 
 
-class cBioGenCheckerboard :
+class cBioGenCheckerboard:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 protected:
+
 	int m_BiomeSize;
 
 	// cBiomeGen overrides:
@@ -156,18 +157,20 @@ protected:
 
 
 
-class cBioGenVoronoi :
+class cBioGenVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
+
 	cBioGenVoronoi(int a_Seed) :
 		m_Voronoi(a_Seed)
 	{
 	}
 
 protected:
+
 	cVoronoiMap m_Voronoi;
 
 	// cBiomeGen overrides:
@@ -181,13 +184,14 @@ protected:
 
 
 
-class cBioGenDistortedVoronoi :
+class cBioGenDistortedVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
-	cBioGenDistortedVoronoi(int a_Seed) :
+
+	cBioGenDistortedVoronoi(int a_Seed):
 		m_Noise(a_Seed),
 		m_Voronoi(a_Seed),
 		m_CellSize(0)
@@ -216,12 +220,13 @@ protected:
 
 
 
-class cBioGenMultiStepMap :
+class cBioGenMultiStepMap:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenMultiStepMap(int a_Seed);
 
 protected:
@@ -276,12 +281,13 @@ protected:
 
 
 
-class cBioGenTwoLevel :
+class cBioGenTwoLevel:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenTwoLevel(int a_Seed);
 
 protected:

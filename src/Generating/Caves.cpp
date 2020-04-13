@@ -117,12 +117,13 @@ typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
 
 /** A collection of connected tunnels, possibly branching. */
-class cStructGenWormNestCaves::cCaveSystem :
+class cStructGenWormNestCaves::cCaveSystem:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	// The generating block position; is read directly in cStructGenWormNestCaves::GetCavesForChunk()
 	int m_BlockX;
 	int m_BlockZ;
@@ -577,7 +578,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 // cStructGenWormNestCaves::cCaveSystem:
 
 cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
-	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_Size(a_Size)
 {
 	int Num = 1 + a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) % 3;

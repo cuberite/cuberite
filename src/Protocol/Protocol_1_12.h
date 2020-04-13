@@ -24,12 +24,13 @@ Declares the 1.12 protocol classes:
 
 
 
-class cProtocol_1_12 :
+class cProtocol_1_12:
 	public cProtocol_1_11_1
 {
-	typedef cProtocol_1_11_1 Super;
+	using Super = cProtocol_1_11_1;
 
 public:
+
 	cProtocol_1_12(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 protected:
@@ -49,12 +50,13 @@ protected:
 
 
 
-class cProtocol_1_12_1 :
+class cProtocol_1_12_1:
 	public cProtocol_1_12
 {
-	typedef cProtocol_1_12 Super;
+	using Super = cProtocol_1_12;
 
 public:
+
 	cProtocol_1_12_1(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 protected:
@@ -71,9 +73,10 @@ protected:
 class cProtocol_1_12_2:
 	public cProtocol_1_12_1
 {
-	typedef cProtocol_1_12_1 Super;
+	using Super = cProtocol_1_12_1;
 
 public:
+
 	cProtocol_1_12_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State):
 		Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 	{

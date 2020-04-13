@@ -9,12 +9,12 @@
 class cBlockPressurePlateHandler :
 	public cClearMetaOnDrop<cBlockHandler>
 {
-	using super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
 
 	cBlockPressurePlateHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

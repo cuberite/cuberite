@@ -17,9 +17,10 @@
 class cPieceStructuresGen::cGen:
 	public cGridStructGen
 {
-	typedef cGridStructGen Super;
+	using Super = cGridStructGen;
 
 public:
+
 	cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
 		Super(a_Seed),
 		m_BiomeGen(a_BiomeGen),

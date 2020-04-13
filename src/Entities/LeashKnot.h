@@ -14,7 +14,7 @@ class cLeashKnot :
 	public cHangingEntity
 {
 	// tolua_end
-	using super = cHangingEntity;
+	using Super = cHangingEntity;
 
 public:  // tolua_export
 

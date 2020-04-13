@@ -8,9 +8,11 @@
 
 
 
-class cRedstoneRepeaterHandler : public cRedstoneHandler
+class cRedstoneRepeaterHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	inline static bool IsOn(BLOCKTYPE a_Block)

@@ -44,10 +44,10 @@ enum
 
 
 
-class cWSSAnvil :
+class cWSSAnvil:
 	public cWSSchema
 {
-	typedef cWSSchema super;
+	using Super = cWSSchema;
 
 public:
 

@@ -228,13 +228,15 @@ cMojangAPI::sProfile::sProfile(
 ////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI::cUpdateThread:
 
-class cMojangAPI::cUpdateThread :
+class cMojangAPI::cUpdateThread:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
+
 public:
-	cUpdateThread(cMojangAPI & a_MojangAPI) :
-		super("cMojangAPI::cUpdateThread"),
+
+	cUpdateThread(cMojangAPI & a_MojangAPI):
+		Super("cMojangAPI::cUpdateThread"),
 		m_MojangAPI(a_MojangAPI)
 	{
 	}

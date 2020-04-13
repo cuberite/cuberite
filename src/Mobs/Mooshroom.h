@@ -7,13 +7,14 @@
 
 
 
-class cMooshroom :
+class cMooshroom:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
-	cMooshroom(void);
+
+	cMooshroom();
 
 	CLASS_PROTODEF(cMooshroom)
 

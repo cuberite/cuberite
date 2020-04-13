@@ -20,7 +20,7 @@ class cChestEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntityWithItems;
+	using Super = cBlockEntityWithItems;
 
 	// tolua_begin
 

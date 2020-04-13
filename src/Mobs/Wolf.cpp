@@ -11,7 +11,7 @@
 
 
 cWolf::cWolf(void) :
-	super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6, 0.8),
+	Super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6, 0.8),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -30,7 +30,7 @@ cWolf::cWolf(void) :
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	cPawn * PreviousTarget = GetTarget();
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -106,7 +106,7 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 	}
 
 	NotifyAlliesOfFight(static_cast<cPawn*>(GetTarget()));
-	return super::Attack(a_Dt);
+	return Super::Attack(a_Dt);
 
 }
 
@@ -260,7 +260,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		super::Tick(a_Dt, a_Chunk);
+		Super::Tick(a_Dt, a_Chunk);
 	}
 
 	if (!IsTicking())

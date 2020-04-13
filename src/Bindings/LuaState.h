@@ -285,7 +285,7 @@ public:
 	class cCallback:
 		public cTrackedRef
 	{
-		typedef cTrackedRef Super;
+		using Super = cTrackedRef;
 
 	public:
 
@@ -334,7 +334,7 @@ public:
 	class cOptionalCallback:
 		public cCallback
 	{
-		typedef cCallback Super;
+		using Super = cCallback;
 
 	public:
 
@@ -369,7 +369,8 @@ public:
 	class cTableRef:
 		public cTrackedRef
 	{
-		typedef cTrackedRef Super;
+		using Super = cTrackedRef;
+
 	public:
 		cTableRef(void) {}
 

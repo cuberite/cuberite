@@ -7,13 +7,15 @@
 
 
 
-class cItemSaplingHandler : public cItemHandler
+class cItemSaplingHandler:
+	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemSaplingHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+
+	cItemSaplingHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
@@ -25,7 +27,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		bool res = super::GetPlacementBlockTypeMeta(
+		bool res = Super::GetPlacementBlockTypeMeta(
 			a_World, a_Player,
 			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 			a_CursorX, a_CursorY, a_CursorZ,

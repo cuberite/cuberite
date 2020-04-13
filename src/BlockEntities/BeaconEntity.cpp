@@ -13,7 +13,7 @@
 
 
 cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
@@ -264,7 +264,7 @@ void cBeaconEntity::GiveEffects(void)
 
 void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBeaconEntity &>(a_Src);
 	m_BeaconLevel = src.m_BeaconLevel;
 	m_Contents.CopyFrom(src.m_Contents);

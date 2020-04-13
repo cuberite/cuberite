@@ -13,12 +13,12 @@ Additionally supports the metadata specifying block sub-type in its lower 2 bits
 class cBlockSidewaysHandler:
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
 	cBlockSidewaysHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

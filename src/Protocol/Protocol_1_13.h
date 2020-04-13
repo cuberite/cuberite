@@ -28,12 +28,13 @@ class BlockTypePalette;
 
 
 
-class cProtocol_1_13 :
+class cProtocol_1_13:
 	public cProtocol_1_12_2
 {
-	typedef cProtocol_1_12_2 Super;
+	using Super = cProtocol_1_12_2;
 
 public:
+
 	cProtocol_1_13(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	virtual void Initialize(cClientHandle & a_Client) override;

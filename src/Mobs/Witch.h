@@ -7,12 +7,13 @@
 
 
 
-class cWitch :
+class cWitch:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	cWitch();
 
 	CLASS_PROTODEF(cWitch)

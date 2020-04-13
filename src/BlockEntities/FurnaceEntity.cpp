@@ -23,7 +23,7 @@ enum
 
 
 cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
@@ -58,7 +58,7 @@ cFurnaceEntity::~cFurnaceEntity()
 void cFurnaceEntity::Destroy()
 {
 	m_IsDestroyed = true;
-	super::Destroy();
+	Super::Destroy();
 }
 
 
@@ -67,7 +67,7 @@ void cFurnaceEntity::Destroy()
 
 void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cFurnaceEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_CurrentRecipe = src.m_CurrentRecipe;
@@ -255,7 +255,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 
 void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
+	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
 	if (m_IsDestroyed)
 	{

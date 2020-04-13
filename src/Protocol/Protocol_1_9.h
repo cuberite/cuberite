@@ -30,10 +30,10 @@ Declares the 1.9 protocol classes:
 
 
 
-class cProtocol_1_9_0 :
+class cProtocol_1_9_0:
 	public cProtocol
 {
-	typedef cProtocol Super;
+	using Super = cProtocol;
 
 public:
 
@@ -292,12 +292,13 @@ protected:
 
 
 /** The version 108 protocol, used by 1.9.1.  Uses an int rather than a byte for dimension in join game. */
-class cProtocol_1_9_1 :
+class cProtocol_1_9_1:
 	public cProtocol_1_9_0
 {
-	typedef cProtocol_1_9_0 Super;
+	using Super = cProtocol_1_9_0;
 
 public:
+
 	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol_1_9_0 overrides:
@@ -311,12 +312,13 @@ public:
 
 
 /** The version 109 protocol, used by 1.9.2.  Same as 1.9.1, except the server list ping version number changed with the protocol number. */
-class cProtocol_1_9_2 :
+class cProtocol_1_9_2:
 	public cProtocol_1_9_1
 {
-	typedef cProtocol_1_9_1 Super;
+	using Super = cProtocol_1_9_1;
 
 public:
+
 	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol_1_9_1 overrides:
@@ -329,12 +331,13 @@ public:
 
 
 /** The version 110 protocol, used by 1.9.3 and 1.9.4. */
-class cProtocol_1_9_4 :
+class cProtocol_1_9_4:
 	public cProtocol_1_9_2
 {
-	typedef cProtocol_1_9_2 Super;
+	using Super = cProtocol_1_9_2;
 
 public:
+
 	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	// cProtocol_1_9_2 overrides:

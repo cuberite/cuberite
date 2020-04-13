@@ -9,7 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-	super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6, 1.8),
+	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6, 1.8),
 	m_IsCharging(false),
 	m_ChargeTimer(0)
 {
@@ -50,7 +50,7 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 
 void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

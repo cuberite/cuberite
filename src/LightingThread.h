@@ -45,10 +45,10 @@ class cWorld;
 
 
 
-class cLightingThread :
+class cLightingThread:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
 

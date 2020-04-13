@@ -7,14 +7,15 @@
 
 
 
-class cBlockLilypadHandler :
+class cBlockLilypadHandler:
 	public cClearMetaOnDrop<cBlockHandler>
 {
-	typedef cClearMetaOnDrop<cBlockHandler> super;
+	using Super = cClearMetaOnDrop<cBlockHandler>;
+
 public:
 
-	cBlockLilypadHandler(BLOCKTYPE a_BlockType) :
-		super(a_BlockType)
+	cBlockLilypadHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 

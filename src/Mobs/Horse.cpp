@@ -11,7 +11,7 @@
 
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4, 1.6),
+	Super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4, 1.6),
 	cEntityWindowOwner(this),
 	m_bHasChest(false),
 	m_bIsEating(false),
@@ -47,7 +47,7 @@ cHorse::~cHorse()
 
 void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -116,7 +116,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_bIsTame)
 	{
@@ -272,7 +272,7 @@ void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If horse is tame and someone is sitting on it, don't walk around
 	if ((!m_bIsTame) || (m_Attachee == nullptr))
 	{
-		super::InStateIdle(a_Dt, a_Chunk);
+		Super::InStateIdle(a_Dt, a_Chunk);
 	}
 }
 
@@ -284,7 +284,7 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
 	if ((m_bIsTame) && IsSaddled())
 	{
-		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
+		Super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
 }
 

@@ -10,12 +10,12 @@
 class cBlockStairsHandler :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>;
+	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>;
 
 public:
 
 	cBlockStairsHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 
 	}

@@ -7,20 +7,29 @@
 
 
 
-class cBlockDeadBushHandler :
+class cBlockDeadBushHandler:
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using Super = cBlockHandler;
+
 public:
-	cBlockDeadBushHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockDeadBushHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{

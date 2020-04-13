@@ -51,14 +51,14 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 
 /** The actual world storage class */
-class cWorldStorage :
+class cWorldStorage:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
 
-	cWorldStorage(void);
+	cWorldStorage();
 	virtual ~cWorldStorage() override;
 
 	/** Queues a chunk to be loaded, asynchronously.

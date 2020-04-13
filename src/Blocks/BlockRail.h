@@ -19,12 +19,12 @@ enum ENUM_PURE
 class cBlockRailHandler :
 	public cClearMetaOnDrop<cBlockHandler>
 {
-	using super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
 
 	cBlockRailHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 
@@ -57,7 +57,7 @@ public:
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override
 	{
-		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
+		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
 
 		// Alert diagonal rails:
 		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
@@ -80,7 +80,7 @@ public:
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) override
 	{
-		super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
+		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
 
 		// Alert diagonal rails:
 		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);

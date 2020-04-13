@@ -50,9 +50,10 @@ class cNullCommandOutputCallback :
 class cStringAccumCommandOutputCallback:
 	public cCommandOutputCallback
 {
-	typedef cCommandOutputCallback super;
+	using Super = cCommandOutputCallback;
 
 public:
+
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override;
 	virtual void Finished(void) override {}
@@ -83,14 +84,14 @@ public:
 
 
 /** Sends all command output to a log, line by line; deletes self when command finishes processing */
-class cLogCommandDeleteSelfOutputCallback :
+class cLogCommandDeleteSelfOutputCallback:
 	public cLogCommandOutputCallback
 {
-	typedef cLogCommandOutputCallback super;
+	using Super = cLogCommandOutputCallback;
 
 	virtual void Finished(void) override
 	{
-		super::Finished();
+		Super::Finished();
 		delete this;
 	}
 } ;

@@ -28,7 +28,8 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 	NIBBLETYPE a_Falloff,
 	int a_TickDelay,
 	int a_NumNeighborsForSource
-) : super(a_World, a_Fluid, a_StationaryFluid, a_Falloff, a_TickDelay, a_NumNeighborsForSource)
+):
+	Super(a_World, a_Fluid, a_StationaryFluid, a_Falloff, a_TickDelay, a_NumNeighborsForSource)
 {
 }
 

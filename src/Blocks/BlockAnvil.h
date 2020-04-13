@@ -10,14 +10,15 @@
 
 
 
-class cBlockAnvilHandler :
+class cBlockAnvilHandler:
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
-public:
-	using super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
+	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
 
-	cBlockAnvilHandler(BLOCKTYPE a_BlockType)
-		: super(a_BlockType)
+public:
+
+	cBlockAnvilHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 
@@ -48,7 +49,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
 		{
 			return false;
 		}

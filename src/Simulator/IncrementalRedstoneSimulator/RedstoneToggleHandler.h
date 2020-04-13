@@ -9,9 +9,11 @@
 
 
 
-class cRedstoneToggleHandler : public cRedstoneHandler
+class cRedstoneToggleHandler:
+	public cRedstoneHandler
 {
-	typedef cRedstoneHandler super;
+	using Super = cRedstoneHandler;
+
 public:
 
 	inline static Vector3i GetPositionAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)

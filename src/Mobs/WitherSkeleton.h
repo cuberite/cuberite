@@ -7,13 +7,14 @@
 
 
 
-class cWitherSkeleton :
+class cWitherSkeleton:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cWitherSkeleton(void);
+
+	cWitherSkeleton();
 
 	CLASS_PROTODEF(cWitherSkeleton)
 

@@ -11,12 +11,12 @@
 class cBlockNetherWartHandler :
 	public cBlockPlant<false>
 {
-	using super = cBlockPlant<false>;
+	using Super = cBlockPlant<false>;
 
 public:
 
 	cBlockNetherWartHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

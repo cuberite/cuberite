@@ -10,12 +10,12 @@
 class cBlockSpongeHandler :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
 	cBlockSpongeHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 
@@ -33,7 +33,7 @@ public:
 		{
 			return;
 		}
-		super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
+		Super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
 	}
 
 

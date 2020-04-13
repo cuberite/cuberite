@@ -7,13 +7,15 @@
 
 
 
-class cItemThrowableHandler :
+class cItemThrowableHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff) :
-		super(a_ItemType),
+
+	cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
+		Super(a_ItemType),
 		m_ProjectileKind(a_ProjectileKind),
 		m_SpeedCoeff(a_SpeedCoeff)
 	{
@@ -54,13 +56,15 @@ protected:
 
 
 
-class cItemEggHandler :
+class cItemEggHandler:
 	public cItemThrowableHandler
 {
-	typedef cItemThrowableHandler super;
+	using Super = cItemThrowableHandler;
+
 public:
-	cItemEggHandler(void) :
-		super(E_ITEM_EGG, cProjectileEntity::pkEgg, 30)
+
+	cItemEggHandler():
+		Super(E_ITEM_EGG, cProjectileEntity::pkEgg, 30)
 	{
 	}
 } ;
@@ -68,30 +72,15 @@ public:
 
 
 
-class cItemSnowballHandler :
+class cItemSnowballHandler:
 	public cItemThrowableHandler
 {
-	typedef cItemThrowableHandler super;
+	using Super = cItemThrowableHandler;
 
 public:
-	cItemSnowballHandler(void) :
-		super(E_ITEM_SNOWBALL, cProjectileEntity::pkSnowball, 30)
-	{
-	}
-} ;
 
-
-
-
-
-class cItemEnderPearlHandler :
-	public cItemThrowableHandler
-{
-	typedef cItemThrowableHandler super;
-
-public:
-	cItemEnderPearlHandler(void) :
-		super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)
+	cItemSnowballHandler():
+		Super(E_ITEM_SNOWBALL, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 } ;
@@ -100,13 +89,32 @@ public:
 
 
 
-class cItemBottleOEnchantingHandler :
+class cItemEnderPearlHandler:
 	public cItemThrowableHandler
 {
-	typedef cItemThrowableHandler super;
+	using Super = cItemThrowableHandler;
+
 public:
-	cItemBottleOEnchantingHandler(void) :
-		super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 14)
+
+	cItemEnderPearlHandler():
+		Super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)
+	{
+	}
+} ;
+
+
+
+
+
+class cItemBottleOEnchantingHandler:
+	public cItemThrowableHandler
+{
+	using Super = cItemThrowableHandler;
+
+public:
+
+	cItemBottleOEnchantingHandler():
+		Super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 14)
 	{
 	}
 };
@@ -115,13 +123,15 @@ public:
 
 
 
-class cItemFireworkHandler :
+class cItemFireworkHandler:
 	public cItemThrowableHandler
 {
-	typedef cItemThrowableHandler super;
+	using Super = cItemThrowableHandler;
+
 public:
-	cItemFireworkHandler(void) :
-		super(E_ITEM_FIREWORK_ROCKET, cProjectileEntity::pkFirework, 0)
+
+	cItemFireworkHandler():
+		Super(E_ITEM_FIREWORK_ROCKET, cProjectileEntity::pkFirework, 0)
 	{
 	}
 

@@ -76,7 +76,7 @@ public:
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
-	super("ServerTickThread"),
+	Super("ServerTickThread"),
 	m_Server(a_Server)
 {
 }

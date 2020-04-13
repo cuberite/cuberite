@@ -10,7 +10,7 @@
 
 
 cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, Vector3d a_Pos) :
-	super(a_EntityType, a_Pos, 0.8, 0.8),
+	Super(a_EntityType, a_Pos, 0.8, 0.8),
 	m_Facing(cHangingEntity::BlockFaceToProtocolFace(a_Facing))
 {
 	SetMaxHealth(1);

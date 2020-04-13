@@ -7,14 +7,15 @@
 
 
 
-class cItemCookedFishHandler :
+class cItemCookedFishHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemCookedFishHandler()
-		: super(E_ITEM_COOKED_FISH, FoodInfo(0, 0))
+
+	cItemCookedFishHandler():
+		Super(E_ITEM_COOKED_FISH, FoodInfo(0, 0))
 	{
 	}
 

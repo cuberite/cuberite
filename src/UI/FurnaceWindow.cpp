@@ -37,14 +37,14 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 			// Result Slot
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
 			// Furnace Input / Fuel Slot
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
 	else
@@ -65,7 +65,7 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 			// Hotbar Area
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 		}
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
 

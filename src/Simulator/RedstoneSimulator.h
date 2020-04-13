@@ -19,14 +19,15 @@ inline cRedstoneSimulatorChunkData::~cRedstoneSimulatorChunkData() {}
 
 
 
-class cRedstoneSimulator :
+class cRedstoneSimulator:
 	public cSimulator
 {
-	typedef cSimulator super;
+	using Super = cSimulator;
+
 public:
 
-	cRedstoneSimulator(cWorld & a_World) :
-		super(a_World)
+	cRedstoneSimulator(cWorld & a_World):
+		Super(a_World)
 	{
 	}
 

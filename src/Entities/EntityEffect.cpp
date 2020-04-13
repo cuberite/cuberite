@@ -365,7 +365,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 
 void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 {
-	super::OnTick(a_Target);
+	Super::OnTick(a_Target);
 
 	if (a_Target.IsMob() && static_cast<cMonster &>(a_Target).IsUndead())
 	{
@@ -392,7 +392,7 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 
 void cEntityEffectHunger::OnTick(cPawn & a_Target)
 {
-	super::OnTick(a_Target);
+	Super::OnTick(a_Target);
 
 	if (a_Target.IsPlayer())
 	{
@@ -426,7 +426,7 @@ void cEntityEffectInvisibility::BroadcastMetadata(cPawn & a_Target)
 
 void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 {
-	super::OnTick(a_Target);
+	Super::OnTick(a_Target);
 
 	// Damage reduction = 0.5 damage, multiplied by potion level (Weakness II = 1 damage)
 	// double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
@@ -444,7 +444,7 @@ void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 
 void cEntityEffectPoison::OnTick(cPawn & a_Target)
 {
-	super::OnTick(a_Target);
+	Super::OnTick(a_Target);
 
 	if (a_Target.IsMob())
 	{
@@ -483,7 +483,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 
 void cEntityEffectWither::OnTick(cPawn & a_Target)
 {
-	super::OnTick(a_Target);
+	Super::OnTick(a_Target);
 
 	// Damage frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 	int frequency = std::max(1, FloorC(40.0 / static_cast<double>(m_Intensity + 1)));

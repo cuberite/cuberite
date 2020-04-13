@@ -184,11 +184,11 @@ template <
 class cYawRotator:
 	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
 {
-	using super = cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>;
+	using Super = cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>;
 public:
 
 	cYawRotator(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{}
 
 
@@ -203,7 +203,7 @@ public:
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
 		{
 			return false;
 		}
@@ -258,11 +258,11 @@ template <
 class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
 {
-	using super = cYawRotator<Base, BitMask, North, East, South, West>;
+	using Super = cYawRotator<Base, BitMask, North, East, South, West>;
 public:
 
 	cPitchYawRotator(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{}
 
 
@@ -277,7 +277,7 @@ public:
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		if (!super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
 		{
 			return false;
 		}
@@ -319,6 +319,6 @@ public:
 			return Down;
 		}
 
-		return super::YawToMetaData(a_Rotation);
+		return Super::YawToMetaData(a_Rotation);
 	}
 };

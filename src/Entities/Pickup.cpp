@@ -97,7 +97,7 @@ protected:
 // cPickup:
 
 cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
-	super(etPickup, a_Pos, 0.2, 0.2),
+	Super(etPickup, a_Pos, 0.2, 0.2),
 	m_Timer(0),
 	m_Item(a_Item),
 	m_bCollected(false),
@@ -127,7 +127,7 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -204,7 +204,7 @@ bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return true;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }
 
 

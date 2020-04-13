@@ -16,12 +16,13 @@
 
 
 
-class cVaporizeFluidSimulator :
+class cVaporizeFluidSimulator:
 	public cFluidSimulator
 {
-	typedef cFluidSimulator super;
+	using Super = cFluidSimulator;
 
 public:
+
 	cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
 	// cSimulator overrides:

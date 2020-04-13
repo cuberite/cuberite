@@ -18,7 +18,7 @@
 class cStructGenMineShafts :
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	typedef cGridStructGen Super;
 
 public:
 	cStructGenMineShafts(

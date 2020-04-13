@@ -11,7 +11,7 @@
 
 
 cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos):
-	super(etPainting, a_Direction, a_Pos),
+	Super(etPainting, a_Direction, a_Pos),
 	m_Name(a_Name)
 {
 }
@@ -22,7 +22,7 @@ cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_
 
 void cPainting::SpawnOn(cClientHandle & a_Client)
 {
-	super::SpawnOn(a_Client);
+	Super::SpawnOn(a_Client);
 	a_Client.SendPaintingSpawn(*this);
 }
 

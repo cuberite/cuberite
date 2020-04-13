@@ -12,10 +12,16 @@ class cClientHandle;
 
 
 // tolua_begin
-class cMonster :
+class cMonster:
 	public cPawn
 {
-	typedef cPawn super;
+
+	// tolua_end
+
+	using Super = cPawn;
+
+	// tolua_begin
+
 public:
 
 	enum eFamily

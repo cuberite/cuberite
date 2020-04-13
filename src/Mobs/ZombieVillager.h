@@ -7,12 +7,13 @@
 
 
 
-class cZombieVillager :
+class cZombieVillager:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	cZombieVillager(cVillager::eVillagerType a_Profession);
 
 	CLASS_PROTODEF(cZombieVillager)

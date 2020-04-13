@@ -21,7 +21,7 @@ protocol version instance and redirects everything to it. */
 class cProtocolRecognizer:
 	public cProtocol
 {
-	typedef cProtocol super;
+	using Super = cProtocol;
 
 public:
 	enum

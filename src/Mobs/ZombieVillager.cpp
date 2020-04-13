@@ -11,7 +11,7 @@
 
 
 cZombieVillager::cZombieVillager(cVillager::eVillagerType a_Profession) :
-	super("ZombieVillager", mtZombieVillager, "entity.zombie_villager.hurt", "entity.zombie_villager.death", "entity.ambient", 0.6, 1.8),
+	Super("ZombieVillager", mtZombieVillager, "entity.zombie_villager.hurt", "entity.zombie_villager.death", "entity.ambient", 0.6, 1.8),
 	m_ConversionTime(-1),
 	m_Profession(a_Profession)
 {
@@ -45,7 +45,7 @@ void cZombieVillager::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cZombieVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -72,7 +72,7 @@ void cZombieVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cZombieVillager::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_GOLDEN_APPLE) && GetEntityEffect(cEntityEffect::effWeakness) != nullptr)

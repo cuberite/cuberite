@@ -15,7 +15,7 @@
 
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
-	super(a_EntityType, Vector3d(), a_Width, a_Height),
+	Super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),
 	m_bTouchGround(false)
@@ -40,7 +40,7 @@ cPawn::~cPawn()
 void cPawn::Destroyed()
 {
 	StopEveryoneFromTargetingMe();
-	super::Destroyed();
+	Super::Destroyed();
 }
 
 
@@ -114,7 +114,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		);
 	}
 
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -130,7 +130,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 {
 	ClearEntityEffects();
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 }
 
 
@@ -139,7 +139,7 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 
 bool cPawn::IsFireproof(void) const
 {
-	return super::IsFireproof() || HasEntityEffect(cEntityEffect::effFireResistance);
+	return Super::IsFireproof() || HasEntityEffect(cEntityEffect::effFireResistance);
 }
 
 
@@ -163,7 +163,7 @@ void cPawn::HandleAir(void)
 		return;
 	}
 
-	super::HandleAir();
+	Super::HandleAir();
 }
 
 
@@ -499,6 +499,6 @@ cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
 
 void cPawn::ResetPosition(Vector3d a_NewPosition)
 {
-	super::ResetPosition(a_NewPosition);
+	Super::ResetPosition(a_NewPosition);
 	m_LastGroundHeight = GetPosY();
 }

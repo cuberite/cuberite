@@ -100,7 +100,7 @@ public:
 // cLightingThread:
 
 cLightingThread::cLightingThread(cWorld & a_World):
-	super("cLightingThread"),
+	Super("cLightingThread"),
 	m_World(a_World),
 	m_MaxHeight(0),
 	m_NumSeeds(0)
@@ -140,7 +140,7 @@ void cLightingThread::Stop(void)
 	m_ShouldTerminate = true;
 	m_evtItemAdded.Set();
 
-	super::Stop();
+	Super::Stop();
 }
 
 

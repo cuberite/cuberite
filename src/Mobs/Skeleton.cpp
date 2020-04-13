@@ -10,7 +10,7 @@
 
 
 cSkeleton::cSkeleton(void) :
-	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6, 1.8)
+	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6, 1.8)
 {
 }
 
@@ -65,7 +65,7 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 
 void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
 }
 

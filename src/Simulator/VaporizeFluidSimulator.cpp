@@ -14,7 +14,7 @@
 
 
 cVaporizeFluidSimulator::cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
-	super(a_World, a_Fluid, a_StationaryFluid)
+	Super(a_World, a_Fluid, a_StationaryFluid)
 {
 }
 

@@ -16,12 +16,12 @@
 
 
 // tolua_begin
-class cBeaconEntity :
+class cBeaconEntity:
 	public cBlockEntityWithItems
 {
 	// tolua_end
 
-	using super = cBlockEntityWithItems;
+	using Super = cBlockEntityWithItems;
 
 
 public:  // tolua_export

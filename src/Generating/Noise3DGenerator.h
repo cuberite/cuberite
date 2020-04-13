@@ -20,12 +20,13 @@
 
 
 
-class cNoise3DGenerator :
+class cNoise3DGenerator:
 	public cChunkGenerator
 {
-	typedef cChunkGenerator Super;
+	using Super = cChunkGenerator;
 
 public:
+
 	cNoise3DGenerator();
 	virtual ~cNoise3DGenerator() override;
 

@@ -108,7 +108,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 // cProtocol_1_8_0:
 
 cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+	Super(a_Client),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),

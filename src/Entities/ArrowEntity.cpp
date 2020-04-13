@@ -9,7 +9,7 @@
 
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	super(pkArrow, a_Creator, a_Pos, 0.5, 0.5),
+	Super(pkArrow, a_Creator, a_Pos, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
@@ -35,7 +35,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 
 
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
-	super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
+	Super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
 	m_PickupState(psInSurvivalOrCreative),
 	m_DamageCoeff(2),
 	m_IsCritical((a_Force >= 1)),
@@ -77,7 +77,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	Vector3d Hit = a_HitPos;
 	Hit += GetSpeed().NormalizeCopy() / 100000;  // Make arrow sink into block a bit so it lodges (TODO: investigate how to stop them going so far so that they become black clientside)
 
-	super::OnHitSolidBlock(Hit, a_HitFace);
+	Super::OnHitSolidBlock(Hit, a_HitFace);
 	Vector3i BlockHit = Hit.Floor();
 
 	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
@@ -100,7 +100,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
-	super::OnHitEntity(a_EntityHit, a_HitPos);
+	Super::OnHitEntity(a_EntityHit, a_HitPos);
 
 	int Damage = static_cast<int>(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
@@ -165,7 +165,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 
 void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

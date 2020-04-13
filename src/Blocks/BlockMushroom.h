@@ -10,12 +10,12 @@
 class cBlockMushroomHandler:
 	public cClearMetaOnDrop<cBlockHandler>
 {
-	using super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
 
 	cBlockMushroomHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

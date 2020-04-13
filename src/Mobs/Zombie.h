@@ -6,12 +6,13 @@
 
 
 
-class cZombie :
+class cZombie:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	cZombie();
 
 	CLASS_PROTODEF(cZombie)

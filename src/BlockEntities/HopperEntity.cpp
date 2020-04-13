@@ -18,7 +18,7 @@
 
 
 cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
 	m_LastMoveItemsOutTick(0),
 	m_Locked(false)
@@ -63,7 +63,7 @@ std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMet
 
 void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cHopperEntity &>(a_Src);
 	m_LastMoveItemsInTick = src.m_LastMoveItemsInTick;
 	m_LastMoveItemsOutTick = src.m_LastMoveItemsOutTick;

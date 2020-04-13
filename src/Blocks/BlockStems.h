@@ -14,12 +14,12 @@ template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
 class cBlockStemsHandler:
 	public cBlockPlant<true>
 {
-	using super = cBlockPlant<true>;
+	using Super = cBlockPlant<true>;
 
 public:
 
 	cBlockStemsHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

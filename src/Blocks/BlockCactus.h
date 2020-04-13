@@ -10,12 +10,12 @@
 class cBlockCactusHandler :
 	public cClearMetaOnDrop<cBlockPlant<false>>
 {
-	using super = cClearMetaOnDrop<cBlockPlant<false>>;
+	using Super = cClearMetaOnDrop<cBlockPlant<false>>;
 
 public:
 
 	cBlockCactusHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 
@@ -159,7 +159,7 @@ protected:
 		// Only allow growing if there's an air block above:
 		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
 		{
-			return super::CanGrow(a_Chunk, a_RelPos);
+			return Super::CanGrow(a_Chunk, a_RelPos);
 		}
 		return paStay;
 	}

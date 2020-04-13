@@ -11,7 +11,7 @@
 
 
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos):
-	super(etEnderCrystal, a_Pos, 1.0, 1.0)
+	Super(etEnderCrystal, a_Pos, 1.0, 1.0)
 {
 	SetMaxHealth(5);
 }
@@ -41,7 +41,7 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
 
