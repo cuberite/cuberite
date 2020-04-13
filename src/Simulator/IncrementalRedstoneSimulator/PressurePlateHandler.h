@@ -144,7 +144,7 @@ public:
 					return {};
 				}
 			}
-			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
+			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.6f);
 			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
 		}
 
