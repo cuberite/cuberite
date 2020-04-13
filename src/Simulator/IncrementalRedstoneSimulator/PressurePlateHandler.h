@@ -3,6 +3,7 @@
 
 #include "RedstoneHandler.h"
 #include "../../BoundingBox.h"
+#include "../../Entities/Pickup.h"
 
 
 
@@ -27,7 +28,7 @@ public:
 	{
 		UNUSED(a_Meta);
 
-		unsigned int NumberOfEntities = 0;
+		int NumberOfEntities = 0;
 		bool FoundPlayer = false;
 		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & a_Entity)
 			{
@@ -36,6 +37,11 @@ public:
 					FoundPlayer = true;
 				}
 
+				if (a_Entity.IsPickup())
+				{
+					NumberOfEntities += static_cast<cPickup &>(a_Entity).GetItem().m_ItemCount;
+					return false;
+				}
 				NumberOfEntities++;
 				return false;
 			}
@@ -72,16 +78,103 @@ public:
 		UNUSED(a_PoweringData.PowerLevel);
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
-		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
+		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 
-		if (Power != PreviousPower.PowerLevel)
+		const auto PreviousPower = ChunkData->GetCachedPowerData(a_Position);
+		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the platey
+
+		const auto PlateUpdates = GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
+		auto DelayInfo = ChunkData->GetMechanismDelayInfo(a_Position);
+
+		// Resting state?
+		if (DelayInfo == nullptr)
 		{
-			a_World.SetBlockMeta(a_Position, (Power == 0) ? E_META_PRESSURE_PLATE_RAISED : E_META_PRESSURE_PLATE_DEPRESSED);
-			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
+			if (Power == 0)
+			{
+				// Nothing happened, back to rest
+				return {};
+			}
+
+			// From rest, a player stepped on us
+			// Schedule a minimum 0.5 second delay before even thinking about releasing
+			ChunkData->m_MechanismDelays[a_Position] = std::make_pair(5, true);
+
+			auto soundToPlay = GetClickOnSound(a_BlockType);
+			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.6f);
+
+			// Update power
+			ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+
+			// Immediately depress plate
+			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
+			return PlateUpdates;
 		}
 
-		return {};
+		// Not a resting state
+
+		int DelayTicks;
+		bool HasExitedMinimumOnDelayPhase;
+		std::tie(DelayTicks, HasExitedMinimumOnDelayPhase) = *DelayInfo;
+
+		// Are we waiting for the initial delay or subsequent release delay?
+		if (DelayTicks > 0)
+		{
+			// Nothing changes, if there is nothing on it anymore, because the state is locked.
+			if (Power == 0)
+			{
+				return {};
+			}
+
+			// Yes. Are we waiting to release, and found that the player stepped on it again?
+			if (!HasExitedMinimumOnDelayPhase)
+			{
+				// Reset delay
+				*DelayInfo = std::make_pair(0, true);
+			}
+
+			// Did the power level change and is still above zero?
+			if (Power != PreviousPower.PowerLevel)
+			{
+				// Yes. Update power
+				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				return PlateUpdates;
+			}
+
+			return {};
+		}
+
+		// Not waiting for anything. Has the initial delay elapsed?
+		if (HasExitedMinimumOnDelayPhase)
+		{
+			// Yep, initial delay elapsed. Has the player gotten off?
+			if (Power == 0)
+			{
+				// Yes. Go into subsequent release delay, for a further 0.5 seconds
+				*DelayInfo = std::make_pair(5, false);
+				return {};
+			}
+
+			// Did the power level change and is still above zero?
+			if (Power != PreviousPower.PowerLevel)
+			{
+				// Yes. Update power
+				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				return PlateUpdates;
+			}
+
+			// Yes, but player's still on the plate, do nothing
+			return {};
+		}
+
+		// Just got out of the subsequent release phase, reset everything and raise the plate
+		ChunkData->m_MechanismDelays.erase(a_Position);
+
+		auto soundToPlay = GetClickOffSound(a_BlockType);
+		a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
+		ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+
+		a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
+		return PlateUpdates;
 	}
 
 	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
@@ -91,5 +184,46 @@ public:
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		return {};
+	}
+
+private:
+	static AString GetClickOnSound(BLOCKTYPE a_BlockType)
+	{
+		// manage on-sound
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+				return "block.wood_pressureplate.click_on";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+				return "block.wood_pressureplate.click_on";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+				return "block.metal_pressureplate.click_on";
+			default:
+			{
+				ASSERT(!"No on sound for this one!");
+				return "";
+			}
+		}
+	}
+
+	static AString GetClickOffSound(BLOCKTYPE a_BlockType)
+	{
+		// manage on-sound
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+				return "block.wood_pressureplate.click_off";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+				return "block.wood_pressureplate.click_off";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+				return "block.metal_pressureplate.click_off";
+			default:
+			{
+				ASSERT(!"No off sound for this one!");
+				return "";
+			}
+		}
 	}
 };
