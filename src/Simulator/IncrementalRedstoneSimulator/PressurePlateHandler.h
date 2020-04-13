@@ -99,7 +99,7 @@ public:
 			// Schedule a minimum 0.5 second delay before even thinking about releasing
 			ChunkData->m_MechanismDelays[a_Position] = std::make_pair(5, true);
 
-			auto soundToPlay = GetClickOffSound(a_BlockType);
+			auto soundToPlay = GetClickOnSound(a_BlockType);
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.6f);
 
 			// Update power
@@ -126,14 +126,14 @@ public:
 			}
 
 			// Yes. Are we waiting to release, and found that the player stepped on it again?
-			if (!HasExitedMinimumOnDelayPhase && (Power > 0))
+			if (!HasExitedMinimumOnDelayPhase)
 			{
 				// Reset delay
 				*DelayInfo = std::make_pair(0, true);
 			}
 
 			// Did the power level change and is still above zero?
-			if ((Power != PreviousPower.PowerLevel) && (Power > 0))
+			if (Power != PreviousPower.PowerLevel)
 			{
 				// Yes. Update power
 				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
@@ -190,48 +190,40 @@ private:
 	static AString GetClickOnSound(BLOCKTYPE a_BlockType)
 	{
 		// manage on-sound
-		AString soundToPlay = "";
 		switch (a_BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
-				soundToPlay = "block.wood_pressureplate.click_on";
-				break;
+				return "block.wood_pressureplate.click_on";
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
-				soundToPlay = "block.wood_pressureplate.click_on";
-				break;
+				return "block.wood_pressureplate.click_on";
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-				soundToPlay = "block.metal_pressureplate.click_on";
-				break;
+				return "block.metal_pressureplate.click_on";
 			default:
 			{
 				ASSERT(!"No on sound fo this one!");
+				return "";
 			}
 		}
-		return soundToPlay;
 	}
 
 	static AString GetClickOffSound(BLOCKTYPE a_BlockType)
 	{
 		// manage on-sound
-		AString soundToPlay = "";
 		switch (a_BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
-				soundToPlay = "block.wood_pressureplate.click_off";
-				break;
+				return "block.wood_pressureplate.click_off";
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
-				soundToPlay = "block.wood_pressureplate.click_off";
-				break;
+				return "block.wood_pressureplate.click_off";
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-				soundToPlay = "block.metal_pressureplate.click_off";
-				break;
+				return "block.metal_pressureplate.click_off";
 			default:
 			{
-				ASSERT(!"No off sound fo this one!");
+				ASSERT(!"No on sound fo this one!");
+				return "";
 			}
 		}
-		return soundToPlay;
 	}
 };
