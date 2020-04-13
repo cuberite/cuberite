@@ -1493,7 +1493,7 @@ bool cLuaState::GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal)
 	return false;
 }
 
-// Instantiate the previous function for all 3 vector3 types:
+// Explicitly instantiate the previous function for all Vector3 types:
 template bool cLuaState::GetStackValue(int a_StackPos, Vector3d & a_ReturnedVal);
 template bool cLuaState::GetStackValue(int a_StackPos, Vector3f & a_ReturnedVal);
 template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_ReturnedVal);

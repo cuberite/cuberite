@@ -1031,7 +1031,12 @@ protected:
 	/** Removes the specified reference from tracking.
 	The reference will no longer be invalidated when this Lua state is about to be closed. */
 	void UntrackRef(cTrackedRef & a_Ref);
-} ;
+};  // cLuaState
+
+// Instantiate the GetStackValue(Vector3<>) function for all Vector3 types:
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3d & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3f & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_ReturnedVal);
 
 
 
