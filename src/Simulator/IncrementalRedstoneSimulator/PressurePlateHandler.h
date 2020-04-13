@@ -3,6 +3,7 @@
 
 #include "RedstoneHandler.h"
 #include "../../BoundingBox.h"
+#include "../../Entities/Pickup.h"
 
 
 
@@ -36,6 +37,11 @@ public:
 					FoundPlayer = true;
 				}
 
+				if (a_Entity.IsPickup())
+				{
+					NumberOfEntities += dynamic_cast<cPickup*>(&a_Entity)->GetItem().m_ItemCount;
+					return false;
+				}
 				NumberOfEntities++;
 				return false;
 			}
@@ -72,59 +78,28 @@ public:
 		UNUSED(a_PoweringData.PowerLevel);
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		cIncrementalRedstoneSimulatorChunkData *ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
+		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 
-		// get current states
-		auto PreviousPower = ChunkData->GetCachedPowerData(a_Position);
-		auto PreviousPlateState = ChunkData->GetCachedPressurePlateState(a_Position);
+		const auto PreviousPower = ChunkData->GetCachedPowerData(a_Position);
+		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the platey
 
-		// initialise variables that should be realised in the world after this method exits
-		unsigned char Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);  // Get the current power of the plate
-		cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
+		const auto PlateUpdates = GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
+		auto DelayInfo = ChunkData->GetMechanismDelayInfo(a_Position);
 
-		if ((Power != 0) && (PreviousPlateState == E_PRESSURE_PLATE_RAISED))  // Plate is pressed initially
+		// Resting state?
+		if (DelayInfo == nullptr)
 		{
-			// schedule locked state to be released after 1 sec
-			a_World.ScheduleTask(20, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & a_aWorld)
+			if (Power == 0)
 			{
-				if (this->GetPowerLevel(a_aWorld, a_Position, a_BlockType, a_Meta) == 0)
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-				}
-				else
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
-				}
-			});
-		}
+				// Nothing happened, back to rest
+				return {};
+			}
 
-		if ((Power == 0) && (PreviousPlateState == E_PRESSURE_PLATE_HELD_DOWN))  // Plate is not pressed anymore, but didn't release yet
-		{
-			// schedule release after 0.5 sec
-			a_World.ScheduleTask(10, [a_Position, a_BlockType, a_Meta, ChunkData, this](cWorld & a_aWorld)
-			{
-				bool AlreadyReleased = (ChunkData->GetCachedPressurePlateState(a_Position) == E_PRESSURE_PLATE_RAISED);
-				if ((this->GetPowerLevel(a_aWorld, a_Position, a_BlockType, a_Meta) == 0) && (!AlreadyReleased))
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_WANTS_TO_RELEASE);
-				}
-				else if (!AlreadyReleased)
-				{
-					ChunkData->SetCachedPressurePlateState(a_Position, E_PRESSURE_PLATE_HELD_DOWN);
-				}
-			});
-		}
+			// From rest, a player stepped on us
+			// Schedule a minimum 0.5 second delay before even thinking about releasing
+			ChunkData->m_MechanismDelays[a_Position] = std::make_pair(5, true);
 
-		DoPressurePlateStateTransition(PreviousPower, PreviousPlateState, &Power, &NextPressurePlateState);
-
-		if (NextPressurePlateState != PreviousPlateState)
-		{
-			ChunkData->SetCachedPressurePlateState(a_Position, NextPressurePlateState);
-		}
-
-		if ((NextPressurePlateState != E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_DEPRESSED))  // Plate gets pressed
-		{
-			// manage on-sounds
+			// manage on-sound
 			AString soundToPlay = "";
 			switch (a_BlockType)
 			{
@@ -145,41 +120,92 @@ public:
 				}
 			}
 			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.6f);
-			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
-		}
 
-		if ((NextPressurePlateState == E_PRESSURE_PLATE_RAISED) && (a_Meta != E_META_PRESSURE_PLATE_RAISED))  // Plate gets released
-		{
-			// manage off-sounds
-			AString soundToPlay = "";
-			switch (a_BlockType)
-			{
-				case E_BLOCK_STONE_PRESSURE_PLATE:
-					soundToPlay = "block.wood_pressureplate.click_off";
-					break;
-				case E_BLOCK_WOODEN_PRESSURE_PLATE:
-					soundToPlay = "block.wood_pressureplate.click_off";
-					break;
-				case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-				case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-					soundToPlay = "block.metal_pressureplate.click_off";
-					break;
-				default:
-				{
-					ASSERT(!"Unhandled/unimplemented block in pressure plate handler!");
-					return {};
-				}
-			}
-			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
-			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
-		}
-
-		if (Power != PreviousPower.PowerLevel)  // Power output changed
-		{
+			// Update power
 			ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
-			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
+
+			// Immediately depress plate
+			a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
+			return PlateUpdates;
 		}
-		return {};
+
+		// Not a resting state
+
+		int DelayTicks;
+		bool HasExitedMinimumOnDelayPhase;
+		std::tie(DelayTicks, HasExitedMinimumOnDelayPhase) = *DelayInfo;
+
+		// Are we waiting for the initial delay or subsequent release delay?
+		if (DelayTicks > 0)
+		{
+			// Yes. Are we waiting to release, and found that the player stepped on it again?
+			if (!HasExitedMinimumOnDelayPhase && (Power > 0))
+			{
+				// Reset delay
+				*DelayInfo = std::make_pair(0, true);
+			}
+
+			// Did the power level change and is still above zero?
+			if ((Power != PreviousPower.PowerLevel) && (Power > 0))
+			{
+				// Yes. Update power
+				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				return PlateUpdates;
+			}
+
+			return {};
+		}
+
+		// Not waiting for anything. Has the initial delay elapsed?
+		if (HasExitedMinimumOnDelayPhase)
+		{
+			// Yep, initial delay elapsed. Has the player gotten off?
+			if (Power == 0)
+			{
+				// Yes. Go into subsequent release delay, for a further 0.5 seconds
+				*DelayInfo = std::make_pair(5, false);
+			}
+
+			// Did the power level change and is still above zero?
+			if ((Power != PreviousPower.PowerLevel) && (Power > 0))
+			{
+				// Yes. Update power
+				ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				return PlateUpdates;
+			}
+
+			// Yes, but player's still on the plate, do nothing
+			return {};
+		}
+
+		// Just got out of the subsequent release phase, reset everything and raise the plate
+		ChunkData->m_MechanismDelays.erase(a_Position);
+
+		// manage off-sound
+		AString soundToPlay = "";
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+				soundToPlay = "block.wood_pressureplate.click_off";
+				break;
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+				soundToPlay = "block.wood_pressureplate.click_off";
+				break;
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+				soundToPlay = "block.metal_pressureplate.click_off";
+				break;
+			default:
+			{
+				ASSERT(!"Unhandled/unimplemented block in pressure plate handler!");
+				return {};
+			}
+		}
+		a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
+		ChunkData->SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+
+		a_World.SetBlockMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
+		return PlateUpdates;
 	}
 
 	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
@@ -189,36 +215,5 @@ public:
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		return {};
-	}
-
-private:
-	void DoPressurePlateStateTransition(cRedstoneHandler::PoweringData PreviousPower, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE PreviousPlateState, unsigned char * Power, cRedstoneHandler::ENUM_PRESSURE_PLATE_STATE* NextPressurePlateState) const
-	{
-		switch (PreviousPlateState)
-		{
-		case E_PRESSURE_PLATE_INITIALLY_PRESSED:
-			if (*Power == 0)
-			{
-				*Power = PreviousPower.PowerLevel;
-			}
-			*NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
-			break;
-		case E_PRESSURE_PLATE_HELD_DOWN:
-			if (*Power == 0)
-			{
-				*Power = PreviousPower.PowerLevel;
-			}
-			*NextPressurePlateState = E_PRESSURE_PLATE_HELD_DOWN;
-			break;
-		case E_PRESSURE_PLATE_RAISED:
-			if (*Power != 0)
-			{
-				*NextPressurePlateState = E_PRESSURE_PLATE_INITIALLY_PRESSED;
-			}
-			break;
-		case E_PRESSURE_PLATE_WANTS_TO_RELEASE:
-			*NextPressurePlateState = E_PRESSURE_PLATE_RAISED;
-			break;
-		}
 	}
 };
