@@ -696,6 +696,10 @@ public:
 		return GetStackValue(a_StackPos, a_ReturnedVal.GetDest());
 	}
 
+	/** Retrieves any Vector3 value and coerces it into a Vector3<T>. */
+	template <typename T>
+	bool GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal);
+
 	/** Pushes the named value in the table at the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
 	If the value is found, it is pushed on top of the stack and the returned cStackValue is valid.
@@ -805,9 +809,14 @@ public:
 	Returns false and logs a special warning ("wrong calling convention") if not. */
 	bool CheckParamStaticSelf(const char * a_SelfClassName);
 
-	bool IsParamUserType(int a_Param, AString a_UserType);
+	/** Returns true if the specified parameter is of the specified class. */
+	bool IsParamUserType(int a_ParamIdx, AString a_UserType);
 
-	bool IsParamNumber(int a_Param);
+	/** Returns true if the specified parameter is a number. */
+	bool IsParamNumber(int a_ParamIdx);
+
+	/** Returns true if the specified parameter is any of the Vector3 types. */
+	bool IsParamVector3(int a_ParamIdx);
 
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
 	bool ReportErrors(int status);
@@ -1027,7 +1036,12 @@ protected:
 	/** Removes the specified reference from tracking.
 	The reference will no longer be invalidated when this Lua state is about to be closed. */
 	void UntrackRef(cTrackedRef & a_Ref);
-} ;
+};  // cLuaState
+
+// Instantiate the GetStackValue(Vector3<>) function for all Vector3 types:
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3d & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3f & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_ReturnedVal);
 
 
 

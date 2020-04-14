@@ -39,10 +39,8 @@ static bool CheckParamVectorOr3Numbers(cLuaState & L, const char * a_VectorName,
 template <typename T>
 static bool GetStackVectorOr3Numbers(cLuaState & L, int a_Index, Vector3<T> & a_Return)
 {
-	Vector3<T> * UserType;
-	if (L.GetStackValue(a_Index, UserType))
+	if (L.GetStackValue(a_Index, a_Return))
 	{
-		a_Return = *UserType;
 		return true;
 	}
 	return L.GetStackValues(a_Index, a_Return.x, a_Return.y, a_Return.z);
@@ -367,10 +365,10 @@ static int tolua_cWorld_DoExplosionAt(lua_State * tolua_S)
 		case esBed:
 		{
 			// esBed receives a Vector3i SourceData param:
-			Vector3i * pos = nullptr;
+			Vector3i pos;
 			L.GetStackValue(8, pos);
 			SourceType = esBed;
-			SourceData = pos;
+			SourceData = &pos;
 			break;
 		}
 
@@ -481,16 +479,11 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 
 	// Get parameters:
 	cWorld * Self;
-	Vector3d * Position;
+	Vector3d Position;
 	double RangeLimit;
 	cLuaState::cRef FnRef;
 	bool CheckLineOfSight = true, IgnoreSpectators = true;  // Defaults for the optional params
 	L.GetStackValues(1, Self, Position, RangeLimit, FnRef, CheckLineOfSight, IgnoreSpectators);
-
-	if (Position == nullptr)
-	{
-		return L.ApiParamError("Expected a non-nil Vector3d for parameter #2");
-	}
 
 	if (!FnRef.IsValid())
 	{
@@ -498,7 +491,7 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->DoWithNearestPlayer(*Position, RangeLimit, [&](cPlayer & a_Player)
+	bool res = Self->DoWithNearestPlayer(Position, RangeLimit, [&](cPlayer & a_Player)
 	{
 		bool ret = false;
 		L.Call(FnRef, &a_Player, cLuaState::Return, ret);
@@ -895,7 +888,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 	}
 
 	cWorld * self = nullptr;
-	Vector3d * Position = nullptr;
+	Vector3d Position;
 	int Reward;
 	L.GetStackValues(1, self, Position, Reward);
 	if (self == nullptr)
@@ -903,14 +896,9 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 		tolua_error(tolua_S, "Invalid 'self' in function 'SpawnSplitExperienceOrbs'", nullptr);
 		return 0;
 	}
-	if (Position == nullptr)
-	{
-		tolua_error(tolua_S, "Error in function 'SpawnSplitExperienceOrbs' arg #2. Value must not be nil.", nullptr);
-		return 0;
-	}
 
 	// Execute and push result:
-	L.Push(self->SpawnExperienceOrb(Position->x, Position->y, Position->z, Reward));
+	L.Push(self->SpawnExperienceOrb(Position, Reward));
 	return 1;
 }
 

@@ -1727,6 +1727,26 @@ end
 
 
 
+function HandleVectorCmd(a_Split, a_Player)
+	a_Player:SendMessage("Testing the Vector3 APIs...")
+
+	-- Test the Vector3 coercion in ManualBindings - any Vector3 type should be accepted for any Vector3 parameter:
+	local pos = a_Player:GetPosition()
+	local c = cCuboid:new()
+	c:Assign(pos - Vector3d(2, 2, 2), pos + Vector3d(2, 2, 2))
+	assert(c:IsInside(Vector3d(pos)))
+	assert(c:IsInside(Vector3f(pos)))
+	assert(c:IsInside(Vector3i(pos)))
+	assert(c:IsInside({pos.x, pos.y, pos.z}))
+
+	a_Player:SendMessage("Test successful.")
+	return true
+end
+
+
+
+
+
 function HandleWESel(a_Split, a_Player)
 	-- Check if the selection is a cuboid:
 	local IsCuboid = cPluginManager:CallPlugin("WorldEdit", "IsPlayerSelectionCuboid")
