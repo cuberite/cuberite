@@ -117,6 +117,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
+		case E_BLOCK_CACTUS:             return new cItemCactusHandler(a_ItemType);
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
@@ -217,11 +218,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		case E_ITEM_BEETROOT_SEEDS:
-		case E_BLOCK_CACTUS:
-		{
-			return new cItemCactusHandler(a_ItemType);
-		}
-
 		case E_ITEM_MELON_SEEDS:
 		case E_ITEM_PUMPKIN_SEEDS:
 		case E_ITEM_SEEDS:

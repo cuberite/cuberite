@@ -422,6 +422,24 @@ void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace
 
 
 
+Vector3i GetBlockNextTo(Vector3i a_CurrentPosition, eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return Vector3i(a_CurrentPosition.x - 1, a_CurrentPosition.y, a_CurrentPosition.z);
+		case BLOCK_FACE_XP: return Vector3i(a_CurrentPosition.x + 1, a_CurrentPosition.y, a_CurrentPosition.z);
+		case BLOCK_FACE_YM: return Vector3i(a_CurrentPosition.x, a_CurrentPosition.y - 1, a_CurrentPosition.z);
+		case BLOCK_FACE_YP: return Vector3i(a_CurrentPosition.x, a_CurrentPosition.y + 1, a_CurrentPosition.z);
+		case BLOCK_FACE_ZM: return Vector3i(a_CurrentPosition.x, a_CurrentPosition.y, a_CurrentPosition.z - 1);
+		case BLOCK_FACE_ZP: return Vector3i(a_CurrentPosition.x, a_CurrentPosition.y, a_CurrentPosition.z + 1);
+		default: return a_CurrentPosition;
+	}
+}
+
+
+
+
+
 bool ItemCategory::IsPickaxe(short a_ItemType)
 {
 	switch (a_ItemType)
