@@ -809,9 +809,14 @@ public:
 	Returns false and logs a special warning ("wrong calling convention") if not. */
 	bool CheckParamStaticSelf(const char * a_SelfClassName);
 
-	bool IsParamUserType(int a_Param, AString a_UserType);
+	/** Returns true if the specified parameter is of the specified class. */
+	bool IsParamUserType(int a_ParamIdx, AString a_UserType);
 
-	bool IsParamNumber(int a_Param);
+	/** Returns true if the specified parameter is a number. */
+	bool IsParamNumber(int a_ParamIdx);
+
+	/** Returns true if the specified parameter is any of the Vector3 types. */
+	bool IsParamVector3(int a_ParamIdx);
 
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
 	bool ReportErrors(int status);

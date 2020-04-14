@@ -1988,24 +1988,40 @@ bool cLuaState::CheckParamStaticSelf(const char * a_SelfClassName)
 
 
 
-bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
+bool cLuaState::IsParamUserType(int a_ParamIdx, AString a_UserType)
 {
 	ASSERT(IsValid());
 
 	tolua_Error tolua_err;
-	return (tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err) == 1);
+	return (tolua_isusertype(m_LuaState, a_ParamIdx, a_UserType.c_str(), 0, &tolua_err) == 1);
 }
 
 
 
 
 
-bool cLuaState::IsParamNumber(int a_Param)
+bool cLuaState::IsParamNumber(int a_ParamIdx)
 {
 	ASSERT(IsValid());
 
 	tolua_Error tolua_err;
-	return (tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err) == 1);
+	return (tolua_isnumber(m_LuaState, a_ParamIdx, 0, &tolua_err) == 1);
+}
+
+
+
+
+
+bool cLuaState::IsParamVector3(int a_ParamIdx)
+{
+	ASSERT(IsValid());
+
+	return (
+		IsParamUserType(a_ParamIdx, "Vector3<double>") ||
+		IsParamUserType(a_ParamIdx, "Vector3<float>") ||
+		IsParamUserType(a_ParamIdx, "Vector3<int>") ||
+		lua_istable(m_LuaState, a_ParamIdx)  // Assume any table is good enough
+	);
 }
 
 
