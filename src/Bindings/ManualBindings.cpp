@@ -2967,7 +2967,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 	{
 		// This is the Vector3-based variant of the call:
 		if (
-			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			!L.CheckParamVector3(idx + 1, idx + 2) ||
 			!L.CheckParamEnd(idx + 3)
 		)
 		{
@@ -3061,11 +3061,11 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		return 1;
 	}
 
-	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	if (L.IsParamVector3(idx + 1))
 	{
-		// This is the Vector3d-based variant of the call:
+		// This is the Vector3-based variant of the call:
 		if (
-			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			!L.CheckParamVector3(idx + 1, idx + 2) ||
 			// Optional param lineOfSight is not checked
 			!L.CheckParamEnd(idx + 4)
 		)
@@ -3089,7 +3089,7 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		return 1;
 	}
 
-	tolua_error(L, "cLineBlockTracer:LineOfSightTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	tolua_error(L, "cLineBlockTracer:LineOfSightTrace(): Invalid parameters, expected either a set of coords, or two Vector3's", nullptr);
 	return 0;
 }
 

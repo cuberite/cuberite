@@ -1877,6 +1877,32 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 
 
 
+bool cLuaState::CheckParamVector3(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+
+	for (int i = a_StartParam; i <= a_EndParam; ++i)
+	{
+		if (IsParamVector3(a_StartParam))
+		{
+			continue;
+		}
+
+		ApiParamError("Failed to read parameter #%d. Vector3 expected, got %s", i, GetTypeText(i).c_str());
+		return false;
+	}
+	return true;
+}
+
+
+
+
+
 bool cLuaState::CheckParamUUID(int a_StartParam, int a_EndParam)
 {
 	ASSERT(IsValid());
