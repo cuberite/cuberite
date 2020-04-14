@@ -798,6 +798,10 @@ public:
 	Accepts either cUUID instances or strings that contain UUIDs */
 	bool CheckParamUUID(int a_StartParam, int a_EndParam = -1);
 
+	/** Returns true if the specified parameters on the stack are Vector3s; also logs warning if not.
+	Accepts any Vector3 type instances or tables. */
+	bool CheckParamVector3(int a_StartParam, int a_EndParam = -1);
+
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 
