@@ -167,12 +167,10 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 		)
 		{
 			SetFurColor(ColorInheritance[i].Child);
-			m_World->BroadcastEntityMetadata(*this);
 			return;
 		}
 	}
 	SetFurColor(GetRandomProvider().RandBool() ? Parent1->GetFurColor() : Parent2->GetFurColor());
-	m_World->BroadcastEntityMetadata(*this);
 }
 
 
