@@ -63,7 +63,10 @@ cServerHandleImpl::~cServerHandleImpl()
 void cServerHandleImpl::Close(void)
 {
 	// Stop the listener sockets:
-	evconnlistener_disable(m_ConnListener);
+	if (m_ConnListener != nullptr)
+	{
+		evconnlistener_disable(m_ConnListener);
+	}
 	if (m_SecondaryConnListener != nullptr)
 	{
 		evconnlistener_disable(m_SecondaryConnListener);
