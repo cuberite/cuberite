@@ -66,12 +66,10 @@ void cServerHandleImpl::Close(void)
 	if (m_ConnListener != nullptr)
 	{
 		evconnlistener_disable(m_ConnListener);
-		m_ConnListener = nullptr;
 	}
 	if (m_SecondaryConnListener != nullptr)
 	{
 		evconnlistener_disable(m_SecondaryConnListener);
-		m_SecondaryConnListener = nullptr;
 	}
 	m_IsListening = false;
 
