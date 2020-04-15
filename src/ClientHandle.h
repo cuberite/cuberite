@@ -343,6 +343,10 @@ public:  // tolua_export
 	/** Handles a player opening their inventory while riding a horse.
 	@param a_EntityID ID of the player that is to open the inventory. Should be the same as GetPlayer()->GetUniqueID().  */
 	void HandleOpenHorseInventory(UInt32 a_EntityID);
+	
+	/** Handles a player starting a flight at the elytra.
+	@param a_EntityID ID of the player who must start flight. Must be the same as GetPlayer () -> GetUniqueID (). */
+	void HandleStartElytraFlight(UInt32 a_EntityID);
 
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
