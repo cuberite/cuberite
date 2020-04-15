@@ -679,6 +679,11 @@ void cClientHandle::HandleOpenHorseInventory(UInt32 a_EntityID)
 	}
 }
 
+void cClientHandle::HandleStartElytraFlight(UInt32 a_EntityID)
+{
+	// TODO
+	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+}
 
 
 
