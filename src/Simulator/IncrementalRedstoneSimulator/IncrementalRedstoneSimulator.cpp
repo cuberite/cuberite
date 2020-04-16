@@ -18,6 +18,7 @@
 #include "PistonHandler.h"
 #include "SmallGateHandler.h"
 #include "NoteBlockHandler.h"
+#include "ObserverHandler.h"
 #include "TNTHandler.h"
 #include "PoweredRailHandler.h"
 #include "PressurePlateHandler.h"
@@ -89,6 +90,8 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 
 		case E_BLOCK_REDSTONE_TORCH_OFF:
 		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>();
+
+		case E_BLOCK_OBSERVER: return cpp14::make_unique<cObserverHandler>();
 
 		case E_BLOCK_PISTON:
 		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>();

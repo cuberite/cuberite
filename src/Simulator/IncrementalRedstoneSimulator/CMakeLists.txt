@@ -22,6 +22,7 @@ set (HDRS
 	PistonHandler.h
 	SmallGateHandler.h
 	NoteBlockHandler.h
+	ObserverHandler.h
 	TNTHandler.h
 	TrappedChestHandler.h
 	TripwireHookHandler.h
