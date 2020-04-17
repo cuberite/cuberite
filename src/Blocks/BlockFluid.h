@@ -153,7 +153,7 @@ public:
 		BLOCKTYPE BlockType;
 		if (
 			!cChunkDef::IsValidHeight(Pos.y) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_RelPos, BlockType) ||
+			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
 			!cFireSimulator::IsFuel(BlockType)
 		)
 		{
