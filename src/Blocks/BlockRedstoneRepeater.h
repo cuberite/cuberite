@@ -77,38 +77,42 @@ public:
 		return 11;
 	}
 
-
-	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
-			case 0x0: return {0, 0, 1};
-			case 0x1: return {-1, 0, 0};
-			case 0x2: return {0, 0, -1};
-			case 0x3: return {1, 0, 0};
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
+
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return {0, 0, 0};
+				return { 0, 0, 0 };
 			}
 		}
 	}
 
-
 	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
+		return -GetRearCoordinateOffset(a_Meta);
+	}
+
+	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
-			case 0x0: return {0, 0, -1};
-			case 0x1: return {1, 0, 0};
-			case 0x2: return {0, 0, 1};
-			case 0x3: return {-1, 0, 0};
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return {0, 0, 0};
+				return { 0, 0, 0 };
 			}
 		}
 	}
