@@ -188,6 +188,7 @@ public:
 
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 
+	bool IsArrow       (void) const { return IsA("cArrowEntity");              }
 	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
