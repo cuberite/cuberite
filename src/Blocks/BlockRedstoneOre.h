@@ -12,9 +12,10 @@ class cBlockRedstoneOreHandler :
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
+
 public:
 
-	using Super::Super;
+	using Super::Super;  // Inherit constructor from base
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -55,19 +56,19 @@ class cBlockGlowingRedstoneOreHandler:
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
+
 public:
 
-	using Super::Super;
+	using Super::Super;  // Inherit constructor from base
 
 	virtual void OnUpdate(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
 		cBlockPluginInterface & a_BlockPluginInterface,
 		cChunk & a_Chunk,
-		int a_RelX, int a_RelY, int a_RelZ
+		const Vector3i a_RelPos
 	) override
 	{
-		const Vector3i a_RelPos{a_RelX, a_RelY, a_RelZ};
 		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE, 0);
 	}
