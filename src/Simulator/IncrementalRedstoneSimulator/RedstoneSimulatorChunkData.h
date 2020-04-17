@@ -44,6 +44,7 @@ public:
 	void ErasePowerData(const Vector3i & a_Position)
 	{
 		m_CachedPowerLevels.erase(a_Position);
+		m_MechanismDelays.erase(a_Position);
 	}
 
 	cRedstoneHandler::PoweringData ExchangeUpdateOncePowerData(const Vector3i & a_Position, cRedstoneHandler::PoweringData a_PoweringData)
