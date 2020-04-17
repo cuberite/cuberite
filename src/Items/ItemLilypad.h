@@ -66,7 +66,7 @@ public:
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);	
+		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
 
 		if (!Callbacks.m_HasHitLilyPadSurface)
 		{
@@ -87,7 +87,7 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
-		// First do lily pad specific checks for water/ice under the lilypad or water in the place of the pad
+		// First do lily pad specific checks for water or ice under the lilypad or water in the place of the pad
 		Vector3i PlacementPos = GetBlockNextTo(Vector3i(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace);
 
 		// If the block where we are trying to place is a water block, try placing on top of the water block instead
