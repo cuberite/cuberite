@@ -178,6 +178,16 @@ public:
 		);
 	}
 
+	/** Returns a new Vector3i with coords set to std::ceil() of this vector's coords. */
+	inline Vector3<int> Ceil() const
+	{
+		return Vector3<int>(
+			CeilC(x),
+			CeilC(y),
+			CeilC(z)
+		);
+	}
+
 	// tolua_end
 
 	inline bool operator != (const Vector3<T> & a_Rhs) const
