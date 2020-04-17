@@ -518,6 +518,43 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
+/** function: cWorld:SetNextBlockTick */
+static int tolua_cWorld_SetNextBlockTick(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cWorld") ||
+		!LuaState.CheckParamNumber(2, 4) ||
+		!LuaState.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cWorld * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+
+	if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetNextBlockTick'", nullptr);
+	}
+	Self->SetNextBlockToTick({BlockX, BlockY, BlockZ});
+	LOGWARNING("Warning: 'cWorld:SetNextBlockTick' function is deprecated. Please use 'cWorld:SetNextBlockToTick' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
 void DeprecatedBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -558,6 +595,7 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cWorld");
+		tolua_function(tolua_S, "SetNextBlockTick", tolua_cWorld_SetNextBlockTick);
 		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
 	tolua_endmodule(tolua_S);
 

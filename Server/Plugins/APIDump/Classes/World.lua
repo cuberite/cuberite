@@ -3032,7 +3032,18 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Sets the blockticking to start at the specified block in the next tick.",
+				Notes = "DEPRECATED, use SetNextBlockToTick() instead.",
+			},
+			SetNextBlockToTick =
+			{
+				Params =
+				{
+					{
+						Name = "BlockPos",
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Requests that the specified block be ticked at the start of the next world tick. Only one block per chunk can be queued this way; a second call to the same chunk overwrites the previous call.",
 			},
 			SetSavingEnabled =
 			{

@@ -590,9 +590,9 @@ bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 
 
 
-void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::SetNextBlockToTick(const Vector3i a_BlockPos)
 {
-	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->SetNextBlockToTick(a_BlockPos);
 }
 
 
@@ -3195,7 +3195,7 @@ void cWorld::TickQueuedBlocks(void)
 		if (Block->TicksToWait <= 0)
 		{
 			// TODO: Handle the case when the chunk is already unloaded
-			m_ChunkMap->TickBlock(Block->X, Block->Y, Block->Z);
+			m_ChunkMap->TickBlock({Block->X, Block->Y, Block->Z});
 			delete Block;  // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else

@@ -373,8 +373,10 @@ public:
 	Returns the number of stages the plant has grown, 0 if not a plant. */
 	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
 
-	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
-	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Causes the specified block to be ticked on the next Tick() call.
+	Plugins can use this via the cWorld:SetNextBlockToTick() API.
+	Only one block coord per chunk may be set, a second call overwrites the first call */
+	void SetNextBlockToTick(const Vector3i a_BlockPos);
 
 	/** Make a Mob census, of all mobs, their family, their chunk and their distance to closest player */
 	void CollectMobCensus(cMobCensus & a_ToFill);
@@ -385,7 +387,7 @@ public:
 	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
-	void TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void TickBlock(const Vector3i a_BlockPos);
 
 	void UnloadUnusedChunks(void);
 	void SaveAllChunks(void);

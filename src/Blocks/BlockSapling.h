@@ -43,26 +43,31 @@ public:
 
 
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		NIBBLETYPE Light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY, a_RelZ)));
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
+		auto Light = std::max(a_Chunk.GetBlockLight(a_RelPos), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelPos)));
 
 		// Only grow if we have the right amount of light
 		if (Light > 8)
 		{
 			auto & random = GetRandomProvider();
 			// Only grow if we are in the right growth stage and have the right amount of space around them.
-			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelX, a_RelY, a_RelZ, Meta))
+			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelPos.x, a_RelPos.y, a_RelPos.z, Meta))
 			{
-				int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-				int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-				a_Chunk.GetWorld()->GrowTree(BlockX, a_RelY, BlockZ);
+				auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+				a_Chunk.GetWorld()->GrowTree(WorldPos.x, WorldPos.y, WorldPos.z);
 			}
 			// Only move to the next growth stage if we haven't gone there yet
 			else if (((Meta & 0x08) == 0) && random.RandBool(0.45))
 			{
-				a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x08);
+				a_Chunk.SetMeta(a_RelPos, Meta | 0x08);
 			}
 		}
 	}

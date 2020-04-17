@@ -30,8 +30,14 @@ public:
 	virtual ~cBlockHandler() {}
 
 	/** Called when the block gets ticked either by a random tick or by a queued tick.
-	Note that the coords are chunk-relative! */
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	Note that the coords in a_RelPos are chunk-relative! */
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_BlockPluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	);
 
 	/** Returns the relative bounding box that must be entity-free in
 	order for the block to be placed. a_XM, a_XP, etc. stand for the
@@ -108,7 +114,14 @@ public:
 	static void NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_NeighborPos, eBlockFace a_WhichNeighbor);
 
 	/** Called when the player starts digging the block. */
-	virtual void OnDigging(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {}
+	virtual void OnDigging(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ
+	)
+	{
+	}
 
 	/** Called if the user right clicks the block and the block is useable
 	returns true if the use was successful, return false to use the block as a "normal" block */

@@ -2030,16 +2030,16 @@ int cChunkMap::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 
 
 
-void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::SetNextBlockToTick(const Vector3i a_BlockPos)
 {
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
+	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, ChunkPos);
 
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
+	auto Chunk = GetChunkNoLoad(ChunkPos);
 	if (Chunk != nullptr)
 	{
-		Chunk->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
+		Chunk->SetNextBlockToTick(RelPos);
 	}
 }
 
@@ -2100,17 +2100,17 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 
 
 
-void cChunkMap::TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::TickBlock(const Vector3i a_BlockPos)
 {
+	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
+	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, ChunkPos);
 	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
+	auto Chunk = GetChunkNoLoad(ChunkPos);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return;
 	}
-	Chunk->TickBlock(a_BlockX, a_BlockY, a_BlockZ);
+	Chunk->TickBlock(RelPos);
 }
 
 

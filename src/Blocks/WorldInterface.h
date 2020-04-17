@@ -73,6 +73,10 @@ public:
 	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches the specified block position. */
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
+
 	/** Returns or sets the minumim or maximum netherportal width */
 	virtual int GetMinNetherPortalWidth(void) const = 0;
 	virtual int GetMaxNetherPortalWidth(void) const = 0;
