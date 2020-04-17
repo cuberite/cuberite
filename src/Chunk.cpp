@@ -856,7 +856,7 @@ void cChunk::TickBlocks(void)
 	}  // for i
 
 	// Set a new random coord for the next tick:
-	m_BlockToTick = cChunkDef::IndexToCoordinate(Idx);
+	m_BlockToTick = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
 }
 
 
