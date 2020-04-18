@@ -144,10 +144,20 @@ public:
 		return 0;
 	}
 
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_Meta)
+	{
+		if (a_Meta & 0x08)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	/** Checks if the button is already on or if there an arrow in a wooden button */
 	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
-		if (a_Meta & 0x08)
+		if (IsButtonOn(a_Meta))
 		{
 			return true;
 		}
@@ -206,7 +216,6 @@ private:
 		return Vector3d(0, 0, 0);
 	}
 } ;
-
 
 
 

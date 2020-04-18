@@ -125,9 +125,11 @@ public:
 			}
 
 			// Release button process
+			auto soundToPlay = (a_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_off" : "block.wood_button.click_off");
+
 			a_World.SetBlockMeta(a_Position, a_World.GetBlockMeta(a_Position) & 0x07, false);
 			a_World.WakeUpSimulators(a_Position);
-			a_World.BroadcastSoundEffect("block.stone_button.click_off", a_Position, 0.5f, 0.5f);
+			a_World.BroadcastSoundEffect(soundToPlay, a_Position, 0.5f, 0.5f);
 
 			ChunkData->m_MechanismDelays.erase(a_Position);
 			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
