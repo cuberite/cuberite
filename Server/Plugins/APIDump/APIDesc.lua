@@ -13224,46 +13224,74 @@ end
 			{
 				AddFaceDirection =
 				{
-					Params =
 					{
+						Params =
 						{
-							Name = "BlockX",
-							Type = "number",
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockFace",
+								Type = "eBlockFace",
+							},
+							{
+								Name = "IsInverse",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
+						Returns =
 						{
-							Name = "BlockY",
-							Type = "number",
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
 						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockFace",
-							Type = "eBlockFace",
-						},
-						{
-							Name = "IsInverse",
-							Type = "boolean",
-							IsOptional = true,
-						},
+						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 					},
-					Returns =
 					{
+						Params =
 						{
-							Name = "BlockX",
-							Type = "number",
+							{
+								Name = "BlockPos",
+								Type = "Vector3i",
+							},
+							{
+								Name = "BlockFace",
+								Type = "eBlockFace",
+							},
+							{
+								Name = "IsInverse",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
+						Returns =
 						{
-							Name = "BlockY",
-							Type = "number",
+							{
+								Name = "BlockPos",
+								Type = "Vector3i",
+							},
 						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
+						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 					},
-					Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 				},
 				Base64Decode =
 				{
