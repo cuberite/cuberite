@@ -46,7 +46,7 @@ public:
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
-		if (auto ChunkData = dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData())
+		if (dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData() != nullptr)
 		{
 			// Delay managed in Update-function of cRedstoneToggleHandler
 			return true;
