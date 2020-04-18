@@ -154,13 +154,14 @@ public:
 		return false;
 	}
 
-	/** Checks if the button is already on or if there an arrow in a wooden button */
+	/** Returns true if the button is on and handles arrows stuck in a wooden button */
 	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		if (IsButtonOn(a_Meta))
 		{
 			return true;
 		}
+
 		if ((a_BlockType == E_BLOCK_WOODEN_BUTTON) && (HandleArrowInIt(a_World, a_Position, a_Meta)))
 		{
 			a_World.SetBlockMeta(a_Position, a_World.GetBlockMeta(a_Position) | 0x08, false);
@@ -170,6 +171,7 @@ public:
 			a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", a_Position, 0.5f, 0.6f);
 			return true;
 		}
+
 		return false;
 	}
 
