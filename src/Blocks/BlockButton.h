@@ -46,10 +46,26 @@ public:
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
-		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 10 : 15;
-
-		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData();
-		ChunkData->m_MechanismDelays[Pos] = std::make_pair(TickDelay, false);
+		if (auto ChunkData = dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData())
+		{
+			auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 10 : 15;
+			ChunkData->m_MechanismDelays[Pos] = std::make_pair(TickDelay, false);
+		}
+		else
+		{
+			auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+			a_Player.GetWorld()->ScheduleTask(TickDelay, [SoundPos, Pos, this](cWorld & a_World)
+				{
+					if (a_World.GetBlock(Pos) == m_BlockType)
+					{
+						// Block hasn't change in the meantime; set its meta
+						a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
+						a_World.WakeUpSimulators(Pos);
+						a_World.BroadcastSoundEffect("block.stone_button.click_off", SoundPos, 0.5f, 0.5f);
+					}
+				}
+			);
+		}
 
 		return true;
 	}
@@ -126,6 +142,16 @@ public:
 	}
 
 	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_Meta)
+	{
+		if (a_Meta & 0x08)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/** Extracts the ON bit from metadata and returns if true if it is set and checks for arrows in the button */
 	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		if (a_Meta & 0x08)
