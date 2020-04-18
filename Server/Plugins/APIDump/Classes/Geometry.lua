@@ -542,6 +542,11 @@ return
 			},
 		},
 	},
+
+
+
+
+
 	cCuboid =
 	{
 		Desc = [[
@@ -911,6 +916,11 @@ return
 			},
 		},
 	},
+
+
+
+
+
 	cLineBlockTracer =
 	{
 		Desc = [[
@@ -1118,6 +1128,11 @@ end
 			},
 		},
 	},
+
+
+
+
+
 	Vector3d =
 	{
 		Desc = [[
@@ -1207,6 +1222,16 @@ end
 					},
 				},
 				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords.",
 			},
 			Clamp =
 			{
@@ -1683,6 +1708,11 @@ end
 			},
 		},
 	},
+
+
+
+
+
 	Vector3f =
 	{
 		Desc = [[
@@ -1772,6 +1802,16 @@ end
 					},
 				},
 				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords.",
 			},
 			Clamp =
 			{
@@ -2280,6 +2320,11 @@ end
 			},
 		},
 	},
+
+
+
+
+
 	Vector3i =
 	{
 		Desc = [[
@@ -2369,6 +2414,16 @@ end
 					},
 				},
 				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords. Normally not too useful with integer-only vectors, but still included for API completeness.",
 			},
 			Clamp =
 			{
