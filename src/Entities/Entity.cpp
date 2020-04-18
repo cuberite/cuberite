@@ -73,6 +73,7 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
+	m_WorldChangeInfo.m_NewWorld = nullptr;
 }
 
 
@@ -1406,7 +1407,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
 				// Nether portal in the overworld
@@ -1438,7 +1439,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
 			}
@@ -1486,7 +1487,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 				// End portal in the overworld
 				else
@@ -1512,7 +1513,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 
 			}
@@ -1576,36 +1577,59 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
+bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
-	ASSERT(a_World != nullptr);
-
 	// Ask the plugins if the entity is allowed to change world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, a_World))
 	{
 		// A Plugin isn't allowing the entity to change world
 		return false;
 	}
 
+	const auto OldWorld = m_WorldChangeInfo.m_NewWorld;
+
 	// Create new world change info
-	auto NewWCI = cpp14::make_unique<sWorldChangeInfo>();
-	*NewWCI = { a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+	// (The last warp command always takes precedence)
+	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
 
-	// Publish atomically
-	auto OldWCI = m_WorldChangeInfo.exchange(std::move(NewWCI));
-
-	if (OldWCI == nullptr)
+	if (OldWorld != nullptr)
 	{
-		// Schedule a new world change.
-		GetWorld()->QueueTask(
-			[this](cWorld & a_CurWorld)
-			{
-				auto WCI = m_WorldChangeInfo.exchange(nullptr);
-				cWorld::cLock Lock(a_CurWorld);
-				DoMoveToWorld(*WCI);
-			}
-		);
+		// Avoid scheduling multiple warp tasks
+		// Only move ahead if we came from a "not warping" state
+		return true;
 	}
+
+	// TODO: move to capture when C++14
+	const auto EntityID = GetUniqueID();
+
+	/* Requirements:
+	Only one world change in-flight at any time
+	No ticking during world changes
+	The last invocation takes effect
+
+	As of writing, cWorld ticks entities, clients, and then processes tasks
+	We may call MoveToWorld (any number of times - consider multiple /portal commands within a tick) in the first and second stages
+	Queue a task onto the third stage to invoke DoMoveToWorld ONCE with the last given destination world
+	Store entity IDs in case client tick found the player disconnected and immediately destroys the object
+
+	After the move begins, no further calls to MoveToWorld is possible since neither the client nor entity is ticked
+	This remains until the warp is complete and the destination world resumes ticking.
+	*/
+	GetWorld()->QueueTask(
+		[EntityID](cWorld & a_CurWorld)
+		{
+			a_CurWorld.DoWithEntityByID(
+				EntityID,
+				[](cEntity & a_Entity)
+				{
+					auto & WCI = a_Entity.m_WorldChangeInfo;
+					a_Entity.DoMoveToWorld(WCI);
+					WCI.m_NewWorld = nullptr;
+					return true;
+				}
+			);
+		}
+	);
 
 	return true;
 }
@@ -1614,9 +1638,9 @@ bool cEntity::MoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPo
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1632,7 +1656,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
