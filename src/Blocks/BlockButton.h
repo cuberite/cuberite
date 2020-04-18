@@ -153,7 +153,7 @@ public:
 	/** Extracts the ON bit from metadata and returns if true if it is set and checks for arrows in the button */
 	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
-		if (a_Meta & 0x08)
+		if (IsButtonOn(a_Meta))
 		{
 			return true;
 		}
@@ -214,7 +214,6 @@ private:
 		return Vector3d(0, 0, 0);
 	}
 } ;
-
 
 
 
