@@ -16594,6 +16594,26 @@ end
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
 				},
+				E_META_REDSTONE_REPEATER_FACING_ZM =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the negative Z direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_XP =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the positive X direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_ZP =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the positive Z direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_XM =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the negative X direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_MASK =
+				{
+					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
+				},
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
