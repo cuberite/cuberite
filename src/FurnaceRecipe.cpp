@@ -290,7 +290,11 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_In
 			{
 				continue;
 			}
-			else
+			else if ((Recipe.In->m_ItemDamage != -1) && (Recipe.In->m_ItemDamage == a_Ingredient.m_ItemDamage))
+			{
+				BestRecipe = &Recipe;
+			}
+			else if (Recipe.In->m_ItemDamage == -1)
 			{
 				BestRecipe = &Recipe;
 			}
