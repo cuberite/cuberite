@@ -103,8 +103,9 @@ public:
 				// ...but pressed anyway?
 				if (a_Meta & 0x08)
 				{
-					// Yes.
-					a_World.SetBlockMeta(a_Position, a_Meta & 0x07, false);
+					// Yes. Set delay to release the button.
+					auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 10 : 15;
+					ChunkData->m_MechanismDelays[a_Position] = std::make_pair(TickDelay, false);
 					a_World.WakeUpSimulators(a_Position);
 					return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
 				}

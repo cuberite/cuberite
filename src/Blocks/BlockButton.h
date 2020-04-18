@@ -48,24 +48,23 @@ public:
 		// Queue a button reset (unpress)
 		if (auto ChunkData = dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData())
 		{
-			auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 10 : 15;
-			ChunkData->m_MechanismDelays[Pos] = std::make_pair(TickDelay, false);
+			// Delay managed in Update-function of cRedstoneToggleHandler
+			return true;
 		}
-		else
-		{
-			auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-			a_Player.GetWorld()->ScheduleTask(TickDelay, [SoundPos, Pos, this](cWorld & a_World)
+
+		// noop-mode should show the buttons being pressed in at least
+		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		a_Player.GetWorld()->ScheduleTask(TickDelay, [SoundPos, Pos, this](cWorld & a_World)
+			{
+				if (a_World.GetBlock(Pos) == m_BlockType)
 				{
-					if (a_World.GetBlock(Pos) == m_BlockType)
-					{
-						// Block hasn't change in the meantime; set its meta
-						a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
-						a_World.WakeUpSimulators(Pos);
-						a_World.BroadcastSoundEffect("block.stone_button.click_off", SoundPos, 0.5f, 0.5f);
-					}
+					// Block hasn't change in the meantime; set its meta
+					a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
+					a_World.WakeUpSimulators(Pos);
+					a_World.BroadcastSoundEffect("block.stone_button.click_off", SoundPos, 0.5f, 0.5f);
 				}
-			);
-		}
+			}
+		);
 
 		return true;
 	}
