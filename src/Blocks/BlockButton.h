@@ -60,12 +60,12 @@ public:
 			{
 				if (a_World.GetBlock(Pos) == m_BlockType)
 				{
-					// Block hasn't change in the meantime; set its meta
-					auto soundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_off" : "block.wood_button.click_off");
+					// Block hasn't change in the meantime; release it
+					auto soundToPlayOnRelease = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_off" : "block.wood_button.click_off");
 
 					a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
 					a_World.WakeUpSimulators(Pos);
-					a_World.BroadcastSoundEffect(soundToPlay, SoundPos, 0.5f, 0.5f);
+					a_World.BroadcastSoundEffect(soundToPlayOnRelease, SoundPos, 0.5f, 0.5f);
 				}
 			}
 		);
