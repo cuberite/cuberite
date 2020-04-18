@@ -80,8 +80,8 @@ public:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_LEVER: return cBlockLeverHandler::IsLeverOn(a_Meta) ? 15 : 0;
-			case E_BLOCK_STONE_BUTTON: return cBlockButtonHandler::IsButtonOn(a_Meta) ? 15 : 0;
-			case E_BLOCK_WOODEN_BUTTON: return cBlockButtonHandler::IsButtonOn(a_World, a_Position, a_Meta) ? 15 : 0;
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON: return cBlockButtonHandler::IsButtonOn(a_World, a_Position, a_BlockType, a_Meta) ? 15 : 0;
 			default:
 			{
 				ASSERT(!"Unexpected block passed to button/lever handler");
@@ -118,8 +118,8 @@ public:
 				return {};
 			}
 
-			// Check for arrows - delay resetting is done in "HasArrowInIt"-Function
-			if ((a_BlockType == E_BLOCK_WOODEN_BUTTON) && (cBlockButtonHandler::HasArrowInIt(a_World, a_Position, a_Meta)))
+			// Handle arrows if it is a wooden button
+			if ((a_BlockType == E_BLOCK_WOODEN_BUTTON) && (cBlockButtonHandler::HandleArrowInIt(a_World, a_Position, a_Meta)))
 			{
 				return {};
 			}

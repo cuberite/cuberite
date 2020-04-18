@@ -41,9 +41,11 @@ public:
 		// Set p the ON bit to on
 		Meta |= 0x08;
 
+		auto soundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_on" : "block.wood_button.click_on");
+
 		a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta, false);
 		a_WorldInterface.WakeUpSimulators(Pos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(soundToPlay, SoundPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
 		// Queue a button reset (unpress)
 		if (dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData() != nullptr)
@@ -59,9 +61,11 @@ public:
 				if (a_World.GetBlock(Pos) == m_BlockType)
 				{
 					// Block hasn't change in the meantime; set its meta
+					auto soundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_off" : "block.wood_button.click_off");
+
 					a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
 					a_World.WakeUpSimulators(Pos);
-					a_World.BroadcastSoundEffect("block.stone_button.click_off", SoundPos, 0.5f, 0.5f);
+					a_World.BroadcastSoundEffect(soundToPlay, SoundPos, 0.5f, 0.5f);
 				}
 			}
 		);
@@ -140,45 +144,33 @@ public:
 		return 0;
 	}
 
-	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsButtonOn(NIBBLETYPE a_Meta)
+	/** Checks if the button is already on or if there an arrow in a wooden button */
+	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		if (a_Meta & 0x08)
 		{
 			return true;
 		}
-		return false;
-	}
-
-	/** Extracts the ON bit from metadata and returns if true if it is set and checks for arrows in the button */
-	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
-	{
-		if (a_Meta & 0x08)
-		{
-			return true;
-		}
-		if (HasArrowInIt(a_World, a_Position, a_Meta))
+		if ((a_BlockType == E_BLOCK_WOODEN_BUTTON) && (HandleArrowInIt(a_World, a_Position, a_Meta)))
 		{
 			a_World.SetBlockMeta(a_Position, a_World.GetBlockMeta(a_Position) | 0x08, false);
 			a_World.WakeUpSimulators(a_Position);
-			a_World.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", a_Position, 0.5f, 0.6f);
+
+			// sound name is ok to be wood, because only wood gets triggered by arrow
+			a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", a_Position, 0.5f, 0.6f);
 			return true;
 		}
 		return false;
 	}
 
-	static bool HasArrowInIt(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
+	/** Returns true if an arrow was found in the button */
+	static bool HandleArrowInIt(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		auto faceOffset = GetButtonOffsetOnBlock(a_Meta);
 
-		bool FoundArrow = false;
-		a_World.ForEachEntityInBox(cBoundingBox(faceOffset + a_Position, 0.2, 0.2), [&](cEntity & a_Entity)
+		bool FoundArrow = !a_World.ForEachEntityInBox(cBoundingBox(faceOffset + a_Position, 0.2, 0.2), [&](cEntity & a_Entity)
 			{
-				if (a_Entity.IsArrow())
-				{
-					FoundArrow = true;
-				}
-				return false;
+				return a_Entity.IsArrow();
 			}
 		);
 		if (FoundArrow)

@@ -85,6 +85,8 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("entity.arrow.hit", BlockHit, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+
+	// To make buttons get pressed if they got hit by the arrow
 	m_World->WakeUpSimulators(m_HitBlockPos);
 
 	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
