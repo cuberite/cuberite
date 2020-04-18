@@ -195,7 +195,7 @@ private:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
-				return "block.wood_pressureplate.click_on";
+				return "block.stone_pressureplate.click_on";
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 				return "block.wood_pressureplate.click_on";
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
@@ -211,11 +211,11 @@ private:
 
 	static AString GetClickOffSound(BLOCKTYPE a_BlockType)
 	{
-		// manage on-sound
+		// manage off-sound
 		switch (a_BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
-				return "block.wood_pressureplate.click_off";
+				return "block.stone_pressureplate.click_off";
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 				return "block.wood_pressureplate.click_off";
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
