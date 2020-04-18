@@ -74,24 +74,34 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
-	Vector3d Hit = a_HitPos;
-	Hit += GetSpeed().NormalizeCopy() / 100000;  // Make arrow sink into block a bit so it lodges (TODO: investigate how to stop them going so far so that they become black clientside)
+	// Save the direction we're going in before Super resets it
+	auto Speed = GetSpeed();
+	Speed.Normalize();
 
-	Super::OnHitSolidBlock(Hit, a_HitFace);
-	Vector3i BlockHit = Hit.Floor();
+	Super::OnHitSolidBlock(a_HitPos, a_HitFace);
 
-	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
-	m_HitBlockPos = Vector3i(X, Y, Z);
+	/*
+	The line tracer returns the arrow hit position located on the face of a block;
+	if the arrow hit a block at -5, 95, -5 then a_HitPos would start off as -4, 95.5, -4.1,
+	i.e. it collided with the X face.
+
+	Then we add a bit of speed vector to make a_HitPos -4.0001, 95.5, -4.1
+	and floor to get exactly -5, 95, -5 which is stored in m_HitBlockPos.
+	*/
+
+	// Nudge into the block a tiny bit according to its direction of travel
+	// Floor to give the coordinates of the block it crashed into
+	a_HitPos += Speed / 100000;
+	m_HitBlockPos = a_HitPos.Floor();
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("entity.arrow.hit", BlockHit, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("entity.arrow.hit", m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
-	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
+	if ((m_World->GetBlock(m_HitBlockPos) == E_BLOCK_TNT) && IsOnFire())
 	{
-		m_World->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
-		m_World->SpawnPrimedTNT(Vector3d(BlockHit));
+		m_World->SetBlock(m_HitBlockPos, E_BLOCK_AIR, 0);
+		m_World->SpawnPrimedTNT(m_HitBlockPos);
 	}
-
 }
 
 
@@ -202,16 +212,16 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		auto relPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
-		auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
+		auto RelPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
+		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPos);
 
-		if (chunk == nullptr)
+		if (Chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;
 		}
 
-		if (chunk->GetBlock(relPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		if (Chunk->GetBlock(RelPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}
