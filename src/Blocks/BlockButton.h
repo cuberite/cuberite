@@ -4,7 +4,7 @@
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "Mixins.h"
-#include "../Simulator/IncrementalRedstoneSimulator/IncrementalRedstoneSimulator.h"
+#include "ChunkInterface.h"
 
 
 
@@ -30,45 +30,23 @@ public:
 		Vector3i Pos(a_BlockX, a_BlockY, a_BlockZ);
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Pos);
 
-		Vector3d SoundPos(Pos);
-
 		// If button is already on do nothing
-		if (Meta & 0x08)
+		if (IsButtonOn(Meta))
 		{
 			return false;
 		}
 
-		// Set p the ON bit to on
+		// Set the ON bit to on
 		Meta |= 0x08;
 
-		auto soundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_on" : "block.wood_button.click_on");
+		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
-		a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta, false);
+		a_ChunkInterface.SetBlockMeta(Pos, Meta, false);
 		a_WorldInterface.WakeUpSimulators(Pos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(soundToPlay, SoundPos, 0.5f, 0.6f, a_Player.GetClientHandle());
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, Pos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
 		// Queue a button reset (unpress)
-		if (dynamic_cast<cIncrementalRedstoneSimulator *>(a_Player.GetWorld()->GetRedstoneSimulator())->GetChunkData() != nullptr)
-		{
-			// Delay managed in Update-function of cRedstoneToggleHandler
-			return true;
-		}
-
-		// noop-mode should show the buttons being pressed in at least
-		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-		a_Player.GetWorld()->ScheduleTask(TickDelay, [SoundPos, Pos, this](cWorld & a_World)
-			{
-				if (a_World.GetBlock(Pos) == m_BlockType)
-				{
-					// Block hasn't change in the meantime; release it
-					auto soundToPlayOnRelease = (m_BlockType == E_BLOCK_STONE_BUTTON ? "block.stone_button.click_off" : "block.wood_button.click_off");
-
-					a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
-					a_World.WakeUpSimulators(Pos);
-					a_World.BroadcastSoundEffect(soundToPlayOnRelease, SoundPos, 0.5f, 0.5f);
-				}
-			}
-		);
+		QueueButtonRelease(*a_Player.GetWorld(), Pos, m_BlockType);
 
 		return true;
 	}
@@ -147,75 +125,106 @@ public:
 	/** Extracts the ON bit from metadata and returns if true if it is set */
 	static bool IsButtonOn(NIBBLETYPE a_Meta)
 	{
-		if (a_Meta & 0x08)
-		{
-			return true;
-		}
-		return false;
+		return (a_Meta & 0x08) == 0x08;
 	}
 
-	/** Returns true if the button is on and handles arrows stuck in a wooden button */
-	static bool CheckAndUpdateButtonState(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	/** Event handler for an arrow striking a block.
+	Performs appropriate handling if the arrow intersected a wooden button. */
+	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
 	{
-		if (IsButtonOn(a_Meta))
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
+
+		if (
+			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
+			(Type != E_BLOCK_WOODEN_BUTTON) || IsButtonOn(Meta) ||
+			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
+		)
 		{
-			return true;
+			// Bail if we're not specifically a wooden button, or it's already on
+			// or if the arrow didn't intersect. It is very important that nothing is
+			// done if the button is depressed, since the release task will already be queued
+			return;
 		}
 
-		if ((a_BlockType == E_BLOCK_WOODEN_BUTTON) && (HandleArrowInIt(a_World, a_Position, a_Meta)))
-		{
-			a_World.SetBlockMeta(a_Position, a_World.GetBlockMeta(a_Position) | 0x08, false);
-			a_World.WakeUpSimulators(a_Position);
+		a_World.SetBlockMeta(Pos, Meta | 0x08, false);
+		a_World.WakeUpSimulators(Pos);
 
-			// sound name is ok to be wood, because only wood gets triggered by arrow
-			a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", a_Position, 0.5f, 0.6f);
-			return true;
-		}
+		// sound name is ok to be wood, because only wood gets triggered by arrow
+		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
 
-		return false;
+		// Queue a button reset
+		QueueButtonRelease(a_World, Pos, Type);
+	}
+
+private:
+
+	/** Schedules a recurring event at appropriate intervals to release a button at a given position.
+	The given block type is checked when the task is executed to ensure the position still contains a button. */
+	static void QueueButtonRelease(cWorld & a_World, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
+	{
+		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		a_World.ScheduleTask(
+			TickDelay,
+			[a_Position, a_BlockType](cWorld & a_World)
+			{
+				BLOCKTYPE Type;
+				NIBBLETYPE Meta;
+
+				if (
+					!a_World.GetBlockTypeMeta(a_Position, Type, Meta) ||
+					(Type != a_BlockType) ||
+					IsButtonPressedByArrow(a_World, a_Position, Type, Meta)
+				)
+				{
+					// Try again in a little while
+					QueueButtonRelease(a_World, a_Position, a_BlockType);
+					return;
+				}
+
+				// Block hasn't change in the meantime; release it
+				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
+
+				a_World.SetBlockMeta(a_Position, Meta & 0x07, false);
+				a_World.WakeUpSimulators(a_Position);
+				a_World.BroadcastSoundEffect(SoundToPlayOnRelease, a_Position, 0.5f, 0.5f);
+			}
+		);
 	}
 
 	/** Returns true if an arrow was found in the button */
-	static bool HandleArrowInIt(cWorld & a_World, Vector3i a_Position, NIBBLETYPE a_Meta)
+	static bool IsButtonPressedByArrow(cWorld & a_World, const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		auto faceOffset = GetButtonOffsetOnBlock(a_Meta);
-
-		bool FoundArrow = !a_World.ForEachEntityInBox(cBoundingBox(faceOffset + a_Position, 0.2, 0.2), [&](cEntity & a_Entity)
+		const auto FaceOffset = GetButtonOffsetOnBlock(a_Meta);
+		const bool FoundArrow = !a_World.ForEachEntityInBox(
+			cBoundingBox(FaceOffset + a_Position, 0.2, 0.2),
+			[](cEntity & a_Entity)
 			{
 				return a_Entity.IsArrow();
 			}
 		);
-		if (FoundArrow)
-		{
-			auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-			ChunkData->m_MechanismDelays[a_Position] = std::make_pair(1, false);
-		}
+
 		return FoundArrow;
 	}
 
-private:
 	static Vector3d GetButtonOffsetOnBlock(NIBBLETYPE a_Meta)
 	{
 		switch (BlockMetaDataToBlockFace(a_Meta))
 		{
-		case BLOCK_FACE_YM:
-			return Vector3d(0.5, 1, 0.5);
-		case BLOCK_FACE_XP:
-			return Vector3d(0, 0.5, 0.5);
-		case BLOCK_FACE_XM:
-			return Vector3d(1, 0.5, 0.5);
-		case BLOCK_FACE_ZP:
-			return Vector3d(0.5, 0.5, 0);
-		case BLOCK_FACE_ZM:
-			return Vector3d(0.5, 0.5, 1);
-		case BLOCK_FACE_YP:
-			return Vector3d(0.5, 0, 0.5);
-		case BLOCK_FACE_NONE:
-		{
-			ASSERT(!"Unhandled block face!");
+			case BLOCK_FACE_YM: return { 0.5, 1, 0.5 };
+			case BLOCK_FACE_XP: return { 0, 0.5, 0.5 };
+			case BLOCK_FACE_XM: return { 1, 0.5, 0.5 };
+			case BLOCK_FACE_ZP: return { 0.5, 0.5, 0 };
+			case BLOCK_FACE_ZM: return { 0.5, 0.5, 1 };
+			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
+			case BLOCK_FACE_NONE:
+			default:
+			{
+				ASSERT(!"Unhandled block face!");
+				return { 0, 0, 0 };
+			}
 		}
-		}
-		return Vector3d(0, 0, 0);
 	}
 } ;
 

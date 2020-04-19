@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "ArrowEntity.h"
 #include "../Chunk.h"
+#include "../Blocks/BlockButton.h"
 
 
 
@@ -105,6 +106,8 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 		m_World->SetBlock(m_HitBlockPos, E_BLOCK_AIR, 0);
 		m_World->SpawnPrimedTNT(m_HitBlockPos);
 	}
+
+	cBlockButtonHandler::OnArrowHit(*m_World, m_HitBlockPos, a_HitFace);
 }
 
 
