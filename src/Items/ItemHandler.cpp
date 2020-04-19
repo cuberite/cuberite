@@ -371,11 +371,13 @@ bool cItemHandler::OnPlayerPlace(
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	auto blockHandler = BlockHandler(ClickedBlockType);
+	auto HandlerB = BlockHandler(ClickedBlockType);
 	auto PlacedBlockPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-	if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+	if (HandlerB->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 	{
+		// Replace the clicked block:
 		a_World.DropBlockAsPickups(a_ClickedBlockPos, &a_Player, nullptr);
+		PlacedBlockPos = a_ClickedBlockPos;
 	}
 	else
 	{
