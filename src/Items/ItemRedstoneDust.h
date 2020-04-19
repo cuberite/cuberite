@@ -34,15 +34,18 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_ClickedBlockPos,
+		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		// Check the block below, if it supports dust on top of it:
-		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace, true);
-		auto UnderPos = PlacePos.addedY(-1);
+		auto UnderPos = a_PlacedBlockPos.addedY(-1);
+		if (UnderPos.y <= 0)
+		{
+			return false;
+		}
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		if (!a_World->GetBlockTypeMeta(UnderPos, BlockType, BlockMeta))

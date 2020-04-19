@@ -25,7 +25,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_ClickedBlockPos,
+		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
@@ -33,7 +33,7 @@ public:
 	{
 		bool res = Super::GetPlacementBlockTypeMeta(
 			a_World, a_Player,
-			a_ClickedBlockPos, a_ClickedBlockFace,
+			a_PlacedBlockPos, a_ClickedBlockFace,
 			a_CursorPos,
 			a_BlockType, a_BlockMeta
 		);

@@ -36,20 +36,20 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_ClickedBlockPos,
+		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		// Only allow planting seeds from the top side of the block:
-		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
+		if ((a_ClickedBlockFace != BLOCK_FACE_TOP) || (a_PlacedBlockPos.y <= 0))
 		{
 			return false;
 		}
 
 		// Only allow placement on farmland
-		if (a_World->GetBlock(a_ClickedBlockPos) != E_BLOCK_FARMLAND)
+		if (a_World->GetBlock(a_PlacedBlockPos.addedY(-1)) != E_BLOCK_FARMLAND)
 		{
 			return false;
 		}
