@@ -358,7 +358,7 @@ bool cItemHandler::OnPlayerPlace(
 		return false;
 	}
 
-	if (cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
+	if (!cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
 	{
 		// The clicked block is outside the world, ignore this call altogether (#128)
 		return false;
