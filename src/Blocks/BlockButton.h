@@ -138,7 +138,7 @@ public:
 
 		if (
 			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
-			(Type != E_BLOCK_WOODEN_BUTTON) || IsButtonOn(Meta) ||
+			IsButtonOn(Meta) ||
 			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
 		)
 		{
@@ -162,10 +162,10 @@ private:
 
 	/** Schedules a recurring event at appropriate intervals to release a button at a given position.
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
-	static void QueueButtonRelease(cWorld & a_World, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
+	static void QueueButtonRelease(cWorld & a_Wurld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
 	{
 		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-		a_World.ScheduleTask(
+		a_Wurld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_BlockType](cWorld & a_World)
 			{
@@ -174,9 +174,14 @@ private:
 
 				if (
 					!a_World.GetBlockTypeMeta(a_Position, Type, Meta) ||
-					(Type != a_BlockType) ||
-					IsButtonPressedByArrow(a_World, a_Position, Type, Meta)
+					(Type != a_BlockType) || !IsButtonOn(Meta)
 				)
+				{
+					// Total failure or block changed, bail
+					return;
+				}
+
+				if (IsButtonPressedByArrow(a_World, a_Position, Type, Meta))
 				{
 					// Try again in a little while
 					QueueButtonRelease(a_World, a_Position, a_BlockType);
@@ -193,9 +198,14 @@ private:
 		);
 	}
 
-	/** Returns true if an arrow was found in the button */
+	/** Returns true if an arrow was found in the wooden button */
 	static bool IsButtonPressedByArrow(cWorld & a_World, const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
+		if (a_BlockType != E_BLOCK_WOODEN_BUTTON)
+		{
+			return false;
+		}
+
 		const auto FaceOffset = GetButtonOffsetOnBlock(a_Meta);
 		const bool FoundArrow = !a_World.ForEachEntityInBox(
 			cBoundingBox(FaceOffset + a_Position, 0.2, 0.2),
@@ -219,7 +229,6 @@ private:
 			case BLOCK_FACE_ZM: return { 0.5, 0.5, 1 };
 			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
 			case BLOCK_FACE_NONE:
-			default:
 			{
 				ASSERT(!"Unhandled block face!");
 				return { 0, 0, 0 };
