@@ -1386,7 +1386,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_8_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cProtocol_1_8_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	double PosX = a_Entity.GetPosX();

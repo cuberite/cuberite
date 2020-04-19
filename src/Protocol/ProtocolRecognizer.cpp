@@ -850,10 +850,10 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData);
 }
 
 

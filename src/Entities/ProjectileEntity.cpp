@@ -30,13 +30,6 @@
 
 
 
-/** Converts an angle in radians into a byte representation used by the network protocol */
-#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
@@ -451,7 +444,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12);
 	a_Client.SendEntityMetadata(*this);
 }
 
