@@ -489,7 +489,7 @@ bool cItemHandler::OnDiggingBlock(
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
-	UNUSED(a_Item);
+	UNUSED(a_HeldItem);
 	UNUSED(a_ClickedBlockPos);
 	UNUSED(a_ClickedBlockFace);
 

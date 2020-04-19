@@ -34,7 +34,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		UNUSED(a_Item);
+		UNUSED(a_HeldItem);
 		UNUSED(a_ClickedBlockFace);
 
 		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you right-click it.
