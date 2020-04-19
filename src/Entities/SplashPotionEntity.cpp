@@ -9,13 +9,6 @@
 
 
 
-/** Converts an angle in radians into a byte representation used by the network protocol */
-#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cSplashPotionEntity:
 
@@ -103,7 +96,7 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 
 void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, 73, m_PotionColor, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, 73, m_PotionColor);
 	a_Client.SendEntityMetadata(*this);
 }
 

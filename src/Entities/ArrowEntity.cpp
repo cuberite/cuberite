@@ -9,16 +9,6 @@
 
 
 
-/** Converts an angle in degrees into a byte representation used by the network protocol */
-static Byte AngleToProto(double a_X)
-{
-	return static_cast<Byte>((a_X * 255) / 360);
-}
-
-
-
-
-
 cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
 	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5, 0.5),
 	m_PickupState(psNoPickup),
@@ -173,7 +163,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 
 void cArrowEntity::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, static_cast<int>(m_CreatorData.m_UniqueID + 1), AngleToProto(GetYaw()), AngleToProto(GetPitch()));
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, static_cast<int>(m_CreatorData.m_UniqueID + 1));
 	a_Client.SendEntityMetadata(*this);
 }
 
