@@ -159,7 +159,7 @@ public:
 			return false;
 		}
 
-		if (a_World->CreateProjectile(a_ClickedBlockPos + Vector3d(0.5, 1, 0.5), m_ProjectileKind, a_Player, &a_Player->GetEquippedItem()) == 0)
+		if (a_World->CreateProjectile(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 1, 0.5), m_ProjectileKind, a_Player, &a_Player->GetEquippedItem()) == 0)
 		{
 			return false;
 		}

@@ -35,7 +35,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// Is there a doublechest already next to this block?
+		// Cannot place right next to double-chest:
 		if (!CanBeAt(a_ChunkInterface, a_PlacedBlockPos))
 		{
 			// Yup, cannot form a triple-chest, refuse:
