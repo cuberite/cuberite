@@ -53,7 +53,7 @@ public:
 			a_World->DropBlockAsPickups(a_ClickedBlockPos, a_Player, &a_HeldItem);
 			if (a_Player->IsGameModeSurvival())
 			{
-				a_Player->GetInventory().DamageEquippedItem();
+				a_Player->UseEquippedItem();
 			}
 			return true;
 		}
