@@ -297,15 +297,25 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
+	auto EntityID = m_EntityID;
+	auto & DestinationWorld = m_World;
+	auto DestinationPosition = Position;
+
 	// Lookup our warping entity by ID
 	// Necessary as they may have been destroyed in the meantime (#4582)
-	m_SourceWorld.DoWithEntityByID(
-		m_EntityID,
-		[this, &Position](cEntity & a_Entity)
+	// And since this is called from the destination world's thread queue a task on the source world
+	m_SourceWorld.QueueTask(
+		[EntityID, &DestinationWorld, DestinationPosition](cWorld & a_World)
 		{
-			FLOGD("Placing player at {0}", Position);
-			a_Entity.MoveToWorld(m_World, Position, true, false);
-			return true;
+			a_World.DoWithEntityByID(
+				EntityID,
+				[&DestinationWorld, &DestinationPosition](cEntity & a_Entity)
+				{
+					FLOGD("Placing player at {0}", DestinationPosition);
+					a_Entity.MoveToWorld(DestinationWorld, DestinationPosition, true, false);
+					return true;
+				}
+			);
 		}
 	);
 
