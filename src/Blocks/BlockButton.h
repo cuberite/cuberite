@@ -155,7 +155,7 @@ public:
 	}
 
 	/** Returns true if the button is on and handles arrows stuck in a wooden button */
-	static bool IsButtonOn(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	static bool CheckAndUpdateButtonState(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		if (IsButtonOn(a_Meta))
 		{

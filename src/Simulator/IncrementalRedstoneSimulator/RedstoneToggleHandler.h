@@ -81,7 +81,7 @@ public:
 		{
 			case E_BLOCK_LEVER: return cBlockLeverHandler::IsLeverOn(a_Meta) ? 15 : 0;
 			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON: return cBlockButtonHandler::IsButtonOn(a_World, a_Position, a_BlockType, a_Meta) ? 15 : 0;
+			case E_BLOCK_WOODEN_BUTTON: return cBlockButtonHandler::CheckAndUpdateButtonState(a_World, a_Position, a_BlockType, a_Meta) ? 15 : 0;
 			default:
 			{
 				ASSERT(!"Unexpected block passed to button/lever handler");
