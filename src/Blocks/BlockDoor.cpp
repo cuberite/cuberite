@@ -41,7 +41,9 @@ void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInter
 
 
 bool cBlockDoorHandler::OnUse(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
+	cPlayer & a_Player,
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
@@ -84,12 +86,15 @@ bool cBlockDoorHandler::OnUse(
 
 
 void cBlockDoorHandler::OnCancelRightClick(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
+	cPlayer & a_Player,
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace
 )
 {
 	UNUSED(a_ChunkInterface);
+	UNUSED(a_BlockFace);
 
 	a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);

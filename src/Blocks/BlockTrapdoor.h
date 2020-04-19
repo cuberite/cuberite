@@ -33,7 +33,9 @@ public:
 
 
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
@@ -58,7 +60,9 @@ public:
 
 
 	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
 	) override

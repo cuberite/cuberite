@@ -136,7 +136,9 @@ public:
 	a_CursorPos is the cursor position within the clicked block face.
 	Returns true if the use was successful, return false to use the block as a "normal" block */
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
@@ -148,7 +150,9 @@ public:
 	/** Called when a right click to this block is cancelled.
 	Descendants should force the server to send the real state of a block to the client to prevent client assuming the operation was successfull. */
 	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
 	)

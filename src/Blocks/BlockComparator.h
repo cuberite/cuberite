@@ -26,7 +26,9 @@ public:
 
 
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
@@ -44,12 +46,16 @@ public:
 
 
 	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
 	) override
 	{
 		UNUSED(a_ChunkInterface);
+		UNUSED(a_BlockFace);
+
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 

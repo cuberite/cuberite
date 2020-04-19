@@ -24,7 +24,9 @@ public:
 
 
 	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
 	) override

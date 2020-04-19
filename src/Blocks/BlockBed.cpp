@@ -55,16 +55,19 @@ void cBlockBedHandler::OnBroken(
 
 
 bool cBlockBedHandler::OnUse(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-	const Vector3i a_ClickedBlockPos,
-	eBlockFace a_ClickedBlockFace,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
+	cPlayer & a_Player,
+	const Vector3i a_BlockPos,
+	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
 )
 {
 	// Sleeping in bed only allowed in Overworld, beds explode elsewhere:
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
-		a_WorldInterface.DoExplosionAt(5, a_ClickedBlockPos.x, a_ClickedBlockPos.y, a_ClickedBlockPos.z, true, esBed, const_cast<Vector3i *>(&a_ClickedBlockPos));
+		auto PosCopy = a_BlockPos;
+		a_WorldInterface.DoExplosionAt(5, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, true, esBed, &PosCopy);
 		return true;
 	}
 
@@ -77,7 +80,7 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Check if the bed is occupied:
-	auto Meta = a_ChunkInterface.GetBlockMeta(a_ClickedBlockPos);
+	auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 	if ((Meta & 0x04) == 0x04)
 	{
 		a_Player.SendMessageFailure("This bed is occupied");
@@ -102,14 +105,14 @@ bool cBlockBedHandler::OnUse(
 	if ((Meta & 0x8) == 0x8)
 	{
 		// Is pillow
-		a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_ClickedBlockPos);
+		a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockPos);
 	}
 	else
 	{
 		// Is foot end
 		VERIFY((Meta & 0x04) != 0x04);  // Occupied flag should never be set, else our compilator (intended) is broken
 
-		auto PillowPos = a_ClickedBlockPos + MetaDataToDirection(Meta & 0x03);
+		auto PillowPos = a_BlockPos + MetaDataToDirection(Meta & 0x03);
 		if (a_ChunkInterface.GetBlock(PillowPos) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 		{
 			a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, PillowPos);
@@ -117,7 +120,7 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Occupy the bed:
-	a_Player.SetBedPos(a_ClickedBlockPos);
+	a_Player.SetBedPos(a_BlockPos);
 	SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 	a_Player.SetIsInBed(true);
 	a_Player.SendMessageSuccess("Home position set successfully");
@@ -141,7 +144,7 @@ bool cBlockBedHandler::OnUse(
 			}
 		);
 		a_WorldInterface.SetTimeOfDay(0);
-		a_ChunkInterface.SetBlockMeta(a_ClickedBlockPos, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 	}
 	return true;
 }
