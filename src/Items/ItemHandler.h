@@ -82,9 +82,9 @@ public:
 
 
 	/** Called when the player tries to use the item (right mouse button).
-	Return false to abort the usage. DEFAULT: False */
+	Descendants can return false to abort the usage (default behavior). */
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	);

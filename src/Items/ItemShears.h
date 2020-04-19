@@ -34,6 +34,38 @@ public:
 
 
 
+	virtual bool OnItemUse(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
+	) override
+	{
+		// Cannot use while aiming at nothing:
+		if (a_ClickedBlockFace == BLOCK_FACE_NONE)
+		{
+			return false;
+		}
+
+		// Use on leaves:
+		auto BlockType = a_World->GetBlock(a_ClickedBlockPos);
+		if ((BlockType == E_BLOCK_LEAVES) || (BlockType == E_BLOCK_NEW_LEAVES))
+		{
+			a_World->DropBlockAsPickups(a_ClickedBlockPos, a_Player, &a_HeldItem);
+			if (a_Player->IsGameModeSurvival())
+			{
+				a_Player->GetInventory().DamageEquippedItem();
+			}
+			return true;
+		}
+
+		// No action:
+		return false;
+	}
+
+
+
+
+
 	virtual bool OnDiggingBlock(
 		cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
