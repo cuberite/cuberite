@@ -42,7 +42,7 @@ public:
 	{
 		// Check the block below, if it supports dust on top of it:
 		auto UnderPos = a_PlacedBlockPos.addedY(-1);
-		if (UnderPos.y <= 0)
+		if (UnderPos.y < 0)
 		{
 			return false;
 		}
