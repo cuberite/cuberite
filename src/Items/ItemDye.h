@@ -27,13 +27,14 @@ public:
 
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if ((a_Item.m_ItemDamage == E_META_DYE_WHITE) && (a_BlockFace != BLOCK_FACE_NONE))
+		if ((a_Item.m_ItemDamage == E_META_DYE_WHITE) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			// Bonemeal (white dye) is used to fertilize plants:
-			if (fertilizePlant(*a_World, {a_BlockX, a_BlockY, a_BlockZ}))
+			if (FertilizePlant(*a_World, a_ClickedBlockPos))
 			{
 				if (a_Player->IsGameModeSurvival())
 				{
@@ -42,7 +43,7 @@ public:
 				}
 			}
 		}
-		else if ((a_Item.m_ItemDamage == E_META_DYE_BROWN) && (a_BlockFace >= BLOCK_FACE_ZM) && (a_BlockFace <= BLOCK_FACE_XP))
+		else if ((a_Item.m_ItemDamage == E_META_DYE_BROWN) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
 		{
 			// Players can't place blocks while in adventure mode.
 			if (a_Player->IsGameModeAdventure())
@@ -53,25 +54,24 @@ public:
 			// Cocoa (brown dye) can be planted on jungle logs:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta);
 
 			// Check if the block that the player clicked is a jungle log.
-			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x3) != E_META_LOG_JUNGLE))
+			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
 			{
 				return false;
 			}
 
 			// Get the location from the new cocoa pod.
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
-			BlockMeta = cBlockCocoaPodHandler::BlockFaceToMeta(a_BlockFace);
+			auto CocoaPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace, false);
+			BlockMeta = cBlockCocoaPodHandler::BlockFaceToMeta(a_ClickedBlockFace);
 
-			if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_AIR)
+			// Place the cocoa pod:
+			if (a_World->GetBlock(CocoaPos) != E_BLOCK_AIR)
 			{
 				return false;
 			}
-
-			// Place the cocoa pod:
-			if (a_Player->PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta))
+			if (a_Player->PlaceBlock(CocoaPos.x, CocoaPos.y, CocoaPos.z, E_BLOCK_COCOA_POD, BlockMeta))
 			{
 				if (a_Player->IsGameModeSurvival())
 				{
@@ -97,7 +97,7 @@ public:
 	Returns true if the plant was fertilized successfully, false if not / not a plant.
 	Note that successful fertilization doesn't mean successful growth - for blocks that have only a chance to grow,
 	fertilization success is reported even in the case when the chance fails (bonemeal still needs to be consumed). */
-	bool fertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
+	bool FertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
 	{
 		BLOCKTYPE blockType;
 		NIBBLETYPE blockMeta;

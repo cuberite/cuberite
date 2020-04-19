@@ -28,21 +28,26 @@ public:
 	{
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-		a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
-		return a_Player.GetWorld()->DoWithChunkAt(Pos,
-			[this, Pos, &a_ChunkInterface](cChunk & a_Chunk)
+		a_BlockMeta = FindMeta(a_ChunkInterface, a_PlacedBlockPos);
+		return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
+			[this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
 			{
-				auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-				return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk);
+				auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
+				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
 			}
 		);
 	}
@@ -111,18 +116,18 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
-		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
+		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelPos.addedY(-1))))
 		{
 			return false;
 		}
 
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
 		switch (Meta)
 		{
 			case E_META_RAIL_ASCEND_XP:
@@ -132,19 +137,16 @@ public:
 			{
 				// Mapping between the meta and the neighbors that need checking
 				Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
-				static const struct
+				static const Vector3i Coords[] =
 				{
-					int x, z;
-				} Coords[] =
-				{
-					{ 1,  0},  // east,  XP
-					{-1,  0},  // west,  XM
-					{ 0, -1},  // north, ZM
-					{ 0,  1},  // south, ZP
+					{ 1, 0,  0},  // east,  XP
+					{-1, 0,  0},  // west,  XM
+					{ 0, 0, -1},  // north, ZM
+					{ 0, 0,  1},  // south, ZP
 				} ;
 				BLOCKTYPE  BlockType;
 				NIBBLETYPE BlockMeta;
-				if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[Meta].x, a_RelY, a_RelZ + Coords[Meta].z, BlockType, BlockMeta))
+				if (!a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[Meta], BlockType, BlockMeta))
 				{
 					// Too close to the edge, cannot simulate
 					return true;
@@ -154,6 +156,10 @@ public:
 		}
 		return true;
 	}
+
+
+
+
 
 	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos)
 	{

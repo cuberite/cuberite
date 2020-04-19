@@ -6,14 +6,14 @@
 #include "BlockSlab.h"
 
 
-class cBlockLeverHandler :
+class cBlockLeverHandler:
 	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
 	using Super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
 
 public:
 
-	cBlockLeverHandler(BLOCKTYPE a_BlockType) :
+	cBlockLeverHandler(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
 	{
 	}
@@ -22,15 +22,19 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(Coords) ^ 0x08);
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x08);
 
-		a_ChunkInterface.SetBlockMeta(Coords.x, Coords.y, Coords.z, Meta);
-		a_WorldInterface.WakeUpSimulators(Coords);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", Vector3d(Coords), 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
 
@@ -58,14 +62,16 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
+		a_BlockMeta = LeverDirectionToMetaData(a_ClickedBlockFace);
 		return true;
 	}
 
@@ -73,6 +79,7 @@ public:
 
 
 
+	/** Converts the block face of the neighbor to which the lever is attached to the lever block's meta. */
 	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
 	{
 		// Determine lever direction:
@@ -93,6 +100,7 @@ public:
 
 
 
+	/** Converts the leve block's meta to the block face of the neighbor to which the lever is attached. */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
@@ -117,34 +125,33 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-
-		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
-
-		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height -1))
+		// Find the type of block the lever is attached to:
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
+		auto NeighborFace = BlockMetaDataToBlockFace(Meta);
+		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
+		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		{
+			return false;
+		}
+		BLOCKTYPE NeighborBlockType;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
 		{
 			return false;
 		}
 
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
-
-
-		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
+		// Allow any full block or the "good" side of a half-slab:
+		if (cBlockInfo::FullyOccupiesVoxel(NeighborBlockType))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
+		else if (cBlockSlabHandler::IsAnySlabType(NeighborBlockType))
 		{
-			// Check if the slab is turned up side down
-			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
-			{
-				return true;
-			}
+			return (
+				(((Meta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
+				(((Meta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
+			);
 		}
 
 		return false;

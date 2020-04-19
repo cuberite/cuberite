@@ -8,44 +8,53 @@
 
 
 
-class cItemSeedsHandler :
+class cItemSeedsHandler:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemSeedsHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemSeedsHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
+
+
+
+
 
 	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (a_BlockFace != BLOCK_FACE_TOP)
+		// Only allow planting seeds from the top side of the block:
+		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
 		{
-			// Only allow planting seeds from the top side of the block
 			return false;
 		}
 
 		// Only allow placement on farmland
-		int X = a_BlockX;
-		int Y = a_BlockY;
-		int Z = a_BlockZ;
-		AddFaceDirection(X, Y, Z, a_BlockFace, true);
-		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_FARMLAND)
+		if (a_World->GetBlock(a_ClickedBlockPos) != E_BLOCK_FARMLAND)
 		{
 			return false;
 		}
 
+		// Get the produce block based on the seed item:
 		a_BlockMeta = 0;
 		switch (m_ItemType)
 		{

@@ -21,44 +21,107 @@ public:
 	{
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-		Meta ^= 0x04;  // Toggle 3rd (addition / subtraction) bit with XOR
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		// Toggle the 3rd bit (addition / subtraction):
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		Meta ^= 0x04;
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) override
 	{
 		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+		if (a_RelPos.y <= 0)
+		{
+			return false;
+		}
+
+		BLOCKTYPE BelowBlock;
+		NIBBLETYPE BelowBlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
+
+		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		{
+			return true;
+		}
+		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+		{
+			// Check if the slab is turned up side down
+			if ((BelowBlockMeta & 0x08) == 0x08)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
+
+
+
+
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		return cItem(E_ITEM_COMPARATOR, 1, 0);
 	}
 
+
+
+
+
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x4) == 0x4);
 	}
 
+
+
+
+
 	inline static bool IsOn(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x8) == 0x8);
 	}
+
+
+
+
 
 	inline static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
 	{
@@ -98,6 +161,10 @@ public:
 		return a_Position;
 	}
 
+
+
+
+
 	inline static Vector3i GetRearCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
@@ -117,6 +184,10 @@ public:
 		return a_Position;
 	}
 
+
+
+
+
 	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
@@ -135,6 +206,10 @@ public:
 
 		return a_Position;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

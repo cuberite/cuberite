@@ -406,8 +406,9 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 bool cBlockHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
 {
@@ -437,7 +438,7 @@ void cBlockHandler::OnUpdate(
 
 void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
-	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetPos(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
+	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetAbsolutePos(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
 }
 
 
@@ -509,7 +510,7 @@ cItems cBlockHandler::ConvertToPickups(
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk)
 {
 	return true;
 }
@@ -554,10 +555,10 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-/* default functionality: only test for height, since we assume full voxels with varying height */
-bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta)
 {
-	return a_Position.y < cBlockInfo::GetBlockHeight(a_BlockType);
+	// Default functionality: Test the height, since we assume full voxels with varying height
+	return (a_RelPosition.y < cBlockInfo::GetBlockHeight(m_BlockType));
 }
 
 
@@ -584,7 +585,7 @@ void cBlockHandler::Check(
 	cChunk & a_Chunk
 )
 {
-	if (!CanBeAt(a_ChunkInterface, a_RelPos.x, a_RelPos.y, a_RelPos.z, a_Chunk))
+	if (!CanBeAt(a_ChunkInterface, a_RelPos, a_Chunk))
 	{
 		if (DoesDropOnUnsuitable())
 		{

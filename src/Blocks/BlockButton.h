@@ -24,36 +24,38 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		Vector3i Pos(a_BlockX, a_BlockY, a_BlockZ);
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Pos);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
-		Vector3d SoundPos(Pos);
-
-		// If button is already on do nothing
+		// If button is already on, do nothing:
 		if (Meta & 0x08)
 		{
 			return false;
 		}
 
-		// Set p the ON bit to on
+		// Set the ON bit to on
 		Meta |= 0x08;
 
-		a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta, false);
-		a_WorldInterface.WakeUpSimulators(Pos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", SoundPos, 0.5f, 0.6f);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta, false);
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.stone_button.click_on", a_BlockPos, 0.5f, 0.6f);
 
 		// Queue a button reset (unpress)
 		auto TickDelay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-		a_Player.GetWorld()->ScheduleTask(TickDelay, [SoundPos, Pos, this](cWorld & a_World)
+		a_Player.GetWorld()->ScheduleTask(TickDelay, [a_BlockPos, this](cWorld & a_World)
 			{
-				if (a_World.GetBlock(Pos) == m_BlockType)
+				if (a_World.GetBlock(a_BlockPos) == m_BlockType)
 				{
 					// Block hasn't change in the meantime; set its meta
-					a_World.SetBlockMeta(Pos.x, Pos.y, Pos.z, a_World.GetBlockMeta(Pos) & 0x07, false);
-					a_World.WakeUpSimulators(Pos);
-					a_World.BroadcastSoundEffect("block.stone_button.click_off", SoundPos, 0.5f, 0.5f);
+					a_World.SetBlockMeta(a_BlockPos, a_World.GetBlockMeta(a_BlockPos) & 0x07, false);
+					a_World.WakeUpSimulators(a_BlockPos);
+					a_World.BroadcastSoundEffect("block.stone_button.click_off", a_BlockPos, 0.5f, 0.5f);
 				}
 			}
 		);
@@ -61,23 +63,38 @@ public:
 		return true;
 	}
 
+
+
+
+
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
+		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
 		return true;
 	}
 
+
+
+
+
+	/** Converts the block face of the neighbor to which the button is attached, to the block meta for this button. */
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
@@ -97,6 +114,11 @@ public:
 		UNREACHABLE("Unsupported block face");
 	}
 
+
+
+
+
+	/** Converts the block meta of this button into a block face of the neighbor to which the button is attached. */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
@@ -115,16 +137,27 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
+		auto SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
+		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
+		{
+			return false;
+		}
+		BLOCKTYPE SupportBlockType;
+		a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
-
-		return (a_RelY > 0) && (cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
@@ -132,7 +165,11 @@ public:
 		return 0;
 	}
 
-	/** Extracts the ON bit from metadata and returns if true if it is set */
+
+
+
+
+	/** Extracts the ON bit from metadata. */
 	static bool IsButtonOn(NIBBLETYPE a_BlockMeta)
 	{
 		return ((a_BlockMeta & 0x8) == 0x8);

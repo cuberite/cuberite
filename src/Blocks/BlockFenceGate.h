@@ -20,35 +20,60 @@ public:
 	{
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 		NIBBLETYPE NewMetaData = YawToMetaData(a_Player.GetYaw());
 		OldMetaData ^= 4;  // Toggle the gate
 
 		if ((OldMetaData & 1) == (NewMetaData & 1))
 		{
 			// Standing in front of the gate - apply new direction
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, (OldMetaData & 4) | (NewMetaData & 3));
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, (OldMetaData & 4) | (NewMetaData & 3));
 		}
 		else
 		{
 			// Standing aside - use last direction
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, OldMetaData);
 		}
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0, a_Player.GetClientHandle());
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) override
 	{
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

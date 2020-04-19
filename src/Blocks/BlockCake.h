@@ -20,9 +20,14 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
 		if (!a_Player.Feed(2, 0.4))
 		{
@@ -31,11 +36,11 @@ public:
 
 		if (Meta >= 5)
 		{
-			a_ChunkInterface.DigBlock(a_WorldInterface, {a_BlockX, a_BlockY, a_BlockZ});
+			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos);
 		}
 		else
 		{
-			a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta + 1);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta + 1);
 		}
 		return true;
 	}

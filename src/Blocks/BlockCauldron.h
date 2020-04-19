@@ -32,9 +32,14 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 		auto EquippedItem = a_Player.GetEquippedItem();
 		switch (EquippedItem.m_ItemType)
 		{
@@ -42,7 +47,7 @@ public:
 			{
 				if (Meta == 3)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 0);
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, 0);
 					// Give new bucket, filled with fluid when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
@@ -55,7 +60,7 @@ public:
 			{
 				if (Meta < 3)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 3);
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, 3);
 					// Give empty bucket back when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
@@ -68,7 +73,7 @@ public:
 			{
 				if (Meta > 0)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
 					// Give new potion when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
@@ -82,8 +87,8 @@ public:
 				// Refill cauldron with water bottles.
 				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
 				{
-					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockX, a_BlockY, a_BlockZ), ++Meta);
-					// Give empty bottle when the gamemode is not creative:
+					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockPos), ++Meta);
+					// Give back an empty bottle when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));

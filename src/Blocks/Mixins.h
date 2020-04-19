@@ -189,7 +189,8 @@ public:
 
 	cYawRotator(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
-	{}
+	{
+	}
 
 
 
@@ -197,13 +198,14 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockPos, a_BlockFace, a_CursorPos, a_BlockType, BaseMeta))
 		{
 			return false;
 		}
@@ -259,25 +261,29 @@ class cPitchYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
 {
 	using Super = cYawRotator<Base, BitMask, North, East, South, West>;
+
 public:
 
 	cPitchYawRotator(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
-	{}
+	{
+	}
 
 
 
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, BaseMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, BaseMeta))
 		{
 			return false;
 		}

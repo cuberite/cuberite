@@ -44,9 +44,11 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
@@ -54,18 +56,18 @@ public:
 		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
 
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
-		switch (a_BlockFace)
+		switch (a_ClickedBlockFace)
 		{
 			case BLOCK_FACE_TOP:
 			{
 				// Bottom half slab block
-				a_BlockMeta = Meta & 0x7;
+				a_BlockMeta = Meta & 0x07;
 				break;
 			}
 			case BLOCK_FACE_BOTTOM:
 			{
 				// Top half slab block
-				a_BlockMeta = Meta | 0x8;
+				a_BlockMeta = Meta | 0x08;
 				break;
 			}
 			case BLOCK_FACE_EAST:
@@ -73,15 +75,15 @@ public:
 			case BLOCK_FACE_SOUTH:
 			case BLOCK_FACE_WEST:
 			{
-				if (a_CursorY > 7)
+				if (a_CursorPos.y > 7)
 				{
 					// Cursor at top half of block, place top slab
-					a_BlockMeta = Meta | 0x8; break;
+					a_BlockMeta = Meta | 0x08; break;
 				}
 				else
 				{
 					// Cursor at bottom half of block, place bottom slab
-					a_BlockMeta = Meta & 0x7; break;
+					a_BlockMeta = Meta & 0x07; break;
 				}
 			}
 			case BLOCK_FACE_NONE: return false;
@@ -89,10 +91,10 @@ public:
 
 		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
 		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
-		if (IsAnySlabType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})))
+		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_PlacedBlockPos)))
 		{
 			a_BlockType = GetDoubleSlabType(m_BlockType);
-			a_BlockMeta = a_BlockMeta & 0x7;
+			a_BlockMeta = a_BlockMeta & 0x07;
 		}
 
 		return true;
@@ -117,7 +119,11 @@ public:
 
 
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) override
 	{
 		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
 		{
@@ -125,7 +131,7 @@ public:
 		}
 
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
-		a_Player.GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_Player.GetWorld()->SendBlockTo(a_BlockPos, a_Player);
 	}
 
 
@@ -222,13 +228,13 @@ public:
 
 
 
-	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	virtual bool IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) override
 	{
-		if (a_BlockMeta & 0x8)  // top half
+		if (a_BlockMeta & 0x08)  // top half
 		{
 			return true;
 		}
-		return cBlockHandler::IsInsideBlock(a_Position, a_BlockType, a_BlockMeta);
+		return cBlockHandler::IsInsideBlock(a_Position, a_BlockMeta);
 	}
 } ;
 
@@ -236,7 +242,7 @@ public:
 
 
 
-class cBlockDoubleSlabHandler :
+class cBlockDoubleSlabHandler:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

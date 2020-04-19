@@ -12,23 +12,43 @@
 class cBlockWorkbenchHandler:
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockWorkbenchHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockWorkbenchHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		cWindow * Window = new cCraftingWindow(a_BlockX, a_BlockY, a_BlockZ);
+		cWindow * Window = new cCraftingWindow(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 		a_Player.OpenWindow(*Window);
 		return true;
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

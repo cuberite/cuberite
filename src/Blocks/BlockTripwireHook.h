@@ -24,14 +24,16 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = DirectionToMetadata(a_BlockFace);
+		a_BlockMeta = DirectionToMetadata(a_ClickedBlockFace);
 
 		return true;
 	}
@@ -79,16 +81,17 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, MetadataToDirection(Meta), true);
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
-
-		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
+		auto NeighborPos = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
+		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		{
+			return false;
+		}
+		BLOCKTYPE NeighborBlockType;
+		a_Chunk.UnboundedRelGetBlockType(a_RelPos, NeighborBlockType);
+		return cBlockInfo::FullyOccupiesVoxel(NeighborBlockType);
 	}
 
 

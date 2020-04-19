@@ -40,15 +40,18 @@ void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInter
 
 
 
-bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cBlockDoorHandler::OnUse(
+	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+	const Vector3i a_BlockPos,
+	eBlockFace a_BlockFace,
+	const Vector3i a_CursorPos
+)
 {
 	UNUSED(a_WorldInterface);
 	UNUSED(a_BlockFace);
-	UNUSED(a_CursorX);
-	UNUSED(a_CursorY);
-	UNUSED(a_CursorZ);
+	UNUSED(a_CursorPos);
 
-	switch (a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}))
+	switch (a_ChunkInterface.GetBlock(a_BlockPos))
 	{
 		default:
 		{
@@ -61,14 +64,14 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		case E_BLOCK_SPRUCE_DOOR:
 		case E_BLOCK_OAK_DOOR:
 		{
-			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0, a_Player.GetClientHandle());
+			ChangeDoor(a_ChunkInterface, a_BlockPos);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 			break;
 		}
 		// Prevent iron door from opening on player click
 		case E_BLOCK_IRON_DOOR:
 		{
-			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockPos, a_BlockFace);
 			break;
 		}
 	}
@@ -80,22 +83,26 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+void cBlockDoorHandler::OnCancelRightClick(
+	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+	const Vector3i a_BlockPos,
+	eBlockFace a_BlockFace
+)
 {
 	UNUSED(a_ChunkInterface);
 
-	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+	a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
-	if (Meta & 0x8)
+	if (Meta & 0x08)
 	{
-		// Current block is top of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, a_Player);
+		// Current block is top of the door, send the bottom part:
+		a_WorldInterface.SendBlockTo(a_BlockPos.addedY(-1), a_Player);
 	}
 	else
 	{
-		// Current block is bottom of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, a_Player);
+		// Current block is bottom of the door, send the top part:
+		a_WorldInterface.SendBlockTo(a_BlockPos.addedY(1), a_Player);
 	}
 }
 

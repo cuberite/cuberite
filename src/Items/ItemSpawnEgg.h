@@ -20,27 +20,30 @@ public:
 
 
 
+
+
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if (a_BlockFace < 0)
+		// Must click a valid block:
+		if (a_ClickedBlockFace < 0)
 		{
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-		if (a_BlockFace == BLOCK_FACE_YM)
+		auto PlacementPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		if (a_ClickedBlockFace == BLOCK_FACE_YM)
 		{
-			a_BlockY--;
+			PlacementPos.y--;
 		}
 
-		eMonsterType MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
+		auto MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
 		if (
 			(MonsterType != mtInvalidType) &&  // Valid monster type
-			(a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
+			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
 		{
 			if (!a_Player->IsGameModeCreative())
 			{
@@ -52,6 +55,9 @@ public:
 
 		return false;
 	}
+
+
+
 
 
 	/** Converts the Spawn egg item damage to the monster type to spawn.

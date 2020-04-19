@@ -32,7 +32,12 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
@@ -41,35 +46,53 @@ public:
 		}
 
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}) ^ 0x04);
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0, a_Player.GetClientHandle());
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x04);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) override
 	{
 		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
+		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
 
-		if (a_CursorY > 7)
+		if (a_CursorPos.y > 7)
 		{
 			a_BlockMeta |= 0x8;
 		}
 		return true;
 	}
+
+
+
+
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
@@ -90,6 +113,10 @@ public:
 		UNREACHABLE("Unsupported block face");
 	}
 
+
+
+
+
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x3)
@@ -105,6 +132,10 @@ public:
 			}
 		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

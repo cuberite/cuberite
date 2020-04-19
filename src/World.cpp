@@ -1429,7 +1429,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 		bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
 		auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
-		ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
+		ch->SendExplosion({a_BlockX, a_BlockY, a_BlockZ}, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
 	}
 
 	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);

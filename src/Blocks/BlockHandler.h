@@ -44,19 +44,28 @@ public:
 	blocktype of the minus-X neighbor, the positive-X neighbor, etc. */
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP);
 
-	/** Called before a block is placed into a world.
+	/** Called before a block is placed into a world by player, by cItemHandler::GetPlacementBlockTypeMeta().
 	The handler should return true to allow placement, false to refuse.
-	Also, the handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
-	Called by cItemHandler::GetPlacementBlockTypeMeta() if the item is a block */
+	a_PlacedBlockPos is the coords of the block being placed
+	a_ClickedBlockFace is the face of the neighbor block clicked by the client to place this block.
+	a_CursorPos is the position of the cursor within the neighbor's face
+	The descendant handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
+	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value. */
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
 
 	/** Called by cWorld::SetBlock() after the block has been set */
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	virtual void OnPlaced(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	);
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
@@ -118,18 +127,33 @@ public:
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
 		cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ
+		const Vector3i a_BlockPos
 	)
 	{
 	}
 
-	/** Called if the user right clicks the block and the block is useable
-	returns true if the use was successful, return false to use the block as a "normal" block */
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) { return false; }
+	/** Called when the user right clicks the block and the block is useable.
+	a_CursorPos is the cursor position within the clicked block face.
+	Returns true if the use was successful, return false to use the block as a "normal" block */
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	)
+	{
+		return false;
+	}
 
 	/** Called when a right click to this block is cancelled.
-	It forces the server to send the real state of a block to the client to prevent client assuming the operation is successfull */
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) {}
+	Descendants should force the server to send the real state of a block to the client to prevent client assuming the operation was successfull. */
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	)
+	{
+	}
 
 	/** Returns the pickups that would result if the block was mined by a_Digger using a_Tool.
 	Doesn't do any actual block change / mining, only calculates the pickups.
@@ -145,41 +169,37 @@ public:
 	);
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
+	virtual bool CanBeAt(
+		cChunkInterface & a_ChunkInterface,
+		const Vector3i a_RelPos,
+		const cChunk & a_Chunk
+	);
 
 	/** Checks whether the block has an effect on growing the plant */
 	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) { return false; }
-
-	/** Checks if the block can be placed at this point.
-	Default: CanBeAt(...)
-	NOTE: This call doesn't actually place the block
-	*/
-	// virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 
 	/** Called to check whether this block supports a rclk action.
 	If it returns true, OnUse() is called */
 	virtual bool IsUseable(void);
 
 	/** Indicates whether the client will click through this block.
-	For example digging a fire will hit the block below the fire so fire is clicked through
-	*/
+	For example digging a fire will hit the block below the fire so fire is clicked through. */
 	virtual bool IsClickedThrough(void);
 
 	/** Checks if the player can build "inside" this block.
 	For example blocks placed "on" snow will be placed at the same position. So: Snow ignores Build collision
 	@param a_Pos Position of the block
 	@param a_Player Player trying to build on the block
-	@param a_Meta Meta value of the block currently at a_Pos
-	*/
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
+	@param a_Meta Meta value of the block currently at a_Pos */
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, const Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta);
 
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */
 	virtual bool DoesDropOnUnsuitable(void);
 
-	/** Tests if a_Position is inside the block where a_Position is relative to the origin of the block
-	Note that this is considered from a "top-down" perspective i.e. empty spaces on the bottom of a block don't matter */
-	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
+	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
+	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */
+	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta);
 
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops (DropBlockAsPickup() / SetBlock()) if the position is no longer suitable (CanBeAt(), DoesDropOnUnsuitable()),

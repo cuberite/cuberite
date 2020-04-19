@@ -26,6 +26,10 @@ public:
 		return 0;
 	}
 
+
+
+
+
 	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_World);
@@ -35,6 +39,10 @@ public:
 		return 0;
 	}
 
+
+
+
+
 	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
@@ -42,12 +50,16 @@ public:
 		if (a_PoweringData != static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
 		{
 			cChunkInterface ChunkInterface(a_World.GetChunkMap());
-			cBlockDoorHandler::SetOpen(ChunkInterface, a_Position.x, a_Position.y, a_Position.z, (a_PoweringData.PowerLevel != 0));
+			cBlockDoorHandler::SetOpen(ChunkInterface, a_Position, (a_PoweringData.PowerLevel != 0));
 			a_World.BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_Position, 0);
 		}
 
 		return {};
 	}
+
+
+
+
 
 	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
 	{
