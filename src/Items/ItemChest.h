@@ -65,6 +65,17 @@ public:
 				// The block is being placed outside the world, ignore this packet altogether (#128)
 				return false;
 			}
+
+			// Check if the chest can overwrite the block at PlacePos:
+			BLOCKTYPE PlaceBlock;
+			NIBBLETYPE PlaceMeta;
+			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
+			blockHandler = BlockHandler(PlaceBlock);
+			if (!blockHandler->DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
+			{
+				return false;
+			}
+			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, PlacePos);
 		}
 
 		// Check that there is at most one single neighbor of the same chest type:
