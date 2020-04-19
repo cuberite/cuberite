@@ -9,13 +9,16 @@
 
 
 
-class cItemSpawnEggHandler : public cItemHandler
+class cItemSpawnEggHandler:
+	public cItemHandler
 {
-public:
-	cItemSpawnEggHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
-	{
+	using Super = cItemHandler;
 
+public:
+
+	cItemSpawnEggHandler(int a_ItemType):
+		Super(a_ItemType)
+	{
 	}
 
 
@@ -23,7 +26,10 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) override
@@ -40,7 +46,7 @@ public:
 			PlacementPos.y--;
 		}
 
-		auto MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
+		auto MonsterType = ItemDamageToMonsterType(a_HeldItem.m_ItemDamage);
 		if (
 			(MonsterType != mtInvalidType) &&  // Valid monster type
 			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded

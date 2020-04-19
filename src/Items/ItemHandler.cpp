@@ -346,7 +346,9 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 bool cItemHandler::OnPlayerPlace(
-	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+	cWorld & a_World,
+	cPlayer & a_Player,
+	const cItem & a_EquippedItem,
 	const Vector3i a_ClickedBlockPos,
 	eBlockFace a_ClickedBlockFace,
 	const Vector3i a_CursorPos
@@ -478,8 +480,11 @@ bool cItemHandler::OnItemUse(
 
 
 bool cItemHandler::OnDiggingBlock(
-	cWorld * a_World, cPlayer * a_Player, const cItem & a_Item,
-	const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace
+	cWorld * a_World,
+	cPlayer * a_Player,
+	const cItem & a_HeldItem,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace
 )
 {
 	UNUSED(a_World);

@@ -27,7 +27,10 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) override

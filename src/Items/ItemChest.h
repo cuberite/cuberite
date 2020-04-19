@@ -25,7 +25,9 @@ public:
 	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
 	the parent class cannot do that. */
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos

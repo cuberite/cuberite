@@ -35,7 +35,9 @@ public:
 
 
 	virtual bool OnDiggingBlock(
-		cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) override

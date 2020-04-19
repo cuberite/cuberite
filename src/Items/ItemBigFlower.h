@@ -25,11 +25,13 @@ public:
 
 
 	virtual bool GetBlocksToPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToSet
+		sSetBlockVector & a_BlocksToPlace
 	) override
 	{
 		// Can only be placed on dirt:
@@ -55,8 +57,8 @@ public:
 			return false;
 		}
 
-		a_BlocksToSet.emplace_back(a_PlacedBlockPos, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
-		a_BlocksToSet.emplace_back(TopPos,           E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
+		a_BlocksToPlace.emplace_back(TopPos,           E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 		return true;
 	}
 };

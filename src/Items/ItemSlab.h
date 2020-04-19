@@ -28,7 +28,9 @@ public:
 
 	// cItemHandler overrides:
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos

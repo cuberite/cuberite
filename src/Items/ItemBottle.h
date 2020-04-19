@@ -17,9 +17,12 @@ class cItemBottleHandler:
 public:
 
 	cItemBottleHandler():
-		cItemHandler(E_ITEM_GLASS_BOTTLE)
+		Super(E_ITEM_GLASS_BOTTLE)
 	{
 	}
+
+
+
 
 
 	/** Searches for a water source block in the line of sight.
@@ -69,8 +72,13 @@ public:
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) override

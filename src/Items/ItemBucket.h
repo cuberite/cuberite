@@ -16,26 +16,34 @@
 class cItemBucketHandler :
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemBucketHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemBucketHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_ClickedBlockPos, a_ClickedBlockFace);
-			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_LAVA);
-			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_WATER);
+			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace);
+			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_LAVA);
+			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_WATER);
 			default:
 			{
 				ASSERT(!"Unhandled ItemType");
@@ -43,6 +51,8 @@ public:
 			}
 		}
 	}
+
+
 
 
 
@@ -218,6 +228,8 @@ public:
 		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
+
+
 
 
 

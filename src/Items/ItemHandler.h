@@ -46,7 +46,9 @@ public:
 	If the block placement is refused inside this call, it will automatically revert the client-side changes.
 	Returns true if the placement succeeded, false if the placement was aborted for any reason. */
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos
@@ -57,15 +59,18 @@ public:
 	a_PlacedBlockPos points to the location where the new block should be set.
 	a_ClickedBlockFace is the block face of the neighbor that was clicked to place this block.
 	a_CursorPos is the position of the mouse cursor within the clicked (neighbor's) block face.
+	The blocks in a_BlocksToPlace will be sent through cPlayer::PlaceBlocks() after returning from this function.
 	The default handler uses GetPlacementBlockTypeMeta() and provides that as the single block at the specified coords.
 	Returns true if the placement succeeded, false if the placement was aborted for any reason.
 	If aborted, the server then sends all original blocks in the coords provided in a_BlocksToSet to the client. */
 	virtual bool GetBlocksToPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToSet
+		sSetBlockVector & a_BlocksToPlace
 	);
 
 
@@ -84,7 +89,10 @@ public:
 	/** Called when the player tries to use the item (right mouse button).
 	Descendants can return false to abort the usage (default behavior). */
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_HeldItem,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	);
