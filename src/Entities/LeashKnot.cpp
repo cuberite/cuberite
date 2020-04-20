@@ -107,7 +107,7 @@ void cLeashKnot::GetDrops(cItems & a_Items, cEntity * a_Killer)
 void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	Super::SpawnOn(a_ClientHandle);
-	a_ClientHandle.SendSpawnObject(*this, 77, GetProtocolFacing());
+	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 

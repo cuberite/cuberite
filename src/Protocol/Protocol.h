@@ -185,7 +185,6 @@ public:
 	virtual void SendLoginSuccess               (void) = 0;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) = 0;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) = 0;
-	virtual void SendPickupSpawn                (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities            (void) = 0;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) = 0;
@@ -215,10 +214,8 @@ public:
 	virtual void SendSetRawTitle                (const AString & a_Title) = 0;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) = 0;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
-	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) = 0;
+	virtual void SendSpawnEntity                (const cEntity & a_Entity) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
-	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData) = 0;
-	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) = 0;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) = 0;
@@ -258,9 +255,6 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
-
-	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

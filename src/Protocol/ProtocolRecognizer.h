@@ -89,7 +89,6 @@ public:
 	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities            (void) override;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
@@ -117,10 +116,8 @@ public:
 	virtual void SendSetRawTitle                (const AString & a_Title) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
-	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
+	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData) override;
-	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
@@ -155,9 +152,6 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
-
-	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
 	void HandlePacketStatusRequest();

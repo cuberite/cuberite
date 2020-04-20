@@ -550,16 +550,6 @@ void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendPickupSpawn(a_Pickup);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendPlayerAbilities(void)
 {
 	ASSERT(m_Protocol != nullptr);
@@ -830,10 +820,10 @@ void cProtocolRecognizer::SendSoundParticleEffect(const EffectID a_EffectID, int
 
 
 
-void cProtocolRecognizer::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+void cProtocolRecognizer::SendSpawnEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+	m_Protocol->SendSpawnEntity(a_Entity);
 }
 
 
@@ -844,26 +834,6 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnMob(a_Mob);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
 
@@ -1014,15 +984,6 @@ AString cProtocolRecognizer::GetAuthServerID(void)
 {
 	ASSERT(m_Protocol != nullptr);
 	return m_Protocol->GetAuthServerID();
-}
-
-
-
-
-
-UInt32 cProtocolRecognizer::GetProtocolMobType(eMonsterType a_MobType)
-{
-	return 0;
 }
 
 
