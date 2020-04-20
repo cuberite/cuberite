@@ -62,6 +62,8 @@ public:
 	virtual void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
+	virtual void SendExperience                 (void) override;
+	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
@@ -94,8 +96,6 @@ public:
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendExperience                 (void) override;
-	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
@@ -161,7 +161,7 @@ protected:
 	cFile m_CommLogFile;
 
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	void AddReceivedData(const char * a_Data, size_t a_Size);
+	virtual void AddReceivedData(const char * a_Data, size_t a_Size);
 
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
@@ -172,46 +172,46 @@ protected:
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/
-	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
-	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
-	void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Login state (m_State == 2):
-	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
-	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Game state (m_State == 3):
-	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
-	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
-	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
+	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
 
 
 	/** Sends the data to the client, encrypting them if needed. */
@@ -220,34 +220,32 @@ protected:
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
-	void SendCompass(const cWorld & a_World);
-
 	/** Reads an item out of the received data, sets a_Item to the values read.
 	Returns false if not enough received data.
 	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
 
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	virtual void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
 
-	void StartEncryption(const Byte * a_Key);
+	virtual void StartEncryption(const Byte * a_Key);
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
 	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
 
 	/** Writes the item data into a packet. */
-	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
 	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
-	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the mob-specific metadata for the specified mob */
-	void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
-	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
 	/** Writes the block entity data for the specified block entity into the packet. */
-	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 } ;
