@@ -166,7 +166,6 @@ public:  // tolua_export
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
 	void SendEntityMetadata             (const cEntity & a_Entity);
-	void SendEntityProperties           (const cEntity & a_Entity);
 	void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
@@ -184,7 +183,6 @@ public:  // tolua_export
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
-	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
@@ -209,10 +207,8 @@ public:  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
-	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
+	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData);
-	void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendTeleportEntity             (const cEntity & a_Entity);

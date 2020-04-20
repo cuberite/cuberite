@@ -544,7 +544,7 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 	switch (a_MobType)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 52;
+		case mtInvalidType:           return 53;
 		case mtBat:                   return 65;
 		case mtBlaze:                 return 61;
 		case mtCaveSpider:            return 59;

@@ -92,7 +92,7 @@ cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_Co
 
 void cFloater::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, 90, static_cast<int>(m_PlayerID));
+	a_Client.SendSpawnEntity(*this);
 }
 
 
@@ -107,7 +107,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
 		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSZ_TOINT) == 0))
 	{
-		if ((!m_CanPickupItem) && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if (!m_CanPickupItem && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{

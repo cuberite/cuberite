@@ -22,7 +22,7 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos):
 
 void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnObject(*this, 51, 0);
+	a_ClientHandle.SendSpawnEntity(*this);
 }
 
 

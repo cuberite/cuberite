@@ -2733,15 +2733,6 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, const Vec
 
 
 
-void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
-{
-	m_Protocol->SendPickupSpawn(a_Pickup);
-}
-
-
-
-
-
 void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	m_Protocol->SendPaintingSpawn(a_Painting);
@@ -3031,9 +3022,9 @@ void cClientHandle::SendSoundParticleEffect(const EffectID a_EffectID, int a_Src
 
 
 
-void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+void cClientHandle::SendSpawnEntity(const cEntity & a_Entity)
 {
-	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+	m_Protocol->SendSpawnEntity(a_Entity);
 }
 
 
@@ -3043,24 +3034,6 @@ void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 {
 	m_Protocol->SendSpawnMob(a_Mob);
-}
-
-
-
-
-
-void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
-{
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData);
-}
-
-
-
-
-
-void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)  // VehicleSubType is specific to Minecarts
-{
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
 
