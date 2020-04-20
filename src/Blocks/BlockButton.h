@@ -113,7 +113,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && (cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
+		return (a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn);
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
@@ -162,10 +162,10 @@ private:
 
 	/** Schedules a recurring event at appropriate intervals to release a button at a given position.
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
-	static void QueueButtonRelease(cWorld & a_Wurld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
+	static void QueueButtonRelease(cWorld & a_ButtonWorld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
 	{
 		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
-		a_Wurld.ScheduleTask(
+		a_ButtonWorld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_BlockType](cWorld & a_World)
 			{
@@ -199,7 +199,7 @@ private:
 	}
 
 	/** Returns true if an arrow was found in the wooden button */
-	static bool IsButtonPressedByArrow(cWorld & a_World, const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	static bool IsButtonPressedByArrow(cWorld & a_World, const Vector3i a_ButtonPosition, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
 		if (a_BlockType != E_BLOCK_WOODEN_BUTTON)
 		{
@@ -208,7 +208,7 @@ private:
 
 		const auto FaceOffset = GetButtonOffsetOnBlock(a_Meta);
 		const bool FoundArrow = !a_World.ForEachEntityInBox(
-			cBoundingBox(FaceOffset + a_Position, 0.2, 0.2),
+			cBoundingBox(FaceOffset + a_ButtonPosition, 0.2, 0.2),
 			[](cEntity & a_Entity)
 			{
 				return a_Entity.IsArrow();
