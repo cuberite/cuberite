@@ -60,7 +60,6 @@ public:
 				}
 				return true;
 			}
-			return false;
 		}
 
 		// If there's already a slab in the destination, combine it into a double-slab:
