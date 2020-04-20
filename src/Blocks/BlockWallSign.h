@@ -37,7 +37,11 @@ public:
 	{
 		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetMeta(a_RelPos));
 		BLOCKTYPE NeighborType;
-		a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType);
+		if (!a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType))
+		{
+			// The neighbor is not accessible (unloaded chunk), bail out without changing this
+			return true;
+		}
 		return ((NeighborType == E_BLOCK_WALLSIGN) || (NeighborType == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(NeighborType));
 	}
 
