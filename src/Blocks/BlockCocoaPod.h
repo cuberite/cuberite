@@ -22,16 +22,15 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockFace, true);
-
+		// Check that we're attached to a jungle log block:
+		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelPos));
+		auto LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta);
-
-		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x3) == E_META_LOG_JUNGLE));
+		a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta);
+		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
 	}
 
 

@@ -18,15 +18,19 @@ public:
 	{
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelY - 1 <= 0)
+		if (a_RelPos.y <= 1)
 		{
 			return false;
 		}
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
-		BLOCKTYPE Block = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:
@@ -46,6 +50,10 @@ public:
 			}
 		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

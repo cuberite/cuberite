@@ -27,14 +27,16 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// Is there a doublechest already next to this block?
-		if (!CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ))
+		// Cannot place right next to double-chest:
+		if (!CanBeAt(a_ChunkInterface, a_PlacedBlockPos))
 		{
 			// Yup, cannot form a triple-chest, refuse:
 			return false;
@@ -42,13 +44,13 @@ public:
 
 		// Try to read double-chest information:
 		cBlockArea Area;
-		if (!Area.Read(a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
+		if (!Area.Read(a_ChunkInterface, a_PlacedBlockPos - Vector3i(1, 0, 1), a_PlacedBlockPos + Vector3i(1, 0, 1)))
 		{
 			return false;
 		}
 
 		// Get meta as if this was a single-chest:
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
 		{
 			return false;
 		}
@@ -80,21 +82,20 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		return CanBeAt(a_ChunkInterface, BlockX, a_RelY, BlockZ);
+		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		return CanBeAt(a_ChunkInterface, BlockPos);
 	}
 
 
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
 	{
 		cBlockArea Area;
-		if (!Area.Read(a_ChunkInterface, a_BlockX - 2, a_BlockX + 2, a_BlockY, a_BlockY, a_BlockZ - 2, a_BlockZ + 2))
+		if (!Area.Read(a_ChunkInterface, a_BlockPos - Vector3i(2, 0, 2), a_BlockPos + Vector3i(2, 0, 2)))
 		{
 			// Cannot read the surroundings, probably at the edge of loaded chunks. Disallow.
 			return false;

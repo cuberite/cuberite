@@ -90,30 +90,31 @@ public:
 				// Y Coord out of range
 				continue;
 			}
-			auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Pos);
-			if (chunk == nullptr)
+			auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Pos);
+			if (Chunk == nullptr)
 			{
 				// Unloaded chunk
 				continue;
 			}
-			chunk->GetBlockTypeMeta(Pos, DestBlock, DestMeta);
+			Chunk->GetBlockTypeMeta(Pos, DestBlock, DestMeta);
 			if ((DestBlock != E_BLOCK_DIRT) || (DestMeta != E_META_DIRT_NORMAL))
 			{
 				// Not a regular dirt block
 				continue;
 			}
-			BLOCKTYPE Above = chunk->GetBlock(AbovePos);
-			NIBBLETYPE light = std::max(chunk->GetBlockLight(AbovePos), chunk->GetTimeAlteredLight(chunk->GetSkyLight(AbovePos)));
-			if ((light > 4)  &&
-				cBlockInfo::IsTransparent(Above) &&
-				(!IsBlockLava(Above)) &&
-				(!IsBlockWaterOrIce(Above))
+			auto AboveDestPos = Pos.addedY(1);
+			auto AboveBlockType = Chunk->GetBlock(AboveDestPos);
+			auto Light = std::max(Chunk->GetBlockLight(AboveDestPos), Chunk->GetTimeAlteredLight(Chunk->GetSkyLight(AboveDestPos)));
+			if ((Light > 4)  &&
+				cBlockInfo::IsTransparent(AboveBlockType) &&
+				(!IsBlockLava(AboveBlockType)) &&
+				(!IsBlockWaterOrIce(AboveBlockType))
 			)
 			{
-				auto absPos = chunk->RelativeToAbsolute(Pos);
-				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*chunk->GetWorld(), absPos.x, absPos.y, absPos.z, ssGrassSpread))
+				auto AbsPos = Chunk->RelativeToAbsolute(Pos);
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos.x, AbsPos.y, AbsPos.z, ssGrassSpread))
 				{
-					chunk->FastSetBlock(Pos, E_BLOCK_GRASS, 0);
+					Chunk->FastSetBlock(Pos, E_BLOCK_GRASS, 0);
 				}
 			}
 		}  // for i - repeat twice

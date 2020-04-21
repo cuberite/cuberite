@@ -32,10 +32,30 @@ public:
 
 
 	// Overrides:
-	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override;
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override;
-	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		const Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) override;
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) override;
+
+	virtual cItems ConvertToPickups(
+		NIBBLETYPE a_BlockMeta,
+		cBlockEntity * a_BlockEntity,
+		const cEntity * a_Digger,
+		const cItem * a_Tool
+	) override;
+
+	virtual void OnPlacedByPlayer(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const sSetBlock & a_BlockChange
+	) override;
 
 
 

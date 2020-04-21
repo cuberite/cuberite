@@ -346,41 +346,44 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 bool cItemHandler::OnPlayerPlace(
-	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ
+	cWorld & a_World,
+	cPlayer & a_Player,
+	const cItem & a_EquippedItem,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos
 )
 {
-	if (a_BlockFace < 0)
+	if (a_ClickedBlockFace == BLOCK_FACE_NONE)
 	{
-		// Clicked in air
+		// Clicked in the air, no placement possible
 		return false;
 	}
 
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
 	{
 		// The clicked block is outside the world, ignore this call altogether (#128)
 		return false;
 	}
 
-	BLOCKTYPE ClickedBlock;
+	BLOCKTYPE ClickedBlockType;
 	NIBBLETYPE ClickedBlockMeta;
 
-	a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+	a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	auto blockHandler = BlockHandler(ClickedBlock);
-	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
-	if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, absPos, a_Player, ClickedBlockMeta))
+	auto HandlerB = BlockHandler(ClickedBlockType);
+	auto PlacedBlockPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+	if (HandlerB->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 	{
-		a_World.DropBlockAsPickups(absPos, &a_Player, nullptr);
+		// Replace the clicked block:
+		a_World.DropBlockAsPickups(a_ClickedBlockPos, &a_Player, nullptr);
+		PlacedBlockPos = a_ClickedBlockPos;
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		if (!cChunkDef::IsValidHeight(PlacedBlockPos.y))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (#128)
 			return false;
@@ -388,11 +391,11 @@ bool cItemHandler::OnPlayerPlace(
 
 		NIBBLETYPE PlaceMeta;
 		BLOCKTYPE PlaceBlock;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
+		a_World.GetBlockTypeMeta(PlacedBlockPos, PlaceBlock, PlaceMeta);
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, PlaceMeta))
+		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, PlaceMeta))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -402,14 +405,15 @@ bool cItemHandler::OnPlayerPlace(
 
 	// Get all the blocks to place:
 	sSetBlockVector blocks;
-	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
+	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, blocks))
 	{
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
-			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), a_Player);
+			const auto & AbsPos = blk.GetAbsolutePos();
+			a_World.SendBlockTo(AbsPos, a_Player);
 		}
-		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_World.SendBlockTo(PlacedBlockPos, a_Player);
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
@@ -436,18 +440,19 @@ bool cItemHandler::OnPlayerPlace(
 
 bool cItemHandler::GetBlocksToPlace(
 	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
+	const Vector3i a_PlacedBlockPos,
+	eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos,
 	sSetBlockVector & a_BlocksToSet
 )
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, BlockType, BlockMeta))
 	{
 		return false;
 	}
-	a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	a_BlocksToSet.emplace_back(a_PlacedBlockPos, BlockType, BlockMeta);
 	return true;
 }
 
@@ -457,17 +462,15 @@ bool cItemHandler::GetBlocksToPlace(
 
 bool cItemHandler::OnItemUse(
 	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace
 )
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_PluginInterface);
 	UNUSED(a_Item);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_BlockFace);
+	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockFace);
 
 	return false;
 }
@@ -476,15 +479,19 @@ bool cItemHandler::OnItemUse(
 
 
 
-bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
+bool cItemHandler::OnDiggingBlock(
+	cWorld * a_World,
+	cPlayer * a_Player,
+	const cItem & a_HeldItem,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace
+)
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
-	UNUSED(a_Item);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_Dir);
+	UNUSED(a_HeldItem);
+	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockFace);
 
 	return false;
 }
@@ -815,8 +822,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
+	const Vector3i a_PlacedBlockPos, eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
 {
@@ -832,8 +839,8 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, *a_Player,
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-		a_CursorX, a_CursorY, a_CursorZ,
+		a_PlacedBlockPos, a_ClickedBlockFace,
+		a_CursorPos,
 		a_BlockType, a_BlockMeta
 	);
 }

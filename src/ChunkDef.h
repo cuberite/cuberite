@@ -555,8 +555,17 @@ struct sSetBlock
 	/** Returns the absolute Z coord of the stored block. */
 	int GetZ(void) const { return m_RelZ + cChunkDef::Width * m_ChunkZ; }
 
-	/** Returns the absolute position of the stored block. */
-	Vector3i GetPos(void) const { return Vector3i(GetX(), GetY(), GetZ()); }
+	/** Returns the absolute coords of the stored block. */
+	Vector3i GetAbsolutePos() const
+	{
+		return Vector3i(GetX(), GetY(), GetZ());
+	}
+
+	/** Returns the relative position of the stored block within its chunk. */
+	Vector3i GetRelativePos() const
+	{
+		return Vector3i(m_RelX, m_RelY, m_RelZ);
+	}
 };
 
 typedef std::list<sSetBlock> sSetBlockList;

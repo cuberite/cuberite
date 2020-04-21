@@ -696,6 +696,13 @@ public:
 
 	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
+	/** Sends the block at the specified coords to the player.
+	Used mainly when plugins disable block-placing or block-breaking, to restore the previous block. */
+	void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	{
+		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
+	}
+
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */
 	bool SetSpawn(double a_X, double a_Y, double a_Z);

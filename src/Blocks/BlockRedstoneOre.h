@@ -17,30 +17,38 @@ public:
 
 	using Super::Super;  // Inherit constructor from base
 
+
+
+
+
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ,
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		const Vector3i a_CursorPos
 	) override
 	{
-		Vector3i BlockPos{a_BlockX, a_BlockY, a_BlockZ};
-		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
+		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
 		return false;
 	}
+
+
+
+
 
 	virtual void OnDigging(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
 		cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ
+		const Vector3i a_BlockPos
 	) override
 	{
-		Vector3i BlockPos{a_BlockX, a_BlockY, a_BlockZ};
-		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
+		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
 	}
+
+
+
+
 
 	virtual bool IsUseable() override
 	{
@@ -60,6 +68,10 @@ class cBlockGlowingRedstoneOreHandler:
 public:
 
 	using Super::Super;  // Inherit constructor from base
+
+
+
+
 
 	virtual void OnUpdate(
 		cChunkInterface & a_ChunkInterface,

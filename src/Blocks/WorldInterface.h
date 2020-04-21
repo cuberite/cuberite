@@ -60,6 +60,12 @@ public:
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
 
+	/** Sends the block on those coords to the player */
+	inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	{
+		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
+	}
+
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) = 0;
 

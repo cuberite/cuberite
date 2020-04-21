@@ -7,22 +7,26 @@
 
 
 
-class cBlockEndPortalFrameHandler :
+class cBlockEndPortalFrameHandler:
 	public cMetaRotator<cBlockHandler, 0x03,
-	E_META_END_PORTAL_FRAME_ZM,
-	E_META_END_PORTAL_FRAME_XP,
-	E_META_END_PORTAL_FRAME_ZP,
-	E_META_END_PORTAL_FRAME_XM
-	>
-{
-public:
-	cBlockEndPortalFrameHandler(BLOCKTYPE a_BlockType):
-		cMetaRotator<cBlockHandler, 0x03,
 		E_META_END_PORTAL_FRAME_ZM,
 		E_META_END_PORTAL_FRAME_XP,
 		E_META_END_PORTAL_FRAME_ZP,
 		E_META_END_PORTAL_FRAME_XM
-		>(a_BlockType)
+	>
+{
+	using Super = cMetaRotator<
+		cBlockHandler, 0x03,
+		E_META_END_PORTAL_FRAME_ZM,
+		E_META_END_PORTAL_FRAME_XP,
+		E_META_END_PORTAL_FRAME_ZP,
+		E_META_END_PORTAL_FRAME_XM
+	>;
+
+public:
+
+	cBlockEndPortalFrameHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 
@@ -31,9 +35,11 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{

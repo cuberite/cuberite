@@ -16,25 +16,34 @@
 class cItemBucketHandler :
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemBucketHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemBucketHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_LAVA);
-			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_WATER);
+			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace);
+			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_LAVA);
+			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_WATER);
 			default:
 			{
 				ASSERT(!"Unhandled ItemType");
@@ -45,7 +54,9 @@ public:
 
 
 
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+
+
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace)
 	{
 		// Players can't pick up fluid while in adventure mode.
 		if (a_Player->IsGameModeAdventure())
@@ -53,7 +64,8 @@ public:
 			return false;
 		}
 
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		// Needs a valid clicked block:
+		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
@@ -114,7 +126,7 @@ public:
 
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
+		const Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
 	)
 	{
 		// Players can't place fluid while in adventure mode.
@@ -216,6 +228,8 @@ public:
 		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
+
+
 
 
 
