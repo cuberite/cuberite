@@ -490,14 +490,22 @@ void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 {
 	Vector3d BodyDistance;
-	if (!a_IsFollowingPath && (GetTarget() != nullptr))
+	if (!a_IsFollowingPath)
 	{
+		if (GetTarget() == nullptr)
+		{
+			// Avoid dirtying head position when nothing will change
+			// Thus avoids creating unnecessary network traffic
+			return;
+		}
+
 		BodyDistance = GetTarget()->GetPosition() - GetPosition();
 	}
 	else
 	{
 		BodyDistance = m_NextWayPointPosition - GetPosition();
 	}
+
 	double BodyRotation, BodyPitch;
 	BodyDistance.Normalize();
 	VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, BodyRotation, BodyPitch);
