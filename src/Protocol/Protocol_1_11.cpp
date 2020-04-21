@@ -394,8 +394,8 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());  // Doesn't seem to be used
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
