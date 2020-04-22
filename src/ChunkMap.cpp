@@ -414,47 +414,19 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
 
 
 
-int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
+cpp17::optional<int> cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
-	for (;;)
-	{
-		cCSLock Lock(m_CSChunks);
-		int ChunkX, ChunkZ, BlockY = 0;
-		cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
-		cChunkPtr Chunk = GetChunk(ChunkX, ChunkZ);
-		if (Chunk == nullptr)
-		{
-			return 0;
-		}
-
-		if (Chunk->IsValid())
-		{
-			return Chunk->GetHeight(a_BlockX, a_BlockZ);
-		}
-
-		// The chunk is not valid, wait for it to become valid:
-		cCSUnlock Unlock(Lock);
-		m_evtChunkValid.Wait();
-	}  // while (true)
-}
-
-
-
-
-
-bool cChunkMap::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
-{
-	// Returns false if chunk not loaded / generated
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ, BlockY = 0;
 	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
-		return false;
+		return cpp17::nullopt;
 	}
-	a_Height = Chunk->GetHeight(a_BlockX, a_BlockZ);
-	return true;
+
+	return Chunk->GetHeight(a_BlockX, a_BlockZ);
 }
 
 

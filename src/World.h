@@ -23,6 +23,7 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
+#include "Optional.h"
 
 
 
@@ -155,13 +156,10 @@ public:
 
 	virtual eDimension GetDimension(void) const override { return m_Dimension; }
 
-	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	virtual int GetHeight(int a_BlockX, int a_BlockZ) override;
-
 	// tolua_end
 
-	/** Retrieves the world height at the specified coords; returns false if chunk not loaded / generated */
-	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
+	/** Retrieves the world height at the specified coords; returns nullopt if chunk not loaded / generated */
+	virtual cpp17::optional<int> GetHeight(int a_BlockX, int a_BlockZ) override;  // Exported in ManualBindings.cpp
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// Implemented in Broadcaster.cpp
@@ -1048,14 +1046,15 @@ public:
 		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
 	}
 
+	// tolua_end
+
 	/** Returns true if it is raining or storming at the specified location,
-	and the rain reaches (the bottom of) the specified block position. */
-	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) override;
+	and the rain reaches (the bottom of) the specified block position.
+	Returns nullopt for unloaded chunks. */
+	virtual cpp17::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) override;  // Exported in ManualBindings_World.cpp
 
 	/** Returns the seed of the world. */
-	int GetSeed(void) { return m_Generator.GetSeed(); }
-
-	// tolua_end
+	int GetSeed(void) { return m_Generator.GetSeed(); }  // tolua_export
 
 	cChunkGeneratorThread & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }

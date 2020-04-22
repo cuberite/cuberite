@@ -908,7 +908,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
-	/* Exported manually, because tolua would require the out-only param a_Height to be used when calling
+	/* Exported manually because we don't export optional<T>
 	Function signature: world:TryGetHeight(a_World, a_BlockX, a_BlockZ) -> IsValid, Height
 	*/
 
@@ -935,14 +935,74 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 	}
 
 	// Call the implementation:
-	int Height = 0;
-	bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-	L.Push(res);
-	if (res)
+	cpp17::optional<int> Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.has_value());
+	if (Height.has_value())
 	{
-		L.Push(Height);
+		L.Push(Height.value());
 		return 2;
 	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetHeight(lua_State * tolua_S)
+{
+	// Signature: world:GetHeight(a_World, a_BlockX, a_BlockZ) -> Height
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 3) ||
+		!L.CheckParamEnd(4)
+		)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * self = nullptr;
+	int BlockX = 0;
+	int BlockZ = 0;
+	L.GetStackValues(1, self, BlockX, BlockZ);
+
+	// Call the implementation:
+	FLOGWARN("cWorld:GetHeight is DEPRECATED, use TryGetHeight instead");
+	cpp17::optional<int> Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.value_or(0));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_IsWeatherWetAtXYZ(lua_State * tolua_S)
+{
+	/* Signature: world:IsWeatherWetAtXYZ(Vector) -> boolean */
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamVector3(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * self = nullptr;
+	Vector3i BlockPos;
+	L.GetStackValues(1, self, BlockPos);
+
+	// Call the implementation:
+	cpp17::optional<bool> IsWet = self->IsWeatherWetAtXYZ(BlockPos);
+	L.Push(IsWet.value_or(true));
 	return 1;
 }
 
@@ -997,6 +1057,8 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
+			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
+			tolua_function(tolua_S, "IsWeatherWetAtXYZ",                    tolua_cWorld_IsWeatherWetAtXYZ);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }

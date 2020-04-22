@@ -62,6 +62,7 @@ SET (SRCS
 	MobSpawner.cpp
 	MonsterConfig.cpp
 	NetherPortalScanner.cpp
+	Optional.cpp
 	OverridesSettingsRepository.cpp
 	PalettedBlockArea.cpp
 	ProbabDistrib.cpp

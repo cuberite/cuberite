@@ -1205,7 +1205,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	}
 
 	// Fire is extinguished by rain
-	if (GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()))
+	if (GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()).value_or(false))
 	{
 		m_TicksLeftBurning = 0;
 	}

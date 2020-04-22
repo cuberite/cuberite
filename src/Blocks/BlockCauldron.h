@@ -123,7 +123,8 @@ public:
 	) override
 	{
 		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		if (!a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
+		auto IsWet = a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1));
+		if (!IsWet.value_or(false))
 		{
 			// It's not raining at our current location or we do not have a direct view of the sky
 			return;

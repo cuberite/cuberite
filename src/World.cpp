@@ -562,7 +562,7 @@ void cWorld::ChangeWeather(void)
 
 
 
-bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
+cpp17::optional<bool> cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 {
 	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
 	{
@@ -574,7 +574,13 @@ bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 		return true;
 	}
 
-	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
+	auto Height = GetHeight(a_Pos.x, a_Pos.z);
+	if (!Height)
+	{
+		return cpp17::nullopt;
+	}
+
+	for (int y = Height.value(); y >= a_Pos.y; y--)
 	{
 		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
 		if (cBlockInfo::IsRainBlocker(BlockType))
@@ -742,7 +748,9 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 		}
 	}
 
-	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
+	// FIXME: Can this GetHeight call fail?
+	m_SpawnY = GetHeight(
+		static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ)).value_or(80);
 	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 }
 
@@ -766,7 +774,8 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
-	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
+	// FIXME: can fail
+	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)).value_or(80) + 2;
 	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 2.0f);
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
@@ -2266,18 +2275,9 @@ void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 
 
 
-int cWorld::GetHeight(int a_X, int a_Z)
+cpp17::optional<int> cWorld::GetHeight(int a_X, int a_Z)
 {
 	return m_ChunkMap->GetHeight(a_X, a_Z);
-}
-
-
-
-
-
-bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
-{
-	return m_ChunkMap->TryGetHeight(a_BlockX, a_BlockZ, a_Height);
 }
 
 
