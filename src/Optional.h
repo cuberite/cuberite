@@ -8,11 +8,11 @@ extern nullopt_t nullopt;
 
 
 /** Cheap imitation of std::optional<T>
- *
- * Provides the interface of std::optional but doesn't end the lifetime of the
- * held object when !has_value(). Instead, it just sets it to the default
- * value.
- */
+
+	Provides the interface of std::optional but doesn't end the lifetime of the
+	held object when !has_value(). Instead, it just sets it to the default
+	value.
+*/
 template <typename T>
 class optional
 {
@@ -72,7 +72,7 @@ public:
 	const T & operator *() const { return value(); }
 
 	template <typename U>
-	T value_or(U && default_value) const &
+	T value_or(U && default_value) const&
 	{
 		if (m_IsEngaged)
 		{
