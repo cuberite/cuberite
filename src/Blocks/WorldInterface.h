@@ -98,7 +98,7 @@ public:
 	virtual void SetMinNetherPortalHeight(int a_NewMinHeight) = 0;
 	virtual void SetMaxNetherPortalHeight(int a_NewMaxHeight) = 0;
 
-	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
+	/** Returns the world height at the specified coords; returns nullopt for unloaded / generated chunks */
 	virtual cpp17::optional<int> GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */

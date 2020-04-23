@@ -935,7 +935,7 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 	}
 
 	// Call the implementation:
-	cpp17::optional<int> Height = self->GetHeight(BlockX, BlockZ);
+	auto Height = self->GetHeight(BlockX, BlockZ);
 	L.Push(Height.has_value());
 	if (Height.has_value())
 	{
@@ -972,7 +972,7 @@ static int tolua_cWorld_GetHeight(lua_State * tolua_S)
 
 	// Call the implementation:
 	FLOGWARN("cWorld:GetHeight is DEPRECATED, use TryGetHeight instead");
-	cpp17::optional<int> Height = self->GetHeight(BlockX, BlockZ);
+	auto Height = self->GetHeight(BlockX, BlockZ);
 	L.Push(Height.value_or(0));
 	return 1;
 }
@@ -1001,7 +1001,7 @@ static int tolua_cWorld_IsWeatherWetAtXYZ(lua_State * tolua_S)
 	L.GetStackValues(1, self, BlockPos);
 
 	// Call the implementation:
-	cpp17::optional<bool> IsWet = self->IsWeatherWetAtXYZ(BlockPos);
+	auto IsWet = self->IsWeatherWetAtXYZ(BlockPos);
 	L.Push(IsWet.value_or(true));
 	return 1;
 }
@@ -1058,7 +1058,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
 			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
-			tolua_function(tolua_S, "IsWeatherWetAtXYZ",                    tolua_cWorld_IsWeatherWetAtXYZ);
+			tolua_function(tolua_S, "IsWeatherWetAtXYZ",            tolua_cWorld_IsWeatherWetAtXYZ);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }
