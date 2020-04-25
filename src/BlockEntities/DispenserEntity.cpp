@@ -115,7 +115,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			double MobX = 0.5 + dispAbsCoord.x;
 			double MobZ = 0.5 + dispAbsCoord.z;
 			auto MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(m_Contents.GetSlot(a_SlotNum).m_ItemDamage);
-			if (m_World->SpawnMob(MobX, dispAbsCoord.y, MobZ, static_cast<eMonsterType>(MonsterType), false) != cEntity::INVALID_ID)
+			if (m_World->SpawnMob(MobX, dispAbsCoord.y, MobZ, MonsterType, false) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
