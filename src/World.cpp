@@ -580,7 +580,7 @@ cpp17::optional<bool> cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 		return cpp17::nullopt;
 	}
 
-	for (int y = Height.value(); y >= a_Pos.y; y--)
+	for (int y = *Height; y >= a_Pos.y; y--)
 	{
 		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
 		if (cBlockInfo::IsRainBlocker(BlockType))
@@ -688,26 +688,22 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	for (int BiomeCheckIndex = 0; BiomeCheckIndex < BiomeCheckCount; ++BiomeCheckIndex)
 	{
 		EMCSBiome Biome = GetBiomeAt(BiomeOffset.x, BiomeOffset.z);
-		if ((Biome == EMCSBiome::biOcean) || (Biome == EMCSBiome::biFrozenOcean))
+		if ((Biome != EMCSBiome::biOcean) && (Biome != EMCSBiome::biFrozenOcean))
 		{
-			BiomeOffset += Vector3d(cChunkDef::Width * 4, 0, 0);
-			continue;
+			// Found a usable biome
+			break;
 		}
 
-		// Found a usable biome
-		// Spawn chunks so we can find a nice spawn.
-		int ChunkX = 0, ChunkZ = 0;
-		cChunkDef::BlockToChunk(BiomeOffset.x, BiomeOffset.z, ChunkX, ChunkZ);
-		cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
-		break;
+		BiomeOffset.x += cChunkDef::Width * 4;
 	}
 
 	// Check 0, 0 first.
-	double SpawnY = 0.0;
-	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
+	Vector3d BiomeSpawn = BiomeOffset;
+	if (CanSpawnAt(BiomeSpawn.x, BiomeSpawn.y, BiomeSpawn.z))
 	{
-		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
-
+		SetSpawn(BiomeSpawn.x + 0.5, BiomeSpawn.y, BiomeSpawn.z + 0.5);
+		auto ChunkPos = cChunkDef::BlockToChunk(GetSpawnPos().Floor());
+		cSpawnPrepare::PrepareChunks(*this, ChunkPos, a_MaxSpawnRadius);
 		FLOGINFO("World \"{0}\": Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 		return;
 	}
@@ -727,6 +723,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	};
 
 	static const int PerRadiSearchCount = ARRAYCOUNT(ChunkOffset);
+	double SpawnY = 0.0;
 
 	for (int RadiusOffset = 1; RadiusOffset < (a_MaxSpawnRadius * 2); ++RadiusOffset)
 	{
@@ -738,9 +735,8 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 			{
 				SetSpawn(PotentialSpawn.x + 0.5, SpawnY, PotentialSpawn.z + 0.5);
 
-				int ChunkX, ChunkZ;
-				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
-				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
+				auto ChunkPos = cChunkDef::BlockToChunk(GetSpawnPos().Floor());
+				cSpawnPrepare::PrepareChunks(*this, ChunkPos, a_MaxSpawnRadius);
 
 				FLOGINFO("World \"{0}\":Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 				return;
@@ -748,9 +744,9 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 		}
 	}
 
-	// FIXME: Can this GetHeight call fail?
-	m_SpawnY = GetHeight(
-		static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ)).value_or(80);
+	SetSpawn(BiomeSpawn.x + 0.5, BiomeSpawn.y, BiomeSpawn.z + 0.5);
+	auto ChunkPos = cChunkDef::BlockToChunk(GetSpawnPos().Floor());
+	cSpawnPrepare::PrepareChunks(*this, ChunkPos, a_MaxSpawnRadius);
 	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 }
 
@@ -771,11 +767,56 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 		E_BLOCK_NETHERRACK
 	};
 
+
+	class cCanSpawnChunkStay:
+		public cChunkStay
+	{
+		cEvent m_ChunksReady;
+	public:
+
+		cCanSpawnChunkStay(double a_X, double a_Z)
+		{
+			auto Chunk = cChunkDef::BlockToChunk(Vector3d{a_X, 0.0, a_Z}.Floor());
+			for (int XOffset = -1; XOffset != 2; ++XOffset)
+			{
+				for (int ZOffset = -1; ZOffset != 2; ++ZOffset)
+				{
+					Add(Chunk.m_ChunkX + XOffset, Chunk.m_ChunkZ + ZOffset);
+				}
+			}
+		}
+
+		virtual ~cCanSpawnChunkStay() override
+		{
+			Disable();
+		}
+
+		virtual bool OnAllChunksAvailable() override
+		{
+			m_ChunksReady.Set();
+			return false;  // Keep chunk stay active
+		}
+
+		virtual void OnChunkAvailable(int, int) override {}
+		virtual void OnDisabled() override {}
+
+		void Wait()
+		{
+			m_ChunksReady.Wait();
+		}
+	};
+
+	// Use chunk stay to load 3x3 chunk area around a_X, a_Z
+	cCanSpawnChunkStay ChunkStay(a_X, a_Z);
+	ChunkStay.Enable(*m_ChunkMap);
+	ChunkStay.Wait();
+
 	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
-	// FIXME: can fail
-	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)).value_or(80) + 2;
+	auto Height = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z));
+	ASSERT(Height.has_value());
+	static const int HighestSpawnPoint = *Height + 2;
 	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 2.0f);
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
@@ -825,6 +866,8 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 		return true;
 	}
 
+	// Always set a_Y so it can be used when we fail to find any spawn point
+	a_Y = HighestSpawnPoint - 2;
 	return false;
 }
 

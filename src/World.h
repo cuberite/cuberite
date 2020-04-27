@@ -706,6 +706,10 @@ public:
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
 	double GetSpawnZ(void) const { return m_SpawnZ; }
+	Vector3d GetSpawnPos() const
+	{
+		return {m_SpawnX, m_SpawnY, m_SpawnZ};
+	}
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) override;

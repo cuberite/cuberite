@@ -1997,6 +1997,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns the Z coord of the default spawn",
 			},
+			GetSpawnPos =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3d"
+					},
+				},
+				Notes = "Returns the default spawn position",
+			},
 			GetStorageLoadQueueLength =
 			{
 				Returns =
