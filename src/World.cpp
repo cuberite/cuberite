@@ -457,21 +457,6 @@ cWorld::~cWorld()
 	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
 	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
-
-	m_Storage.WaitForFinish();
-
-	if (IsSavingEnabled())
-	{
-		// Unload the scoreboard
-		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
-		Serializer.Save();
-
-		m_MapManager.SaveMapData();
-	}
-
-	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
-	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
-	m_ChunkMap.reset();
 }
 
 
@@ -964,11 +949,25 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 	m_Lighting.Stop();
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
-	m_Storage.Stop();
+	m_Storage.Stop();  // Waits for thread to finish
 
 	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
 	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
 	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
+
+	if (IsSavingEnabled())
+	{
+		// Unload the scoreboard
+		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
+		Serializer.Save();
+
+		m_MapManager.SaveMapData();
+	}
+
+	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
+	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
+	// TODO: destructors should only be used for releasing resources, not doing extra work
+	m_ChunkMap.reset();
 }
 
 
