@@ -1739,7 +1739,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!",
+				Notes = "<b>DEPRECATED</b>, use TryGetHeight instead. Returns the maximum height of the particular block column in the world. If the chunk is not loaded, this function used to block until the chunk was loaded, leading to possible deadlock. Now it returns 0 instead.",
 			},
 			GetIniFileName =
 			{

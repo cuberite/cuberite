@@ -971,6 +971,7 @@ static int tolua_cWorld_GetHeight(lua_State * tolua_S)
 	L.GetStackValues(1, self, BlockX, BlockZ);
 
 	// Call the implementation:
+	L.LogStackTrace();
 	FLOGWARN("cWorld:GetHeight is DEPRECATED, use TryGetHeight instead");
 	auto Height = self->GetHeight(BlockX, BlockZ);
 	L.Push(Height.value_or(0));
@@ -1050,15 +1051,15 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachPlayer",                ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "GetBlockInfo",                 tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",             tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
 			tolua_function(tolua_S, "GetSignLines",                 tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "IsWeatherWetAtXYZ",            tolua_cWorld_IsWeatherWetAtXYZ);
 			tolua_function(tolua_S, "PrepareChunk",                 tolua_cWorld_PrepareChunk);
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
-			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
-			tolua_function(tolua_S, "IsWeatherWetAtXYZ",            tolua_cWorld_IsWeatherWetAtXYZ);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }
