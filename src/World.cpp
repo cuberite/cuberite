@@ -774,9 +774,9 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 		cEvent m_ChunksReady;
 	public:
 
-		cCanSpawnChunkStay(double a_X, double a_Z)
+		cCanSpawnChunkStay(double a_WorldX, double a_WorldZ)
 		{
-			auto Chunk = cChunkDef::BlockToChunk(Vector3d{a_X, 0.0, a_Z}.Floor());
+			auto Chunk = cChunkDef::BlockToChunk(Vector3d{a_WorldX, 0.0, a_WorldZ}.Floor());
 			for (int XOffset = -1; XOffset != 2; ++XOffset)
 			{
 				for (int ZOffset = -1; ZOffset != 2; ++ZOffset)
