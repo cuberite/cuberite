@@ -1,13 +1,13 @@
 
 #pragma once
 
-#include "Protocol/Authenticator.h"
-#include "Protocol/MojangAPI.h"
-#include "HTTP/HTTPServer.h"
+#include "BlockTypeRegistry.h"
 #include "Defines.h"
 #include "FunctionRef.h"
+#include "HTTP/HTTPServer.h"
+#include "Protocol/Authenticator.h"
+#include "Protocol/MojangAPI.h"
 #include "RankManager.h"
-#include "BlockTypeRegistry.h"
 
 
 
@@ -144,7 +144,7 @@ public:
 	void TickCommands(void);
 
 	/** Returns the number of chunks loaded */
-	int GetTotalChunkCount(void);  // tolua_export
+	size_t GetTotalChunkCount(void);  // tolua_export
 
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
@@ -212,10 +212,10 @@ private:
 		cCommandOutputCallback * m_Output;
 	} ;
 
-	typedef std::map<AString, cWorld *> WorldMap;
+	typedef std::map<AString, cWorld> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
 
-	cWorld * m_pDefaultWorld;
+	AString m_DefaultWorldName;
 	WorldMap m_WorldsByName;
 
 	cCriticalSection m_CSPendingCommands;
@@ -264,12 +264,6 @@ private:
 
 	/** Stops each world's threads, so that it's safe to unload them */
 	void StopWorlds(cDeadlockDetect & a_DeadlockDetect);
-
-	/** Unloads all worlds from memory */
-	void UnloadWorlds(void);
-
-	/** Does the actual work of executing a command */
-	void DoExecuteConsoleCommand(const AString & a_Cmd);
 
 	static cRoot * s_Root;
 

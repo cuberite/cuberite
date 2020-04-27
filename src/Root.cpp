@@ -53,7 +53,6 @@ cRoot * cRoot::s_Root = nullptr;
 
 
 cRoot::cRoot(void) :
-	m_pDefaultWorld(nullptr),
 	m_Server(nullptr),
 	m_MonsterConfig(nullptr),
 	m_CraftingRecipes(nullptr),
@@ -306,9 +305,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
 	delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
 
-	LOG("Unloading worlds...");
-	UnloadWorlds();
-
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
@@ -454,11 +450,13 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
 		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
 
-		AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
-		m_pDefaultWorld = new cWorld("world", "world", a_dd, WorldNames);
-		m_WorldsByName["world"] = m_pDefaultWorld;
-		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
-		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
+		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
+		m_DefaultWorldName = "world";
+
+		// TODO: C++17 try_emplace
+		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world"), std::forward_as_tuple("world", "world", a_dd, WorldNames));
+		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world_nether"), std::forward_as_tuple("world_nether", "world_nether", a_dd, WorldNames, dimNether, "world"));
+		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world_the_end"), std::forward_as_tuple("world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world"));
 		return;
 	}
 
@@ -473,8 +471,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	// Get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_pDefaultWorld = new cWorld(DefaultWorldName, DefaultWorldPath, a_dd, WorldNames);
-	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
+	m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple(DefaultWorldName), std::forward_as_tuple(DefaultWorldName, DefaultWorldPath, a_dd, WorldNames));
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -518,7 +515,6 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld * NewWorld;
 		AString LowercaseName = StrToLower(WorldName);
 		AString WorldPath = a_Settings.GetValueSet("WorldPaths", WorldName, WorldName);
 		AString NetherAppend = "_nether";
@@ -539,7 +535,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = DefaultWorldName;
+				LinkTo = m_DefaultWorldName;
 			}
 			Dimension = dimNether;
 		}
@@ -553,7 +549,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = DefaultWorldName;
+				LinkTo = m_DefaultWorldName;
 			}
 			Dimension = dimEnd;
 		}
@@ -567,12 +563,11 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = DefaultWorldName;
+				LinkTo = m_DefaultWorldName;
 			}
 			Dimension = dimEnd;
 		}
-		NewWorld = new cWorld(WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo);
-		m_WorldsByName[WorldName] = NewWorld;
+		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple(WorldName), std::forward_as_tuple(WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo));
 	}  // for i - Worlds
 
 	if (!FoundAdditionalWorlds)
@@ -591,11 +586,12 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->Start();
-		itr->second->InitializeSpawn();
-		m_PluginManager->CallHookWorldStarted(*itr->second);
+		auto & World = Entry.second;
+		World.Start();
+		World.InitializeSpawn();
+		m_PluginManager->CallHookWorldStarted(World);
 	}
 }
 
@@ -605,24 +601,10 @@ void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 
 void cRoot::StopWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->Stop(a_DeadlockDetect);
+		Entry.second.Stop(a_DeadlockDetect);
 	}
-}
-
-
-
-
-
-void cRoot::UnloadWorlds(void)
-{
-	m_pDefaultWorld = nullptr;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
-	{
-		delete itr->second;
-	}
-	m_WorldsByName.clear();
 }
 
 
@@ -631,7 +613,13 @@ void cRoot::UnloadWorlds(void)
 
 cWorld * cRoot::GetDefaultWorld()
 {
-	return m_pDefaultWorld;
+	const auto FindResult = m_WorldsByName.find(m_DefaultWorldName);
+	if (FindResult == m_WorldsByName.cend())
+	{
+		return nullptr;
+	}
+
+	return &FindResult->second;
 }
 
 
@@ -640,10 +628,10 @@ cWorld * cRoot::GetDefaultWorld()
 
 cWorld * cRoot::GetWorld(const AString & a_WorldName)
 {
-	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
-	if (itr != m_WorldsByName.end())
+	const auto FindResult = m_WorldsByName.find(a_WorldName);
+	if (FindResult != m_WorldsByName.cend())
 	{
-		return itr->second;
+		return &FindResult->second;
 	}
 
 	return nullptr;
@@ -657,12 +645,9 @@ bool cRoot::ForEachWorld(cWorldListCallback a_Callback)
 {
 	for (auto & World : m_WorldsByName)
 	{
-		if (World.second != nullptr)
+		if (a_Callback(World.second))
 		{
-			if (a_Callback(*World.second))
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 	return true;
@@ -753,14 +738,14 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID
 
 
 
-int cRoot::GetTotalChunkCount(void)
+size_t cRoot::GetTotalChunkCount(void)
 {
-	int res = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	size_t Count = 0;
+	for (const auto & Entry : m_WorldsByName)
 	{
-		res += static_cast<int>(itr->second->GetNumChunks());
+		Count += Entry.second.GetNumChunks();
 	}
-	return res;
+	return Count;
 }
 
 
@@ -769,9 +754,9 @@ int cRoot::GetTotalChunkCount(void)
 
 void cRoot::SaveAllChunks(void)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->QueueSaveAllChunks();
+		Entry.second.QueueSaveAllChunks();
 	}
 }
 
@@ -781,9 +766,9 @@ void cRoot::SaveAllChunks(void)
 
 void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->SetSavingEnabled(a_SavingEnabled);
+		Entry.second.SetSavingEnabled(a_SavingEnabled);
 	}
 }
 
@@ -793,10 +778,10 @@ void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 
 void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->SendPlayerList(a_DestPlayer);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.SendPlayerList(a_DestPlayer);
+	}
 }
 
 
@@ -805,10 +790,10 @@ void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->BroadcastPlayerListAddPlayer(a_Player);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastPlayerListAddPlayer(a_Player);
+	}
 }
 
 
@@ -817,10 +802,10 @@ void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClien
 
 void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->BroadcastPlayerListRemovePlayer(a_Player);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastPlayerListRemovePlayer(a_Player);
+	}
 }
 
 
@@ -829,10 +814,10 @@ void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cCl
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastChat(a_Message, nullptr, a_ChatPrefix);
+	}
 }
 
 
@@ -841,10 +826,10 @@ void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 
 void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastChat(a_Message);
+	}
 }
 
 
@@ -853,10 +838,9 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 
 bool cRoot::ForEachPlayer(cPlayerListCallback a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
+	for (auto & Entry : m_WorldsByName)
 	{
-		++itr2;
-		if (!itr->second->ForEachPlayer(a_Callback))
+		if (!Entry.second.ForEachPlayer(a_Callback))
 		{
 			return false;
 		}
@@ -920,9 +904,9 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
+		if (Entry.second.DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
 		{
 			return true;
 		}
@@ -936,9 +920,9 @@ bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a
 
 bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
-	for (auto World : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		if (World.second->DoWithPlayer(a_PlayerName, a_Callback))
+		if (Entry.second.DoWithPlayer(a_PlayerName, a_Callback))
 		{
 			return true;
 		}
@@ -1070,23 +1054,23 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	int SumNumInLighting = 0;
 	int SumNumInGenerator = 0;
 	int SumMem = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		cWorld * World = itr->second;
-		int NumInGenerator = World->GetGeneratorQueueLength();
-		int NumInSaveQueue = static_cast<int>(World->GetStorageSaveQueueLength());
-		int NumInLoadQueue = static_cast<int>(World->GetStorageLoadQueueLength());
+		auto & World = Entry.second;
+		const auto NumInGenerator = World.GetGeneratorQueueLength();
+		const auto NumInSaveQueue = World.GetStorageSaveQueueLength();
+		const auto NumInLoadQueue = World.GetStorageLoadQueueLength();
 		int NumValid = 0;
 		int NumDirty = 0;
 		int NumInLighting = 0;
-		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
-		a_Output.Out("World %s:", World->GetName().c_str());
+		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
+		a_Output.Out("World %s:", World.GetName().c_str());
 		a_Output.Out("  Num loaded chunks: %d", NumValid);
 		a_Output.Out("  Num dirty chunks: %d", NumDirty);
 		a_Output.Out("  Num chunks in lighting queue: %d", NumInLighting);
-		a_Output.Out("  Num chunks in generator queue: %d", NumInGenerator);
-		a_Output.Out("  Num chunks in storage load queue: %d", NumInLoadQueue);
-		a_Output.Out("  Num chunks in storage save queue: %d", NumInSaveQueue);
+		a_Output.Out("  Num chunks in generator queue: %zu", NumInGenerator);
+		a_Output.Out("  Num chunks in storage load queue: %zu", NumInLoadQueue);
+		a_Output.Out("  Num chunks in storage save queue: %zu", NumInSaveQueue);
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
 		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
 		a_Output.Out("  Per-chunk memory size breakdown:");

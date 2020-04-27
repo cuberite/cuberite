@@ -121,10 +121,10 @@ void cChunkGeneratorThread::WaitForQueueEmpty(void)
 
 
 
-int cChunkGeneratorThread::GetQueueLength(void) const
+size_t cChunkGeneratorThread::GetQueueLength(void) const
 {
 	cCSLock Lock(m_CS);
-	return static_cast<int>(m_Queue.size());
+	return m_Queue.size();
 }
 
 
