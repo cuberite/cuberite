@@ -2005,18 +2005,6 @@ void cPlayer::TossHeldItem(char a_Amount)
 
 
 
-void cPlayer::TossPickup(const cItem & a_Item)
-{
-	cItems Drops;
-	Drops.push_back(a_Item);
-
-	TossItems(Drops);
-}
-
-
-
-
-
 void cPlayer::TossItems(const cItems & a_Items)
 {
 	if (IsGameModeSpectator())  // Players can't toss items in spectator
@@ -2026,10 +2014,21 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
+	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
+	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
+	m_World->SpawnItemPickups(a_Items, Position, Speed, true);  // 'true' because created by player
+}
+
+
+
+
+
+void cPlayer::TossPickup(const cItem & a_Item)
+{
+	cItems Drops;
+	Drops.push_back(a_Item);
+
+	TossItems(Drops);
 }
 
 

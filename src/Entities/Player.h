@@ -329,6 +329,9 @@ public:
 	/** tosses the item held in hand (when in UI windows) */
 	void TossHeldItem(char a_Amount = 1);
 
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
+
 	/** tosses a pickup newly created from a_Item */
 	void TossPickup(const cItem & a_Item);
 
@@ -768,9 +771,6 @@ protected:
 
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
-
-	/** Tosses a list of items. */
-	void TossItems(const cItems & a_Items);
 
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
