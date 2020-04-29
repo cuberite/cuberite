@@ -307,6 +307,10 @@ protected:
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
 	eNBTParseError ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
+
+	/** Returns the minimum size, in bytes, of the specified tag type.
+	Used for sanity-checking. */
+	static size_t GetMinTagSize(eTagType a_TagType);
 } ;
 
 
