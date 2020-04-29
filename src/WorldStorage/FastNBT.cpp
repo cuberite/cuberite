@@ -443,6 +443,7 @@ size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
 {
 	switch (a_TagType)
 	{
+		case TAG_End:       return 1;
 		case TAG_Byte:      return 1;
 		case TAG_Short:     return 2;
 		case TAG_Int:       return 4;
@@ -455,6 +456,7 @@ size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
 		case TAG_Compound:  return 1;  // Single TAG_End byte
 		case TAG_IntArray:  return 4;  // 4 bytes for the count
 	}
+	UNREACHABLE("Unsupported nbt tag type");
 }
 
 
