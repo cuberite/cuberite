@@ -30,13 +30,6 @@
 
 
 
-/** Converts an angle in radians into a byte representation used by the network protocol */
-#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
@@ -244,16 +237,11 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height):
-	Super(etProjectile, a_Pos, a_Width, a_Height),
-	m_ProjectileKind(a_Kind),
-	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
-	m_IsInGround(false)
+	cProjectileEntity(a_Kind, a_Creator, a_Pos, a_Width, a_Height)
 {
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
-	SetGravity(-12.0f);
-	SetAirDrag(0.01f);
 }
 
 
@@ -456,7 +444,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12);
 	a_Client.SendEntityMetadata(*this);
 }
 

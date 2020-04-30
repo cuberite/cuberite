@@ -8,7 +8,10 @@
 #
 # **** Item Definition ****
 # An Item is defined by an Item Type, an amount (and damage)
-# The damage is optional, and if not specified it's assumed to be 0
+# The damage is optional, and if not specified it's assumed to be 0.
+# If a damage of -1 is specified, then the damage won't be checked when matching recipes.
+# Note that when specifying items using names from items.ini, those already contain the damage value in them,
+# so the damage value doesn't need to be specified here.
 #
 # Cactus Green example:
 #    351     :   2    ( ,   1    )
@@ -25,7 +28,7 @@
 #    Cobble  :   0    ,   1    @  200  =    1     :   1    ,   1     $    10
 #   ItemType : Damage , Amount @ ticks = ItemType : Damage , Amount  $ Experience 
 #
-#   If the experience paramater isn't included, experience reward will default to zero.
+#   If the experience parameter isn't included, experience reward will default to zero.
 #
 # **** Fuel ****
 #
@@ -43,73 +46,73 @@
 #--------------------------
 # Smelting recipes
 
-Beef                = Steak                              $ 0.35
-BlackTerracotta     = BlackGlazedTerracotta              $ 0.1
-BlueTerracotta      = BlueGlazedTerracotta               $ 0.1
-BrownTerracotta     = BrownGlazedTerracotta              $ 0.10
-Cactus              = CactusGreen                        $ 0.2
-ChainmailBoots      = IronNugget                         $ 0.1
-ChainmailChestplate = IronNugget                         $ 0.1
-ChainmailHelmet     = IronNugget                         $ 0.1
-ChainmailLeggings   = IronNugget                         $ 0.1
-Chicken             = CookedChicken                      $ 0.35
-ChorusFruit         = PoppedChorusFruit                  $ 0.1
-Clay                = Brick                              $ 0.3
-ClayBlock           = HardenedClay                       $ 0.35
-CoalOre             = Coal                               $ 0.1
-Cobblestone         = Stone                              $ 0.1
-CyanTerracotta      = CyanGlazedTerracotta               $ 0.1
-DiamondOre          = Diamond                            $ 1.0
-EmeraldOre          = Emerald                            $ 1.0
-Fish                = CookedFish                         $ 0.35
-GoldOre             = GoldIngot                          $ 1.0
-GoldAxe             = GoldNugget                         $ 0.1
-GoldBoots           = GoldNugget                         $ 0.1
-GoldChestplate      = GoldNugget                         $ 0.1
-GoldHorseArmor      = GoldNugget                         $ 0.1
-GoldHelmet          = GoldNugget                         $ 0.1
-GoldHoe             = GoldNugget                         $ 0.1
-GoldPants           = GoldNugget                         $ 0.1
-GoldPickaxe         = GoldNugget                         $ 0.1
-GoldShovel          = GoldNugget                         $ 0.1
-GoldSword           = GoldNugget                         $ 0.1
-GrayTerracotta      = GrayGlazedTerracotta               $ 0.1
-GreenTerracotta     = GreenGlazedTerracotta              $ 0.1
-IronOre             = IronIngot                          $ 0.7
-IronAxe             = IronNugget                         $ 0.1
-IronBoots           = IronNugget                         $ 0.1
-IronChestplate      = IronNugget                         $ 0.1
-IronHorseArmor      = IronNugget                         $ 0.1
-IronHelmet          = IronNugget                         $ 0.1
-IronHoe             = IronNugget                         $ 0.1
-IronLeggings        = IronNugget                         $ 0.1
-IronPickaxe         = IronNugget                         $ 0.1
-IronShovel          = IronNugget                         $ 0.1
-IronSword           = IronNugget                         $ 0.1
-LapisOre            = LapisLazuli                        $ 0.2
-LightBlueTerracotta = LightBlueGlazedTerracotta          $ 0.1
-LightGrayTerracotta = LightGrayGlazedTerracotta          $ 0.1
-LimeTerracotta      = LimeGlazedTerracotta               $ 0.1
-Log                 = CharCoal                           $ 0.15
-Log2                = CharCoal                           $ 0.15
-MagentaTerracotta   = MagentaGlazedTerracotta            $ 0.1
-Mutton              = CookedMutton                       $ 0.35
-NetherQuartzOre     = NetherQuartz                       $ 0.2
-Netherrack          = NetherBrick                        $ 0.1
-OrangeTerracotta    = OrangeGlazedTerracotta             $ 0.1
-PinkTerracotta      = PinkGlazedTerracotta               $ 0.1
-Porkchop            = CookedPorkchop                     $ 0.35
-Potato              = BakedPotato                        $ 0.35
-PurpleTerracotta    = PurpleGlazedTerracotta             $ 0.1
-Rabbit              = CookedRabbit                       $ 0.35
-RedTerracotta       = RedGlazedTerracotta                $ 0.1
-RedstoneOre         = Redstone                           $ 0.7
-Salmon              = CookedSalmon                       $ 0.35
-Sand                = Glass                              $ 0.1
-StoneBrick          = CrackedStoneBricks                 $ 0.1
-WetSponge           = Sponge                             $ 0.15
-WhiteTerracotta     = WhiteGlazedTerracotta              $ 0.1
-YellowTerracotta    = YellowGlazedTerracotta             $ 0.1
+Beef                   = Steak                              $ 0.35
+BlackTerracotta        = BlackGlazedTerracotta              $ 0.1
+BlueTerracotta         = BlueGlazedTerracotta               $ 0.1
+BrownTerracotta        = BrownGlazedTerracotta              $ 0.10
+Cactus                 = CactusGreen                        $ 0.2
+ChainmailBoots:-1      = IronNugget                         $ 0.1
+ChainmailChestplate:-1 = IronNugget                         $ 0.1
+ChainmailHelmet:-1     = IronNugget                         $ 0.1
+ChainmailLeggings:-1   = IronNugget                         $ 0.1
+Chicken                = CookedChicken                      $ 0.35
+ChorusFruit            = PoppedChorusFruit                  $ 0.1
+Clay                   = Brick                              $ 0.3
+ClayBlock              = HardenedClay                       $ 0.35
+CoalOre                = Coal                               $ 0.1
+Cobblestone            = Stone                              $ 0.1
+CyanTerracotta         = CyanGlazedTerracotta               $ 0.1
+DiamondOre             = Diamond                            $ 1.0
+EmeraldOre             = Emerald                            $ 1.0
+Fish                   = CookedFish                         $ 0.35
+GoldOre                = GoldIngot                          $ 1.0
+GoldAxe:-1             = GoldNugget                         $ 0.1
+GoldBoots:-1           = GoldNugget                         $ 0.1
+GoldChestplate:-1      = GoldNugget                         $ 0.1
+GoldHorseArmor:-1      = GoldNugget                         $ 0.1
+GoldHelmet:-1          = GoldNugget                         $ 0.1
+GoldHoe:-1             = GoldNugget                         $ 0.1
+GoldPants:-1           = GoldNugget                         $ 0.1
+GoldPickaxe:-1         = GoldNugget                         $ 0.1
+GoldShovel:-1          = GoldNugget                         $ 0.1
+GoldSword:-1           = GoldNugget                         $ 0.1
+GrayTerracotta         = GrayGlazedTerracotta               $ 0.1
+GreenTerracotta        = GreenGlazedTerracotta              $ 0.1
+IronOre                = IronIngot                          $ 0.7
+IronAxe:-1             = IronNugget                         $ 0.1
+IronBoots:-1           = IronNugget                         $ 0.1
+IronChestplate:-1      = IronNugget                         $ 0.1
+IronHorseArmor:-1      = IronNugget                         $ 0.1
+IronHelmet:-1          = IronNugget                         $ 0.1
+IronHoe:-1             = IronNugget                         $ 0.1
+IronLeggings:-1        = IronNugget                         $ 0.1
+IronPickaxe:-1         = IronNugget                         $ 0.1
+IronShovel:-1          = IronNugget                         $ 0.1
+IronSword:-1           = IronNugget                         $ 0.1
+LapisOre               = LapisLazuli                        $ 0.2
+LightBlueTerracotta    = LightBlueGlazedTerracotta          $ 0.1
+LightGrayTerracotta    = LightGrayGlazedTerracotta          $ 0.1
+LimeTerracotta         = LimeGlazedTerracotta               $ 0.1
+Log:-1                 = CharCoal                           $ 0.15
+Log2:-1                = CharCoal                           $ 0.15
+MagentaTerracotta      = MagentaGlazedTerracotta            $ 0.1
+Mutton                 = CookedMutton                       $ 0.35
+NetherQuartzOre        = NetherQuartz                       $ 0.2
+Netherrack             = NetherBrick                        $ 0.1
+OrangeTerracotta       = OrangeGlazedTerracotta             $ 0.1
+PinkTerracotta         = PinkGlazedTerracotta               $ 0.1
+Porkchop               = CookedPorkchop                     $ 0.35
+Potato                 = BakedPotato                        $ 0.35
+PurpleTerracotta       = PurpleGlazedTerracotta             $ 0.1
+Rabbit                 = CookedRabbit                       $ 0.35
+RedTerracotta          = RedGlazedTerracotta                $ 0.1
+RedstoneOre            = Redstone                           $ 0.7
+Salmon                 = CookedSalmon                       $ 0.35
+Sand                   = Glass                              $ 0.1
+StoneBrick             = CrackedStoneBricks                 $ 0.1
+WetSponge              = Sponge                             $ 0.15
+WhiteTerracotta        = WhiteGlazedTerracotta              $ 0.1
+YellowTerracotta       = YellowGlazedTerracotta             $ 0.1
 
 
 

@@ -7,25 +7,33 @@
 
 
 
-class cBlockPortalHandler :
+class cBlockPortalHandler:
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
 public:
-	cBlockPortalHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockPortalHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// We set to zero so MCS doesn't stop you from building weird portals like vanilla does
+		// We set meta to zero so Cuberite doesn't stop a Creative-mode player from building custom portal shapes
 		// CanBeAt doesn't do anything if meta is zero
-		// We set to zero because the client sends meta = 2 to the server (it calculates rotation itself)
+		// We set to zero because the client sends meta = 1 or 2 to the server (it calculates rotation itself)
 
 		a_BlockType = m_BlockType;
 		a_BlockMeta = 0;
@@ -67,14 +75,14 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height - 1))
+		if ((a_RelPos.y <= 0) || (a_RelPos.y >= cChunkDef::Height - 1))
 		{
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
 		}
 
-		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
+		switch (a_Chunk.GetMeta(a_RelPos))
 		{
 			case 0x1:
 			{
@@ -91,8 +99,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
-
+					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -115,8 +122,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
-
+					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -127,6 +133,10 @@ public:
 		}
 		return true;
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

@@ -4,28 +4,25 @@
 #include "ArrowEntity.h"
 #include "../Chunk.h"
 #include "../Blocks/BlockButton.h"
+#include "../ClientHandle.h"
 
 
 
 
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkArrow, a_Creator, a_Pos, 0.5, 0.5),
+	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
 	m_Timer(0),
 	m_HitGroundTimer(0),
 	m_HasTeleported(false),
-	m_bIsCollected(false),
-	m_HitBlockPos(Vector3i(0, 0, 0))
+	m_bIsCollected(false)
 {
-	SetSpeed(a_Speed);
 	SetMass(0.1);
 	SetGravity(-20.0f);
-	SetAirDrag(0.01f);
-	SetYawFromSpeed();
-	SetPitchFromSpeed();
+
 	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
 		m_UniqueID, GetSpeed(), GetYaw(), GetPitch()
 	);
@@ -36,22 +33,10 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 
 
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
-	Super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
-	m_PickupState(psInSurvivalOrCreative),
-	m_DamageCoeff(2),
-	m_IsCritical((a_Force >= 1)),
-	m_Timer(0),
-	m_HitGroundTimer(0),
-	m_HasTeleported(false),
-	m_bIsCollected(false),
-	m_HitBlockPos(0, 0, 0)
+	cArrowEntity(&a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20))
 {
-	if (a_Player.IsGameModeCreative())
-	{
-		m_PickupState = psInCreative;
-	}
-	SetGravity(-20.0f);
-	SetAirDrag(0.01f);
+	m_IsCritical = a_Force >= 1;
+	m_PickupState = a_Player.IsGameModeCreative() ? psInCreative : psInSurvivalOrCreative;
 }
 
 
@@ -79,21 +64,24 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	auto Speed = GetSpeed();
 	Speed.Normalize();
 
-	Super::OnHitSolidBlock(a_HitPos, a_HitFace);
-
 	/*
 	The line tracer returns the arrow hit position located on the face of a block;
 	if the arrow hit a block at -5, 95, -5 then a_HitPos would start off as -4, 95.5, -4.1,
 	i.e. it collided with the X face.
 
+	First we subtract a bit of speed vector so it doesn't appear black clientside.
+
 	Then we add a bit of speed vector to make a_HitPos -4.0001, 95.5, -4.1
 	and floor to get exactly -5, 95, -5 which is stored in m_HitBlockPos.
 	*/
 
+	// Shift the arrow's position slightly back so that less than 50% of the hitbox
+	// is in the block. Otherwise the arrow can appear black
+	Super::OnHitSolidBlock(a_HitPos - (Speed / 100), a_HitFace);
+
 	// Nudge into the block a tiny bit according to its direction of travel
 	// Floor to give the coordinates of the block it crashed into
-	a_HitPos += Speed / 100000;
-	m_HitBlockPos = a_HitPos.Floor();
+	m_HitBlockPos = (a_HitPos + (Speed / 100000)).Floor();
 
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("entity.arrow.hit", m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
@@ -178,6 +166,16 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 
 
 
+void cArrowEntity::SpawnOn(cClientHandle & a_Client)
+{
+	a_Client.SendSpawnObject(*this, m_ProjectileKind, static_cast<int>(m_CreatorData.m_UniqueID + 1));
+	a_Client.SendEntityMetadata(*this);
+}
+
+
+
+
+
 void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
@@ -217,16 +215,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		auto RelPos = a_Chunk.AbsoluteToRelative(m_HitBlockPos);
-		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPos);
-
-		if (Chunk == nullptr)
-		{
-			// Inside an unloaded chunk, abort
-			return;
-		}
-
-		if (Chunk->GetBlock(RelPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		if (m_World->GetBlock(m_HitBlockPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}

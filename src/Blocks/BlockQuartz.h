@@ -7,42 +7,57 @@
 
 
 
-class cBlockQuartzHandler : public cBlockHandler
+class cBlockQuartzHandler:
+	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockQuartzHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	cBlockQuartzHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
+		auto Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
 
-		if (Meta != E_META_QUARTZ_PILLAR)  // Check if the block is a pillar block.
+		// Pillar block needs additional direction in the metadata:
+		if (Meta != E_META_QUARTZ_PILLAR)
 		{
 			a_BlockMeta = Meta;
 			return true;
 		}
-
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace, Meta);
+		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
 		return true;
 	}
 
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_QuartzMeta)
+
+
+
+
+	/** Converts the block face of the pillar block's "base" to the block's metadata. */
+	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				return a_QuartzMeta;  // Top or bottom, just return original
+				return E_META_QUARTZ_PILLAR;  // Top or bottom
 			}
 
 			case BLOCK_FACE_ZP:
@@ -57,14 +72,16 @@ public:
 				return 0x3;  // East or west
 			}
 
-			case BLOCK_FACE_NONE:
+			default:
 			{
-				ASSERT(!"Unhandled block face!");
-				return a_QuartzMeta;  // No idea, give a special meta (all sides the same)
+				return E_META_QUARTZ_PILLAR;
 			}
 		}
-		UNREACHABLE("Unsupported block face");
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

@@ -23,23 +23,25 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
-		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockType, BlockMeta);
+		a_ChunkInterface.GetBlockTypeMeta(a_PlacedBlockPos, BlockType, BlockMeta);
 		if (BlockType == m_BlockType)
 		{
-			a_BlockMeta = BlockMeta | DirectionToMetaData(a_BlockFace);
+			a_BlockMeta = BlockMeta | DirectionToMetaData(a_ClickedBlockFace);
 		}
 		else
 		{
-			a_BlockMeta = DirectionToMetaData(a_BlockFace);
+			a_BlockMeta = DirectionToMetaData(a_ClickedBlockFace);
 		}
 		a_BlockType = m_BlockType;
 		return true;

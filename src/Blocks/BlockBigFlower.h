@@ -9,7 +9,7 @@
 
 
 
-class cBlockBigFlowerHandler :
+class cBlockBigFlowerHandler:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -95,15 +95,15 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BlockType, BlockMeta);
+		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BlockType, BlockMeta);
 
 		return IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !IsMetaTopPart(BlockMeta));
 	}
@@ -112,7 +112,7 @@ public:
 
 
 
-	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override
+	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, const Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override
 	{
 		if ((a_OldBlockMeta & 0x8) != 0)
 		{

@@ -19,17 +19,23 @@ public:
 	{
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		bool res = Super::GetPlacementBlockTypeMeta(
 			a_World, a_Player,
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-			a_CursorX, a_CursorY, a_CursorZ,
+			a_PlacedBlockPos,
+			a_ClickedBlockFace,
+			a_CursorPos,
 			a_BlockType, a_BlockMeta
 		);
 		a_BlockMeta = a_BlockMeta | 0x4;  // 0x4 bit set means this is a player-placed leaves block, not to be decayed

@@ -173,7 +173,7 @@ public:  // tolua_export
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
+	void SendExplosion                  (const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
 	void SendHeldItemChange             (int a_ItemIndex);
@@ -211,7 +211,7 @@ public:  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
+	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData);
 	void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);

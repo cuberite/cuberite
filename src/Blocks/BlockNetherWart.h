@@ -8,7 +8,7 @@
 
 
 
-class cBlockNetherWartHandler :
+class cBlockNetherWartHandler:
 	public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
@@ -64,10 +64,10 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
 		// Needs to be placed on top of a Soulsand block:
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_SOULSAND));
+		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_SOULSAND));
 	}
 
 

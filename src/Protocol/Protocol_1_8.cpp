@@ -115,22 +115,55 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 	m_ReceivedData(32 KiB),
 	m_IsEncrypted(false)
 {
-
-	// BungeeCord handling:
-	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
-	// hostname\00ip-address\00uuid\00profile-properties-as-json
 	AStringVector Params;
-	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	SplitZeroTerminatedStrings(a_ServerAddress, Params);
+
+	if (Params.size() >= 2)
 	{
-		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 		m_ServerAddress = Params[0];
-		m_Client->SetIPString(Params[1]);
 
-		cUUID UUID;
-		UUID.FromString(Params[2]);
-		m_Client->SetUUID(UUID);
+		if (Params[1] == "FML")
+		{
+			LOGD("Forge client connected!");
+			m_Client->SetIsForgeClient();
+		}
+		else if (Params.size() == 4)
+		{
+			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord())
+			{
+				// BungeeCord handling:
+				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+				// hostname\00ip-address\00uuid\00profile-properties-as-json
 
-		m_Client->SetProperties(Params[3]);
+				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+
+				m_Client->SetIPString(Params[1]);
+
+				cUUID UUID;
+				UUID.FromString(Params[2]);
+				m_Client->SetUUID(UUID);
+
+				Json::Value root;
+				Json::Reader reader;
+				if (!reader.parse(Params[3], root))
+				{
+					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+				}
+				else
+				{
+					m_Client->SetProperties(root);
+				}
+			}
+			else
+			{
+				LOG("BungeeCord is disabled, but client sent additional data, set AllowBungeeCord=1 if you want to allow it");
+			}
+		}
+		else
+		{
+			LOG("Unknown additional data sent in server address (BungeeCord/FML?): %zu parameters", Params.size());
+			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
+		}
 	}
 
 	// Create the comm log file, if so requested:
@@ -538,6 +571,37 @@ void cProtocol_1_8_0::SendEntityVelocity(const cEntity & a_Entity)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendExperience(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktExperience);
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteBEFloat(Player->GetXpPercentage());
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSpawnExperienceOrb);
+	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
+	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
 }
 
 
@@ -1168,44 +1232,12 @@ void cProtocol_1_8_0::SendResourcePack(const AString & a_ResourcePackUrl)
 
 void cProtocol_1_8_0::SendRespawn(eDimension a_Dimension)
 {
-
 	cPacketizer Pkt(*this, pktRespawn);
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
 	Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendExperience(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktExperience);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEFloat(Player->GetXpPercentage());
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetXpLevel()));
-	Pkt.WriteVarInt32(static_cast<UInt32>(Player->GetCurrentXp()));
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnExperienceOrb);
-	Pkt.WriteVarInt32(a_ExpOrb.GetUniqueID());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
-	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
-	Pkt.WriteBEInt16(static_cast<Int16>(a_ExpOrb.GetReward()));
 }
 
 
@@ -1386,7 +1418,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_8_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cProtocol_1_8_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	double PosX = a_Entity.GetPosX();
@@ -1521,9 +1553,8 @@ void cProtocol_1_8_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int 
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktTitle);  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(2);  // Set title display times
-
 	Pkt.WriteBEInt32(a_FadeInTicks);
 	Pkt.WriteBEInt32(a_DisplayTicks);
 	Pkt.WriteBEInt32(a_FadeOutTicks);
@@ -3240,10 +3271,22 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		AString Hex;
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Printf("Outgoing packet: type %s (0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
-			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), a_Pkt.GetPacketType(), PacketLen, PacketLen, m_State, Hex
+		m_CommLogFile.Printf("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+			PacketLen, PacketLen, m_State, Hex
 		);
+		/*
+		// Useful for debugging a new protocol:
+		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+			PacketLen, PacketLen, m_State, Hex
+		);
+		//*/
 	}
+	/*
+	// Useful for debugging a new protocol:
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	*/
 }
 
 

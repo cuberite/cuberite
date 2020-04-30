@@ -17,6 +17,9 @@ public:
 	}
 
 
+
+
+
 	// cItemHandler overrides:
 	virtual bool IsDrinkable(short a_ItemDamage) override
 	{
@@ -26,12 +29,19 @@ public:
 	}
 
 
+
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		short PotionDamage = a_Item.m_ItemDamage;
+		short PotionDamage = a_HeldItem.m_ItemDamage;
 
 		// Do not throw non-splash potions:
 		if (cEntityEffect::IsPotionDrinkable(PotionDamage))
@@ -57,6 +67,9 @@ public:
 
 		return true;
 	}
+
+
+
 
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override

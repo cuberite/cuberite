@@ -23,13 +23,13 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
-		BLOCKTYPE Surface = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		BLOCKTYPE Surface = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS))
 		{
 			// Cactus can only be placed on sand and itself
@@ -37,22 +37,19 @@ public:
 		}
 
 		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
-		static const struct
+		static const Vector3i Coords[] =
 		{
-			int x, z;
-		} Coords[] =
-		{
-			{-1,  0},
-			{ 1,  0},
-			{ 0, -1},
-			{ 0,  1},
-		} ;
+			{-1, 0,  0},
+			{ 1, 0,  0},
+			{ 0, 0, -1},
+			{ 0, 0,  1},
+		};
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
 			if (
-				a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) &&
+				a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[i], BlockType, BlockMeta) &&
 				(
 					cBlockInfo::IsSolid(BlockType) ||
 					(BlockType == E_BLOCK_LAVA) ||

@@ -1165,7 +1165,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				{
 					ItemHandler = cItemHandler::GetItemHandler(m_Player->GetInventory().GetShieldSlot());
 				}
-				ItemHandler->OnItemShoot(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				ItemHandler->OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 			}
 			return;
 		}
@@ -1294,10 +1294,10 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
-	Handler->OnDigging(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	Handler->OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 }
 
 
@@ -1444,9 +1444,11 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
 	// Distance from the block's center to the player's eye height
-	double Dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
-	FLOGD("HandleRightClick: {0}, face {1}, Hand: {2}, HeldItem: {3}; Dist: {4:.02f}",
-		Vector3i{a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, a_Hand, ItemToFullString(HeldItem), Dist
+	auto ClickedBlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	auto CursorPos = Vector3i(a_CursorX, a_CursorY, a_CursorZ);
+	double Dist = (Vector3d(ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
+		ClickedBlockPos, a_BlockFace, CursorPos, a_Hand, ItemToFullString(HeldItem), Dist
 	);
 
 	// Check the reach distance:
@@ -1464,7 +1466,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		World->GetBlockTypeMeta(ClickedBlockPos, BlockType, BlockMeta);
 		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
 
 		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
@@ -1476,7 +1478,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
-				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
 				{
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
@@ -1487,14 +1489,14 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				if (!Success && Placeable)
 				{
 					// place a block
-					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
 				}
 			}
 			else
 			{
 				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
 				// A plugin doesn't agree with the action, replace the block on the client and quit:
-				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 			}
 		}
 		else if (Placeable)
@@ -1507,7 +1509,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				return;
 			}
 			// place a block
-			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
 		}
 		else
 		{
@@ -1516,7 +1518,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				// All plugins agree with using the item
 				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 				Success = true;
 			}
@@ -1827,7 +1829,7 @@ void cClientHandle::HandleUseItem(eHand a_Hand)
 		{
 			// All plugins agree with using the item
 			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, -1, 255, -1, BLOCK_FACE_NONE);
+			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {-1, 255, -1}, BLOCK_FACE_NONE);
 			PlgMgr->CallHookPlayerUsedItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0);
 		}
 	}
@@ -2641,7 +2643,7 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 
 
-void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+void cClientHandle::SendExplosion(const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion)
 {
 	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
@@ -2652,7 +2654,7 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 	// Update the statistics:
 	m_NumExplosionsThisTick++;
 
-	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
+	m_Protocol->SendExplosion(a_Pos.x, a_Pos.y, a_Pos.z, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
 
 
@@ -3047,9 +3049,9 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
 {
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData);
 }
 
 

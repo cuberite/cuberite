@@ -7,36 +7,48 @@
 
 
 
-class cItemRedstoneDustHandler : public cItemHandler
+class cItemRedstoneDustHandler:
+	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemRedstoneDustHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+
+	cItemRedstoneDustHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
+
+
+
+
 
 	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
+
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// Check if coords are out of range:
-		if ((a_BlockY <= 0) || (a_BlockY >= cChunkDef::Height))
+		// Check the block below, if it supports dust on top of it:
+		auto UnderPos = a_PlacedBlockPos.addedY(-1);
+		if (UnderPos.y < 0)
 		{
 			return false;
 		}
-
-		// Check the block below, if it supports dust on top of it:
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		if (!a_World->GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockType, BlockMeta))
+		if (!a_World->GetBlockTypeMeta(UnderPos, BlockType, BlockMeta))
 		{
 			return false;
 		}
@@ -49,6 +61,9 @@ public:
 		a_BlockMeta = 0;
 		return true;
 	}
+
+
+
 
 
 	/** Returns true if the specified block type / meta is suitable to have redstone dust on top of it. */

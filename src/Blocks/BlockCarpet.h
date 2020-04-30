@@ -14,14 +14,14 @@
 
 
 
-class cBlockCarpetHandler :
+class cBlockCarpetHandler:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockCarpetHandler(BLOCKTYPE a_BlockType) :
+	cBlockCarpetHandler(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
 	{
 	}
@@ -31,9 +31,11 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
@@ -46,9 +48,9 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		return (a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR);
+		return (a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) != E_BLOCK_AIR);
 	}
 
 

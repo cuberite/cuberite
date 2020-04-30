@@ -331,10 +331,7 @@ void cPawn::HandleFalling(void)
 	/* The blocks we're interested in relative to the player to account for larger than 1 blocks.
 	This can be extended to do additional checks in case there are blocks that are represented as one block
 	in memory but have a hitbox larger than 1 (like fences) */
-	static const struct
-	{
-		int x, y, z;
-	} BlockSampleOffsets[] =
+	static const Vector3i BlockSampleOffsets[] =
 	{
 		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)
 		{ 0, -1, 0 },  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water (i.e. on side of pool)
@@ -354,26 +351,26 @@ void cPawn::HandleFalling(void)
 		/* We go through the blocks that we consider "relevant" */
 		for (size_t j = 0; j < ARRAYCOUNT(BlockSampleOffsets); j++)
 		{
-			Vector3i BlockTestPosition = CrossTestPosition.Floor() + Vector3i(BlockSampleOffsets[j].x, BlockSampleOffsets[j].y, BlockSampleOffsets[j].z);
+			Vector3i BlockTestPosition = CrossTestPosition.Floor() + BlockSampleOffsets[j];
 
 			if (!cChunkDef::IsValidHeight(BlockTestPosition.y))
 			{
 				continue;
 			}
 
-			BLOCKTYPE Block = GetWorld()->GetBlock(BlockTestPosition);
+			BLOCKTYPE BlockType = GetWorld()->GetBlock(BlockTestPosition);
 			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
 
 			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
 			if (j == 0)
 			{
-				IsFootInWater |= IsBlockWater(Block);
-				IsFootInLiquid |= IsFootInWater || IsBlockLava(Block) || (Block == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
-				IsFootOnSlimeBlock |= (Block == E_BLOCK_SLIME_BLOCK);
+				IsFootInWater |= IsBlockWater(BlockType);
+				IsFootInLiquid |= IsFootInWater || IsBlockLava(BlockType) || (BlockType == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
+				IsFootOnSlimeBlock |= (BlockType == E_BLOCK_SLIME_BLOCK);
 			}
 
 			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground. */
-			if ((cBlockInfo::IsSolid(Block)) && (cBlockInfo::GetHandler(Block)->IsInsideBlock(CrossTestPosition - BlockTestPosition, Block, BlockMeta)))
+			if ((cBlockInfo::IsSolid(BlockType)) && (cBlockInfo::GetHandler(BlockType)->IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
 			{
 				OnGround = true;
 			}

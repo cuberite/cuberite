@@ -10,20 +10,27 @@
 
 
 
-class cBlockFenceHandler :
+class cBlockFenceHandler:
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
+
 	// These are the min and max coordinates (X and Z) for a straight fence.
 	// 0.4 and 0.6 are really just guesses, but they seem pretty good.
 	// (0.4 to 0.6 is a fence that's 0.2 wide, down the center of the block)
 	const double MIN_COORD = 0.4;
 	const double MAX_COORD = 0.6;
 
-	cBlockFenceHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockFenceHandler(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
 	{
 	}
+
+
+
+
 
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override
 	{
@@ -76,9 +83,20 @@ public:
 		return PlacementBox;
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player.GetWorld(), { a_BlockX, a_BlockY, a_BlockZ });
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(*a_Player.GetWorld(), a_BlockPos);
 		auto KnotAlreadyExists = (LeashKnot != nullptr);
 
 		if (KnotAlreadyExists)
@@ -89,7 +107,7 @@ public:
 		// New knot? needs to init and produce sound effect
 		else
 		{
-			auto NewLeashKnot = cpp14::make_unique<cLeashKnot>(a_BlockFace, Vector3i{a_BlockX, a_BlockY, a_BlockZ});
+			auto NewLeashKnot = cpp14::make_unique<cLeashKnot>(a_BlockFace, a_BlockPos);
 			auto NewLeashKnotPtr = NewLeashKnot.get();
 
 			NewLeashKnotPtr->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);
@@ -112,10 +130,24 @@ public:
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) override
 	{
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
+
+
+
+
 
 	virtual bool IsUseable(void) override
 	{
