@@ -26,14 +26,12 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
+		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
+		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
+		if (!a_Chunk.UnboundedRelGetBlock(BelowBlockPos, BelowBlock, BelowBlockMeta)) return false;
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{

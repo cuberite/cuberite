@@ -36,7 +36,13 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		return (a_RelPos.y > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelPos.addedY(-1)));
+		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+
+		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BelowBlock;
+		if (!a_Chunk.UnboundedRelGetBlockType(BelowBlockPos, BelowBlock)) return false;
+		
+		return IsBlockTypeOfDirt(BelowBlock);
 	}
 
 

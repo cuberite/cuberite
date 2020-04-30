@@ -66,8 +66,14 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
+		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+
+		Vector3i BelowPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BelowBlock;
+		if (!a_Chunk.UnboundedRelGetBlockType(BelowPos, BelowBlock)) return false;
+
 		// Needs to be placed on top of a Soulsand block:
-		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_SOULSAND));
+		return (BelowBlock == E_BLOCK_SOULSAND);
 	}
 
 

@@ -134,8 +134,8 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		auto NeighborBlockFace = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto LadderAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		eBlockFace NeighborBlockFace = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
+		Vector3i LadderAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		return LadderCanBePlacedAt(a_ChunkInterface, LadderAbsPos, NeighborBlockFace);
 	}
 

@@ -20,23 +20,7 @@ public:
 	}
 
 
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
-		BLOCKTYPE Surface = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS))
-		{
-			// Cactus can only be placed on sand and itself
-			return false;
-		}
-
-		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
+	static bool ValidateBlocksSurroundingCactus(const Vector3i a_RelPos, const cChunk & a_Chunk) {
 		static const Vector3i Coords[] =
 		{
 			{-1, 0,  0},
@@ -54,12 +38,29 @@ public:
 					cBlockInfo::IsSolid(BlockType) ||
 					(BlockType == E_BLOCK_LAVA) ||
 					(BlockType == E_BLOCK_STATIONARY_LAVA)
+					)
 				)
-			)
 			{
 				return false;
 			}
 		}  // for i - Coords[]
+	}
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	{
+		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+
+		Vector3i BelowPos = a_RelPos.addedY(-1);
+		BLOCKTYPE Surface;
+
+		if (!a_Chunk.UnboundedRelGetBlockType(BelowPos, Surface)) return false;
+
+		// Cactus can only be placed on sand and itself
+		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS)) return false;
+
+		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
+		if (!ValidateBlocksSurroundingCactus) return false;
 
 		return true;
 	}
@@ -117,31 +118,15 @@ public:
 			a_Chunk.UnboundedRelFastSetBlock(pos, E_BLOCK_CACTUS, 0);
 
 			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks; if they aren't, drop as pickup and bail out the growing
-			static const Vector3i neighborOffsets[] =
+			if (!ValidateBlocksSurroundingCactus(pos, a_Chunk))
 			{
-				{-1, 0,  0},
-				{ 1, 0,  0},
-				{ 0, 0, -1},
-				{ 0, 0,  1},
-			} ;
-			for (const auto & ofs: neighborOffsets)
-			{
-				if (
-					a_Chunk.UnboundedRelGetBlockType(pos + ofs, blockType) &&
-					(
-						cBlockInfo::IsSolid(blockType) ||
-						(blockType == E_BLOCK_LAVA) ||
-						(blockType == E_BLOCK_STATIONARY_LAVA)
-					)
-				)
-				{
-					// Remove the cactus
-					auto absPos = a_Chunk.RelativeToAbsolute(pos);
-					a_Chunk.GetWorld()->DropBlockAsPickups(absPos);
-					return i + 1;
-				}
-			}  // for neighbor
+				// Remove the cactus
+				auto absPos = a_Chunk.RelativeToAbsolute(pos);
+				a_Chunk.GetWorld()->DropBlockAsPickups(absPos);
+				return i + 1;
+			}
 		}  // for i - numToGrow
+
 		return numToGrow;
 	}
 

@@ -24,14 +24,12 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelPos.y <= 1)
-		{
-			return false;
-		}
+		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
-		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		switch (Block)
+		Vector3i BelowPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		switch (BelowBlock)
 		{
 			case E_BLOCK_ACACIA_FENCE:
 			case E_BLOCK_BIRCH_FENCE:
@@ -46,7 +44,7 @@ public:
 			}
 			default:
 			{
-				return (!cBlockInfo::IsTransparent(Block));
+				return (!cBlockInfo::IsTransparent(BelowBlock));
 			}
 		}
 	}

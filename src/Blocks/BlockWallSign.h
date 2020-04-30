@@ -35,7 +35,7 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetMeta(a_RelPos));
+		Vector3i NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetMeta(a_RelPos));
 		BLOCKTYPE NeighborType;
 		if (!a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType))
 		{
