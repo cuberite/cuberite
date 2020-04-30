@@ -10,13 +10,6 @@
 
 
 
-/** If a list being loaded has more than this number of items, it's considered corrupted. */
-static const int MAX_LIST_ITEMS = 10000;
-
-
-
-
-
 // The number of NBT tags that are reserved when an NBT parsing is started.
 // You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
@@ -257,7 +250,8 @@ eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 	NEEDBYTES(4, eNBTParseError::npListMissingLength);
 	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
-	if ((Count < 0) || (Count > MAX_LIST_ITEMS))
+	auto MinChildSize = GetMinTagSize(a_ChildrenType);
+	if ((Count < 0) || (Count > static_cast<int>((m_Length - m_Pos) / MinChildSize)))
 	{
 		return eNBTParseError::npListInvalidLength;
 	}
@@ -439,6 +433,30 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, Length - Begin);
 	}
 	return Tag;
+}
+
+
+
+
+
+size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
+{
+	switch (a_TagType)
+	{
+		case TAG_End:       return 1;
+		case TAG_Byte:      return 1;
+		case TAG_Short:     return 2;
+		case TAG_Int:       return 4;
+		case TAG_Long:      return 8;
+		case TAG_Float:     return 4;
+		case TAG_Double:    return 8;
+		case TAG_String:    return 2;  // 2 bytes for the string length
+		case TAG_ByteArray: return 4;  // 4 bytes for the count
+		case TAG_List:      return 5;  // 1 byte list type + 4 bytes count
+		case TAG_Compound:  return 1;  // Single TAG_End byte
+		case TAG_IntArray:  return 4;  // 4 bytes for the count
+	}
+	UNREACHABLE("Unsupported nbt tag type");
 }
 
 

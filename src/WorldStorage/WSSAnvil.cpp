@@ -326,7 +326,8 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT parsing failed", a_Data);
+		auto msg = fmt::format("NBT parsing failed: {}, pos {}", NBT.GetErrorCode().message(), NBT.GetErrorPos());
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, msg, a_Data);
 		return false;
 	}
 
@@ -3520,8 +3521,8 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType).c_str(), a_Data);
 		return false;
 	}
-		return true;
-	}
+	return true;
+}
 
 
 
