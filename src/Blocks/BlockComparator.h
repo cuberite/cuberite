@@ -74,20 +74,28 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		{
+			return false;
+		}
 
 		Vector3i BelowPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
 		a_Chunk.GetBlockTypeMeta(BelowPos, BelowBlock, BelowBlockMeta);
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock)) return true;
+		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		{
+			return true;
+		}
 
 		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
 			// Check if the slab is turned up side down
 			if ((BelowBlockMeta & 0x08) == 0x08)
+			{
 				return true;
+			}
 		}
 		return false;
 	}

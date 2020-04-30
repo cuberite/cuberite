@@ -148,10 +148,16 @@ public:
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
 		Vector3i SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
 
-		if (!cChunkDef::IsValidHeight(SupportRelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
+		{
+			return false;
+		}
 
 		BLOCKTYPE SupportBlockType;
-		if (!a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType)) return false;;
+		if (!a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType))
+		{
+			return false;
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
 	}

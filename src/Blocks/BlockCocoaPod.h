@@ -24,14 +24,20 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		{
+			return false;
+		}
 
 		// Check that we're attached to a jungle log block:
 		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelPos));
 		Vector3i LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta)) return false;
+		if (!a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta))
+		{
+			return false;
+		}
 
 		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
 	}

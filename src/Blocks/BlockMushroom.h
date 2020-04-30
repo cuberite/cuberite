@@ -34,11 +34,15 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		{
+			return false;
+		}
 
 		// Cannot be at too much light
 		NIBBLETYPE TotalLight = a_Chunk.GetSkyLightAltered(a_RelPos) + a_Chunk.GetBlockLight(a_RelPos);
-		if (TotalLight > MUSHROOM_MAX_LIGHT_THRESHOLD) {
+		if (TotalLight > MUSHROOM_MAX_LIGHT_THRESHOLD)
+		{
 			return false;
 		}
 

@@ -24,7 +24,10 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		{
+			return false;
+		}
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
 		Vector3i BelowPos = a_RelPos.addedY(-1);

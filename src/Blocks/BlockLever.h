@@ -134,8 +134,11 @@ public:
 
 		eBlockFace NeighborFace = BlockMetaDataToBlockFace(Meta);
 		Vector3i NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
-		if (!cChunkDef::IsValidHeight(NeighborPos.y)) return false;
-		
+		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		{
+			return false;
+		}
+
 		BLOCKTYPE NeighborBlockType;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
 		{

@@ -20,7 +20,8 @@ public:
 	}
 
 
-	static bool ValidateBlocksSurroundingCactus(const Vector3i a_RelPos, const cChunk & a_Chunk) {
+	static bool ValidateBlocksSurroundingCactus(const Vector3i a_RelPos, const cChunk & a_Chunk)
+	{
 		static const Vector3i Coords[] =
 		{
 			{-1, 0,  0},
@@ -51,16 +52,25 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		{
+			return false;
+		}
 
 		Vector3i BelowPos = a_RelPos.addedY(-1);
 		BLOCKTYPE Surface = a_Chunk.GetBlock(BelowPos);
 
 		// Cactus can only be placed on sand and itself
-		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS)) return false;
+		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS))
+		{
+			return false;
+		}
 
 		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
-		if (!ValidateBlocksSurroundingCactus(a_RelPos, a_Chunk)) return false;
+		if (!ValidateBlocksSurroundingCactus(a_RelPos, a_Chunk))
+		{
+			return false;
+		}
 
 		return true;
 	}

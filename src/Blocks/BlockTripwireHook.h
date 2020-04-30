@@ -86,10 +86,16 @@ public:
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
 		Vector3i NeighborPos = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
 
-		if (!cChunkDef::IsValidHeight(NeighborPos.y)) return false;
+		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		{
+			return false;
+		}
 
 		BLOCKTYPE NeighborBlockType;
-		if (!a_Chunk.UnboundedRelGetBlockType(a_RelPos, NeighborBlockType)) return false;
+		if (!a_Chunk.UnboundedRelGetBlockType(a_RelPos, NeighborBlockType))
+		{
+			return false;
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(NeighborBlockType);
 	}
