@@ -37,8 +37,7 @@ public:
 		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
 		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
-		BLOCKTYPE BelowBlockType;
-		if (!a_Chunk.UnboundedRelGetBlockType(BelowBlockPos, BelowBlockType)) return false;
+		BLOCKTYPE BelowBlockType = a_Chunk.GetBlock(BelowBlockPos);
 
 		return ((BelowBlockType == E_BLOCK_SIGN_POST) || (BelowBlockType == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(BelowBlockType));
 	}

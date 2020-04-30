@@ -34,7 +34,7 @@ public:
 			NIBBLETYPE BlockMeta;
 			if (
 				a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[i], BlockType, BlockMeta) &&
-				(
+					(
 					cBlockInfo::IsSolid(BlockType) ||
 					(BlockType == E_BLOCK_LAVA) ||
 					(BlockType == E_BLOCK_STATIONARY_LAVA)
@@ -54,9 +54,7 @@ public:
 		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
 		Vector3i BelowPos = a_RelPos.addedY(-1);
-		BLOCKTYPE Surface;
-
-		if (!a_Chunk.UnboundedRelGetBlockType(BelowPos, Surface)) return false;
+		BLOCKTYPE Surface = a_Chunk.GetBlock(BelowPos);
 
 		// Cactus can only be placed on sand and itself
 		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS)) return false;

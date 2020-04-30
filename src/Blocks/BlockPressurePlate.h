@@ -28,7 +28,7 @@ public:
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
 		Vector3i BelowPos = a_RelPos.addedY(-1);
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowPos);
 		switch (BelowBlock)
 		{
 			case E_BLOCK_ACACIA_FENCE:

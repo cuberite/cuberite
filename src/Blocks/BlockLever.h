@@ -130,8 +130,7 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
 		// Find the type of block the lever is attached to:
-		NIBBLETYPE Meta;
-		if (!a_Chunk.UnboundedRelGetBlockMeta(a_RelPos, Meta)) return false;
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
 
 		eBlockFace NeighborFace = BlockMetaDataToBlockFace(Meta);
 		Vector3i NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);

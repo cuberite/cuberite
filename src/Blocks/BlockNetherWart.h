@@ -69,8 +69,7 @@ public:
 		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
 		Vector3i BelowPos = a_RelPos.addedY(-1);
-		BLOCKTYPE BelowBlock;
-		if (!a_Chunk.UnboundedRelGetBlockType(BelowPos, BelowBlock)) return false;
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowPos);
 
 		// Needs to be placed on top of a Soulsand block:
 		return (BelowBlock == E_BLOCK_SOULSAND);

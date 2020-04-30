@@ -117,7 +117,7 @@ public:
 		Vector3i BelowPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BlockBelow;
 		NIBBLETYPE MetaBelow;
-		if (!a_Chunk.UnboundedRelGetBlock(BelowPos, BlockBelow, MetaBelow)) return false;
+		a_Chunk.GetBlockTypeMeta(BelowPos, BlockBelow, MetaBelow);
 
 		return CanBeOn(BlockBelow, MetaBelow);
 	}

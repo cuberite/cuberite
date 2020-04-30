@@ -43,7 +43,7 @@ public:
 
 		BLOCKTYPE UnderType;
 		NIBBLETYPE UnderMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(UnderPos, UnderType, UnderMeta)) return false;
+		a_Chunk.GetBlockTypeMeta(UnderPos, UnderType, UnderMeta);
 
 		return (
 			(((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) && (UnderMeta == 0)) ||  // A water source is below

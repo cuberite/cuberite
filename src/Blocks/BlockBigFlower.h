@@ -102,7 +102,7 @@ public:
 		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(BelowBlockPos, BlockType, BlockMeta)) return false;
+		a_Chunk.GetBlockTypeMeta(BelowBlockPos, BlockType, BlockMeta);
 
 		return IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !IsMetaTopPart(BlockMeta));
 	}
