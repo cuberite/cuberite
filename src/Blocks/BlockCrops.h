@@ -110,7 +110,7 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		if (!cChunkDef::IsValidHeight(a_RelPos.y - 1))
 		{
 			return false;
 		}
