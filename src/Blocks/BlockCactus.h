@@ -44,6 +44,8 @@ public:
 				return false;
 			}
 		}  // for i - Coords[]
+
+		return true;
 	}
 
 
@@ -60,7 +62,7 @@ public:
 		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS)) return false;
 
 		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
-		if (!ValidateBlocksSurroundingCactus) return false;
+		if (!ValidateBlocksSurroundingCactus(a_RelPos, a_Chunk)) return false;
 
 		return true;
 	}

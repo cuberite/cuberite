@@ -14,7 +14,7 @@ class cBlockMushroomHandler:
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
-	const NIBBLETYPE MAXIMUM_LIGHT_THRESHOLD = 12;
+	const NIBBLETYPE MUSHROOM_MAX_LIGHT_THRESHOLD = 12;
 
 
 	cBlockMushroomHandler(BLOCKTYPE a_BlockType):
@@ -37,7 +37,10 @@ public:
 		if (!cChunkDef::IsValidHeight(a_RelPos.y)) return false;
 
 		// Cannot be at too much light
-		if (a_Chunk.GetBlockLight(a_RelPos) > MAXIMUM_LIGHT_THRESHOLD) return false;
+		NIBBLETYPE TotalLight = a_Chunk.GetSkyLightAltered(a_RelPos) + a_Chunk.GetBlockLight(a_RelPos);
+		if (TotalLight > MUSHROOM_MAX_LIGHT_THRESHOLD) {
+			return false;
+		}
 
 		Vector3i BelowPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BelowBlock;
