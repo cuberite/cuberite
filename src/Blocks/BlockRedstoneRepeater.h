@@ -80,10 +80,7 @@ public:
 		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(BelowBlockPos, BelowBlock, BelowBlockMeta))
-		{
-			return false;
-		}
+		a_Chunk.GetBlockTypeMeta(BelowBlockPos, BelowBlock, BelowBlockMeta);
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{

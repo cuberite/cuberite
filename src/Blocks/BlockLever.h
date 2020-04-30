@@ -142,7 +142,7 @@ public:
 		BLOCKTYPE NeighborBlockType;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
 		{
-			return false;
+			return true;
 		}
 
 		// Allow any full block or the "good" side of a half-slab:

@@ -94,7 +94,7 @@ public:
 		BLOCKTYPE NeighborBlockType;
 		if (!a_Chunk.UnboundedRelGetBlockType(a_RelPos, NeighborBlockType))
 		{
-			return false;
+			return true;
 		}
 
 		return cBlockInfo::FullyOccupiesVoxel(NeighborBlockType);

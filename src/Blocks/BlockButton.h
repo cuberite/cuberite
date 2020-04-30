@@ -156,7 +156,7 @@ public:
 		BLOCKTYPE SupportBlockType;
 		if (!a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType))
 		{
-			return false;
+			return true;
 		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
