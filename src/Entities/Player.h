@@ -329,9 +329,6 @@ public:
 	/** tosses the item held in hand (when in UI windows) */
 	void TossHeldItem(char a_Amount = 1);
 
-	/** Tosses a list of items. */
-	void TossItems(const cItems & a_Items);
-
 	/** tosses a pickup newly created from a_Item */
 	void TossPickup(const cItem & a_Item);
 
@@ -374,6 +371,9 @@ public:
 	UInt32 GetFloaterID(void) const { return m_FloaterID; }
 
 	// tolua_end
+
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
 
 	/** Sets a player's in-bed state
 	We can't be sure plugins will keep this value updated, so no exporting

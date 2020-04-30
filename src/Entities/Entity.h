@@ -334,7 +334,7 @@ public:
 
 	/** Returns the last position we sent to all the clients. Use this to
 	initialize clients with our position. */
-	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
+	Vector3d GetLastSentPosition(void) const { return m_LastSentPosition; }
 
 	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
 	void DestroyNoScheduling(bool a_ShouldBroadcast);
@@ -506,6 +506,10 @@ public:
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	/** Returns whether the entity's orientation has been set manually.
+	Primarily inteded for protocol use. */
+	bool IsOrientationDirty() const;
 
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();

@@ -59,10 +59,7 @@ public:
 
 			if (Item.m_ItemCount <= 0)
 			{
-				/* Experimental: show animation pickups getting together */
-				auto Diff = (m_Pickup->GetPosition() * 32.0).Floor() - (EntityPos * 32.0).Floor();
-				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, Vector3<char>(Diff));
-				/* End of experimental animation */
+				a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
 				a_Entity.Destroy();
 
 				// Reset the timer
@@ -253,7 +250,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		}
 
 		m_Item.m_ItemCount -= NumAdded;
-		m_World->BroadcastCollectEntity(*this, a_Dest, NumAdded);
+		m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
 
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 		m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
