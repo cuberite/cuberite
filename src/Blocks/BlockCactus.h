@@ -35,12 +35,12 @@ public:
 			NIBBLETYPE BlockMeta;
 			if (
 				a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[i], BlockType, BlockMeta) &&
-					(
-					cBlockInfo::IsSolid(BlockType) ||
-					(BlockType == E_BLOCK_LAVA) ||
-					(BlockType == E_BLOCK_STATIONARY_LAVA)
-					)
+				(
+				cBlockInfo::IsSolid(BlockType) ||
+				(BlockType == E_BLOCK_LAVA) ||
+				(BlockType == E_BLOCK_STATIONARY_LAVA)
 				)
+			)
 			{
 				return false;
 			}
