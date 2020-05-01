@@ -116,7 +116,7 @@ cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
 
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnVehicle(*this, 10, static_cast<char>(m_Payload));  // 10 = Minecarts
+	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 

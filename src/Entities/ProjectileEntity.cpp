@@ -283,7 +283,6 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 
 			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
 		}
-		case pkFishingFloat: break;
 	}
 
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
@@ -347,7 +346,6 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
-		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
 	}
 	UNREACHABLE("Unsupported projectile kind");
 }
@@ -443,8 +441,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
-	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12);
+	a_Client.SendSpawnEntity(*this);
 	a_Client.SendEntityMetadata(*this);
 }
 

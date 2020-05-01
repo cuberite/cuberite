@@ -33,7 +33,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnVehicle(*this, 1);
+	a_ClientHandle.SendSpawnEntity(*this);
 }
 
 
