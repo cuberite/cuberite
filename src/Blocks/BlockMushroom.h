@@ -40,7 +40,7 @@ public:
 		}
 
 		// Cannot be at too much light
-		NIBBLETYPE TotalLight = a_Chunk.GetSkyLightAltered(a_RelPos) + a_Chunk.GetBlockLight(a_RelPos);
+		NIBBLETYPE TotalLight = std::max(a_Chunk.GetSkyLightAltered(a_RelPos), a_Chunk.GetBlockLight(a_RelPos));
 		if (TotalLight > MUSHROOM_MAX_LIGHT_THRESHOLD)
 		{
 			return false;
