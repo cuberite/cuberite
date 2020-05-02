@@ -38,14 +38,7 @@ public:
 				else
 				{
 					/** Check if block is not aligned in z direction */
-					if (a_Offset.z == 0)
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}
+					return (a_Offset.z != 0);
 				}
 			case E_BLOCK_ACTIVE_COMPARATOR:
 			case E_BLOCK_INACTIVE_COMPARATOR:
