@@ -1643,9 +1643,8 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 
 void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 {
-	double PosX = a_Player.GetPosX();
-	double PosY = a_Player.GetPosY();
-	double PosZ = a_Player.GetPosZ();
+	auto BoundingBox = cBoundingBox(a_Player.GetPosition(), a_Player.GetWidth(), a_Player.GetHeight());
+	BoundingBox.Expand(1, 0.5, 1);
 
 	for (auto & Entity : m_Entities)
 	{
@@ -1653,11 +1652,8 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 		{
 			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = static_cast<float>(Entity->GetPosX() - PosX);
-		float DiffY = static_cast<float>(Entity->GetPosY() - PosY);
-		float DiffZ = static_cast<float>(Entity->GetPosZ() - PosZ);
-		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
-		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
+
+		if (BoundingBox.IsInside(Entity->GetPosition()))
 		{
 			/*
 			LOG("Pickup %d being collected by player \"%s\", distance %f",
@@ -1673,14 +1669,6 @@ void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 			{
 				static_cast<cProjectileEntity &>(*Entity).CollectedBy(a_Player);
 			}
-		}
-		else if (SqrDist < 5 * 5)
-		{
-			/*
-			LOG("Pickup %d close to player \"%s\", but still too far to collect: %f",
-				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
-			);
-			*/
 		}
 	}
 }
