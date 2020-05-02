@@ -14,14 +14,17 @@ class cRedstoneWireHandler:
 
 public:
 
-	inline static bool IsDirectlyConnectingMechanism(cWorld & a_World, BLOCKTYPE a_Block, Vector3i a_QueryPosition, Vector3i a_Offset)
+	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, Vector3i a_Offset)
 	{
 		switch (a_Block)
 		{
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
-				if ((a_World.GetBlockMeta(a_QueryPosition) & 0x1) == 1)
+				/** Check when repeater is in x direction  */
+				a_BlockMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
+				if ((a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XP) || (a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XM))
 				{
+					/** Check if Block is not aligned in in x direction */
 					if (a_Offset.x == 0)
 					{
 						return false;
@@ -31,8 +34,10 @@ public:
 						return true;
 					}
 				}
+				/** when repeater is in z direction */
 				else
 				{
+					/** Check if block is not aligned in z direction */
 					if (a_Offset.z == 0)
 					{
 						return false;
@@ -94,14 +99,14 @@ public:
 			a_Meta++;
 		}
 
-		if ((a_QueryPosition != (a_Position + OffsetYM())) && !IsDirectlyConnectingMechanism(a_World, a_QueryBlockType, a_QueryPosition, a_QueryPosition - a_Position))
+		if ((a_QueryPosition != (a_Position + OffsetYM())) && !IsDirectlyConnectingMechanism( a_QueryBlockType, a_Meta, a_QueryPosition - a_Position))
 		{
 			Vector3i PotentialOffset;
 			bool FoundOneBorderingMechanism = false;
 
 			for (const auto & Offset : StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_World, a_Position)))
 			{
-				if (IsDirectlyConnectingMechanism(a_World, a_World.GetBlock(Offset + a_Position), a_QueryPosition, Offset))
+				if (IsDirectlyConnectingMechanism(a_World.GetBlock(Offset + a_Position), a_Meta, Offset))
 				{
 					if (FoundOneBorderingMechanism)
 					{
