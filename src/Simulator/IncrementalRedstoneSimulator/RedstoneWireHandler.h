@@ -25,14 +25,7 @@ public:
 				if ((a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XP) || (a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XM))
 				{
 					/** Check if Block is not aligned in in x direction */
-					if (a_Offset.x == 0)
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}
+					return (a_Offset.x != 0);
 				}
 				/** when repeater is in z direction */
 				else
