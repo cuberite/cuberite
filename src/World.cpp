@@ -1024,7 +1024,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 	for (auto & Entity : EntitiesToAdd)
 	{
-		Entity->SetWorld(this);
 		auto EntityPtr = Entity.get();
 		m_ChunkMap->AddEntity(std::move(Entity));
 		EntityPtr->OnAddToWorld(*this);
