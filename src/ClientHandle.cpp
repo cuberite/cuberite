@@ -1641,6 +1641,12 @@ void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 
 void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
+	if (!m_Player->IsGameModeSpectator())
+	{
+		Kick("Tried to use spectator mode when not in game mode spectator.");
+		return;
+	}
+
 	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer & a_ToSpectate)
 	{
 		m_Player->TeleportToEntity(a_ToSpectate);
