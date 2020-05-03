@@ -3198,8 +3198,8 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "cBoundingBox",
 						},
 					},
-					Notes = "Returns the bounding box of the entity, which has width and height corresponding to the entity, and is aligned with the block grid."
-				}
+					Notes = "Returns the bounding box of the entity, which has width and height corresponding to the entity, and is aligned with the block grid.",
+				},
 				GetChunkX =
 				{
 					Returns =
