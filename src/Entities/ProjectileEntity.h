@@ -29,20 +29,19 @@ class cProjectileEntity :
 
 public:
 
-	/** The kind of the projectile. The numbers correspond to the network type ID used for spawning them in the protocol. */
+	/** The kind of the projectile. */
 	enum eKind
 	{
-		pkArrow         = 60,
-		pkSnowball      = 61,
-		pkEgg           = 62,
-		pkGhastFireball = 63,
-		pkFireCharge    = 64,
-		pkEnderPearl    = 65,
-		pkExpBottle     = 75,
-		pkSplashPotion  = 73,
-		pkFirework      = 76,
-		pkWitherSkull   = 66,
-		pkFishingFloat  = 90,
+		pkArrow,
+		pkSnowball,
+		pkEgg,
+		pkGhastFireball,
+		pkFireCharge,
+		pkEnderPearl,
+		pkExpBottle,
+		pkSplashPotion,
+		pkFirework,
+		pkWitherSkull,
 	} ;
 
 	// tolua_end
@@ -93,7 +92,7 @@ public:
 	/** Returns the unique ID of the entity who created this projectile
 	May return an ID <0
 	*/
-	UInt32 GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
+	UInt32 GetCreatorUniqueID(void) const { return m_CreatorData.m_UniqueID; }
 
 	/** Returns the name of the player that created the projectile
 	Will be empty for non-player creators
@@ -142,6 +141,6 @@ protected:
 	// cEntity overrides:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void SpawnOn(cClientHandle & a_Client) final override;
 
 } ;  // tolua_export

@@ -22,8 +22,8 @@ cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
 
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnObject(*this, 50, 1);  // 50 means TNT
-	m_bDirtyOrientation = false;
+	a_ClientHandle.SendSpawnEntity(*this);
+	m_bDirtyOrientation = false;  // TODO: why?
 	m_bDirtyHead = false;
 }
 

@@ -329,35 +329,6 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPickupSpawn(const cPickup & a_Pickup)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	{  // TODO Use SendSpawnObject
-		cPacketizer Pkt(*this, pktSpawnObject);
-		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
-		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-		Pkt.WriteBEUInt64(0);
-		Pkt.WriteBEUInt64(a_Pickup.GetUniqueID());
-		Pkt.WriteBEUInt8(2);  // Type = Pickup
-		Pkt.WriteBEDouble(a_Pickup.GetPosX());
-		Pkt.WriteBEDouble(a_Pickup.GetPosY());
-		Pkt.WriteBEDouble(a_Pickup.GetPosZ());
-		Pkt.WriteByteAngle(a_Pickup.GetYaw());
-		Pkt.WriteByteAngle(a_Pickup.GetPitch());
-		Pkt.WriteBEInt32(0);  // No object data
-		Pkt.WriteBEInt16(0);  // No velocity
-		Pkt.WriteBEInt16(0);
-		Pkt.WriteBEInt16(0);
-	}
-
-	SendEntityMetadata(a_Pickup);
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -447,32 +418,6 @@ void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, double a_X, d
 
 
 
-void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_FallingBlock.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
-	Pkt.WriteBEUInt8(70);  // Falling block
-	Vector3d LastSentPos = a_FallingBlock.GetLastSentPos();
-	Pkt.WriteBEDouble(LastSentPos.x);
-	Pkt.WriteBEDouble(LastSentPos.y);
-	Pkt.WriteBEDouble(LastSentPos.z);
-	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
-	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedZ() * 400));
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -495,64 +440,6 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
 	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	double PosX = a_Entity.GetPosX();
-	double PosZ = a_Entity.GetPosZ();
-	double Yaw = a_Entity.GetYaw();
-	if (a_ObjectType == 71)
-	{
-		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
-	}
-
-	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
-	Pkt.WriteBEDouble(PosX);
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(PosZ);
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteByteAngle(Yaw);
-	Pkt.WriteBEInt32(a_ObjectData);
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Vector3d LastSentPos = a_Vehicle.GetLastSentPos();
-	Pkt.WriteBEDouble(LastSentPos.x);
-	Pkt.WriteBEDouble(LastSentPos.y);
-	Pkt.WriteBEDouble(LastSentPos.z);
-	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
-	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
-	Pkt.WriteBEInt32(a_VehicleSubType);
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
 }
 
 
@@ -2280,6 +2167,32 @@ void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	a_Pkt.WriteBEUInt64(0);
+	a_Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
+
+	a_Pkt.WriteBEUInt8(a_ObjectType);
+	a_Pkt.WriteBEDouble(a_Entity.GetPosX());
+	a_Pkt.WriteBEDouble(a_Entity.GetPosY());
+	a_Pkt.WriteBEDouble(a_Entity.GetPosZ());
+	a_Pkt.WriteByteAngle(a_Entity.GetPitch());
+	a_Pkt.WriteByteAngle(a_Entity.GetYaw());
+	a_Pkt.WriteBEInt32(a_ObjectData);
+	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 }
 
 

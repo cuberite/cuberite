@@ -54,15 +54,11 @@ public:
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
 	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData) override;
-	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
@@ -126,6 +122,9 @@ protected:
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
+
+	/** Writes the entity type and entity-dependent data into a packet structure required for the entity to initially spawn. */
+	virtual void WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;

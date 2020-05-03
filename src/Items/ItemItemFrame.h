@@ -41,7 +41,7 @@ public:
 		}
 
 		// Make sure block that will be occupied by the item frame is free now:
-		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		BLOCKTYPE Block = a_World->GetBlock(PlacePos);
 		if (Block != E_BLOCK_AIR)
 		{
@@ -49,7 +49,7 @@ public:
 		}
 
 		// Place the item frame:
-		auto ItemFrame = cpp14::make_unique<cItemFrame>(a_ClickedBlockFace, a_ClickedBlockPos);
+		auto ItemFrame = cpp14::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 		{

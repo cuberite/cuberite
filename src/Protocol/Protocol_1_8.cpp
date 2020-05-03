@@ -31,6 +31,7 @@ Implements the 1.8 protocol classes:
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
+#include "../Entities/Floater.h"
 #include "../Entities/Painting.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
@@ -852,28 +853,6 @@ void cProtocol_1_8_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_8_0::SendPickupSpawn(const cPickup & a_Pickup)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	{
-		cPacketizer Pkt(*this, pktSpawnObject);
-		Pkt.WriteVarInt32(a_Pickup.GetUniqueID());
-		Pkt.WriteBEUInt8(2);  // Type = Pickup
-		Pkt.WriteFPInt(a_Pickup.GetPosX());
-		Pkt.WriteFPInt(a_Pickup.GetPosY());
-		Pkt.WriteFPInt(a_Pickup.GetPosZ());
-		Pkt.WriteByteAngle(a_Pickup.GetYaw());
-		Pkt.WriteByteAngle(a_Pickup.GetPitch());
-		Pkt.WriteBEInt32(0);  // No object data
-	}
-	SendEntityMetadata(a_Pickup);
-}
-
-
-
-
-
 void cProtocol_1_8_0::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1370,23 +1349,45 @@ void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, int a_S
 
 
 
-void cProtocol_1_8_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 {
-	ASSERT(m_State == 3);  // In game mode?
+	Int32 EntityData = /* Default: velocity present flag */ 1;
+	const auto EntityType = GetProtocolEntityType(a_Entity);
+
+	if (a_Entity.IsMinecart())
+	{
+		const auto & Cart = static_cast<const cMinecart &>(a_Entity);
+		EntityData = static_cast<Int32>(Cart.GetPayload());
+	}
+	else if (a_Entity.IsItemFrame())
+	{
+		const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+		EntityData = static_cast<Int32>(Frame.GetProtocolFacing());
+	}
+	else if (a_Entity.IsFallingBlock())
+	{
+		const auto & Block = static_cast<const cFallingBlock &>(a_Entity);
+		EntityData = Block.GetBlockType() | (static_cast<Int32>(Block.GetBlockMeta()) << 12);
+	}
+	else if (a_Entity.IsFloater())
+	{
+		const auto & Floater = static_cast<const cFloater &>(a_Entity);
+		EntityData = static_cast<Int32>(Floater.GetOwnerID());
+	}
+	else if (a_Entity.IsProjectile())
+	{
+		using PType = cProjectileEntity::eKind;
+		const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+		if (Projectile.GetProjectileKind() == PType::pkArrow)
+		{
+			const auto & Arrow = static_cast<const cArrowEntity &>(Projectile);
+			EntityData = static_cast<Int32>(Arrow.GetCreatorUniqueID() + 1);
+		}
+	}
 
 	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_FallingBlock.GetUniqueID());
-	Pkt.WriteBEUInt8(70);  // Falling block
-	Vector3d LastSentPos = a_FallingBlock.GetLastSentPos();
-	Pkt.WriteFPInt(LastSentPos.x);
-	Pkt.WriteFPInt(LastSentPos.y);
-	Pkt.WriteFPInt(LastSentPos.z);
-	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
-	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteBEInt32(static_cast<Int32>(a_FallingBlock.GetBlockType()) | (static_cast<Int32>(a_FallingBlock.GetBlockMeta()) << 12));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_FallingBlock.GetSpeedZ() * 400));
+	WriteEntitySpawn(Pkt, a_Entity, EntityType, EntityData);
 }
 
 
@@ -1412,64 +1413,6 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata terminator
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData)
-{
-	ASSERT(m_State == 3);  // In game mode?
-	double PosX = a_Entity.GetPosX();
-	double PosZ = a_Entity.GetPosZ();
-	double Yaw = a_Entity.GetYaw();
-	if (a_ObjectType == 71)
-	{
-		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
-	}
-
-	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_ObjectType));
-	Pkt.WriteFPInt(PosX);
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(PosZ);
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteByteAngle(Yaw);
-	Pkt.WriteBEInt32(a_ObjectData);
-	if (a_ObjectData != 0)
-	{
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktSpawnObject);
-	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Vector3d LastSentPos = a_Vehicle.GetLastSentPos();
-	Pkt.WriteFPInt(LastSentPos.x);
-	Pkt.WriteFPInt(LastSentPos.y);
-	Pkt.WriteFPInt(LastSentPos.z);
-	Pkt.WriteByteAngle(a_Vehicle.GetPitch());
-	Pkt.WriteByteAngle(a_Vehicle.GetYaw());
-	Pkt.WriteBEInt32(a_VehicleSubType);
-	if (a_VehicleSubType != 0)
-	{
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
-		Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
-	}
 }
 
 
@@ -1808,70 +1751,70 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 
 int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 {
-	static std::map<AString, int> ParticleMap;
-	if (ParticleMap.empty())
+	static const std::unordered_map<AString, int> ParticleMap
 	{
 		// Initialize the ParticleMap:
-		ParticleMap["explode"]          = 0;
-		ParticleMap["largeexplode"]     = 1;
-		ParticleMap["hugeexplosion"]    = 2;
-		ParticleMap["fireworksspark"]   = 3;
-		ParticleMap["bubble"]           = 4;
-		ParticleMap["splash"]           = 5;
-		ParticleMap["wake"]             = 6;
-		ParticleMap["suspended"]        = 7;
-		ParticleMap["depthsuspend"]     = 8;
-		ParticleMap["crit"]             = 9;
-		ParticleMap["magiccrit"]        = 10;
-		ParticleMap["smoke"]            = 11;
-		ParticleMap["largesmoke"]       = 12;
-		ParticleMap["spell"]            = 13;
-		ParticleMap["instantspell"]     = 14;
-		ParticleMap["mobspell"]         = 15;
-		ParticleMap["mobspellambient"]  = 16;
-		ParticleMap["witchmagic"]       = 17;
-		ParticleMap["dripwater"]        = 18;
-		ParticleMap["driplava"]         = 19;
-		ParticleMap["angryvillager"]    = 20;
-		ParticleMap["happyvillager"]    = 21;
-		ParticleMap["townaura"]         = 22;
-		ParticleMap["note"]             = 23;
-		ParticleMap["portal"]           = 24;
-		ParticleMap["enchantmenttable"] = 25;
-		ParticleMap["flame"]            = 26;
-		ParticleMap["lava"]             = 27;
-		ParticleMap["footstep"]         = 28;
-		ParticleMap["cloud"]            = 29;
-		ParticleMap["reddust"]          = 30;
-		ParticleMap["snowballpoof"]     = 31;
-		ParticleMap["snowshovel"]       = 32;
-		ParticleMap["slime"]            = 33;
-		ParticleMap["heart"]            = 34;
-		ParticleMap["barrier"]          = 35;
-		ParticleMap["iconcrack"]        = 36;
-		ParticleMap["blockcrack"]       = 37;
-		ParticleMap["blockdust"]        = 38;
-		ParticleMap["droplet"]          = 39;
-		ParticleMap["take"]             = 40;
-		ParticleMap["mobappearance"]    = 41;
-		ParticleMap["dragonbreath"]     = 42;
-		ParticleMap["endrod"]           = 43;
-		ParticleMap["damageindicator"]  = 44;
-		ParticleMap["sweepattack"]      = 45;
-		ParticleMap["fallingdust"]      = 46;
-		ParticleMap["totem"]            = 47;
-		ParticleMap["spit"]             = 48;
-	}
+		{ "explode",          0 },
+		{ "largeexplode",     1 },
+		{ "hugeexplosion",    2 },
+		{ "fireworksspark",   3 },
+		{ "bubble",           4 },
+		{ "splash",           5 },
+		{ "wake",             6 },
+		{ "suspended",        7 },
+		{ "depthsuspend",     8 },
+		{ "crit",             9 },
+		{ "magiccrit",        10 },
+		{ "smoke",            11 },
+		{ "largesmoke",       12 },
+		{ "spell",            13 },
+		{ "instantspell",     14 },
+		{ "mobspell",         15 },
+		{ "mobspellambient",  16 },
+		{ "witchmagic",       17 },
+		{ "dripwater",        18 },
+		{ "driplava",         19 },
+		{ "angryvillager",    20 },
+		{ "happyvillager",    21 },
+		{ "townaura",         22 },
+		{ "note",             23 },
+		{ "portal",           24 },
+		{ "enchantmenttable", 25 },
+		{ "flame",            26 },
+		{ "lava",             27 },
+		{ "footstep",         28 },
+		{ "cloud",            29 },
+		{ "reddust",          30 },
+		{ "snowballpoof",     31 },
+		{ "snowshovel",       32 },
+		{ "slime",            33 },
+		{ "heart",            34 },
+		{ "barrier",          35 },
+		{ "iconcrack",        36 },
+		{ "blockcrack",       37 },
+		{ "blockdust",        38 },
+		{ "droplet",          39 },
+		{ "take",             40 },
+		{ "mobappearance",    41 },
+		{ "dragonbreath",     42 },
+		{ "endrod",           43 },
+		{ "damageindicator",  44 },
+		{ "sweepattack",      45 },
+		{ "fallingdust",      46 },
+		{ "totem",            47 },
+		{ "spit",             48 }
+	};
 
-	AString ParticleName = StrToLower(a_ParticleName);
-	if (ParticleMap.find(ParticleName) == ParticleMap.end())
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
 	{
 		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
 		ASSERT(!"Unknown particle");
 		return 0;
 	}
 
-	return ParticleMap[ParticleName];
+	return FindResult->second;
 }
 
 
@@ -1883,7 +1826,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 	switch (a_MobType)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 52;
+		case mtInvalidType:           return 53;
 		case mtBat:                   return 65;
 		case mtBlaze:                 return 61;
 		case mtCaveSpider:            return 59;
@@ -1919,41 +1862,6 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombieVillager:        return 27;
 	}
 	UNREACHABLE("Unsupported mob type");
-}
-
-
-
-
-
-void cProtocol_1_8_0::FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw)
-{
-	switch (a_ObjectData)
-	{
-		case 0:
-		{
-			a_PosZ += 1;
-			a_Yaw = 0;
-			break;
-		}
-		case 1:
-		{
-			a_PosX -= 1;
-			a_Yaw = 90;
-			break;
-		}
-		case 2:
-		{
-			a_PosZ -= 1;
-			a_Yaw = 180;
-			break;
-		}
-		case 3:
-		{
-			a_PosX += 1;
-			a_Yaw = 270;
-			break;
-		}
-	}
 }
 
 
@@ -3917,4 +3825,77 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
+}
+
+
+
+
+
+void cProtocol_1_8_0::WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	a_Pkt.WriteBEUInt8(a_ObjectType);
+	a_Pkt.WriteFPInt(a_Entity.GetPosX());
+	a_Pkt.WriteFPInt(a_Entity.GetPosY());
+	a_Pkt.WriteFPInt(a_Entity.GetPosY());
+	a_Pkt.WriteByteAngle(a_Entity.GetPitch());
+	a_Pkt.WriteByteAngle(a_Entity.GetYaw());
+	a_Pkt.WriteBEInt32(a_ObjectData);
+
+	if (a_ObjectData != 0)
+	{
+		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
+	}
+}
+
+
+
+
+
+UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 51;
+		case Type::etPickup: return 2;
+		case Type::etFallingBlock: return 70;
+		case Type::etMinecart: return 10;
+		case Type::etBoat: return 1;
+		case Type::etTNT: return 50;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 60;
+				case PType::pkSnowball: return 61;
+				case PType::pkEgg: return 62;
+				case PType::pkGhastFireball: return 63;
+				case PType::pkFireCharge: return 64;
+				case PType::pkEnderPearl: return 65;
+				case PType::pkExpBottle: return 75;
+				case PType::pkSplashPotion: return 73;
+				case PType::pkFirework: return 76;
+				case PType::pkWitherSkull: return 66;
+			}
+		}
+		case Type::etFloater: return 90;
+		case Type::etItemFrame: return 71;
+		case Type::etLeashKnot: return 77;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
+	}
 }

@@ -26,7 +26,7 @@ cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLET
 
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnFallingBlock(*this);
+	a_ClientHandle.SendSpawnEntity(*this);
 }
 
 

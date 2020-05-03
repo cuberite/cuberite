@@ -4,7 +4,6 @@
 #include "ArrowEntity.h"
 #include "../Chunk.h"
 #include "../Blocks/BlockButton.h"
-#include "../ClientHandle.h"
 
 
 
@@ -160,16 +159,6 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
-}
-
-
-
-
-
-void cArrowEntity::SpawnOn(cClientHandle & a_Client)
-{
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, static_cast<int>(m_CreatorData.m_UniqueID + 1));
-	a_Client.SendEntityMetadata(*this);
 }
 
 

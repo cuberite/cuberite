@@ -76,7 +76,6 @@ public:
 	virtual void SendLoginSuccess               (void) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPickupSpawn                (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities            (void) override;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
@@ -104,10 +103,8 @@ public:
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) override;
 	virtual void SendSetRawTitle                (const AString & a_Title) override;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
-	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
+	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData) override;
-	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
@@ -134,9 +131,6 @@ public:
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
-
-	/** Minecraft 1.8 use other locations to spawn the item frame. This function converts the 1.7 positions to 1.8 positions. */
-	static void FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw);
 
 protected:
 
@@ -167,7 +161,7 @@ protected:
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType);
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
@@ -246,6 +240,15 @@ protected:
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
 
+	/** Writes the entity type and entity-dependent data into a packet structure required for the entity to initially spawn. */
+	virtual void WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
+
 	/** Writes the block entity data for the specified block entity into the packet. */
 	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
+
+private:
+
+	/** Converts an entity to a protocol-specific entity type.
+	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
+	UInt8 GetProtocolEntityType(const cEntity & a_Entity);
 } ;
