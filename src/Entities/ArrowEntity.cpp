@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "ArrowEntity.h"
 #include "../Chunk.h"
+#include "../Blocks/BlockButton.h"
 
 
 
@@ -83,6 +84,10 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("entity.arrow.hit", m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+
+	// Trigger any buttons that were hit
+	// Wooden buttons will be depressed by the arrow
+	cBlockButtonHandler::OnArrowHit(*m_World, m_HitBlockPos, a_HitFace);
 
 	if ((m_World->GetBlock(m_HitBlockPos) == E_BLOCK_TNT) && IsOnFire())
 	{
