@@ -1298,9 +1298,8 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 			if (!a_Entity.IsTNT() && !a_Entity.IsFallingBlock())  // Don't apply damage to other TNT entities and falling blocks, they should be invincible
 			{
-				cBoundingBox bbEntity(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
-
-				if (!bbTNT.IsInside(bbEntity))  // If bbEntity is inside bbTNT, not vice versa!
+				auto EntityBox = a_Entity.GetBoundingBox();
+				if (!bbTNT.IsInside(EntityBox))  // If entity box is inside tnt box, not vice versa!
 				{
 					return false;
 				}

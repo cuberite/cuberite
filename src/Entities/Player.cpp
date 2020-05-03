@@ -2780,7 +2780,7 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 			{
 				return false;
 			}
-			cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+			auto EntBox = a_Entity.GetBoundingBox();
 			for (auto BlockBox : PlacementBoxes)
 			{
 				// Put in a little bit of wiggle room

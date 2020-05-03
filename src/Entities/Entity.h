@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "../BoundingBox.h"
 #include "../Item.h"
 #include "../OSSupport/AtomicUniquePtr.h"
 
@@ -238,6 +239,8 @@ public:
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
+
+	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetMass    (double a_Mass);
