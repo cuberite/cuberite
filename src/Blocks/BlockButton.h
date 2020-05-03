@@ -255,6 +255,11 @@ private:
 		return FoundArrow;
 	}
 
+	/** Returns an offset to the integer world coordinates of a button.
+	Applying this offset yields the centre of the button's bounding box,
+	in terms of the position within the block the button with given meta occupies.
+
+	TODO: this is only approximate, return the exact bbox instead. */
 	static Vector3d GetButtonOffsetOnBlock(NIBBLETYPE a_Meta)
 	{
 		switch (BlockMetaDataToBlockFace(a_Meta))
@@ -273,6 +278,3 @@ private:
 		}
 	}
 } ;
-
-
-
