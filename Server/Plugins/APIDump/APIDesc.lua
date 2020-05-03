@@ -3190,6 +3190,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage.",
 				},
+				GetBoundingBox =
+				{
+					Returns =
+					{
+						{
+							Type = "cBoundingBox",
+						},
+					},
+					Notes = "Returns the bounding box of the entity, which has width and height corresponding to the entity, and is aligned with the block grid."
+				}
 				GetChunkX =
 				{
 					Returns =

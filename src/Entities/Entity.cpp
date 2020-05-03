@@ -2353,7 +2353,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;
 	}
 
-	cBoundingBox EntityBox(GetPosition(), m_Width / 2, m_Height);
+	auto EntityBox = GetBoundingBox();
 	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
 	cBoundingBox IntersectionBox(EntityBox);
 

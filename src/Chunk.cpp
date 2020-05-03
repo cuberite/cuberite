@@ -1625,7 +1625,7 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 
 void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
 {
-	auto BoundingBox = cBoundingBox(a_Player.GetPosition(), a_Player.GetWidth(), a_Player.GetHeight());
+	auto BoundingBox = a_Player.GetBoundingBox();
 	BoundingBox.Expand(1, 0.5, 1);
 
 	for (auto & Entity : m_Entities)
@@ -1876,8 +1876,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Ca
 		{
 			continue;
 		}
-		cBoundingBox EntBox(Entity->GetPosition(), Entity->GetWidth() / 2, Entity->GetHeight());
-		if (!EntBox.DoesIntersect(a_Box))
+		if (!Entity->GetBoundingBox().DoesIntersect(a_Box))
 		{
 			// The entity is not in the specified box
 			continue;
