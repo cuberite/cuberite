@@ -235,7 +235,7 @@ static void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_Overri
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
 	}
-	catch (const fmt::FormatError & exc)
+	catch (const fmt::format_error & exc)
 	{
 		cRoot::m_TerminateEventRaised = true;
 		FLOGERROR("Formatting exception: {0}", exc.what());

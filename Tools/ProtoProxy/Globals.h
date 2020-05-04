@@ -181,6 +181,7 @@ typedef unsigned char Byte;
 
 // Common headers (part 1, without macros):
 #include "fmt/format.h"
+#include "fmt/printf.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 

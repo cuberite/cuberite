@@ -4,31 +4,55 @@
 
 // python style format specified logging
 
-extern void FLOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOG, const char *)
+extern void vFLOG(const char * a_Format, fmt::format_args a_ArgList);
+template <typename... Args>
+void FLOG(const char * a_Format, const Args & ... args) {
+	vFLOG(a_Format, fmt::make_format_args(args...));
+}
 
-extern void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGINFO, const char *)
+extern void vFLOGINFO(const char * a_Format, fmt::format_args a_ArgList);
+template <typename... Args>
+void FLOGINFO(const char * a_Format, const Args & ... args) {
+	vFLOGINFO(a_Format, fmt::make_format_args(args...));
+}
 
-extern void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGWARNING, const char *)
+extern void vFLOGWARNING(const char * a_Format, fmt::format_args a_ArgList);
+template <typename... Args>
+void FLOGWARNING(const char * a_Format, const Args & ... args) {
+	vFLOGWARNING(a_Format, fmt::make_format_args(args...));
+}
 
-extern void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGERROR, const char *)
+extern void vFLOGERROR(const char * a_Format, fmt::format_args a_ArgList);
+template <typename... Args>
+void FLOGERROR(const char * a_Format, const Args & ... args) {
+	vFLOGERROR(a_Format, fmt::make_format_args(args...));
+}
 
 // printf style format specified logging (DEPRECATED)
 
-extern void LOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOG, const char *)
+extern void vLOG(const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+void LOG(const char * a_Format, const Args & ... args) {
+	vLOG(a_Format, fmt::make_printf_args(args...));
+}
 
-extern void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGINFO, const char *)
+extern void vLOGINFO(const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+void LOGINFO(const char * a_Format, const Args & ... args) {
+	vLOGINFO(a_Format, fmt::make_printf_args(args...));
+}
 
-extern void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGWARNING, const char *)
+extern void vLOGWARNING(const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+void LOGWARNING(const char * a_Format, const Args & ... args) {
+	vLOGWARNING(a_Format, fmt::make_printf_args(args...));
+}
 
-extern void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGERROR, const char *)
+extern void vLOGERROR(const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+void LOGERROR(const char * a_Format, const Args & ... args) {
+	vLOGERROR(a_Format, fmt::make_printf_args(args...));
+}
 
 
 // Macro variants

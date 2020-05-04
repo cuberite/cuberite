@@ -836,7 +836,7 @@ static int GetRelBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({0}) are out of range ({1})",
+		return L.FApiParamError("The coords ({0}) are out of range ({1})",
 			coords, (self->GetSize() - Vector3i(1, 1, 1))
 		);
 	}

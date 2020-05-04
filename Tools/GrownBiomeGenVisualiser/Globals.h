@@ -192,6 +192,7 @@ typedef unsigned char Byte;
 
 // Common headers (without macros):
 #include "fmt/format.h"
+#include "fmt/printf.h"
 #include "StringUtils.h"
 
 
