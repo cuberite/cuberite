@@ -217,7 +217,7 @@ public:
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+		Tracer.Trace(Start, End);
 
 		if (!Callbacks.m_HasHitFluid)
 		{
@@ -269,7 +269,7 @@ public:
 		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
 		// we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
-		if (!Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
+		if (!Tracer.Trace(Start, End))
 		{
 			a_BlockPos = Callbacks.m_Pos;
 			a_BlockType = Callbacks.m_ReplacedBlockType;

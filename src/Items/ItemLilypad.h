@@ -96,7 +96,7 @@ public:
 		} Callbacks;
 		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
 		auto End =   a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
-		cLineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+		cLineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, Start, End);
 
 		if (Callbacks.m_HasHitFluid)
 		{

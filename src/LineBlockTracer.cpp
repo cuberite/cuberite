@@ -32,7 +32,7 @@ cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End)
 {
 	cLineBlockTracer Tracer(a_World, a_Callbacks);
-	return Tracer.Trace(a_Start.x, a_Start.y, a_Start.z, a_End.x, a_End.y, a_End.z);
+	return Tracer.Trace(a_Start, a_End);
 }
 
 
@@ -128,25 +128,6 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 		eBlockFace & m_HitBlockFace;
 	} callbacks(a_Start, a_End, a_HitCoords, a_HitBlockCoords, a_HitBlockFace);
 	return !Trace(a_World, callbacks, a_Start, a_End);
-}
-
-
-
-
-
-bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks &a_Callbacks, double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ)
-{
-	cLineBlockTracer Tracer(a_World, a_Callbacks);
-	return Tracer.Trace(a_StartX, a_StartY, a_StartZ, a_EndX, a_EndY, a_EndZ);
-}
-
-
-
-
-
-bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ)
-{
-	return Trace({a_StartX, a_StartY, a_StartZ}, {a_EndX, a_EndY, a_EndZ});
 }
 
 

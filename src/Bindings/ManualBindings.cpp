@@ -3122,6 +3122,8 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	/* Supported function signatures:
 	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical
 	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	cLineBlockTracer:Trace(World, Callbacks, Start, End)  // Canonical
+	cLineBlockTracer.Trace(World, Callbacks, Start, End)
 	*/
 
 	// If the first param is the cLineBlockTracer class, shift param index by one:
@@ -3136,9 +3138,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(idx, "cWorld") ||
-		!L.CheckParamTable   (idx + 1) ||
-		!L.CheckParamNumber  (idx + 2, idx + 7) ||
-		!L.CheckParamEnd     (idx + 8)
+		!L.CheckParamTable   (idx + 1)
 	)
 	{
 		return 0;
@@ -3146,20 +3146,49 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 	// Get the params:
 	cWorld * world;
-	double startX, startY, startZ;
-	double endX, endY, endZ;
+	Vector3d start;
+	Vector3d end;
 	cLuaState::cTableRefPtr callbacks;
-	if (!L.GetStackValues(idx, world, callbacks, startX, startY, startZ, endX, endY, endZ))
+	if (
+		L.CheckParamNumber  (idx + 2, idx + 7) &&
+		L.CheckParamEnd     (idx + 8)
+	)
 	{
-		LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
-		L.LogStackTrace();
-		L.LogStackValues("Values on the stack");
+		if (!L.GetStackValues(idx, world, callbacks, start.x, start.y, start.z, end.x, end.y, end.z))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		else
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Deprecated overload should take two Vector3d.");
+		}
+
+	}
+	else if (
+		L.CheckParamNumber  (idx + 2, idx + 3) &&
+		L.CheckParamEnd     (idx + 4) &&
+		L.CheckParamUserType(idx + 2, "Vector3d") &&
+		L.CheckParamUserType(idx + 3, "Vector3d")
+	)
+	{
+		if (!L.GetStackValues(idx, world, callbacks, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+	}
+	else
+	{
 		return 0;
 	}
-
 	// Trace:
 	cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
-	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, startX, startY, startZ, endX, endY, endZ);
+	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
 	tolua_pushboolean(L, res ? 1 : 0);
 	return 1;
 }

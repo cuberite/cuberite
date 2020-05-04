@@ -45,16 +45,10 @@ public:
 	cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks);
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	bool Trace(double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ);
-
-	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
 	bool Trace(const Vector3d & a_Start, const Vector3d & a_End);
 
 
 	// Utility functions for simple one-line usage:
-
-	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ);
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
 	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End);
