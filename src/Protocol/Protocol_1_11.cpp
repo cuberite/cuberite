@@ -341,13 +341,13 @@ cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString & a_S
 
 
 
-void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
+void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktCollectEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	Pkt.WriteVarInt32(a_Collected.GetUniqueID());
+	Pkt.WriteVarInt32(a_Collector.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
 }
 
@@ -389,7 +389,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
-	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);

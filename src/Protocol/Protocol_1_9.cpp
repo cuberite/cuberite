@@ -170,33 +170,50 @@ void cProtocol_1_9_0::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
-void cProtocol_1_9_0::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktEntityRelMove);
+	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+
+	// Limitations of a short
+	static const auto Max = std::numeric_limits<Int16>::max();
+
+	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	{
+		const auto Move = static_cast<Vector3<Int16>>(Delta);
+
+		// Difference within limitations, use a relative move packet
+		if (a_Entity.IsOrientationDirty())
+		{
+			cPacketizer Pkt(*this, pktEntityRelMoveLook);
+			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+			Pkt.WriteBEInt16(Move.x);
+			Pkt.WriteBEInt16(Move.y);
+			Pkt.WriteBEInt16(Move.z);
+			Pkt.WriteByteAngle(a_Entity.GetYaw());
+			Pkt.WriteByteAngle(a_Entity.GetPitch());
+			Pkt.WriteBool(a_Entity.IsOnGround());
+		}
+		else
+		{
+			cPacketizer Pkt(*this, pktEntityRelMove);
+			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+			Pkt.WriteBEInt16(Move.x);
+			Pkt.WriteBEInt16(Move.y);
+			Pkt.WriteBEInt16(Move.z);
+			Pkt.WriteBool(a_Entity.IsOnGround());
+		}
+
+		return;
+	}
+
+	// Too big a movement, do a teleport
+	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
-	Pkt.WriteBEInt16(a_RelX * 128);
-	Pkt.WriteBEInt16(a_RelY * 128);
-	Pkt.WriteBEInt16(a_RelZ * 128);
-	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityRelMoveLook);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
-	Pkt.WriteBEInt16(a_RelX * 128);
-	Pkt.WriteBEInt16(a_RelY * 128);
-	Pkt.WriteBEInt16(a_RelZ * 128);
+	Pkt.WriteBEDouble(a_Entity.GetPosX());
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(a_Entity.GetPosZ());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
@@ -386,7 +403,7 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Vector3d LastSentPos = a_Player.GetLastSentPos();
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -428,7 +445,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
-	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -440,24 +457,6 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
 	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendTeleportEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEDouble(a_Entity.GetPosX());
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -1323,6 +1322,33 @@ eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 
 
 
+void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSpawnObject);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
+
+	Pkt.WriteBEUInt8(a_ObjectType);
+	Pkt.WriteBEDouble(a_Entity.GetPosX());
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteBEInt32(a_ObjectData);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
+}
+
+
+
+
+
 void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
@@ -2167,32 +2193,6 @@ void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	a_Pkt.WriteBEUInt64(0);
-	a_Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-
-	a_Pkt.WriteBEUInt8(a_ObjectType);
-	a_Pkt.WriteBEDouble(a_Entity.GetPosX());
-	a_Pkt.WriteBEDouble(a_Entity.GetPosY());
-	a_Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	a_Pkt.WriteByteAngle(a_Entity.GetPitch());
-	a_Pkt.WriteByteAngle(a_Entity.GetYaw());
-	a_Pkt.WriteBEInt32(a_ObjectData);
-	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-	a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 }
 
 

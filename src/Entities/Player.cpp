@@ -681,6 +681,24 @@ void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 
 
 
+void cPlayer::TossItems(const cItems & a_Items)
+{
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
+	{
+		return;
+	}
+
+	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
+
+	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
+	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
+	m_World->SpawnItemPickups(a_Items, Position, Speed, true);  // 'true' because created by player
+}
+
+
+
+
+
 void cPlayer::StartEating(void)
 {
 	// Set the timer:
@@ -1647,11 +1665,10 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		ResetPosition({a_PosX, a_PosY, a_PosZ});
+		SetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
 		m_bIsTeleporting = true;
 
-		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 		m_ClientHandle->SendPlayerMoveLook();
 	}
 }
@@ -2011,25 +2028,6 @@ void cPlayer::TossPickup(const cItem & a_Item)
 	Drops.push_back(a_Item);
 
 	TossItems(Drops);
-}
-
-
-
-
-
-void cPlayer::TossItems(const cItems & a_Items)
-{
-	if (IsGameModeSpectator())  // Players can't toss items in spectator
-	{
-		return;
-	}
-
-	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
-
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
 }
 
 

@@ -233,10 +233,10 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 
 
-void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
+void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendCollectEntity(a_Entity, a_Player, a_Count);
+	m_Protocol->SendCollectEntity(a_Collected, a_Collector, a_Count);
 }
 
 
@@ -285,6 +285,16 @@ void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
 
 
@@ -341,30 +351,20 @@ void cProtocolRecognizer::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
+void cProtocolRecognizer::SendEntityPosition(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendEntityPosition(a_Entity);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendEntityProperties(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityProperties(a_Entity);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -554,16 +554,6 @@ void cProtocolRecognizer::SendPlayerAbilities(void)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerAbilities();
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
 
 
@@ -854,16 +844,6 @@ void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Resul
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTabCompletionResults(a_Results);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendTeleportEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendTeleportEntity(a_Entity);
 }
 
 

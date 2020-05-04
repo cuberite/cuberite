@@ -15,8 +15,6 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 	m_DamageCoeff(2),
 	m_IsCritical(false),
 	m_Timer(0),
-	m_HitGroundTimer(0),
-	m_HasTeleported(false),
 	m_bIsCollected(false)
 {
 	SetMass(0.1);
@@ -191,19 +189,6 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
-		if (!m_HasTeleported)  // Sent a teleport already, don't do again
-		{
-			if (m_HitGroundTimer > std::chrono::milliseconds(500))
-			{
-				m_World->BroadcastTeleportEntity(*this);
-				m_HasTeleported = true;
-			}
-			else
-			{
-				m_HitGroundTimer += a_Dt;
-			}
-		}
-
 		if (m_World->GetBlock(m_HitBlockPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
