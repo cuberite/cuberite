@@ -59,7 +59,7 @@ public:
 
 	void Run(void);
 
-	void vLog(const char * a_Format, fmt::printf_args);
+	void vLog(const char * a_Format, fmt::printf_args a_ArgList);
 
 	template <typename... Args>
 	void Log(const char * a_Format, const Args & ... a_Args)
@@ -67,7 +67,7 @@ public:
 		vLog(a_Format, fmt::make_printf_args(a_Args...));
 	}
 
-	void vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args);
+	void vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList);
 
 	template <typename... Args>
 	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, const Args & ... a_Args)
