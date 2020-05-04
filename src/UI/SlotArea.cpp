@@ -2620,10 +2620,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 		Item.Empty();
 	}  // for i - itr->second[]
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because player created
+	a_Player.TossItems(Drops);
 }
 
 

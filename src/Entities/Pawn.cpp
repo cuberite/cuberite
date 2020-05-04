@@ -84,7 +84,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Spectators cannot push entities around
 	if ((!IsPlayer()) || (!static_cast<cPlayer *>(this)->IsGameModeSpectator()))
 	{
-		m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), GetWidth(), GetHeight()), [=](cEntity & a_Entity)
+		m_World->ForEachEntityInBox(GetBoundingBox(), [=](cEntity & a_Entity)
 			{
 				if (a_Entity.GetUniqueID() == GetUniqueID())
 				{

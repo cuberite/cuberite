@@ -352,14 +352,14 @@ void cProtocol_1_8_0::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerial
 
 
 
-void cProtocol_1_8_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
+void cProtocol_1_8_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
 	UNUSED(a_Count);
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktCollectEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	Pkt.WriteVarInt32(a_Collected.GetUniqueID());
+	Pkt.WriteVarInt32(a_Collector.GetUniqueID());
 }
 
 
@@ -424,6 +424,19 @@ void cProtocol_1_8_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 	cPacketizer Pkt(*this, pktEditSign);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktEntityAnimation);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEInt8(a_Animation);
 }
 
 
@@ -502,6 +515,52 @@ void cProtocol_1_8_0::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
+void cProtocol_1_8_0::SendEntityPosition(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32;
+
+	// Limitations of a byte
+	static const auto Max = std::numeric_limits<Int8>::max();
+
+	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	{
+		const auto Move = static_cast<Vector3<Int8>>(Delta);
+
+		// Difference within limitations, use a relative move packet
+		if (a_Entity.IsOrientationDirty())
+		{
+			cPacketizer Pkt(*this, pktEntityRelMoveLook);
+			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+			Pkt.WriteBEInt8(Move.x);
+			Pkt.WriteBEInt8(Move.y);
+			Pkt.WriteBEInt8(Move.z);
+			Pkt.WriteByteAngle(a_Entity.GetYaw());
+			Pkt.WriteByteAngle(a_Entity.GetPitch());
+			Pkt.WriteBool(a_Entity.IsOnGround());
+		}
+		else
+		{
+			cPacketizer Pkt(*this, pktEntityRelMove);
+			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+			Pkt.WriteBEInt8(Move.x);
+			Pkt.WriteBEInt8(Move.y);
+			Pkt.WriteBEInt8(Move.z);
+			Pkt.WriteBool(a_Entity.IsOnGround());
+		}
+
+		return;
+	}
+
+	// Too big a movement, do a teleport
+	SendEntityTeleport(a_Entity);
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendEntityProperties(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -509,40 +568,6 @@ void cProtocol_1_8_0::SendEntityProperties(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, pktEntityProperties);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityProperties(Pkt, a_Entity);
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityRelMove);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_RelX);
-	Pkt.WriteBEInt8(a_RelY);
-	Pkt.WriteBEInt8(a_RelZ);
-	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityRelMoveLook);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_RelX);
-	Pkt.WriteBEInt8(a_RelY);
-	Pkt.WriteBEInt8(a_RelZ);
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -882,19 +907,6 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 
 
 
-void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityAnimation);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Animation);
-}
-
-
-
-
-
 void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1133,7 +1145,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Vector3d LastSentPos = a_Player.GetLastSentPos();
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteFPInt(LastSentPos.z);
@@ -1386,8 +1398,7 @@ void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 		}
 	}
 
-	cPacketizer Pkt(*this, pktSpawnObject);
-	WriteEntitySpawn(Pkt, a_Entity, EntityType, EntityData);
+	SendEntitySpawn(a_Entity, EntityType, EntityData);
 }
 
 
@@ -1401,7 +1412,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
-	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
 	Pkt.WriteFPInt(LastSentPos.z);
@@ -1452,24 +1463,6 @@ void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results)
 	{
 		Pkt.WriteString(*itr);
 	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendTeleportEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteFPInt(a_Entity.GetPosX());
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -3201,6 +3194,37 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 
 
+void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	{
+		cPacketizer Pkt(*this, pktSpawnObject);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+		Pkt.WriteBEUInt8(a_ObjectType);
+		Pkt.WriteFPInt(a_Entity.GetPosX());  // Position appears to be ignored...
+		Pkt.WriteFPInt(a_Entity.GetPosY());
+		Pkt.WriteFPInt(a_Entity.GetPosY());
+		Pkt.WriteByteAngle(a_Entity.GetPitch());
+		Pkt.WriteByteAngle(a_Entity.GetYaw());
+		Pkt.WriteBEInt32(a_ObjectData);
+
+		if (a_ObjectData != 0)
+		{
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
+		}
+	}
+
+	// Otherwise 1.8 clients don't show the entity
+	SendEntityTeleport(a_Entity);
+}
+
+
+
+
+
 void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
@@ -3831,25 +3855,16 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 
 
 
-void cProtocol_1_8_0::WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
+void cProtocol_1_8_0::SendEntityTeleport(const cEntity & a_Entity)
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	a_Pkt.WriteBEUInt8(a_ObjectType);
-	a_Pkt.WriteFPInt(a_Entity.GetPosX());
-	a_Pkt.WriteFPInt(a_Entity.GetPosY());
-	a_Pkt.WriteFPInt(a_Entity.GetPosY());
-	a_Pkt.WriteByteAngle(a_Entity.GetPitch());
-	a_Pkt.WriteByteAngle(a_Entity.GetYaw());
-	a_Pkt.WriteBEInt32(a_ObjectData);
-
-	if (a_ObjectData != 0)
-	{
-		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-		a_Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-	}
+	cPacketizer Pkt(*this, pktTeleportEntity);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
