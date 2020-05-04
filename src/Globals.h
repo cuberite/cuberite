@@ -235,8 +235,23 @@ template class SizeChecker<UInt8,  1>;
 
 
 // Common headers (part 1, without macros):
+
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wunknown-pragmas"
+	#pragma clang diagnostic ignored "-Wunknown-warning-option"
+	#pragma clang diagnostic ignored "-Wsigned-enum-bitfield"
+	#pragma clang diagnostic ignored "-Wundefined-func-template"
+	#pragma clang diagnostic ignored "-Wc++2a-compat"
+#endif
+
 #include "fmt/format.h"
 #include "fmt/printf.h"
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
+
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"

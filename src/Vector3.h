@@ -395,9 +395,11 @@ public:
 
 
 
+namespace fmt
+{
 
 template <typename What>
-class fmt::formatter<Vector3<What>>:
+class formatter<Vector3<What>>:
 	public fmt::formatter<What>
 {
 	using Super = fmt::formatter<What>;
@@ -432,6 +434,8 @@ public:
 		return a_Ctx.out();
 	}
 };
+
+}
 
 
 
