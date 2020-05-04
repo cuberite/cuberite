@@ -2828,12 +2828,19 @@ public:
 		bool res = false;
 		if (!m_Callbacks->CallTableFn(
 			"OnNextBlock",
-			a_Block.x, a_Block.y, a_Block.z, a_BlockType, a_BlockMeta, a_EntryFace,
+			a_Block, a_BlockType, a_BlockMeta, a_EntryFace,
 			cLuaState::Return, res
 		))
 		{
-			// No such function in the table, skip the callback
-			return false;
+			if (!m_Callbacks->CallTableFn(
+				"OnNextBlock",
+				a_Block.x, a_Block.y, a_Block.z, a_BlockType, a_BlockMeta, a_EntryFace,
+				cLuaState::Return, res
+			))
+			{
+				// No such function in the table, skip the callback
+				return false;
+			}
 		}
 		return res;
 	}
@@ -2843,12 +2850,19 @@ public:
 		bool res = false;
 		if (!m_Callbacks->CallTableFn(
 			"OnNextBlockNoData",
-			a_Block.x, a_Block.y, a_Block.z, a_EntryFace,
+			a_Block, a_EntryFace,
 			cLuaState::Return, res
 		))
 		{
-			// No such function in the table, skip the callback
-			return false;
+			if (!m_Callbacks->CallTableFn(
+				"OnNextBlockNoData",
+				a_Block.x, a_Block.y, a_Block.z, a_EntryFace,
+				cLuaState::Return, res
+			))
+			{
+				// No such function in the table, skip the callback
+				return false;
+			}
 		}
 		return res;
 	}
@@ -2858,12 +2872,19 @@ public:
 		bool res = false;
 		if (!m_Callbacks->CallTableFn(
 			"OnOutOfWorld",
-			a_Block.x, a_Block.y, a_Block.z,
+			a_Block,
 			cLuaState::Return, res
 		))
 		{
-			// No such function in the table, skip the callback
-			return false;
+			if (!m_Callbacks->CallTableFn(
+				"OnOutOfWorld",
+				a_Block.x, a_Block.y, a_Block.z,
+				cLuaState::Return, res
+			))
+			{
+				// No such function in the table, skip the callback
+				return false;
+			}
 		}
 		return res;
 	}
@@ -2873,12 +2894,19 @@ public:
 		bool res = false;
 		if (!m_Callbacks->CallTableFn(
 			"OnIntoWorld",
-			a_Block.x, a_Block.y, a_Block.z,
+			a_Block,
 			cLuaState::Return, res
 		))
 		{
-			// No such function in the table, skip the callback
-			return false;
+			if (!m_Callbacks->CallTableFn(
+				"OnIntoWorld",
+				a_Block.x, a_Block.y, a_Block.z,
+				cLuaState::Return, res
+			))
+			{
+				// No such function in the table, skip the callback
+				return false;
+			}
 		}
 		return res;
 	}
