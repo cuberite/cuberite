@@ -11,7 +11,6 @@
 #include "json/json.h"
 #include "../mbedTLS++/BlockingSslClientSocket.h"
 #include "../mbedTLS++/SslConfig.h"
-#include "../RankManager.h"
 #include "../OSSupport/IsThread.h"
 #include "../Root.h"
 
@@ -282,7 +281,6 @@ cMojangAPI::cMojangAPI(void) :
 	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS),
 	m_UUIDToProfileServer(DEFAULT_UUID_TO_PROFILE_SERVER),
 	m_UUIDToProfileAddress(DEFAULT_UUID_TO_PROFILE_ADDRESS),
-	m_RankMgr(nullptr),
 	m_UpdateThread(new cUpdateThread(*this))
 {
 }
@@ -425,7 +423,6 @@ void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const 
 		cCSLock Lock(m_CSUUIDToName);
 		m_UUIDToName[a_UUID] = sProfile(a_PlayerName, a_UUID, "", "", Now);
 	}
-	NotifyNameUUID(a_PlayerName, a_UUID);
 }
 
 
@@ -447,7 +444,6 @@ void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const cUUID & a_
 		cCSLock Lock(m_CSUUIDToProfile);
 		m_UUIDToProfile[a_UUID] = sProfile(a_PlayerName, a_UUID, a_Properties, Now);
 	}
-	NotifyNameUUID(a_PlayerName, a_UUID);
 }
 
 
@@ -735,7 +731,6 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 					continue;
 				}
 				m_NameToUUID[StrToLower(JsonName)] = sProfile(JsonName, JsonUUID, "", "", Now);
-				NotifyNameUUID(JsonName, JsonUUID);
 			}  // for idx - root[]
 		}  // cCSLock (m_CSNameToUUID)
 
@@ -866,21 +861,6 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(PlayerName)] = sProfile(PlayerName, a_UUID, Properties, Now);
-	}
-	NotifyNameUUID(PlayerName, a_UUID);
-}
-
-
-
-
-
-void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UUID)
-{
-	// Notify the rank manager:
-	cCSLock Lock(m_CSRankMgr);
-	if (m_RankMgr != nullptr)
-	{
-		m_RankMgr->NotifyNameUUID(a_PlayerName, a_UUID);
 	}
 }
 

@@ -15,7 +15,6 @@
 
 
 class cUUID;
-class cMojangAPI;
 
 
 
@@ -50,11 +49,8 @@ public:
 	/** Creates the rank manager. Needs to be initialized before other use. */
 	cRankManager(void);
 
-	~cRankManager();
-
-	/** Initializes the rank manager. Performs migration and default-setting if no data is found in the DB.
-	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */
-	void Initialize(cMojangAPI & a_MojangAPI);
+	/** Initializes the rank manager. Performs default-setting if no data is found in the DB. */
+	void Initialize();
 
 	/** Returns the name of the rank that the specified player has assigned to them.
 	If the player has no rank assigned, returns an empty string (NOT the default rank). */
@@ -242,9 +238,6 @@ public:
 	/** Returns true iff the specified group contains the specified restriction. */
 	bool IsRestrictionInGroup(const AString & a_Restriction, const AString & a_GroupName);
 
-	/** Called by cMojangAPI whenever the playername-uuid pairing is discovered. Updates the DB. */
-	void NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UUID);
-
 	/** Sets the specified rank as the default rank.
 	Returns true on success, false on failure (rank not found). */
 	bool SetDefaultRank(const AString & a_RankName);
@@ -272,10 +265,6 @@ protected:
 
 	/** Set to true once the manager is initialized. */
 	bool m_IsInitialized;
-
-	/** The MojangAPI instance that is used for translating playernames to UUIDs.
-	Set in Initialize(), may be nullptr. */
-	cMojangAPI * m_MojangAPI;
 
 
 	/** Returns true if all the DB tables are empty, indicating a fresh new install. */
