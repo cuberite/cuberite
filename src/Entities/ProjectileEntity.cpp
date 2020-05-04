@@ -147,7 +147,7 @@ public:
 			}
 		}
 
-		cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+		auto EntBox = a_Entity.GetBoundingBox();
 
 		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
 		// The results should be good enough for our purposes

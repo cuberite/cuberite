@@ -372,6 +372,9 @@ public:
 
 	// tolua_end
 
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
+
 	/** Sets a player's in-bed state
 	We can't be sure plugins will keep this value updated, so no exporting
 	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
@@ -768,9 +771,6 @@ protected:
 
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
-
-	/** Tosses a list of items. */
-	void TossItems(const cItems & a_Items);
 
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */

@@ -1641,6 +1641,12 @@ void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 
 void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
+	if (!m_Player->IsGameModeSpectator())
+	{
+		Kick("Tried to use spectator mode when not in game mode spectator.");
+		return;
+	}
+
 	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer & a_ToSpectate)
 	{
 		m_Player->TeleportToEntity(a_ToSpectate);
@@ -2497,9 +2503,9 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 
 
 
-void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
+void cClientHandle::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
-	m_Protocol->SendCollectEntity(a_Entity, a_Player, a_Count);
+	m_Protocol->SendCollectEntity(a_Collected, a_Collector, a_Count);
 }
 
 
@@ -2603,22 +2609,9 @@ void cClientHandle::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
-void cClientHandle::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cClientHandle::SendEntityPosition(const cEntity & a_Entity)
 {
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-
-	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cClientHandle::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-
-	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+	m_Protocol->SendEntityPosition(a_Entity);
 }
 
 
@@ -3052,15 +3045,6 @@ void cClientHandle::SendStatistics(const cStatManager & a_Manager)
 void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	m_Protocol->SendTabCompletionResults(a_Results);
-}
-
-
-
-
-
-void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
-{
-	m_Protocol->SendTeleportEntity(a_Entity);
 }
 
 

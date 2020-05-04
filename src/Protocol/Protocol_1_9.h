@@ -46,8 +46,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
-	virtual void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
-	virtual void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
+	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
@@ -59,7 +58,6 @@ public:
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
@@ -111,6 +109,9 @@ protected:
 	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
 	eHand HandIntToEnum(Int32 a_Hand);
 
+	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
+	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
+
 	/** Writes the item data into a packet. */
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
 
@@ -122,9 +123,6 @@ protected:
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
-
-	/** Writes the entity type and entity-dependent data into a packet structure required for the entity to initially spawn. */
-	virtual void WriteEntitySpawn(cPacketizer & a_Pkt, const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 
 	/** Writes the block entity data for the specified block entity into the packet. */
 	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;

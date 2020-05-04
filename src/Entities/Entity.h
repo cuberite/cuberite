@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "../BoundingBox.h"
 #include "../Item.h"
 #include "../OSSupport/AtomicUniquePtr.h"
 
@@ -188,6 +189,7 @@ public:
 
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 
+	bool IsArrow       (void) const { return IsA("cArrowEntity");              }
 	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
@@ -238,6 +240,8 @@ public:
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
+
+	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetMass    (double a_Mass);
@@ -334,7 +338,7 @@ public:
 
 	/** Returns the last position we sent to all the clients. Use this to
 	initialize clients with our position. */
-	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
+	Vector3d GetLastSentPosition(void) const { return m_LastSentPosition; }
 
 	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
 	void DestroyNoScheduling(bool a_ShouldBroadcast);
@@ -506,6 +510,10 @@ public:
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	/** Returns whether the entity's orientation has been set manually.
+	Primarily inteded for protocol use. */
+	bool IsOrientationDirty() const;
 
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();

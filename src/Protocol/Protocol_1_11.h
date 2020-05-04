@@ -30,7 +30,7 @@ public:
 
 	cProtocol_1_11_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	virtual void SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count) override;
+	virtual void SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
 	virtual void SendHideTitle    (void) override;
 	virtual void SendResetTitle   (void) override;
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;

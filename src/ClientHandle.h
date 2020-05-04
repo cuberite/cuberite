@@ -154,7 +154,7 @@ public:  // tolua_export
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
 	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count);
+	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void SendDisconnect                 (const AString & a_Reason);
@@ -166,8 +166,7 @@ public:  // tolua_export
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
 	void SendEntityMetadata             (const cEntity & a_Entity);
-	void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntityPosition             (const cEntity & a_Entity);
 	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
@@ -211,7 +210,6 @@ public:  // tolua_export
 	void SendSpawnMob                   (const cMonster & a_Mob);
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
-	void SendTeleportEntity             (const cEntity & a_Entity);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
 	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
