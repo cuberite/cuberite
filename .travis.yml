@@ -1,78 +1,61 @@
 language: cpp
-sudo: false
+cache: ccache
 
 # Use Linux by default
 os: linux
+dist: bionic
+
+# CMake version out of date: update
+# TODO: add ARM64, PPC, SPARC builds when we find CMake for them
+addons:
+  snaps:
+  - name: cmake
+    confinement: classic
+    channel: latest
 
 matrix:
   include:
-    # gcc on arm64
-    - compiler: gcc
-      arch: arm64
-      addons:
-        apt:
-          packages:
-            - ccache
-      env: &Debug
-        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
-    # AppleClang
+    # AppleClang Release
     # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
     - os: osx
-      compiler: clang
+      osx_image: xcode11.3
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Release
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE
+
+    # AppleClang Debug
     - os: osx
-      compiler: clang
-      env: *Debug
+      osx_image: xcode11.3
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-    # Default clang
+      env: &Debug
+        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
+
+    # Default Clang Release
     - compiler: clang
+      before_install: &use-cmake
+        - export PATH=/snap/bin/:${PATH}
       env: *Release
+
+    # Default Clang Debug
     - compiler: clang
+      before_install: *use-cmake
       env: *Debug
-    # clang 3.5
-    - compiler: clang
-      dist: trusty
-      addons: &clang35
-        apt:
-          packages:
-            - clang++-3.5
-            - clang-3.5
-      before_install:
-        - CC=clang-3.5;CXX=clang++-3.5
-      env: *Release
-    - compiler: clang
-      dist: trusty
-      addons: *clang35
-      before_install:
-        - CC=clang-3.5;CXX=clang++-3.5
-      env: *Debug
-    # gcc 4.8
+
+    # Default GCC Release
     - compiler: gcc
-      addons: &gcc48
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.8
-            - gcc-4.8
-      before_install:
-        - CC=gcc-4.8;CXX=g++-4.8
+      before_install: *use-cmake
       env: *Release
+
+    # Default GCC Debug
     - compiler: gcc
-      addons: *gcc48
-      before_install:
-        - CC=gcc-4.8;CXX=g++-4.8
+      before_install: *use-cmake
       env: *Debug
 
 before_script:
   - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
 script: ./travisbuild.sh
-cache: ccache
-
 
 notifications:
   email:

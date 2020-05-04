@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: Visual Studio 2015
+image: Visual Studio 2019
 clone_depth: 50
 
 # Set up environment variables for build info
@@ -38,7 +38,8 @@ for:
   - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
   - cd %BUILD_DIR%
   - echo %TIME%
-  - cmake -G "Visual Studio 14 2015 Win64" -DSELF_TEST=1 -DBUILD_TOOLS=1 ..
+  # TODO: re-add -DSELF_TEST=YES -DBUILD_TOOLS=YES once PCH for tools enabled (too slow otherwise)
+  - cmake -G "Visual Studio 16 2019" -A "x64" -DSELF_TEST=NO -DBUILD_TOOLS=NO ..
   - echo %TIME%
   - cd ..
 
@@ -63,7 +64,7 @@ for:
   - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
   - cd %BUILD_DIR%
   - echo %TIME%
-  - cmake -G "Visual Studio 14 2015" ..
+  - cmake -G "Visual Studio 16 2019" ..
   - echo %TIME%
   - cd ..
 
@@ -88,7 +89,7 @@ for:
   - if not exist %BUILD_DIR% mkdir %BUILD_DIR%
   - cd %BUILD_DIR%
   - echo %TIME%
-  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - cmake -G "Visual Studio 16 2019" -A "x64" ..
   - echo %TIME%
   - cd ..
 
