@@ -66,7 +66,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlock, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (IsBlockWater(a_CBBlockType))
 				{
@@ -74,7 +74,7 @@ public:
 					{
 						return false;
 					}
-					AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, BLOCK_FACE_YP);  // Always place pad at top of water block
+					AddFaceDirection(a_CBBlock, BLOCK_FACE_YP);  // Always place pad at top of water block
 					if (
 						!IsBlockWater(a_CBBlockType) &&
 						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
@@ -84,7 +84,7 @@ public:
 						return true;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
+					m_Pos = a_CBBlock;
 					return true;
 				}
 				return false;

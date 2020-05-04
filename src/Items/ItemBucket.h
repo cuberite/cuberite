@@ -197,7 +197,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 			{
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
@@ -206,7 +206,7 @@ public:
 						return false;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = a_Block;
 					return true;
 				}
 				return false;
@@ -244,7 +244,7 @@ public:
 			NIBBLETYPE m_ReplacedBlockMeta;
 			eBlockFace m_EntryFace;
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlock, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if ((a_CBBlockType != E_BLOCK_AIR) && !IsBlockLiquid(a_CBBlockType))
 				{
@@ -253,9 +253,9 @@ public:
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
 					if (!cFluidSimulator::CanWashAway(a_CBBlockType))
 					{
-						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
+						AddFaceDirection(a_CBBlock, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);  // (Block could be washed away, replace it)
+					m_Pos = a_CBBlock;  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
 				}
 				return false;

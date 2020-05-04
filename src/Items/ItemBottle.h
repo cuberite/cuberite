@@ -43,7 +43,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 			{
 				if (IsBlockWater(a_BlockType))
 				{
@@ -52,7 +52,7 @@ public:
 						return false;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = a_Block;
 					return true;
 				}
 				return false;

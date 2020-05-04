@@ -52,11 +52,11 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlock, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
+					m_Pos = a_CBBlock;
 					m_HasFound = true;
 					return true;
 				}
