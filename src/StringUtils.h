@@ -25,7 +25,8 @@ typedef std::map<AString, AString> AStringMap;
 Returns a_Dst. */
 extern AString & vPrintf(AString & a_Dst, const char * format, fmt::printf_args args);
 template <typename... Args>
-AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args) {
+AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args)
+{
 	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(args...));
 }
 
@@ -33,7 +34,8 @@ AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args) 
 Returns the formatted string by value. */
 extern AString vPrintf(const char * format, fmt::printf_args args);
 template <typename... Args>
-AString Printf(const char * a_Format, const Args & ... args) {
+AString Printf(const char * a_Format, const Args & ... args)
+{
 	return vPrintf(a_Format, fmt::make_printf_args(args...));
 }
 
