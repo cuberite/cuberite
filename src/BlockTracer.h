@@ -39,17 +39,33 @@ public:
 
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
+		Prefer Vector3i overload
 		*/
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) = 0;
+		bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace)
+		{
+			return OnNextBlock({a_BlockX, a_BlockY, a_BlockY}, a_BlockType, a_BlockMeta, a_EntryFace);
+		}
+
+		/** Called on each block encountered along the path, including the first block (path start)
+		When this callback returns true, the tracing is aborted.
+		*/
+		virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) = 0;
+
+		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
+		When this callback returns true, the tracing is aborted.
+		Prefer Vector3i overload
+		*/
+		bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace)
+		{
+			return OnNextBlockNoData({a_BlockX, a_BlockY, a_BlockZ}, a_EntryFace);
+		}
 
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace)
+		virtual bool OnNextBlockNoData(Vector3i a_Block, char a_EntryFace)
 		{
-			UNUSED(a_BlockX);
-			UNUSED(a_BlockY);
-			UNUSED(a_BlockZ);
+			UNUSED(a_Block);
 			UNUSED(a_EntryFace);
 			return false;
 		}
@@ -59,12 +75,22 @@ public:
 		If this callback returns true, the tracing is aborted.
 		Note that some paths can go out of the world and come back again (parabola),
 		in such a case this callback is followed by OnIntoWorld() and further OnNextBlock() calls
+		Prefer Vector3i overload
 		*/
-		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ)
+		bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ)
 		{
-			UNUSED(a_BlockX);
-			UNUSED(a_BlockY);
-			UNUSED(a_BlockZ);
+			return OnOutOfWorld({a_BlockX, a_BlockY, a_BlockZ});
+		}
+
+		/** Called when the path goes out of world, either below (a_BlockY < 0) or above (a_BlockY >= cChunkDef::Height)
+		The coords specify the exact point at which the path exited the world.
+		If this callback returns true, the tracing is aborted.
+		Note that some paths can go out of the world and come back again (parabola),
+		in such a case this callback is followed by OnIntoWorld() and further OnNextBlock() calls
+		*/
+		virtual bool OnOutOfWorld(Vector3d a_Block)
+		{
+			UNUSED(a_Block);
 			return false;
 		}
 
@@ -74,11 +100,20 @@ public:
 		Note that some paths can go out of the world and come back again (parabola),
 		in such a case this callback is followed by further OnNextBlock() calls
 		*/
-		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ)
+		bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ)
 		{
-			UNUSED(a_BlockX);
-			UNUSED(a_BlockY);
-			UNUSED(a_BlockZ);
+			return OnIntoWorld({a_BlockX, a_BlockY, a_BlockZ});
+		}
+
+		/** Called when the path goes into the world, from either below (a_BlockY < 0) or above (a_BlockY >= cChunkDef::Height)
+		The coords specify the exact point at which the path entered the world.
+		If this callback returns true, the tracing is aborted.
+		Note that some paths can go out of the world and come back again (parabola),
+		in such a case this callback is followed by further OnNextBlock() calls
+		*/
+		virtual bool OnIntoWorld(Vector3d a_Block)
+		{
+			UNUSED(a_Block);
 			return false;
 		}
 

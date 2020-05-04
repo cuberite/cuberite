@@ -47,6 +47,10 @@ public:
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
 	bool Trace(double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ);
 
+	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
+	bool Trace(const Vector3d & a_Start, const Vector3d & a_End);
+
+
 	// Utility functions for simple one-line usage:
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
@@ -75,19 +79,19 @@ public:
 
 protected:
 	/** The start point of the trace */
-	double m_StartX, m_StartY, m_StartZ;
+	Vector3d m_Start;
 
 	/** The end point of the trace */
-	double m_EndX, m_EndY, m_EndZ;
+	Vector3d m_End;
 
 	/** The difference in coords, End - Start */
-	double m_DiffX, m_DiffY, m_DiffZ;
+	Vector3d m_Diff;
 
 	/** The increment at which the block coords are going from Start to End; either +1 or -1 */
-	int m_DirX, m_DirY, m_DirZ;
+	Vector3i m_Dir;
 
 	/** The current block */
-	int m_CurrentX, m_CurrentY, m_CurrentZ;
+	Vector3i m_Current;
 
 	/** The face through which the current block has been entered */
 	eBlockFace m_CurrentFace;
