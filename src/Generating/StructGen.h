@@ -16,7 +16,7 @@
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 
-
+#include <functional>
 
 
 
@@ -48,7 +48,8 @@ protected:
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
-		sSetBlockVector & a_OutsideOther
+		sSetBlockVector & a_OutsideOther,
+		std::function<bool(cNoise&, Vector3i)> a_Condition
 	) ;
 
 	/** Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow. */
@@ -59,10 +60,16 @@ protected:
 		sSetBlockVector & a_Overflow
 	);
 
+	/** Get the number of Tree to generate for chunk (a_ChunkX; a_ChunkZ)
+	if it returns zero, a_randomNum is set to a range of 0 to 1023 indicating the probability that a tree should spawn: a_RandomNum / cStructGenTrees::DividerForOnePerC
+	else a_RandomNum is 0 */
 	int GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BiomeMap & a_Biomes
+		const cChunkDef::BiomeMap & a_Biomes,
+		int & a_RandomNum
 	);
+
+	static const int DividerForOnePerC = 1024;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;

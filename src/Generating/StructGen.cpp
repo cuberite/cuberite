@@ -50,12 +50,21 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				Dest = &a_ChunkDesc;
 			}
 
-			int NumTrees = GetNumTrees(BaseX, BaseZ, Dest->GetBiomeMap());
+			int RandomNumTree = 0;
+			int NumTrees = GetNumTrees(BaseX, BaseZ, Dest->GetBiomeMap(), RandomNumTree);
 
 			sSetBlockVector OutsideLogs, OutsideOther;
 			for (int i = 0; i < NumTrees; i++)
 			{
-				GenerateSingleTree(BaseX, BaseZ, i, *Dest, OutsideLogs, OutsideOther);
+				GenerateSingleTree(BaseX, BaseZ, i, *Dest, OutsideLogs, OutsideOther, [](cNoise &, Vector3i) { return true; });
+			}
+			// generate a tree probability RandomNumTree / DividerForOnePerC
+			if (true)
+			{
+				GenerateSingleTree(BaseX, BaseZ, 0, *Dest, OutsideLogs, OutsideOther, [RandomNumTree](cNoise & a_Noise, Vector3i a_Vec)
+				{
+					return ((a_Noise.IntNoise3DInt(a_Vec) / 8) % DividerForOnePerC)  < RandomNumTree;
+				});
 			}
 
 			sSetBlockVector IgnoredOverflow;
@@ -78,7 +87,8 @@ void cStructGenTrees::GenerateSingleTree(
 	int a_ChunkX, int a_ChunkZ, int a_Seq,
 	cChunkDesc & a_ChunkDesc,
 	sSetBlockVector & a_OutsideLogs,
-	sSetBlockVector & a_OutsideOther
+	sSetBlockVector & a_OutsideOther,
+	std::function<bool(cNoise&, Vector3i)> a_Condition
 )
 {
 	int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) / 19) % cChunkDef::Width;
@@ -94,6 +104,12 @@ void cStructGenTrees::GenerateSingleTree(
 	// Check the block underneath the tree:
 	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(x, Height, z);
 	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND))
+	{
+		return;
+	}
+
+	// only generate tree if a_Condition is true
+	if (!a_Condition(m_Noise, {x, Height, z}))
 	{
 		return;
 	}
@@ -197,75 +213,76 @@ void cStructGenTrees::ApplyTreeImage(
 
 int cStructGenTrees::GetNumTrees(
 	int a_ChunkX, int a_ChunkZ,
-	const cChunkDef::BiomeMap & a_Biomes
+	const cChunkDef::BiomeMap & a_Biomes,
+	int & a_RandomNum
 )
 {
 	auto BiomeTrees = [](EMCSBiome a_Biome)
 	{
 		switch (a_Biome)
 		{
-			case biOcean:                return 2;
-			case biPlains:               return 1;
+			case biOcean:                return DividerForOnePerC * 2;
+			case biPlains:               return 32;
 			case biDesert:               return 0;
-			case biExtremeHills:         return 3;
-			case biForest:               return 30;
-			case biTaiga:                return 30;
-			case biSwampland:            return 8;
+			case biExtremeHills:         return DividerForOnePerC * 3;
+			case biForest:               return DividerForOnePerC * 30;
+			case biTaiga:                return DividerForOnePerC * 30;
+			case biSwampland:            return DividerForOnePerC * 8;
 			case biRiver:                return 0;
 			case biNether:               return 0;
 			case biEnd:                  return 0;
 			case biFrozenOcean:          return 0;
 			case biFrozenRiver:          return 0;
-			case biIcePlains:            return 1;
-			case biIceMountains:         return 1;
-			case biMushroomIsland:       return 3;
-			case biMushroomShore:        return 3;
+			case biIcePlains:            return 32;
+			case biIceMountains:         return 128;
+			case biMushroomIsland:       return DividerForOnePerC * 3;
+			case biMushroomShore:        return DividerForOnePerC * 3;
 			case biBeach:                return 0;
 			case biDesertHills:          return 0;
-			case biForestHills:          return 20;
-			case biTaigaHills:           return 20;
-			case biExtremeHillsEdge:     return 5;
-			case biJungle:               return 120;
-			case biJungleHills:          return 90;
-			case biJungleEdge:           return 90;
+			case biForestHills:          return DividerForOnePerC * 20;
+			case biTaigaHills:           return DividerForOnePerC * 20;
+			case biExtremeHillsEdge:     return DividerForOnePerC * 5;
+			case biJungle:               return DividerForOnePerC * 120;
+			case biJungleHills:          return DividerForOnePerC * 90;
+			case biJungleEdge:           return DividerForOnePerC * 90;
 			case biDeepOcean:            return 0;
 			case biStoneBeach:           return 0;
 			case biColdBeach:            return 0;
-			case biBirchForest:          return 30;
-			case biBirchForestHills:     return 20;
-			case biRoofedForest:         return 50;
-			case biColdTaiga:            return 20;
-			case biColdTaigaHills:       return 15;
-			case biMegaTaiga:            return 30;
-			case biMegaTaigaHills:       return 25;
-			case biExtremeHillsPlus:     return 3;
-			case biSavanna:              return 8;
-			case biSavannaPlateau:       return 12;
-			case biMesa:                 return 2;
-			case biMesaPlateauF:         return 8;
-			case biMesaPlateau:          return 8;
+			case biBirchForest:          return DividerForOnePerC * 30;
+			case biBirchForestHills:     return DividerForOnePerC * 20;
+			case biRoofedForest:         return DividerForOnePerC * 50;
+			case biColdTaiga:            return DividerForOnePerC * 20;
+			case biColdTaigaHills:       return DividerForOnePerC * 15;
+			case biMegaTaiga:            return DividerForOnePerC * 30;
+			case biMegaTaigaHills:       return DividerForOnePerC * 25;
+			case biExtremeHillsPlus:     return DividerForOnePerC * 3;
+			case biSavanna:              return DividerForOnePerC * 8;
+			case biSavannaPlateau:       return DividerForOnePerC * 12;
+			case biMesa:                 return DividerForOnePerC * 2;
+			case biMesaPlateauF:         return DividerForOnePerC * 8;
+			case biMesaPlateau:          return DividerForOnePerC * 8;
 			// Biome variants
-			case biSunflowerPlains:      return 1;
+			case biSunflowerPlains:      return 32;
 			case biDesertM:              return 0;
-			case biExtremeHillsM:        return 4;
-			case biFlowerForest:         return 30;
-			case biTaigaM:               return 30;
-			case biSwamplandM:           return 8;
-			case biIcePlainsSpikes:      return 1;
-			case biJungleM:              return 120;
-			case biJungleEdgeM:          return 90;
-			case biBirchForestM:         return 30;
-			case biBirchForestHillsM:    return 20;
-			case biRoofedForestM:        return 40;
-			case biColdTaigaM:           return 30;
-			case biMegaSpruceTaiga:      return 30;
-			case biMegaSpruceTaigaHills: return 30;
-			case biExtremeHillsPlusM:    return 4;
-			case biSavannaM:             return 8;
-			case biSavannaPlateauM:      return 12;
-			case biMesaBryce:            return 4;
-			case biMesaPlateauFM:        return 12;
-			case biMesaPlateauM:         return 12;
+			case biExtremeHillsM:        return DividerForOnePerC * 4;
+			case biFlowerForest:         return DividerForOnePerC * 2;
+			case biTaigaM:               return DividerForOnePerC * 30;
+			case biSwamplandM:           return DividerForOnePerC * 8;
+			case biIcePlainsSpikes:      return 8;
+			case biJungleM:              return DividerForOnePerC * 120;
+			case biJungleEdgeM:          return DividerForOnePerC * 90;
+			case biBirchForestM:         return DividerForOnePerC * 30;
+			case biBirchForestHillsM:    return DividerForOnePerC * 20;
+			case biRoofedForestM:        return DividerForOnePerC * 40;
+			case biColdTaigaM:           return DividerForOnePerC * 30;
+			case biMegaSpruceTaiga:      return DividerForOnePerC * 30;
+			case biMegaSpruceTaigaHills: return DividerForOnePerC * 30;
+			case biExtremeHillsPlusM:    return DividerForOnePerC * 4;
+			case biSavannaM:             return DividerForOnePerC * 8;
+			case biSavannaPlateauM:      return DividerForOnePerC * 12;
+			case biMesaBryce:            return DividerForOnePerC * 4;
+			case biMesaPlateauFM:        return DividerForOnePerC * 12;
+			case biMesaPlateauM:         return DividerForOnePerC * 12;
 			// Non-biomes
 			case biInvalidBiome:
 			case biNumBiomes:
@@ -279,12 +296,22 @@ int cStructGenTrees::GetNumTrees(
 		UNREACHABLE("Unsupported biome");
 	};
 
-	int NumTrees = 0;
+	int NumTrees = 0, NumTreesPerChunk = 0;
 	for (auto Biome : a_Biomes)
 	{
 		NumTrees += BiomeTrees(Biome);
 	}
-	return NumTrees / 1024;
+
+	NumTreesPerChunk = NumTrees / (cChunkDef::Width * cChunkDef::Width * 4 * DividerForOnePerC);
+	if ((NumTreesPerChunk) == 0)
+	{
+		a_RandomNum = NumTrees / (cChunkDef::Width * cChunkDef::Width * 4);
+	}
+	else
+	{
+		a_RandomNum = 0;
+	}
+	return NumTreesPerChunk;
 }
 
 
