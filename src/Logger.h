@@ -50,14 +50,10 @@ public:
 	};
 
 	/** Log a message formatted with a printf style formatting string. */
-	void LogPrintf(
-		std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList
-	);
+	void LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList);
 
 	/** Log a message formatted with a python style formatting string. */
-	void LogFormat(
-		std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList
-	);
+	void LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList);
 
 	/** Logs the simple text message at the specified log level. */
 	void LogSimple(std::string_view a_Message, eLogLevel a_LogLevel = eLogLevel::Regular);
@@ -65,8 +61,10 @@ public:
 	cAttachment AttachListener(std::unique_ptr<cListener> a_Listener);
 
 	static cLogger & GetInstance(void);
+
 	// Must be called before calling GetInstance in a multithreaded context
 	static void InitiateMultithreading();
+
 private:
 
 	cCriticalSection m_CriticalSection;
@@ -74,8 +72,4 @@ private:
 
 	void DetachListener(cListener * a_Listener);
 	void LogLine(std::string_view a_Line, eLogLevel a_LogLevel);
-
 };
-
-
-

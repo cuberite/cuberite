@@ -53,9 +53,9 @@ public:
 	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
 	static int vlua_do_error(lua_State * L, const char * a_pFormat, fmt::printf_args a_ArgList);
 	template <typename... Args>
-	static int lua_do_error(lua_State * L, const char * a_Format, const Args & ... args)
+	static int lua_do_error(lua_State * L, const char * a_Format, const Args & ... a_Args)
 	{
-		return vlua_do_error(L, a_Format, fmt::make_printf_args(args...));
+		return vlua_do_error(L, a_Format, fmt::make_printf_args(a_Args...));
 	}
 
 

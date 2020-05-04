@@ -10,8 +10,6 @@
 #include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
-#include "fmt/printf.h"
-
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
 #endif
@@ -284,12 +282,12 @@ void cConnection::Run(void)
 
 
 
-void cConnection::vLog(const char * a_Format, fmt::printf_args a_Args)
+void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 {
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_Args);
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
 	fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
@@ -303,7 +301,7 @@ void cConnection::vLog(const char * a_Format, fmt::printf_args a_Args)
 
 
 
-void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_Args)
+void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList)
 {
 	AString Hex;
 	CreateHexDump(Hex, a_Data, a_Size, 16);
@@ -311,13 +309,11 @@ void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Fo
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_Args);
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
 	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
-	/*
 	// Log to screen:
-	std::cout << FullMsg;
-	//*/
+	// std::cout << FullMsg;
 }
 
 

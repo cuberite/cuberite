@@ -400,26 +400,25 @@ public:
 
 
 
-namespace fmt
-{
 
+/** Allows formatting a Vector<T> using the same format specifiers as for T
+e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
 template <typename What>
-class formatter<Vector3<What>>:
-	public fmt::formatter<What>
+class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
 {
 	using Super = fmt::formatter<What>;
 
 	template <typename FormatContext, size_t Len>
 	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
 	{
-		auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
+		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
 		a_Ctx.advance_to(Itr);
 	}
 
 	template <typename FormatContext>
 	void Write(FormatContext & a_Ctx, const What & a_Arg)
 	{
-		auto Itr = Super::format(a_Arg, a_Ctx);
+		const auto Itr = Super::format(a_Arg, a_Ctx);
 		a_Ctx.advance_to(Itr);
 	}
 
@@ -439,8 +438,6 @@ public:
 		return a_Ctx.out();
 	}
 };
-
-}
 
 
 

@@ -84,9 +84,7 @@ void cLogger::LogLine(std::string_view a_Line, eLogLevel a_LogLevel)
 
 
 
-void cLogger::LogPrintf(
-	std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList
-)
+void cLogger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList)
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
@@ -100,9 +98,7 @@ void cLogger::LogPrintf(
 
 
 
-void cLogger::LogFormat(
-	std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList
-)
+void cLogger::LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList)
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
@@ -152,9 +148,7 @@ void cLogger::DetachListener(cListener * a_Listener)
 ////////////////////////////////////////////////////////////////////////////////
 // Global functions
 
-void Logger::LogFormat(
-	std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList
-)
+void Logger::LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList)
 {
 	cLogger::GetInstance().LogFormat(a_Format, a_LogLevel, a_ArgList);
 }
@@ -163,9 +157,7 @@ void Logger::LogFormat(
 
 
 
-void Logger::LogPrintf(
-	std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList
-)
+void Logger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList)
 {
 	cLogger::GetInstance().LogPrintf(a_Format, a_LogLevel, a_ArgList);
 }
@@ -178,7 +170,3 @@ void Logger::LogSimple(std::string_view a_Message, eLogLevel a_LogLevel)
 {
 	cLogger::GetInstance().LogSimple(a_Message, a_LogLevel);
 }
-
-
-
-

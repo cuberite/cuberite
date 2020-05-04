@@ -23,25 +23,25 @@ typedef std::map<AString, AString> AStringMap;
 
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & vPrintf(AString & a_Dst, const char * format, fmt::printf_args args);
+extern AString & vPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args a_ArgList);
 template <typename... Args>
-AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args)
+AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
 {
-	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(args...));
+	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(a_Args...));
 }
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString vPrintf(const char * format, fmt::printf_args args);
+extern AString vPrintf(const char * a_Format, fmt::printf_args a_ArgList);
 template <typename... Args>
-AString Printf(const char * a_Format, const Args & ... args)
+AString Printf(const char * a_Format, const Args & ... a_Args)
 {
-	return vPrintf(a_Format, fmt::make_printf_args(args...));
+	return vPrintf(a_Format, fmt::make_printf_args(a_Args...));
 }
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */
-extern AString & vAppendPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args args);
+extern AString & vAppendPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args a_ArgList);
 template <typename... Args>
 extern AString & AppendPrintf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
 {
