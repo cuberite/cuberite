@@ -459,7 +459,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 			return;
 		}
 	}
-	UNREACHABLE();
+	UNREACHABLE("Unsupported rail meta type");
 }
 
 
