@@ -230,12 +230,12 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 	switch (a_Biome)
 	{
 		case biPlains:
-		case biExtremeHills:
-		case biExtremeHillsEdge:
 		case biForest:
 		case biMushroomIsland:
 		case biMushroomShore:
 		case biForestHills:
+		case biSunflowerPlains:
+		case biFlowerForest:
 		case biDeepOcean:
 		case biStoneBeach:
 		case biColdBeach:
@@ -252,10 +252,14 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 			return;
 		}
 
-		case biTaiga:
+		case biColdTaiga:
+		case biColdTaigaM:
+		case biColdTaigaHills:
 		case biIcePlains:
 		case biIceMountains:
+		case biTaiga:
 		case biTaigaHills:
+		case biTaigaM:
 		{
 			// Conifers
 			GetConiferTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
@@ -273,6 +277,8 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biJungle:
 		case biJungleHills:
 		case biJungleEdge:
+		case biJungleM:
+		case biJungleEdgeM:
 		{
 			// Apple bushes, large jungle trees, small jungle trees
 			if (a_Noise.IntNoise3DInt(a_BlockPos.addedY(16 * a_Seq).addedZ(16 * a_Seq)) < 0x6fffffff)
@@ -301,26 +307,34 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 			return;
 		}
 
-		case biColdTaiga:
-		case biColdTaigaHills:
 		case biMegaTaiga:
 		case biMegaTaigaHills:
-		case biExtremeHillsPlus:
-		case biSunflowerPlains:
-		case biDesertM:
-		case biExtremeHillsM:
-		case biFlowerForest:
-		case biTaigaM:
-		case biIcePlainsSpikes:
-		case biJungleM:
-		case biJungleEdgeM:
-		case biColdTaigaM:
+		{
+			// TODO: implement trees
+			return;
+		}
+
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
+		{
+			// TODO: implement trees
+			return;
+		}
+
+		case biExtremeHills:
+		case biExtremeHillsM:
+		case biExtremeHillsEdge:
+		case biExtremeHillsPlus:
 		case biExtremeHillsPlusM:
 		{
-			// TODO: These need their special trees
-			GetBirchTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			if (a_Noise.IntNoise3DInt(a_BlockPos.addedY(16 * a_Seq).addedZ(16 * a_Seq)) < 0x6fffffff)
+			{
+				GetConiferTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else
+			{
+				GetAppleTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
 			return;
 		}
 
@@ -352,6 +366,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 
 		case biDesert:
 		case biDesertHills:
+		case biDesertM:
 		case biRiver:
 		case biBeach:
 		case biHell:
@@ -359,6 +374,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biOcean:
 		case biFrozenOcean:
 		case biFrozenRiver:
+		case biIcePlainsSpikes:
 		case biVariant:
 		case biNumBiomes:
 		case biNumVariantBiomes:
