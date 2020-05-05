@@ -1178,12 +1178,12 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
 				-- abort the trace
 				return true;
 			end
-			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
+			World:SetBlock(a_Block, E_BLOCK_COBWEB, 0);
 		end
 	};
 
@@ -2424,6 +2424,87 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	-- Define the callbacks to use for tracing:
 	local Callbacks =
 	{
+		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta, a_EntryFace)
+			LOG(string.format("{%d, %d, %d}: %s", a_Block.x, a_Block.y, a_Block.z, ItemToString(cItem(a_BlockType, 1, a_BlockMeta))))
+		end,
+		OnNextBlockNoData = function(a_Block, a_EntryFace)
+			LOG(string.format("{%d, %d, %d} (no data)", a_Block.x, a_Block.y, a_Block.z))
+		end,
+		OnNoChunk = function()
+			LOG("Chunk not loaded")
+		end,
+		OnNoMoreHits = function()
+			LOG("Trace finished")
+		end,
+		OnOutOfWorld = function()
+			LOG("Out of world")
+		end,
+		OnIntoWorld = function()
+			LOG("Into world")
+		end,
+	}
+
+	-- Approximate the chunks needed for the trace by iterating over all chunks and measuring their center's distance from the traced line
+	local Chunks = {}
+	local sx = math.floor(Coords[1] / 16)
+	local sz = math.floor(Coords[3] / 16)
+	local ex = math.floor(Coords[4] / 16)
+	local ez = math.floor(Coords[6] / 16)
+	local sgnx = (sx < ex) and 1 or -1
+	local sgnz = (sz < ez) and 1 or -1
+	for z = sz, ez, sgnz do
+		local ChunkCenterZ = z * 16 + 8
+		for x = sx, ex, sgnx do
+			local ChunkCenterX = x * 16 + 8
+			local sqdist = SqDistPtFromLine(ChunkCenterX, ChunkCenterZ, Coords[1], Coords[3], Coords[4], Coords[6])
+			if (sqdist <= 128) then
+				table.insert(Chunks, {x, z})
+			end
+		end
+	end
+
+	-- Load the chunks and do the trace once loaded:
+	World:ChunkStay(Chunks,
+		nil,
+		function()
+			cLineBlockTracer:Trace(World, Callbacks, {Coords[1], Coords[2], Coords[3]}, {Coords[4], Coords[5], Coords[6]})
+		end
+	)
+	return true
+end
+
+
+
+
+
+function HandleConsoleTestTracerDeprecated(a_Split, a_EntireCmd)
+	-- Check required params:
+	if not(a_Split[7]) then
+		return true, "Usage: " .. a_Split[1] .. " <x1> <y1> <z1> <x2> <y2> <z2> [<WorldName>]"
+	end
+	local Coords = {}
+	for i = 1, 6 do
+		local v = tonumber(a_Split[i + 1])
+		if not(v) then
+			return true, "Parameter " .. (i + 1) .. " (" .. tostring(a_Split[i + 1]) .. ") not a number "
+		end
+		Coords[i] = v
+	end
+
+	-- Get the world in which to test:
+	local World
+	if (a_Split[8]) then
+		World = cRoot:GetWorld(a_Split[2])
+	else
+		World = cRoot:Get():GetDefaultWorld()
+	end
+	if not(World) then
+		return true, "No such world"
+	end
+
+	-- Define the callbacks to use for tracing:
+	local Callbacks =
+	{
 		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace)
 			LOG(string.format("{%d, %d, %d}: %s", a_BlockX, a_BlockY, a_BlockZ, ItemToString(cItem(a_BlockType, 1, a_BlockMeta))))
 		end,
@@ -2467,7 +2548,7 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	World:ChunkStay(Chunks,
 		nil,
 		function()
-			cLineBlockTracer:Trace(World, Callbacks, {Coords[1], Coords[2], Coords[3]}, {Coords[4], Coords[5], Coords[6]})
+			cLineBlockTracer:Trace(World, Callbacks, Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], Coords[6])
 		end
 	)
 	return true
@@ -2716,9 +2797,9 @@ function HandleBlkCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
-				a_Player:SendMessage("Block at " .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
+				a_Player:SendMessage("Block at " .. a_Block.x .. ", " .. a_Block.y .. ", " .. a_Block.z .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
 				return true;
 			end
 		end
