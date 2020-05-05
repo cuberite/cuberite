@@ -46,10 +46,10 @@ protected:
 	*/
 	void GenerateSingleTree(
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
+		Vector3i a_Pos,
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
-		sSetBlockVector & a_OutsideOther,
-		std::function<bool(cNoise&, Vector3i)> a_Condition
+		sSetBlockVector & a_OutsideOther
 	) ;
 
 	/** Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow. */
@@ -63,13 +63,10 @@ protected:
 	/** Get the number of Tree to generate for chunk (a_ChunkX; a_ChunkZ)
 	if it returns zero, a_randomNum is set to a range of 0 to 1023 indicating the probability that a tree should spawn: a_RandomNum / cStructGenTrees::DividerForOnePerC
 	else a_RandomNum is 0 */
-	int GetNumTrees(
+	double GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BiomeMap & a_Biomes,
-		int & a_RandomNum
+		const cChunkDef::BiomeMap & a_Biomes
 	);
-
-	static const int DividerForOnePerC = 1024;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
