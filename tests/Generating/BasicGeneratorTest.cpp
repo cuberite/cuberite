@@ -186,7 +186,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				}
 				TEST_EQUAL_MSG(y, prevHeight, Printf("Failed: Same height across the entire chunk, at {%d, %d}: exp %d, got %d; top block: %d",
 					x, z, prevHeight, y, chd.GetBlockType(x, y, z)
-				))
+				));
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(blockType, E_BLOCK_BEDROCK,
 					Printf("Bedrock ceiling at {%d, %d, %d}: %d", x, y, z, blockType)
