@@ -58,9 +58,6 @@ Implements the 1.9 protocol classes:
 
 
 
-/** The slot number that the client uses to indicate "outside the window". */
-static const Int16 SLOT_NUM_OUTSIDE = -999;
-
 /** Value for main hand in Hand parameter for Protocol 1.9. */
 static const UInt32 MAIN_HAND = 0;
 static const UInt32 OFF_HAND = 1;
@@ -1033,6 +1030,9 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
+
+	/** The slot number that the client uses to indicate "outside the window". */
+	static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
 	eClickAction Action;

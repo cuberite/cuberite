@@ -58,9 +58,9 @@ Implements the 1.11 protocol classes:
 	#pragma clang diagnostic ignored "-Wduplicate-enum"
 #endif
 
-namespace Metadata
+namespace Metadata_1_11
 {
-	enum Metadata_Index
+	enum MetadataIndex
 	{
 		// Entity
 		ENTITY_FLAGS,
@@ -653,7 +653,7 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_11;
 
 	// Common metadata:
 	Int8 Flags = 0;
@@ -860,7 +860,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_11;
 
 	// Living Enitiy Metadata
 	if (a_Mob.HasCustomName())

@@ -3,6 +3,8 @@
 
 // Declares the cCompositeChat class used to wrap a chat message with multiple parts (text, url, cmd)
 
+#pragma once
+
 #include "Defines.h"
 #include "json/json.h"
 #include "Logger.h"
