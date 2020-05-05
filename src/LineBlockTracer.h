@@ -45,7 +45,7 @@ public:
 	cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks);
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	bool Trace(const Vector3d & a_Start, const Vector3d & a_End);
+	bool Trace(Vector3d a_Start, Vector3d a_End);
 
 
 	// Utility functions for simple one-line usage:
@@ -105,7 +105,6 @@ protected:
 
 	bool ChunkCallback(cChunk * a_Chunk);
 } ;
-
 
 
 
