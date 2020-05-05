@@ -3119,17 +3119,22 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	{
 		return 0;
 	}
-
+	std::cerr << "a" << std::endl;
 	// Get the params:
 	cWorld * world;
 	Vector3d start;
 	Vector3d end;
 	cLuaState::cTableRefPtr callbacks;
 	if (
-		L.CheckParamNumber  (idx + 2, idx + 7) &&
-		L.CheckParamEnd     (idx + 8)
+		L.IsParamNumber  (idx + 2) &&
+		L.IsParamNumber  (idx + 3) &&
+		L.IsParamNumber  (idx + 4) &&
+		L.IsParamNumber  (idx + 5) &&
+		L.IsParamNumber  (idx + 6) &&
+		L.IsParamNumber  (idx + 7) &&
+		L.CheckParamEnd  (idx + 8)
 	)
-	{
+	{std::cerr << "b" << std::endl;
 		if (!L.GetStackValues(idx, world, callbacks, start.x, start.y, start.z, end.x, end.y, end.z))
 		{
 			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
@@ -3144,12 +3149,11 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 	}
 	else if (
-		L.CheckParamNumber  (idx + 2, idx + 3) &&
-		L.CheckParamEnd     (idx + 4) &&
-		L.CheckParamUserType(idx + 2, "Vector3d") &&
-		L.CheckParamUserType(idx + 3, "Vector3d")
+		L.IsParamVector3(idx + 2) &&
+		L.IsParamVector3(idx + 3) &&
+		L.CheckParamEnd (idx + 4)
 	)
-	{
+	{std::cerr << "c" << std::endl;
 		if (!L.GetStackValues(idx, world, callbacks, start, end))
 		{
 			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
@@ -3160,6 +3164,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	}
 	else
 	{
+		LOGERROR("Invalid overload of cLineBlockTracer:Trace()");
 		return 0;
 	}
 	// Trace:

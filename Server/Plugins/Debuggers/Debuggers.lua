@@ -1195,7 +1195,7 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local Start = EyePos + LookVector + LookVector;
 	local End = EyePos + LookVector * 50;
 
-	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+	cLineBlockTracer.Trace(World, Callbacks, Start, End);
 
 	return true;
 end
@@ -2467,7 +2467,7 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	World:ChunkStay(Chunks,
 		nil,
 		function()
-			cLineBlockTracer:Trace(World, Callbacks, Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], Coords[6])
+			cLineBlockTracer:Trace(World, Callbacks, {Coords[1], Coords[2], Coords[3]}, {Coords[4], Coords[5], Coords[6]})
 		end
 	)
 	return true
@@ -2730,7 +2730,7 @@ function HandleBlkCmd(a_Split, a_Player)
 
 	local End = EyePos + LookVector * 50;
 
-	cLineBlockTracer.Trace(World, Callbacks, EyePos.x, EyePos.y, EyePos.z, End.x, End.y, End.z);
+	cLineBlockTracer.Trace(World, Callbacks, EyePos, End);
 
 	return true;
 end
