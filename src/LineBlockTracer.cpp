@@ -54,7 +54,7 @@ bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Sta
 			m_IsLavaOpaque(a_IsLavaOpaque)
 		{}
 
-		virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 		{
 			switch (a_BlockType)
 			{
@@ -98,7 +98,7 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 		{
 		}
 
-		virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 		{
 			if (!cBlockInfo::IsSolid(a_BlockType))
 			{
@@ -106,9 +106,9 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			}
 
 			// We hit a solid block, calculate the exact hit coords and abort trace:
-			m_HitBlockCoords = a_Block;
+			m_HitBlockCoords = a_BlockPos;
 			m_HitBlockFace = a_EntryFace;
-			cBoundingBox bb(a_Block, a_Block + Vector3i(1, 1, 1));  // Bounding box of the block hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
 			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))

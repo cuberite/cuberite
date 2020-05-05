@@ -2916,14 +2916,14 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
-			a_Block.x, a_Block.y, a_Block.z,
-			a_BlockType,
-			a_BlockMeta,
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			a_BlockPosType,
+			a_BlockPosMeta,
 			a_EntryFace,
 			cLuaState::Return, res)
 		)
@@ -2934,12 +2934,12 @@ public:
 		return false;
 	}
 
-	virtual bool OnNextBlockNoData(Vector3i a_Block, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnNextBlockNoData",
-			a_Block.x, a_Block.y, a_Block.z,
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
 			a_EntryFace,
 			cLuaState::Return, res)
 		)
@@ -2950,12 +2950,12 @@ public:
 		return false;
 	}
 
-	virtual bool OnOutOfWorld(Vector3d a_Block) override
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnOutOfWorld",
-			a_Block.x, a_Block.y, a_Block.z,
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
 			cLuaState::Return, res)
 		)
 		{
@@ -2965,12 +2965,12 @@ public:
 		return false;
 	}
 
-	virtual bool OnIntoWorld(Vector3d a_Block) override
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnIntoWorld",
-			a_Block.x, a_Block.y, a_Block.z,
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
 			cLuaState::Return, res)
 		)
 		{
