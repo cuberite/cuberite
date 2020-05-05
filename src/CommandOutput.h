@@ -15,9 +15,9 @@ class cCommandOutputCallback
 public:
 	virtual ~cCommandOutputCallback() {}  // Force a virtual destructor in subclasses
 
-	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	void vOut(const char * a_Fmt, fmt::printf_args);
 
+	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	template <typename... Args>
 	void Out(const char * a_Fmt, const Args & ... a_Args)
 	{
