@@ -134,7 +134,7 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 
 
 
-bool cLineBlockTracer::Trace(const Vector3d & a_Start, const Vector3d & a_End)
+bool cLineBlockTracer::Trace(const Vector3d a_Start, const Vector3d a_End)
 {
 	// Initialize the member veriables:
 	m_Start = a_Start;
