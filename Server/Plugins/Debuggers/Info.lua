@@ -395,7 +395,7 @@ g_PluginInfo =
 		["testtracerdeprecated"] =
 		{
 			Handler = HandleConsoleTestTracerDeprecated,
-			HelpString = "Tests the cLineBlockTracer",
+			HelpString = "Tests the cLineBlockTracer's deprecated API",
 		},
 
 		["testurlclient"] =
@@ -417,7 +417,6 @@ g_PluginInfo =
 		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
-
 
 
 
