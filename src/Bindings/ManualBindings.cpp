@@ -3257,8 +3257,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 		tolua_pushboolean(L, res ? 1 : 0);
 		return 1;
 	}
-	LOGERROR("Invalid overload of cLineBlockTracer:Trace()");
-	return 0;
+	return L.ApiParamError("Invalid overload of cLineBlockTracer:Trace()");
 }
 
 
