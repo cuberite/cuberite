@@ -2799,7 +2799,7 @@ function HandleBlkCmd(a_Split, a_Player)
 	local Callbacks = {
 		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
-				a_Player:SendMessage("Block at " .. a_Block.x .. ", " .. a_Block.y .. ", " .. a_Block.z .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
+				a_Player:SendMessage("Block at " .. a_BlockPos.x .. ", " .. a_BlockPos.y .. ", " .. a_BlockPos.z .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
 				return true;
 			end
 		end
@@ -2839,7 +2839,6 @@ function HandleTeamsCmd(a_Split, a_Player)
 
 	return true
 end
-
 
 
 
