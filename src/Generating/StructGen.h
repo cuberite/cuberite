@@ -58,9 +58,9 @@ protected:
 		sSetBlockVector & a_Overflow
 	);
 
-	/** Get the number of Tree to generate for chunk (a_ChunkX; a_ChunkZ)
-	if it returns zero, a_randomNum is set to a range of 0 to 1023 indicating the probability that a tree should spawn: a_RandomNum / cStructGenTrees::DividerForOnePerC
-	else a_RandomNum is 0 */
+	/** Get the the number of trees to generate in a_Chunk
+	If the value is between 0 and 1, it should be interpreted as the probability that a tree should be generated.
+	*/
 	double GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes
