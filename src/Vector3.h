@@ -384,22 +384,6 @@ public:
 		z = -z;
 	}
 
-	// tolua_end
-
-	/** Allows formatting a Vector<T> using the same format specifiers as for T
-	e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
-	template <typename ArgFormatter>
-	friend void format_arg(fmt::BasicFormatter<char, ArgFormatter> & a_Formatter, const char *& a_FormatStr, Vector3 a_Vec)
-	{
-		std::array<T, 3> Data{{a_Vec.x, a_Vec.y, a_Vec.z}};
-
-		a_Formatter.writer() << '{';
-		fmt::format_arg(a_Formatter, a_FormatStr, fmt::join(Data.cbegin(), Data.cend(), ", "));
-		a_Formatter.writer() << '}';
-	}
-
-	// tolua_begin
-
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 
@@ -407,6 +391,51 @@ public:
 	static const double NO_INTERSECTION;
 };
 // tolua_end
+
+
+
+
+namespace fmt
+{
+
+template <typename What>
+class formatter<Vector3<What>>:
+	public fmt::formatter<What>
+{
+	using Super = fmt::formatter<What>;
+
+	template <typename FormatContext, size_t Len>
+	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
+	{
+		auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
+		a_Ctx.advance_to(Itr);
+	}
+
+	template <typename FormatContext>
+	void Write(FormatContext & a_Ctx, const What & a_Arg)
+	{
+		auto Itr = Super::format(a_Arg, a_Ctx);
+		a_Ctx.advance_to(Itr);
+	}
+
+public:
+
+	template <typename FormatContext>
+	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
+			-> typename FormatContext::iterator
+	{
+		Write(a_Ctx, "{");
+		Write(a_Ctx, a_Vec.x);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.y);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.z);
+		Write(a_Ctx, "}");
+		return a_Ctx.out();
+	}
+};
+
+}
 
 
 

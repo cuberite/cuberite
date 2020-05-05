@@ -284,16 +284,13 @@ void cConnection::Run(void)
 
 
 
-void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vLog(const char * a_Format, fmt::printf_args a_Args)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
-	fmt::printf(FullMsg, "\n");
-
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_Args);
+	fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
 	#endif  // _DEBUG
@@ -306,17 +303,16 @@ void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
 
 
 
-void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_Args)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
 	AString Hex;
-	fmt::printf(FullMsg, "\n%s\n", CreateHexDump(Hex, a_Data, a_Size, 16));
+	CreateHexDump(Hex, a_Data, a_Size, 16);
 
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_Args);
+	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
 	/*
 	// Log to screen:
