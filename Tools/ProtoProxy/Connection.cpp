@@ -38,21 +38,21 @@
 
 #define HANDLE_CLIENT_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ClientBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while(false)
 
 #define HANDLE_SERVER_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ServerBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while(false)
 
 #define CLIENTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")
 #define SERVERSEND(...) SendData(m_ServerSocket, __VA_ARGS__, "Server")
@@ -60,7 +60,7 @@
 #define SERVERENCRYPTSEND(...) SendEncryptedData(m_ServerSocket, m_ServerEncryptor, __VA_ARGS__, "Server")
 
 #define COPY_TO_SERVER() \
-	{ \
+	do { \
 		AString ToServer; \
 		m_ClientBuffer.ReadAgain(ToServer); \
 		switch (m_ServerState) \
@@ -84,10 +84,10 @@
 			} \
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define COPY_TO_CLIENT() \
-	{ \
+	do { \
 		AString ToClient; \
 		m_ServerBuffer.ReadAgain(ToClient); \
 		switch (m_ClientState) \
@@ -110,10 +110,10 @@
 			\
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define HANDLE_CLIENT_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
 			AString Leftover; \
@@ -122,16 +122,16 @@
 			m_ClientBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 #define HANDLE_SERVER_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
 			m_ServerBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 
 
@@ -1777,7 +1777,7 @@ bool cConnection::HandleServerKeepAlive(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, PingID);
 	Log("Received a PACKET_KEEP_ALIVE from the server:");
 	Log("  ID = %u", PingID);
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -1875,7 +1875,7 @@ bool cConnection::HandleServerMapChunk(void)
 
 	// TODO: Save the compressed data into a file for later analysis
 
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -2238,9 +2238,9 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	sSpawnDatas Data;
 	for (UInt32 i = 0; i < DataCount; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature)
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature);
 		Data.push_back(sSpawnData(Name, Value, Signature));
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
