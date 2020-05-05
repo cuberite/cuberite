@@ -3205,7 +3205,8 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 			L.LogStackValues("Values on the stack");
 			return 0;
 		}
-		LOGWARNING("cLineBlockTracer:Trace(): Deprecated overload should take two Vector3d.");
+		LOGWARNING("cLineBlockTracer:Trace(): Using plain numbers is deprecated, use Vector3 coords instead.");
+		L.LogStackTrace();
 		// Trace:
 		cLuaBlockTracerCallbacksOld tracerCallbacks(std::move(callbacks));
 		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
