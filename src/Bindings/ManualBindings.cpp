@@ -2922,8 +2922,8 @@ public:
 		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
 			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
-			a_BlockPosType,
-			a_BlockPosMeta,
+			a_BlockType,
+			a_BlockMeta,
 			a_EntryFace,
 			cLuaState::Return, res)
 		)
