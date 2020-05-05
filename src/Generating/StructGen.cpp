@@ -290,13 +290,13 @@ double cStructGenTrees::GetNumTrees(
 			case biNumVariantBiomes:
 			{
 				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
-				return .0;
+				return 0.0;
 			}
 		}
 		UNREACHABLE("Unsupported biome");
 	};
 
-	double NumTrees = .0;
+	double NumTrees = 0.0;
 	for (auto Biome : a_Biomes)
 	{
 		NumTrees += BiomeTrees(Biome);
