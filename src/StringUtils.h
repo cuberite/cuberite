@@ -23,21 +23,29 @@ typedef std::map<AString, AString> AStringMap;
 
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString &, Printf, AString &, const char *)
+extern AString & vPrintf(AString & a_Dst, const char * format, fmt::printf_args args);
+template <typename... Args>
+AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args)
+{
+	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(args...));
+}
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString, Printf, const char *)
+extern AString vPrintf(const char * format, fmt::printf_args args);
+template <typename... Args>
+AString Printf(const char * a_Format, const Args & ... args)
+{
+	return vPrintf(a_Format, fmt::make_printf_args(args...));
+}
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */
+extern AString & vAppendPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args args);
 template <typename... Args>
-extern AString & AppendPrintf(AString & a_Dst, const char * format, const Args & ... args)
+extern AString & AppendPrintf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
 {
-	a_Dst += Printf(format, args...);
-	return a_Dst;
+	return vAppendPrintf(a_Dst, a_Format, fmt::make_printf_args(a_Args...));
 }
 
 /** Split the string at any of the listed delimiters.

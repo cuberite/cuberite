@@ -692,10 +692,11 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::Printf(const char * a_Fmt, fmt::ArgList a_ArgList)
+int cFile::vPrintf(const char * a_Fmt, fmt::printf_args a_ArgList)
 {
-	AString buf = ::Printf(a_Fmt, a_ArgList);
-	return Write(buf.c_str(), buf.length());
+	fmt::memory_buffer Buffer;
+	fmt::printf(Buffer, fmt::to_string_view(a_Fmt), a_ArgList);
+	return Write(Buffer.data(), Buffer.size());
 }
 
 

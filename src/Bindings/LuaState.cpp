@@ -2107,7 +2107,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(fmt::StringRef a_Msg)
+int cLuaState::ApiParamError(fmt::string_view a_Msg)
 {
 	// Retrieve current function name
 	lua_Debug entry;
