@@ -284,7 +284,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
-	ASSERT((m_CurrentY >= 0) && (m_CurrentY < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
+	ASSERT((m_Current.y >= 0) && (m_Current.y < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 
 	// This is the actual line tracing loop.
 	for (;;)
