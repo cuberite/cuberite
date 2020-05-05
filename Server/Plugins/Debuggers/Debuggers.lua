@@ -1178,7 +1178,7 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
 				-- abort the trace
 				return true;
@@ -2424,10 +2424,10 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	-- Define the callbacks to use for tracing:
 	local Callbacks =
 	{
-		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta, a_EntryFace)
+		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta, a_EntryFace)
 			LOG(string.format("{%d, %d, %d}: %s", a_Block.x, a_Block.y, a_Block.z, ItemToString(cItem(a_BlockType, 1, a_BlockMeta))))
 		end,
-		OnNextBlockNoData = function(a_Block, a_EntryFace)
+		OnNextBlockNoData = function(a_BlockPos, a_EntryFace)
 			LOG(string.format("{%d, %d, %d} (no data)", a_Block.x, a_Block.y, a_Block.z))
 		end,
 		OnNoChunk = function()
@@ -2797,7 +2797,7 @@ function HandleBlkCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_Block, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
 				a_Player:SendMessage("Block at " .. a_Block.x .. ", " .. a_Block.y .. ", " .. a_Block.z .. " is " .. a_BlockType .. ":" .. a_BlockMeta)
 				return true;
