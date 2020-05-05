@@ -16,8 +16,6 @@
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 
-#include <functional>
-
 
 
 class cStructGenTrees :
