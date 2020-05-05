@@ -58,6 +58,7 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 	// If tables are empty, create default ranks
 	if (AreDBTablesEmpty())
 	{
+		LOGINFO("Creating default ranks...");
 		CreateDefaults();
 		LOGINFO("Default ranks created.");
 	}
