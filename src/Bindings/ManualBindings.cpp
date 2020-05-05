@@ -2823,11 +2823,16 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnNextBlock", a_Block, a_BlockType, a_BlockMeta, a_EntryFace, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlock",
+			a_BlockPos,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2836,11 +2841,14 @@ public:
 		return false;
 	}
 
-	virtual bool OnNextBlockNoData(Vector3i a_Block, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnNextBlockNoData", a_Block, a_EntryFace, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
+			a_BlockPos,
+			a_EntryFace,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2849,11 +2857,13 @@ public:
 		return false;
 	}
 
-	virtual bool OnOutOfWorld(Vector3d a_Block) override
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnOutOfWorld", a_Block, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
+			a_BlockPos,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2862,11 +2872,12 @@ public:
 		return false;
 	}
 
-	virtual bool OnIntoWorld(Vector3d a_Block) override
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnIntoWorld", a_Block, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn("OnIntoWorld",
+			a_BlockPos,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2893,7 +2904,9 @@ protected:
 
 
 
-/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks */
+/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+This is the deprecated version of cLuaBlockTracerCallback.
+*/
 class cLuaBlockTracerCallbacksOld :
 	public cLuaBlockTracerCallbacks
 {
@@ -2906,8 +2919,13 @@ public:
 	virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnNextBlock", a_Block.x, a_Block.y, a_Block.z, a_BlockType, a_BlockMeta, a_EntryFace, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlock",
+			a_Block.x, a_Block.y, a_Block.z,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2919,8 +2937,11 @@ public:
 	virtual bool OnNextBlockNoData(Vector3i a_Block, char a_EntryFace) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnNextBlockNoData", a_Block.x, a_Block.y, a_Block.z, a_EntryFace, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
+			a_Block.x, a_Block.y, a_Block.z,
+			a_EntryFace,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2932,8 +2953,10 @@ public:
 	virtual bool OnOutOfWorld(Vector3d a_Block) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnOutOfWorld", a_Block.x, a_Block.y, a_Block.z, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
+			a_Block.x, a_Block.y, a_Block.z,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -2945,8 +2968,10 @@ public:
 	virtual bool OnIntoWorld(Vector3d a_Block) override
 	{
 		bool res = false;
-		if (
-			m_Callbacks->CallTableFn("OnIntoWorld", a_Block.x, a_Block.y, a_Block.z, cLuaState::Return, res)
+		if (m_Callbacks->CallTableFn(
+			"OnIntoWorld",
+			a_Block.x, a_Block.y, a_Block.z,
+			cLuaState::Return, res)
 		)
 		{
 			return res;
@@ -3159,8 +3184,8 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 {
 	/* Supported function signatures:
-	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical
-	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical  // DEPRECATED
+	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // DEPRECATED
 	cLineBlockTracer:Trace(World, Callbacks, Start, End)  // Canonical
 	cLineBlockTracer.Trace(World, Callbacks, Start, End)
 	*/
