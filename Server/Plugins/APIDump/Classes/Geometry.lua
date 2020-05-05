@@ -1011,25 +1011,44 @@ the most popular tracing reasons - line of sight and solid hits.
 			},  -- LineOfSightTrace
 			Trace =
 			{
-				IsStatic = true,
-				Params =
 				{
-					{ Name = "World",     Type = "cWorld" },
-					{ Name = "Callbacks", Type = "table" },
-					{ Name = "StartX",    Type = "number" },
-					{ Name = "StartY",    Type = "number" },
-					{ Name = "StartZ",    Type = "number" },
-					{ Name = "EndX",      Type = "number" },
-					{ Name = "EndY",      Type = "number" },
-					{ Name = "EndZ",      Type = "number" },
-				},
-				Returns =
-				{
+					IsStatic = true,
+					Params =
 					{
-						Type = "boolean",
+						{ Name = "World",     Type = "cWorld" },
+						{ Name = "Callbacks", Type = "table" },
+						{ Name = "StartX",    Type = "number" },
+						{ Name = "StartY",    Type = "number" },
+						{ Name = "StartZ",    Type = "number" },
+						{ Name = "EndX",      Type = "number" },
+						{ Name = "EndY",      Type = "number" },
+						{ Name = "EndZ",      Type = "number" },
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
 				},
-				Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World",     Type = "cWorld" },
+						{ Name = "Callbacks", Type = "table" },
+						{ Name = "Start",     Type = "Vector3d" },
+						{ Name = "End",       Type = "Vector3d" },
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+				},
 			},
 		},
 		Constants =
@@ -1060,11 +1079,48 @@ the most popular tracing reasons - line of sight and solid hits.
 			{
 				Header = "Callbacks",
 				Contents = [[
-The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
+<p>The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
 individual functions from that table for the events that occur on the line - hitting a block, going out of
 valid world data etc. The following table lists all the available callbacks. If the callback function is
 not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
-aborted and Trace() returns false.</p>
+aborted and Trace() returns false.<br>
+Note: The folowings can only be used when the Trace() function uses Vector3d too, except for the ones that do not use parameters.</p>
+<p>
+<table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
+<tr><td>OnNextBlock</td><td>BlockPos, BlockType, BlockMeta, EntryFace</td>
+	<td>Called when the ray hits a new valid block. The block type and meta is given. EntryFace is one of the
+	BLOCK_FACE_ constants indicating which "side" of the block got hit by the ray.</td></tr>
+<tr><td>OnNextBlockNoData</td><td>BlockPos, EntryFace</td>
+	<td>Called when the ray hits a new block, but the block is in an unloaded chunk - no valid data is
+	available. Only the coords and the entry face are given.</td></tr>
+<tr><td>OnOutOfWorld</td><td>BlockPos</td>
+	<td>Called when the ray goes outside of the world (Y-wise); the coords specify the exact exit point. Note
+	that for other paths than lines (considered for future implementations) the path may leave the world and
+	go back in again later, in such a case this callback is followed by OnIntoWorld() and further
+	OnNextBlock() calls.</td></tr>
+<tr><td>OnIntoWorld</td><td>BlockPos</td>
+	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
+<tr><td>OnNoMoreHits</td><td>&nbsp;</td>
+	<td>Called when the path is sure not to hit any more blocks. This is the final callback, no more
+	callbacks are called after this function. Unlike the other callbacks, this function doesn't have a return
+	value.</td></tr>
+<tr><td>OnNoChunk</td><td>&nbsp;</td>
+	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
+	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
+</table>
+</p>
+				]],
+			},
+			{
+				Header = "Deprecated Callbacks",
+				Contents = [[
+<p>The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
+individual functions from that table for the events that occur on the line - hitting a block, going out of
+valid world data etc. The following table lists all the available callbacks. If the callback function is
+not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
+aborted and Trace() returns false.<br>
+Note: The folowings are deprecated. They should be replaced with the alternatives that uses Vector3d. 
+They can only be used when the Trace() function uses double too.</p>
 <p>
 <table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
 <tr><td>OnNextBlock</td><td>BlockX, BlockY, BlockZ, BlockType, BlockMeta, EntryFace</td>
@@ -1080,14 +1136,8 @@ aborted and Trace() returns false.</p>
 	OnNextBlock() calls.</td></tr>
 <tr><td>OnIntoWorld</td><td>X, Y, Z</td>
 	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
-<tr><td>OnNoMoreHits</td><td>&nbsp;</td>
-	<td>Called when the path is sure not to hit any more blocks. This is the final callback, no more
-	callbacks are called after this function. Unlike the other callbacks, this function doesn't have a return
-	value.</td></tr>
-<tr><td>OnNoChunk</td><td>&nbsp;</td>
-	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
-	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
 </table>
+</p>
 				]],
 			},
 			{
@@ -1101,12 +1151,12 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
 				-- abort the trace
 				return true;
 			end
-			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
+			World:SetBlock(a_BlockPos, E_BLOCK_COBWEB, 0);
 		end
 	};
 
@@ -1118,7 +1168,7 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local Start = EyePos + LookVector + LookVector;
 	local End = EyePos + LookVector * 50;
 
-	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+	cLineBlockTracer.Trace(World, Callbacks, Start, End);
 
 	return true;
 end
