@@ -3,6 +3,8 @@
 
 // Declares various classes that process command output
 
+#pragma once
+
 
 
 

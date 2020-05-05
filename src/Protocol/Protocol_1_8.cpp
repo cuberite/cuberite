@@ -54,13 +54,6 @@ Implements the 1.8 protocol classes:
 
 
 
-/** The slot number that the client uses to indicate "outside the window". */
-static const Int16 SLOT_NUM_OUTSIDE = -999;
-
-
-
-
-
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
 	do { \
@@ -2824,6 +2817,9 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
+
+	/** The slot number that the client uses to indicate "outside the window". */
+	static const Int16 SLOT_NUM_OUTSIDE = -999;
 
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
 	eClickAction Action;
