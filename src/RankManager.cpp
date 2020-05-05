@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "RankManager.h"
+#include "Protocol/MojangAPI.h"
 #include "ClientHandle.h"
 
 
@@ -16,7 +17,8 @@
 
 cRankManager::cRankManager(void) :
 	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
-	m_IsInitialized(false)
+	m_IsInitialized(false),
+	m_MojangAPI(nullptr)
 {
 }
 
@@ -24,7 +26,19 @@ cRankManager::cRankManager(void) :
 
 
 
-void cRankManager::Initialize()
+cRankManager::~cRankManager()
+{
+	if (m_MojangAPI != nullptr)
+	{
+		m_MojangAPI->SetRankManager(nullptr);
+	}
+}
+
+
+
+
+
+void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 {
 	ASSERT(!m_IsInitialized);  // Calling Initialize for the second time?
 
@@ -38,6 +52,8 @@ void cRankManager::Initialize()
 	m_DB.exec("CREATE TABLE IF NOT EXISTS DefaultRank (RankID INTEGER)");
 
 	m_IsInitialized = true;
+
+	a_MojangAPI.SetRankManager(this);
 
 	// If tables are empty, create default ranks
 	if (AreDBTablesEmpty())
@@ -1679,6 +1695,28 @@ bool cRankManager::IsRestrictionInGroup(const AString & a_Restriction, const ASt
 		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, ex.what());
 	}
 	return false;
+}
+
+
+
+
+
+void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UUID)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET PlayerName = ? WHERE PlayerUUID = ?");
+		stmt.bind(1, a_PlayerName);
+		stmt.bind(2, a_UUID.ToShortString());
+		stmt.exec();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to update DB: %s", __FUNCTION__, ex.what());
+	}
 }
 
 

@@ -211,7 +211,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
-	m_RankManager->Initialize();
+	m_RankManager->Initialize(*m_MojangAPI);
 	m_CraftingRecipes = new cCraftingRecipes();
 	m_FurnaceRecipe   = new cFurnaceRecipe();
 	m_BrewingRecipes.reset(new cBrewingRecipes());

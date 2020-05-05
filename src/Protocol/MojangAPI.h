@@ -17,6 +17,9 @@
 
 
 
+// fwd: ../RankManager.h"
+class cRankManager;
+
 namespace Json
 {
 	class Value;
@@ -76,6 +79,9 @@ public:
 	/** Called by the Authenticator to add a profile that it has received from authenticating a user. Adds
 	the profile to the respective mapping caches and updtes their datetime stamp to now. */
 	void AddPlayerProfile(const AString & a_PlayerName, const cUUID & a_UUID, const Json::Value & a_Properties);
+
+	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
+	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
 
 protected:
 	/** The thread that periodically checks for stale data and re-queries it from the server. */
@@ -162,6 +168,12 @@ protected:
 	/** Protects m_UUIDToProfile against simultaneous multi-threaded access. */
 	cCriticalSection m_CSUUIDToProfile;
 
+	/** The rank manager that is notified of the name-uuid pairings. May be nullptr. Protected by m_CSRankMgr. */
+	cRankManager * m_RankMgr;
+
+	/** Protects m_RankMgr agains simultaneous multi-threaded access. */
+	cCriticalSection m_CSRankMgr;
+
 	/** The thread that periodically updates the stale data in the DB from the Mojang servers. */
 	std::shared_ptr<cUpdateThread> m_UpdateThread;
 
@@ -190,6 +202,10 @@ protected:
 	/** Queries the specified UUID's profile and stores it in the m_UUIDToProfile cache. If already present, updates the cache entry.
 	UUIDs that are not valid will not be added into the cache. */
 	void QueryUUIDToProfile(const cUUID & a_UUID);
+
+	/** Called for each name-uuid pairing that is discovered.
+	If assigned, notifies the m_RankManager of the event. */
+	void NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_PlayerUUID);
 
 	/** Updates the stale values in the DB from the Mojang servers. Called from the cUpdateThread, blocks on the HTTPS API calls. */
 	void Update(void);
