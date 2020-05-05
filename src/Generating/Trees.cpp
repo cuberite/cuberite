@@ -310,14 +310,14 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biMegaTaiga:
 		case biMegaTaigaHills:
 		{
-			// TODO: implement trees
+			// TODO: implement trees 2x2 huge conifers (spruce and pine)
 			return;
 		}
 
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		{
-			// TODO: implement trees
+			// TODO: implement trees 2x2 huge spruce
 			return;
 		}
 
