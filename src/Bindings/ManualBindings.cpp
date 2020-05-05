@@ -2826,16 +2826,10 @@ public:
 	virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
-		if (m_Callbacks->CallTableFn(
-			"OnNextBlock",
-			a_Block, a_BlockType, a_BlockMeta, a_EntryFace,
-			cLuaState::Return, res
-		));
-		else if (!m_Callbacks->CallTableFn(
-			"OnNextBlock",
-			a_Block.x, a_Block.y, a_Block.z, a_BlockType, a_BlockMeta, a_EntryFace,
-			cLuaState::Return, res
-		))
+		if (
+			!m_Callbacks->CallTableFn("OnNextBlock", a_Block, a_BlockType, a_BlockMeta, a_EntryFace, cLuaState::Return, res) &&
+			!m_Callbacks->CallTableFn("OnNextBlock", a_Block.x, a_Block.y, a_Block.z, a_BlockType, a_BlockMeta, a_EntryFace, cLuaState::Return, res)
+		)
 		{
 			// No such function in the table, skip the callback
 			return false;
@@ -2846,16 +2840,10 @@ public:
 	virtual bool OnNextBlockNoData(Vector3i a_Block, char a_EntryFace) override
 	{
 		bool res = false;
-		if (m_Callbacks->CallTableFn(
-			"OnNextBlockNoData",
-			a_Block, a_EntryFace,
-			cLuaState::Return, res
-		));
-		else if (!m_Callbacks->CallTableFn(
-			"OnNextBlockNoData",
-			a_Block.x, a_Block.y, a_Block.z, a_EntryFace,
-			cLuaState::Return, res
-		))
+		if (
+			!m_Callbacks->CallTableFn("OnNextBlockNoData", a_Block, a_EntryFace, cLuaState::Return, res) &&
+			!m_Callbacks->CallTableFn("OnNextBlockNoData", a_Block.x, a_Block.y, a_Block.z, a_EntryFace, cLuaState::Return, res)
+		)
 		{
 			// No such function in the table, skip the callback
 			return false;
@@ -2866,16 +2854,10 @@ public:
 	virtual bool OnOutOfWorld(Vector3d a_Block) override
 	{
 		bool res = false;
-		if (m_Callbacks->CallTableFn(
-			"OnOutOfWorld",
-			a_Block,
-			cLuaState::Return, res
-		));
-		else if (!m_Callbacks->CallTableFn(
-			"OnOutOfWorld",
-			a_Block.x, a_Block.y, a_Block.z,
-			cLuaState::Return, res
-		))
+		if (
+			!m_Callbacks->CallTableFn("OnOutOfWorld", a_Block, cLuaState::Return, res) &&
+			!m_Callbacks->CallTableFn("OnOutOfWorld", a_Block.x, a_Block.y, a_Block.z, cLuaState::Return, res)
+		)
 		{
 			// No such function in the table, skip the callback
 			return false;
@@ -2886,16 +2868,10 @@ public:
 	virtual bool OnIntoWorld(Vector3d a_Block) override
 	{
 		bool res = false;
-		if (m_Callbacks->CallTableFn(
-			"OnIntoWorld",
-			a_Block,
-			cLuaState::Return, res
-		));
-		else if (!m_Callbacks->CallTableFn(
-			"OnIntoWorld",
-			a_Block.x, a_Block.y, a_Block.z,
-			cLuaState::Return, res
-		))
+		if (
+			!m_Callbacks->CallTableFn("OnIntoWorld", a_Block, cLuaState::Return, res) &&
+			!m_Callbacks->CallTableFn("OnIntoWorld", a_Block.x, a_Block.y, a_Block.z, cLuaState::Return, res)
+		)
 		{
 			// No such function in the table, skip the callback
 			return false;

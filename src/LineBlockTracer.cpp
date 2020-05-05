@@ -309,7 +309,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			// We've gone out of the world, that's the end of this trace
 			double IntersectX, IntersectZ;
 			CalcXZIntersection(m_Current.y, IntersectX, IntersectZ);
-			if (m_Callbacks->OnOutOfWorld(IntersectX, m_Current.y, IntersectZ))
+			if (m_Callbacks->OnOutOfWorld({IntersectX, double(m_Current.y), IntersectZ}))
 			{
 				// The callback terminated the trace
 				return false;
@@ -333,7 +333,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			int RelX = m_Current.x - a_Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = m_Current.z - a_Chunk->GetPosZ() * cChunkDef::Width;
 			a_Chunk->GetBlockTypeMeta(RelX, m_Current.y, RelZ, BlockType, BlockMeta);
-			if (m_Callbacks->OnNextBlock(m_Current.x, m_Current.y, m_Current.z, BlockType, BlockMeta, m_CurrentFace))
+			if (m_Callbacks->OnNextBlock(m_Current, BlockType, BlockMeta, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;
