@@ -1183,7 +1183,7 @@ function HandleSpideyCmd(a_Split, a_Player)
 				-- abort the trace
 				return true;
 			end
-			World:SetBlock(a_Block, E_BLOCK_COBWEB, 0);
+			World:SetBlock(a_BlockPos, E_BLOCK_COBWEB, 0);
 		end
 	};
 
@@ -2839,7 +2839,6 @@ function HandleTeamsCmd(a_Split, a_Player)
 
 	return true
 end
-
 
 
 
