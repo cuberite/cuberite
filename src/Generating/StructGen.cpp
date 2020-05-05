@@ -223,16 +223,16 @@ double cStructGenTrees::GetNumTrees(
 		{
 			case biOcean:                return 2.0;
 			case biPlains:               return 0.03125;
-			case biDesert:               return .0;
+			case biDesert:               return 0.0;
 			case biExtremeHills:         return 3.0;
 			case biForest:               return 30.0;
 			case biTaiga:                return 30.0;
 			case biSwampland:            return 8.0;
-			case biRiver:                return .0;
-			case biNether:               return .0;
-			case biEnd:                  return .0;
-			case biFrozenOcean:          return .0;
-			case biFrozenRiver:          return .0;
+			case biRiver:                return 0.0;
+			case biNether:               return 0.0;
+			case biEnd:                  return 0.0;
+			case biFrozenOcean:          return 0.0;
+			case biFrozenRiver:          return 0.0;
 			case biIcePlains:            return 0.03125;
 			case biIceMountains:         return 0.125;
 			case biMushroomIsland:       return 3.0;
@@ -245,9 +245,9 @@ double cStructGenTrees::GetNumTrees(
 			case biJungle:               return 120.0;
 			case biJungleHills:          return 90.0;
 			case biJungleEdge:           return 90.0;
-			case biDeepOcean:            return .0;
-			case biStoneBeach:           return .0;
-			case biColdBeach:            return .0;
+			case biDeepOcean:            return 0.0;
+			case biStoneBeach:           return 0.0;
+			case biColdBeach:            return 0.0;
 			case biBirchForest:          return 30.0;
 			case biBirchForestHills:     return 20.0;
 			case biRoofedForest:         return 50.0;
@@ -263,7 +263,7 @@ double cStructGenTrees::GetNumTrees(
 			case biMesaPlateau:          return 8.0;
 			// Biome variants
 			case biSunflowerPlains:      return 0.03125;
-			case biDesertM:              return .0;
+			case biDesertM:              return 0.0;
 			case biExtremeHillsM:        return 4.0;
 			case biFlowerForest:         return 2.0;
 			case biTaigaM:               return 30.0;
