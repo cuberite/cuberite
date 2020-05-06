@@ -2464,10 +2464,12 @@ function HandleConsoleTestTracer(a_Split, a_EntireCmd)
 	end
 
 	-- Load the chunks and do the trace once loaded:
+	local startPos = Vector3i(Coords[1], Coords[2], Coords[3])
+	local endPos = Vector3i(Coords[4], Coords[5], Coords[6])
 	World:ChunkStay(Chunks,
 		nil,
 		function()
-			cLineBlockTracer:Trace(World, Callbacks, {Coords[1], Coords[2], Coords[3]}, {Coords[4], Coords[5], Coords[6]})
+			cLineBlockTracer:Trace(World, Callbacks, startPos, endPos)
 		end
 	)
 	return true
@@ -2839,6 +2841,5 @@ function HandleTeamsCmd(a_Split, a_Player)
 
 	return true
 end
-
 
 
