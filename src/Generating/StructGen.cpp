@@ -61,7 +61,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				Pos.y = Dest->GetHeight(Pos.x, Pos.z);
 
-				// If this test is not done with exact position for some reason the trees are cut at Chunk border
+				// If this test is not done with Block position as example Chunk coorinates the trees are cut at Chunk border
 				if (std::abs(m_Noise.IntNoise3D(BaseX * 16 + Pos.x, Pos.y, BaseZ *16 + Pos.z)) <= NumTrees)
 				{
 					GenerateSingleTree(BaseX, BaseZ, 0, Pos, *Dest, OutsideLogs, OutsideOther);
