@@ -1084,7 +1084,9 @@ individual functions from that table for the events that occur on the line - hit
 valid world data etc. The following table lists all the available callbacks. If the callback function is
 not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
 aborted and Trace() returns false.<br>
-Note: The folowings can only be used when the Trace() function uses Vector3d too, except for the ones that do not use parameters.</p>
+Note: The folowing can only be used when using the Vector3-based Trace() function. When using
+the number-based overload, the callbacks receive number-based coordinates (see Deprecated
+Callbacks below).</p>
 <p>
 <table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
 <tr><td>OnNextBlock</td><td>BlockPos, BlockType, BlockMeta, EntryFace</td>
