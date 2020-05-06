@@ -56,7 +56,7 @@ public:
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
-					m_Pos = a_CBBlock;
+					m_Pos = a_CBBlockPos;
 					m_HasFound = true;
 					return true;
 				}
