@@ -74,7 +74,7 @@ public:
 					{
 						return false;
 					}
-					a_CBBlock = AddFaceDirection(a_CBBlock, BLOCK_FACE_YP);  // Always place pad at top of water block
+					a_CBBlockPos = AddFaceDirection(a_CBBlockPos, BLOCK_FACE_YP);  // Always place pad at top of water block
 					if (
 						!IsBlockWater(a_CBBlockType) &&
 						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
