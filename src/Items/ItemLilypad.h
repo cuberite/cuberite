@@ -66,7 +66,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(Vector3i a_CBBlock, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (IsBlockWater(a_CBBlockType))
 				{
