@@ -18,8 +18,6 @@
 
 
 
-
-
 class cStructGenTrees :
 	public cFinishGen
 {
@@ -46,6 +44,7 @@ protected:
 	*/
 	void GenerateSingleTree(
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
+		Vector3i a_Pos,
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
@@ -59,7 +58,10 @@ protected:
 		sSetBlockVector & a_Overflow
 	);
 
-	int GetNumTrees(
+	/** Get the the number of trees to generate in a_Chunk
+	If the value is between 0 and 1, it should be interpreted as the probability that a tree should be generated.
+	*/
+	double GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes
 	);
