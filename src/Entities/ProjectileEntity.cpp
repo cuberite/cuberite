@@ -50,7 +50,7 @@ protected:
 	double m_SlowdownCoeff;
 
 	// cCallbacks overrides:
-	virtual bool OnNextBlock(Vector3i a_Block, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		/*
 		// DEBUG:
@@ -454,7 +454,6 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
 
 
 
