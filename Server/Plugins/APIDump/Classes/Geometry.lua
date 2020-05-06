@@ -1110,7 +1110,6 @@ Callbacks below).</p>
 	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
 	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
 </table>
-</p>
 				]],
 			},
 			{
