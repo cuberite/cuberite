@@ -29,7 +29,7 @@ cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 
 
 
-bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End)
+bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End)
 {
 	cLineBlockTracer Tracer(a_World, a_Callbacks);
 	return Tracer.Trace(a_Start, a_End);
