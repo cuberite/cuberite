@@ -1079,7 +1079,7 @@ the most popular tracing reasons - line of sight and solid hits.
 			{
 				Header = "Callbacks",
 				Contents = [[
-<p>The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
+The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
 individual functions from that table for the events that occur on the line - hitting a block, going out of
 valid world data etc. The following table lists all the available callbacks. If the callback function is
 not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
