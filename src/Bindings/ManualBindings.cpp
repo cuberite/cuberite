@@ -2905,8 +2905,8 @@ protected:
 
 
 /** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
-This is the deprecated version of cLuaBlockTracerCallback.
-*/
+This is the deprecated version of cLuaBlockTracerCallback, used when the plugin calls
+the Trace function with number-based coords. */
 class cLuaBlockTracerCallbacksOld :
 	public cLuaBlockTracerCallbacks
 {
