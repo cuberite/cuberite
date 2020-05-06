@@ -1132,7 +1132,7 @@ When using the deprecated number-based Trace function, Cuberite will instead ass
 <tr><td>OnIntoWorld</td><td>X, Y, Z</td>
 	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
 </table>
-</p>
+
 				]],
 			},
 			{
