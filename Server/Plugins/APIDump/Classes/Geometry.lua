@@ -1116,13 +1116,7 @@ Callbacks below).</p>
 			{
 				Header = "Deprecated Callbacks",
 				Contents = [[
-<p>The Callbacks in the Trace() function is a table that contains named functions. Cuberite will call
-individual functions from that table for the events that occur on the line - hitting a block, going out of
-valid world data etc. The following table lists all the available callbacks. If the callback function is
-not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
-aborted and Trace() returns false.<br>
-Note: The folowings are deprecated. They should be replaced with the alternatives that uses Vector3d. 
-They can only be used when the Trace() function uses double too.</p>
+When using the deprecated number-based Trace function, Cuberite will instead assume the following signatures for the callbacks:</p>
 <p>
 <table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
 <tr><td>OnNextBlock</td><td>BlockX, BlockY, BlockZ, BlockType, BlockMeta, EntryFace</td>
