@@ -1030,7 +1030,7 @@ the most popular tracing reasons - line of sight and solid hits.
 							Type = "boolean",
 						},
 					},
-					Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+					Notes = "(OBSOLETE, use the Vector3-based overload instead) Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
 				},
 				{
 					IsStatic = true,
