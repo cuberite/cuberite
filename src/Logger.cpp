@@ -46,9 +46,9 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 	AString Line;
 	#ifdef _DEBUG
-		Printf(Line, "[%04llx|%02d:%02d:%02d] %s\n", static_cast<UInt64>(std::hash<std::thread::id>()(std::this_thread::get_id())), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
+		Printf(Line, "[%04llx|%02d:%02d:%02d] %s\n", static_cast<UInt64>(std::hash<std::thread::id>()(std::this_thread::get_id())), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message);
 	#else
-		Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
+		Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message);
 	#endif
 
 
@@ -63,18 +63,18 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 
 
-void cLogger::LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
+void cLogger::vLogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList)
 {
-	LogSimple(Printf(a_Format, a_ArgList), a_LogLevel);
+	LogSimple(vPrintf(a_Format, a_ArgList), a_LogLevel);
 }
 
 
 
 
 
-void cLogger::LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
+void cLogger::vLogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList)
 {
-	LogSimple(fmt::format(a_Format, a_ArgList), a_LogLevel);
+	LogSimple(fmt::vformat(a_Format, a_ArgList), a_LogLevel);
 }
 
 
@@ -117,72 +117,72 @@ void cLogger::DetachListener(cListener * a_Listener)
 ////////////////////////////////////////////////////////////////////////////////
 // Global functions
 
-void FLOG(const char * a_Format, fmt::ArgList a_ArgList)
+void vFLOG(const char * a_Format, fmt::format_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat(a_Format, cLogger::llRegular, a_ArgList);
+	cLogger::GetInstance().vLogFormat(a_Format, cLogger::llRegular, a_ArgList);
 }
 
 
 
 
 
-void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
+void vFLOGINFO(const char * a_Format, fmt::format_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llInfo, a_ArgList);
+	cLogger::GetInstance().vLogFormat( a_Format, cLogger::llInfo, a_ArgList);
 }
 
 
 
 
 
-void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
+void vFLOGWARNING(const char * a_Format, fmt::format_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llWarning, a_ArgList);
+	cLogger::GetInstance().vLogFormat( a_Format, cLogger::llWarning, a_ArgList);
 }
 
 
 
 
 
-void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
+void vFLOGERROR(const char * a_Format, fmt::format_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llError, a_ArgList);
+	cLogger::GetInstance().vLogFormat(a_Format, cLogger::llError, a_ArgList);
 }
 
 
 
 
 
-void LOG(const char * a_Format, fmt::ArgList a_ArgList)
+void vLOG(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llRegular, a_ArgList);
+	cLogger::GetInstance().vLogPrintf(a_Format, cLogger::llRegular, a_ArgList);
 }
 
 
 
 
 
-void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
+void vLOGINFO(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llInfo, a_ArgList);
+	cLogger::GetInstance().vLogPrintf(a_Format, cLogger::llInfo, a_ArgList);
 }
 
 
 
 
 
-void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
+void vLOGWARNING(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llWarning, a_ArgList);
+	cLogger::GetInstance().vLogPrintf(a_Format, cLogger::llWarning, a_ArgList);
 }
 
 
 
 
 
-void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
+void vLOGERROR(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llError, a_ArgList);
+	cLogger::GetInstance().vLogPrintf( a_Format, cLogger::llError, a_ArgList);
 }
 
 

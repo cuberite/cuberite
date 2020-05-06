@@ -53,11 +53,14 @@ public:
 
 
 
-#define EXPECT(X) if (!(X)) \
-	{ \
-		ASSERT(X); \
-		throw cTestFailure(#X, __FILE__, __LINE__); \
-	}
+#define EXPECT(X) \
+	do { \
+		if (!(X)) \
+		{ \
+			ASSERT(X); \
+			throw cTestFailure(#X, __FILE__, __LINE__); \
+		} \
+	} while (false)
 
 
 

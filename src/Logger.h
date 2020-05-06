@@ -59,12 +59,20 @@ public:
 	};
 
 	/** Log a message formatted with a printf style formatting string. */
-	void LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(void, LogPrintf, const char *, eLogLevel)
+	void vLogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList);
+	template <typename... Args>
+	void LogPrintf(const char * a_Format, eLogLevel a_LogLevel, const Args & ... args)
+	{
+		vLogPrintf(a_Format, a_LogLevel, fmt::make_printf_args(args...));
+	}
 
 	/** Log a message formatted with a python style formatting string. */
-	void LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(void, LogFormat, const char *, eLogLevel)
+	void vLogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList);
+	template <typename... Args>
+	void LogFormat(const char * a_Format, eLogLevel a_LogLevel, const Args & ... args)
+	{
+		vLogFormat(a_Format, a_LogLevel, fmt::make_format_args(args...));
+	}
 
 	/** Logs the simple text message at the specified log level. */
 	void LogSimple(AString a_Message, eLogLevel a_LogLevel = llRegular);

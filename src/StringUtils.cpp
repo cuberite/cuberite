@@ -52,10 +52,12 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & Printf(AString & str, const char * format, fmt::ArgList args)
+AString & vPrintf(AString & str, const char * format, fmt::printf_args args)
 {
 	ASSERT(format != nullptr);
-	str = fmt::sprintf(format, args);
+	fmt::memory_buffer Buffer;
+	fmt::printf(Buffer, fmt::to_string_view(format), args);
+	str.assign(Buffer.data(), Buffer.size());
 	return str;
 }
 
@@ -63,10 +65,23 @@ AString & Printf(AString & str, const char * format, fmt::ArgList args)
 
 
 
-AString Printf(const char * format, fmt::ArgList args)
+AString vPrintf(const char * format, fmt::printf_args args)
 {
 	ASSERT(format != nullptr);
-	return fmt::sprintf(format, args);
+	return fmt::vsprintf(format, args);
+}
+
+
+
+
+
+AString & vAppendPrintf(AString & a_String, const char * format, fmt::printf_args args)
+{
+	ASSERT(format != nullptr);
+	fmt::memory_buffer Buffer;
+	fmt::printf(Buffer, fmt::to_string_view(format), args);
+	a_String.append(Buffer.data(), Buffer.size());
+	return a_String;
 }
 
 
@@ -630,18 +645,18 @@ format binary data this way:
 */
 AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	fmt::MemoryWriter Output;
+	fmt::memory_buffer Output;
 	/* If formatting the data from the comment above:
 		Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
 		Chars holds: "1234567890abcdef" */
-	fmt::MemoryWriter Hex, Chars;
+	fmt::memory_buffer Hex, Chars;
 
 	if (a_Size > 0)
 	{
 		// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
 		const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
 		const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
-		Output.buffer().reserve(NumLines * CharsPerLine);
+		Output.reserve(NumLines * CharsPerLine);
 	}
 
 	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
@@ -650,12 +665,20 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		for (size_t j = 0; j < k; j++)
 		{
 			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
-			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
-			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
+			Hex.push_back(HEX(c >> 4));
+			Hex.push_back(HEX(c & 0xf));
+			Hex.push_back(' ');
+			Chars.push_back((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
 
 		// Write Hex with a dynamic fixed width
-		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+		auto HexStr = fmt::string_view(Hex.data(), Hex.size());
+		auto CharsStr = fmt::string_view(Chars.data(), Chars.size());
+		fmt::format_to(
+			Output, "{0:08x}: {1:{2}}   {3}\n",
+			i, HexStr, a_BytesPerLine * 3, CharsStr
+		);
+
 		Hex.clear();
 		Chars.clear();
 	}  // for i
