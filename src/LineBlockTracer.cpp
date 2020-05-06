@@ -167,9 +167,7 @@ bool cLineBlockTracer::Trace(const Vector3d a_Start, const Vector3d a_End)
 		m_Callbacks->OnIntoWorld(m_Start);
 	}
 
-	m_Current.x = FloorC(m_Start.x);
-	m_Current.y = FloorC(m_Start.y);
-	m_Current.z = FloorC(m_Start.z);
+	m_Current = m_Start.Floor();
 
 	m_Diff = m_End -  m_Start;
 
@@ -346,7 +344,6 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 		}
 	}
 }
-
 
 
 
