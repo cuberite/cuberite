@@ -58,10 +58,8 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				Vector3i Pos;
 				Pos.x = (m_Noise.IntNoise3DInt(BaseX + BaseZ, BaseZ, 0) / 19) % cChunkDef::Width;
 				Pos.z = (m_Noise.IntNoise3DInt(BaseX - BaseZ, 0, BaseZ) / 19) % cChunkDef::Width;
-
 				Pos.y = Dest->GetHeight(Pos.x, Pos.z);
 
-				// If this test is not done with Block position as example Chunk coorinates the trees are cut at Chunk border
 				if (std::abs(m_Noise.IntNoise3D(BaseX * cChunkDef::Width + Pos.x, Pos.y, BaseZ * cChunkDef::Width + Pos.z)) <= NumTrees)
 				{
 					GenerateSingleTree(BaseX, BaseZ, 0, Pos, *Dest, OutsideLogs, OutsideOther);
@@ -74,8 +72,8 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 					Vector3i Pos;
 					Pos.x = (m_Noise.IntNoise3DInt(BaseX + BaseZ, BaseZ, i) / 19) % cChunkDef::Width;
 					Pos.z = (m_Noise.IntNoise3DInt(BaseX - BaseZ, i, BaseZ) / 19) % cChunkDef::Width;
-
 					Pos.y = Dest->GetHeight(Pos.x, Pos.z);
+
 					GenerateSingleTree(BaseX, BaseZ, i, Pos, *Dest, OutsideLogs, OutsideOther);
 				}
 			}
