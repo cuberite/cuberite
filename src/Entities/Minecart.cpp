@@ -952,7 +952,6 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			break;
-			UNREACHABLE("Invalid minecart movement");
 		}
 		case E_META_RAIL_CURVED_ZP_XM:
 		{
@@ -970,7 +969,6 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			break;
-			UNREACHABLE("Invalid minecart movement");
 		}
 		case E_META_RAIL_CURVED_ZM_XM:
 		{
@@ -988,7 +986,6 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			break;
-			UNREACHABLE("Invalid minecart movement");
 		}
 		case E_META_RAIL_CURVED_ZM_XP:
 		{
@@ -1006,7 +1003,6 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 			}
 
 			break;
-			UNREACHABLE("Invalid minecart movement");
 		}
 	}
 

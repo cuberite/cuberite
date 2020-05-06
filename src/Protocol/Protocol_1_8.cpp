@@ -3909,4 +3909,5 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etExpOrb:
 		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
 	}
+	UNREACHABLE("Unhandled entity kind");
 }
