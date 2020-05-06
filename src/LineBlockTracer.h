@@ -51,7 +51,7 @@ public:
 	// Utility functions for simple one-line usage:
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End);
+	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End);
 
 	/** Returns true if the two positions are within line of sight (not obscured by blocks).
 	a_Sight specifies which blocks are considered transparent for the trace, is an OR-combination of eLineOfSight constants. */
@@ -105,7 +105,6 @@ protected:
 
 	bool ChunkCallback(cChunk * a_Chunk);
 } ;
-
 
 
 
