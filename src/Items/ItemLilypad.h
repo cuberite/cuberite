@@ -84,7 +84,7 @@ public:
 						return true;
 					}
 					m_HasHitFluid = true;
-					m_Pos = a_CBBlock;
+					m_Pos = a_CBBlockPos;
 					return true;
 				}
 				return false;
