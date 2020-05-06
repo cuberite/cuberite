@@ -282,7 +282,7 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	float FinalDamage = a_RawDamage;
+	float FinalDamage = static_cast<float>(a_RawDamage);
 	float ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
 
 	ApplyArmorDamage(static_cast<int>(ArmorCover));
