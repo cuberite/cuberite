@@ -276,5 +276,6 @@ private:
 				return { 0, 0, 0 };
 			}
 		}
+		UNREACHABLE(!"Unhandled block face!");
 	}
 } ;
