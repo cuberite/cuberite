@@ -65,7 +65,7 @@ protected:
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
-			cBoundingBox bb(a_Block, a_Block + Vector3i(1, 1, 1));  // Bounding box of the block hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
 			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
@@ -454,6 +454,5 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
 
 
