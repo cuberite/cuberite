@@ -255,7 +255,7 @@ public:
 					{
 						a_CBBlockPos = AddFaceDirection(a_CBBlockPos, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
-					m_Pos = a_CBBlock;  // (Block could be washed away, replace it)
+					m_Pos = a_CBBlockPos;  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
 				}
 				return false;
