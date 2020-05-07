@@ -226,7 +226,8 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"DeadBushes, "
 				"NaturalPatches, "
 				"PreSimulator, "
-				"Animals"
+				"Animals, "
+				"OverworldClumpFlowers"
 			);
 			break;
 		}  // dimOverworld
