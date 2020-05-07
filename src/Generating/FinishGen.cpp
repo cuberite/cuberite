@@ -338,7 +338,7 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 		for (const auto & BlockName : Blocks)
 		{
 			cItem Block = cItem();
-			if (!StringToItem(BlockName, Block) && IsValidBlock(Block.m_ItemType))
+			if (!StringToItem(BlockName, Block) || !IsValidBlock(Block.m_ItemType))
 			{
 				LOGWARNING("Block \"%s\" is invalid", BlockName.c_str());
 				continue;
@@ -374,11 +374,11 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 
 	if (foliage.size() == 0)
 	{
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower, redflower, lilac, rosebush"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower, redflower, azurebluet, oxeyedaisy"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; oxeyedaisy"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium, redtulip, orangetulip, whitetulip, pinktulip, oxeyedaisy"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland, SwamplandM = brownmushroom, redmushroom, blueorchid"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), foliage);
 	}
 
 	return foliage;
