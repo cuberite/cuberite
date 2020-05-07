@@ -80,5 +80,4 @@ notifications:
     on_failure: always
 branches:
   only:
-    - coverity_scan
     - master

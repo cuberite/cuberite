@@ -262,9 +262,9 @@ public:
 	bool Open()
 	{
 		// Assume creation succeeds, as the API does not provide a way to tell if the folder exists.
-		cFile::CreateFolder(FILE_IO_PREFIX "logs");
+		cFile::CreateFolder("logs");
 		bool success = m_File.Open(
-			FILE_IO_PREFIX + Printf(
+			Printf(
 				"logs/LOG_%d.txt",
 				std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(
 					std::chrono::system_clock::now().time_since_epoch()

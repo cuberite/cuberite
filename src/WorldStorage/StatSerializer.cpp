@@ -24,7 +24,7 @@ cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_
 	m_Path = StatsPath + "/" + a_FileName + ".json";
 
 	// Ensure that the directory exists.
-	cFile::CreateFolder(FILE_IO_PREFIX + StatsPath);
+	cFile::CreateFolder(StatsPath);
 }
 
 
@@ -33,10 +33,10 @@ cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_
 
 bool cStatSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())
 	{
-		Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_LegacyPath);
+		Data = cFile::ReadWholeFile(m_LegacyPath);
 		if (Data.empty())
 		{
 			return false;
@@ -64,7 +64,7 @@ bool cStatSerializer::Save(void)
 	SaveStatToJSON(Root);
 
 	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	if (!File.Open(m_Path, cFile::fmWrite))
 	{
 		return false;
 	}
