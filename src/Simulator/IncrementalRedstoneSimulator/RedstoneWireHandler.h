@@ -14,25 +14,23 @@ class cRedstoneWireHandler:
 
 public:
 
-	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, Vector3i a_Offset)
+	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
 	{
 		switch (a_Block)
 		{
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
-				/** Check when repeater is in x direction  */
+			{
 				a_BlockMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
 				if ((a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XP) || (a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XM))
 				{
-					/** Check if Block is not aligned in in x direction */
-					return (a_Offset.x != 0);
+					// Wire connects to repeater if repeater is aligned along X
+					// and wire is in front or behind it (#4639)
+					return a_Offset.x != 0;
 				}
-				/** when repeater is in z direction */
-				else
-				{
-					/** Check if block is not aligned in z direction */
-					return (a_Offset.z != 0);
-				}
+
+				return a_Offset.z != 0;
+			}
 			case E_BLOCK_ACTIVE_COMPARATOR:
 			case E_BLOCK_INACTIVE_COMPARATOR:
 			case E_BLOCK_REDSTONE_TORCH_OFF:
@@ -42,7 +40,7 @@ public:
 		}
 	}
 
-	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, Vector3i a_Position) const
+	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, const Vector3i a_Position) const
 	{
 		cVector3iArray RelativePositions;
 		auto YPTerraceBlock = a_World.GetBlock(a_Position + OffsetYP());
