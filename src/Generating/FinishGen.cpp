@@ -252,20 +252,20 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 		int z = a_CenterZ + (((rnd / 256) % RANGE_FROM_CENTER * 2) - RANGE_FROM_CENTER);
 		int Top = a_ChunkDesc.GetHeight(x, z);
 
-		if (a_ChunkDesc.GetBlockType(x, Top, z) != E_BLOCK_GRASS)
+		auto GroundBlockType = a_ChunkDesc.GetBlockType(x, Top, z);
+		if ((GroundBlockType == E_BLOCK_GRASS) ||
+			((GroundBlockType == E_BLOCK_MYCELIUM) && ((a_BlockType == E_BLOCK_RED_MUSHROOM) || (a_BlockType == E_BLOCK_BROWN_MUSHROOM))))
 		{
-			continue;
-		}
-
-		a_ChunkDesc.SetBlockTypeMeta(x, Top + 1, z, a_BlockType, a_BlockMeta);
-		if (a_IsDoubleTall)
-		{
-			a_ChunkDesc.SetBlockTypeMeta(x, Top + 2, z, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
-			a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 2));
-		}
-		else
-		{
-			a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 1));
+			a_ChunkDesc.SetBlockTypeMeta(x, Top + 1, z, a_BlockType, a_BlockMeta);
+			if (a_IsDoubleTall)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, Top + 2, z, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 2));
+			}
+			else
+			{
+				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(Top + 1));
+			}
 		}
 	}
 
@@ -379,6 +379,7 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore = brownmushroom; redmushroom"), foliage);
 	}
 
 	return foliage;
