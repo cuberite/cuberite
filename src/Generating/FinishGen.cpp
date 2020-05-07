@@ -818,22 +818,11 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 				{
 					float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10);
 					float val4 = m_Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20);
-					if (val1 + val2 > 0.2f)
-					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_YELLOW_FLOWER);
-					}
-					else if (val2 + val3 > 0.2f)
-					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_RED_ROSE);
-					}
-					else if (val3 + val4 > 0.2f)
-					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_RED_MUSHROOM);
-					}
-					else if (val1 + val4 > 0.2f)
-					{
-						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_BROWN_MUSHROOM);
-					}
+					if ((val1 + val2 > 0.2f) ||
+						(val2 + val3 > 0.2f) ||
+						(val3 + val4 > 0.2f) ||
+						(val1 + val4 > 0.2f))
+					{}
 					else if (val1 + val2 + val3 + val4 < -0.1)
 					{
 						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
