@@ -1626,7 +1626,12 @@ bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 	{
 		case E_META_SAPLING_APPLE:    GetAppleTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_CONIFER:  GetConiferTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_CONIFER:
+		{
+			bool IsLarge = GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta);
+			GetConiferTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other, IsLarge);
+			break;
+		}
 		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_JUNGLE:
 		{
