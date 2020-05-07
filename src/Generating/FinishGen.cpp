@@ -375,7 +375,7 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 	if (foliage.size() == 0)
 	{
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; oxeyedaisy"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), foliage);
