@@ -28,5 +28,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Simulator ${SRCS} ${HDRS})
-	target_link_libraries(Simulator fmt::fmt)
+	target_link_libraries(Simulator fmt::fmt SQLiteCpp)
 endif()

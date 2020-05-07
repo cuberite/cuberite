@@ -16,7 +16,7 @@
 // cRankManager:
 
 cRankManager::cRankManager(void) :
-	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
+	m_DB("Ranks.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE),
 	m_IsInitialized(false),
 	m_MojangAPI(nullptr)
 {

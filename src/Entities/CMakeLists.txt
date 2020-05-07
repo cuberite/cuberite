@@ -59,5 +59,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Entities ${SRCS} ${HDRS})
-	target_link_libraries(Entities fmt::fmt WorldStorage)
+	target_link_libraries(Entities fmt::fmt WorldStorage SQLiteCpp)
 endif()
