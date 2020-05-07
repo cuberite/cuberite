@@ -251,8 +251,8 @@ double cStructGenTrees::GetNumTrees(
 			case biRoofedForest:         return 50.0;
 			case biColdTaiga:            return 20.0;
 			case biColdTaigaHills:       return 15.0;
-			case biMegaTaiga:            return 30.0;
-			case biMegaTaigaHills:       return 25.0;
+			case biMegaTaiga:            return 15.0;
+			case biMegaTaigaHills:       return 15.0;
 			case biExtremeHillsPlus:     return 3.0;
 			case biSavanna:              return 8.0;
 			case biSavannaPlateau:       return 12.0;
@@ -273,8 +273,8 @@ double cStructGenTrees::GetNumTrees(
 			case biBirchForestHillsM:    return 20.0;
 			case biRoofedForestM:        return 40.0;
 			case biColdTaigaM:           return 30.0;
-			case biMegaSpruceTaiga:      return 30.0;
-			case biMegaSpruceTaigaHills: return 30.0;
+			case biMegaSpruceTaiga:      return 15.0;
+			case biMegaSpruceTaigaHills: return 15.0;
 			case biExtremeHillsPlusM:    return 4.0;
 			case biSavannaM:             return 8.0;
 			case biSavannaPlateauM:      return 12.0;

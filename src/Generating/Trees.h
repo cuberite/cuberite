@@ -83,13 +83,25 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random conifer tree */
-void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random spruce (short conifer, two layers of leaves) */
-void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random spruce */
+void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random pine (tall conifer, little leaves at top) */
-void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random pine /
+void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small spruce (short conifer, two layers of leaves) */
+void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small pine (tall conifer, little leaves at top) */
+void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large spruce (short conifer, multiple layers of leaves) */
+void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large pine (tall conifer, little leaves at top) */
+void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random swampland tree */
 void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
