@@ -23,7 +23,7 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 
 	Printf(m_Path, "%s%cmap_%i.dat", DataPath.c_str(), cFile::PathSeparator(), a_Map->GetID());
 
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	cFile::CreateFolder(DataPath);
 }
 
 
@@ -32,7 +32,7 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 
 bool cMapSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())
 	{
 		return false;
@@ -75,7 +75,7 @@ bool cMapSerializer::Save(void)
 	#endif  // _DEBUG
 
 	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	if (!File.Open(m_Path, cFile::fmWrite))
 	{
 		return false;
 	}
@@ -207,7 +207,7 @@ cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount
 
 	Printf(m_Path, "%s%cidcounts.dat", DataPath.c_str(), cFile::PathSeparator());
 
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	cFile::CreateFolder(DataPath);
 }
 
 
@@ -216,7 +216,7 @@ cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount
 
 bool cIDCountSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())
 	{
 		return false;
@@ -266,7 +266,7 @@ bool cIDCountSerializer::Save(void)
 	#endif  // _DEBUG
 
 	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	if (!File.Open(m_Path, cFile::fmWrite))
 	{
 		return false;
 	}

@@ -148,12 +148,6 @@ typedef unsigned short     UInt16;
 
 
 
-#define FILE_IO_PREFIX ""
-
-
-
-
-
 // CRT stuff:
 #include <sys/stat.h>
 #include <assert.h>

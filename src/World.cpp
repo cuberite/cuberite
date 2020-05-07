@@ -223,7 +223,7 @@ cWorld::cWorld(
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	cFile::CreateFolderRecursive(FILE_IO_PREFIX + m_DataPath);
+	cFile::CreateFolderRecursive(m_DataPath);
 
 	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
 	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);

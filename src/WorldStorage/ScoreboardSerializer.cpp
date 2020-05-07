@@ -22,7 +22,7 @@ cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScore
 
 	m_Path = DataPath + cFile::PathSeparator() + "scoreboard.dat";
 
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	cFile::CreateFolder(DataPath);
 }
 
 
@@ -31,7 +31,7 @@ cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScore
 
 bool cScoreboardSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())
 	{
 		return false;
@@ -74,7 +74,7 @@ bool cScoreboardSerializer::Save(void)
 	#endif  // _DEBUG
 
 	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	if (!File.Open(m_Path, cFile::fmWrite))
 	{
 		return false;
 	}

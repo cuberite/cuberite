@@ -94,18 +94,18 @@ bool cPluginLua::Load(void)
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
-		m_LuaState.AddPackagePath("path", FILE_IO_PREFIX + GetLocalFolder() + "/?.lua");
+		m_LuaState.AddPackagePath("path", GetLocalFolder() + "/?.lua");
 		#ifdef _WIN32
 			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
 		#else
-			m_LuaState.AddPackagePath("cpath", FILE_IO_PREFIX + GetLocalFolder() + "/?.so");
+			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "/?.so");
 		#endif
 
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}
 
-	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
+	std::string PluginPath = GetLocalFolder() + "/";
 
 	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
 	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
