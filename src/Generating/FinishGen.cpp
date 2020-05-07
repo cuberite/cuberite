@@ -379,7 +379,7 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore = brownmushroom; redmushroom"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = brownmushroom; redmushroom"), foliage);
 	}
 
 	return foliage;
