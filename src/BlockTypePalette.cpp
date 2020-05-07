@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "BlockTypePalette.h"
 #include "json/value.h"
-#include "json/reader.h"
+#include "JsonUtils.h"
 
 
 
@@ -170,10 +170,8 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 {
 	// Parse the string into JSON object:
 	Json::Value root;
-	Json::CharReaderBuilder builder;
-	std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 	std::string errs;
-	if (!reader->parse(aJsonPalette.data(), aJsonPalette.data() + aJsonPalette.size(), &root, &errs))
+	if (!JsonUtils::ParseString(aJsonPalette, root, &errs))
 	{
 		throw LoadFailedException(errs);
 	}

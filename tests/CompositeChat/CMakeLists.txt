@@ -10,12 +10,14 @@ add_definitions(-DTEST_GLOBALS=1)
 
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/CompositeChat.cpp
+	${CMAKE_SOURCE_DIR}/src/JsonUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 )
 
 set (SHARED_HDRS
 	../TestHelpers.h
 	${CMAKE_SOURCE_DIR}/src/CompositeChat.h
+	${CMAKE_SOURCE_DIR}/src/JsonUtils.h
 	${CMAKE_SOURCE_DIR}/src/StringUtils.h
 )
 
@@ -28,7 +30,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(CompositeChat-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(CompositeChat-exe jsoncpp_lib_static fmt::fmt)
+target_link_libraries(CompositeChat-exe jsoncpp_lib fmt::fmt)
 add_test(NAME CompositeChat-test COMMAND CompositeChat-exe)
 
 

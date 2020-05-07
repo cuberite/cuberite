@@ -47,6 +47,7 @@ SET (SRCS
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
+	JsonUtils.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
@@ -126,6 +127,7 @@ SET (HDRS
 	Item.h
 	ItemGrid.h
 	LazyArray.h
+	JsonUtils.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h
@@ -439,7 +441,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")

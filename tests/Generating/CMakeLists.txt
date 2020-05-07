@@ -161,7 +161,7 @@ add_library(GeneratorTestingSupport STATIC
 	${GENERATING_HDRS}
 	${STUBS}
 )
-target_link_libraries(GeneratorTestingSupport tolualib zlib fmt::fmt jsoncpp_lib_static)
+target_link_libraries(GeneratorTestingSupport tolualib zlib fmt::fmt jsoncpp_lib)
 source_group("Stubs" FILES ${STUBS})
 source_group("Generating" FILES ${GENERATING_HDRS} ${GENERATING_SRCS})
 

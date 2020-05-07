@@ -41,6 +41,7 @@ Implements the 1.11 protocol classes:
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../CompositeChat.h"
+#include "../JsonUtils.h"
 #include "../Bindings/PluginManager.h"
 
 
@@ -642,9 +643,8 @@ void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 
@@ -1265,7 +1265,6 @@ void cProtocol_1_11_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }

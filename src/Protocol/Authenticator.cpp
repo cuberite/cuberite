@@ -9,6 +9,7 @@
 #include "../UUID.h"
 
 #include "../IniFile.h"
+#include "../JsonUtils.h"
 #include "json/json.h"
 
 #include "../mbedTLS++/BlockingSslClientSocket.h"
@@ -185,8 +186,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		return false;
 	}
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(Response, root, false))
+	if (!JsonUtils::ParseString(Response, root))
 	{
 		LOGWARNING("cAuthenticator: Cannot parse received data (authentication) to JSON!");
 		return false;

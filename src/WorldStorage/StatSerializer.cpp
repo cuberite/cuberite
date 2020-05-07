@@ -6,6 +6,7 @@
 #include "StatSerializer.h"
 
 #include "../Statistics.h"
+#include "../JsonUtils.h"
 
 
 
@@ -44,9 +45,8 @@ bool cStatSerializer::Load(void)
 	}
 
 	Json::Value Root;
-	Json::Reader Reader;
 
-	if (Reader.parse(Data, Root, false))
+	if (JsonUtils::ParseString(Data, Root))
 	{
 		return LoadStatFromJSON(Root);
 	}
@@ -69,8 +69,7 @@ bool cStatSerializer::Save(void)
 		return false;
 	}
 
-	Json::StyledWriter Writer;
-	AString JsonData = Writer.write(Root);
+	AString JsonData = JsonUtils::WriteStyledString(Root);
 
 	File.Write(JsonData.data(), JsonData.size());
 	File.Close();
