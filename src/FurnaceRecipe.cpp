@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#define FURNACE_RECIPE_FILE FILE_IO_PREFIX "furnace.txt"
+#define FURNACE_RECIPE_FILE "furnace.txt"
 
 
 

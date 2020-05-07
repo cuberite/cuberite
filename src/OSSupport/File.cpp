@@ -71,9 +71,9 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	}
 
 	#ifdef _WIN32
-		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
+		m_File = _fsopen((iFileName).c_str(), Mode, _SH_DENYWR);
 	#else
-		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
+		m_File = fopen((iFileName).c_str(), Mode);
 	#endif  // _WIN32
 
 	if ((m_File == nullptr) && (iMode == fmReadWrite))
@@ -84,9 +84,9 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		// Simply re-open for read-writing, erasing existing contents:
 
 		#ifdef _WIN32
-			m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
+			m_File = _fsopen((iFileName).c_str(), "wb+", _SH_DENYWR);
 		#else
-			m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
+			m_File = fopen((iFileName).c_str(), "wb+");
 		#endif  // _WIN32
 
 	}

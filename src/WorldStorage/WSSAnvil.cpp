@@ -112,7 +112,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.EndCompound();
 		Writer.Finish();
 
-		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
+		gzFile gz = gzopen((fnam).c_str(), "wb");
 		if (gz != nullptr)
 		{
 			gzwrite(gz, Writer.GetResult().data(), static_cast<unsigned>(Writer.GetResult().size()));
@@ -181,7 +181,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	// Construct the filename for offloading:
 	AString OffloadFileName;
 	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
-	cFile::CreateFolder(FILE_IO_PREFIX + OffloadFileName);
+	cFile::CreateFolder(OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
 	#ifdef _MSC_VER
@@ -287,7 +287,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// Load it anew:
 	AString FileName;
 	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
-	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
+	cFile::CreateFolder(FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)

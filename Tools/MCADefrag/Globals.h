@@ -133,16 +133,6 @@ typedef unsigned char Byte;
 	#define SocketError errno
 #endif
 
-#if !defined(ANDROID_NDK)
-	#define USE_SQUIRREL
-#endif
-
-#if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/mcserver/"
-#else
-	#define FILE_IO_PREFIX ""
-#endif
-
 
 
 

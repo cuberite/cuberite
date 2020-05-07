@@ -166,16 +166,6 @@ typedef unsigned char Byte;
 	#include <fcntl.h>
 #endif
 
-#if !defined(ANDROID_NDK)
-	#define USE_SQUIRREL
-#endif
-
-#if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/mcserver/"
-#else
-	#define FILE_IO_PREFIX ""
-#endif
-
 
 
 
