@@ -14,11 +14,7 @@ AString WriteFastString(const Json::Value & a_Root)
 	Json::StreamWriterBuilder Builder;
 	Builder["commentStyle"] = "None";
 	Builder["indentation"] = "";
-	std::unique_ptr<Json::StreamWriter> Writer(Builder.newStreamWriter());
-
-	std::stringstream Stream;
-	Writer->write(a_Root, &Stream);
-	return Stream.str();
+	return Json::writeString(Builder, a_Root);
 }
 
 
@@ -28,11 +24,7 @@ AString WriteFastString(const Json::Value & a_Root)
 AString WriteStyledString(const Json::Value & a_Root)
 {
 	Json::StreamWriterBuilder Builder;
-	std::unique_ptr<Json::StreamWriter> Writer(Builder.newStreamWriter());
-
-	std::stringstream Stream;
-	Writer->write(a_Root, &Stream);
-	return Stream.str();
+	return Json::writeString(Builder, a_Root);
 }
 
 
