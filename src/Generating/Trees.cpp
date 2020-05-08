@@ -833,7 +833,7 @@ void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
-	// Half chance for a spruce, half for a pine:
+	// Half chance for a spruce, half for a pine and for the large ones 3 chances for a pine and one for spruce:
 	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq).addedZ(32 * a_Seq)) < (a_Large ? 0x20000000 : 0x40000000))
 	{
 		GetSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, a_Large);
