@@ -18,4 +18,4 @@ echo api  1>>cmds.txt
 echo stop  1>>cmds.txt
 Cuberite --port 32767  0<cmds.txt
 7z a -tzip -y ManualAPI.zip -scsWIN "ManualAPI.lua"
-7z a -tzip -y AutoAPI.zip -scsWIN "BindingsDocs\*.lua" -x!_raw.lua
+7z a -tzip -y AutoAPI.zip -scsWIN ".\BindingsDocs\*.lua" -x!_raw.lua
