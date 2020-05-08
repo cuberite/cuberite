@@ -191,6 +191,8 @@ static const sCoords BigO1Spruce[] =
 	/*  2 */           {0,  2}, {1,  2},
 } ;
 
+static const sCoords BigO0[] = {};
+
 
 
 typedef struct
@@ -225,7 +227,7 @@ static const sCoordsArr BigOPineLayers[] =
 static const sCoordsArr BigOSpruceLayersV1[] =
 {
 	{BigO1Spruce, ARRAYCOUNT(BigO1Spruce)},
-	{{}, 0},
+	{BigO0, ARRAYCOUNT(BigO0)},
 };
 
 static const sCoordsArr BigOSpruceLayersV2[] =
