@@ -10,7 +10,7 @@ mkdir -p tidy-build
 cd tidy-build
 cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
-if run-clang-tidy.py $ARGS; then
+if run-clang-tidy $ARGS; then
 	echo "clang-tidy: No violations found"
 else
 	echo "clang-tidy: Found violations"
