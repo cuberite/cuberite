@@ -32,23 +32,22 @@ matrix:
       env: &Debug
         - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
 
-    # Default Clang Release
+    # Clang 7.0 - Release
     - compiler: clang
       before_install: &use-cmake
         - export PATH=/snap/bin/:${PATH}
       env: *Release
 
-    # Default Clang Debug
+    # Clang 7.0 - Debug
     - compiler: clang
       before_install: *use-cmake
       env: *Debug
 
-    # Default GCC Release
+    # GCC 7.4 - Release, CMake 3.12
     - compiler: gcc
-      before_install: *use-cmake
       env: *Release
 
-    # Default GCC Debug
+    # GCC 7.4 - Debug
     - compiler: gcc
       before_install: *use-cmake
       env: *Debug
