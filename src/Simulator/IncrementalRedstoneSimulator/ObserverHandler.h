@@ -83,13 +83,13 @@ public:
 		{
 			// Remain on for 1 tick before resetting
 			*DelayInfo = std::make_pair(1, false);
-			a_World.SetBlockMeta(a_Position.x, a_Position.y, a_Position.z, a_Meta | 0x8, a_Meta);
+			a_World.SetBlockMeta(a_Position, a_Meta | 0x8);
 		}
 		else
 		{
 			// We've reset. Erase delay data in preparation for detecting further updates
 			Data->m_MechanismDelays.erase(a_Position);
-			a_World.SetBlockMeta(a_Position.x, a_Position.y, a_Position.z, a_Meta & ~0x8, a_Meta);
+			a_World.SetBlockMeta(a_Position, a_Meta & ~0x8);
 		}
 
 		return { a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Meta) };
