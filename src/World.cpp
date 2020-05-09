@@ -562,7 +562,7 @@ void cWorld::ChangeWeather(void)
 
 
 
-cpp17::optional<bool> cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
+std::optional<bool> cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 {
 	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
 	{
@@ -577,7 +577,7 @@ cpp17::optional<bool> cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 	auto Height = GetHeight(a_Pos.x, a_Pos.z);
 	if (!Height)
 	{
-		return cpp17::nullopt;
+		return std::nullopt;
 	}
 
 	for (int y = *Height; y >= a_Pos.y; y--)
@@ -2318,7 +2318,7 @@ void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
 
 
 
-cpp17::optional<int> cWorld::GetHeight(int a_X, int a_Z)
+std::optional<int> cWorld::GetHeight(int a_X, int a_Z)
 {
 	return m_ChunkMap->GetHeight(a_X, a_Z);
 }

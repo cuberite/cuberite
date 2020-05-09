@@ -4,6 +4,7 @@
 #define MAX_PLAYERS 65535
 
 #include <functional>
+#include <optional>
 
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
@@ -23,7 +24,6 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
-#include "Optional.h"
 
 
 
@@ -159,7 +159,7 @@ public:
 	// tolua_end
 
 	/** Retrieves the world height at the specified coords; returns nullopt if chunk not loaded / generated */
-	virtual cpp17::optional<int> GetHeight(int a_BlockX, int a_BlockZ) override;  // Exported in ManualBindings.cpp
+	virtual std::optional<int> GetHeight(int a_BlockX, int a_BlockZ) override;  // Exported in ManualBindings.cpp
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// Implemented in Broadcaster.cpp
@@ -1055,7 +1055,7 @@ public:
 	/** Returns true if it is raining or storming at the specified location,
 	and the rain reaches (the bottom of) the specified block position.
 	Returns nullopt for unloaded chunks. */
-	virtual cpp17::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) override;  // Exported in ManualBindings_World.cpp
+	virtual std::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) override;  // Exported in ManualBindings_World.cpp
 
 	/** Returns the seed of the world. */
 	int GetSeed(void) { return m_Generator.GetSeed(); }  // tolua_export

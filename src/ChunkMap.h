@@ -7,11 +7,11 @@
 
 
 #include <functional>
+#include <optional>
 
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 #include "FunctionRef.h"
-#include "Optional.h"
 
 
 
@@ -124,7 +124,7 @@ public:
 
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
-	cpp17::optional<int> GetHeight(int a_BlockX, int a_BlockZ);  // Returns nullopt if chunk not loaded / generated
+	std::optional<int> GetHeight(int a_BlockX, int a_BlockZ);  // Returns nullopt if chunk not loaded / generated
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.

@@ -3,7 +3,8 @@
 
 #include "../FunctionRef.h"
 #include "../Mobs/MonsterTypes.h"
-#include "../Optional.h"
+
+#include <optional>
 
 class cBedEntity;
 class cBlockEntity;
@@ -84,7 +85,7 @@ public:
 	and the rain reaches the specified block position.
 	Returns nullopt for unloaded chunks.
 	*/
-	virtual cpp17::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
+	virtual std::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
 
 	/** Returns or sets the minumim or maximum netherportal width */
 	virtual int GetMinNetherPortalWidth(void) const = 0;
@@ -99,7 +100,7 @@ public:
 	virtual void SetMaxNetherPortalHeight(int a_NewMaxHeight) = 0;
 
 	/** Returns the world height at the specified coords; returns nullopt for unloaded / generated chunks */
-	virtual cpp17::optional<int> GetHeight(int a_BlockX, int a_BlockZ) = 0;
+	virtual std::optional<int> GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) = 0;

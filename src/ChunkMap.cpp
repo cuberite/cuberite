@@ -414,7 +414,7 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
 
 
 
-cpp17::optional<int> cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
+std::optional<int> cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
 	cCSLock Lock(m_CSChunks);
 	int ChunkX, ChunkZ, BlockY = 0;
@@ -423,7 +423,7 @@ cpp17::optional<int> cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
-		return cpp17::nullopt;
+		return std::nullopt;
 	}
 
 	return Chunk->GetHeight(a_BlockX, a_BlockZ);
