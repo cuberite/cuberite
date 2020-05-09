@@ -13,19 +13,17 @@
 
 
 
-cmake_minimum_required (VERSION 3.12.4)
+cmake_minimum_required (VERSION 3.13)
+project(
+	Cuberite
+	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"
+	HOMEPAGE_URL "https://cuberite.org"
+	LANGUAGES C CXX
+)
 
-if (POLICY CMP0054)
-	cmake_policy(SET CMP0054 NEW)
-endif()
-
-# Without this, the MSVC variable isn't defined for MSVC builds ( https://cmake.org/pipermail/cmake/2011-November/047130.html )
-enable_language(CXX C)
-
-# Enable the support for solution folders in MSVC
-if (MSVC)
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-endif()
+option(BUILD_TOOLS "Sets up additional executables to be built along with the server" OFF)
+option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
+option(SELF_TEST "Enables testing code to be built" OFF)
 
 # These env variables are used for configuring Travis CI builds.
 if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
@@ -93,54 +91,20 @@ else()
 	set(BUILD_DATETIME "approx: ${BUILD_DATETIME}")
 endif()
 
-# We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
-# Adapted from https://web.archive.org/web/https://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
-if(MSVC OR MSVC_IDE)
-	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
-		message(FATAL_ERROR "The project requires C++11 features. "
-			"You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
-	elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
-		message( "VC11: using Microsoft Visual Studio 2012 "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
-		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
-	else() # VC12+, assuming C++11 supported.
-	endif()
-else()  # GCC or Clang, so get compiler version directly since CMAKE_CXX_COMPILER_VERSION is only available in CMake 2.8.8 and later
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE DUMPED_COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	# Check for gcc version 4.8 or greater
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND DUMPED_COMPILER_VERSION VERSION_LESS "4.8")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 4.8 is needed")
-	endif()
-
-	# Check for clang version 3.4 or greater
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND DUMPED_COMPILER_VERSION VERSION_LESS "3.4")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 3.4 is needed")
-	endif()
-endif()
-
+# We need C++17 features
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(BUILD_TOOLS OFF CACHE BOOL "")
-set(SELF_TEST OFF CACHE BOOL "")
-
-# Check whether Lua can be used:
-if (NOT(DISABLE_SYSTEM_LUA))
-	include(CheckLua.cmake)
-	if(HAS_LUA_INTERPRETER)
-		message(STATUS "Lua has been found in your system and will be used for the build.")
-		set(USE_SYSTEM_LUA 1)
-	else()
-		message(STATUS "Lua has NOT been found in your system, the build will use its own Lua implementation.")
-		unset(USE_SYSTEM_LUA)
-	endif()
-else()
-	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
+# The need for speed (in Release)
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPO_SUPPORTED)
+if(IPO_SUPPORTED)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 endif()
 
+# Static CRT
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
@@ -156,35 +120,14 @@ if(${BUILD_UNSTABLE_TOOLS})
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
-include(SetFlags.cmake)
-set_flags()
-set_lib_flags()
-enable_profile()
 
-# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
-if (WIN32)
-	add_definitions(-DLUA_BUILD_AS_DLL)
-endif()
+add_executable(${CMAKE_PROJECT_NAME})
+add_subdirectory(src)
 
-# The Expat library is linked in statically, make the source files aware of that:
-add_definitions(-DXML_STATIC)
-
-# Let Lua use additional checks on its C API. This is only compiled into Debug builds:
-add_definitions(-DLUA_USE_APICHECK)
-
-# Self Test Mode enables extra checks at startup
-if(${SELF_TEST})
-	add_definitions(-DSELF_TEST)
-endif()
-
-# Build all dependent libraries as static:
-SET(CMAKE_BUILD_STATIC_LIBRARIES ON)
-
-####
-
-
-
-project (Cuberite)
+# Set the startup project to Cuberite, and the debugger dir:
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 
 # Set options for SQLiteCpp, disable all their tests and lints:
 set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
@@ -203,12 +146,14 @@ set(EVENT__DISABLE_REGRESS   YES CACHE BOOL   "Disable LibEvent regression tests
 set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL   "Disable LibEvent samples"          FORCE)
 set(EVENT__LIBRARY_TYPE "STATIC" CACHE STRING "Use static LibEvent libraries"     FORCE)
 
-# Set options for JsonCPP, disabling all of their tests
-# Additionally, their library is output to a strange location; make sure the linker knows where to find it
+# Set options for JsonCPP, disabling all of their tests:
 set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables")
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
 set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
-link_directories(lib/jsoncpp/src/lib_json)
+
+# Set options for mbedtls:
+set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs.")
+set(ENABLE_TESTING OFF CACHE BOOL "Build mbed TLS tests.")
 
 # Check that the libraries are present:
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
@@ -241,8 +186,8 @@ endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/luaproxy/CMakeLists.txt)
 	message(FATAL_ERROR "luaproxy is missing in folder lib/luaproxy. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/sqlite/CMakeLists.txt)
-	message(FATAL_ERROR "sqlite is missing in folder lib/sqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
+if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/lsqlite/CMakeLists.txt)
+	message(FATAL_ERROR "lsqlite is missing in folder lib/lsqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/tolua++/CMakeLists.txt)
 	message(FATAL_ERROR "tolua++ is missing in folder lib/tolua++. Have you initialized and updated the submodules / downloaded the extra libraries?")
@@ -251,84 +196,66 @@ if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/zlib/CMakeLists.txt)
 	message(FATAL_ERROR "zlib is missing in folder lib/zlib. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
 
-
-
-
-# Include all the libraries:
-add_subdirectory(lib/jsoncpp/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/zlib/)
-add_subdirectory(lib/lua/)
-add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/SQLiteCpp/)
-add_subdirectory(lib/sqlite/)
-add_subdirectory(lib/expat/)
-add_subdirectory(lib/luaexpat/)
-add_subdirectory(lib/libevent/ EXCLUDE_FROM_ALL)
+# Include all the libraries
+# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
+# (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those):
+add_subdirectory(lib/expat)
 add_subdirectory(lib/fmt)
+add_subdirectory(lib/jsoncpp EXCLUDE_FROM_ALL)
+add_subdirectory(lib/libevent EXCLUDE_FROM_ALL)
+add_subdirectory(lib/lsqlite)
+add_subdirectory(lib/lua)
+add_subdirectory(lib/luaexpat)
+add_subdirectory(lib/mbedtls)
+add_subdirectory(lib/SQLiteCpp)
+add_subdirectory(lib/tolua++ EXCLUDE_FROM_ALL)
+add_subdirectory(lib/zlib)
 
+# Add required includes:
+target_include_directories(
+	${CMAKE_PROJECT_NAME} SYSTEM PRIVATE
+	lib/mbedtls/include
+	lib/TCLAP/include
+	lib # TODO fix files including zlib/x instead of x
+)
 
-# Add proper includes for LibEvent's event-config.h header:
-include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
+# Link dependencies as private:
+target_link_libraries(
+	${CMAKE_PROJECT_NAME} PRIVATE
+	event_core
+	event_extra
+	fmt::fmt
+	jsoncpp_lib
+	lsqlite
+	lua
+	luaexpat
+	mbedtls
+	SQLiteCpp
+	tolualib
+	zlib
+)
 
-# Prettify jsoncpp_lib name in VS solution explorer
+# Special case handling for libevent pthreads:
+if(NOT WIN32)
+	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE event_pthreads_static)
+endif()
+
+# Prettify jsoncpp_lib name in VS solution explorer:
 set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
-# jsoncpp uses these for ccache support, clashing with our method
-set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
-set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
 
 if (WIN32)
-	add_subdirectory(lib/luaproxy/)
+	add_subdirectory(lib/luaproxy)
 endif()
 
-# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
-# (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/mbedtls.cmake EXCLUDE_FROM_ALL)
-
-if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
-	# mbed TLS uses the frame pointer's register in inline assembly for its bignum implementation:
-	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
-	target_compile_options(mbedcrypto PRIVATE -fomit-frame-pointer)
-endif()
-
-set_exe_flags()
-
-add_subdirectory(src)
-
+# Self Test Mode enables extra checks at startup
 if(${SELF_TEST})
 	message("Tests enabled")
 	enable_testing()
+	target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SELF_TEST)
 	add_subdirectory(tests)
 endif()
 
-# Put projects into solution folders in MSVC:
-if (MSVC)
-	set_target_properties(
-		event_core_static
-		event_extra_static
-		expat
-		fmt
-		jsoncpp_lib
-		lua
-		luaexpat
-		mbedcrypto
-		mbedtls
-		mbedx509
-		lsqlite
-		SQLiteCpp
-		tolualib
-		zlib
-		PROPERTIES FOLDER Lib
-	)
-	set_target_properties(
-		luaproxy
-		PROPERTIES FOLDER Support
-	)
-
-	if(${BUILD_TOOLS})
-		set_target_properties(
-			MCADefrag
-			ProtoProxy
-			PROPERTIES FOLDER Tools
-		)
-	endif()
-endif()
+include("CMake/Fixups.cmake")
+include("CMake/GenerateBindings.cmake")
+include("CMake/GroupSources.cmake")
+include("CMake/SetCompilerFlags.cmake")

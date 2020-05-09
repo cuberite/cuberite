@@ -1,13 +1,5 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
+find_package(Threads REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-
-add_definitions(-DTEST_GLOBALS=1)
-
-
-
-
 
 # Define individual test executables:
 
@@ -41,7 +33,7 @@ add_executable(BlockTypeRegistryTest
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
-target_link_libraries(BlockTypeRegistryTest fmt::fmt)
+target_link_libraries(BlockTypeRegistryTest fmt::fmt Threads::Threads)
 
 # PalettedBlockAreaTest: Verify that the PalettedBlockArea class works as intended:
 add_executable(PalettedBlockAreaTest

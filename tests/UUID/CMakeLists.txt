@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/UUID.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp

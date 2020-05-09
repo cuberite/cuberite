@@ -19,8 +19,8 @@ local g_ShouldIgnorePkg =
 local g_ShouldIgnoreCMake =
 {
 	["tolua"] = true,
-	["../Bindings/AllToLua.pkg"] = true,
-	["../Bindings/BindingsProcessor.lua"] = true,
+	["Bindings/AllToLua.pkg"] = true,
+	["Bindings/BindingsProcessor.lua"] = true,
 }
 
 
@@ -37,7 +37,7 @@ local function getAllToLuaPkgFiles()
 				if (g_ShouldIgnorePkg[a_FileName]) then
 					return
 				end
-				a_FileName = a_FileName:gsub("../Bindings/", "")  -- Normalize the path
+				a_FileName = a_FileName:gsub("%.%./", "")  -- Normalize the path
 				table.insert(res, a_FileName)
 				res[a_FileName] = true
 			end
@@ -54,7 +54,7 @@ end
 --- Returns a sorted list of all files listed as dependencies in CMakeLists.txt
 -- The returned table has both an array part (list of files) and a dictionary part ("filename" -> true)
 local function getCMakeListsFiles()
-	local f = assert(io.open("CMakeLists.txt", "r"))
+	local f = assert(io.open("../../CMake/GenerateBindings.cmake", "r"))
 	local contents = f:read("*all")
 	f:close()
 	local res = {}
@@ -69,7 +69,6 @@ local function getCMakeListsFiles()
 					if (g_ShouldIgnoreCMake[a_FileName]) then
 						return
 					end
-					a_FileName = a_FileName:gsub("../Bindings/", "")  -- Normalize the path
 					table.insert(res, a_FileName)
 					res[a_FileName] = true
 				end

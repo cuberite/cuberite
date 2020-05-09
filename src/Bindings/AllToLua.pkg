@@ -36,11 +36,12 @@ $cfile "../IniFile.h"
 
 $cfile "../OSSupport/File.h"
 
-$cfile "LuaFunctions.h"
-$cfile "PluginManager.h"
-$cfile "Plugin.h"
-$cfile "PluginLua.h"
-$cfile "LuaWindow.h"
+// Extra indirection as CheckBindingsDependencies assumes working directory is sources root:
+$cfile "../Bindings/LuaFunctions.h"
+$cfile "../Bindings/PluginManager.h"
+$cfile "../Bindings/Plugin.h"
+$cfile "../Bindings/PluginLua.h"
+$cfile "../Bindings/LuaWindow.h"
 
 $cfile "../BlockType.h"
 $cfile "../BlockInfo.h"

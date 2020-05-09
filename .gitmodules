@@ -47,10 +47,9 @@
 	path = lib/luaproxy
 	url = https://github.com/cuberite/luaproxy.git
 	ignore = dirty
-[submodule "lib/sqlite"]
-	path = lib/sqlite
-	url = https://github.com/cuberite/sqlite.git
-	ignore = dirty
+[submodule "lib/lsqlite"]
+	path = lib/lsqlite
+	url = https://github.com/cuberite/sqlite
 [submodule "lib/tolua++"]
 	path = lib/tolua++
 	url = https://github.com/cuberite/toluapp.git

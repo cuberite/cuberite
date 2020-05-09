@@ -15,7 +15,8 @@ if [ `which ccache` ]; then
 	ccache -z # Zero statistics
 fi
 
-cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 ${CACHE_ARGS};
+# Turn off PCH to work around a Clang Travis issue with failing builds
+cmake . -DBUILD_TOOLS=YES -DPRECOMPILE_HEADERS=NO -DSELF_TEST=YES ${CACHE_ARGS};
 
 echo "Building..."
 cmake --build . -j 2
