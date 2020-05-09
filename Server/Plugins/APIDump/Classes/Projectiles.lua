@@ -302,10 +302,6 @@ return
 			{
 				Notes = "The projectile is a (flying) {{cFireworkEntity|firework}}",
 			},
-			pkFishingFloat =
-			{
-				Notes = "The projectile is a {{cFloater|fishing float}}",
-			},
 			pkGhastFireball =
 			{
 				Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}",
