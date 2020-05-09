@@ -390,6 +390,13 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 	#error TOLUA_EXPOSITION should never actually be defined
 #endif
 
+template <typename T>
+auto ToUnsigned(T a_Val)
+{
+	ASSERT(a_Val >= 0);
+	return static_cast<std::make_unsigned_t<T>>(a_Val);
+}
+
 
 
 
