@@ -266,11 +266,8 @@ add_subdirectory(lib/fmt)
 # Add proper includes for LibEvent's event-config.h header:
 include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 
-# Prettify jsoncpp_lib_static name in VS solution explorer
-set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")
-# jsoncpp uses these for ccache support, clashing with our method
-set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
-set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
+# Prettify jsoncpp_lib name in VS solution explorer
+set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
 
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
@@ -303,7 +300,7 @@ if (MSVC)
 		event_extra_static
 		expat
 		fmt
-		jsoncpp_lib_static
+		jsoncpp_lib
 		lua
 		luaexpat
 		mbedcrypto
