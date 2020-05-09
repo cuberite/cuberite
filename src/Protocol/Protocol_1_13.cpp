@@ -27,6 +27,7 @@ Implements the 1.13 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
+#include "../JsonUtils.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -253,9 +254,8 @@ void cProtocol_1_13::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 

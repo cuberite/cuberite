@@ -26,11 +26,12 @@ add_executable(BlockTypePaletteTest
 	../TestHelpers.h
 	${CMAKE_SOURCE_DIR}/src/BlockState.cpp
 	${CMAKE_SOURCE_DIR}/src/BlockTypePalette.cpp
+	${CMAKE_SOURCE_DIR}/src/JsonUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/File.cpp
 )
-target_link_libraries(BlockTypePaletteTest fmt::fmt jsoncpp_lib_static)
+target_link_libraries(BlockTypePaletteTest fmt::fmt jsoncpp_lib)
 
 # BlockTypeRegistryTest: Verify that the BlockTypeRegistry class works as intended:
 add_executable(BlockTypeRegistryTest
@@ -50,11 +51,12 @@ add_executable(PalettedBlockAreaTest
 	${CMAKE_SOURCE_DIR}/src/BlockTypeRegistry.cpp
 	${CMAKE_SOURCE_DIR}/src/BlockTypePalette.cpp
 	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
+	${CMAKE_SOURCE_DIR}/src/JsonUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/PalettedBlockArea.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
-target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_lib_static)
+target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_lib)
 
 # Extra files for BlockTypePalette test:
 file (COPY

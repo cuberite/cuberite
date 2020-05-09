@@ -16,6 +16,7 @@
 #include "../SetChunkData.h"
 #include "../Root.h"
 #include "../BlockType.h"
+#include "../JsonUtils.h"
 
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
@@ -830,8 +831,7 @@ AString cWSSAnvil::DecodeSignLine(const AString & a_Line)
 
 	// Try to parse the JSON:
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(a_Line, root, false) || !root.isObject())
+	if (!JsonUtils::ParseString(a_Line, root) || !root.isObject())
 	{
 		return a_Line;
 	}

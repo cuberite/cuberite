@@ -28,6 +28,7 @@
 #include "../Blocks/ChunkInterface.h"
 
 #include "../IniFile.h"
+#include "../JsonUtils.h"
 #include "json/json.h"
 
 // 6000 ticks or 5 minutes
@@ -2196,10 +2197,13 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 	// Parse the JSON format:
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(buffer, root, false))
+	AString ParseError;
+	if (!JsonUtils::ParseString(buffer, root, &ParseError))
 	{
-		LOGWARNING("Cannot parse player data in file \"%s\"", a_FileName.c_str());
+		FLOGWARNING(
+			"Cannot parse player data in file \"{0}\":\n  {1}",
+			a_FileName, ParseError
+		);
 		return false;
 	}
 
@@ -2369,9 +2373,7 @@ bool cPlayer::SaveToDisk()
 		root["gamemode"] = static_cast<int>(eGameMode_NotSet);
 	}
 
-	Json::StyledWriter writer;
-	std::string JsonData = writer.write(root);
-
+	auto JsonData = JsonUtils::WriteStyledString(root);
 	AString SourceFile = GetUUIDFileName(m_UUID);
 
 	cFile f;

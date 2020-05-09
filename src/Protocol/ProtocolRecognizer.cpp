@@ -19,6 +19,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
+#include "../JsonUtils.h"
 #include "../Bindings/PluginManager.h"
 
 
@@ -1222,8 +1223,7 @@ void cProtocolRecognizer::HandlePacketStatusRequest(void)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);

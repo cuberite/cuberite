@@ -27,7 +27,7 @@ Implements the 1.9 protocol classes:
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../Statistics.h"
-#include "../World.h"
+#include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 
@@ -702,8 +702,7 @@ void cProtocol_1_9_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	auto Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
@@ -2281,8 +2280,7 @@ void cProtocol_1_9_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
@@ -2339,8 +2337,7 @@ void cProtocol_1_9_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
@@ -2397,8 +2394,7 @@ void cProtocol_1_9_4::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
@@ -2439,19 +2435,18 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	Writer.AddInt("z",        a_BlockZ);
 	Writer.AddString("id", "Sign");
 
-	Json::StyledWriter JsonWriter;
 	Json::Value Line1;
 	Line1["text"] = a_Line1;
-	Writer.AddString("Text1", JsonWriter.write(Line1));
+	Writer.AddString("Text1", JsonUtils::WriteFastString(Line1));
 	Json::Value Line2;
 	Line2["text"] = a_Line2;
-	Writer.AddString("Text2", JsonWriter.write(Line2));
+	Writer.AddString("Text2", JsonUtils::WriteFastString(Line2));
 	Json::Value Line3;
 	Line3["text"] = a_Line3;
-	Writer.AddString("Text3", JsonWriter.write(Line3));
+	Writer.AddString("Text3", JsonUtils::WriteFastString(Line3));
 	Json::Value Line4;
 	Line4["text"] = a_Line4;
-	Writer.AddString("Text4", JsonWriter.write(Line4));
+	Writer.AddString("Text4", JsonUtils::WriteFastString(Line4));
 
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
