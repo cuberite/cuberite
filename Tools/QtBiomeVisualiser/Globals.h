@@ -249,11 +249,6 @@ around it, "(32 KiB)") */
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
-// Same as assert but in all Self test builds
-#ifdef SELF_TEST
-	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
-#endif
-
 // C++11 has std::shared_ptr in <memory>, included earlier
 #define SharedPtr std::shared_ptr
 

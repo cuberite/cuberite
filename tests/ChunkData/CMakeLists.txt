@@ -1,10 +1,5 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
-
-add_definitions(-DTEST_GLOBALS=1)
 add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
 
 target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
@@ -43,5 +38,5 @@ set_target_properties(
 )
 set_target_properties(
 	ChunkBuffer
-	PROPERTIES FOLDER Lib
+	PROPERTIES FOLDER Tests/Libraries
 )

@@ -15,6 +15,8 @@
 
 
 
+#pragma once
+
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"

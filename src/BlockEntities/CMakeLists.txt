@@ -1,5 +1,6 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	BeaconEntity.cpp
 	BedEntity.cpp
 	BlockEntity.cpp
@@ -19,9 +20,7 @@ SET (SRCS
 	MobSpawnerEntity.cpp
 	NoteEntity.cpp
 	SignEntity.cpp
-)
 
-SET (HDRS
 	BeaconEntity.h
 	BedEntity.h
 	BlockEntity.h
@@ -42,8 +41,3 @@ SET (HDRS
 	NoteEntity.h
 	SignEntity.h
 )
-
-if(NOT MSVC)
-	add_library(BlockEntities ${SRCS} ${HDRS})
-	target_link_libraries(BlockEntities fmt::fmt SQLiteCpp)
-endif()

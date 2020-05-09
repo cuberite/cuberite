@@ -21,7 +21,6 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-include(../../lib/mbedtls.cmake)
 add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
 
 set_exe_flags()

@@ -26,6 +26,13 @@ Regular upscaling takes two arrays and "moves" the input from src to dst; src is
 
 
 
+
+#pragma once
+
+
+
+
+
 /**
 Linearly interpolates values in the array between the equidistant anchor points (upscales).
 Works in-place (input is already present at the correct output coords)

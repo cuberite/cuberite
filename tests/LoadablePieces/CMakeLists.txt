@@ -1,10 +1,6 @@
-enable_testing()
-
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_definitions(-DTEST_GLOBALS=1)
 
 set (SHARED_SRCS
 	${CMAKE_SOURCE_DIR}/src/BiomeDef.cpp
@@ -75,8 +71,8 @@ set (SRCS
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors")
-	add_flags_cxx("-Wno-error=switch-enum")
+	add_compile_options("-Wno-error=global-constructors")
+	add_compile_options("-Wno-error=switch-enum")
 endif()
 
 

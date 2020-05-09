@@ -9,7 +9,10 @@ ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE "$@" $REGEX"
 # Generate the compilation database
 mkdir -p tidy-build
 cd tidy-build
-cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+# Disable precompiled headers since they aren't generated during linting which causes an error
+# Disable unity builds since clang-tidy needs the full list of compiled files to check each one
+cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPRECOMPILE_HEADERS=OFF -DUNITY_BUILDS=OFF ..
 
 # Ensure LuaState_Typedefs.inc has been generated
 (cd ../src/Bindings && lua BindingsProcessor.lua)
