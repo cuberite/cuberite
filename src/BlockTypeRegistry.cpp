@@ -15,11 +15,11 @@ BlockInfo::BlockInfo(
 	const std::map<AString, AString> & aHints,
 	const std::map<AString, BlockInfo::HintCallback> & aHintCallbacks
 ):
-	mPluginName(aPluginName),
-	mBlockTypeName(aBlockTypeName),
-	mHandler(aHandler),
-	mHints(aHints),
-	mHintCallbacks(aHintCallbacks)
+	m_PluginName(aPluginName),
+	m_BlockTypeName(aBlockTypeName),
+	m_Handler(aHandler),
+	m_Hints(aHints),
+	m_HintCallbacks(aHintCallbacks)
 {
 }
 
@@ -33,16 +33,16 @@ AString BlockInfo::hintValue(
 )
 {
 	// Search the hint callbacks first:
-	auto itrC = mHintCallbacks.find(aHintName);
-	if (itrC != mHintCallbacks.end())
+	auto itrC = m_HintCallbacks.find(aHintName);
+	if (itrC != m_HintCallbacks.end())
 	{
 		// Hint callback found, use it:
-		return itrC->second(mBlockTypeName, aBlockState);
+		return itrC->second(m_BlockTypeName, aBlockState);
 	}
 
 	// Search the static hints:
-	auto itr = mHints.find(aHintName);
-	if (itr != mHints.end())
+	auto itr = m_Hints.find(aHintName);
+	if (itr != m_Hints.end())
 	{
 		// Hint found, use it:
 		return itr->second;
@@ -58,14 +58,14 @@ AString BlockInfo::hintValue(
 
 void BlockInfo::setHint(const AString & aHintKey, const AString & aHintValue)
 {
-	mHints[aHintKey] = aHintValue;
+	m_Hints[aHintKey] = aHintValue;
 
 	// Warn if the hint is already provided by a callback (aHintValue will be ignored when evaluating the hint):
-	auto itrC = mHintCallbacks.find(aHintKey);
-	if (itrC != mHintCallbacks.end())
+	auto itrC = m_HintCallbacks.find(aHintKey);
+	if (itrC != m_HintCallbacks.end())
 	{
 		LOGINFO("Setting a static hint %s for block type %s, but there's already a callback for that hint. The static hint will be ignored.",
-			aHintKey.c_str(), mBlockTypeName.c_str()
+			aHintKey.c_str(), m_BlockTypeName.c_str()
 		);
 	}
 }
@@ -76,7 +76,7 @@ void BlockInfo::setHint(const AString & aHintKey, const AString & aHintValue)
 
 void BlockInfo::removeHint(const AString & aHintKey)
 {
-	mHints.erase(aHintKey);
+	m_Hints.erase(aHintKey);
 }
 
 
@@ -97,9 +97,9 @@ void BlockTypeRegistry::registerBlockType(
 	auto blockInfo = std::make_shared<BlockInfo>(aPluginName, aBlockTypeName, aHandler, aHints, aHintCallbacks);
 
 	// Check previous registrations:
-	cCSLock lock(mCSRegistry);
-	auto itr = mRegistry.find(aBlockTypeName);
-	if (itr != mRegistry.end())
+	cCSLock lock(m_CSRegistry);
+	auto itr = m_Registry.find(aBlockTypeName);
+	if (itr != m_Registry.end())
 	{
 		if (itr->second->pluginName() != aPluginName)
 		{
@@ -108,7 +108,7 @@ void BlockTypeRegistry::registerBlockType(
 	}
 
 	// Store the registration:
-	mRegistry[aBlockTypeName] = blockInfo;
+	m_Registry[aBlockTypeName] = blockInfo;
 }
 
 
@@ -117,9 +117,9 @@ void BlockTypeRegistry::registerBlockType(
 
 std::shared_ptr<BlockInfo> BlockTypeRegistry::blockInfo(const AString & aBlockTypeName)
 {
-	cCSLock lock(mCSRegistry);
-	auto itr = mRegistry.find(aBlockTypeName);
-	if (itr == mRegistry.end())
+	cCSLock lock(m_CSRegistry);
+	auto itr = m_Registry.find(aBlockTypeName);
+	if (itr == m_Registry.end())
 	{
 		return nullptr;
 	}
@@ -132,12 +132,12 @@ std::shared_ptr<BlockInfo> BlockTypeRegistry::blockInfo(const AString & aBlockTy
 
 void BlockTypeRegistry::removeAllByPlugin(const AString & aPluginName)
 {
-	cCSLock lock(mCSRegistry);
-	for (auto itr = mRegistry.begin(); itr != mRegistry.end();)
+	cCSLock lock(m_CSRegistry);
+	for (auto itr = m_Registry.begin(); itr != m_Registry.end();)
 	{
 		if (itr->second->pluginName() == aPluginName)
 		{
-			itr = mRegistry.erase(itr);
+			itr = m_Registry.erase(itr);
 		}
 		else
 		{
@@ -156,9 +156,9 @@ void BlockTypeRegistry::setBlockTypeHint(
 	const AString & aHintValue
 )
 {
-	cCSLock lock(mCSRegistry);
-	auto blockInfo = mRegistry.find(aBlockTypeName);
-	if (blockInfo == mRegistry.end())
+	cCSLock lock(m_CSRegistry);
+	auto blockInfo = m_Registry.find(aBlockTypeName);
+	if (blockInfo == m_Registry.end())
 	{
 		throw NotRegisteredException(aBlockTypeName, aHintKey, aHintValue);
 	}
@@ -174,9 +174,9 @@ void BlockTypeRegistry::removeBlockTypeHint(
 	const AString & aHintKey
 )
 {
-	cCSLock lock(mCSRegistry);
-	auto blockInfo = mRegistry.find(aBlockTypeName);
-	if (blockInfo == mRegistry.end())
+	cCSLock lock(m_CSRegistry);
+	auto blockInfo = m_Registry.find(aBlockTypeName);
+	if (blockInfo == m_Registry.end())
 	{
 		return;
 	}
@@ -195,8 +195,8 @@ BlockTypeRegistry::AlreadyRegisteredException::AlreadyRegisteredException(
 	std::shared_ptr<BlockInfo> aNewRegistration
 ) :
 	Super(message(aPreviousRegistration, aNewRegistration)),
-	mPreviousRegistration(aPreviousRegistration),
-	mNewRegistration(aNewRegistration)
+	m_PreviousRegistration(aPreviousRegistration),
+	m_NewRegistration(aNewRegistration)
 {
 }
 
