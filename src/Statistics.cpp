@@ -6,6 +6,10 @@
 #include "Statistics.h"
 
 
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 
 cStatInfo cStatInfo::ms_Info[statCount] =
 {
@@ -75,6 +79,10 @@ cStatInfo cStatInfo::ms_Info[statCount] =
 	cStatInfo(statJunkFished,     "stat.junkFished"),
 	cStatInfo(statTreasureFished, "stat.treasureFished")
 };
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
 
 
 
