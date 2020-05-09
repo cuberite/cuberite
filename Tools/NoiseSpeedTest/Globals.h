@@ -230,3 +230,10 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 {
 	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
 }
+
+template <typename T>
+auto ToUnsigned(T a_Val)
+{
+	ASSERT(a_Val >= 0);
+	return static_cast<std::make_unsigned_t<T>>(a_Val);
+}
