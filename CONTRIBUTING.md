@@ -14,7 +14,7 @@ When contributing, you must follow our code conventions. Otherwise, CI builds wi
 
 Here are the conventions:
 
- - We use the subset of C++11 supported by MSVC 2013 (ask if you think that something outside of this subset would be useful)
+ - We use C++17.
  - All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  - Use spaces after the comment markers: `// Comment` instead of `//Comment`. A comment must be prefixed with two spaces if it's on the same line with code:
    - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
