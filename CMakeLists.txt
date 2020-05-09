@@ -251,7 +251,7 @@ endif()
 
 
 # Include all the libraries:
-add_subdirectory(lib/jsoncpp/)
+add_subdirectory(lib/jsoncpp/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
@@ -268,6 +268,9 @@ include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 
 # Prettify jsoncpp_lib name in VS solution explorer
 set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
+# jsoncpp uses these for ccache support, clashing with our method
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
 
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
