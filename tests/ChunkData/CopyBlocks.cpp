@@ -32,7 +32,7 @@ static void test()
 			delete a_Ptr;
 		}
 
-		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const NOEXCEPT override
+		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const noexcept override
 		{
 			return false;
 		}

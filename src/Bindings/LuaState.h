@@ -78,7 +78,7 @@ public:
 				}
 			}
 
-			~cStackBalanceCheck() CAN_THROW
+			~cStackBalanceCheck() noexcept(false)
 			{
 				auto currStackPos = lua_gettop(m_LuaState);
 				if (currStackPos != m_StackPos)
@@ -118,7 +118,7 @@ public:
 		{
 		}
 
-		~cStackBalancePopper() CAN_THROW
+		~cStackBalancePopper() noexcept(false)
 		{
 			auto curTop = lua_gettop(m_LuaState);
 			if (curTop > m_Count)
@@ -478,7 +478,7 @@ public:
 			std::swap(m_StackLen, a_Src.m_StackLen);
 		}
 
-		~cStackValue() CAN_THROW
+		~cStackValue() noexcept(false)
 		{
 			if (m_LuaState != nullptr)
 			{

@@ -39,7 +39,7 @@ class cNetworkSingleton
 {
 public:
 	cNetworkSingleton();
-	~cNetworkSingleton() CAN_THROW;
+	~cNetworkSingleton() noexcept(false);
 
 	/** Returns the singleton instance of this class */
 	static cNetworkSingleton & Get(void);
