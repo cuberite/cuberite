@@ -25,18 +25,9 @@ class cBlockIDMap
 	typedef std::map<AString, std::pair<short, short>, Comparator> ItemMap;
 
 public:
-	static bool m_bHasRunInit;
 
 	cBlockIDMap(void)
 	{
-		// Dont load items.ini on construct, this will search the wrong path when running as a service.
-	}
-
-
-	void init()
-	{
-		m_bHasRunInit = true;
-
 		cIniFile Ini;
 		if (!Ini.ReadFile("items.ini"))
 		{
@@ -189,8 +180,11 @@ protected:
 
 
 
-bool cBlockIDMap::m_bHasRunInit = false;
-static cBlockIDMap gsBlockIDMap;
+static cBlockIDMap & GetBlockIDMap()
+{
+	static cBlockIDMap IDMap;
+	return IDMap;
+}
 
 
 
@@ -224,11 +218,7 @@ int BlockStringToType(const AString & a_BlockTypeString)
 		return res;
 	}
 
-	if (!gsBlockIDMap.m_bHasRunInit)
-	{
-		gsBlockIDMap.init();
-	}
-	return gsBlockIDMap.Resolve(TrimString(a_BlockTypeString));
+	return GetBlockIDMap().Resolve(TrimString(a_BlockTypeString));
 }
 
 
@@ -243,11 +233,7 @@ bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 		ItemName = ItemName.substr(10);
 	}
 
-	if (!gsBlockIDMap.m_bHasRunInit)
-	{
-		gsBlockIDMap.init();
-	}
-	return gsBlockIDMap.ResolveItem(ItemName, a_Item);
+	return GetBlockIDMap().ResolveItem(ItemName, a_Item);
 }
 
 
@@ -256,11 +242,7 @@ bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 
 AString ItemToString(const cItem & a_Item)
 {
-	if (!gsBlockIDMap.m_bHasRunInit)
-	{
-		gsBlockIDMap.init();
-	}
-	return gsBlockIDMap.Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
+	return GetBlockIDMap().Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
 }
 
 
@@ -269,11 +251,7 @@ AString ItemToString(const cItem & a_Item)
 
 AString ItemTypeToString(short a_ItemType)
 {
-	if (!gsBlockIDMap.m_bHasRunInit)
-	{
-		gsBlockIDMap.init();
-	}
-	return gsBlockIDMap.Desolve(a_ItemType, -1);
+	return GetBlockIDMap().Desolve(a_ItemType, -1);
 }
 
 

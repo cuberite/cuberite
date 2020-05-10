@@ -36,12 +36,7 @@
 
 
 
-#ifdef __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wglobal-constructors"
-#endif
-
-static const Vector3i gCrossCoords[] =
+static constexpr Vector3i gCrossCoords[] =
 {
 	{ 1, 0,  0},
 	{-1, 0,  0},
@@ -53,7 +48,7 @@ static const Vector3i gCrossCoords[] =
 
 
 
-static const Vector3i gNeighborCoords[] =
+static constexpr Vector3i gNeighborCoords[] =
 {
 	{ 1,  0,  0},
 	{-1,  0,  0},
@@ -61,11 +56,7 @@ static const Vector3i gNeighborCoords[] =
 	{ 0, -1,  0},
 	{ 0,  0,  1},
 	{ 0,  0, -1},
-} ;
-
-#ifdef __clang__
-	#pragma clang diagnostic pop
-#endif
+};
 
 
 

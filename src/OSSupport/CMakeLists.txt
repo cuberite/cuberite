@@ -40,10 +40,6 @@ SET (HDRS
 	WinStackWalker.h
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors ")
-endif()
-
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
 	target_link_libraries(OSSupport fmt::fmt)

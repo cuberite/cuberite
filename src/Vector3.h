@@ -17,8 +17,8 @@ public:
 	T x, y, z;
 
 
-	inline Vector3(void) : x(0), y(0), z(0) {}
-	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
+	constexpr Vector3(void) : x(0), y(0), z(0) {}
+	constexpr Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
 	#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
@@ -31,7 +31,12 @@ public:
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
 	template <typename U, typename = typename std::enable_if<!std::is_same<U, T>::value>::type>
-	Vector3(const Vector3<U> & a_Rhs): x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	constexpr Vector3(const Vector3<U> & a_Rhs):
+			x(static_cast<T>(a_Rhs.x)),
+			y(static_cast<T>(a_Rhs.y)),
+			z(static_cast<T>(a_Rhs.z))
+	{
+	}
 	// tolua_begin
 
 	inline void Set(T a_x, T a_y, T a_z)
