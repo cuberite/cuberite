@@ -230,7 +230,7 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 		{
 			return cpp14::make_unique<cVanillaCPPConsoleListener>();
 		}
-	#elif (defined (__linux) && !defined(ANDROID)) || defined (__APPLE__)
+	#elif defined (__linux) || defined (__APPLE__)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
 		{
