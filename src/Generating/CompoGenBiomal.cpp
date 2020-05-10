@@ -48,7 +48,7 @@ public:
 	const BlockInfo * Get(void) const { return m_Pattern; }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::Height];
+	BlockInfo m_Pattern[cChunkDef::Height] = {};
 } ;
 
 
