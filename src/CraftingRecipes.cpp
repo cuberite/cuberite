@@ -268,6 +268,7 @@ void cCraftingRecipe::Dump(void)
 cCraftingRecipes::cCraftingRecipes(void)
 {
 	LoadRecipes();
+	PopulateRecipeNameMap();
 }
 
 
@@ -286,7 +287,7 @@ cCraftingRecipes::~cCraftingRecipes()
 bool cCraftingRecipes::isNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
 {
 	bool ContainsNewItem = false;
-	for (auto Ingredient : a_Recipe->m_Ingredients)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
 		if (
 			(Ingredient.m_Item.m_ItemType == a_Item.m_ItemType) &&
@@ -313,7 +314,7 @@ bool cCraftingRecipes::isNewCraftableRecipe(const cRecipe * a_Recipe, const cIte
 std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
 {
 	std::vector<UInt32> Recipes;
-	for (UInt32 i = 0; i<m_Recipes.size(); i++)
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
 	{
 		if (m_Recipes[i]->m_RecipeName.empty())
 		{
@@ -333,15 +334,7 @@ std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item
 
 std::map<AString, UInt32> cCraftingRecipes::getRecipeNameMap()
 {
-	std::map<AString, UInt32> RecipeNameMap;
-	for (UInt32 i=0; i<m_Recipes.size(); i++)
-	{
-		if (!m_Recipes[i]->m_RecipeName.empty())
-		{
-			RecipeNameMap.emplace(m_Recipes[i]->m_RecipeName, i + 1);
-		}
-	}
-	return RecipeNameMap;
+	return m_RecipeNameMap;
 }
 
 
@@ -429,6 +422,22 @@ void cCraftingRecipes::LoadRecipes(void)
 
 
 
+void cCraftingRecipes::PopulateRecipeNameMap(void)
+{
+	std::map<AString, UInt32> RecipeNameMap;
+	for (UInt32 i=0; i < m_Recipes.size(); i++)
+	{
+		if (!m_Recipes[i]->m_RecipeName.empty())
+		{
+			m_RecipeNameMap.emplace(m_Recipes[i]->m_RecipeName, i + 1);
+		}
+	}
+}
+
+
+
+
+
 void cCraftingRecipes::ClearRecipes(void)
 {
 	for (cRecipes::iterator itr = m_Recipes.begin(); itr != m_Recipes.end(); ++itr)
@@ -459,7 +468,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = cpp14::make_unique<cCraftingRecipes::cRecipe>();
 
 	AStringVector RecipeSplit = StringSplit(Sides[0], ":");
-	AString resultPart = RecipeSplit[0];
+	auto & resultPart = RecipeSplit[0];
 	if (RecipeSplit.size() > 1)
 	{
 		resultPart = RecipeSplit[1];

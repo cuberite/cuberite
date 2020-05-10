@@ -181,6 +181,9 @@ public:
 	/** Loads the given Recipe into the crafting grid */
 	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
 
+	/** Returns the specific SlotArea */
+	cSlotArea * GetSlotArea(UInt32 a_SlotAreaIndex);
+
 protected:
 	cSlotAreas m_SlotAreas;
 

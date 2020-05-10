@@ -768,8 +768,7 @@ void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 
 
 
-void cWindow::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
+cSlotArea * cWindow::GetSlotArea(UInt32 a_SlotAreaIndex)
 {
-	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(m_SlotAreas[0]);
-	slotAreaCrafting->LoadRecipe(a_Player, a_RecipeId);
+	return m_SlotAreas[a_SlotAreaIndex];
 }

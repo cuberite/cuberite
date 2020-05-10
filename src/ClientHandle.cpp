@@ -3149,7 +3149,9 @@ void cClientHandle::SendInitRecipes(UInt32 a_RecipeId)
 
 void cClientHandle::HandleCraftRecipe(UInt32 a_RecipeId)
 {
-	m_Player->GetWindow()->LoadRecipe(*m_Player, a_RecipeId);
+	auto SlotArea = m_Player->GetWindow()->GetSlotArea(0);
+	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(SlotArea);
+	slotAreaCrafting->LoadRecipe(*m_Player, a_RecipeId);
 }
 
 

@@ -1025,7 +1025,10 @@ void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, RecipeID);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    MakeAll);
 	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
-	m_Client->HandleCraftRecipe(CuberiteRecipeId);
+	if (CuberiteRecipeId.has_value())
+	{
+		m_Client->HandleCraftRecipe(CuberiteRecipeId.value());
+	}
 }
 
 
@@ -1420,14 +1423,16 @@ void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	UInt32 ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
-
-	cPacketizer Pkt(*this, pktUnlockRecipe);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteBool(true);
-	Pkt.WriteBool(false);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteVarInt32(ProtocolRecipeId);
+	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	if (ProtocolRecipeId.has_value())
+	{
+		cPacketizer Pkt(*this, pktUnlockRecipe);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteBool(true);
+		Pkt.WriteBool(false);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+	}
 }
 
 
@@ -1439,22 +1444,24 @@ void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
 	// Translate ID here
 	ASSERT(m_State == 3);  // In game mode?
 
-	UInt32 ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
-
-	cPacketizer Pkt(*this, pktUnlockRecipe);
-	Pkt.WriteVarInt32(0);
-	Pkt.WriteBool(true);
-	Pkt.WriteBool(false);
-	if (a_RecipeID == 0)
+	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	if (ProtocolRecipeId.has_value())
 	{
+		cPacketizer Pkt(*this, pktUnlockRecipe);
 		Pkt.WriteVarInt32(0);
-		Pkt.WriteVarInt32(0);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId);
+		Pkt.WriteBool(true);
+		Pkt.WriteBool(false);
+		if (a_RecipeID == 0)
+		{
+			Pkt.WriteVarInt32(0);
+			Pkt.WriteVarInt32(0);
+		}
+		else
+		{
+			Pkt.WriteVarInt32(1);
+			Pkt.WriteVarInt32(ProtocolRecipeId.value());
+			Pkt.WriteVarInt32(1);
+			Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		}
 	}
 }

@@ -789,7 +789,7 @@ void cSlotAreaCrafting::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
 	}
 	cCraftingRecipes::cRecipe * Recipe = cRoot::Get()->GetCraftingRecipes()->getRecipeById(a_RecipeId);
 
-	std::list<cItem> usedItems;
+	std::vector<cItem> usedItems;
 	ClearCraftingGrid(a_Player);
 
 	for (auto itrS = Recipe->m_Ingredients.begin(); itrS != Recipe->m_Ingredients.end(); ++itrS)

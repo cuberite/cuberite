@@ -2393,7 +2393,7 @@ bool cPlayer::SaveToDisk()
 	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
 
 	Json::Value JSON_KnownItems;
-	for (auto KnownItem : m_KnownItems)
+	for (const auto & KnownItem : m_KnownItems)
 	{
 		Json::Value JSON_Item;
 		KnownItem.GetJson(JSON_Item);

@@ -185,4 +185,9 @@ private:
 	/** Checks if all ingredients of the recipe are within the know items list and if the (new) ItemId is part of the ingredients. This makes sure to only find 'new' recipes */
 	bool isNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
 
+	/** Mapping the minecraft recipe names to the internal cuberite recipe Ids */
+	std::map<AString, UInt32> m_RecipeNameMap;
+
+	/** Populates the RecipeNameMap */
+	void PopulateRecipeNameMap(void);
 } ;
