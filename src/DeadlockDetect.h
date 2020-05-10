@@ -80,7 +80,7 @@ protected:
 	/** Called when a deadlock is detected in a world. Aborts the server.
 	a_WorldName is the name of the world whose age has triggered the detection.
 	a_WorldAge is the age (in ticks) in which the world is stuck. */
-	NORETURN void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
+	[[noreturn]] void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
 
 	/** Outputs a listing of the tracked CSs, together with their name and state. */
 	void ListTrackedCSs();

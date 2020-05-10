@@ -37,7 +37,7 @@ class cNBTParseErrorCategory final :
 	cNBTParseErrorCategory() = default;
 public:
 	/** Category name */
-	virtual const char * name() const NOEXCEPT override
+	virtual const char * name() const noexcept override
 	{
 		return "NBT parse error";
 	}
@@ -46,7 +46,7 @@ public:
 	virtual AString message(int a_Condition) const override;
 
 	/** Returns the canonical error category instance. */
-	static const cNBTParseErrorCategory & Get() NOEXCEPT
+	static const cNBTParseErrorCategory & Get() noexcept
 	{
 		static cNBTParseErrorCategory Category;
 		return Category;
@@ -123,7 +123,7 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 
 
 
-std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
+std::error_code make_error_code(eNBTParseError a_Err) noexcept
 {
 	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
 }
