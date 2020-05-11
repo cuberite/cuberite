@@ -39,4 +39,4 @@ endif()
 
 # Put all files into one project, separate by the folders:
 get_property(TARGET_SOURCE_FILES TARGET ${CMAKE_PROJECT_NAME} PROPERTY SOURCES)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src FILES ${TARGET_SOURCE_FILES})
+source_group(TREE "${PROJECT_SOURCE_DIR}/src" FILES ${TARGET_SOURCE_FILES})

@@ -8,14 +8,19 @@ export CUBERITE_BUILD_DATETIME=`date`
 
 # Use ccache if available
 if [ `which ccache` ]; then
+	# Re-run compile on pre-processed sources on cache miss (slightly faster?)
 	export CCACHE_CPP2=true
+
+	# Tell CMake of ccache's existence
 	CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+
 	echo "Using ccache installed at $(which ccache)"
 	ccache --max-size=3G
 	ccache -z # Zero statistics
 fi
 
-# Turn off PCH to work around a Clang Travis issue with failing builds
+# Work around a Clang + ccache issue with failing builds
+# by disabling precompiled headers
 cmake . -DBUILD_TOOLS=YES -DPRECOMPILE_HEADERS=NO -DSELF_TEST=YES ${CACHE_ARGS};
 
 echo "Building..."

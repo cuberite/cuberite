@@ -168,26 +168,11 @@ foreach(folder ${FOLDERS})
 	add_subdirectory(${folder})
 endforeach(folder)
 
-# TODO: CMake includes PCH in every source file
-# Remove when every build has PCH enabled:
 file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
 	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/src/Globals.h\"\n")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/include/")
-
-# Enable PCH
-# TODO: upgrade CMake version and remove guard:
-if (PRECOMPILE_HEADERS AND CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
-	target_precompile_headers(${CMAKE_PROJECT_NAME} PRIVATE Globals.h)
-else()
-	message(WARNING "Precompiled headers for FASTER BUILDS not enabled, upgrade to CMake 1.16 or newer!")
-endif()
-
-# Link process information library:
-if (WIN32)
-	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Psapi.lib)
-endif()
 
 # Output the executable into the $/Server folder, so that it has access to external resources:
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES

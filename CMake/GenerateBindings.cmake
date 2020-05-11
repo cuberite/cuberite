@@ -99,9 +99,9 @@ set(BINDING_OUTPUTS
 )
 
 # Make the file paths absolute and pointing to the bindings folder:
-set(BINDINGS_FOLDER "${PROJECT_SOURCE_DIR}/src/Bindings/")
+set(BINDINGS_FOLDER "${CMAKE_SOURCE_DIR}/src/Bindings/")
 list(TRANSFORM BINDING_OUTPUTS PREPEND ${BINDINGS_FOLDER})
-list(TRANSFORM BINDING_DEPENDENCIES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+list(TRANSFORM BINDING_DEPENDENCIES PREPEND "${CMAKE_SOURCE_DIR}/src/")
 
 # Generate the bindings:
 add_custom_command(

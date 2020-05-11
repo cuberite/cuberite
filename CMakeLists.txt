@@ -24,6 +24,7 @@ project(
 option(BUILD_TOOLS "Sets up additional executables to be built along with the server" OFF)
 option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
 option(SELF_TEST "Enables testing code to be built" OFF)
+option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
 
 # These env variables are used for configuring Travis CI builds.
 if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
@@ -120,14 +121,10 @@ if(${BUILD_UNSTABLE_TOOLS})
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
-
-add_executable(${CMAKE_PROJECT_NAME})
-add_subdirectory(src)
-
-# Set the startup project to Cuberite, and the debugger dir:
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
+include(SetFlags.cmake)
+set_flags()
+set_lib_flags()
+enable_profile()
 
 # Set options for SQLiteCpp, disable all their tests and lints:
 set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
@@ -186,8 +183,8 @@ endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/luaproxy/CMakeLists.txt)
 	message(FATAL_ERROR "luaproxy is missing in folder lib/luaproxy. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/lsqlite/CMakeLists.txt)
-	message(FATAL_ERROR "lsqlite is missing in folder lib/lsqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
+if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/sqlite/CMakeLists.txt)
+	message(FATAL_ERROR "sqlite is missing in folder lib/sqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
 endif()
 if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/tolua++/CMakeLists.txt)
 	message(FATAL_ERROR "tolua++ is missing in folder lib/tolua++. Have you initialized and updated the submodules / downloaded the extra libraries?")
@@ -197,19 +194,40 @@ if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/zlib/CMakeLists.txt)
 endif()
 
 # Include all the libraries
-# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
+# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are compiled
 # (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those):
 add_subdirectory(lib/expat)
 add_subdirectory(lib/fmt)
 add_subdirectory(lib/jsoncpp EXCLUDE_FROM_ALL)
 add_subdirectory(lib/libevent EXCLUDE_FROM_ALL)
-add_subdirectory(lib/lsqlite)
+add_subdirectory(lib/sqlite)
 add_subdirectory(lib/lua)
 add_subdirectory(lib/luaexpat)
 add_subdirectory(lib/mbedtls)
 add_subdirectory(lib/SQLiteCpp)
 add_subdirectory(lib/tolua++ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/zlib)
+
+set_exe_flags()
+add_executable(${CMAKE_PROJECT_NAME})
+add_subdirectory(src)
+
+# Set the startup project to Cuberite, and the debugger dir:
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+
+# Enable PCH and jumbo builds on supporting CMake:
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+	if (PRECOMPILE_HEADERS)
+		target_precompile_headers(${CMAKE_PROJECT_NAME} PRIVATE src/Globals.h)
+	endif()
+	
+	if (UNITY_BUILDS)
+		set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
+	endif()
+else()
+	message(WARNING "Precompiled headers for FASTER BUILDS not enabled, upgrade to CMake 1.16 or newer!")
+endif()
 
 # Add required includes:
 target_include_directories(
@@ -235,6 +253,11 @@ target_link_libraries(
 	zlib
 )
 
+# Link process information library:
+if (WIN32)
+	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Psapi.lib)
+endif()
+
 # Special case handling for libevent pthreads:
 if(NOT WIN32)
 	target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE event_pthreads_static)
@@ -258,4 +281,4 @@ endif()
 include("CMake/Fixups.cmake")
 include("CMake/GenerateBindings.cmake")
 include("CMake/GroupSources.cmake")
-include("CMake/SetCompilerFlags.cmake")
+# TODO: include("CMake/SetCompilerFlags.cmake")
