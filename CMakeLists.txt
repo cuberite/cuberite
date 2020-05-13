@@ -13,7 +13,7 @@
 
 
 
-cmake_minimum_required (VERSION 2.8.7)
+cmake_minimum_required (VERSION 3.12.4)
 
 if (POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
@@ -120,6 +120,10 @@ else()  # GCC or Clang, so get compiler version directly since CMAKE_CXX_COMPILE
 	endif()
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
 
@@ -188,7 +192,7 @@ set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis t
 set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool."             FORCE)
 set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                                 FORCE)
 set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
-set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
+set(SQLITECPP_INTERNAL_SQLITE ON  CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
 set(SQLITE_ENABLE_COLUMN_METADATA OFF CACHE BOOL "" FORCE)
 
 # Set options for LibEvent, disable all their tests and benchmarks:
@@ -251,29 +255,26 @@ endif()
 
 
 # Include all the libraries:
-add_subdirectory(lib/jsoncpp/)
+add_subdirectory(lib/jsoncpp/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/SQLiteCpp/)
+add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/libevent/ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/fmt)
 
 
-# Add proper include directories so that SQLiteCpp can find SQLite3:
-get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
-set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
-set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-
 # Add proper includes for LibEvent's event-config.h header:
 include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 
-# Prettify jsoncpp_lib_static name in VS solution explorer
-set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")
+# Prettify jsoncpp_lib name in VS solution explorer
+set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
+# jsoncpp uses these for ccache support, clashing with our method
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "")
 
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
@@ -306,13 +307,13 @@ if (MSVC)
 		event_extra_static
 		expat
 		fmt
-		jsoncpp_lib_static
+		jsoncpp_lib
 		lua
 		luaexpat
 		mbedcrypto
 		mbedtls
 		mbedx509
-		sqlite
+		lsqlite
 		SQLiteCpp
 		tolualib
 		zlib

@@ -50,7 +50,7 @@ protected:
 	double m_SlowdownCoeff;
 
 	// cCallbacks overrides:
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		/*
 		// DEBUG:
@@ -65,7 +65,7 @@ protected:
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
 			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
@@ -75,7 +75,7 @@ protected:
 			{
 				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, Intersection))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, Face, Intersection))
 				{
 					return false;
 				}
@@ -454,7 +454,4 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
-
-
 

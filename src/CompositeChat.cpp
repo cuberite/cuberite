@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "CompositeChat.h"
 #include "ClientHandle.h"
+#include "JsonUtils.h"
 
 
 
@@ -408,11 +409,10 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 
 	#if 1
 		// Serialize as machine-readable string (no whitespace):
-		Json::FastWriter writer;
-		return writer.write(msg);
+		return JsonUtils::WriteFastString(msg);
 	#else
 		// Serialize as human-readable string (pretty-printed):
-		return msg.toStyledString();
+		return JsonUtils::WriteStyledString(msg);
 	#endif
 }
 

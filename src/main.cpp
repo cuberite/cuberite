@@ -10,20 +10,6 @@
 
 
 
-#ifdef ANDROID
-	// Workaround for Android NDK builds that do not support std::to_string
-	namespace std
-	{
-		template <typename T>
-		std::string to_string(T Value)
-		{
-			std::ostringstream TempStream;
-			TempStream << Value;
-			return TempStream.str();
-		}
-	}
-#endif
-
 #ifdef _MSC_VER
 	#include <dbghelp.h>
 #endif  // _MSC_VER

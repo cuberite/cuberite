@@ -26,6 +26,7 @@ Implements the 1.12 protocol classes:
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../Bindings/PluginManager.h"
+#include "../JsonUtils.h"
 
 
 
@@ -361,9 +362,8 @@ void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 
@@ -1220,9 +1220,8 @@ void cProtocol_1_12_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 
@@ -1378,9 +1377,8 @@ void cProtocol_1_12_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	}
 
 	// Serialize the response into a packet:
-	Json::FastWriter Writer;
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Writer.write(ResponseValue));
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 

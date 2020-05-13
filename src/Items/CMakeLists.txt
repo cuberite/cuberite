@@ -65,5 +65,5 @@ SET (HDRS
 
 if(NOT MSVC)
 	add_library(Items ${SRCS} ${HDRS})
-	target_link_libraries(Items fmt::fmt)
+	target_link_libraries(Items fmt::fmt SQLiteCpp)
 endif()

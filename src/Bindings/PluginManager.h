@@ -387,7 +387,7 @@ public:
 
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
-	static AString GetPluginsPath(void) { return FILE_IO_PREFIX "Plugins"; }  // tolua_export
+	static AString GetPluginsPath(void) { return "Plugins"; }  // tolua_export
 
 private:
 	friend class cRoot;

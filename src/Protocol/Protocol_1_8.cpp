@@ -24,6 +24,7 @@ Implements the 1.8 protocol classes:
 #include "../Statistics.h"
 #include "../UUID.h"
 #include "../World.h"
+#include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
@@ -138,8 +139,7 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 				m_Client->SetUUID(UUID);
 
 				Json::Value root;
-				Json::Reader reader;
-				if (!reader.parse(Params[3], root))
+				if (!JsonUtils::ParseString(Params[3], root))
 				{
 					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
 				}
@@ -1561,13 +1561,12 @@ void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	cPacketizer Pkt(*this, pktUpdateSign);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
 
-	Json::StyledWriter JsonWriter;
 	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
 	{
 		Json::Value RootValue;
 		RootValue["text"] = Lines[i];
-		Pkt.WriteString(JsonWriter.write(RootValue).c_str());
+		Pkt.WriteString(JsonUtils::WriteFastString(RootValue));
 	}
 }
 
@@ -2275,8 +2274,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	auto Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);
@@ -2741,11 +2739,10 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 
 	AString Lines[4];
 	Json::Value root;
-	Json::Reader reader;
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		if (reader.parse(Line, root, false))
+		if (JsonUtils::ParseString(Line, root))
 		{
 			Lines[i] = root.asString();
 		}

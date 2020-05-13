@@ -172,7 +172,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{

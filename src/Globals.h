@@ -36,17 +36,6 @@
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
-	#define OBSOLETE __declspec(deprecated)
-
-	#define NORETURN __declspec(noreturn)
-	#if (_MSC_VER < 1900)  // noexcept support was added in VS 2015
-		#define NOEXCEPT  throw()
-		#define CAN_THROW throw(...)
-	#else
-		#define NOEXCEPT  noexcept
-		#define CAN_THROW noexcept(false)
-	#endif
-
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
@@ -73,30 +62,10 @@
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// override is part of c++11
-	#if __cplusplus < 201103L
-		#define override
-	#endif
-
-	#define OBSOLETE __attribute__((deprecated))
-
-	#define NORETURN __attribute((__noreturn__))
-	#define NOEXCEPT  noexcept
-	#define CAN_THROW noexcept(false)
-
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
 
-#endif
-
-
-
-
-#ifdef  _DEBUG
-	#define NORETURNDEBUG NORETURN
-#else
-	#define NORETURNDEBUG
 #endif
 
 
@@ -188,12 +157,6 @@ template class SizeChecker<UInt8,  1>;
 	#include <semaphore.h>
 	#include <fcntl.h>
 	#include <unistd.h>
-#endif
-
-#if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/Cuberite/"
-#else
-	#define FILE_IO_PREFIX ""
 #endif
 
 
@@ -373,15 +336,11 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
-//temporary replacement for std::make_unique until we get c++14
+// TODO: Replace cpp14 with std at point of use
 
 namespace cpp14
 {
-	template <class T, class... Args>
-	std::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}
+using std::make_unique;
 }
 
 // a tick is 50 ms
@@ -395,6 +354,13 @@ using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 #ifdef TOLUA_EXPOSITION
 	#error TOLUA_EXPOSITION should never actually be defined
 #endif
+
+template <typename T>
+auto ToUnsigned(T a_Val)
+{
+	ASSERT(a_Val >= 0);
+	return static_cast<std::make_unsigned_t<T>>(a_Val);
+}
 
 
 

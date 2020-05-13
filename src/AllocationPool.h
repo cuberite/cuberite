@@ -34,7 +34,7 @@ public:
 	virtual void Free(T * a_ptr) = 0;
 
 	/** Two pools compare equal if memory allocated by one can be freed by the other */
-	bool IsEqual(const cAllocationPool & a_Other) const NOEXCEPT
+	bool IsEqual(const cAllocationPool & a_Other) const noexcept
 	{
 		return ((this == &a_Other) || DoIsEqual(a_Other) || a_Other.DoIsEqual(*this));
 	}
@@ -50,7 +50,7 @@ public:
 	}
 
 private:
-	virtual bool DoIsEqual(const cAllocationPool & a_Other) const NOEXCEPT = 0;
+	virtual bool DoIsEqual(const cAllocationPool & a_Other) const noexcept = 0;
 };
 
 
@@ -176,7 +176,7 @@ private:
 	std::list<void *> m_FreeList;
 	std::unique_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
 
-	virtual bool DoIsEqual(const cAllocationPool<T> & a_Other) const NOEXCEPT override
+	virtual bool DoIsEqual(const cAllocationPool<T> & a_Other) const noexcept override
 	{
 		return (dynamic_cast<const cListAllocationPool<T>*>(&a_Other) != nullptr);
 	}

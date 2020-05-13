@@ -21,7 +21,7 @@ public:
 	using iterator = pointer;
 	using const_iterator = const_pointer;
 
-	cLazyArray(size_type a_Size) NOEXCEPT:
+	cLazyArray(size_type a_Size) noexcept:
 		m_Size{ a_Size }
 	{
 		ASSERT(a_Size > 0);
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	cLazyArray(cLazyArray && a_Other) NOEXCEPT:
+	cLazyArray(cLazyArray && a_Other) noexcept:
 		m_Array{ std::move(a_Other.m_Array) },
 		m_Size{ a_Other.m_Size }
 	{
@@ -49,7 +49,7 @@ public:
 		return *this;
 	}
 
-	cLazyArray & operator = (cLazyArray && a_Other) NOEXCEPT
+	cLazyArray & operator = (cLazyArray && a_Other) noexcept
 	{
 		m_Array = std::move(a_Other.m_Array);
 		m_Size = a_Other.m_Size;
@@ -77,13 +77,13 @@ public:
 	iterator        end()       { return data() + m_Size; }
 	const_iterator  end() const { return cend(); }
 
-	size_type size() const NOEXCEPT { return m_Size; }
+	size_type size() const noexcept { return m_Size; }
 
 	const T * data() const
 	{
 		if (m_Array == nullptr)
 		{
-			m_Array.reset(new T[m_Size]);
+			m_Array.reset(new T[ToUnsigned(m_Size)]);
 		}
 		return m_Array.get();
 	}
@@ -95,13 +95,13 @@ public:
 		return const_cast<T *>(const_this->data());
 	}
 
-	void swap(cLazyArray & a_Other) NOEXCEPT
+	void swap(cLazyArray & a_Other) noexcept
 	{
 		std::swap(m_Array, a_Other.m_Array);
 		std::swap(m_Size, a_Other.m_Size);
 	}
 
-	friend void swap(cLazyArray & a_Lhs, cLazyArray & a_Rhs) NOEXCEPT
+	friend void swap(cLazyArray & a_Lhs, cLazyArray & a_Rhs) noexcept
 	{
 		a_Lhs.swap(a_Rhs);
 	}
@@ -124,7 +124,7 @@ public:
 	}
 
 	/** Returns true if the array has already been allocated. */
-	bool IsStorageAllocated() const NOEXCEPT { return (m_Array != nullptr); }
+	bool IsStorageAllocated() const noexcept { return (m_Array != nullptr); }
 
 private:
 	// Mutable so const data() can allocate the array

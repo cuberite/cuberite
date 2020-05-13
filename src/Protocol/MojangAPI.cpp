@@ -8,6 +8,7 @@
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Statement.h"
 #include "../IniFile.h"
+#include "../JsonUtils.h"
 #include "json/json.h"
 #include "../mbedTLS++/BlockingSslClientSocket.h"
 #include "../mbedTLS++/SslConfig.h"
@@ -514,7 +515,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 	try
 	{
 		// Open up the SQLite DB:
-		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+		SQLite::Database db("MojangAPI.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
 
@@ -572,7 +573,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 	try
 	{
 		// Open up the SQLite DB:
-		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+		SQLite::Database db("MojangAPI.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
 
@@ -670,8 +671,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 			root.append(req);
 		}  // for itr - a_PlayerNames[]
 		a_NamesToQuery.erase(a_NamesToQuery.begin(), itr);
-		Json::FastWriter Writer;
-		AString RequestBody = Writer.write(root);
+		auto RequestBody = JsonUtils::WriteFastString(root);
 
 		// Create the HTTP request:
 		AString Request;
@@ -712,11 +712,11 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		Response.erase(0, idxHeadersEnd + 4);
 
 		// Parse the returned string into Json:
-		Json::Reader reader;
-		if (!reader.parse(Response, root, false) || !root.isArray())
+		AString ParseError;
+		if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
-			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16));
 			continue;
 		}
 
@@ -822,11 +822,11 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the returned string into Json:
-	Json::Reader reader;
 	Json::Value root;
-	if (!reader.parse(Response, root, false) || !root.isObject())
+	AString ParseError;
+	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
 	{
-		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, reader.getFormattedErrorMessages().c_str());
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}

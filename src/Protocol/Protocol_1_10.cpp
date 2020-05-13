@@ -16,6 +16,7 @@ Implements the 1.10 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 
@@ -375,8 +376,7 @@ void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
+	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(Response);

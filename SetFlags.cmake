@@ -74,11 +74,6 @@ macro(set_flags)
 			)
 		endif()
 
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
-
 		#on os x clang adds pthread for us but we need to add it for gcc
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
@@ -87,11 +82,6 @@ macro(set_flags)
 			add_flags_cxx("-pthread")
 		endif()
 	elseif (ANDROID)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-
 		add_flags_cxx("-fsigned-char")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
@@ -106,11 +96,6 @@ macro(set_flags)
 				OUTPUT_VARIABLE GCC_VERSION
 			)
 		endif()
-
-		set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 
 		# We use a signed char (fixes #640 on RasPi)
 		add_flags_cxx("-fsigned-char")

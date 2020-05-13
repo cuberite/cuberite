@@ -126,7 +126,7 @@ enum class eNBTParseError
 };
 
 // The following is required to make an error_code constructible from an eNBTParseError
-std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT;
+std::error_code make_error_code(eNBTParseError a_Err) noexcept;
 
 namespace std
 {

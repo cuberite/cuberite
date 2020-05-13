@@ -2823,64 +2823,67 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnNextBlockNoData",
-			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnOutOfWorld",
-			a_BlockX, a_BlockY, a_BlockZ,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
-			"OnIntoWorld",
-			a_BlockX, a_BlockY, a_BlockZ,
-			cLuaState::Return, res
-		))
+		if (m_Callbacks->CallTableFn("OnIntoWorld",
+			a_BlockPos,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
 	virtual void OnNoMoreHits(void) override
@@ -2895,7 +2898,88 @@ public:
 
 protected:
 	cLuaState::cTableRefPtr m_Callbacks;
-} ;
+};
+
+
+
+
+
+/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+This is the deprecated version of cLuaBlockTracerCallback, used when the plugin calls
+the Trace function with number-based coords. */
+class cLuaBlockTracerCallbacksOld :
+	public cLuaBlockTracerCallbacks
+{
+public:
+	cLuaBlockTracerCallbacksOld(cLuaState::cTableRefPtr && a_Callbacks):
+		cLuaBlockTracerCallbacks(std::move(a_Callbacks))
+	{
+	}
+
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlock",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnIntoWorld",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+};
 
 
 
@@ -3100,8 +3184,10 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 {
 	/* Supported function signatures:
-	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical
-	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical  // DEPRECATED
+	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // DEPRECATED
+	cLineBlockTracer:Trace(World, Callbacks, Start, End)  // Canonical
+	cLineBlockTracer.Trace(World, Callbacks, Start, End)
 	*/
 
 	// If the first param is the cLineBlockTracer class, shift param index by one:
@@ -3116,9 +3202,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(idx, "cWorld") ||
-		!L.CheckParamTable   (idx + 1) ||
-		!L.CheckParamNumber  (idx + 2, idx + 7) ||
-		!L.CheckParamEnd     (idx + 8)
+		!L.CheckParamTable   (idx + 1)
 	)
 	{
 		return 0;
@@ -3126,22 +3210,54 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 	// Get the params:
 	cWorld * world;
-	double startX, startY, startZ;
-	double endX, endY, endZ;
+	Vector3d start;
+	Vector3d end;
 	cLuaState::cTableRefPtr callbacks;
-	if (!L.GetStackValues(idx, world, callbacks, startX, startY, startZ, endX, endY, endZ))
+	if (
+		L.IsParamNumber  (idx + 2) &&
+		L.IsParamNumber  (idx + 3) &&
+		L.IsParamNumber  (idx + 4) &&
+		L.IsParamNumber  (idx + 5) &&
+		L.IsParamNumber  (idx + 6) &&
+		L.IsParamNumber  (idx + 7) &&
+		L.CheckParamEnd  (idx + 8)
+	)
 	{
-		LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+		if (!L.GetStackValues(idx, world, callbacks, start.x, start.y, start.z, end.x, end.y, end.z))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		LOGWARNING("cLineBlockTracer:Trace(): Using plain numbers is deprecated, use Vector3 coords instead.");
 		L.LogStackTrace();
-		L.LogStackValues("Values on the stack");
-		return 0;
+		// Trace:
+		cLuaBlockTracerCallbacksOld tracerCallbacks(std::move(callbacks));
+		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		tolua_pushboolean(L, res ? 1 : 0);
+		return 1;
 	}
-
-	// Trace:
-	cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
-	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, startX, startY, startZ, endX, endY, endZ);
-	tolua_pushboolean(L, res ? 1 : 0);
-	return 1;
+	else if (
+		L.IsParamVector3(idx + 2) &&
+		L.IsParamVector3(idx + 3) &&
+		L.CheckParamEnd (idx + 4)
+	)
+	{
+		if (!L.GetStackValues(idx, world, callbacks, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		// Trace:
+		cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
+		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		tolua_pushboolean(L, res ? 1 : 0);
+		return 1;
+	}
+	return L.ApiParamError("Invalid overload of cLineBlockTracer:Trace()");
 }
 
 

@@ -6,16 +6,16 @@ To compile Cuberite from source, you need the following set of software:
  - CMake
  - Platform-specific make tool (Windows would be MSVC, Linux/macOS GNU make, etc.)
  - C compiler
- - Modern C++ compiler and linker
+ - Modern C++17 capable compiler and linker
 
 To contribute code, you also need a Git client.
 
 Windows
 -------
 
-We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but we don't test against them and they aren't supported. Visual Studio 2013 Express for Desktop is being actively used for development.
+We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but we don't test against them and they aren't supported. Visual Studio 2017 Community and above are being actively used for development.
 
-You can find download links for VS2013 Express [here][1].
+You can find download links for VS2019 Community [here][1].
 
 Next, you need to download and install [CMake][2]. You should download a full installation package, so that the installer will set everything up for you (especially the paths).
 
@@ -56,6 +56,8 @@ macOS
 
  - Install CMake from its [website][9] or homebrew: `brew install cmake`.
 
+Cuberite requires Xcode 11.3 or newer.
+
 ### Getting the Source
 
 ```
@@ -77,7 +79,13 @@ Install git, make, cmake and clang (or gcc), using your platform's package manag
 ```
 sudo apt-get install git make cmake clang
 ```
-Ensure that you have modern C++ compiler and linker (Clang 3.5+, GCC 4.8+, or VS 2013+).
+Ensure that you have modern C++ compiler and linker (Clang 7.0+, GCC 7.4+, or VS 2017+).
+Cuberite also requires CMake 3.13 or newer.  You might find that your distribution
+defaults are too out of date, in which case you may need to add a new `apt` source,
+or download directly from the projects' websites:
+
+ - [Clang][Clang-download]
+ - [CMake][2]
 
 ### Getting the Source
 
@@ -260,3 +268,4 @@ Disables optimizations for the build host. This is important when building on a 
 [10]: https://developer.android.com/ndk/downloads/index.html
 [11]: https://www.lua.org/download.html
 [12]: https://github.com/ninja-build/ninja/releases
+[clang-download]: https://releases.llvm.org/download.html

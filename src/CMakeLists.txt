@@ -47,6 +47,7 @@ SET (SRCS
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
+	JsonUtils.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
@@ -126,6 +127,7 @@ SET (HDRS
 	Item.h
 	ItemGrid.h
 	LazyArray.h
+	JsonUtils.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h
@@ -171,18 +173,9 @@ file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
 	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/Globals.h\"\n")
 
 include_directories("${CMAKE_BINARY_DIR}/include")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/TCLAP/include")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(BlockType.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-	set_source_files_properties(ByteBuffer.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-	set_source_files_properties(ClientHandle.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors ")
-	set_source_files_properties(Statistics.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-endif()
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
@@ -439,7 +432,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/ports/devel)
 endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib_static mbedtls zlib sqlite lua SQLiteCpp event_core event_extra fmt::fmt)
+target_link_libraries(${CMAKE_PROJECT_NAME} luaexpat jsoncpp_lib mbedtls zlib lsqlite lua SQLiteCpp event_core event_extra fmt::fmt)
 
 # Create a folder for Bindings' documentation:
 FILE(MAKE_DIRECTORY "Bindings/docs")
