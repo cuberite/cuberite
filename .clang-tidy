@@ -5,6 +5,7 @@ Checks: >-
   readability-redundant-string-init,
   readability-redundant-control-flow,
   performance-unnecessary-value-param,
+  performance-unnecessary-copy-initialization,
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           'm_'
