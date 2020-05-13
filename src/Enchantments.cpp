@@ -304,7 +304,7 @@ bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 		// {enchInfinity, enchMending}
 	};
 
-	for (auto excl: IncompatibleEnchantments)
+	for (const auto & excl: IncompatibleEnchantments)
 	{
 		if (excl.count(a_EnchantmentID) != 0)
 		{

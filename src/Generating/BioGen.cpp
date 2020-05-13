@@ -167,7 +167,7 @@ void cBioGenMulticache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	for (auto itr : m_Caches)
+	for (const auto & itr : m_Caches)
 	{
 		itr->InitializeBiomeGen(a_IniFile);
 	}

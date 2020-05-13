@@ -6,6 +6,8 @@ Checks: >-
   readability-redundant-control-flow,
   performance-unnecessary-value-param,
   performance-unnecessary-copy-initialization,
+  performance-for-range-copy,
+  performance-implicit-conversion-in-loop,
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           'm_'

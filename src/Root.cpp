@@ -505,7 +505,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	*/
 
 	bool FoundAdditionalWorlds = false;
-	for (auto WorldNameValue : Worlds)
+	for (const auto & WorldNameValue : Worlds)
 	{
 		AString ValueName = WorldNameValue.first;
 		if (ValueName.compare("World") != 0)

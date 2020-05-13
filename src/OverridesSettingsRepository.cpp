@@ -112,7 +112,7 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 
 	auto ret = overrides;
 
-	for (auto mainpair : main)
+	for (const auto & mainpair : main)
 	{
 		bool found = false;
 		for (const auto & overridepair : overrides)

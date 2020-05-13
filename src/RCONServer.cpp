@@ -124,7 +124,7 @@ cRCONServer::cRCONServer(cServer & a_Server) :
 
 cRCONServer::~cRCONServer()
 {
-	for (auto srv: m_ListenServers)
+	for (const auto & srv: m_ListenServers)
 	{
 		srv->Close();
 	}
@@ -153,7 +153,7 @@ void cRCONServer::Initialize(cSettingsRepositoryInterface & a_Settings)
 	AStringVector Ports = ReadUpgradeIniPorts(a_Settings, "RCON", "Ports", "PortsIPv4", "PortsIPv6", "25575");
 
 	// Start listening on each specified port:
-	for (auto port: Ports)
+	for (const auto & port: Ports)
 	{
 		UInt16 PortNum;
 		if (!StringToInteger(port, PortNum))

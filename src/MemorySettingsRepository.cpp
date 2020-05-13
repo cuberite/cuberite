@@ -110,7 +110,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 std::vector<std::pair<AString, AString>> cMemorySettingsRepository::GetValues(AString a_keyName)
 {
 	std::vector<std::pair<AString, AString>> ret;
-	for (auto pair : m_Map[a_keyName])
+	for (const auto & pair : m_Map[a_keyName])
 	{
 		ret.emplace_back(pair.first, pair.second.getStringValue());
 	}

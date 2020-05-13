@@ -79,7 +79,7 @@ void cServerHandleImpl::Close(void)
 		cCSLock Lock(m_CS);
 		std::swap(Conns, m_Connections);
 	}
-	for (auto conn: Conns)
+	for (const auto & conn: Conns)
 	{
 		conn->Shutdown();
 	}
