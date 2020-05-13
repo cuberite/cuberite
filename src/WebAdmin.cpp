@@ -167,7 +167,7 @@ bool cWebAdmin::LoadLoginPage(void)
 void cWebAdmin::RemoveAllPluginWebTabs(const AString & a_PluginName)
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](cWebTabPtr a_CBWebTab)
+	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](const cWebTabPtr & a_CBWebTab)
 		{
 			return (a_CBWebTab->m_PluginName == a_PluginName);
 		}),
@@ -519,7 +519,7 @@ void cWebAdmin::AddWebTab(
 )
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, a_Callback));
+	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, std::move(a_Callback)));
 }
 
 

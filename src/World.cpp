@@ -3061,7 +3061,7 @@ void cWorld::QueueSaveAllChunks(void)
 void cWorld::QueueTask(std::function<void(cWorld &)> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.emplace_back(0, a_Task);
+	m_Tasks.emplace_back(0, std::move(a_Task));
 }
 
 
@@ -3075,7 +3075,7 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 	// Insert the task into the list of scheduled tasks
 	{
 		cCSLock Lock(m_CSTasks);
-		m_Tasks.emplace_back(TargetTick, a_Task);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
 	}
 }
 

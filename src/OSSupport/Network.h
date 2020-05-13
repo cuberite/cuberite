@@ -132,7 +132,7 @@ protected:
 
 	/** Creates a new link, with the specified callbacks. */
 	cTCPLink(cCallbacksPtr a_Callbacks):
-		m_Callbacks(a_Callbacks)
+		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
 };

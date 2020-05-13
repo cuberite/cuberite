@@ -1112,7 +1112,9 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_
 
 
 
-void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment)
+void cEnchantments::CheckEnchantmentConflictsFromVector(
+	cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment
+)
 {
 	if (a_FirstEnchantment.GetLevel(cEnchantments::enchProtection) > 0)
 	{

@@ -815,7 +815,7 @@ public:
 	bool CheckParamStaticSelf(const char * a_SelfClassName);
 
 	/** Returns true if the specified parameter is of the specified class. */
-	bool IsParamUserType(int a_ParamIdx, AString a_UserType);
+	bool IsParamUserType(int a_ParamIdx, const AString & a_UserType);
 
 	/** Returns true if the specified parameter is a number. */
 	bool IsParamNumber(int a_ParamIdx);

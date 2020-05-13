@@ -30,7 +30,7 @@ void cLogger::InitiateMultithreading()
 
 
 
-void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
+void cLogger::LogSimple(const AString & a_Message, eLogLevel a_LogLevel)
 {
 	time_t rawtime;
 	time(&rawtime);

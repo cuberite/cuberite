@@ -48,7 +48,7 @@ public:
 	CLASS_PROTODEF(cPlayer)
 
 
-	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
+	cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName);
 
 	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
 

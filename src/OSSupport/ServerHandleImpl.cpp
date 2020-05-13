@@ -32,7 +32,7 @@ static bool IsValidSocket(evutil_socket_t a_Socket)
 // cServerHandleImpl:
 
 cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks):
-	m_ListenCallbacks(a_ListenCallbacks),
+	m_ListenCallbacks(std::move(a_ListenCallbacks)),
 	m_ConnListener(nullptr),
 	m_SecondaryConnListener(nullptr),
 	m_IsListening(false),
@@ -100,7 +100,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks)};
+	cServerHandleImplPtr res{new cServerHandleImpl(std::move(a_ListenCallbacks))};
 	res->m_SelfPtr = res;
 	if (res->Listen(a_Port))
 	{
@@ -108,7 +108,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	}
 	else
 	{
-		a_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
+		res->m_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
 		res->m_SelfPtr.reset();
 	}
 	return res;
@@ -363,7 +363,7 @@ cServerHandlePtr cNetwork::Listen(
 	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	return cServerHandleImpl::Listen(a_Port, a_ListenCallbacks);
+	return cServerHandleImpl::Listen(a_Port, std::move(a_ListenCallbacks));
 }
 
 

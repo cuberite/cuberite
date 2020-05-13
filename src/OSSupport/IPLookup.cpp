@@ -17,10 +17,10 @@
 // cIPLookup:
 
 cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
-	m_Callbacks(a_Callbacks),
+	m_Callbacks(std::move(a_Callbacks)),
 	m_IP(a_IP)
 {
-	ASSERT(a_Callbacks != nullptr);
+	ASSERT(m_Callbacks != nullptr);
 }
 
 

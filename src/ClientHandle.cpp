@@ -213,7 +213,10 @@ void cClientHandle::GenerateOfflineUUID(void)
 
 
 
-AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
+AString cClientHandle::FormatChatPrefix(
+	bool ShouldAppendChatPrefixes, const AString & a_ChatPrefixS,
+	const AString & m_Color1, const AString & m_Color2
+)
 {
 	if (ShouldAppendChatPrefixes)
 	{
@@ -3310,7 +3313,7 @@ void cClientHandle::SocketClosed(void)
 void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
 	ASSERT(m_Self == nullptr);
-	m_Self = a_Self;
+	m_Self = std::move(a_Self);
 }
 
 

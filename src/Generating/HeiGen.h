@@ -73,7 +73,7 @@ class cHeiGenMultiCache:
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenMultiCache(cTerrainHeightGenPtr a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cHeiGenMultiCache(const cTerrainHeightGenPtr & a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
@@ -176,7 +176,7 @@ public:
 
 	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen):
 		m_Noise(a_Seed),
-		m_BiomeGen(a_BiomeGen)
+		m_BiomeGen(std::move(a_BiomeGen))
 	{
 	}
 

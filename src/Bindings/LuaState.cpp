@@ -2014,7 +2014,7 @@ bool cLuaState::CheckParamStaticSelf(const char * a_SelfClassName)
 
 
 
-bool cLuaState::IsParamUserType(int a_ParamIdx, AString a_UserType)
+bool cLuaState::IsParamUserType(int a_ParamIdx, const AString & a_UserType)
 {
 	ASSERT(IsValid());
 

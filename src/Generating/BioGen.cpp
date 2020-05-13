@@ -58,7 +58,7 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 // cBioGenCache:
 
 cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
-	m_BioGenToCache(a_BioGenToCache),
+	m_BioGenToCache(std::move(a_BioGenToCache)),
 	m_CacheSize(a_CacheSize),
 	m_NumHits(0),
 	m_NumMisses(0),
@@ -139,7 +139,7 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenMulticache:
 
-cBioGenMulticache::cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches) :
+cBioGenMulticache::cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches) :
 	m_NumSubCaches(a_NumSubCaches)
 {
 	m_Caches.reserve(a_NumSubCaches);

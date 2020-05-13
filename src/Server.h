@@ -83,7 +83,7 @@ public:
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
-	bool IsPlayerInQueue(AString a_Username);
+	bool IsPlayerInQueue(const AString & a_Username);
 
 	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */

@@ -289,7 +289,7 @@ const AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 
 
 
-bool cServer::IsPlayerInQueue(AString a_Username)
+bool cServer::IsPlayerInQueue(const AString & a_Username)
 {
 	cCSLock Lock(m_CSClients);
 	for (auto client : m_Clients)

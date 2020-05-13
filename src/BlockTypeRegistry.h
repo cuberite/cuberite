@@ -164,8 +164,8 @@ public:
 	/** Creates a new instance of the exception that provides info on both the original registration and the newly attempted
 	registration that caused the failure. */
 	AlreadyRegisteredException(
-		std::shared_ptr<BlockInfo> aPreviousRegistration,
-		std::shared_ptr<BlockInfo> aNewRegistration
+		const std::shared_ptr<BlockInfo> & aPreviousRegistration,
+		const std::shared_ptr<BlockInfo> & aNewRegistration
 	);
 
 	// Simple getters:
@@ -182,8 +182,8 @@ private:
 	/** Returns the general exception message formatted by the two registrations.
 	The output is used when logging. */
 	static AString message(
-		std::shared_ptr<BlockInfo> aPreviousRegistration,
-		std::shared_ptr<BlockInfo> aNewRegistration
+		const std::shared_ptr<BlockInfo> & aPreviousRegistration,
+		const std::shared_ptr<BlockInfo> & aNewRegistration
 	);
 };
 

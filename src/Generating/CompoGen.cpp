@@ -330,7 +330,7 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 // cCompoGenCache:
 
 cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
-	m_Underlying(a_Underlying),
+	m_Underlying(std::move(a_Underlying)),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[ToUnsigned(a_CacheSize)]),
 	m_CacheData(new sCacheData[ToUnsigned(a_CacheSize)]),

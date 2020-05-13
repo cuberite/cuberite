@@ -511,7 +511,7 @@ cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_Bi
 	m_DensityNoiseA(a_Seed + 1),
 	m_DensityNoiseB(a_Seed + 2),
 	m_BaseNoise(a_Seed + 3),
-	m_BiomeGen(a_BiomeGen),
+	m_BiomeGen(std::move(a_BiomeGen)),
 	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Set impossible coords for the chunk so that it's always considered stale
 {
 	// Generate the weight distribution for summing up neighboring biomes:

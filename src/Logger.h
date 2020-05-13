@@ -75,7 +75,7 @@ public:
 	}
 
 	/** Logs the simple text message at the specified log level. */
-	void LogSimple(AString a_Message, eLogLevel a_LogLevel = llRegular);
+	void LogSimple(const AString & a_Message, eLogLevel a_LogLevel = llRegular);
 
 	cAttachment AttachListener(std::unique_ptr<cListener> a_Listener);
 

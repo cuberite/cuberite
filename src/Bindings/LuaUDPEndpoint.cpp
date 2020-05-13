@@ -40,7 +40,7 @@ bool cLuaUDPEndpoint::Open(UInt16 a_Port, cLuaUDPEndpointPtr a_Self)
 	ASSERT(m_Self == nullptr);  // Must not be opened yet
 	ASSERT(m_Endpoint == nullptr);
 
-	m_Self = a_Self;
+	m_Self = std::move(a_Self);
 	m_Endpoint = cNetwork::CreateUDPEndpoint(a_Port, *this);
 	return m_Endpoint->IsOpen();
 }

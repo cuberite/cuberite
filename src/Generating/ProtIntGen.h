@@ -198,7 +198,7 @@ public:
 
 	cProtIntGenZoom(int a_Seed, Underlying a_UnderlyingGen):
 		Super(a_Seed),
-		m_UnderlyingGen(a_UnderlyingGen)
+		m_UnderlyingGen(std::move(a_UnderlyingGen))
 	{
 	}
 
@@ -269,7 +269,7 @@ public:
 
 	cProtIntGenSmooth(int a_Seed, Underlying a_Underlying):
 		Super(a_Seed),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -342,7 +342,7 @@ class cProtIntGenAvgValues:
 public:
 
 	cProtIntGenAvgValues(Underlying a_Underlying):
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -387,7 +387,7 @@ class cProtIntGenAvg4Values:
 public:
 
 	cProtIntGenAvg4Values(Underlying a_Underlying):
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -438,7 +438,7 @@ class cProtIntGenWeightAvg:
 public:
 
 	cProtIntGenWeightAvg(Underlying a_Underlying):
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -490,7 +490,7 @@ public:
 		m_ChancePct(a_ChancePct),
 		m_Min(a_Min),
 		m_Range(a_Range),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -537,7 +537,7 @@ public:
 		Super(a_Seed),
 		m_Range(a_HalfRange * 2 + 1),
 		m_HalfRange(a_HalfRange),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -580,7 +580,7 @@ public:
 	cProtIntGenRndAvg(int a_Seed, int a_AvgChancePct, Underlying a_Underlying):
 		Super(a_Seed),
 		m_AvgChancePct(a_AvgChancePct),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -638,7 +638,7 @@ public:
 	cProtIntGenRndBetween(int a_Seed, int a_AvgChancePct, Underlying a_Underlying):
 		Super(a_Seed),
 		m_AvgChancePct(a_AvgChancePct),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -693,7 +693,7 @@ class cProtIntGenBeaches:
 public:
 
 	cProtIntGenBeaches(Underlying a_Underlying):
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -798,7 +798,7 @@ public:
 	cProtIntGenAddIslands(int a_Seed, int a_Chance, Underlying a_Underlying):
 		Super(a_Seed),
 		m_Chance(a_Chance),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -842,7 +842,7 @@ class cProtIntGenBiomeGroupEdges:
 public:
 
 	cProtIntGenBiomeGroupEdges(Underlying a_Underlying):
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -941,7 +941,7 @@ public:
 
 	cProtIntGenBiomes(int a_Seed, Underlying a_Underlying):
 		Super(a_Seed),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1072,7 +1072,7 @@ public:
 		m_From(a_From),
 		m_To(a_To),
 		m_Chance(a_Chance),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1131,8 +1131,8 @@ class cProtIntGenMixRivers:
 public:
 
 	cProtIntGenMixRivers(Underlying a_Biomes, Underlying a_Rivers):
-		m_Biomes(a_Biomes),
-		m_Rivers(a_Rivers)
+		m_Biomes(std::move(a_Biomes)),
+		m_Rivers(std::move(a_Rivers))
 	{
 	}
 
@@ -1197,7 +1197,7 @@ public:
 
 	cProtIntGenRiver(int a_Seed, Underlying a_Underlying):
 		Super(a_Seed),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1256,7 +1256,7 @@ public:
 		Super(a_Seed),
 		m_Chance(a_Chance),
 		m_ToValue(a_ToValue),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1347,7 +1347,7 @@ public:
 		Super(a_Seed),
 		m_Chance(a_Chance),
 		m_ToValue(a_ToValue),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1396,7 +1396,7 @@ public:
 	cProtIntGenRareBiomeGroups(int a_Seed, int a_Chance, Underlying a_Underlying):
 		Super(a_Seed),
 		m_Chance(a_Chance),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1444,8 +1444,8 @@ public:
 
 	cProtIntGenAlternateBiomes(int a_Seed, Underlying a_Alterations, Underlying a_BaseBiomes):
 		Super(a_Seed),
-		m_Alterations(a_Alterations),
-		m_BaseBiomes(a_BaseBiomes)
+		m_Alterations(std::move(a_Alterations)),
+		m_BaseBiomes(std::move(a_BaseBiomes))
 	{
 	}
 
@@ -1510,7 +1510,7 @@ public:
 
 	cProtIntGenBiomeEdges(int a_Seed, Underlying a_Underlying):
 		Super(a_Seed),
-		m_Underlying(a_Underlying)
+		m_Underlying(std::move(a_Underlying))
 	{
 	}
 
@@ -1670,8 +1670,8 @@ public:
 
 	cProtIntGenMBiomes(int a_Seed, Underlying a_Alteration, Underlying a_Underlying):
 		Super(a_Seed),
-		m_Underlying(a_Underlying),
-		m_Alteration(a_Alteration)
+		m_Underlying(std::move(a_Underlying)),
+		m_Alteration(std::move(a_Alteration))
 	{
 	}
 

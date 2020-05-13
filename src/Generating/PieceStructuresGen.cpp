@@ -23,8 +23,8 @@ public:
 
 	cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
 		Super(a_Seed),
-		m_BiomeGen(a_BiomeGen),
-		m_HeightGen(a_HeightGen),
+		m_BiomeGen(std::move(a_BiomeGen)),
+		m_HeightGen(std::move(a_HeightGen)),
 		m_SeaLevel(a_SeaLevel),
 		m_Name(a_Name),
 		m_MaxDepth(5)
@@ -131,7 +131,7 @@ cPieceStructuresGen::cPieceStructuresGen(int a_Seed):
 
 
 
-bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen)
+bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
 {
 	// Load each piecepool:
 	auto structures = StringSplitAndTrim(a_Prefabs, "|");

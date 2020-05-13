@@ -1401,7 +1401,7 @@ bool cPluginManager::BindCommand(
 
 	auto & reg = m_Commands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = a_Permission;
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1508,7 +1508,7 @@ bool cPluginManager::BindConsoleCommand(
 
 	auto & reg = m_ConsoleCommands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = "";
 	reg.m_HelpString = a_HelpString;
 	return true;
