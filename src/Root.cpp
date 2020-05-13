@@ -891,11 +891,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 				m_BestRating = Rating;
 				++m_NumMatches;
 			}
-			if (Rating == m_NameLength)  // Perfect match
-			{
-				return true;
-			}
-			return false;
+			return (Rating == m_NameLength);  // Perfect match
 		}
 
 		cCallback (const AString & a_CBPlayerName) :
