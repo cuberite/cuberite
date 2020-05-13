@@ -1,7 +1,8 @@
 Checks: >-
   -*,
   readability-identifier-naming,
-  readability-redundant-string-cstr
+  readability-redundant-string-cstr,
+  readability-redundant-string-init,
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           'm_'

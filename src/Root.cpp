@@ -527,7 +527,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 		// The default world is an overworld with no links
 		eDimension Dimension = dimOverworld;
-		AString LinkTo = "";
+		AString LinkTo;
 
 		// if the world is called x_nether
 		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
