@@ -473,7 +473,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	// Get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str(), a_dd, WorldNames);
+	m_pDefaultWorld = new cWorld(DefaultWorldName, DefaultWorldPath, a_dd, WorldNames);
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
@@ -571,7 +571,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			}
 			Dimension = dimEnd;
 		}
-		NewWorld = new cWorld(WorldName.c_str(), WorldPath.c_str(), a_dd, WorldNames, Dimension, LinkTo);
+		NewWorld = new cWorld(WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo);
 		m_WorldsByName[WorldName] = NewWorld;
 	}  // for i - Worlds
 

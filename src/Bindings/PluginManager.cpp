@@ -57,7 +57,7 @@ void cPluginManager::RefreshPluginList(void)
 {
 	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath);
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{

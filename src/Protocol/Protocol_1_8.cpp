@@ -831,7 +831,7 @@ void cProtocol_1_8_0::SendPaintingSpawn(const cPainting & a_Painting)
 
 	cPacketizer Pkt(*this, pktSpawnPainting);
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
-	Pkt.WriteString(a_Painting.GetName().c_str());
+	Pkt.WriteString(a_Painting.GetName());
 	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
@@ -3266,7 +3266,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName.c_str());
+			Writer.AddString("Name", a_Item.m_CustomName);
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -3327,7 +3327,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());
 			Writer.AddInt("y", CommandBlockEntity.GetPosY());
 			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand());
 			// You can set custom names for windows in Vanilla
 			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
 			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
