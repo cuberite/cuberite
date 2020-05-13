@@ -20,3 +20,4 @@ CheckOptions:
 #  value:           camelBack
 WarningsAsErrors: '*'
 HeaderFilterRegex: '/cuberite/src/\.?[^\.]'
+FormatStyle: 'file'
