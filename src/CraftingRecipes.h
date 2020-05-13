@@ -143,7 +143,7 @@ public:
 	cRecipe * getRecipeById(UInt32 a_RecipeId);
 
 	/** Gets a map of all recipes with name and recipe id */
-	std::map<AString, UInt32> getRecipeNameMap();
+	std::map<AString, UInt32> & getRecipeNameMap();
 
 protected:
 

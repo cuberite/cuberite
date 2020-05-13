@@ -70,17 +70,17 @@ void cRecipeMapper::AddRecipeLine(const AString & a_ProtocolVersion, int a_LineN
 	if (Sides.size() != 2)
 	{
 		LOGINFO("Recipe incompletely configured %s", a_RecipeLine);
+		return;
 	}
-	StringToInteger<UInt32>(Sides[0].c_str(), Id);
-	try
-	{
-		const UInt32 RecipeIndex = a_RecipeNameMap.at(Sides[1]);
-		m_ProtocolVersionMap[a_ProtocolVersion].emplace(Id, RecipeIndex);
-	}
-	catch (const std::out_of_range&)
+	StringToInteger<UInt32>(Sides[0], Id);
+
+	auto RecipeIndex = a_RecipeNameMap.find(Sides[1]);
+	if (RecipeIndex == a_RecipeNameMap.end())
 	{
 		LOGINFO("Cannot find RecipeId for %s", Sides[1]);
+		return;
 	}
+	m_ProtocolVersionMap[a_ProtocolVersion].emplace(Id, RecipeIndex);
 }
 
 

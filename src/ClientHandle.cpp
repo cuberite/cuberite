@@ -3152,6 +3152,22 @@ void cClientHandle::HandleCraftRecipe(UInt32 a_RecipeId)
 	auto SlotArea = m_Player->GetWindow()->GetSlotArea(0);
 	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(SlotArea);
 	slotAreaCrafting->LoadRecipe(*m_Player, a_RecipeId);
+
+	auto * Window = m_Player->GetWindow();
+	if (Window == nullptr)
+	{
+		return;
+	}
+
+	auto WindowType = Window->GetWindowType();
+	if (Window->GetWindowType() == cWindow::wtInventory)
+	{
+		static_cast<cInventoryWindow *>(Window)->LoadRecipe(*m_Player, a_RecipeId);
+	}
+	else if (Window->GetWindowType() == cWindow::wtWorkbench)
+	{
+		static_cast<cCraftingWindow *>(Window)->LoadRecipe(*m_Player, a_RecipeId);
+	}
 }
 
 

@@ -72,3 +72,9 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 
 
 
+
+void cInventoryWindow::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
+{
+	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(m_SlotAreas[0]);
+	slotAreaCrafting->LoadRecipe(a_Player, a_RecipeId);
+}
