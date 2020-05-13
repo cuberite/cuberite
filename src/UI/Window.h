@@ -178,12 +178,6 @@ public:
 	/** Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea */
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 
-	/** Loads the given Recipe into the crafting grid */
-	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
-
-	/** Returns the specific SlotArea */
-	cSlotArea * GetSlotArea(UInt32 a_SlotAreaIndex);
-
 protected:
 	cSlotAreas m_SlotAreas;
 

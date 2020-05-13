@@ -138,12 +138,11 @@ public:
 		int m_Height;
 	} ;
 
-	/** Returns the recipe by id aka CuberiteRecipeId, the Id is the non tech list
-	index (starting by 1), 0 is used for not found. */
+	/** Returns the recipe by id */
 	cRecipe * getRecipeById(UInt32 a_RecipeId);
 
 	/** Gets a map of all recipes with name and recipe id */
-	std::map<AString, UInt32> & getRecipeNameMap();
+	const std::map<AString, UInt32> & getRecipeNameMap();
 
 protected:
 

@@ -34,7 +34,7 @@ void cRecipeMapper::loadRecipes(const AString & a_ProtocolVersion)
 	// Split it into lines, then process each line as a single recipe:
 	AStringVector Split = StringSplit(Everything, "\n");
 	m_ProtocolVersionMap[a_ProtocolVersion] = {};
-	auto RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
+	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
 
 	int LineNum = 1;
 	for (AStringVector::const_iterator itr = Split.begin(); itr != Split.end(); ++itr, ++LineNum)
@@ -77,10 +77,9 @@ void cRecipeMapper::AddRecipeLine(const AString & a_ProtocolVersion, int a_LineN
 	auto RecipeIndex = a_RecipeNameMap.find(Sides[1]);
 	if (RecipeIndex == a_RecipeNameMap.end())
 	{
-		LOGINFO("Cannot find RecipeId for %s", Sides[1]);
 		return;
 	}
-	m_ProtocolVersionMap[a_ProtocolVersion].emplace(Id, RecipeIndex);
+	m_ProtocolVersionMap[a_ProtocolVersion].emplace(Id, RecipeIndex->second);
 }
 
 

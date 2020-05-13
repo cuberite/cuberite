@@ -2286,12 +2286,16 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		m_KnownItems.insert(Item);
 	}
 
-	auto RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
+	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
 
 	Json::Value & JSON_KnownRecipes = root["knownRecipes"];
 	for (UInt32 i = 0; i < JSON_KnownRecipes.size(); i++)
 	{
-			m_KnownRecipes.insert(RecipeNameMap[JSON_KnownRecipes[i].asString()]);
+		auto RecipeId = RecipeNameMap.find(JSON_KnownRecipes[i].asString());
+		if (RecipeId != RecipeNameMap.end())
+		{
+			m_KnownRecipes.insert(RecipeId->second);
+		}
 	}
 
 	m_GameMode = static_cast<eGameMode>(root.get("gamemode", eGameMode_NotSet).asInt());

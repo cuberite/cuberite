@@ -14,6 +14,8 @@
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
+#include "UI/InventoryWindow.h"
+#include "UI/CraftingWindow.h"
 #include "UI/Window.h"
 #include "UI/AnvilWindow.h"
 #include "UI/BeaconWindow.h"
@@ -3149,17 +3151,12 @@ void cClientHandle::SendInitRecipes(UInt32 a_RecipeId)
 
 void cClientHandle::HandleCraftRecipe(UInt32 a_RecipeId)
 {
-	auto SlotArea = m_Player->GetWindow()->GetSlotArea(0);
-	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(SlotArea);
-	slotAreaCrafting->LoadRecipe(*m_Player, a_RecipeId);
-
 	auto * Window = m_Player->GetWindow();
 	if (Window == nullptr)
 	{
 		return;
 	}
 
-	auto WindowType = Window->GetWindowType();
 	if (Window->GetWindowType() == cWindow::wtInventory)
 	{
 		static_cast<cInventoryWindow *>(Window)->LoadRecipe(*m_Player, a_RecipeId);

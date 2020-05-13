@@ -322,7 +322,7 @@ std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item
 		}
 		if (isNewCraftableRecipe(m_Recipes[i], a_Item, a_KnownItems))
 		{
-			Recipes.push_back(i + 1);
+			Recipes.push_back(i);
 		}
 	}
 	return Recipes;
@@ -474,7 +474,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		Recipe->m_RecipeName = RecipeSplit[0];
 	}
 	// Parse the result:
-	AStringVector ResultSplit = StringSplit(resultPart, ",");
+	AStringVector ResultSplit = StringSplit(*resultPart, ",");
 	if (ResultSplit.empty())
 	{
 		LOGWARNING("crafting.txt: line %d: Result is empty, ignoring the recipe.", a_LineNum);

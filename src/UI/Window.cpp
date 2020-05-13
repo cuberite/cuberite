@@ -763,12 +763,3 @@ void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
-
-
-
-
-
-cSlotArea * cWindow::GetSlotArea(UInt32 a_SlotAreaIndex)
-{
-	return m_SlotAreas[a_SlotAreaIndex];
-}
