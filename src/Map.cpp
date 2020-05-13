@@ -151,12 +151,14 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 				ChunkHeight /= 4;
 				while (((--Height) != -1) && IsBlockWater(a_Chunk.GetBlock(RelX, Height, RelZ)))
 				{
+					continue;
 				}
 			}
 			else if (ColourID == 0)
 			{
 				while (((--Height) != -1) && ((ColourID = BlockHandler(a_Chunk.GetBlock(RelX, Height, RelZ))->GetMapBaseColourID(a_Chunk.GetMeta(RelX, Height, RelZ))) == 0))
 				{
+					continue;
 				}
 			}
 
