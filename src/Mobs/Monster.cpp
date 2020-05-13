@@ -325,7 +325,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
-			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, m_EMState == IDLE ? true : false))
+			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, m_EMState == IDLE))
 			{
 				case ePathFinderStatus::PATH_FOUND:
 				{

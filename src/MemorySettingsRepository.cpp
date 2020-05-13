@@ -23,11 +23,7 @@ bool cMemorySettingsRepository::HasValue(const AString & a_KeyName, const AStrin
 		return false;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
-	if (iter == outerIter->second.end())
-	{
-		return false;
-	}
-	return true;
+	return (iter != outerIter->second.end());
 }
 
 

@@ -615,7 +615,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 
 	// Choose if we have to add another branch
-	bool TwoTop = (a_Noise.IntNoise3D(a_BlockPos) < 0 ? true : false);
+	bool TwoTop = (a_Noise.IntNoise3D(a_BlockPos) < 0);
 	if (!TwoTop)
 	{
 		return;

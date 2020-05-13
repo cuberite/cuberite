@@ -128,11 +128,7 @@ bool cBlockBedHandler::OnUse(
 	// Fast-forward the time if all players in the world are in their beds:
 	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
 	{
-		if (!a_OtherPlayer.IsInBed())
-		{
-			return true;
-		}
-		return false;
+		return !a_OtherPlayer.IsInBed();
 	};
 	if (a_WorldInterface.ForEachPlayer(TimeFastForwardTester))
 	{

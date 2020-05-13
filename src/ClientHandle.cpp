@@ -2078,12 +2078,10 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 	ASSERT(m_Player != nullptr);
 	ASSERT(m_Player->GetWorld() != nullptr);
 
-	if ((cRoot::Get()->GetServer()->ShouldLimitPlayerBlockChanges()) && (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS))
-	{
-		return false;
-	}
-
-	return true;
+	return !(
+		(cRoot::Get()->GetServer()->ShouldLimitPlayerBlockChanges()) &&
+		(m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
+	);
 }
 
 

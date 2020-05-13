@@ -2040,11 +2040,10 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
 {
-	if ((m_AttachedTo != nullptr) && (a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID()))
-	{
-		return true;
-	}
-	return false;
+	return (
+		(m_AttachedTo != nullptr) &&
+		(a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID())
+	);
 }
 
 

@@ -123,7 +123,7 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 				break;
 			}
 		}
-		if (found == false)
+		if (!found)
 		{
 			ret.push_back(mainpair);
 		}

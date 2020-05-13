@@ -893,7 +893,7 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 			for (int y = 0; y < a_GridHeight; ++y)
 			{
 				int GridIdx = x + a_GridStride * y;
-				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && (found == false))
+				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && !found)
 				{
 					found = true;
 					temp = a_CraftingGrid[GridIdx].CopyOne();
