@@ -19,7 +19,6 @@ cEnderDragon::cEnderDragon(void) :
 
 void cEnderDragon::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	return;
 }
 
 

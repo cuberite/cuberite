@@ -617,7 +617,6 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 void cEntity::ApplyArmorDamage(int DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
-	return;
 }
 
 
