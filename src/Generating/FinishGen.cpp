@@ -542,21 +542,26 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
 			if (GrassType < 60)
 			{
-				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
 			}
-			else if (GrassType < 90)
+			else if ((GrassType < 90) && CanFernGrow(a_ChunkDesc.GetBiome(x, z)))
 			{
-				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_FERN);
 			}
 			else if (!IsBiomeVeryCold(a_ChunkDesc.GetBiome(x, z)))
 			{
 				// If double long grass we have to choose what type we should use:
 				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
 				{
-					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
-					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
-					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
-					a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y + 1));
+					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 
+						E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
+
+					if ((Meta != E_META_BIG_FLOWER_LARGE_FERN) || CanLargeFernGrow(a_ChunkDesc.GetBiome(x, z)))
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
+						a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+						a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y + 1));
+					}
 				}
 			}
 			else
@@ -565,6 +570,61 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, meta);
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
+		}
+	}
+}
+
+
+
+
+
+bool cFinishGenTallGrass::CanFernGrow(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biJungle:
+		case biJungleEdge:
+		case biJungleEdgeM:
+		case biJungleHills:
+		case biJungleM:
+		{
+			return true;
+		}
+
+		default:
+		{
+			return CanLargeFernGrow(a_Biome);
+		}
+	}
+}
+
+
+
+
+
+bool cFinishGenTallGrass::CanLargeFernGrow(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biColdTaiga:
+		case biColdTaigaHills:
+		case biColdTaigaM:
+
+		case biTaiga:
+		case biTaigaHills:
+		case biTaigaM:
+
+		case biMegaSpruceTaiga:
+		case biMegaSpruceTaigaHills:
+		case biMegaTaiga:
+		case biMegaTaigaHills:
+		{
+			return true;
+		}
+
+		default:
+		{
+			return false;
 		}
 	}
 }
@@ -817,23 +877,13 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			{
 				case E_BLOCK_GRASS:
 				{
-					float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10);
-					float val4 = m_Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20);
-					if ((val1 + val2 > 0.2f) ||
-						(val2 + val3 > 0.2f) ||
-						(val3 + val4 > 0.2f) ||
-						(val1 + val4 > 0.2f))
-					{}
-					else if (val1 + val2 + val3 + val4 < -0.1)
-					{
-						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
-					}
-					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
+					if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
 						// Checks and block placing are handled in the TryAddSugarcane method
 					}
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
+						float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10);
 						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, static_cast<int>(val3 * 8) % 4);
 					}
 					break;

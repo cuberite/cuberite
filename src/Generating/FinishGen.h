@@ -179,6 +179,9 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
+	bool CanFernGrow(EMCSBiome a_Biome);
+	bool CanLargeFernGrow(EMCSBiome a_Biome);
+
 	int GetBiomeDensity(EMCSBiome a_Biome)
 	{
 		switch (a_Biome)
