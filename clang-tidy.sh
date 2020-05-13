@@ -9,7 +9,7 @@ ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE "$@" $REGEX"
 # Generate the compilation database
 mkdir -p tidy-build
 cd tidy-build
-cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPRECOMPILE_HEADERS=OFF ..
 
 # Ensure LuaState_Typedefs.inc has been generated
 (cd ../src/Bindings && lua BindingsProcessor.lua)

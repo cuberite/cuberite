@@ -12,9 +12,3 @@ if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
 	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
 	target_compile_options(mbedcrypto PRIVATE -fomit-frame-pointer)
 endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	# Generated file has old-style casts, missing prototypes, and deprecated declarations
-	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -Wno-everything)
-	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
-endif()

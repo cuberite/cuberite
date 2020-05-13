@@ -221,7 +221,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 	if (PRECOMPILE_HEADERS)
 		target_precompile_headers(${CMAKE_PROJECT_NAME} PRIVATE src/Globals.h)
 	endif()
-	
+
 	if (UNITY_BUILDS)
 		set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 	endif()
@@ -270,11 +270,19 @@ if (WIN32)
 	add_subdirectory(lib/luaproxy)
 endif()
 
+# Selectively disable warnings in the level where the target is created:
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	# Generated file has old-style casts, missing prototypes, and deprecated declarations
+	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -Wno-everything)
+
+	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
+	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
+endif()
+
 # Self Test Mode enables extra checks at startup
 if(${SELF_TEST})
 	message("Tests enabled")
 	enable_testing()
-	target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE SELF_TEST)
 	add_subdirectory(tests)
 endif()
 

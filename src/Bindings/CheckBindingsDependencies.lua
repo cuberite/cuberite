@@ -37,7 +37,17 @@ local function getAllToLuaPkgFiles()
 				if (g_ShouldIgnorePkg[a_FileName]) then
 					return
 				end
-				a_FileName = a_FileName:gsub("%.%./", "")  -- Normalize the path
+
+				-- Normalize the path: AllToLua is relative to src\Bindings
+				-- but the CMake dependencies list is relative to src\
+				a_FileName, cnt = a_FileName:gsub("%.%./", "")
+
+				-- If no replacements were done, this entry must point to a file
+				-- inside the Bindings folder; normalize it
+				if cnt == 0 then
+					a_FileName = "Bindings/" .. a_FileName
+				end
+
 				table.insert(res, a_FileName)
 				res[a_FileName] = true
 			end
