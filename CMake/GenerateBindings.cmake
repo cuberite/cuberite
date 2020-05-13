@@ -110,11 +110,3 @@ add_custom_command(
 	WORKING_DIRECTORY ${BINDINGS_FOLDER}
 	DEPENDS ${BINDING_DEPENDENCIES} luaexe
 )
-
-# Generate AllFiles.lst for CheckBasicStyle.lua
-get_target_property(ALL_FILES ${CMAKE_PROJECT_NAME} SOURCES)
-foreach(FILE ${ALL_FILES})
-	file(RELATIVE_PATH RELATIVE "${PROJECT_SOURCE_DIR}/src" ${FILE})
-	set(ALL_FILES_AS_LINES "${ALL_FILES_AS_LINES}${RELATIVE}\n")
-endforeach()
-file(WRITE src/AllFiles.lst "${ALL_FILES_AS_LINES}")

@@ -8,7 +8,8 @@ export CUBERITE_BUILD_DATETIME=`date`
 
 # Use ccache if available
 if [ `which ccache` ]; then
-	# Re-run compile on pre-processed sources on cache miss (slightly faster?)
+	# Re-run compile on pre-processed sources on cache miss
+	# "It's slower actually, but clang builds fail without it."
 	export CCACHE_CPP2=true
 
 	# Tell CMake of ccache's existence

@@ -174,6 +174,17 @@ file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
 configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/include/")
 
+# Generate AllFiles.lst for CheckBasicStyle.lua
+get_target_property(ALL_FILES ${CMAKE_PROJECT_NAME} SOURCES)
+foreach(FILE ${ALL_FILES})
+	# target_sources converts to absolute but CheckBasicStyle expects relative
+	file(RELATIVE_PATH RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" ${FILE})
+
+	# Convert CMake list into newline-delimited string
+	set(ALL_FILES_AS_LINES "${ALL_FILES_AS_LINES}${RELATIVE}\n")
+endforeach()
+file(WRITE AllFiles.lst "${ALL_FILES_AS_LINES}")
+
 # Output the executable into the $/Server folder, so that it has access to external resources:
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY                ${CMAKE_BINARY_DIR}/Server
