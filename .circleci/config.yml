@@ -26,7 +26,6 @@ jobs:
     docker: *cube_docker
     steps:
     - attach_workspace: { at: ~/ }
-    - run: (cd src/Bindings && lua BindingsProcessor.lua)
     - run: ./clang-tidy.sh -j 2
 
 workflows:
