@@ -557,7 +557,6 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktTimeUpdate:            return 0x44;
 		case pktTitle:                 return 0x45;
 		case pktUnloadChunk:           return 0x1d;
-		case pktUnlockRecipe:          return 0x31;
 		case pktUpdateBlockEntity:     return 0x09;
 		case pktUpdateHealth:          return 0x3e;
 		case pktUpdateScore:           return 0x42;
@@ -568,6 +567,12 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktWindowItems:           return 0x14;
 		case pktWindowOpen:            return 0x13;
 		case pktWindowProperty:        return 0x15;
+
+		// Unsupported packets
+		case pktUnlockRecipe:
+		{
+			break;
+		}
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
 }

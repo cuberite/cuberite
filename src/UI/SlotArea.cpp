@@ -789,7 +789,7 @@ void cSlotAreaCrafting::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
 	}
 	cCraftingRecipes::cRecipe * Recipe = cRoot::Get()->GetCraftingRecipes()->getRecipeById(a_RecipeId);
 
-	std::vector<cItem> usedItems;
+	int NumItems = 0;
 	ClearCraftingGrid(a_Player);
 
 	for (auto itrS = Recipe->m_Ingredients.begin(); itrS != Recipe->m_Ingredients.end(); ++itrS)
@@ -801,12 +801,12 @@ void cSlotAreaCrafting::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
 			break;
 		}
 		cItem Item = FoundItem->CopyOne();
-		usedItems.push_back(Item);
+		++NumItems;
 		int pos = 1 + itrS->x + m_GridSize * itrS->y;
 		// Assuming there are ether shaped or unshaped recipes, no mixed ones
 		if ((itrS->x == -1) && (itrS->y == -1))
 		{
-			pos = static_cast<int>(usedItems.size());
+			pos = NumItems;
 		}
 		// Handle x wildcard
 		else if (itrS->x == -1)

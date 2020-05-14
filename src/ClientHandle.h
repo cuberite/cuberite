@@ -19,7 +19,6 @@
 #include "Protocol/ForgeHandshake.h"
 #include "UUID.h"
 
-#include "CraftingRecipes.h"
 
 
 
