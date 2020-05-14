@@ -787,7 +787,7 @@ void cSlotAreaCrafting::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
 	{
 		return;
 	}
-	cCraftingRecipes::cRecipe * Recipe = cRoot::Get()->GetCraftingRecipes()->getRecipeById(a_RecipeId);
+	cCraftingRecipes::cRecipe * Recipe = cRoot::Get()->GetCraftingRecipes()->GetRecipeById(a_RecipeId);
 
 	int NumItems = 0;
 	ClearCraftingGrid(a_Player);

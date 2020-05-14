@@ -225,7 +225,7 @@ void cPlayer::AddKnownItem(const cItem & a_Item)
 	auto Response = m_KnownItems.insert(a_Item.CopyOne());
 	if (Response.second)
 	{
-		auto Recipes = cRoot::Get()->GetCraftingRecipes()->findNewRecipesForItem(a_Item, m_KnownItems);
+		auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
 		for (const auto & RecipeId : Recipes)
 		{
 			AddKnownRecipe(RecipeId);
@@ -2286,7 +2286,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		m_KnownItems.insert(Item);
 	}
 
-	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
+	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->GetRecipeNameMap();
 
 	Json::Value & JSON_KnownRecipes = root["knownRecipes"];
 	for (UInt32 i = 0; i < JSON_KnownRecipes.size(); i++)
@@ -2407,7 +2407,7 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_KnownRecipes;
 	for (auto KnownRecipe : m_KnownRecipes)
 	{
-		auto Recipe = cRoot::Get()->GetCraftingRecipes()->getRecipeById(KnownRecipe);
+		auto Recipe = cRoot::Get()->GetCraftingRecipes()->GetRecipeById(KnownRecipe);
 		JSON_KnownRecipes.append(Recipe->m_RecipeName);
 	}
 

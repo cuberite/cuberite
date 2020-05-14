@@ -763,3 +763,6 @@ void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
+
+
+

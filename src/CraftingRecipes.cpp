@@ -284,7 +284,7 @@ cCraftingRecipes::~cCraftingRecipes()
 
 
 
-bool cCraftingRecipes::isNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+bool cCraftingRecipes::IsNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
 {
 	bool ContainsNewItem = false;
 	for (const auto & Ingredient : a_Recipe->m_Ingredients)
@@ -311,7 +311,7 @@ bool cCraftingRecipes::isNewCraftableRecipe(const cRecipe * a_Recipe, const cIte
 
 
 
-std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+std::vector<UInt32> cCraftingRecipes::FindNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
 {
 	std::vector<UInt32> Recipes;
 	for (UInt32 i = 0; i < m_Recipes.size(); i++)
@@ -320,7 +320,7 @@ std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item
 		{
 			continue;
 		}
-		if (isNewCraftableRecipe(m_Recipes[i], a_Item, a_KnownItems))
+		if (IsNewCraftableRecipe(m_Recipes[i], a_Item, a_KnownItems))
 		{
 			Recipes.push_back(i);
 		}
@@ -332,7 +332,7 @@ std::vector<UInt32> cCraftingRecipes::findNewRecipesForItem(const cItem & a_Item
 
 
 
-const std::map<AString, UInt32> & cCraftingRecipes::getRecipeNameMap()
+const std::map<AString, UInt32> & cCraftingRecipes::GetRecipeNameMap()
 {
 	return m_RecipeNameMap;
 }
@@ -341,7 +341,7 @@ const std::map<AString, UInt32> & cCraftingRecipes::getRecipeNameMap()
 
 
 
-cCraftingRecipes::cRecipe* cCraftingRecipes::getRecipeById(UInt32 a_RecipeId)
+cCraftingRecipes::cRecipe* cCraftingRecipes::GetRecipeById(UInt32 a_RecipeId)
 {
 	return m_Recipes[a_RecipeId];
 }

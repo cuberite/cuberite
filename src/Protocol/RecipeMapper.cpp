@@ -34,7 +34,7 @@ void cRecipeMapper::loadRecipes(const AString & a_ProtocolVersion)
 	// Split it into lines, then process each line as a single recipe:
 	AStringVector Split = StringSplit(Everything, "\n");
 	m_ProtocolVersionMap[a_ProtocolVersion] = {};
-	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->getRecipeNameMap();
+	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->GetRecipeNameMap();
 
 	int LineNum = 1;
 	for (AStringVector::const_iterator itr = Split.begin(); itr != Split.end(); ++itr, ++LineNum)

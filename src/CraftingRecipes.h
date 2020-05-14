@@ -116,7 +116,7 @@ public:
 	void GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 
 	/** Find recipes which contain the new item and all ingredients are in the known items */
-	std::vector<UInt32> findNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
+	std::vector<UInt32> FindNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
 
 	struct cRecipeSlot
 	{
@@ -139,10 +139,10 @@ public:
 	} ;
 
 	/** Returns the recipe by id */
-	cRecipe * getRecipeById(UInt32 a_RecipeId);
+	cRecipe * GetRecipeById(UInt32 a_RecipeId);
 
 	/** Gets a map of all recipes with name and recipe id */
-	const std::map<AString, UInt32> & getRecipeNameMap();
+	const std::map<AString, UInt32> & GetRecipeNameMap();
 
 protected:
 
@@ -182,7 +182,7 @@ protected:
 
 private:
 	/** Checks if all ingredients of the recipe are within the know items list and if the (new) ItemId is part of the ingredients. This makes sure to only find 'new' recipes */
-	bool isNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
+	bool IsNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
 
 	/** Mapping the minecraft recipe names to the internal cuberite recipe Ids */
 	std::map<AString, UInt32> m_RecipeNameMap;
