@@ -12,9 +12,7 @@ cd tidy-build
 cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
 # Ensure LuaState_Typedefs.inc has been generated
-pushd ../src/Bindings
-lua BindingsProcessor.lua
-popd
+(cd ../src/Bindings && lua BindingsProcessor.lua)
 
 if run-clang-tidy $ARGS; then
 	echo "clang-tidy: No violations found"
