@@ -17,7 +17,7 @@ BlockInfo::BlockInfo(
 ):
 	m_PluginName(aPluginName),
 	m_BlockTypeName(aBlockTypeName),
-	m_Handler(aHandler),
+	m_Handler(std::move(aHandler)),
 	m_Hints(aHints),
 	m_HintCallbacks(aHintCallbacks)
 {
@@ -94,7 +94,9 @@ void BlockTypeRegistry::registerBlockType(
 	const std::map<AString, BlockInfo::HintCallback> & aHintCallbacks
 )
 {
-	auto blockInfo = std::make_shared<BlockInfo>(aPluginName, aBlockTypeName, aHandler, aHints, aHintCallbacks);
+	auto blockInfo = std::make_shared<BlockInfo>(
+		aPluginName, aBlockTypeName, std::move(aHandler), aHints, aHintCallbacks
+	);
 
 	// Check previous registrations:
 	cCSLock lock(m_CSRegistry);
@@ -191,8 +193,8 @@ void BlockTypeRegistry::removeBlockTypeHint(
 // BlockTypeRegistry::AlreadyRegisteredException:
 
 BlockTypeRegistry::AlreadyRegisteredException::AlreadyRegisteredException(
-	std::shared_ptr<BlockInfo> aPreviousRegistration,
-	std::shared_ptr<BlockInfo> aNewRegistration
+	const std::shared_ptr<BlockInfo> & aPreviousRegistration,
+	const std::shared_ptr<BlockInfo> & aNewRegistration
 ) :
 	Super(message(aPreviousRegistration, aNewRegistration)),
 	m_PreviousRegistration(aPreviousRegistration),
@@ -205,8 +207,8 @@ BlockTypeRegistry::AlreadyRegisteredException::AlreadyRegisteredException(
 
 
 AString BlockTypeRegistry::AlreadyRegisteredException::message(
-	std::shared_ptr<BlockInfo> aPreviousRegistration,
-	std::shared_ptr<BlockInfo> aNewRegistration
+	const std::shared_ptr<BlockInfo> & aPreviousRegistration,
+	const std::shared_ptr<BlockInfo> & aNewRegistration
 )
 {
 	return Printf("Attempting to register BlockTypeName %s from plugin %s, while it is already registered in plugin %s",

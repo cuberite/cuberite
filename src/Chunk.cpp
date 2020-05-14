@@ -1749,8 +1749,6 @@ void cChunk::RemoveClient(cClientHandle * a_Client)
 			a_Client->SendDestroyEntity(*Entity);
 		}
 	}
-
-	return;
 }
 
 

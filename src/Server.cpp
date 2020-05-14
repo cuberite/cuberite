@@ -289,10 +289,10 @@ const AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 
 
 
-bool cServer::IsPlayerInQueue(AString a_Username)
+bool cServer::IsPlayerInQueue(const AString & a_Username)
 {
 	cCSLock Lock(m_CSClients);
-	for (auto client : m_Clients)
+	for (const auto & client : m_Clients)
 	{
 		if ((client->GetUsername()).compare(a_Username) == 0)
 		{
@@ -403,7 +403,7 @@ void cServer::TickClients(float a_Dt)
 
 bool cServer::Start(void)
 {
-	for (auto port: m_Ports)
+	for (const auto & port: m_Ports)
 	{
 		UInt16 PortNum;
 		if (!StringToInteger(port, PortNum))
@@ -422,11 +422,7 @@ bool cServer::Start(void)
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
-	if (!m_TickThread.Start())
-	{
-		return false;
-	}
-	return true;
+	return m_TickThread.Start();
 }
 
 
@@ -636,7 +632,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 void cServer::Shutdown(void)
 {
 	// Stop listening on all sockets:
-	for (auto srv: m_ServerHandles)
+	for (const auto & srv: m_ServerHandles)
 	{
 		srv->Close();
 	}

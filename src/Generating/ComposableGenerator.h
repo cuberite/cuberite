@@ -98,7 +98,7 @@ public:
 	*/
 	static cTerrainShapeGenPtr CreateShapeGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
+		const cBiomeGenPtr & a_BiomeGen,
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
@@ -137,7 +137,7 @@ public:
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */
 	static cTerrainHeightGenPtr CreateHeightGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
+		const cBiomeGenPtr & a_BiomeGen,
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
@@ -169,8 +169,8 @@ public:
 	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk. */
 	static cTerrainCompositionGenPtr CreateCompositionGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
-		cTerrainShapeGenPtr a_ShapeGen,
+		const cBiomeGenPtr & a_BiomeGen,
+		const cTerrainShapeGenPtr & a_ShapeGen,
 		int a_Seed
 	);
 } ;

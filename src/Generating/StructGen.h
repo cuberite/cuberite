@@ -25,9 +25,9 @@ public:
 	cStructGenTrees(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, cTerrainCompositionGenPtr a_CompositionGen) :
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
-		m_BiomeGen(a_BiomeGen),
-		m_ShapeGen(a_ShapeGen),
-		m_CompositionGen(a_CompositionGen)
+		m_BiomeGen(std::move(a_BiomeGen)),
+		m_ShapeGen(std::move(a_ShapeGen)),
+		m_CompositionGen(std::move(a_CompositionGen))
 	{}
 
 protected:
@@ -82,7 +82,7 @@ public:
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_Fluid(a_Fluid),
-		m_ShapeGen(a_ShapeGen),
+		m_ShapeGen(std::move(a_ShapeGen)),
 		m_Probability(a_Probability)
 	{
 	}

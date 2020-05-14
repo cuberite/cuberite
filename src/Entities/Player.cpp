@@ -86,7 +86,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 
-cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
+cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName) :
 	Super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
@@ -1869,14 +1869,8 @@ bool cPlayer::PermissionMatches(const AStringVector & a_Permission, const AStrin
 	}
 
 	// So far all the sub-items have matched
-	// If the sub-item count is the same, then the permission matches:
-	if (lenP == lenT)
-	{
-		return true;
-	}
-
-	// There are more sub-items in either the permission or the template, not a match:
-	return false;
+	// If the sub-item count is the same, then the permission matches
+	return (lenP == lenT);
 }
 
 

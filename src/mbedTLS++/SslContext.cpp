@@ -41,7 +41,7 @@ int cSslContext::Initialize(std::shared_ptr<const cSslConfig> a_Config)
 	}
 
 	// Check the Config:
-	m_Config = a_Config;
+	m_Config = std::move(a_Config);
 	if (m_Config == nullptr)
 	{
 		ASSERT(!"Config must not be nullptr");

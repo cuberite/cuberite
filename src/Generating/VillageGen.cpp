@@ -137,7 +137,7 @@ public:
 			{a_OriginX + a_MaxSize, cChunkDef::Height - 1, a_OriginZ + a_MaxSize}
 		),
 		m_Prefabs(a_Prefabs),
-		m_HeightGen(a_HeightGen)
+		m_HeightGen(std::move(a_HeightGen))
 	{
 		// Generate the pieces for this village; don't care about the Y coord:
 		cPieceGeneratorBFSTree pg(*this, a_Seed);
@@ -348,8 +348,8 @@ cVillageGen::cVillageGen(
 	m_MaxSize(a_MaxSize),
 	m_MinDensity(a_MinDensity),
 	m_MaxDensity(a_MaxDensity),
-	m_BiomeGen(a_BiomeGen),
-	m_HeightGen(a_HeightGen)
+	m_BiomeGen(std::move(a_BiomeGen)),
+	m_HeightGen(std::move(a_HeightGen))
 {
 	for (const auto & toLoad: a_PrefabsToLoad)
 	{

@@ -575,11 +575,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
 			continue;
 		}
-		if (MoveItemsToGrid(*chest))
-		{
-			return true;
-		}
-		return false;
+		return MoveItemsToGrid(*chest);
 	}
 
 	// The chest was single and nothing could be moved

@@ -934,7 +934,7 @@ AStringVector ReadUpgradeIniPorts(
 
 	AStringVector Ports;
 
-	for (auto pair : a_Settings.GetValues(a_KeyName))
+	for (const auto & pair : a_Settings.GetValues(a_KeyName))
 	{
 		if (pair.first != a_PortsValueName)
 		{

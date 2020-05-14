@@ -233,7 +233,7 @@ bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 
 	if (SplitAmount.size() > 1)
 	{
-		if (!StringToInteger<char>(SplitAmount[1].c_str(), a_Item.m_ItemCount))
+		if (!StringToInteger<char>(SplitAmount[1], a_Item.m_ItemCount))
 		{
 			return false;
 		}
@@ -241,7 +241,7 @@ bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 
 	if (SplitMeta.size() > 1)
 	{
-		if (!StringToInteger<short>(SplitMeta[1].c_str(), a_Item.m_ItemDamage))
+		if (!StringToInteger<short>(SplitMeta[1], a_Item.m_ItemDamage))
 		{
 			return false;
 		}

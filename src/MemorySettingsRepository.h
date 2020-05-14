@@ -57,7 +57,7 @@ private:
 			#ifdef _DEBUG
 				m_Type(eType::String),
 			#endif
-			m_stringValue (value)
+			m_stringValue (std::move(value))
 		{
 		}
 

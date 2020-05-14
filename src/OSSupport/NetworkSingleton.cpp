@@ -182,7 +182,7 @@ void cNetworkSingleton::SignalizeStartup(evutil_socket_t a_Socket, short a_Event
 
 
 
-void cNetworkSingleton::AddLink(cTCPLinkPtr a_Link)
+void cNetworkSingleton::AddLink(const cTCPLinkPtr & a_Link)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
@@ -211,7 +211,7 @@ void cNetworkSingleton::RemoveLink(const cTCPLink * a_Link)
 
 
 
-void cNetworkSingleton::AddServer(cServerHandlePtr a_Server)
+void cNetworkSingleton::AddServer(const cServerHandlePtr & a_Server)
 {
 	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);

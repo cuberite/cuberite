@@ -75,7 +75,7 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 		return;
 	}
 
-	const AStringVector & IngredientAndOutput = StringSplit(InputAndIngredient[1].c_str(), "=");
+	const AStringVector & IngredientAndOutput = StringSplit(InputAndIngredient[1], "=");
 	if (IngredientAndOutput.size() != 2)
 	{
 		LOGWARNING("brewing.txt: line %d: A line with '=' was expected", a_LineNum);

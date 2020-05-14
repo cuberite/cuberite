@@ -2297,7 +2297,6 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 
 	// Survival inventory and all other windows' inventory has the same handling as normal slot areas
 	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-	return;
 }
 
 

@@ -57,7 +57,7 @@ void cPluginManager::RefreshPluginList(void)
 {
 	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath);
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{
@@ -1401,7 +1401,7 @@ bool cPluginManager::BindCommand(
 
 	auto & reg = m_Commands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = a_Permission;
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1508,7 +1508,7 @@ bool cPluginManager::BindConsoleCommand(
 
 	auto & reg = m_ConsoleCommands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = "";
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1739,7 +1739,7 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 	// Get the old format plugin list, and migrate it.
 	// Upgrade path added on 2020-03-27
 	auto OldValues = a_Settings.GetValues("Plugins");
-	for (auto NameValue : OldValues)
+	for (const auto & NameValue : OldValues)
 	{
 		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
@@ -1759,7 +1759,7 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 
 	// Get the list of plugins to load:
 	auto Values = a_Settings.GetValues("Plugins");
-	for (auto NameValue : Values)
+	for (const auto & NameValue : Values)
 	{
 		AString Enabled = NameValue.second;
 		if (Enabled == "1")

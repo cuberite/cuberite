@@ -409,7 +409,7 @@ static int tolua_LOG(lua_State * tolua_S)
 	}
 
 	// Log the message:
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), LogLevel);
 	return 0;
 }
 
@@ -427,7 +427,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llInfo);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llInfo);
 	return 0;
 }
 
@@ -445,7 +445,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llWarning);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llWarning);
 	return 0;
 }
 
@@ -463,7 +463,7 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llError);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llError);
 	return 0;
 }
 

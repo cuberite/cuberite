@@ -97,7 +97,7 @@ public:
 	This allows us to use shorter cache depths with faster lookups for more covered area. (#381)
 	a_SubCacheSize defines the size of each sub-cache
 	a_NumSubCaches defines how many sub-caches are used for the multicache. */
-	cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 protected:
 	typedef std::vector<cBiomeGenPtr> cBiomeGenPtrs;

@@ -213,7 +213,10 @@ void cClientHandle::GenerateOfflineUUID(void)
 
 
 
-AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
+AString cClientHandle::FormatChatPrefix(
+	bool ShouldAppendChatPrefixes, const AString & a_ChatPrefixS,
+	const AString & m_Color1, const AString & m_Color2
+)
 {
 	if (ShouldAppendChatPrefixes)
 	{
@@ -2075,12 +2078,12 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 	ASSERT(m_Player != nullptr);
 	ASSERT(m_Player->GetWorld() != nullptr);
 
-	if ((cRoot::Get()->GetServer()->ShouldLimitPlayerBlockChanges()) && (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS))
+	if (!cRoot::Get()->GetServer()->ShouldLimitPlayerBlockChanges())
 	{
-		return false;
+		return true;
 	}
 
-	return true;
+	return (m_NumBlockChangeInteractionsThisTick <= MAX_BLOCK_CHANGE_INTERACTIONS);
 }
 
 
@@ -3310,7 +3313,7 @@ void cClientHandle::SocketClosed(void)
 void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
 	ASSERT(m_Self == nullptr);
-	m_Self = a_Self;
+	m_Self = std::move(a_Self);
 }
 
 

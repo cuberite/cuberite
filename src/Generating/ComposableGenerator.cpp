@@ -39,8 +39,8 @@
 
 cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	cIniFile & a_IniFile,
-	cBiomeGenPtr a_BiomeGen,
-	cTerrainShapeGenPtr a_ShapeGen,
+	const cBiomeGenPtr & a_BiomeGen,
+	const cTerrainShapeGenPtr & a_ShapeGen,
 	int a_Seed
 )
 {

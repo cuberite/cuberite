@@ -21,9 +21,9 @@ class cCompositedHeiGen:
 {
 public:
 	cCompositedHeiGen(cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, cTerrainCompositionGenPtr a_CompositionGen):
-		m_BiomeGen(a_BiomeGen),
-		m_ShapeGen(a_ShapeGen),
-		m_CompositionGen(a_CompositionGen)
+		m_BiomeGen(std::move(a_BiomeGen)),
+		m_ShapeGen(std::move(a_ShapeGen)),
+		m_CompositionGen(std::move(a_CompositionGen))
 	{
 	}
 

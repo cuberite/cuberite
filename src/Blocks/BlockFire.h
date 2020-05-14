@@ -167,8 +167,6 @@ public:
 				}
 			}
 		}
-
-		return;
 	}
 
 	/** Evaluates if coordinates are a portal going XP / XM; returns true if so, and writes boundaries to variable

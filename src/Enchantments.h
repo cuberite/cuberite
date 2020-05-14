@@ -137,7 +137,7 @@ public:
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
 
 	/** Check enchantment conflicts from enchantments from the vector */
-	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
+	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
 
 	/** Gets random enchantment from Vector and returns it */
 	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);

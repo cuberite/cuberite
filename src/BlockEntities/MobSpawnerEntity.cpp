@@ -76,14 +76,7 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 
 void cMobSpawnerEntity::UpdateActiveState(void)
 {
-	if (GetNearbyPlayersNum() > 0)
-	{
-		m_IsActive = true;
-	}
-	else
-	{
-		m_IsActive = false;
-	}
+	m_IsActive = (GetNearbyPlayersNum() > 0);
 }
 
 

@@ -108,7 +108,7 @@ bool cPluginLua::Load(void)
 	std::string PluginPath = GetLocalFolder() + "/";
 
 	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
-	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+	AStringVector Files = cFile::GetFolderContents(PluginPath);
 	AStringVector LuaFiles;
 	bool HasInfoLua = false;
 	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)

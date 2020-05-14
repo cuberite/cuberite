@@ -527,11 +527,7 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 		}
 		case 1: if ((*source >= 0x80) && (*source < 0xc2)) return false;
 	}
-	if (*source > 0xf4)
-	{
-		return false;
-	}
-	return true;
+	return (*source <= 0xf4);
 }
 
 
@@ -1052,7 +1048,7 @@ AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AString
 	AStringVector res = a_Strings1;
 
 	// Add each item from strings2 that is not already present:
-	for (auto item : a_Strings2)
+	for (const auto & item : a_Strings2)
 	{
 		if (std::find(res.begin(), res.end(), item) == res.end())
 		{
@@ -1094,11 +1090,7 @@ bool StringToFloat(const AString & a_String, float & a_Num)
 {
 	char *err;
 	a_Num = strtof(a_String.c_str(), &err);
-	if (*err != 0)
-	{
-		return false;
-	}
-	return true;
+	return (*err == 0);
 }
 
 

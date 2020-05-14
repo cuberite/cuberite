@@ -23,11 +23,7 @@ bool cMemorySettingsRepository::HasValue(const AString & a_KeyName, const AStrin
 		return false;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
-	if (iter == outerIter->second.end())
-	{
-		return false;
-	}
-	return true;
+	return (iter != outerIter->second.end());
 }
 
 
@@ -110,7 +106,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 std::vector<std::pair<AString, AString>> cMemorySettingsRepository::GetValues(AString a_keyName)
 {
 	std::vector<std::pair<AString, AString>> ret;
-	for (auto pair : m_Map[a_keyName])
+	for (const auto & pair : m_Map[a_keyName])
 	{
 		ret.emplace_back(pair.first, pair.second.getStringValue());
 	}

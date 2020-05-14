@@ -138,7 +138,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 			{
-				cItem EquippedItem = a_Player.GetEquippedItem();
+				const cItem & EquippedItem = a_Player.GetEquippedItem();
 				if (FollowedItems.ContainsType(EquippedItem))
 				{
 					Vector3d PlayerPos = a_Player.GetPosition();

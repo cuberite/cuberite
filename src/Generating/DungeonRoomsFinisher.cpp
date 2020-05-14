@@ -289,7 +289,7 @@ protected:
 
 cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainShapeGenPtr a_ShapeGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib) :
 	Super(a_Seed + 100, a_GridSize, a_GridSize, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 1024),
-	m_ShapeGen(a_ShapeGen),
+	m_ShapeGen(std::move(a_ShapeGen)),
 	m_MaxHalfSize((a_MaxSize + 1) / 2),
 	m_MinHalfSize((a_MinSize + 1) / 2),
 	m_HeightProbability(cChunkDef::Height)

@@ -16,7 +16,7 @@
 // cHostnameLookup:
 
 cHostnameLookup::cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
-	m_Callbacks(a_Callbacks),
+	m_Callbacks(std::move(a_Callbacks)),
 	m_Hostname(a_Hostname)
 {
 }

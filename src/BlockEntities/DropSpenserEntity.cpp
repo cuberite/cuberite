@@ -51,7 +51,6 @@ void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_D
 		case E_META_DROPSPENSER_FACING_XP: a_RelCoord.x++; return;
 	}
 	LOGWARNING("%s: Unhandled direction: %d", __FUNCTION__, a_Direction);
-	return;
 }
 
 

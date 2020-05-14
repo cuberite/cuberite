@@ -159,7 +159,7 @@ protected:
 	}
 
 
-	std::pair<bool, AString> DoRequest(std::shared_ptr<cUrlClientRequest> a_Self);
+	std::pair<bool, AString> DoRequest(const std::shared_ptr<cUrlClientRequest> & a_Self);
 
 
 	// cNetwork::cConnectCallbacks override: TCP link connected:
@@ -572,7 +572,7 @@ void cUrlClientRequest::OnRemoteClosed()
 
 
 
-std::pair<bool, AString> cUrlClientRequest::DoRequest(std::shared_ptr<cUrlClientRequest> a_Self)
+std::pair<bool, AString> cUrlClientRequest::DoRequest(const std::shared_ptr<cUrlClientRequest> & a_Self)
 {
 	// We need a shared pointer to self, care must be taken not to pass any other ptr:
 	ASSERT(a_Self.get() == this);
@@ -630,7 +630,7 @@ std::pair<bool, AString> cUrlClient::Get(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap a_Headers,
-	AString a_Body,
+	const AString & a_Body,
 	AStringMap a_Options
 )
 {
