@@ -79,7 +79,7 @@ void LOGERROR(std::string_view a_Format, const Args & ... args)
 // Macro variants
 
 // In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(TEST_GLOBALS)
 	#define LOGD LOG
 #else
 	#define LOGD(...)
@@ -87,7 +87,7 @@ void LOGERROR(std::string_view a_Format, const Args & ... args)
 
 #define LOGWARN LOGWARNING
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(TEST_GLOBALS)
 	#define FLOGD FLOG
 #else
 	#define FLOGD(...)
