@@ -13,28 +13,25 @@
 
 static void WriteLogOpener(fmt::memory_buffer & Buffer)
 {
-	time_t rawtime;
-	time(&rawtime);
+	const time_t rawtime = time(nullptr);
 
-	struct tm * timeinfo;
+	struct tm timeinfo;
 #ifdef _MSC_VER
-	struct tm timeinforeal;
-	timeinfo = &timeinforeal;
-	localtime_s(timeinfo, &rawtime);
+	localtime_s(&timeinfo, &rawtime);
 #else
-	timeinfo = localtime(&rawtime);
+	localtime_r(&rawtime, &timeinfo);
 #endif
 
 #ifdef _DEBUG
 	const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
 	fmt::format_to(
 		Buffer, "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",
-		ThreadID, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec
+		ThreadID, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #else
 	fmt::format_to(
 		Buffer, "[{0:02d}:{1:02d}:{2:02d}] ",
-		timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec
+		timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #endif
 }
