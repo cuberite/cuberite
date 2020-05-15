@@ -33,6 +33,7 @@
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
 #include "../LineBlockTracer.h"
+#include "../Logger.h"
 #include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
@@ -401,7 +402,7 @@ static int tolua_LOG(lua_State * tolua_S)
 	}
 
 	// If the param is a cCompositeChat, read the log level from it:
-	cLogger::eLogLevel LogLevel = cLogger::llRegular;
+	eLogLevel LogLevel = eLogLevel::Regular;
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
@@ -427,7 +428,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llInfo);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), eLogLevel::Info);
 	return 0;
 }
 
@@ -445,7 +446,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llWarning);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), eLogLevel::Warning);
 	return 0;
 }
 
@@ -463,7 +464,7 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llError);
+	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), eLogLevel::Error);
 	return 0;
 }
 

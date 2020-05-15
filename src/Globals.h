@@ -200,46 +200,43 @@ template class SizeChecker<UInt8,  1>;
 // Common headers (part 1, without macros):
 #include "fmt.h"
 #include "StringUtils.h"
+#include "LoggerSimple.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
 #include "OSSupport/File.h"
 #include "OSSupport/StackTrace.h"
 
-#ifndef TEST_GLOBALS
+#ifdef TEST_GLOBALS
 
-	#include "LoggerSimple.h"
-
-#else
-	#include "fmt/printf.h"
-
-	// Logging functions
-	template <typename ... Args>
-	void LOG(const char * a_Format, const Args & ... a_Args)
+	// Basic logging function implementations
+	namespace Logger
 	{
-		fmt::printf(a_Format, a_Args...);
+
+	inline void LogFormat(
+		std::string_view a_Format, eLogLevel, fmt::format_args a_ArgList
+	)
+	{
+		fmt::vprint(a_Format, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}
 
-	#define LOGERROR   LOG
-	#define LOGWARNING LOG
-	#define LOGD       LOG
-	#define LOGINFO    LOG
-	#define LOGWARN    LOG
-
-	template <typename ... Args>
-	void FLOG(const char * a_Format, const Args & ... a_Args)
+	inline void LogPrintf(
+		std::string_view a_Format, eLogLevel, fmt::printf_args a_ArgList
+	)
 	{
-		fmt::print(a_Format, a_Args...);
+		fmt::vprintf(a_Format, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}
 
-	#define FLOGERROR   FLOG
-	#define FLOGWARNING FLOG
-	#define FLOGD       FLOG
-	#define FLOGINFO    FLOG
-	#define FLOGWARN    FLOG
+	inline void LogSimple(std::string_view a_Message, eLogLevel)
+	{
+		fmt::print("{}\n", a_Message);
+		fflush(stdout);
+	}
+
+	}  // namespace Logger
 
 #endif
 

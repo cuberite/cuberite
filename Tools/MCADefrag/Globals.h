@@ -135,6 +135,7 @@ typedef unsigned char Byte;
 
 // Common headers (without macros):
 #include "fmt.h"
+#include "LoggerSimple.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
