@@ -20,21 +20,24 @@ if [ `which ccache` ]; then
 	ccache -z # Zero statistics
 fi
 
-# Work around a Clang + ccache issue with failing builds
-# by disabling precompiled headers
-cmake . -DBUILD_TOOLS=YES -DPRECOMPILE_HEADERS=NO -DSELF_TEST=YES ${CACHE_ARGS};
+# Work around a Clang + ccache issue with failing
+# builds by disabling precompiled headers
+cmake . -DBUILD_TOOLS=YES \
+        -DPRECOMPILE_HEADERS=NO \
+        -DUNITY_BUILDS=${TRAVIS_CUBERITE_UNITY_BUILDS-YES} \
+        -DSELF_TEST=YES \
+        ${CACHE_ARGS};
 
 echo "Building..."
-cmake --build . -j 2
+cmake --build . --parallel 2;
 
 if [ `which ccache` ]; then
-		echo "Built with ccache, outputting cache stats..."
-		ccache -s
+	echo "Built with ccache, outputting cache stats..."
+	ccache -s
 fi
 
 echo "Testing..."
-
-ctest -j 2 -V;
+ctest --output-on-failure --parallel 2;
 
 cd Server/;
 touch apiCheckFailed.flag

@@ -16,7 +16,7 @@ jobs:
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Release
-        - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE
+        - TRAVIS_CUBERITE_BUILD_TYPE=Release
 
     - name: "AppleClang - Debug"
       os: osx
@@ -24,7 +24,7 @@ jobs:
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Debug
-        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
+        - TRAVIS_CUBERITE_BUILD_TYPE=Debug
 
     - name: "Clang 7.0 - Release"
       compiler: clang
@@ -39,13 +39,15 @@ jobs:
       before_install: *use-cmake
       env: *Debug
 
-    - name: "GCC 7.4 - Release, CMake 3.12"
+    - name: "GCC 7.4 - Release, CMake 3.12, jumboless"
       compiler: gcc
       before_install:
         - wget --output-document=${HOME}/CMake http://cmake.org/files/v3.13/cmake-3.13.0-rc1-Linux-x86_64.tar.gz
         - tar --extract --one-top-level=${HOME}/SeeMake --strip-components 1 --file ${HOME}/CMake
         - export PATH=${HOME}/SeeMake/bin/:${PATH}
-      env: *Release
+      env:
+        - TRAVIS_CUBERITE_BUILD_TYPE=Release
+        - TRAVIS_CUBERITE_UNITY_BUILDS=No
 
     - name: "GCC 7.4 - Debug"
       compiler: gcc
