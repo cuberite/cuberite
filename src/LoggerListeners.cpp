@@ -21,7 +21,7 @@
 		virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 		{
 			SetLogColour(a_LogLevel);
-			fwrite(a_Message.data(), 1, a_Message.size(), stdout);
+			fwrite(a_Message.data(), sizeof(char), a_Message.size(), stdout);
 			SetDefaultLogColour();
 		}
 	};
@@ -186,7 +186,7 @@ public:
 				break;
 			}
 		}
-		fwrite(a_Message.data(), 1, a_Message.size(), stdout);
+		fwrite(a_Message.data(), sizeof(char), a_Message.size(), stdout);
 	}
 };
 
