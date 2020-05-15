@@ -18,7 +18,6 @@ cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 ${CACHE_ARGS};
 
 echo "Building..."
 cmake --build . -- -j 2;
-ctest -j 2 -V;
 
 if [ `which ccache` ]; then
 		echo "Built with ccache, outputting cache stats..."
@@ -26,6 +25,8 @@ if [ `which ccache` ]; then
 fi
 
 echo "Testing..."
+
+ctest -j 2 -V;
 
 cd Server/;
 touch apiCheckFailed.flag
