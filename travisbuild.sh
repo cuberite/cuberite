@@ -11,6 +11,7 @@ if [ `which ccache` ]; then
 	export CCACHE_CPP2=true
 	CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 	echo "Using ccache installed at $(which ccache)"
+	ccache --max-size=3G
 	ccache -z # Zero statistics
 fi
 
