@@ -1023,9 +1023,9 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
 
 void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, RecipeID);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    MakeAll);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, RecipeID);
+	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,   MakeAll);
 	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
 	if (CuberiteRecipeId.has_value())
 	{
@@ -1444,27 +1444,28 @@ void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
 
 void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
 {
-	// Translate ID here
 	ASSERT(m_State == 3);  // In game mode?
 
 	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
-	if (ProtocolRecipeId.has_value())
+	if (!ProtocolRecipeId.has_value())
 	{
-		cPacketizer Pkt(*this, pktUnlockRecipe);
+		return;
+	}
+
+	cPacketizer Pkt(*this, pktUnlockRecipe);
+	Pkt.WriteVarInt32(0);
+	Pkt.WriteBool(true);
+	Pkt.WriteBool(false);
+	if (a_RecipeID == 0)
+	{
 		Pkt.WriteVarInt32(0);
-		Pkt.WriteBool(true);
-		Pkt.WriteBool(false);
-		if (a_RecipeID == 0)
-		{
-			Pkt.WriteVarInt32(0);
-			Pkt.WriteVarInt32(0);
-		}
-		else
-		{
-			Pkt.WriteVarInt32(1);
-			Pkt.WriteVarInt32(ProtocolRecipeId.value());
-			Pkt.WriteVarInt32(1);
-			Pkt.WriteVarInt32(ProtocolRecipeId.value());
-		}
+		Pkt.WriteVarInt32(0);
+	}
+	else
+	{
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
 	}
 }

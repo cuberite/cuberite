@@ -6360,7 +6360,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "cItem",
 						},
 					},
-					Notes = "Finds an item based on ItemType and ItemDamage (<- defines the itemType, too)",
+					Notes = "Finds an item in the shield, hotbar and inventory slots matching `ItemType` and `ItemDamage`. The actual item is returned, if none is found `nullptr`. This can be used to validate that the player has a specific type of item.",
 				},
 				GetArmorGrid =
 				{
@@ -7528,7 +7528,7 @@ This class represents a 2D array of items. It is used as the underlying storage 
 							Type = "cItem",
 						},
 					},
-					Notes = "Finds an item based on ItemType and ItemDamage (<- defines the itemType, too)",
+					Notes = "Finds an item within the grid matching `ItemType` and `ItemDamage`. The actual item is returned, if none is found `nullptr`.",
 				},
 				GetFirstEmptySlot =
 				{

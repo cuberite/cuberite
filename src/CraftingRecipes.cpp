@@ -341,7 +341,7 @@ const std::map<AString, UInt32> & cCraftingRecipes::GetRecipeNameMap()
 
 
 
-cCraftingRecipes::cRecipe* cCraftingRecipes::GetRecipeById(UInt32 a_RecipeId)
+cCraftingRecipes::cRecipe * cCraftingRecipes::GetRecipeById(UInt32 a_RecipeId)
 {
 	return m_Recipes[a_RecipeId];
 }
@@ -424,7 +424,7 @@ void cCraftingRecipes::LoadRecipes(void)
 
 void cCraftingRecipes::PopulateRecipeNameMap(void)
 {
-	for (UInt32 i=0; i < m_Recipes.size(); i++)
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
 	{
 		if (!m_Recipes[i]->m_RecipeName.empty())
 		{

@@ -1589,7 +1589,7 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
 {
-	// Not implemented
+	// Client doesn't support this feature
 	return;
 }
 
@@ -1599,7 +1599,7 @@ void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
 
 void cProtocol_1_8_0::SendInitRecipes(UInt32 a_RecipeID)
 {
-	// Not implemented
+	// Client doesn't support this feature
 	return;
 }
 

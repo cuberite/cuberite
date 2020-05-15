@@ -449,8 +449,10 @@ cItem * cItemGrid::FindItem(const cItem & a_RecipeItem)
 
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
-		if ((a_RecipeItem.m_ItemType == m_Slots[i].m_ItemType) &&
-			((a_RecipeItem.m_ItemDamage < 0) || (a_RecipeItem.m_ItemDamage == m_Slots[i].m_ItemDamage)))
+		// Items are equal if none is greater the other
+		auto compare = cItem::sItemCompare{};
+		if (!compare(a_RecipeItem, m_Slots[i]) &&
+			!compare(m_Slots[i], a_RecipeItem))
 		{
 			return &m_Slots[i];
 		}

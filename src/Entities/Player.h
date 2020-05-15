@@ -600,7 +600,8 @@ public:
 	/** get player explosion exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 
-	/** Adds an Item ID to the list of known items */
+	/** Adds an Item to the list of known items.
+	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
 protected:
@@ -756,6 +757,12 @@ protected:
 	/** The main hand of the player */
 	eMainHand m_MainHand;
 
+	/** List on known recipes as Ids */
+	std::set<UInt32> m_KnownRecipes;
+
+	/** List of known items as Ids */
+	std::set<cItem, cItem::sItemCompare> m_KnownItems;
+
 	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
@@ -798,13 +805,8 @@ private:
 	If he is not on ground it also gets divided by 5. */
 	float GetDigSpeed(BLOCKTYPE a_Block);
 
-	/** Add the recipe ID to the known recipes */
+	/** Add the recipe Id to the known recipes.
+	If the recipe is already known, does nothing. */
 	void AddKnownRecipe(UInt32 RecipeId);
-
-	/** List on known recipes as IDs */
-	std::set<UInt32> m_KnownRecipes;
-
-	/** List of known items as IDs */
-	std::set<cItem, cItem::sItemCompare> m_KnownItems;
 
 } ;  // tolua_export

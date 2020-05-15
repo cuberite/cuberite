@@ -10,8 +10,6 @@
 
 #include "Item.h"
 
-#include "Protocol/RecipeMapper.h"
-
 // fwd: cPlayer.h
 class cPlayer;
 
@@ -102,7 +100,20 @@ protected:
 
 
 
+/**
+The crafting recipes are the configurations to build a result item out of a set
+of ingredient items.
 
+The recipes are configured in the `crafting.txt`. When populating the crafting
+grid in game (inventory or crafting table), the items are compared to the
+ingredients to find a matching recipe and show and craft the result.
+
+Each recipe is defined via the result, the ingredients and the minecraft recipe
+name.
+
+To handle the crafting recipes internally efficient the vector index of the
+`cRecipes` is used as `RecipeId`.
+*/
 class cCraftingRecipes
 {
 public:
@@ -115,7 +126,7 @@ public:
 	/** Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found. */
 	void GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 
-	/** Find recipes which contain the new item and all ingredients are in the known items */
+	/** Find recipes and returns the RecipeIds which contain the new item and all ingredients are in the known items */
 	std::vector<UInt32> FindNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
 
 	struct cRecipeSlot
@@ -181,11 +192,19 @@ protected:
 	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight);
 
 private:
-	/** Checks if all ingredients of the recipe are within the know items list and if the (new) ItemId is part of the ingredients. This makes sure to only find 'new' recipes */
-	bool IsNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems);
-
 	/** Mapping the minecraft recipe names to the internal cuberite recipe Ids */
 	std::map<AString, UInt32> m_RecipeNameMap;
+
+	/**
+	Checks if all ingredients of the a_Recipe are within the a_KnownItems list and
+	if the a_NewItem is part of the ingredients.
+	This makes sure to only find 'newly discovered' recipes.
+	*/
+	bool IsNewCraftableRecipe(
+		const cRecipe * a_Recipe,
+		const cItem & a_NewItem,
+		const std::set<cItem, cItem::sItemCompare> & a_KnownItems
+	);
 
 	/** Populates the RecipeNameMap */
 	void PopulateRecipeNameMap(void);

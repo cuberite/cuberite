@@ -175,7 +175,7 @@ public:
 	`m_ItemType` and the wood kind is defined via `m_ItemDamage`. `-1` is used
 	as placeholder for all kinds (e.g. all kind of planks).
 
-	So items are different when the `ItemType is different` or the `ItemDamage`
+	Items are different when the `ItemType` is different or the `ItemDamage`
 	is different and unequal -1.
 	*/
 	struct sItemCompare

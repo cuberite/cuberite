@@ -223,13 +223,17 @@ void cPlayer::AddKnownItem(const cItem & a_Item)
 	}
 
 	auto Response = m_KnownItems.insert(a_Item.CopyOne());
-	if (Response.second)
+	if (!Response.second)
 	{
-		auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
-		for (const auto & RecipeId : Recipes)
-		{
-			AddKnownRecipe(RecipeId);
-		}
+		// The item was already known, bail out:
+		return;
+	}
+
+	// Process the recipes that got unlocked by this newly-known item:
+	auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
+	for (const auto & RecipeId : Recipes)
+	{
+		AddKnownRecipe(RecipeId);
 	}
 }
 
@@ -240,10 +244,12 @@ void cPlayer::AddKnownItem(const cItem & a_Item)
 void cPlayer::AddKnownRecipe(UInt32 a_RecipeId)
 {
 	auto Response = m_KnownRecipes.insert(a_RecipeId);
-	if (Response.second)
+	if (!Response.second)
 	{
-		m_ClientHandle->SendUnlockRecipe(a_RecipeId);
+		// The recipe was already known, bail out:
+		return;
 	}
+	m_ClientHandle->SendUnlockRecipe(a_RecipeId);
 }
 
 

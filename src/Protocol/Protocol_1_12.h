@@ -20,7 +20,7 @@ Declares the 1.12 protocol classes:
 
 #include "Protocol_1_11.h"
 
-
+#include "RecipeMapper.h"
 
 
 

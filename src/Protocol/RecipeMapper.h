@@ -3,6 +3,13 @@
 #include "../CraftingRecipes.h"
 #include <optional>
 
+/**
+The RecipeMapper handles the translation of crafting recipes into protocol
+specific recipe Ids.
+The crafting recipes are identified by the RecipeId.
+The actual configuration is stored in the protocol specific configuration
+directory, e.g. `Server/Protocol/1.12.2/base.recipes.txt`
+*/
 class cRecipeMapper
 {
 public:
