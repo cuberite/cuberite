@@ -11,6 +11,7 @@ if [ `which ccache` ]; then
 	export CCACHE_CPP2=true
 	CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 	echo "Using ccache installed at $(which ccache)"
+	ccache -z # Zero statistics
 fi
 
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 ${CACHE_ARGS};
@@ -18,6 +19,11 @@ cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 ${CACHE_ARGS};
 echo "Building..."
 cmake --build . -- -j 2;
 ctest -j 2 -V;
+
+if [ `which ccache` ]; then
+		echo "Built with ccache, outputting cache stats..."
+		ccache -s
+fi
 
 echo "Testing..."
 
