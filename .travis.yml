@@ -13,42 +13,42 @@ addons:
     confinement: classic
     channel: latest
 
-matrix:
+jobs:
   include:
-    # AppleClang Release
     # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
-    - os: osx
+    - name: "AppleClang - Release"
+      os: osx
       osx_image: xcode11.3
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Release
         - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE
 
-    # AppleClang Debug
-    - os: osx
+    - name: "AppleClang - Debug"
+      os: osx
       osx_image: xcode11.3
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
       env: &Debug
         - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG
 
-    # Clang 7.0 - Release
-    - compiler: clang
+    - name: "Clang 7.0 - Release"
+      compiler: clang
       before_install: &use-cmake
         - export PATH=/snap/bin/:${PATH}
       env: *Release
 
-    # Clang 7.0 - Debug
-    - compiler: clang
+    - name: "Clang 7.0 - Debug"
+      compiler: clang
       before_install: *use-cmake
       env: *Debug
 
-    # GCC 7.4 - Release, CMake 3.12
-    - compiler: gcc
+    - name: "GCC 7.4 - Release, CMake 3.12"
+      compiler: gcc
       env: *Release
 
-    # GCC 7.4 - Debug
-    - compiler: gcc
+    - name: "GCC 7.4 - Debug"
+      compiler: gcc
       before_install: *use-cmake
       env: *Debug
 
