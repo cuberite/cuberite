@@ -80,6 +80,11 @@ public:
 	/** Writes up to a_NumBytes bytes from a_Buffer, returns the number of bytes actually written, or -1 on failure; asserts if not open */
 	int Write(const void * a_Buffer, size_t a_NumBytes);
 
+	int Write(std::string_view a_String)
+	{
+		return Write(a_String.data(), a_String.size());
+	}
+
 	/** Seeks to iPosition bytes from file start, returns old position or -1 for failure; asserts if not open */
 	long Seek (int iPosition);
 

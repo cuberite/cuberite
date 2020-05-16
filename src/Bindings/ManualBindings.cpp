@@ -367,23 +367,19 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 /** Retrieves the log message from the first param on the Lua stack.
 Can take either a string or a cCompositeChat.
 */
-static AString GetLogMessage(lua_State * tolua_S)
+static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 {
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		return static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		Logger::LogSimple(Msg, a_LogLevel);
+		return;
 	}
-	else
-	{
-		size_t len = 0;
-		const char * str = lua_tolstring(tolua_S, 1, &len);
-		if (str != nullptr)
-		{
-			return AString(str, len);
-		}
-	}
-	return "";
+
+	size_t len = 0;
+	const char * str = lua_tolstring(tolua_S, 1, &len);
+	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
 }
 
 
@@ -401,15 +397,17 @@ static int tolua_LOG(lua_State * tolua_S)
 	}
 
 	// If the param is a cCompositeChat, read the log level from it:
-	cLogger::eLogLevel LogLevel = cLogger::llRegular;
+	eLogLevel LogLevel = eLogLevel::Regular;
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType());
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(
+			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
+		);
 	}
 
 	// Log the message:
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), LogLevel);
+	LogFromLuaStack(tolua_S, LogLevel);
 	return 0;
 }
 
@@ -427,7 +425,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llInfo);
+	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
 
@@ -445,7 +443,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llWarning);
+	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
 
@@ -463,7 +461,7 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S), cLogger::llError);
+	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
 

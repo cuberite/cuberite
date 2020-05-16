@@ -7,7 +7,6 @@
 
 #include "Defines.h"
 #include "json/json.h"
-#include "Logger.h"
 
 
 
@@ -231,7 +230,7 @@ public:
 
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
-	static cLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+	static eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
