@@ -32,8 +32,8 @@ echo "Building..."
 cmake --build . -j 2
 
 if [ `which ccache` ]; then
-		echo "Built with ccache, outputting cache stats..."
-		ccache -s
+	echo "Built with ccache, outputting cache stats..."
+	ccache -s
 fi
 
 echo "Testing..."
