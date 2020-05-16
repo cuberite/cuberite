@@ -200,11 +200,11 @@ add_subdirectory(lib/expat)
 add_subdirectory(lib/fmt)
 add_subdirectory(lib/jsoncpp EXCLUDE_FROM_ALL)
 add_subdirectory(lib/libevent EXCLUDE_FROM_ALL)
-add_subdirectory(lib/sqlite)
 add_subdirectory(lib/lua)
 add_subdirectory(lib/luaexpat)
 add_subdirectory(lib/mbedtls)
-add_subdirectory(lib/SQLiteCpp)
+add_subdirectory(lib/SQLiteCpp) # SQLiteCpp needs to be included before sqlite so the lsqlite target is available
+add_subdirectory(lib/sqlite)
 add_subdirectory(lib/tolua++ EXCLUDE_FROM_ALL)
 add_subdirectory(lib/zlib)
 
