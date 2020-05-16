@@ -1,11 +1,6 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/libevent/include)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/mbedtls/include)
-
-add_definitions(-DTEST_GLOBALS=1)
 
 # Create a single Network library that contains all the networking code:
 set (Network_SRCS
@@ -103,7 +98,7 @@ set_target_properties(
 )
 set_target_properties(
 	Network
-	PROPERTIES FOLDER Lib
+	PROPERTIES FOLDER Tests/Libraries
 )
 
 

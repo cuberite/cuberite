@@ -1,9 +1,8 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	ItemHandler.cpp
-)
 
-SET (HDRS
 	ItemArmor.h
 	ItemAxe.h
 	ItemBed.h
@@ -62,8 +61,3 @@ SET (HDRS
 	ItemSword.h
 	ItemThrowable.h
 )
-
-if(NOT MSVC)
-	add_library(Items ${SRCS} ${HDRS})
-	target_link_libraries(Items fmt::fmt SQLiteCpp)
-endif()

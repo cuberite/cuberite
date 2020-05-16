@@ -1,16 +1,12 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	BlockBed.cpp
 	BlockDoor.cpp
 	BlockHandler.cpp
 	BlockPiston.cpp
 	ChunkInterface.cpp
-)
 
-SET (HDRS
 	BlockAnvil.h
 	BlockBed.h
 	BlockBigFlower.h
@@ -105,8 +101,3 @@ SET (HDRS
 	Mixins.h
 	WorldInterface.h
 )
-
-if(NOT MSVC)
-	add_library(Blocks ${SRCS} ${HDRS})
-	target_link_libraries(Blocks fmt::fmt SQLiteCpp)
-endif()

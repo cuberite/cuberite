@@ -8,26 +8,36 @@ export CUBERITE_BUILD_DATETIME=`date`
 
 # Use ccache if available
 if [ `which ccache` ]; then
+	# Re-run compile on pre-processed sources on cache miss
+	# "It's slower actually, but clang builds fail without it."
 	export CCACHE_CPP2=true
+
+	# Tell CMake of ccache's existence
 	CACHE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+
 	echo "Using ccache installed at $(which ccache)"
 	ccache --max-size=3G
 	ccache -z # Zero statistics
 fi
 
-cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1 ${CACHE_ARGS};
+# Work around a Clang + ccache issue with failing
+# builds by disabling precompiled headers
+cmake . -DBUILD_TOOLS=YES \
+        -DPRECOMPILE_HEADERS=NO \
+        -DUNITY_BUILDS=${TRAVIS_CUBERITE_UNITY_BUILDS-YES} \
+        -DSELF_TEST=YES \
+        ${CACHE_ARGS};
 
 echo "Building..."
-cmake --build . -j 2
+cmake --build . --parallel 2;
 
 if [ `which ccache` ]; then
-		echo "Built with ccache, outputting cache stats..."
-		ccache -s
+	echo "Built with ccache, outputting cache stats..."
+	ccache -s
 fi
 
 echo "Testing..."
-
-ctest -j 2 -V;
+ctest --output-on-failure --parallel 2;
 
 cd Server/;
 touch apiCheckFailed.flag
