@@ -14,6 +14,8 @@
 #pragma once
 
 #include <event2/event.h>
+#include <asio/ip/tcp.hpp>
+#include <asio/io_context.hpp>
 #include "NetworkLookup.h"
 #include "CriticalSection.h"
 #include "Event.h"
@@ -57,7 +59,7 @@ public:
 	event_base * GetEventBase(void) { return m_EventBase; }
 
 	/** Returns the thread used to perform hostname and IP lookups */
-	cNetworkLookup & GetLookupThread() { return m_LookupThread; }
+	asio::ip::tcp::resolver & GetLookupThread() { return m_Resolver; }
 
 	/** Adds the specified link to m_Connections.
 	Used by the underlying link implementation when a new link is created. */
@@ -100,7 +102,11 @@ protected:
 	cEvent m_StartupEvent;
 
 	/** The thread on which hostname and ip address lookup is performed. */
-	cNetworkLookup m_LookupThread;
+	std::thread m_LookupThread;
+
+	asio::io_context m_Context;
+
+	asio::ip::tcp::resolver m_Resolver;
 
 
 	/** Converts LibEvent-generated log events into log messages in MCS log. */

@@ -52,7 +52,7 @@ static void DoTest(void)
 
 	// Look up google.com (has multiple IP addresses):
 	LOGD("Network test: Looking up google.com");
-	if (!cNetwork::HostnameToIP("google.com", std::make_shared<cFinishLookupCallbacks>(evtFinish)))
+	if (!cNetwork::HostnameToIP("google.com", std::make_unique<cFinishLookupCallbacks>(evtFinish)))
 	{
 		LOGWARNING("Cannot resolve google.com to IP");
 		abort();
@@ -63,7 +63,7 @@ static void DoTest(void)
 
 	// Look up 8.8.8.8 (Google free DNS):
 	LOGD("Network test: Looking up IP 8.8.8.8");
-	if (!cNetwork::IPToHostName("8.8.8.8", std::make_shared<cFinishLookupCallbacks>(evtFinish)))
+	if (!cNetwork::IPToHostName("8.8.8.8", std::make_unique<cFinishLookupCallbacks>(evtFinish)))
 	{
 		LOGWARNING("Cannot resolve 8.8.8.8 to name");
 		abort();

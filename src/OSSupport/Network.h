@@ -297,7 +297,7 @@ public:
 		Only called if there was no error reported. */
 		virtual void OnFinished(void) = 0;
 	};
-	typedef std::shared_ptr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
+	typedef std::unique_ptr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
 
 
 	/** Queues a TCP connection to be made to the specified host.

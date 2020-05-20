@@ -49,6 +49,7 @@ function(link_dependencies TARGET)
 	# Add required includes:
 	target_include_directories(
 		${TARGET} SYSTEM PRIVATE
+		lib/asio/asio/include
 		lib/mbedtls/include
 		lib/TCLAP/include
 		lib # TODO fix files including zlib/x instead of x
