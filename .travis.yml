@@ -1,22 +1,28 @@
 language: cpp
-cache: ccache
+cache:
+  ccache: true
+  directories:
+    # Store ctest cost data
+    - Testing
 
 # Use Linux by default
 os: linux
 dist: bionic
 
-# TODO: add ARM64, PPC, IBM builds when we find CMake for them
+# TODO: add IBM builds when we find CMake for them
+#       add PowerPC builds when sqlite3 crashing is fixed
 
 jobs:
   include:
-    # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
-    - name: "AppleClang - Release"
-      os: osx
-      osx_image: xcode11.3
+    # ARM workers are the slowest. Having these first in the build matrix makes travis faster overall.
+    - name: "Clang 6.0 - Debug"
+      arch: arm64
+      compiler: clang
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-      env: &Release
-        - TRAVIS_CUBERITE_BUILD_TYPE=Release
+        - wget --output-document=${HOME}/CMake http://anaconda.org/conda-forge/cmake/3.17.0/download/linux-aarch64/cmake-3.17.0-h28c56e5_0.tar.bz2
+        - tar --extract --one-top-level=${HOME}/SeeMake --file ${HOME}/CMake
+        - export PATH=${HOME}/SeeMake/bin/:${PATH}
+      env: *Debug
 
     - name: "AppleClang - Debug"
       os: osx
@@ -54,14 +60,14 @@ jobs:
       before_install: *use-cmake
       env: *Debug
 
-before_script:
-  - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
+# Run the build and tests
 script: ./travisbuild.sh
 
 notifications:
   email:
     on_success: change
     on_failure: always
+
 branches:
   only:
     - master

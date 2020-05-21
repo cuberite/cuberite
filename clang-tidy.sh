@@ -12,7 +12,7 @@ cd tidy-build
 
 # Disable precompiled headers since they aren't generated during linting which causes an error
 # Disable unity builds since clang-tidy needs the full list of compiled files to check each one
-cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPRECOMPILE_HEADERS=OFF -DUNITY_BUILDS=OFF ..
+cmake --target Cuberite -DCMAKE_EXPORT_COMPILE_COMMANDS=Yes -DPRECOMPILE_HEADERS=No -DUNITY_BUILDS=No ..
 
 # Ensure LuaState_Typedefs.inc has been generated
 (cd ../src/Bindings && lua BindingsProcessor.lua)

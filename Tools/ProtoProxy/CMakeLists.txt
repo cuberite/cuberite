@@ -1,10 +1,7 @@
 project (ProtoProxy)
+find_package(Threads REQUIRED)
 
 include(../../SetFlags.cmake)
-
-set_flags()
-set_lib_flags()
-
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
@@ -21,8 +18,6 @@ function(flatten_files arg1)
 endfunction()
 
 add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -99,5 +94,5 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt)
+target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt Threads::Threads)
 

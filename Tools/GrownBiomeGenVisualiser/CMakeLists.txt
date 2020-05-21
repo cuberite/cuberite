@@ -1,13 +1,7 @@
 project (GrownBiomeGenVisualiser)
-
-# Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
-enable_language(CXX C)
+find_package(Threads REQUIRED)
 
 include(../../SetFlags.cmake)
-set_flags()
-set_lib_flags()
-enable_profile()
-
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
@@ -23,10 +17,6 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-
-# Include the libraries:
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -89,6 +79,6 @@ add_executable(GrownBiomeGenVisualiser
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(GrownBiomeGenVisualiser fmt::fmt)
+target_link_libraries(GrownBiomeGenVisualiser fmt::fmt Threads::Threads)
 
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)

@@ -2,10 +2,6 @@ project (AnvilStats)
 
 include(../../SetFlags.cmake)
 
-set_flags()
-set_lib_flags()
-
-
 # Set include paths to the used libraries:
 include_directories("../../lib")
 include_directories("../../src")
@@ -22,8 +18,6 @@ function(flatten_files arg1)
 endfunction()
 
 add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
