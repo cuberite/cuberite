@@ -2742,7 +2742,7 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		if (JsonUtils::ParseString(Line, root))
+		if (JsonUtils::ParseString(Line, root) && root.isString())
 		{
 			Lines[i] = root.asString();
 		}
