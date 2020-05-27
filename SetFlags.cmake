@@ -81,38 +81,44 @@ macro(enable_profile)
 	endif()
 endmacro()
 
-# Add coverage processing, if requested:
-if (NOT MSVC)
+function(set_global_flags)
+	if(MSVC)
+		# Make build use multiple threads under MSVC:
+		add_compile_options(/MP)
 
-	if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
-		message("Including CodeCoverage")
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
-		include(CodeCoverage)
+		# Make build use Unicode:
+		add_compile_definitions(UNICODE _UNICODE)
+	else()
+		# TODO: is this needed? NDEBUG is standard. Also, why are we using _DEBUG?
+		# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
+		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
+		set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
+		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
+		set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   -D_DEBUG")
+		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -DNDEBUG")
+		set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    -DNDEBUG")
 	endif()
-endif()
 
-# TODO: is this needed? NDEBUG is standard. Also, why are we using _DEBUG?
-# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-if (NOT MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
-	set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
-	set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
-	set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   -D_DEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -DNDEBUG")
-	set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    -DNDEBUG")
-endif()
+	# Allow for a forced 32-bit build under 64-bit OS:
+	if (FORCE_32)
+		add_compile_options(-m32)
+		add_link_options(-m32)
+	endif()
 
-if(MSVC)
-	# Make build use multiple threads under MSVC:
-	add_compile_options(/MP)
+	# Have the compiler generate code specifically targeted at the current machine on Linux:
+	if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
+		add_compile_options(-march=native)
+	endif()
+endfunction()
 
-	# Make build use Unicode:
-	add_compile_definitions(UNICODE _UNICODE)
+function(enable_warnings TARGET)
+	if (MSVC)
+		# TODO: MSVC level 4, warnings as errors
+		return ()
+	endif()
 
-	# TODO: level 4, warnings as errors
-else()
 	target_compile_options(
-		${CMAKE_PROJECT_NAME} PRIVATE
+		${TARGET} PRIVATE
 
 		# We use a signed char (fixes #640 on RasPi)
 		# TODO: specify this in code, not a compile flag:
@@ -135,7 +141,7 @@ else()
 
 	if(CMAKE_CXX_COMPILE_ID STREQUAL "Clang")
 		target_compile_options(
-			${CMAKE_PROJECT_NAME}Cuberite PRIVATE
+			${TARGET} PRIVATE
 
 			# Warnings-as-errors only on Clang for now:
 			-Werror
@@ -147,15 +153,4 @@ else()
 			-Wno-error=unused-command-line-argument
 		)
 	endif()
-endif()
-
-# Allow for a forced 32-bit build under 64-bit OS:
-if (FORCE_32)
-	add_flags_cxx("-m32")
-	add_flags_lnk("-m32")
-endif()
-
-# Have the compiler generate code specifically targeted at the current machine on Linux:
-if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
-	add_flags_cxx("-march=native")
-endif()
+endfunction()
