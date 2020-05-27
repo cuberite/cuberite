@@ -28,7 +28,19 @@ option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
 option(SELF_TEST "Enables testing code to be built" OFF)
 option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
 
-# We need C++17 features
+include("CMake/AddDependencies.cmake")
+include("CMake/Fixups.cmake")
+include("CMake/GenerateBindings.cmake")
+include("CMake/GroupSources.cmake")
+include("SetFlags.cmake")
+
+# Add build timestamp and details:
+include("CMake/StampBuild.cmake")
+
+# TODO: set_build_stamp()
+set_global_flags()
+
+# We need C++17 features:
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -40,14 +52,14 @@ if(WHOLE_PROGRAM_OPTIMISATION)
 	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ${IPO_SUPPORTED})
 endif()
 
-# Static CRT
+# Static CRT:
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-# Add build timestamp and details:
-include("CMake/StampBuild.cmake")
 
 add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(src)
+
+enable_warnings(${CMAKE_PROJECT_NAME})
+build_dependencies(${CMAKE_PROJECT_NAME})
 
 # Set the startup project to Cuberite, and the debugger dir:
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
@@ -93,8 +105,6 @@ if(${SELF_TEST})
 	add_subdirectory(tests)
 endif()
 
-include("CMake/AddDependencies.cmake")
-include("CMake/Fixups.cmake")
-include("CMake/GenerateBindings.cmake")
-include("CMake/GroupSources.cmake")
-include("SetFlags.cmake")
+emit_fixups()
+group_sources()
+enable_bindings_generation()
