@@ -97,11 +97,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# The need for speed (in Release)
-include(CheckIPOSupported)
-check_ipo_supported(RESULT IPO_SUPPORTED)
-if(IPO_SUPPORTED)
-	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+# The need for speed (in Release):
+if(WHOLE_PROGRAM_OPTIMISATION)
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT IPO_SUPPORTED)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ${IPO_SUPPORTED})
 endif()
 
 # Static CRT
