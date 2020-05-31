@@ -20,12 +20,13 @@ if [ `which ccache` ]; then
 	ccache -z # Zero statistics
 fi
 
-# Work around a Clang + ccache issue with failing
-# builds by disabling precompiled headers
+# Work around a Clang + ccache issue with failing builds by disabling
+# precompiled headers. Turn off LTO for faster build speeds
 cmake . -DBUILD_TOOLS=YES \
         -DPRECOMPILE_HEADERS=NO \
         -DUNITY_BUILDS=${TRAVIS_CUBERITE_UNITY_BUILDS-YES} \
         -DSELF_TEST=YES \
+        -DWHOLE_PROGRAM_OPTIMISATION=No \
         ${CACHE_ARGS};
 
 echo "Building..."
