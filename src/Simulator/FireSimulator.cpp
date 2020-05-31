@@ -137,6 +137,16 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 		// FIRE_FLOG("FS: Fire at {0} is stepping", absPos);
 
+		// TODO: Add some randomness into this
+		const auto BurnStep = GetBurnStepTime(a_Chunk, relPos);
+		if (BurnStep == 0)
+		{
+			// Fire has no fuel or ground block, extinguish flame
+			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+			itr = Data.erase(itr);
+			continue;
+		}
+
 		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
@@ -154,7 +164,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			a_Chunk->SetMeta(relPos, BlockMeta + 1);
 		}
 
-		itr->Data = GetBurnStepTime(a_Chunk, relPos);  // TODO: Add some randomness into this
+		itr->Data = BurnStep;
 		++itr;
 	}  // for itr - Data[]
 }
@@ -236,9 +246,8 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 		return;
 	}
 
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
+	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
+	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelPos);
 	if (!IsAllowedBlock(BlockType))
 	{
 		return;
@@ -248,15 +257,24 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
+		const Vector3i ItrPos{itr->x, itr->y, itr->z};
+		if (ItrPos == RelPos)
 		{
-			// Already present, skip adding
+			// Block already present, check if burn step should decrease
+			// This means if fuel is removed, then the fire burns out sooner
+			const auto NewBurnStep = GetBurnStepTime(a_Chunk, RelPos);
+			if (itr->Data > NewBurnStep)
+			{
+				FIRE_FLOG("FS: Block lost its fuel at {0}", a_Block);
+				itr->Data = NewBurnStep;
+			}
+
 			return;
 		}
 	}  // for itr - ChunkData[]
 
 	FIRE_FLOG("FS: Adding block {0}", a_Block);
-	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ, 100));
+	ChunkData.push_back(cCoordWithInt(RelPos.x, RelPos.y, RelPos.z, 100));
 }
 
 
@@ -298,8 +316,6 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 	{
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
-		// SetBlock just to make sure fire doesn't spawn
-		a_Chunk->SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 		return 0;
 	}
 	return static_cast<int>(m_BurnStepTimeNonfuel);
