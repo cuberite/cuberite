@@ -75,12 +75,15 @@ void cNetworkSingleton::Initialise(void)
 	#endif
 
 	// Create the main event_base:
-	m_EventBase = event_base_new();
+	event_config * config = event_config_new();
+	event_config_set_flag(config, EVENT_BASE_FLAG_STARTUP_IOCP);
+	m_EventBase = event_base_new_with_config(config);
 	if (m_EventBase == nullptr)
 	{
 		LOGERROR("Failed to initialize LibEvent. The server will now terminate.");
 		abort();
 	}
+	event_config_free(config);
 
 	// Create the event loop thread:
 	m_HasTerminated = false;
