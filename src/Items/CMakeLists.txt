@@ -10,10 +10,10 @@ target_sources(
 	ItemBoat.h
 	ItemBottle.h
 	ItemBow.h
-	ItemBrewingStand.h
+	# ItemBrewingStand.h - SimplePlaceableItemHandler.h
 	ItemBucket.h
-	ItemCake.h
-	ItemCauldron.h
+	# ItemCake.h - SimplePlaceableItemHandler.h
+	# ItemCauldron.h - Merged to SimplePlaceableItemHandler.h
 	ItemChest.h
 	ItemCloth.h
 	ItemComparator.h
@@ -22,7 +22,7 @@ target_sources(
 	ItemDye.h
 	ItemEmptyMap.h
 	ItemFishingRod.h
-	ItemFlowerPot.h
+	# ItemFlowerPot.h - Merged to SimplePlaceableItemHandler.h
 	ItemFood.h
 	ItemFoodSeeds.h
 	ItemGoldenApple.h
@@ -56,8 +56,9 @@ target_sources(
 	ItemSoup.h
 	ItemSpawnEgg.h
 	ItemSpiderEye.h
-	ItemString.h
-	ItemSugarcane.h
+	# ItemString.h - Merged to SimplePlaceableItemHandler.h
+	# ItemSugarcane.h - Merged to SimplePlaceableItemHandler.h
 	ItemSword.h
 	ItemThrowable.h
+	SimplePlaceableItemHandler.h
 )

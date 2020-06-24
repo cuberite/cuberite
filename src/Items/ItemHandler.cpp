@@ -67,6 +67,7 @@
 #include "ItemThrowable.h"
 
 #include "../Blocks/BlockHandler.h"
+#include "SimplePlaceableItemHandler.h"
 
 
 
@@ -132,9 +133,9 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:       return new cItemBrewingStandHandler(a_ItemType);
-		case E_ITEM_CAKE:                return new cItemCakeHandler(a_ItemType);
-		case E_ITEM_CAULDRON:            return new cItemCauldronHandler(a_ItemType);
+		case E_ITEM_BREWING_STAND:       return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_BREWING_STAND);
+		case E_ITEM_CAKE:                return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAKE);
+		case E_ITEM_CAULDRON:            return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAULDRON);
 		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:                 return new cItemEggHandler();
@@ -145,7 +146,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_FLOWER_POT:          return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_FLOWER_POT);
 		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
@@ -160,8 +161,8 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
-		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
+		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_TRIPWIRE);
+		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_SUGARCANE);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
