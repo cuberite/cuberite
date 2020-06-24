@@ -8,7 +8,7 @@ class cSimplePlaceableItemHandler : public cItemHandler
 	using Super = cItemHandler;
 
   public:
-	cSimplePlaceableItemHandler(int a_ItemType, int a_BlockType) :
+	cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
 		Super(a_ItemType)
 	{
 		m_BlockType = a_BlockType;
@@ -29,5 +29,5 @@ class cSimplePlaceableItemHandler : public cItemHandler
 	}
 
   protected:
-	int m_BlockType;
+	BLOCKTYPE m_BlockType;
 };
