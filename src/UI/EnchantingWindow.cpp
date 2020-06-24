@@ -11,12 +11,12 @@
 
 
 
-cEnchantingWindow::cEnchantingWindow(Vector3i a_Block) :
+cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos) :
 	cWindow(wtEnchantment, "Enchant"),
 	m_SlotArea(),
-	m_Block(a_Block)
+	m_BlockPos(a_BlockPos)
 {
-	m_SlotArea = new cSlotAreaEnchanting(*this, m_Block);
+	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockPos);
 	m_SlotAreas.push_back(m_SlotArea);
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));

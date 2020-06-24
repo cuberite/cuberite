@@ -22,7 +22,7 @@ class cEnchantingWindow:
 
 public:
 
-	cEnchantingWindow(Vector3i a_Block);
+	cEnchantingWindow(Vector3i a_BlockPos);
 
 	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
 
@@ -37,7 +37,7 @@ public:
 
 protected:
 	short m_PropertyValue[3];
-	Vector3i m_Block;
+	Vector3i m_BlockPos;
 };
 
 

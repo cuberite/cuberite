@@ -47,15 +47,6 @@ void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Playe
 
 
 
-void cAnvilWindow::GetBlockPos(Vector3i & a_Pos)
-{
-	a_Pos = m_BlockPos;
-}
-
-
-
-
-
 void cAnvilWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas AreasInOrder;

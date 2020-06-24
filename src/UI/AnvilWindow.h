@@ -31,7 +31,7 @@ public:
 	void SetRepairedItemName(const AString & a_Name, cPlayer * a_Player);
 
 	/** Gets the Position from the Anvil */
-	void GetBlockPos(Vector3i & a_Pos);
+	const Vector3i & GetBlockPos() { return m_BlockPos; }
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 

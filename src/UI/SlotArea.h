@@ -381,7 +381,7 @@ class cSlotAreaEnchanting:
 
 public:
 
-	cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_Block);
+	cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_BlockPos);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
@@ -399,7 +399,7 @@ protected:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
-	Vector3i m_Block;
+	Vector3i m_BlockPos;
 };
 
 

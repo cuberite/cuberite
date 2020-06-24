@@ -22,7 +22,7 @@ class cCraftingWindow:
 
 public:
 
-	cCraftingWindow(Vector3i a_Block);
+	cCraftingWindow();
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 };

@@ -121,4 +121,3 @@ build-cuberite
 # clang-tidy
 tidy-build
 run-clang-tidy.py
-/VS2019-x64
