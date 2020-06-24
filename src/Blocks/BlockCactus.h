@@ -20,33 +20,40 @@ public:
 	}
 
 
-	/** Called before a block is placed into a world by player, by cItemHandler::GetPlacementBlockTypeMeta().
-	 The handler should return true to allow placement, false to refuse.
-	 a_PlacedBlockPos is the coords of the block being placed
-	 a_ClickedBlockFace is the face of the neighbor block clicked by the client to place this block.
-	 a_CursorPos is the position of the cursor within the neighbor's face
-	 The descendant handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
-	 The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value. */
+
+
+
+	/** Called before a cactus block is placed by a player, overrides cItemHandler::GetPlacementBlockTypeMeta().
+	Calls CanBeAt function to determine if a cactus block can be placed on a given block. */
 	bool GetPlacementBlockTypeMeta(
-										   cChunkInterface & a_ChunkInterface,
-										   cPlayer & a_Player,
-										   const Vector3i a_PlacedBlockPos,
-										   eBlockFace a_ClickedBlockFace,
-										   const Vector3i a_CursorPos,
-										   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-										   ) override
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		a_BlockType = m_BlockType;
-		return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
-												  [this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
-												  {
-													  auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
-													  return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
-												  }
-												  );
+		if (a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
+			[this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
+			{
+				auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
+				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
+			}
+			))
+			{
+				a_BlockType = m_BlockType;
+				// Setting a_BlockMeta to meta copied from the lowest 4 bits of the player's equipped item's damage value.
+				NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
+				a_BlockMeta = Meta & 0x0f;
+				return true;
+			}
 
-
+		return false;
 	}
+
+
+
 
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
