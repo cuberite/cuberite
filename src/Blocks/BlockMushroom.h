@@ -14,6 +14,8 @@ class cBlockMushroomHandler:
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
+	const NIBBLETYPE MUSHROOM_MAX_LIGHT_THRESHOLD = 12;
+
 
 	cBlockMushroomHandler(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
@@ -32,14 +34,22 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelPos.y <= 0)
+		if (!cChunkDef::IsValidHeight(a_RelPos.y - 1))
 		{
 			return false;
 		}
 
-		// TODO: Cannot be at too much daylight
+		// Cannot be at too much light
+		NIBBLETYPE TotalLight = std::max(a_Chunk.GetSkyLightAltered(a_RelPos), a_Chunk.GetBlockLight(a_RelPos));
+		if (TotalLight > MUSHROOM_MAX_LIGHT_THRESHOLD)
+		{
+			return false;
+		}
 
-		switch (a_Chunk.GetBlock(a_RelPos.addedY(-1)))
+		Vector3i BelowPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowPos);
+
+		switch (BelowBlock)
 		{
 			case E_BLOCK_GLASS:
 			case E_BLOCK_CACTUS:

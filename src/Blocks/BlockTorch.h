@@ -192,14 +192,20 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		auto Face = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto NeighborRelPos = AddFaceDirection(a_RelPos, Face, true);
+
+		eBlockFace Face = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
+		Vector3i NeighborRelPos = AddFaceDirection(a_RelPos, Face, true);
+
+		if (!cChunkDef::IsValidHeight(NeighborRelPos.y))
+		{
+			return false;
+		}
 		BLOCKTYPE NeighborBlockType;
 		NIBBLETYPE NeighborBlockMeta;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborRelPos, NeighborBlockType, NeighborBlockMeta))
 		{
-			// Neighbor in an unloaded chunk, bail out without changint this.
-			return false;
+			// Neighbor in an unloaded chunk, bail out without changing this.
+			return true;
 		}
 
 		return CanBePlacedOn(NeighborBlockType, NeighborBlockMeta, Face);

@@ -112,13 +112,16 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelPos.y <= 0)
+		if (!cChunkDef::IsValidHeight(a_RelPos.y - 1))
 		{
 			return false;
 		}
-		auto BelowPos = a_RelPos.addedY(-1);
-		auto BlockBelow = a_Chunk.GetBlock(BelowPos);
-		auto MetaBelow = a_Chunk.GetMeta(BelowPos);
+
+		Vector3i BelowPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BlockBelow;
+		NIBBLETYPE MetaBelow;
+		a_Chunk.GetBlockTypeMeta(BelowPos, BlockBelow, MetaBelow);
+
 		return CanBeOn(BlockBelow, MetaBelow);
 	}
 

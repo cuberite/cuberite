@@ -137,14 +137,19 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
+		Vector3i SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
+
 		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
 		{
 			return false;
 		}
+
 		BLOCKTYPE SupportBlockType;
-		a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType);
+		if (!a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType))
+		{
+			return true;
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
 	}

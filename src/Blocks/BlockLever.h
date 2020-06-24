@@ -130,17 +130,19 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
 		// Find the type of block the lever is attached to:
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto NeighborFace = BlockMetaDataToBlockFace(Meta);
-		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
+
+		eBlockFace NeighborFace = BlockMetaDataToBlockFace(Meta);
+		Vector3i NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
 		if (!cChunkDef::IsValidHeight(NeighborPos.y))
 		{
 			return false;
 		}
+
 		BLOCKTYPE NeighborBlockType;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
 		{
-			return false;
+			return true;
 		}
 
 		// Allow any full block or the "good" side of a half-slab:

@@ -118,11 +118,15 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		if (a_RelPos.y <= 0)
+		if (!cChunkDef::IsValidHeight(a_RelPos.y - 1))
 		{
 			return false;
 		}
-		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelPos.addedY(-1))))
+
+		Vector3i BelowBlockPos = a_RelPos.addedY(-1);
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowBlockPos);
+
+		if (!cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
 			return false;
 		}
