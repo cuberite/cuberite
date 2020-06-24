@@ -16,7 +16,10 @@ public:
 	}
 
 
-	virtual bool IsPlaceable(void) override { return true; }
+	virtual bool IsPlaceable(void) override
+	{
+		return true;
+	}
 
 
 	virtual bool GetPlacementBlockTypeMeta(
