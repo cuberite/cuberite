@@ -36,14 +36,14 @@ public:
 										   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 										   ) override
 	{
-
-	return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
-											  [this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
-											  {
-											  auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
-											  return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
-											  }
-											  );
+		a_BlockType = m_BlockType;
+		return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
+												  [this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
+												  {
+													  auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
+													  return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
+												  }
+												  );
 
 
 	}
