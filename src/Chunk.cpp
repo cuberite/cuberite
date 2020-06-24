@@ -1707,19 +1707,6 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 	}
 
 	m_LoadedByClient.push_back(a_Client);
-
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
-	{
-		/*
-		// DEBUG:
-		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"",
-			(*itr)->GetUniqueID(), (*itr)->GetClass(),
-			m_PosX, m_PosY, m_PosZ,
-			a_Client->GetUsername().c_str()
-		);
-		*/
-		(*itr)->SpawnOn(*a_Client);
-	}
 	return true;
 }
 
