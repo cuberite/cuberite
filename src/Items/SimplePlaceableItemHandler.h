@@ -3,11 +3,12 @@
 
 #include "ItemHandler.h"
 
-class cSimplePlaceableItemHandler : public cItemHandler
+class cSimplePlaceableItemHandler :
+	public cItemHandler
 {
 	using Super = cItemHandler;
 
-  public:
+public:
 	cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
 		Super(a_ItemType)
 	{
@@ -28,6 +29,6 @@ class cSimplePlaceableItemHandler : public cItemHandler
 		return true;
 	}
 
-  protected:
+protected:
 	BLOCKTYPE m_BlockType;
 };
