@@ -10,7 +10,7 @@
 
 
 
-cCraftingWindow::cCraftingWindow(Vector3i a_Block) : // This Vector3i is never saved or used? Consider removing
+cCraftingWindow::cCraftingWindow(Vector3i a_Block) :  // This Vector3i is never saved or used? Consider removing
 	cWindow(wtWorkbench, "Crafting Table")
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
