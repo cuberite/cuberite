@@ -10,9 +10,9 @@ target_sources(
 	ItemBoat.h
 	ItemBottle.h
 	ItemBow.h
-	# ItemBrewingStand.h - SimplePlaceableItemHandler.h
+	# ItemBrewingStand.h - Merged to SimplePlaceableItemHandler.h
 	ItemBucket.h
-	# ItemCake.h - SimplePlaceableItemHandler.h
+	# ItemCake.h - Merged to SimplePlaceableItemHandler.h
 	# ItemCauldron.h - Merged to SimplePlaceableItemHandler.h
 	ItemChest.h
 	ItemCloth.h
