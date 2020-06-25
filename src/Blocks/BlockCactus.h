@@ -42,13 +42,13 @@ public:
 				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
 			}
 		))
-			{
-				a_BlockType = m_BlockType;
-				// Setting a_BlockMeta to meta copied from the lowest 4 bits of the player's equipped item's damage value.
-				NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
-				a_BlockMeta = Meta & 0x0f;
-				return true;
-			}
+		{
+			a_BlockType = m_BlockType;
+			// Setting a_BlockMeta to meta copied from the lowest 4 bits of the player's equipped item's damage value.
+			NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
+			a_BlockMeta = Meta & 0x0f;
+			return true;
+		}
 
 		return false;
 	}
