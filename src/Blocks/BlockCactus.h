@@ -34,13 +34,14 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
+		if (
+			a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
 			[this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
 			{
 				auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
 				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
 			}
-			))
+		))
 			{
 				a_BlockType = m_BlockType;
 				// Setting a_BlockMeta to meta copied from the lowest 4 bits of the player's equipped item's damage value.
