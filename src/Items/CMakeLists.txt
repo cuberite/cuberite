@@ -10,10 +10,7 @@ target_sources(
 	ItemBoat.h
 	ItemBottle.h
 	ItemBow.h
-	ItemBrewingStand.h
 	ItemBucket.h
-	ItemCake.h
-	ItemCauldron.h
 	ItemChest.h
 	ItemCloth.h
 	ItemComparator.h
@@ -22,7 +19,6 @@ target_sources(
 	ItemDye.h
 	ItemEmptyMap.h
 	ItemFishingRod.h
-	ItemFlowerPot.h
 	ItemFood.h
 	ItemFoodSeeds.h
 	ItemGoldenApple.h
@@ -56,8 +52,7 @@ target_sources(
 	ItemSoup.h
 	ItemSpawnEgg.h
 	ItemSpiderEye.h
-	ItemString.h
-	ItemSugarcane.h
 	ItemSword.h
 	ItemThrowable.h
+	SimplePlaceableItemHandler.h
 )
