@@ -65,4 +65,3 @@ notifications:
 branches:
   only:
     - master
-
