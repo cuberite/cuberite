@@ -181,7 +181,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	}
 
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
-	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
+	LOGD("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	m_Ports = ReadUpgradeIniPorts(a_Settings, "Server", "Ports", "Port", "PortsIPv6", "25565");
 

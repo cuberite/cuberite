@@ -17,6 +17,7 @@
 #include "ChunkSender.h"
 #include "EffectID.h"
 #include "Protocol/ForgeHandshake.h"
+#include "Protocol/ProtocolRecognizer.h"
 #include "UUID.h"
 
 
@@ -437,7 +438,7 @@ private:
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
 
-	std::unique_ptr<cProtocol> m_Protocol;
+	cMultiVersionProtocol m_Protocol;
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
