@@ -453,10 +453,9 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
 		m_DefaultWorldName = "world";
 
-		// TODO: C++17 try_emplace
-		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world"), std::forward_as_tuple("world", "world", a_dd, WorldNames));
-		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world_nether"), std::forward_as_tuple("world_nether", "world_nether", a_dd, WorldNames, dimNether, "world"));
-		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple("world_the_end"), std::forward_as_tuple("world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world"));
+		m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames);
+		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 
@@ -469,9 +468,9 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	}
 
 	// Get the default world
-	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
-	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple(DefaultWorldName), std::forward_as_tuple(DefaultWorldName, DefaultWorldPath, a_dd, WorldNames));
+	m_DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
+	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", m_DefaultWorldName, m_DefaultWorldName);
+	m_WorldsByName.try_emplace(m_DefaultWorldName, m_DefaultWorldName, DefaultWorldPath, a_dd, WorldNames);
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -567,7 +566,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			}
 			Dimension = dimEnd;
 		}
-		m_WorldsByName.emplace(std::piecewise_construct, std::forward_as_tuple(WorldName), std::forward_as_tuple(WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo));
+		m_WorldsByName.try_emplace(WorldName, WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo);
 	}  // for i - Worlds
 
 	if (!FoundAdditionalWorlds)
