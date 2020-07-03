@@ -215,7 +215,7 @@ private:
 	typedef std::map<AString, cWorld> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
 
-	AString m_DefaultWorldName;
+	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 
 	cCriticalSection m_CSPendingCommands;

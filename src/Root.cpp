@@ -451,9 +451,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
 
 		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
-		m_DefaultWorldName = "world";
-
-		m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames);
+		m_pDefaultWorld = &m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames).first->second;
 		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
 		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
@@ -468,9 +466,9 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	}
 
 	// Get the default world
-	m_DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
-	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", m_DefaultWorldName, m_DefaultWorldName);
-	m_WorldsByName.try_emplace(m_DefaultWorldName, m_DefaultWorldName, DefaultWorldPath, a_dd, WorldNames);
+	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
+	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
+	m_pDefaultWorld = &m_WorldsByName.try_emplace(DefaultWorldName, DefaultWorldName, DefaultWorldPath, a_dd, WorldNames).first->second;
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -534,7 +532,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - NetherAppend.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = m_DefaultWorldName;
+				LinkTo = DefaultWorldName;
 			}
 			Dimension = dimNether;
 		}
@@ -548,7 +546,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend1.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = m_DefaultWorldName;
+				LinkTo = DefaultWorldName;
 			}
 			Dimension = dimEnd;
 		}
@@ -562,7 +560,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			LinkTo = WorldName.substr(0, WorldName.size() - EndAppend2.size());
 			if (GetWorld(LinkTo) == nullptr)
 			{
-				LinkTo = m_DefaultWorldName;
+				LinkTo = DefaultWorldName;
 			}
 			Dimension = dimEnd;
 		}
@@ -612,13 +610,7 @@ void cRoot::StopWorlds(cDeadlockDetect & a_DeadlockDetect)
 
 cWorld * cRoot::GetDefaultWorld()
 {
-	const auto FindResult = m_WorldsByName.find(m_DefaultWorldName);
-	if (FindResult == m_WorldsByName.cend())
-	{
-		return nullptr;
-	}
-
-	return &FindResult->second;
+	return m_pDefaultWorld;
 }
 
 
