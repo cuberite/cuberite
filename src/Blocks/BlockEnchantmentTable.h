@@ -34,7 +34,7 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
-		cWindow * Window = new cEnchantingWindow(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+		cWindow * Window = new cEnchantingWindow(a_BlockPos);
 		a_Player.OpenWindow(*Window);
 		return true;
 	}

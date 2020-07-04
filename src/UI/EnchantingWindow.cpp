@@ -11,14 +11,12 @@
 
 
 
-cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos) :
 	cWindow(wtEnchantment, "Enchant"),
 	m_SlotArea(),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_BlockPos(a_BlockPos)
 {
-	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockX, m_BlockY, m_BlockZ);
+	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockPos);
 	m_SlotAreas.push_back(m_SlotArea);
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));

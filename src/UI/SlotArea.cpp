@@ -996,14 +996,12 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_MaximumCost = 0;
 	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
 
-	int PosX, PosY, PosZ;
-	static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos(PosX, PosY, PosZ);
+	const Vector3i BlockPos = static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos();
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
-	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
+	a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta);
 
-	const Vector3i BlockPos{PosX, PosY, PosZ};
 	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
@@ -1013,13 +1011,13 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		if (AnvilDamage > 2)
 		{
 			// Anvil will break
-			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0);
+			a_Player.GetWorld()->SetBlock(BlockPos, E_BLOCK_AIR, 0);
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
 			a_Player.CloseWindow(false);
 		}
 		else
 		{
-			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
+			a_Player.GetWorld()->SetBlockMeta(BlockPos, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
 		}
 	}
@@ -1407,11 +1405,9 @@ void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
-cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
+cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_BlockPos) :
 	cSlotAreaTemporary(2, a_ParentWindow),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_BlockPos(a_BlockPos)
 {
 }
 
@@ -1644,7 +1640,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
 	int Bookshelves = 0;
 	cBlockArea Area;
-	Area.Read(a_World, m_BlockX - 2, m_BlockX + 2, m_BlockY, m_BlockY + 1, m_BlockZ - 2, m_BlockZ + 2);
+	Area.Read(a_World, m_BlockPos - Vector3i(2, 0, 2), m_BlockPos + Vector3i(2, 1, 2));
 
 	static const struct
 	{

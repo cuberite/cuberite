@@ -10,7 +10,7 @@
 
 
 
-cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cCraftingWindow::cCraftingWindow() :
 	cWindow(wtWorkbench, "Crafting Table")
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
