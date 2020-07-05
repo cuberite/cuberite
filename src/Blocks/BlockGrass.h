@@ -111,8 +111,8 @@ private:
 			return Survivability::CanSpread;
 		}
 
-		// Grass turns back to dirt when the block Above it is not transparent or water.
-		// It does not turn to dirt when a snow layer is Above.
+		// Grass turns back to dirt when the block above it is not transparent or water.
+		// It does not turn to dirt when a snow layer is above.
 		const auto Above = a_Chunk.GetBlock(AbovePos);
 		if (
 			(Above != E_BLOCK_SNOW) &&
