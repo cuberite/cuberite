@@ -15,6 +15,18 @@ class cBlockGrassHandler :
 {
 	using super = cBlockHandler;
 
+	enum class Survivability
+	{
+		// Light level so good that the grass can try to spread to neighbours
+		CanSpread,
+
+		// Stay put, light is enough to live on but not propagate
+		DoNothing,
+
+		// Insufficient light, death is upon us
+		DieInDarkness
+	};
+
 public:
 
 	cBlockGrassHandler(BLOCKTYPE a_BlockType):
@@ -53,9 +65,15 @@ public:
 			return;
 		}
 
-		if (!cBlockGrassHandler::TrySurvive(a_Chunk, a_RelPos))
+		switch (cBlockGrassHandler::DetermineSurvivability(a_Chunk, a_RelPos))
 		{
-			return;
+			case Survivability::CanSpread: break;
+			case Survivability::DoNothing: return;
+			case Survivability::DieInDarkness:
+			{
+				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+				return;
+			}
 		}
 
 		// Grass spreads to adjacent dirt blocks:
@@ -66,7 +84,7 @@ public:
 			int OfsY = Random.RandInt(-3, 1);
 			int OfsZ = Random.RandInt(-1, 1);
 
-			cBlockGrassHandler::TryThrive(a_Chunk, a_RelPos + Vector3i(OfsX, OfsY, OfsZ));
+			cBlockGrassHandler::TrySpreadTo(a_Chunk, a_RelPos + Vector3i(OfsX, OfsY, OfsZ));
 		}  // for i - repeat twice
 	}
 
@@ -74,15 +92,23 @@ public:
 
 
 
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	{
+		UNUSED(a_Meta);
+		return 1;
+	}
+
+private:
+
 	/** Check if conditions are favourable to a grass block at the given position.
 	If they are not, the grass dies and is turned to dirt.
 	Returns whether conditions are so good that the grass can try to spread to neighbours. */
-	static bool TrySurvive(cChunk & a_Chunk, const Vector3i a_RelPos)
+	static Survivability DetermineSurvivability(cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
 		const auto AbovePos = a_RelPos.addedY(1);
 		if (!cChunkDef::IsValidHeight(AbovePos.y))
 		{
-			return true;
+			return Survivability::CanSpread;
 		}
 
 		// Grass turns back to dirt when the block Above it is not transparent or water.
@@ -92,13 +118,12 @@ public:
 			(Above != E_BLOCK_SNOW) &&
 			(!cBlockInfo::IsTransparent(Above) || IsBlockWater(Above)))
 		{
-			a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
-			return false;
+			return Survivability::DieInDarkness;
 		}
 
 		// Make sure that there is enough light at the source block to spread
 		const auto Light = std::max(a_Chunk.GetBlockLight(AbovePos), a_Chunk.GetSkyLightAltered(AbovePos));
-		return (Light >= 9);
+		return (Light >= 9) ? Survivability::CanSpread : Survivability::DoNothing;
 	}
 
 
@@ -106,7 +131,7 @@ public:
 
 
 	/** Attempt to spread grass to a block at the given position. */
-	static void TryThrive(cChunk & a_Chunk, Vector3i a_RelPos)
+	static void TrySpreadTo(cChunk & a_Chunk, Vector3i a_RelPos)
 	{
 		if (!cChunkDef::IsValidHeight(a_RelPos.y))
 		{
@@ -148,15 +173,5 @@ public:
 				Chunk->FastSetBlock(a_RelPos, E_BLOCK_GRASS, 0);
 			}
 		}
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
-	{
-		UNUSED(a_Meta);
-		return 1;
 	}
 } ;
