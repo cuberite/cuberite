@@ -37,9 +37,6 @@ include("SetFlags.cmake")
 # Add build timestamp and details:
 include("CMake/StampBuild.cmake")
 
-# TODO: set_build_stamp()
-set_global_flags()
-
 # We need C++17 features:
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -55,11 +52,15 @@ endif()
 # Static CRT:
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
+# TODO: set_build_stamp()
+set_global_flags()
+build_dependencies()
+
 add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(src)
 
-enable_warnings(${CMAKE_PROJECT_NAME})
-build_dependencies(${CMAKE_PROJECT_NAME})
+set_exe_flags(${CMAKE_PROJECT_NAME})
+link_dependencies(${CMAKE_PROJECT_NAME})
 
 # Set the startup project to Cuberite, and the debugger dir:
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})

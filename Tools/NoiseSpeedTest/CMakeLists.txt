@@ -1,7 +1,5 @@
 project (NoiseSpeedTest)
 
-include(../../SetFlags.cmake)
-
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
@@ -61,3 +59,6 @@ set_target_properties(
 	NoiseSpeedTest
 	PROPERTIES FOLDER Tools
 )
+
+include(../../SetFlags.cmake)
+set_exe_flags(NoiseSpeedTest)

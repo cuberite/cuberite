@@ -1,4 +1,4 @@
-function(build_dependencies TARGET)
+function(build_dependencies)
 	# Set options for SQLiteCpp, disable all their tests and lints:
 	set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide.")
 	set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis tool.")
@@ -40,6 +40,12 @@ function(build_dependencies TARGET)
 		add_subdirectory("lib/${DEPENDENCY}" EXCLUDE_FROM_ALL)
 	endforeach()
 
+	if (WIN32)
+		add_subdirectory(lib/luaproxy)
+	endif()
+endfunction()
+
+function(link_dependencies TARGET)
 	# Add required includes:
 	target_include_directories(
 		${TARGET} SYSTEM PRIVATE
@@ -76,8 +82,4 @@ function(build_dependencies TARGET)
 
 	# Prettify jsoncpp_lib name in VS solution explorer:
 	set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
-
-	if (WIN32)
-		add_subdirectory(lib/luaproxy)
-	endif()
 endfunction()

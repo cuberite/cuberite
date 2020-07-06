@@ -1,8 +1,6 @@
 project (ProtoProxy)
 find_package(Threads REQUIRED)
 
-include(../../SetFlags.cmake)
-
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories(SYSTEM "../../lib/mbedtls/include")
@@ -96,3 +94,5 @@ add_executable(ProtoProxy
 
 target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt Threads::Threads)
 
+include(../../SetFlags.cmake)
+set_exe_flags(ProtoProxy)
