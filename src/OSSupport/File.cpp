@@ -695,7 +695,7 @@ AString cFile::GetExecutableExt(void)
 int cFile::vPrintf(const char * a_Fmt, fmt::printf_args a_ArgList)
 {
 	fmt::memory_buffer Buffer;
-	fmt::printf(Buffer, fmt::to_string_view(a_Fmt), a_ArgList);
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Fmt), a_ArgList);
 	return Write(Buffer.data(), Buffer.size());
 }
 

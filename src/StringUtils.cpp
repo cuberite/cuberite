@@ -56,7 +56,7 @@ AString & vPrintf(AString & str, const char * format, fmt::printf_args args)
 {
 	ASSERT(format != nullptr);
 	fmt::memory_buffer Buffer;
-	fmt::printf(Buffer, fmt::to_string_view(format), args);
+	fmt::vprintf(Buffer, fmt::to_string_view(format), args);
 	str.assign(Buffer.data(), Buffer.size());
 	return str;
 }
@@ -79,7 +79,7 @@ AString & vAppendPrintf(AString & a_String, const char * format, fmt::printf_arg
 {
 	ASSERT(format != nullptr);
 	fmt::memory_buffer Buffer;
-	fmt::printf(Buffer, fmt::to_string_view(format), args);
+	fmt::vprintf(Buffer, fmt::to_string_view(format), args);
 	a_String.append(Buffer.data(), Buffer.size());
 	return a_String;
 }
