@@ -1,5 +1,4 @@
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/libevent/include)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/mbedtls/include)
 
 # Create a single Network library that contains all the networking code:

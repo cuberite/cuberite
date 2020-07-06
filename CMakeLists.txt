@@ -232,8 +232,6 @@ endif()
 # Add required includes:
 target_include_directories(
 	${CMAKE_PROJECT_NAME} SYSTEM PRIVATE
-	${CMAKE_CURRENT_BINARY_DIR}/lib/libevent/include # TODO: remove when updating libevent
-	lib/libevent/include
 	lib/mbedtls/include
 	lib/TCLAP/include
 	lib # TODO fix files including zlib/x instead of x
