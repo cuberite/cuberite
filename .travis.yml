@@ -60,6 +60,11 @@ jobs:
       before_install: *use-cmake
       env: *Debug
 
+# Do not let CMake find ccache wrappers
+# we use CMAKE_CXX_COMPILER_LAUNCHER for ccache support
+before_script:
+  - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
+
 # Run the build and tests
 script: ./travisbuild.sh
 

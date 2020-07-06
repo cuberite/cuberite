@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project (MCADefrag)
 find_package(Threads REQUIRED)
 
-include(../../SetFlags.cmake)
-
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
@@ -87,3 +85,6 @@ add_executable(MCADefrag
 )
 
 target_link_libraries(MCADefrag zlib fmt::fmt Threads::Threads)
+
+include(../../SetFlags.cmake)
+set_exe_flags(MCADefrag)

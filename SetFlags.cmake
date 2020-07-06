@@ -111,7 +111,7 @@ function(set_global_flags)
 	endif()
 endfunction()
 
-function(enable_warnings TARGET)
+function(set_exe_flags TARGET)
 	if (MSVC)
 		# TODO: MSVC level 4, warnings as errors
 		return ()
@@ -129,14 +129,6 @@ function(enable_warnings TARGET)
 
 		# All warnings:
 		-Wall -Wextra
-
-		# TODO: actually fix the warnings instead of disabling them
-		# or at least disable on a file-level basis:
-		-Wno-unused-parameter -Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
-		-Wno-double-promotion
-
-		# This is a pretty useless warning, we've already got -Wswitch which is what we need:
-		-Wno-switch-enum
 	)
 
 	if(CMAKE_CXX_COMPILE_ID STREQUAL "Clang")
@@ -145,6 +137,14 @@ function(enable_warnings TARGET)
 
 			# Warnings-as-errors only on Clang for now:
 			-Werror
+
+			# TODO: actually fix the warnings instead of disabling them
+			# or at least disable on a file-level basis:
+			-Wno-unused-parameter -Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
+			-Wno-double-promotion
+
+			# This is a pretty useless warning, we've already got -Wswitch which is what we need:
+			-Wno-switch-enum
 
 			# Weverything with Clang exceptions:
 			-Weverything -Wno-error=disabled-macro-expansion -Wno-weak-vtables

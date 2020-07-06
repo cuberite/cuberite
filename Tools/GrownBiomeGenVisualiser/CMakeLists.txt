@@ -1,8 +1,6 @@
 project (GrownBiomeGenVisualiser)
 find_package(Threads REQUIRED)
 
-include(../../SetFlags.cmake)
-
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
@@ -80,5 +78,7 @@ add_executable(GrownBiomeGenVisualiser
 )
 
 target_link_libraries(GrownBiomeGenVisualiser fmt::fmt Threads::Threads)
-
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)
+
+include(../../SetFlags.cmake)
+set_exe_flags(GrownBiomeGenVisualiser)
