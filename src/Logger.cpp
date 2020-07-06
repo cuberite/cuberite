@@ -90,7 +90,7 @@ void cLogger::LogPrintf(
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
-	fmt::printf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
 	fmt::format_to(Buffer, "\n");
 
 	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
