@@ -39,16 +39,7 @@ public:
 
 	virtual void Initialize(cClientHandle & a_Client) override;
 
-
 protected:
-
-	/** The palette used to transform internal block type palette into the protocol-specific ID. */
-	std::shared_ptr<const BlockTypePalette> m_BlockTypePalette;
-
-	/** Temporary hack for initial 1.13+ support while keeping BLOCKTYPE data:
-	Map of the BLOCKTYPE#META to the protocol-specific NetBlockID. */
-	std::map<UInt32, UInt32> m_BlockTypeMap;
-
 
 	/** Returns the string identifying the palettes' version, such as "1.13" or "1.14.4".
 	The palettes for that version are loaded into m_BlockTypePalette and m_ItemTypePalette. */
@@ -86,4 +77,13 @@ protected:
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const eEntityMetadata a_Metadata, const eEntityMetadataType a_FieldType);
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
+
+private:
+
+	/** The palette used to transform internal block type palette into the protocol-specific ID. */
+	std::shared_ptr<const BlockTypePalette> m_BlockTypePalette;
+
+	/** Temporary hack for initial 1.13+ support while keeping BLOCKTYPE data:
+	Map of the BLOCKTYPE#META to the protocol-specific NetBlockID. */
+	std::map<UInt32, UInt32> m_BlockTypeMap;
 };

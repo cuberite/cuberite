@@ -104,65 +104,120 @@ AString cProtocol_1_13::GetPaletteVersion() const
 
 
 
-UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
+void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	switch (a_PacketType)
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChange);
+	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_BlockType));  // TODO: Palette
+}
+
+
+
+
+
+void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		case pktAttachEntity:         return 0x46;
-		case pktBlockChanges:         return 0x0f;
-		case pktCameraSetTo:          return 0x3c;
-		case pktChatRaw:              return 0x0e;
-		case pktCollectEntity:        return 0x4f;
-		case pktDestroyEntity:        return 0x35;
-		case pktDisconnectDuringGame: return 0x1b;
-		case pktEditSign:             return 0x2c;
-		case pktEntityEffect:         return 0x53;
-		case pktEntityEquipment:      return 0x42;
-		case pktEntityHeadLook:       return 0x39;
-		case pktEntityLook:           return 0x2a;
-		case pktEntityMeta:           return 0x3f;
-		case pktEntityProperties:     return 0x52;
-		case pktEntityRelMove:        return 0x28;
-		case pktEntityRelMoveLook:    return 0x29;
-		case pktEntityStatus:         return 0x1c;
-		case pktEntityVelocity:       return 0x41;
-		case pktExperience:           return 0x43;
-		case pktExplosion:            return 0x1e;
-		case pktGameMode:             return 0x20;
-		case pktHeldItemChange:       return 0x3d;
-		case pktInventorySlot:        return 0x17;
-		case pktJoinGame:             return 0x25;
-		case pktKeepAlive:            return 0x21;
-		case pktLeashEntity:          return 0x40;
-		case pktMapData:              return 0x26;
-		case pktParticleEffect:       return 0x24;
-		case pktPlayerAbilities:      return 0x2e;
-		case pktPlayerList:           return 0x30;
-		case pktPlayerMaxSpeed:       return 0x52;
-		case pktPlayerMoveLook:       return 0x32;
-		case pktPluginMessage:        return 0x19;
-		case pktRemoveEntityEffect:   return 0x36;
-		case pktRespawn:              return 0x38;
-		case pktScoreboardObjective:  return 0x45;
-		case pktSoundEffect:          return 0x1a;
-		case pktSoundParticleEffect:  return 0x23;
-		case pktSpawnPosition:        return 0x49;
-		case pktTabCompletionResults: return 0x10;
-		case pktTeleportEntity:       return 0x50;
-		case pktTimeUpdate:           return 0x4a;
-		case pktTitle:                return 0x4b;
-		case pktUnloadChunk:          return 0x1f;
-		case pktUnlockRecipe:         return 0x32;
-		case pktUpdateHealth:         return 0x44;
-		case pktUpdateScore:          return 0x48;
-		case pktUpdateSign:           return GetPacketID(pktUpdateBlockEntity);
-		case pktUseBed:               return 0x33;
-		case pktWindowClose:          return 0x13;
-		case pktWindowItems:          return 0x15;
-		case pktWindowOpen:           return 0x14;
-		case pktWindowProperty:       return 0x16;
-		default: return Super::GetPacketID(a_PacketType);
-	}
+		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
+		Pkt.WriteBEInt16(Coords);
+		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType));  // TODO: Palette
+	}  // for itr - a_Changes[]
+}
+
+
+
+
+
+void cProtocol_1_13::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ, m_BlockTypeMap);
+	cCSLock Lock(m_CSPacket);
+	SendData(ChunkData.data(), ChunkData.size());
+}
+
+
+
+
+
+void cProtocol_1_13::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	// This packet is unchanged since 1.8
+	// However we are hardcoding a string-to-id mapping inside there
+	// TODO: make a virtual enum-to-id mapping
+}
+
+
+
+
+
+void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	// TODO
+}
+
+
+
+
+
+void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	// TODO
 }
 
 
@@ -291,120 +346,65 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_BlockType));  // TODO: Palette
-}
-
-
-
-
-
-void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChanges);
-	Pkt.WriteBEInt32(a_ChunkX);
-	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
-	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
+	switch (a_PacketType)
 	{
-		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
-		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType));  // TODO: Palette
-	}  // for itr - a_Changes[]
-}
-
-
-
-
-
-void cProtocol_1_13::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ, m_BlockTypeMap);
-	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
-}
-
-
-
-
-
-void cProtocol_1_13::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendPaintingSpawn(const cPainting & a_Painting)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
-{
-	// This packet is unchanged since 1.8
-	// However we are hardcoding a string-to-id mapping inside there
-	// TODO: make a virtual enum-to-id mapping
-}
-
-
-
-
-
-void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
-{
-	// TODO
-}
-
-
-
-
-
-void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
-{
-	// TODO
+		case pktAttachEntity:         return 0x46;
+		case pktBlockChanges:         return 0x0f;
+		case pktCameraSetTo:          return 0x3c;
+		case pktChatRaw:              return 0x0e;
+		case pktCollectEntity:        return 0x4f;
+		case pktDestroyEntity:        return 0x35;
+		case pktDisconnectDuringGame: return 0x1b;
+		case pktEditSign:             return 0x2c;
+		case pktEntityEffect:         return 0x53;
+		case pktEntityEquipment:      return 0x42;
+		case pktEntityHeadLook:       return 0x39;
+		case pktEntityLook:           return 0x2a;
+		case pktEntityMeta:           return 0x3f;
+		case pktEntityProperties:     return 0x52;
+		case pktEntityRelMove:        return 0x28;
+		case pktEntityRelMoveLook:    return 0x29;
+		case pktEntityStatus:         return 0x1c;
+		case pktEntityVelocity:       return 0x41;
+		case pktExperience:           return 0x43;
+		case pktExplosion:            return 0x1e;
+		case pktGameMode:             return 0x20;
+		case pktHeldItemChange:       return 0x3d;
+		case pktInventorySlot:        return 0x17;
+		case pktJoinGame:             return 0x25;
+		case pktKeepAlive:            return 0x21;
+		case pktLeashEntity:          return 0x40;
+		case pktMapData:              return 0x26;
+		case pktParticleEffect:       return 0x24;
+		case pktPlayerAbilities:      return 0x2e;
+		case pktPlayerList:           return 0x30;
+		case pktPlayerMaxSpeed:       return 0x52;
+		case pktPlayerMoveLook:       return 0x32;
+		case pktPluginMessage:        return 0x19;
+		case pktRemoveEntityEffect:   return 0x36;
+		case pktRespawn:              return 0x38;
+		case pktScoreboardObjective:  return 0x45;
+		case pktSoundEffect:          return 0x1a;
+		case pktSoundParticleEffect:  return 0x23;
+		case pktSpawnPosition:        return 0x49;
+		case pktTabCompletionResults: return 0x10;
+		case pktTeleportEntity:       return 0x50;
+		case pktTimeUpdate:           return 0x4a;
+		case pktTitle:                return 0x4b;
+		case pktUnloadChunk:          return 0x1f;
+		case pktUnlockRecipe:         return 0x32;
+		case pktUpdateHealth:         return 0x44;
+		case pktUpdateScore:          return 0x48;
+		case pktUpdateSign:           return GetPacketID(pktUpdateBlockEntity);
+		case pktUseBed:               return 0x33;
+		case pktWindowClose:          return 0x13;
+		case pktWindowItems:          return 0x15;
+		case pktWindowOpen:           return 0x14;
+		case pktWindowProperty:       return 0x16;
+		default: return Super::GetPacketID(a_PacketType);
+	}
 }
 
 
@@ -461,7 +461,6 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 {
 	const UInt8 Entity = 6;
-	const UInt8 Arrow = Entity + 2;
 	const UInt8 Living = Entity + 5;
 	const UInt8 Insentient = Living + 1;
 	const UInt8 Ageable = Insentient + 1;
@@ -478,15 +477,12 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 		case eEntityMetadata::EntityCustomNameVisible:               return 3;
 		case eEntityMetadata::EntitySilent:                          return 4;
 		case eEntityMetadata::EntityNoGravity:                       return 5;
-		// case eEntityMetadata::EntityPose:                            return 6;
 		case eEntityMetadata::PotionThrown:                          return Entity;
 		case eEntityMetadata::FallingBlockPosition:                  return Entity;
 		case eEntityMetadata::AreaEffectCloudRadius:                 return Entity;
 		case eEntityMetadata::AreaEffectCloudColor:                  return Entity + 1;
 		case eEntityMetadata::AreaEffectCloudSinglePointEffect:      return Entity + 2;
 		case eEntityMetadata::AreaEffectCloudParticleId:             return Entity + 3;
-		// case eEntityMetadata::AreaEffectCloudParticleParameter1:     return ;
-		// case eEntityMetadata::AreaEffectCloudParticleParameter2:     return ;
 		case eEntityMetadata::ArrowFlags:                            return Entity;
 		case eEntityMetadata::TippedArrowColor:                      return Entity + 1;
 		case eEntityMetadata::BoatLastHitTime:                       return Entity;
@@ -556,7 +552,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 		case eEntityMetadata::IllagerFlags:                          return Insentient;
 		case eEntityMetadata::SpeIlagerSpell:                        return Insentient + 1;
 		case eEntityMetadata::VexFlags:                              return Insentient;
-		// case eEntityMetadata::AbstractSkeletonArmsSwinging:          return ;
 		case eEntityMetadata::SpiderClimbing:                        return Insentient;
 		case eEntityMetadata::WitchAggresive:                        return Insentient;
 		case eEntityMetadata::WitherFirstHeadTarget:                 return Insentient;
@@ -564,7 +559,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 		case eEntityMetadata::WitherThirdHeadTarget:                 return Insentient + 2;
 		case eEntityMetadata::WitherInvulnerableTimer:               return Insentient + 3;
 		case eEntityMetadata::ZombieIsBaby:                          return Insentient;
-		// case eEntityMetadata::ZombieUnusedWasType:                   return ;
 		case eEntityMetadata::ZombieHandsRisedUp:                    return Insentient + 2;
 		case eEntityMetadata::ZombieVillagerConverting:              return Insentient + 4;
 		case eEntityMetadata::ZombieVillagerProfession:              return Insentient + 5;
@@ -583,6 +577,12 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 		case eEntityMetadata::MinecartCommandBlockLastOutput:        return Minecart + 1;
 		case eEntityMetadata::MinecartFurnacePowered:                return Minecart;
 		case eEntityMetadata::TNTPrimedFuseTime:                     return Entity;
+
+		case eEntityMetadata::EntityPose:
+		case eEntityMetadata::AreaEffectCloudParticleParameter1:
+		case eEntityMetadata::AreaEffectCloudParticleParameter2:
+		case eEntityMetadata::AbstractSkeletonArmsSwinging:
+		case eEntityMetadata::ZombieUnusedWasType: UNREACHABLE("Retrieved invalid metadata for protocol");
 	}
 }
 
@@ -1186,6 +1186,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtIronGolem:
 		case mtSnowGolem:
 		case mtSpider:
+		case mtZombieVillager:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
@@ -1200,7 +1201,9 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtSquid:
+		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
