@@ -4,10 +4,15 @@
 
 cRecipeMapper::cRecipeMapper(void)
 {
-	const AString Protocols [] = {"1.12.2"};
-	for (const auto & Protocol: Protocols)
+	AString path = "Protocol";
+	auto contents = cFile::GetFolderContents(path);
+	for (const auto & content: contents)
 	{
-		loadRecipes(Protocol);
+		auto fullName = path + cFile::PathSeparator() + content;
+		if (cFile::IsFolder(fullName))
+		{
+			loadRecipes(content);
+		}
 	}
 }
 
