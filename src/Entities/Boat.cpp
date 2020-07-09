@@ -34,6 +34,7 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnEntity(*this);
+	a_ClientHandle.SendEntityMetadata(*this);  // Boat colour
 }
 
 
@@ -154,9 +155,6 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		SetLastDamage(GetLastDamage() - 1);
 	}
-
-	// Broadcast any changes in position
-	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -183,6 +181,9 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 void cBoat::SetLastDamage(int TimeSinceLastHit)
 {
 	m_LastDamage = TimeSinceLastHit;
+
+	// Tell the client to play the shaking animation
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -191,10 +192,16 @@ void cBoat::SetLastDamage(int TimeSinceLastHit)
 
 void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
 {
+	// Avoid telling client what it already knows since it may reset animation 1.13+
+	const bool Changed = (m_RightPaddleUsed != a_RightPaddleUsed) || (m_LeftPaddleUsed != a_LeftPaddleUsed);
+
 	m_RightPaddleUsed = a_RightPaddleUsed;
 	m_LeftPaddleUsed = a_LeftPaddleUsed;
 
-	m_World->BroadcastEntityMetadata(*this);
+	if (Changed)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 
