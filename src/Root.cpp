@@ -53,6 +53,7 @@ cRoot * cRoot::s_Root = nullptr;
 
 
 cRoot::cRoot(void) :
+	m_pDefaultWorld(nullptr),
 	m_Server(nullptr),
 	m_MonsterConfig(nullptr),
 	m_CraftingRecipes(nullptr),
@@ -610,6 +611,7 @@ void cRoot::StopWorlds(cDeadlockDetect & a_DeadlockDetect)
 
 cWorld * cRoot::GetDefaultWorld()
 {
+	ASSERT(m_pDefaultWorld != nullptr);
 	return m_pDefaultWorld;
 }
 
