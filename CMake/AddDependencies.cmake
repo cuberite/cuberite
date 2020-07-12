@@ -62,7 +62,7 @@ function(link_dependencies TARGET)
 		fmt::fmt
 		jsoncpp_lib
 		lsqlite
-		lua
+		lualib
 		luaexpat
 		mbedtls
 		SQLiteCpp

@@ -82,6 +82,7 @@ popd
 sha1sum Cuberite.tar.gz > Cuberite.tar.gz.sha1
 
 # Package ProtoProxy
-pushd Tools/ProtoProxy
-sha1sum ProtoProxy > ProtoProxy.sha1
-popd
+# This tool is very out of date, uncomment when it's being worked on again
+# pushd Tools/ProtoProxy
+# sha1sum ProtoProxy > ProtoProxy.sha1
+# popd
