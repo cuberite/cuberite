@@ -2,7 +2,7 @@ function(emit_fixups)
 	# TODO these should be in the submodules
 	# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
 	if (WIN32)
-		target_compile_definitions(lua PUBLIC LUA_BUILD_AS_DLL)
+		target_compile_definitions(lualib PUBLIC LUA_BUILD_AS_DLL)
 	endif()
 
 	# Let Lua use additional checks on its C API. This is only compiled into Debug builds:
