@@ -129,6 +129,9 @@ function(set_exe_flags TARGET)
 
 		# All warnings:
 		-Wall -Wextra
+
+		# Excessive amount of logspam, disable for now:
+		-Wno-unused-parameter
 	)
 
 	if(CMAKE_CXX_COMPILE_ID STREQUAL "Clang")
@@ -140,7 +143,7 @@ function(set_exe_flags TARGET)
 
 			# TODO: actually fix the warnings instead of disabling them
 			# or at least disable on a file-level basis:
-			-Wno-unused-parameter -Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
+			-Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
 			-Wno-double-promotion
 
 			# This is a pretty useless warning, we've already got -Wswitch which is what we need:
