@@ -42,7 +42,7 @@ namespace ObserverHandler
 		// Update the last seen block:
 		FindResult->second = Observed;
 
-		// Determine if to signal an update based on the block previously observed changed
+		// Determine if to signal an update based on if the block previously observed changed
 		return Previous != Observed;
 	}
 

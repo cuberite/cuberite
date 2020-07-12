@@ -927,35 +927,24 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ);
 
 	// TODO Add collision detection with entities.
-	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
-	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
+	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt).count();
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
-		AddSpeedY(m_Gravity * DtSec.count());
-		AddPosition(GetSpeed() * DtSec.count());
+		AddSpeedY(m_Gravity * DtSec);
+		AddPosition(GetSpeed() * DtSec);
 		return;
 	}
 
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
-	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
-	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
+
+	// Make sure we don't stay inside a solid block by pushing out the entity:
+	if (cBlockInfo::IsSolid(BlockIn) && !(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
 	{
-		if (m_bOnGround)  // check if it's still on the ground
-		{
-			if (!cBlockInfo::IsSolid(BlockBelow))  // Check if block below is air or water.
-			{
-				m_bOnGround = false;
-			}
-		}
-	}
-	else if (!(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
-	{
-		// Push out entity.
 		BLOCKTYPE GotBlock;
 
 		static const struct
@@ -977,10 +966,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
 			}
+
 			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-				NextPos.x += gCrossCoords[i].x;
-				NextPos.z += gCrossCoords[i].z;
+				m_Position.x += gCrossCoords[i].x;
+				m_Position.z += gCrossCoords[i].z;
 				IsNoAirSurrounding = false;
 				break;
 			}
@@ -988,11 +978,10 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (IsNoAirSurrounding)
 		{
-			NextPos.y += 0.5;
-		}
+			m_Position.y += 0.5;
 
-		m_bHasSentNoSpeed = false;  // this unlocks movement sending to client in BroadcastMovementUpdate function
-		m_bOnGround = true;
+			// TODO: tracer tries to handle this case too
+		}
 
 		/*
 		// DEBUG:
@@ -1002,13 +991,12 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		*/
 	}
 
-	if (!m_bOnGround)
 	{
 		double fallspeed;
 		if (IsBlockWater(BlockIn))
 		{
-			fallspeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
-			ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
+			fallspeed = m_Gravity * DtSec / 3;  // Fall 3x slower in water
+			ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec));
 		}
 		else if (BlockIn == E_BLOCK_COBWEB)
 		{
@@ -1018,28 +1006,10 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Normal gravity
-			fallspeed = m_Gravity * DtSec.count();
-			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec.count();
+			fallspeed = m_Gravity * DtSec;
+			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec;
 		}
 		NextSpeed.y += static_cast<float>(fallspeed);
-
-		// A real boat floats
-		if (IsBoat())
-		{
-			// Find top water block and sit there
-			int NextBlockY = BlockY;
-			BLOCKTYPE NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
-			while (IsBlockWater(NextBlock))
-			{
-				NextBlock = NextChunk->GetBlock(RelBlockX, ++NextBlockY, RelBlockZ);
-			}
-			NextPos.y = NextBlockY - 0.5;
-			NextSpeed.y = 0;
-		}
-	}
-	else
-	{
-		ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 	}
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
@@ -1071,75 +1041,196 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	NextSpeed += m_WaterSpeed;
 
-	if (NextSpeed.SqrLength() > 0.0f)
+	class cSolidHitCallbacks :
+		public cLineBlockTracer::cCallbacks
+	{
+	public:
+		cSolidHitCallbacks(cEntity & a_Entity, const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, eBlockFace & a_CBHitBlockFace) :
+			m_HitBlockFace(a_CBHitBlockFace),
+			m_Entity(a_Entity),
+			m_Start(a_CBStart),
+			m_End(a_CBEnd),
+			m_HitCoords(a_CBHitCoords)
+		{
+		}
+
+		eBlockFace & m_HitBlockFace;
+
+	private:
+
+		auto GetBlocksToTestAround(const cBoundingBox & a_Around)
+		{
+			auto bstart = a_Around.GetMin().Floor();
+			auto bend = a_Around.GetMax().Floor();
+
+			std::unordered_set<Vector3i, VectorHasher<int>> Checks;
+
+			// TODO: checks too much, very inefficient
+			for (int i = bstart.x; i <= bend.x; i++)
+			for (int j = bstart.y; j <= bend.y; j++)
+			for (int k = bstart.z; k <= bend.z; k++)
+				Checks.emplace(Vector3i(i, j, k));
+
+			return Checks;
+		}
+
+		static double CalculateRetardation(const eBlockFace a_EntryFace, const cBoundingBox & a_Intersection, const cBoundingBox & a_Block, const Vector3d a_Direction)
+		{
+			switch (a_EntryFace)
+			{
+				case BLOCK_FACE_NONE: ASSERT(!"Bounding box intersected a block; the direction vector was too short and didn't clear the block");
+				case BLOCK_FACE_XM: return (a_Intersection.GetMaxX() - a_Block.GetMinX()) / a_Direction.x;
+				case BLOCK_FACE_XP: return (a_Intersection.GetMinX() - a_Block.GetMaxX()) / a_Direction.x;
+				case BLOCK_FACE_YM: return (a_Intersection.GetMaxY() - a_Block.GetMinY()) / a_Direction.y;
+				case BLOCK_FACE_YP: return (a_Intersection.GetMinY() - a_Block.GetMaxY()) / a_Direction.y;
+				case BLOCK_FACE_ZM: return (a_Intersection.GetMaxZ() - a_Block.GetMinZ()) / a_Direction.z;
+				case BLOCK_FACE_ZP: return (a_Intersection.GetMinZ() - a_Block.GetMaxZ()) / a_Direction.z;
+			}
+		}
+
+		void TestBoundingBoxCollisionWithEnvironment(const Vector3d a_TraceIntersection)
+		{
+			cBoundingBox Entity(a_TraceIntersection, m_Entity.GetWidth() / 2, m_Entity.GetHeight());
+			Entity.Expand(0.025, 0.001, 0.025);
+
+			auto Direction = m_End - m_Start;
+			auto Backoff = std::make_pair(0.0, BLOCK_FACE_NONE);
+
+			Direction.Normalize();
+			Direction *= 10;
+
+			for (const auto & Test : GetBlocksToTestAround(Entity))
+			{
+				cChunk * Chunk;
+				Vector3i Relative;
+				if (
+					!m_Entity.GetParentChunk()->GetChunkAndRelByAbsolute(Test, &Chunk, Relative) ||
+					!cBlockInfo::IsSolid(Chunk->GetBlock(Relative))
+				)
+				{
+					continue;
+				}
+
+				cBoundingBox Intersection{Vector3d(), Vector3d()};
+				cBoundingBox Block(Test, Test + Vector3i(1, 1, 1));
+				if (Block.Intersect(Entity, Intersection))
+				{
+					const auto Centre = (Intersection.GetMax() - Intersection.GetMin()) / 2 + Intersection.GetMin();
+					double IgnoredCoefficient;
+					eBlockFace EntryFace;
+
+					VERIFY(Block.CalcLineIntersection(Centre - Direction, Centre + Direction, IgnoredCoefficient, EntryFace));
+
+					Backoff = std::max(
+						Backoff,
+						std::make_pair(CalculateRetardation(EntryFace, Intersection, Block, Direction), EntryFace)
+					);
+				}
+			}
+
+			m_HitCoords = a_TraceIntersection - Direction * Backoff.first;
+			m_HitBlockFace = Backoff.second;
+		}
+
+		virtual void OnNoMoreHits() override
+		{
+			TestBoundingBoxCollisionWithEnvironment(m_End);
+		}
+
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			// We hit a solid block, calculate the exact hit coords and abort trace:
+			//m_HitBlockCoords = a_BlockPos;
+			m_HitBlockFace = a_EntryFace;
+
+			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			eBlockFace Face;  // Face hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
+
+			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
+			{
+				// Math rounding errors have caused the calculation to miss the block completely, assume immediate hit
+				LineCoeff = 0;
+			}
+
+			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
+
+			TestBoundingBoxCollisionWithEnvironment(m_HitCoords);
+
+			return m_HitBlockFace != BLOCK_FACE_NONE;
+		}
+
+	protected:
+		cEntity & m_Entity;
+		const Vector3d & m_Start;
+		const Vector3d & m_End;
+		Vector3d & m_HitCoords;
+	};
+
+	while ((DtSec > 0.001) && (NextSpeed.SqrLength() > 0.0f))
 	{
 		Vector3d HitCoords;
-		Vector3i HitBlockCoords;
 		eBlockFace HitBlockFace;
-		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
-		if (isHit)
-		{
-			// Set our position to where the block was hit:
-			NextPos = HitCoords;
+		const auto NextPos = m_Position + NextSpeed * DtSec;
 
-			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
-			double HalfWidth = GetWidth() / 2.0;
+		cSolidHitCallbacks Callbacks(*this, m_Position, NextPos, HitCoords, HitBlockFace);
+		cLineBlockTracer::Trace(*GetWorld(), Callbacks, m_Position, NextPos);
+
+		// Calculate the proportion of time remaining to simulate
+		// after a (potential) collision midway through movement:
+		DtSec *= (HitCoords - NextPos).Length() / (m_Position - NextPos).Length();
+
+		if (Callbacks.m_HitBlockFace != BLOCK_FACE_NONE)
+		{
+			// Avoid movement in the direction of the blockface that has been hit:
 			switch (HitBlockFace)
 			{
+				case BLOCK_FACE_NONE: ASSERT(!"Unexpected collision face");
 				case BLOCK_FACE_XM:
 				{
 					NextSpeed.x = 0;
-					NextPos.x -= HalfWidth;
+					m_bOnGround = false;
 					break;
 				}
 				case BLOCK_FACE_XP:
 				{
 					NextSpeed.x = 0;
-					NextPos.x += HalfWidth;
+					m_bOnGround = false;
 					break;
 				}
 				case BLOCK_FACE_YM:
 				{
 					NextSpeed.y = 0;
-					NextPos.y -= GetHeight();
+					m_bOnGround = false;
 					break;
 				}
 				case BLOCK_FACE_YP:
 				{
+					// We hit the ground, set the flag and apply friction:
 					NextSpeed.y = 0;
-					// We hit the ground, adjust the position to the top of the block:
 					m_bOnGround = true;
-					NextPos.y = HitBlockCoords.y + 1;
+					ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec));
 					break;
 				}
 				case BLOCK_FACE_ZM:
 				{
 					NextSpeed.z = 0;
-					NextPos.z -= HalfWidth;
+					m_bOnGround = false;
 					break;
 				}
 				case BLOCK_FACE_ZP:
 				{
 					NextSpeed.z = 0;
-					NextPos.z += HalfWidth;
-					break;
-				}
-				default:
-				{
+					m_bOnGround = false;
 					break;
 				}
 			}
 		}
-		else
-		{
-			// We didn't hit anything, so move:
-			NextPos += (NextSpeed * DtSec.count());
-		}
-	}
 
-	SetPosition(NextPos);
-	SetSpeed(NextSpeed);
+		// Set our position to where the block was hit:
+		m_Position = HitCoords;
+		m_Speed = NextSpeed;
+	}
 }
 
 

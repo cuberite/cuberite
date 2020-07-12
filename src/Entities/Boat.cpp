@@ -15,7 +15,7 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	Super(etBoat, a_Pos, 0.98, 0.7),
+	Super(etBoat, a_Pos, 1.5, 0.6),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -143,11 +143,14 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)))
+	// A real boat floats.
+	// Propel to top water block and sit slightly beneath the waterline:
+	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)) && ((GetPosY() - POSY_TOINT) < 0.6))
 	{
 		if (GetSpeedY() < 2)
 		{
-			AddSpeedY(0.2);
+			const auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt).count();
+			SetSpeedY((-m_Gravity + 1) * DtSec);
 		}
 	}
 
