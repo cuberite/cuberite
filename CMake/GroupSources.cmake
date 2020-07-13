@@ -9,7 +9,7 @@ function(group_sources)
 		expat
 		fmt
 		jsoncpp_lib
-		lua
+		lualib
 		luaexpat
 		mbedcrypto
 		mbedtls
