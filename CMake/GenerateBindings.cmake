@@ -109,6 +109,6 @@ function(enable_bindings_generation)
 		OUTPUT ${BINDING_OUTPUTS}
 		COMMAND lua BindingsProcessor.lua
 		WORKING_DIRECTORY ${BINDINGS_FOLDER}
-		DEPENDS ${BINDING_DEPENDENCIES} lua
+		DEPENDS ${BINDING_DEPENDENCIES}
 	)
 endfunction()
