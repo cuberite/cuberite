@@ -1078,7 +1078,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			switch (a_EntryFace)
 			{
-				case BLOCK_FACE_NONE: ASSERT(!"Bounding box intersected a block; the direction vector was too short and didn't clear the block");
+				case BLOCK_FACE_NONE: return 0;
 				case BLOCK_FACE_XM: return (a_Intersection.GetMaxX() - a_Block.GetMinX()) / a_Direction.x;
 				case BLOCK_FACE_XP: return (a_Intersection.GetMinX() - a_Block.GetMaxX()) / a_Direction.x;
 				case BLOCK_FACE_YM: return (a_Intersection.GetMaxY() - a_Block.GetMinY()) / a_Direction.y;
@@ -1091,13 +1091,12 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		void TestBoundingBoxCollisionWithEnvironment(const Vector3d a_TraceIntersection)
 		{
 			cBoundingBox Entity(a_TraceIntersection, m_Entity.GetWidth() / 2, m_Entity.GetHeight());
-			Entity.Expand(0.025, 0.001, 0.025);
+			Entity.Expand(0.0, 0.001, 0.0);
+
+			ASSERT(m_End != m_Start);
 
 			auto Direction = m_End - m_Start;
 			auto Backoff = std::make_pair(0.0, BLOCK_FACE_NONE);
-
-			Direction.Normalize();
-			Direction *= 10;
 
 			for (const auto & Test : GetBlocksToTestAround(Entity))
 			{
@@ -1139,8 +1138,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 		{
+			// TODO: comment
 			// We hit a solid block, calculate the exact hit coords and abort trace:
-			//m_HitBlockCoords = a_BlockPos;
 			m_HitBlockFace = a_EntryFace;
 
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
@@ -1167,7 +1166,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d & m_HitCoords;
 	};
 
-	while ((DtSec > 0.001) && (NextSpeed.SqrLength() > 0.0f))
+	// TODO: comment
+	while ((DtSec > 0.001) && (NextSpeed.SqrLength() > 0.001))
 	{
 		Vector3d HitCoords;
 		eBlockFace HitBlockFace;
