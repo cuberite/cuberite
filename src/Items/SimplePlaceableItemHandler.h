@@ -1,7 +1,10 @@
 #pragma once
 
-
 #include "ItemHandler.h"
+
+
+
+
 
 class cSimplePlaceableItemHandler :
 	public cItemHandler
@@ -9,10 +12,11 @@ class cSimplePlaceableItemHandler :
 	using Super = cItemHandler;
 
 public:
+
 	cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
-		Super(a_ItemType)
+		Super(a_ItemType),
+		m_BlockType(a_BlockType)
 	{
-		m_BlockType = a_BlockType;
 	}
 
 
@@ -32,6 +36,7 @@ public:
 		return true;
 	}
 
-protected:
+private:
+
 	BLOCKTYPE m_BlockType;
 };
