@@ -91,6 +91,18 @@ public:
 		return "cWorld";
 	}
 
+	/** Construct the world and read settings from its ini file.
+	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
+	@param a_WorldNames is a list of all world names, used to validate linked worlds
+	*/
+	cWorld(
+		const AString & a_WorldName, const AString & a_DataPath,
+		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
+		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
+	);
+
+	virtual ~cWorld() override;
+
 	// tolua_begin
 
 	/** Get whether saving chunks is enabled */
@@ -966,7 +978,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline size_t GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -1103,10 +1115,6 @@ public:
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
 private:
-
-	friend class cRoot;
-
-
 
 	class cTickThread:
 		public cIsThread
@@ -1326,17 +1334,6 @@ private:
 
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
 	cSetChunkDataPtrs m_SetChunkDataQueue;
-
-	/** Construct the world and read settings from its ini file.
-	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
-	@param a_WorldNames is a list of all world names, used to validate linked worlds
-	*/
-	cWorld(
-		const AString & a_WorldName, const AString & a_DataPath,
-		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
-		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
-	);
-	virtual ~cWorld() override;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
