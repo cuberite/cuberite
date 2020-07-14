@@ -1067,9 +1067,15 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 			// TODO: checks too much, very inefficient
 			for (int i = bstart.x; i <= bend.x; i++)
-			for (int j = bstart.y; j <= bend.y; j++)
-			for (int k = bstart.z; k <= bend.z; k++)
-				Checks.emplace(Vector3i(i, j, k));
+			{
+				for (int j = bstart.y; j <= bend.y; j++)
+				{
+					for (int k = bstart.z; k <= bend.z; k++)
+					{
+						Checks.emplace(Vector3i(i, j, k));
+					}
+				}
+			}
 
 			return Checks;
 		}
@@ -1146,15 +1152,18 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			eBlockFace Face;  // Face hit
 			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 
+			// First calculate line intersection
 			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
 			{
-				// Math rounding errors have caused the calculation to miss the block completely, assume immediate hit
-				LineCoeff = 0;
+				// Maths rounding errors have caused the calculation to miss the block completely
+				m_HitCoords = m_End;
+				m_HitBlockFace = BLOCK_FACE_NONE;
+				return true;
 			}
 
-			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
-
-			TestBoundingBoxCollisionWithEnvironment(m_HitCoords);
+			// Check bbox collision, setting final values
+			// Line tracer hit position is used as a starting point:
+			TestBoundingBoxCollisionWithEnvironment(m_Start + (m_End - m_Start) * LineCoeff);
 
 			return m_HitBlockFace != BLOCK_FACE_NONE;
 		}
