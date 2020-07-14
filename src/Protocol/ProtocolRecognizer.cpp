@@ -51,6 +51,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_11_1:  return "1.11.1";
 		case PROTO_VERSION_1_12:    return "1.12";
 		case PROTO_VERSION_1_12_1:  return "1.12.1";
+		case PROTO_VERSION_1_12_2:  return "1.12.2";
 		case PROTO_VERSION_1_13:    return "1.13";
 	}
 	ASSERT(!"Unknown protocol version");
@@ -915,6 +916,26 @@ void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendUnlockRecipe(a_RecipeID);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendInitRecipes(UInt32 a_RecipeID)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendInitRecipes(a_RecipeID);
 }
 
 

@@ -169,6 +169,31 @@ public:
 
 	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
 
+	/**
+	Compares two items for the same type or category. Type of item is defined
+	via `m_ItemType` and `m_ItemDamage`. Some items (e.g. planks) have the same
+	`m_ItemType` and the wood kind is defined via `m_ItemDamage`. `-1` is used
+	as placeholder for all kinds (e.g. all kind of planks).
+
+	Items are different when the `ItemType` is different or the `ItemDamage`
+	is different and unequal -1.
+	*/
+	struct sItemCompare
+	{
+		bool operator() (const cItem & a_Lhs, const cItem & a_Rhs) const
+		{
+			if (a_Lhs.m_ItemType != a_Rhs.m_ItemType)
+			{
+				return (a_Lhs.m_ItemType < a_Rhs.m_ItemType);
+			}
+			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
+			{
+				return false;  // -1 is a wildcard, damage of -1 alway compares equal
+			}
+			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
+		}
+	};
+
 	// tolua_begin
 
 	int            m_RepairCost;

@@ -1587,6 +1587,26 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 
 
+void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	// Client doesn't support this feature
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendInitRecipes(UInt32 a_RecipeID)
+{
+	// Client doesn't support this feature
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_State == 3);  // In game mode?

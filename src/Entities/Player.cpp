@@ -31,6 +31,8 @@
 #include "../JsonUtils.h"
 #include "json/json.h"
 
+#include "../CraftingRecipes.h"
+
 // 6000 ticks or 5 minutes
 #define PLAYER_INVENTORY_SAVE_INTERVAL 6000
 
@@ -194,7 +196,60 @@ bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
 
+	if (m_KnownRecipes.empty())
+	{
+		m_ClientHandle->SendInitRecipes(0);
+	}
+	else
+	{
+		for (const auto KnownRecipe : m_KnownRecipes)
+		{
+			m_ClientHandle->SendInitRecipes(KnownRecipe);
+		}
+	}
+
 	return true;
+}
+
+
+
+
+
+void cPlayer::AddKnownItem(const cItem & a_Item)
+{
+	if (a_Item.m_ItemType < 0)
+	{
+		return;
+	}
+
+	auto Response = m_KnownItems.insert(a_Item.CopyOne());
+	if (!Response.second)
+	{
+		// The item was already known, bail out:
+		return;
+	}
+
+	// Process the recipes that got unlocked by this newly-known item:
+	auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
+	for (const auto & RecipeId : Recipes)
+	{
+		AddKnownRecipe(RecipeId);
+	}
+}
+
+
+
+
+
+void cPlayer::AddKnownRecipe(UInt32 a_RecipeId)
+{
+	auto Response = m_KnownRecipes.insert(a_RecipeId);
+	if (!Response.second)
+	{
+		// The recipe was already known, bail out:
+		return;
+	}
+	m_ClientHandle->SendUnlockRecipe(a_RecipeId);
 }
 
 
@@ -2229,6 +2284,26 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = root.get("isflying",       0).asBool();
 
+	Json::Value & JSON_KnownItems = root["knownItems"];
+	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
+	{
+		cItem Item;
+		Item.FromJson(JSON_KnownItems[i]);
+		m_KnownItems.insert(Item);
+	}
+
+	const auto & RecipeNameMap = cRoot::Get()->GetCraftingRecipes()->GetRecipeNameMap();
+
+	Json::Value & JSON_KnownRecipes = root["knownRecipes"];
+	for (UInt32 i = 0; i < JSON_KnownRecipes.size(); i++)
+	{
+		auto RecipeId = RecipeNameMap.find(JSON_KnownRecipes[i].asString());
+		if (RecipeId != RecipeNameMap.end())
+		{
+			m_KnownRecipes.insert(RecipeId->second);
+		}
+	}
+
 	m_GameMode = static_cast<eGameMode>(root.get("gamemode", eGameMode_NotSet).asInt());
 
 	if (m_GameMode == eGameMode_Creative)
@@ -2327,10 +2402,27 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_EnderChestInventory;
 	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
 
+	Json::Value JSON_KnownItems;
+	for (const auto & KnownItem : m_KnownItems)
+	{
+		Json::Value JSON_Item;
+		KnownItem.GetJson(JSON_Item);
+		JSON_KnownItems.append(JSON_Item);
+	}
+
+	Json::Value JSON_KnownRecipes;
+	for (auto KnownRecipe : m_KnownRecipes)
+	{
+		auto Recipe = cRoot::Get()->GetCraftingRecipes()->GetRecipeById(KnownRecipe);
+		JSON_KnownRecipes.append(Recipe->m_RecipeName);
+	}
+
 	Json::Value root;
 	root["position"]            = JSON_PlayerPosition;
 	root["rotation"]            = JSON_PlayerRotation;
 	root["inventory"]           = JSON_Inventory;
+	root["knownItems"]          = JSON_KnownItems;
+	root["knownRecipes"]        = JSON_KnownRecipes;
 	root["equippedItemSlot"]    = m_Inventory.GetEquippedSlotNum();
 	root["enderchestinventory"] = JSON_EnderChestInventory;
 	root["health"]              = m_Health;
@@ -3095,13 +3187,3 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 	return Super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
 }
-
-
-
-
-
-
-
-
-
-

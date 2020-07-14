@@ -102,6 +102,9 @@ public:
 	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 
+	/** Finds an item based on ItemType and ItemDamage (<- defines the itemType, too) */
+	cItem * FindItem(const cItem & a_RecipeItem);
+
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
 	Returns the new count.
@@ -198,6 +201,3 @@ protected:
 	int AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack);
 } ;
 // tolua_end
-
-
-

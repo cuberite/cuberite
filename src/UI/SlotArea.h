@@ -273,6 +273,11 @@ public:
 	// Distributing items into this area is completely disabled
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
 
+	/** Clear the crafting grid */
+	void ClearCraftingGrid(cPlayer & a_Player);
+
+	/** Loads the given Recipe into the crafting grid */
+	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
 
 protected:
 	/** Maps player's EntityID -> current recipe.
@@ -555,7 +560,3 @@ public:
 private:
 	cHorse & m_Horse;
 };
-
-
-
-

@@ -105,6 +105,8 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 
 int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 {
+	m_Owner.AddKnownItem(a_Item);
+
 	cItem ToAdd(a_Item);
 	int res = 0;
 
@@ -201,6 +203,26 @@ int cInventory::RemoveItem(const cItem & a_ItemStack)
 	}
 
 	return RemovedItems;
+}
+
+
+
+
+
+cItem * cInventory::FindItem(const cItem & a_RecipeItem)
+{
+	cItem * Item = m_ShieldSlots.FindItem(a_RecipeItem);
+	if (Item != nullptr)
+	{
+		return Item;
+	}
+	Item = m_HotbarSlots.FindItem(a_RecipeItem);
+	if (Item != nullptr)
+	{
+		return Item;
+	}
+
+	return 	m_InventorySlots.FindItem(a_RecipeItem);
 }
 
 
@@ -863,7 +885,3 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	SendSlot(Base + a_SlotNum);
 }
-
-
-
-

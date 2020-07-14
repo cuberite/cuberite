@@ -268,6 +268,7 @@ void cCraftingRecipe::Dump(void)
 cCraftingRecipes::cCraftingRecipes(void)
 {
 	LoadRecipes();
+	PopulateRecipeNameMap();
 }
 
 
@@ -277,6 +278,72 @@ cCraftingRecipes::cCraftingRecipes(void)
 cCraftingRecipes::~cCraftingRecipes()
 {
 	ClearRecipes();
+}
+
+
+
+
+
+bool cCraftingRecipes::IsNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+{
+	bool ContainsNewItem = false;
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
+	{
+		if (
+			(Ingredient.m_Item.m_ItemType == a_Item.m_ItemType) &&
+			(
+				(Ingredient.m_Item.m_ItemDamage == a_Item.m_ItemDamage) ||
+				(Ingredient.m_Item.m_ItemDamage == -1)
+			)
+		)
+		{
+			ContainsNewItem = true;
+		}
+		if (a_KnownItems.find(Ingredient.m_Item) == a_KnownItems.end())
+		{
+			return false;
+		}
+	}
+	return ContainsNewItem;
+}
+
+
+
+
+
+std::vector<UInt32> cCraftingRecipes::FindNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+{
+	std::vector<UInt32> Recipes;
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
+	{
+		if (m_Recipes[i]->m_RecipeName.empty())
+		{
+			continue;
+		}
+		if (IsNewCraftableRecipe(m_Recipes[i], a_Item, a_KnownItems))
+		{
+			Recipes.push_back(i);
+		}
+	}
+	return Recipes;
+}
+
+
+
+
+
+const std::map<AString, UInt32> & cCraftingRecipes::GetRecipeNameMap()
+{
+	return m_RecipeNameMap;
+}
+
+
+
+
+
+cCraftingRecipes::cRecipe * cCraftingRecipes::GetRecipeById(UInt32 a_RecipeId)
+{
+	return m_Recipes[a_RecipeId];
 }
 
 
@@ -355,6 +422,21 @@ void cCraftingRecipes::LoadRecipes(void)
 
 
 
+void cCraftingRecipes::PopulateRecipeNameMap(void)
+{
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
+	{
+		if (!m_Recipes[i]->m_RecipeName.empty())
+		{
+			m_RecipeNameMap.emplace(m_Recipes[i]->m_RecipeName, i);
+		}
+	}
+}
+
+
+
+
+
 void cCraftingRecipes::ClearRecipes(void)
 {
 	for (cRecipes::iterator itr = m_Recipes.begin(); itr != m_Recipes.end(); ++itr)
@@ -384,8 +466,15 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 
 	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = cpp14::make_unique<cCraftingRecipes::cRecipe>();
 
+	AStringVector RecipeSplit = StringSplit(Sides[0], ":");
+	const auto * resultPart = &RecipeSplit[0];
+	if (RecipeSplit.size() > 1)
+	{
+		resultPart = &RecipeSplit[1];
+		Recipe->m_RecipeName = RecipeSplit[0];
+	}
 	// Parse the result:
-	AStringVector ResultSplit = StringSplit(Sides[0], ",");
+	AStringVector ResultSplit = StringSplit(*resultPart, ",");
 	if (ResultSplit.empty())
 	{
 		LOGWARNING("crafting.txt: line %d: Result is empty, ignoring the recipe.", a_LineNum);
@@ -1059,7 +1148,3 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 		a_Recipe->m_Result.m_ItemColor.SetColor(result_red, result_green, result_blue);
 	}
 }
-
-
-
-

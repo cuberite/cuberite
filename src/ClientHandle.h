@@ -221,6 +221,13 @@ public:  // tolua_export
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Send a newly discovered recipe to show the notification and unlock in the recipe book */
+	void SendUnlockRecipe               (UInt32 a_RecipeId);
+
+	/** Send already known recipes without notification but visible in the recipe book */
+	void SendInitRecipes                (UInt32 a_RecipeId);
+
 	void SendWeather                    (eWeather a_Weather);
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
@@ -370,6 +377,9 @@ public:  // tolua_export
 	void HandleUseItem          (eHand a_Hand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
+
+	/** Called when a recipe from the recipe book is selected */
+	void HandleCraftRecipe      (UInt32 a_RecipeId);
 
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.
