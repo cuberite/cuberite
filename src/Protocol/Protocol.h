@@ -145,6 +145,193 @@ public:
 		pktWindowProperty
 	};
 
+	enum class eEntityMetadata
+	{
+		EntityFlags,
+		EntityAir,
+		EntityCustomName,
+		EntityCustomNameVisible,
+		EntitySilent,
+		EntityNoGravity,
+		EntityPose,
+
+		PotionThrown,
+
+		FallingBlockPosition,
+
+		AreaEffectCloudRadius,
+		AreaEffectCloudColor,
+		AreaEffectCloudSinglePointEffect,
+		AreaEffectCloudParticleId,
+		AreaEffectCloudParticleParameter1,
+		AreaEffectCloudParticleParameter2,
+
+		ArrowFlags,
+		TippedArrowColor,
+
+		BoatLastHitTime,
+		BoatForwardDirection,
+		BoatDamageTaken,
+		BoatType,
+		BoatLeftPaddleTurning,
+		BoatRightPaddleTurning,
+		BoatSplashTimer,
+
+		EnderCrystalBeamTarget,
+		EnderCrystalShowBottom,
+
+		WitherSkullInvulnerable,
+
+		FireworkInfo,
+		FireworkBoostedEntityId,
+
+		ItemFrameItem,
+		ItemFrameRotation,
+
+		ItemItem,
+
+		LivingActiveHand,
+		LivingHealth,
+		LivingPotionEffectColor,
+		LivingPotionEffectAmbient,
+		LivingNumberOfArrows,
+
+		PlayerAdditionalHearts,
+		PlayerScore,
+		PlayerDisplayedSkinParts,
+		PlayerMainHand,
+
+		ArmorStandStatus,
+		ArmorStandHeadRotation,
+		ArmorStandBodyRotation,
+		ArmorStandLeftArmRotation,
+		ArmorStandRightArmRotation,
+		ArmorStandLeftLegRotation,
+		ArmorStandRightLegRotation,
+
+		InsentientFlags,
+
+		BatHanging,
+
+		AgeableIsBaby,
+
+		AbstractHorseFlags,
+		AbstractHorseOwner,
+
+		HorseVariant,
+		HorseArmour,
+
+		ChestedHorseChested,
+
+		LlamaStrength,
+		LlamaCarpetColor,
+		LlamaVariant,
+
+		PigHasSaddle,
+		PigTotalCarrotOnAStickBoost,
+
+		RabbitType,
+
+		PolarBearStanding,
+
+		SheepFlags,
+
+		TameableAnimalFlags,
+		TameableAnimalOwner,
+
+		OcelotType,
+
+		WolfDamageTaken,
+		WolfBegging,
+		WolfCollarColour,
+
+		VillagerProfession,
+
+		IronGolemPlayerCreated,
+
+		ShulkerFacingDirection,
+		ShulkerAttachmentFallingBlockPosition,
+		ShulkerShieldHeight,
+
+		BlazeOnFire,
+
+		CreeperState,
+		CreeperPowered,
+		CreeperIgnited,
+
+		GuardianStatus,
+		GuardianTarget,
+
+		IllagerFlags,
+		SpeIlagerSpell,
+
+		VexFlags,
+
+		AbstractSkeletonArmsSwinging,
+
+		SpiderClimbing,
+
+		WitchAggresive,
+
+		WitherFirstHeadTarget,
+		WitherSecondHeadTarget,
+		WitherThirdHeadTarget,
+		WitherInvulnerableTimer,
+
+		ZombieIsBaby,
+		ZombieUnusedWasType,
+		ZombieHandsRisedUp,
+
+		ZombieVillagerConverting,
+		ZombieVillagerProfession,
+
+		EndermanCarriedBlock,
+		EndermanScreaming,
+
+		EnderDragonDragonPhase,
+
+		GhastAttacking,
+
+		SlimeSize,
+
+		MinecartShakingPower,
+		MinecartShakingDirection,
+		MinecartShakingMultiplier,
+		MinecartBlockIDMeta,
+		MinecartBlockY,
+		MinecartShowBlock,
+
+		MinecartCommandBlockCommand,
+		MinecartCommandBlockLastOutput,
+
+		MinecartFurnacePowered,
+
+		TNTPrimedFuseTime
+	};
+
+	enum class eEntityMetadataType
+	{
+		Byte,
+		VarInt,
+		Float,
+		String,
+		Chat,
+		OptChat,
+		Item,
+		Boolean,
+		Rotation,
+		Position,
+		OptPosition,
+		Direction,
+		OptUUID,
+		OptBlockID,
+		NBT,
+		Particle,
+		VillagerData,
+		OptVarInt,
+		Pose
+	};
+
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 
