@@ -62,8 +62,6 @@ public:
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 
-	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
-
 protected:
 
 	/** The current teleport ID, and whether it has been confirmed by the client */

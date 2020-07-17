@@ -231,7 +231,7 @@ void cProtocol_1_13::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	// Version:
 	Json::Value Version;
 	Version["name"] = "Cuberite 1.13";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_13;
+	Version["protocol"] = cMultiVersionProtocol::PROTO_VERSION_1_13;
 
 	// Players:
 	Json::Value Players;

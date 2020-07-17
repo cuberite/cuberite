@@ -1,14 +1,13 @@
 #pragma once
 
 #include "Protocol.h"
-#include "../ByteBuffer.h"
 
 
 
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x, 1.9.x, 1.10.x, 1.11.x, 1.12.x"
+#define MCS_CLIENT_VERSIONS "1.8.x-1.12.x"
 #define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340"
 #define MCS_LATEST_PROTOCOL_VERSION 340
 
@@ -18,12 +17,10 @@
 
 /** Meta-protocol that recognizes multiple protocol versions, creates the specific
 protocol version instance and redirects everything to it. */
-class cProtocolRecognizer:
-	public cProtocol
+class cMultiVersionProtocol
 {
-	using Super = cProtocol;
-
 public:
+
 	enum
 	{
 		PROTO_VERSION_1_8_0  = 47,
@@ -40,132 +37,67 @@ public:
 		PROTO_VERSION_1_13   = 393
 	};
 
-	cProtocolRecognizer(cClientHandle * a_Client);
-	virtual ~cProtocolRecognizer() override {}
+	cMultiVersionProtocol();
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 
-	/** Called when client sends some data: */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
+	/** Returns if we contain a concrete protocol corresponding to the client's protocol version. */
+	bool VersionRecognitionSuccessful()
+	{
+		return m_Protocol != nullptr;
+	}
 
-	/** Sending stuff to clients (alphabetically sorted): */
-	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
-	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	virtual void SendCameraSetTo                (const cEntity & a_Entity) override;
-	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
-	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
-	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
-	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
-	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
-	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
-	virtual void SendDisconnect                 (const AString & a_Reason) override;
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
-	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
-	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
-	virtual void SendEntityLook                 (const cEntity & a_Entity) override;
-	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
-	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
-	virtual void SendEntityProperties           (const cEntity & a_Entity) override;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
-	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
-	virtual void SendGameMode                   (eGameMode a_GameMode) override;
-	virtual void SendHealth                     (void) override;
-	virtual void SendHeldItemChange             (int a_ItemIndex) override;
-	virtual void SendHideTitle                  (void) override;
-	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
-	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
-	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void SendLoginSuccess               (void) override;
-	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
-	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPlayerAbilities            (void) override;
-	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
-	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
-	virtual void SendPlayerMaxSpeed             (void) override;
-	virtual void SendPlayerMoveLook             (void) override;
-	virtual void SendPlayerPosition             (void) override;
-	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
-	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
-	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendResetTitle                 (void) override;
-	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
-	virtual void SendRespawn                    (eDimension a_Dimension) override;
-	virtual void SendExperience                 (void) override;
-	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
-	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
-	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) override;
-	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) override;
-	virtual void SendSetTitle                   (const cCompositeChat & a_Title) override;
-	virtual void SendSetRawTitle                (const AString & a_Title) override;
-	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
-	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
-	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
-	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
-	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
-	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
-	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
-	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
-	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
-	virtual void SendWeather                    (eWeather a_Weather) override;
-	virtual void SendWholeInventory             (const cWindow & a_Window) override;
-	virtual void SendWindowClose                (const cWindow & a_Window) override;
-	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
+	/** Convenience overload to enable redirecting sends to the underlying implementation. */
+	auto & operator->()
+	{
+		return m_Protocol;
+	}
 
-	virtual AString GetAuthServerID(void) override;
+	/** The function that's responsible for processing incoming protocol data. */
+	std::function<void(cClientHandle &, std::string_view)> HandleIncomingData;
 
-	virtual void SendData(const char * a_Data, size_t a_Size) override;
+	/** Sends a disconnect to the client as a result of a recognition error.
+	This function can be used to disconnect before any protocol has been recognised. */
+	void SendDisconnect(cClientHandle & a_Client, const AString & a_Reason);
 
-protected:
+private:
 
-	/** The recognized protocol */
-	std::unique_ptr<cProtocol> m_Protocol;
+	/** Handles data reception in a newly-created client handle that doesn't yet have known protocol.
+	a_Data contains a view of data that were just received.
+	Calls TryRecognizeProtocol to populate m_Protocol, and transitions to another mode depending on success. */
+	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data);
 
-	/** Buffer for the incoming data until we recognize the protocol */
-	cByteBuffer m_Buffer;
+	/** Handles and responds to unsupported clients sending pings. */
+	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, const std::string_view a_Data);
 
-	/** Is a server list ping for an unrecognized version currently occuring? */
-	bool m_InPingForUnrecognizedVersion;
+	/* Tries to recognize a protocol based on a_Data and m_Buffer contents.
+	a_Data is replaced with a sub-view, with handshake packet removed. */
+	void TryRecognizeProtocol(cClientHandle & a_Client, std::string_view & a_Data);
+
+	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer.
+	The packet length and type have already been read, type is 0.
+	Returns a cProtocol_XXX instance if recognized. */
+	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view & a_Data);
+
+	/** Sends one packet inside a cByteBuffer.
+	This is used only when handling an outdated server ping. */
+	static void SendPacket(cClientHandle & a_Client, cByteBuffer & a_OutPacketBuffer);
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
-	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
+	static UInt32 GetPacketID(cProtocol::ePacketType a_PacketType);
 
-	// Packet handlers while in status state (m_InPingForUnrecognizedVersion == true)
-	void HandlePacketStatusRequest();
-	void HandlePacketStatusPing();
+	/* Status handler for unrecognised versions. */
+	void HandlePacketStatusRequest(cClientHandle & a_Client, cByteBuffer & a_Out);
 
-	/** Tries to recognize protocol based on m_Buffer contents; returns true if recognized */
-	bool TryRecognizeProtocol(void);
+	/* Ping handler for unrecognised versions. */
+	void HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out);
 
-	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
-	The packet length and type have already been read, type is 0
-	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. */
-	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
+	/** The actual protocol implementation.
+	Created when recognition of the client version succeeds with a version we support. */
+	std::unique_ptr<cProtocol> m_Protocol;
 
-	/** Sends a single packet contained within the cPacketizer class.
-	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
-	virtual void SendPacket(cPacketizer & a_Pkt) override;
+	/** Buffer for received protocol data. */
+	cByteBuffer m_Buffer;
+
 } ;

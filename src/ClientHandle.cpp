@@ -32,7 +32,7 @@
 #include "Root.h"
 
 #include "Protocol/Authenticator.h"
-#include "Protocol/ProtocolRecognizer.h"
+#include "Protocol/Protocol.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
@@ -100,8 +100,6 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
-	m_Protocol = cpp14::make_unique<cProtocolRecognizer>(this);
-
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 	m_PingStartTime = std::chrono::steady_clock::now();
@@ -140,8 +138,6 @@ cClientHandle::~cClientHandle()
 		m_PlayerPtr.reset();
 		m_Player = nullptr;
 	}
-
-	m_Protocol.reset();
 
 	LOGD("ClientHandle at %p deleted", static_cast<void *>(this));
 }
@@ -2489,7 +2485,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		return;
 	}
 
-	if (m_Protocol == nullptr)
+	if (!m_Protocol.VersionRecognitionSuccessful())
 	{
 		// TODO (#2588): investigate if and why this occurs
 		return;
@@ -2542,7 +2538,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 	if (!m_HasSentDC)
 	{
 		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
-		m_Protocol->SendDisconnect(a_Reason);
+		m_Protocol.SendDisconnect(*this, a_Reason);
 		m_HasSentDC = true;
 		// csKicked means m_Link will be shut down on the next tick. The
 		// disconnect packet data is sent in the tick thread so the connection
@@ -3385,9 +3381,10 @@ void cClientHandle::ProcessProtocolInOut(void)
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
+
 	if (!IncomingData.empty())
 	{
-		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+		m_Protocol.HandleIncomingData(*this, IncomingData);
 	}
 
 	// Send any queued outgoing data:
@@ -3396,10 +3393,13 @@ void cClientHandle::ProcessProtocolInOut(void)
 		cCSLock Lock(m_CSOutgoingData);
 		std::swap(OutgoingData, m_OutgoingData);
 	}
-	auto link = m_Link;
-	if ((link != nullptr) && !OutgoingData.empty())
+
+	// Capture the link to prevent it being reset between the null check and the Send:
+	auto Link = m_Link;
+
+	if ((Link != nullptr) && !OutgoingData.empty())
 	{
-		link->Send(OutgoingData.data(), OutgoingData.size());
+		Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 }
 
