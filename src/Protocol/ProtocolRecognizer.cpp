@@ -194,8 +194,8 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 	const AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
 	const auto PacketID = GetPacketID(cProtocol::ePacketType::pktDisconnectDuringLogin);
 	cByteBuffer Out(
-		cByteBuffer::GetVarIntSize(static_cast<UInt32>(Message.size())) + Message.size() +
-		cByteBuffer::GetVarIntSize(PacketID)
+		cByteBuffer::GetVarIntSize(PacketID) +
+		cByteBuffer::GetVarIntSize(static_cast<UInt32>(Message.size())) + Message.size()
 	);
 
 	VERIFY(Out.WriteVarInt32(PacketID));
