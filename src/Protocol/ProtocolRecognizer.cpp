@@ -228,9 +228,6 @@ void cMultiVersionProtocol::TryRecognizeProtocol(cClientHandle & a_Client, std::
 
 	m_Protocol = TryRecognizeLengthedProtocol(a_Client, a_Data);
 	ASSERT(m_Protocol != nullptr);
-
-	// The protocol has been recognized, initialize it:
-	m_Protocol->Initialize(a_Client);
 }
 
 

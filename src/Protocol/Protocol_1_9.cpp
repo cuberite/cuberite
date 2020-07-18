@@ -112,7 +112,7 @@ void cProtocol_1_9_0::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerial
 
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_0, a_ChunkX, a_ChunkZ, {});
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_0, a_ChunkX, a_ChunkZ);
 
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
@@ -2416,7 +2416,7 @@ void cProtocol_1_9_4::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerial
 
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_4, a_ChunkX, a_ChunkZ, {});
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_4, a_ChunkX, a_ChunkZ);
 
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());

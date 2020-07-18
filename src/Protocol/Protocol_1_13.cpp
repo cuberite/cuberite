@@ -11,7 +11,6 @@ Implements the 1.13 protocol classes:
 #include "ProtocolRecognizer.h"
 #include "ChunkDataSerializer.h"
 #include "Packetizer.h"
-#include "ProtocolPalettes.h"
 
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -24,7 +23,6 @@ Implements the 1.13 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
-#include "../BlockTypePalette.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -32,6 +30,9 @@ Implements the 1.13 protocol classes:
 #include "../JsonUtils.h"
 
 #include "../Bindings/PluginManager.h"
+
+#include "Palettes/Upgrade.h"
+#include "Palettes/Palette_1_13.h"
 
 
 
@@ -76,41 +77,13 @@ cProtocol_1_13::cProtocol_1_13(cClientHandle * a_Client, const AString & a_Serve
 
 
 
-void cProtocol_1_13::Initialize(cClientHandle & a_Client)
-{
-	// Get the palettes; fail if not available:
-	auto paletteVersion = this->GetPaletteVersion();
-	m_BlockTypePalette = cRoot::Get()->GetProtocolPalettes().blockTypePalette(paletteVersion);
-	if (m_BlockTypePalette == nullptr)
-	{
-		throw std::runtime_error(Printf("This server doesn't support protocol %s.", paletteVersion));
-	}
-
-	// Process the palette into the temporary BLOCKTYPE -> NetBlockID map:
-	auto upg = cRoot::Get()->GetUpgradeBlockTypePalette();
-	m_BlockTypeMap = m_BlockTypePalette->createTransformMapWithFallback(upg, 0);
-}
-
-
-
-
-
-AString cProtocol_1_13::GetPaletteVersion() const
-{
-	return "1.13";
-}
-
-
-
-
-
 void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_BlockType));  // TODO: Palette
+	Pkt.WriteVarInt32(static_cast<UInt32>(Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta))));  // TODO: Palette
 }
 
 
@@ -129,7 +102,7 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(itr->m_BlockType));  // TODO: Palette
+		Pkt.WriteVarInt32(static_cast<UInt32>(Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(itr->m_BlockType, itr->m_BlockMeta))));  // TODO: Palette
 	}  // for itr - a_Changes[]
 }
 
@@ -141,7 +114,7 @@ void cProtocol_1_13::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSeriali
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ, m_BlockTypeMap);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ);
 	cCSLock Lock(m_CSPacket);
 	SendData(ChunkData.data(), ChunkData.size());
 }
@@ -582,8 +555,10 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadata a_Metadata)
 		case eEntityMetadata::AreaEffectCloudParticleParameter1:
 		case eEntityMetadata::AreaEffectCloudParticleParameter2:
 		case eEntityMetadata::AbstractSkeletonArmsSwinging:
-		case eEntityMetadata::ZombieUnusedWasType: UNREACHABLE("Retrieved invalid metadata for protocol");
+		case eEntityMetadata::ZombieUnusedWasType: break;
 	}
+
+	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
 
 
@@ -614,6 +589,8 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadataType a_FieldType)
 		case eEntityMetadataType::OptVarInt:    return 17;
 		case eEntityMetadataType::Pose:         return 18;
 	}
+
+	UNREACHABLE("Translated invalid metadata type for protocol");
 }
 
 
@@ -622,18 +599,20 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadataType a_FieldType)
 
 bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
 {
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemType);
-	if (ItemType == -1)
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemID);
+	if (ItemID == -1)
 	{
 		// The item is empty, no more data follows
 		a_Item.Empty();
 		return true;
 	}
-	a_Item.m_ItemType = ItemType;
+
+	const auto Translated = PaletteUpgrade::ToItem(Palette_1_13::ToItem(ItemID));
+	a_Item.m_ItemType = Translated.first;
+	a_Item.m_ItemDamage = Translated.second;
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
-	a_Item.m_ItemDamage = 0;  // o no, no more damage in 1.13
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
@@ -672,7 +651,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 	// Normal item
 	// TODO: use new item ids
-	a_Pkt.WriteBEInt16(ItemType);
+	a_Pkt.WriteBEInt16(Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_Item.m_ItemType, a_Item.m_ItemDamage)));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
@@ -745,11 +724,8 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 		}
 		case cEntity::etPickup:
 		{
-			/* TODO
-			a_Pkt.WriteBEUInt8(ITEM_ITEM);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+			WriteEntityMetadata(a_Pkt, eEntityMetadata::ItemItem, eEntityMetadataType::Item);
 			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			*/
 			break;
 		}
 		case cEntity::etMinecart:

@@ -32,3 +32,5 @@ target_sources(
 	ProtocolRecognizer.h
 	RecipeMapper.h
 )
+
+add_subdirectory(Palettes)

@@ -5,6 +5,9 @@
 #include "Protocol_1_9.h"
 #include "../ByteBuffer.h"
 
+#include "Palettes/Upgrade.h"
+#include "Palettes/Palette_1_13.h"
+
 
 
 
@@ -45,7 +48,7 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
+const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
 {
 	Serializations::const_iterator itr = m_Serializations.find(a_Version);
 	if (itr != m_Serializations.end())
@@ -59,7 +62,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 		case RELEASE_1_8_0: Serialize47 (data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_0: Serialize107(data, a_ChunkX, a_ChunkZ); break;
 		case RELEASE_1_9_4: Serialize110(data, a_ChunkX, a_ChunkZ); break;
-		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ, a_BlockTypeMap); break;
+		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ); break;
 
 		default:
 		{
@@ -434,11 +437,9 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 
 
 
-void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ, const std::map<UInt32, UInt32> & a_BlockTypeMap)
+void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
-
-	ASSERT(!a_BlockTypeMap.empty());  // We need a protocol-specific translation map
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
@@ -485,8 +486,7 @@ void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_Ch
 			{
 				UInt32 blockType = a_Section.m_BlockTypes[Index];
 				UInt32 blockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
-				auto itr = a_BlockTypeMap.find(blockType * 16 | blockMeta);
-				UInt64 Value = (itr == a_BlockTypeMap.end()) ? 0 :itr->second;
+				UInt64 Value = Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(blockType, blockMeta));
 				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
 
 				// Painful part where we write data into the long array.  Based off of the normal code.

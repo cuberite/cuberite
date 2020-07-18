@@ -158,9 +158,10 @@ target_sources(
 )
 
 set(FOLDERS
-	OSSupport HTTP Items Blocks Protocol Generating mbedTLS++ Bindings
-	WorldStorage Mobs Entities Simulator Simulator/IncrementalRedstoneSimulator
-	BlockEntities UI Noise
+	Bindings BlockEntities Blocks Entities
+	Generating HTTP Items mbedTLS++ Mobs Noise
+	OSSupport Protocol Registries Simulator
+	Simulator/IncrementalRedstoneSimulator UI WorldStorage
 )
 
 # Add all child source directories:
