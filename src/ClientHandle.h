@@ -523,9 +523,6 @@ private:
 	it may just read m_State without locking m_CSState. */
 	std::atomic<eState> m_State;
 
-	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
-	bool m_ShouldCheckDownloaded;
-
 	/** Number of explosions sent this tick */
 	int m_NumExplosionsThisTick;
 

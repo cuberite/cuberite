@@ -91,7 +91,6 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastDigBlockY(cChunkDef::Height + 1),  // Invalid Y, so that the coords don't get picked up
 	m_LastDigBlockZ(0),
 	m_State(csConnected),
-	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
 	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
