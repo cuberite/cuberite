@@ -52,9 +52,11 @@ protected:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 
+	/** Returns 1.13. */
+	virtual Version GetProtocolVersion() override;
+
 	// Packet receiving:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 
 	// Outgoing packet type translation:

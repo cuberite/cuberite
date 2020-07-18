@@ -160,6 +160,9 @@ protected:
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
+	/** Returns 1.8. */
+	virtual Version GetProtocolVersion() override;
+
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType);
 

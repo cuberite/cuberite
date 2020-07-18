@@ -21,26 +21,10 @@ class cMultiVersionProtocol
 {
 public:
 
-	enum
-	{
-		PROTO_VERSION_1_8_0  = 47,
-		PROTO_VERSION_1_9_0  = 107,
-		PROTO_VERSION_1_9_1  = 108,
-		PROTO_VERSION_1_9_2  = 109,
-		PROTO_VERSION_1_9_4  = 110,
-		PROTO_VERSION_1_10_0 = 210,
-		PROTO_VERSION_1_11_0 = 315,
-		PROTO_VERSION_1_11_1 = 316,
-		PROTO_VERSION_1_12   = 335,
-		PROTO_VERSION_1_12_1 = 338,
-		PROTO_VERSION_1_12_2 = 340,
-		PROTO_VERSION_1_13   = 393
-	};
-
 	cMultiVersionProtocol();
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
-	static AString GetVersionTextFromInt(int a_ProtocolVersion);
+	static AString GetVersionTextFromInt(cProtocol::Version a_ProtocolVersion);
 
 	/** Returns if we contain a concrete protocol corresponding to the client's protocol version. */
 	bool VersionRecognitionSuccessful()

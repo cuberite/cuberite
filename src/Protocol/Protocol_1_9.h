@@ -68,15 +68,15 @@ protected:
 	bool m_IsTeleportIdConfirmed;
 	UInt32 m_OutstandingTeleportId;
 
-	/** Get the packet ID for a given packet */
+	/** Get the packet ID for a given packet. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+
+	/** Returns 1.9. */
+	virtual Version GetProtocolVersion() override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-
-	// Packet handlers while in the Status state (m_State == 1):
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 	// Packet handlers while in the Game state (m_State == 3):
 	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer) override;
@@ -158,10 +158,12 @@ public:
 
 	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	// cProtocol_1_9_0 overrides:
-	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+protected:
 
+	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+
+	/** Returns 1.9.1. */
+	virtual Version GetProtocolVersion() override;
 } ;
 
 
@@ -178,9 +180,10 @@ public:
 
 	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	// cProtocol_1_9_1 overrides:
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+protected:
 
+	/** Returns 1.9.2. */
+	virtual Version GetProtocolVersion() override;
 } ;
 
 
@@ -197,14 +200,12 @@ public:
 
 	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	// cProtocol_1_9_2 overrides:
+protected:
+
 	virtual void SendChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendUpdateSign      (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-protected:
-
+	/** Returns 1.9.4. */
+	virtual Version GetProtocolVersion() override;
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
-
 } ;

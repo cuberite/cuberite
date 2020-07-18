@@ -326,6 +326,22 @@ public:
 		Pose
 	};
 
+	enum class Version
+	{
+		Version_1_8_0  = 47,
+		Version_1_9_0  = 107,
+		Version_1_9_1  = 108,
+		Version_1_9_2  = 109,
+		Version_1_9_4  = 110,
+		Version_1_10_0 = 210,
+		Version_1_11_0 = 315,
+		Version_1_11_1 = 316,
+		Version_1_12   = 335,
+		Version_1_12_1 = 338,
+		Version_1_12_2 = 340,
+		Version_1_13   = 393
+	};
+
 	/** Called when client sends some data */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
 
@@ -437,6 +453,9 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
+
+	/** Returns the current protocol's version, for handling status requests. */
+	virtual Version GetProtocolVersion() = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

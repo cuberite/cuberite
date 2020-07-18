@@ -2159,6 +2159,15 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 
 
 
+cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
+{
+	return Version::Version_1_8_0;
+}
+
+
+
+
+
 bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
@@ -2270,8 +2279,9 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "Cuberite 1.8";
-	Version["protocol"] = 47;
+	const auto ProtocolVersion = GetProtocolVersion();
+	Version["name"] = "Cuberite " + cMultiVersionProtocol::GetVersionTextFromInt(ProtocolVersion);
+	Version["protocol"] = static_cast<std::underlying_type_t<cProtocol::Version>>(ProtocolVersion);
 
 	// Players:
 	Json::Value Players;
@@ -2294,10 +2304,9 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	auto Response = JsonUtils::WriteFastString(ResponseValue);
-
+	// Serialize the response into a packet:
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Response);
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 
