@@ -50,7 +50,7 @@ struct sTriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 
 cMultiVersionProtocol::cMultiVersionProtocol() :
 	HandleIncomingData(std::bind(&cMultiVersionProtocol::HandleIncomingDataInRecognitionStage, this, std::placeholders::_1, std::placeholders::_2)),
-	m_Buffer(8 KiB)  // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
+	m_Buffer(32 KiB)
 {
 }
 
@@ -107,7 +107,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 		HandleIncomingData = [this](cClientHandle &, const std::string_view a_In)
 		{
 			// TODO: make it take our a_ReceivedData
-			m_Protocol->DataReceived(a_In.data(), a_In.size());
+			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
 		};
 	}
 	catch (const sUnsupportedButPingableProtocolException &)

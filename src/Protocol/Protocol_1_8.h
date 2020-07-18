@@ -34,7 +34,7 @@ public:
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
 	/** Called when client sends some data: */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
+	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
@@ -143,9 +143,6 @@ protected:
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
 	UInt32 m_State;
 
-	/** Buffer for the received data */
-	cByteBuffer m_ReceivedData;
-
 	bool m_IsEncrypted;
 
 	cAesCfb128Decryptor m_Decryptor;
@@ -155,7 +152,7 @@ protected:
 	cFile m_CommLogFile;
 
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	virtual void AddReceivedData(const char * a_Data, size_t a_Size);
+	virtual void AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size);
 
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;

@@ -343,7 +343,7 @@ public:
 	};
 
 	/** Called when client sends some data */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
