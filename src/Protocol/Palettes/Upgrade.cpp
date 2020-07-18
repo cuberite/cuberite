@@ -1703,9 +1703,9 @@ namespace PaletteUpgrade
 		}
 	}
 
-	Item FromItem(short Item, short Meta)
+	Item FromItem(short Item, short Damage)
 	{
-		switch ((Item << 16) | Meta)
+		switch ((Item << 16) | Damage)
 		{
 			case (1 << 16) | 0: return Item::Stone;
 			case (1 << 16) | 1: return Item::Granite;

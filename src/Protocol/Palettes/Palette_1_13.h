@@ -4,7 +4,7 @@
 
 namespace Palette_1_13
 {
-	Int32 FromBlock(short ID);
-	Int32 FromItem(Item ID);
-	Item ToItem(Int32 ID);
+	UInt32 FromBlock(short ID);
+	UInt32 FromItem(Item ID);
+	Item ToItem(UInt32 ID);
 }

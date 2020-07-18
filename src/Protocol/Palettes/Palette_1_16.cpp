@@ -5,7 +5,7 @@
 
 namespace Palette_1_16
 {
-	Int32 FromBlock(short ID)
+	UInt32 FromBlock(short ID)
 	{
 		using namespace Block;
 
@@ -11779,7 +11779,7 @@ namespace Palette_1_16
 		}
 	}
 
-	Int32 FromItem(Item ID)
+	UInt32 FromItem(Item ID)
 	{
 		switch (ID)
 		{
@@ -12762,7 +12762,7 @@ namespace Palette_1_16
 		}
 	}
 
-	Item ToItem(Int32 ID)
+	Item ToItem(UInt32 ID)
 	{
 		switch (ID)
 		{
