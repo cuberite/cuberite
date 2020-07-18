@@ -15,13 +15,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-static bool IsValidSocket(evutil_socket_t a_Socket)
+namespace ServerHandleImplHelper
 {
-	#ifdef _WIN32
+	static bool IsValidSocket(evutil_socket_t a_Socket)
+	{
+#ifdef _WIN32
 		return (a_Socket != INVALID_SOCKET);
-	#else  // _WIN32
+#else  // _WIN32
 		return (a_Socket >= 0);
-	#endif  // else _WIN32
+#endif  // else _WIN32
+	}
 }
 
 
@@ -129,13 +132,13 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	int err = 0;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
-	if (!IsValidSocket(MainSock))
+	if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (!IsValidSocket(MainSock))
+		if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
 			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
@@ -227,7 +230,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	LOGD("Creating a second socket for IPv4");
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (!IsValidSocket(SecondSock))
+	if (!ServerHandleImplHelper::IsValidSocket(SecondSock))
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("socket(AF_INET, ...) failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
