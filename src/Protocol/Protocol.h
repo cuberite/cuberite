@@ -339,7 +339,9 @@ public:
 		Version_1_12   = 335,
 		Version_1_12_1 = 338,
 		Version_1_12_2 = 340,
-		Version_1_13   = 393
+		Version_1_13   = 393,
+		Version_1_13_1 = 401,
+		Version_1_13_2 = 404  // TODO: this constant should be in WebServer
 	};
 
 	/** Called when client sends some data */

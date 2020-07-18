@@ -74,6 +74,8 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::Version_1_12_1:  return "1.12.1";
 		case cProtocol::Version::Version_1_12_2:  return "1.12.2";
 		case cProtocol::Version::Version_1_13:    return "1.13";
+		case cProtocol::Version::Version_1_13_1:  return "1.13.1";
+		case cProtocol::Version::Version_1_13_2:  return "1.13.2";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -295,6 +297,8 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case cProtocol::Version::Version_1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, ServerPort, NextState);
 		case cProtocol::Version::Version_1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, ServerPort, NextState);
 		case cProtocol::Version::Version_1_13:   return std::make_unique<cProtocol_1_13>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::Version_1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::Version_1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, ServerPort, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

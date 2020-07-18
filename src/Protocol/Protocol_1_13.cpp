@@ -33,6 +33,7 @@ Implements the 1.13 protocol classes:
 
 #include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_13.h"
+#include "Palettes/Palette_1_13_1.h"
 
 
 
@@ -68,14 +69,8 @@ Implements the 1.13 protocol classes:
 
 
 
-cProtocol_1_13::cProtocol_1_13(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_13:
 
 void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
@@ -562,6 +557,24 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(eEntityMetadataType a_FieldType)
 
 
 
+std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID)
+{
+	return PaletteUpgrade::ToItem(Palette_1_13::ToItem(a_ProtocolID));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
+{
+	return Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
 bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemID);
@@ -572,7 +585,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 		return true;
 	}
 
-	const auto Translated = PaletteUpgrade::ToItem(Palette_1_13::ToItem(ItemID));
+	const auto Translated = GetItemFromProtocolID(ItemID);
 	a_Item.m_ItemType = Translated.first;
 	a_Item.m_ItemDamage = Translated.second;
 
@@ -615,8 +628,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 
 	// Normal item
-	// TODO: use new item ids
-	a_Pkt.WriteBEInt16(Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_Item.m_ItemType, a_Item.m_ItemDamage)));
+	a_Pkt.WriteBEInt16(GetProtocolIDFromItem(a_Item.m_ItemType, a_Item.m_ItemDamage));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
@@ -1156,4 +1168,114 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 	}  // switch (a_Mob.GetType())
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_13_1:
+
+cProtocol::Version cProtocol_1_13_1::GetProtocolVersion()
+{
+	return Version::Version_1_13_1;
+}
+
+
+
+
+
+std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID)
+{
+	return PaletteUpgrade::ToItem(Palette_1_13_1::ToItem(a_ProtocolID));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13_1::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
+{
+	return Palette_1_13_1::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_13_2:
+
+cProtocol::Version cProtocol_1_13_2::GetProtocolVersion()
+{
+	return Version::Version_1_13_2;
+}
+
+
+
+
+
+bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBool, bool, Present);
+	if (!Present)
+	{
+		// The item is empty, no more data follows
+		a_Item.Empty();
+		return true;
+	}
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ItemID);
+	const auto Translated = GetItemFromProtocolID(ItemID);
+	a_Item.m_ItemType = Translated.first;
+	a_Item.m_ItemDamage = Translated.second;
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
+	a_Item.m_ItemCount = ItemCount;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	AString Metadata;
+	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	{
+		// No metadata
+		return true;
+	}
+
+	ParseItemMetadata(a_Item, Metadata);
+	return true;
+}
+
+
+
+
+
+void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
+{
+	short ItemType = a_Item.m_ItemType;
+	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
+	if (ItemType <= 0)
+	{
+		// Fix, to make sure no invalid values are sent.
+		ItemType = -1;
+	}
+
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteBool(false);
+		return;
+	}
+
+	// Item present
+	a_Pkt.WriteBool(true);
+
+	// Normal item
+	a_Pkt.WriteVarInt32(GetProtocolIDFromItem(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
+
+	// TODO: NBT
+	a_Pkt.WriteBEInt8(0);
 }

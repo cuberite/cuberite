@@ -35,7 +35,7 @@ class cProtocol_1_13:
 
 public:
 
-	cProtocol_1_13(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_12_2;
 
 protected:
 
@@ -67,10 +67,54 @@ protected:
 
 	virtual UInt8 GetEntityMetadataID(eEntityMetadata a_Metadata);
 	virtual UInt8 GetEntityMetadataID(eEntityMetadataType a_FieldType);
+	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
+	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage);
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const eEntityMetadata a_Metadata, const eEntityMetadataType a_FieldType);
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
+};
+
+
+
+
+
+class cProtocol_1_13_1 :
+	public cProtocol_1_13
+{
+	using Super = cProtocol_1_13;
+
+public:
+
+	using Super::cProtocol_1_13;
+
+protected:
+
+	/** Returns 1.13.1 */
+	virtual Version GetProtocolVersion() override;
+	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
+	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage) override;
+};
+
+
+
+
+
+class cProtocol_1_13_2 :
+	public cProtocol_1_13_1
+{
+	using Super = cProtocol_1_13_1;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	/** Returns 1.13.2 */
+	virtual Version GetProtocolVersion() override;
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
 };
