@@ -333,14 +333,8 @@ namespace Metadata_1_11
 
 
 
-cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_11_0:
 
 void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
@@ -1185,14 +1179,8 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 
 
-cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_11_1:
 
 cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
 {

@@ -28,7 +28,7 @@ class cProtocol_1_11_0:
 
 public:
 
-	cProtocol_1_11_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_10_0;
 
 protected:
 
@@ -62,7 +62,7 @@ class cProtocol_1_11_1:
 
 public:
 
-	cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_11_0;
 
 protected:
 

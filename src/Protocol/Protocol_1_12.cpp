@@ -318,14 +318,8 @@ namespace Metadata_1_12
 
 
 
-cProtocol_1_12::cProtocol_1_12(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_12:
 
 void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
@@ -1118,14 +1112,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 
 
-cProtocol_1_12_1::cProtocol_1_12_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_12_1:
 
 UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 {
@@ -1275,15 +1263,6 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_12_2::
-
-cProtocol_1_12_2::cProtocol_1_12_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
 
 cProtocol::Version cProtocol_1_12_2::GetProtocolVersion()
 {

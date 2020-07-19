@@ -155,7 +155,7 @@ class cProtocol_1_9_1:
 
 public:
 
-	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_0;
 
 protected:
 
@@ -177,7 +177,7 @@ class cProtocol_1_9_2:
 
 public:
 
-	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_1;
 
 protected:
 
@@ -197,7 +197,7 @@ class cProtocol_1_9_4:
 
 public:
 
-	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_2;
 
 protected:
 

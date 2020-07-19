@@ -2155,15 +2155,6 @@ void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_1:
 
-cProtocol_1_9_1::cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
-
 void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
@@ -2211,15 +2202,6 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_2:
 
-cProtocol_1_9_2::cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
-
 cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 {
 	return Version::Version_1_9_2;
@@ -2231,15 +2213,6 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_4:
-
-cProtocol_1_9_4::cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
 
 void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
