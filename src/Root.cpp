@@ -41,7 +41,6 @@
 #include "Logger.h"
 #include "ClientHandle.h"
 #include "BlockTypePalette.h"
-#include "Protocol/ProtocolPalettes.h"
 
 
 
@@ -392,48 +391,6 @@ void cRoot::StopServer()
 void cRoot::LoadGlobalSettings()
 {
 	// Nothing needed yet
-}
-
-
-
-
-
-void cRoot::LoadPalettes(const AString & aProtocolFolder)
-{
-	LOG("Loading UpgradeBlockTypePalette...");
-	try
-	{
-		auto paletteStr = cFile::ReadWholeFile(aProtocolFolder + cFile::PathSeparator() + "UpgradeBlockTypePalette.txt");
-		if (paletteStr.empty())
-		{
-			throw std::runtime_error("File is empty");
-		}
-		m_UpgradeBlockTypePalette.reset(new BlockTypePalette);
-		m_UpgradeBlockTypePalette->loadFromString(paletteStr);
-	}
-	catch (const std::exception & exc)
-	{
-		LOGERROR("Failed to load the Upgrade block type palette from %s/UpgradeBlockTypePalette.txt: %s\nAborting",
-			aProtocolFolder, exc.what()
-		);
-		throw;
-	}
-
-	// Note: This can take a lot of time in MSVC debug builds
-	// If impatient, edit the settings.ini: [Folders] ProtocolPalettes=DummyDir; copy only one palette to DummyDir
-	LOG("Loading per-protocol palettes...");
-	m_ProtocolPalettes.reset(new ProtocolPalettes);
-	m_ProtocolPalettes->load(aProtocolFolder);
-	auto versions = m_ProtocolPalettes->protocolVersions();
-	if (versions.empty())
-	{
-		LOGWARNING("No per-protocol palettes were loaded");
-	}
-	else
-	{
-		std::sort(versions.begin(), versions.end());
-		LOG("Loaded palettes for protocol versions: %s", StringJoin(versions, ", "));
-	}
 }
 
 
