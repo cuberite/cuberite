@@ -3,8 +3,6 @@
 
 #include "SettingsRepositoryInterface.h"
 
-#include <unordered_map>
-
 class cMemorySettingsRepository : public cSettingsRepositoryInterface
 {
 public:

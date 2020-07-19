@@ -7,6 +7,7 @@
 
 #include "File.h"
 #include <fstream>
+#include <sys/stat.h>
 #ifdef _WIN32
 	#include <share.h>  // for _SH_DENYWRITE
 #else

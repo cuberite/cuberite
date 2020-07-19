@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include <unordered_set>
 #include "Mixins.h"
 #include "../Item.h"
 

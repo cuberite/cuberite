@@ -157,7 +157,6 @@ template class SizeChecker<UInt8,  1>;
 
 
 // CRT stuff:
-#include <sys/stat.h>
 #include <cassert>
 #include <cstdio>
 #include <cmath>
@@ -168,24 +167,26 @@ template class SizeChecker<UInt8,  1>;
 
 
 // STL stuff:
-#include <array>
-#include <chrono>
-#include <vector>
-#include <list>
-#include <deque>
-#include <string>
-#include <map>
 #include <algorithm>
-#include <memory>
-#include <set>
-#include <queue>
-#include <limits>
-#include <random>
-#include <type_traits>
+#include <array>
 #include <atomic>
-#include <mutex>
-#include <thread>
+#include <chrono>
 #include <condition_variable>
+#include <deque>
+#include <limits>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <random>
+#include <set>
+#include <string>
+#include <thread>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 
 

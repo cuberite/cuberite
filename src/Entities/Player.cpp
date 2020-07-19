@@ -1,8 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include <unordered_map>
-
 #include "Player.h"
 #include "../Mobs/Wolf.h"
 #include "../Mobs/Horse.h"

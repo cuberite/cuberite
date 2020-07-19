@@ -15,7 +15,6 @@ class cPath;
 	#include "PathFinderIrrlicht_Head.h"
 #endif
 
-#include <unordered_map>
 
 //fwd: ../Chunk.h
 class cChunk;
