@@ -245,13 +245,15 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		return;
 	}
-	cChunkDataSerializer Data(m_Data, m_BiomeMap, m_World.GetDimension());
+
+	{
+		// Send:
+		cChunkDataSerializer Data(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, m_World.GetDimension());
+		Data.SendToClients(a_Clients);
+	}
 
 	for (const auto Client : a_Clients)
 	{
-		// Send:
-		Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
-
 		// Send block-entity packets:
 		for (const auto & Pos : m_BlockEntities)
 		{

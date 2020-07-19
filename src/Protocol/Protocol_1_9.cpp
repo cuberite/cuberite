@@ -106,22 +106,6 @@ void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
-void cProtocol_1_9_0::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
-	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_0, a_ChunkX, a_ChunkZ);
-
-	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -2251,22 +2235,6 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 cProtocol_1_9_4::cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
-}
-
-
-
-
-
-void cProtocol_1_9_4::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
-	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_9_4, a_ChunkX, a_ChunkZ);
-
-	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
 }
 
 

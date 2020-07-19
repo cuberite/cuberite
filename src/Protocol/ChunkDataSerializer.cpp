@@ -4,9 +4,11 @@
 #include "Protocol_1_8.h"
 #include "Protocol_1_9.h"
 #include "../ByteBuffer.h"
+#include "../ClientHandle.h"
 
 #include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_13.h"
+#include "Palettes/Palette_1_13_1.h"
 
 
 
@@ -34,10 +36,14 @@ void ForEachSection(const cChunkData & a_Data, Func a_Func)
 // cChunkDataSerializer:
 
 cChunkDataSerializer::cChunkDataSerializer(
+	int                   a_ChunkX,
+	int                   a_ChunkZ,
 	const cChunkData &    a_Data,
 	const unsigned char * a_BiomeData,
 	const eDimension      a_Dimension
-):
+) :
+	m_ChunkX(a_ChunkX),
+	m_ChunkZ(a_ChunkZ),
 	m_Data(a_Data),
 	m_BiomeData(a_BiomeData),
 	m_Dimension(a_Dimension)
@@ -48,49 +54,74 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::SendToClients(const std::unordered_set<cClientHandle *> & a_SendTo)
 {
-	Serializations::const_iterator itr = m_Serializations.find(a_Version);
-	if (itr != m_Serializations.end())
+	std::unordered_map<cProtocol::Version, std::vector<cClientHandle *>> ClientProtocolVersions;
+
+	for (const auto Client : a_SendTo)
 	{
-		return itr->second;
+		const auto ClientProtocol = static_cast<cProtocol::Version>(Client->GetProtocolVersion());
+		ClientProtocolVersions[ClientProtocol].emplace_back(Client);
 	}
 
-	AString data;
-	switch (a_Version)
+	for (const auto & Entry : ClientProtocolVersions)
 	{
-		case RELEASE_1_8_0: Serialize47 (data, a_ChunkX, a_ChunkZ); break;
-		case RELEASE_1_9_0: Serialize107(data, a_ChunkX, a_ChunkZ); break;
-		case RELEASE_1_9_4: Serialize110(data, a_ChunkX, a_ChunkZ); break;
-		case RELEASE_1_13:  Serialize393(data, a_ChunkX, a_ChunkZ); break;
-
-		default:
+		switch (Entry.first)
 		{
-			LOGERROR("cChunkDataSerializer::Serialize(): Unknown version: %d", a_Version);
-			ASSERT(!"Unknown chunk data serialization version");
-			break;
+			case cProtocol::Version::Version_1_8_0:
+			{
+				Serialize47(Entry.second);
+				continue;
+			}
+			case cProtocol::Version::Version_1_9_0:
+			case cProtocol::Version::Version_1_9_1:
+			case cProtocol::Version::Version_1_9_2:
+			{
+				Serialize107(Entry.second);
+				continue;
+			}
+			case cProtocol::Version::Version_1_9_4:
+			case cProtocol::Version::Version_1_10_0:
+			case cProtocol::Version::Version_1_11_0:
+			case cProtocol::Version::Version_1_11_1:
+			case cProtocol::Version::Version_1_12:
+			case cProtocol::Version::Version_1_12_1:
+			case cProtocol::Version::Version_1_12_2:
+			{
+				Serialize110(Entry.second);
+				continue;
+			}
+			case cProtocol::Version::Version_1_13:
+			{
+				Serialize393And401<&Palette_1_13::FromBlock>(Entry.second);  // This version didn't last very long xD
+				continue;
+			}
+			case cProtocol::Version::Version_1_13_1:
+			case cProtocol::Version::Version_1_13_2:
+			{
+				Serialize393And401<&Palette_1_13_1::FromBlock>(Entry.second);
+				continue;
+			}
 		}
+
+		LOGERROR("cChunkDataSerializer::Serialize(): Unknown version: %d", Entry.first);
+		ASSERT(!"Unknown chunk data serialization version");
 	}
-	if (!data.empty())
-	{
-		m_Serializations[a_Version] = data;
-	}
-	return m_Serializations[a_Version];
 }
 
 
 
 
 
-void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize47(const std::vector<cClientHandle *> & a_SendTo)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
 	Packet.WriteVarInt32(0x21);  // Packet id (Chunk Data packet)
-	Packet.WriteBEInt32(a_ChunkX);
-	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBEInt32(m_ChunkX);
+	Packet.WriteBEInt32(m_ChunkZ);
 	Packet.WriteBool(true);      // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteBEUInt16(m_Data.GetSectionBitmask());
 
@@ -135,48 +166,22 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	// Write the biome data:
 	Packet.WriteBuf(m_BiomeData, BiomeDataSize);
 
-	AString PacketData;
-	Packet.ReadAll(PacketData);
-	Packet.CommitRead();
-
-	cByteBuffer Buffer(20);
-	if (PacketData.size() >= 256)
-	{
-		if (!cProtocol_1_8_0::CompressPacket(PacketData, a_Data))
-		{
-			ASSERT(!"Packet compression failed.");
-			a_Data.clear();
-			return;
-		}
-	}
-	else
-	{
-		AString PostData;
-		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
-		Buffer.WriteVarInt32(0);
-		Buffer.ReadAll(PostData);
-		Buffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
-	}
+	CompressAndSend(Packet, a_SendTo);
 }
 
 
 
 
 
-void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize107(const std::vector<cClientHandle *> & a_SendTo)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
 	Packet.WriteVarInt32(0x20);  // Packet id (Chunk Data packet)
-	Packet.WriteBEInt32(a_ChunkX);
-	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBEInt32(m_ChunkX);
+	Packet.WriteBEInt32(m_ChunkZ);
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 	// Write the chunk size:
@@ -268,48 +273,22 @@ void cChunkDataSerializer::Serialize107(AString & a_Data, int a_ChunkX, int a_Ch
 	// Write the biome data
 	Packet.WriteBuf(m_BiomeData, BiomeDataSize);
 
-	AString PacketData;
-	Packet.ReadAll(PacketData);
-	Packet.CommitRead();
-
-	cByteBuffer Buffer(20);
-	if (PacketData.size() >= 256)
-	{
-		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
-		{
-			ASSERT(!"Packet compression failed.");
-			a_Data.clear();
-			return;
-		}
-	}
-	else
-	{
-		AString PostData;
-		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
-		Buffer.WriteVarInt32(0);
-		Buffer.ReadAll(PostData);
-		Buffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
-	}
+	CompressAndSend(Packet, a_SendTo);
 }
 
 
 
 
 
-void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize110(const std::vector<cClientHandle *> & a_SendTo)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
 	Packet.WriteVarInt32(0x20);  // Packet id (Chunk Data packet)
-	Packet.WriteBEInt32(a_ChunkX);
-	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBEInt32(m_ChunkX);
+	Packet.WriteBEInt32(m_ChunkZ);
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 	// Write the chunk size:
@@ -404,48 +383,23 @@ void cChunkDataSerializer::Serialize110(AString & a_Data, int a_ChunkX, int a_Ch
 	// Identify 1.9.4's tile entity list as empty
 	Packet.WriteBEUInt8(0);
 
-	AString PacketData;
-	Packet.ReadAll(PacketData);
-	Packet.CommitRead();
-
-	cByteBuffer Buffer(20);
-	if (PacketData.size() >= 256)
-	{
-		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
-		{
-			ASSERT(!"Packet compression failed.");
-			a_Data.clear();
-			return;
-		}
-	}
-	else
-	{
-		AString PostData;
-		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
-		Buffer.WriteVarInt32(0);
-		Buffer.ReadAll(PostData);
-		Buffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
-	}
+	CompressAndSend(Packet, a_SendTo);
 }
 
 
 
 
 
-void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+template <auto Palette>
+void cChunkDataSerializer::Serialize393And401(const std::vector<cClientHandle *> & a_SendTo)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
 	Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
-	Packet.WriteBEInt32(a_ChunkX);
-	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBEInt32(m_ChunkX);
+	Packet.WriteBEInt32(m_ChunkZ);
 	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 
@@ -486,7 +440,7 @@ void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_Ch
 			{
 				UInt32 blockType = a_Section.m_BlockTypes[Index];
 				UInt32 blockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
-				UInt64 Value = Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(blockType, blockMeta));
+				UInt64 Value = Palette(PaletteUpgrade::FromBlock(blockType, blockMeta));
 				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
 
 				// Painful part where we write data into the long array.  Based off of the normal code.
@@ -536,32 +490,27 @@ void cChunkDataSerializer::Serialize393(AString & a_Data, int a_ChunkX, int a_Ch
 	// Identify 1.9.4's tile entity list as empty
 	Packet.WriteVarInt32(0);
 
+	CompressAndSend(Packet, a_SendTo);
+}
+
+
+
+
+
+void cChunkDataSerializer::CompressAndSend(cByteBuffer & a_Packet, const std::vector<cClientHandle *> & a_SendTo)
+{
 	AString PacketData;
-	Packet.ReadAll(PacketData);
-	Packet.CommitRead();
+	a_Packet.ReadAll(PacketData);
 
-	if (PacketData.size() >= 256)
+	AString ToSend;
+	if (!cProtocol_1_8_0::CompressPacket(PacketData, ToSend))
 	{
-		if (!cProtocol_1_9_0::CompressPacket(PacketData, a_Data))
-		{
-			ASSERT(!"Packet compression failed.");
-			a_Data.clear();
-			return;
-		}
+		ASSERT(!"Packet compression failed.");
+		return;
 	}
-	else
+
+	for (const auto Client : a_SendTo)
 	{
-		cByteBuffer Buffer(20);
-		AString PostData;
-
-		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
-		Buffer.WriteVarInt32(0);
-		Buffer.ReadAll(PostData);
-		Buffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.reserve(PostData.size() + PacketData.size());
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(PacketData.data(), PacketData.size());
+		Client->SendChunkData(m_ChunkX, m_ChunkZ, ToSend);
 	}
 }

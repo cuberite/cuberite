@@ -46,7 +46,7 @@ public:
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
-	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
+	virtual void SendChunkData                  (const std::string_view a_ChunkData) override;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;

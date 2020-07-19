@@ -2461,7 +2461,7 @@ void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
 
 
 
-void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const std::string_view a_ChunkData)
 {
 	ASSERT(m_Player != nullptr);
 
@@ -2490,7 +2490,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 		return;
 	}
 
-	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+	m_Protocol->SendChunkData(a_ChunkData);
 
 	// Add the chunk to the list of chunks sent to the player:
 	{
