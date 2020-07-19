@@ -87,6 +87,7 @@ Implements the 1.8 protocol classes:
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
+static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
 
 
@@ -328,16 +329,12 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 
 
 
-void cProtocol_1_8_0::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+void cProtocol_1_8_0::SendChunkData(const std::string_view a_ChunkData)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
-	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
-
 	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
+	SendData(a_ChunkData.data(), a_ChunkData.size());
 }
 
 
@@ -805,7 +802,7 @@ void cProtocol_1_8_0::SendLoginSuccess(void)
 	// Enable compression:
 	{
 		cPacketizer Pkt(*this, pktStartCompression);
-		Pkt.WriteVarInt32(256);
+		Pkt.WriteVarInt32(CompressionThreshold);
 	}
 
 	m_State = 3;  // State = Game
@@ -1712,6 +1709,52 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 
 bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
+	const auto UncompressedSize = static_cast<size_t>(a_Packet.size());
+
+	if (UncompressedSize < CompressionThreshold)
+	{
+		/* Size doesn't reach threshold, not worth compressing.
+
+		--------------- Packet format ----------------
+		|--- Header ---------------------------------|
+		| PacketSize: Size of all fields below       |
+		| DataSize: Zero, means below not compressed |
+		|--- Body -----------------------------------|
+		| a_Packet: copy of uncompressed data        |
+		----------------------------------------------
+		*/
+		const UInt32 DataSize = 0;
+		const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize;
+
+		cByteBuffer LengthHeaderBuffer(
+			cByteBuffer::GetVarIntSize(PacketSize) +
+			cByteBuffer::GetVarIntSize(DataSize)
+		);
+
+		LengthHeaderBuffer.WriteVarInt32(PacketSize);
+		LengthHeaderBuffer.WriteVarInt32(DataSize);
+
+		AString LengthData;
+		LengthHeaderBuffer.ReadAll(LengthData);
+
+		a_CompressedData.reserve(LengthData.size() + UncompressedSize);
+		a_CompressedData.append(LengthData.data(), LengthData.size());
+		a_CompressedData.append(a_Packet);
+
+		return true;
+	}
+
+	/* Definitely worth compressing.
+
+	--------------- Packet format ----------------
+	|--- Header ---------------------------------|
+	| PacketSize: Size of all fields below       |
+	| DataSize: Size of uncompressed a_Packet    |
+	|--- Body -----------------------------------|
+	| CompressedData: compressed a_Packet        |
+	----------------------------------------------
+	*/
+
 	// Compress the data:
 	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
@@ -1722,30 +1765,34 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		return false;
 	}
 
-	int Status = compress2(
-		reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
-		reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
-	);
-	if (Status != Z_OK)
+	if (
+		compress2(
+			reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
+			reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
+		) != Z_OK
+	)
 	{
 		return false;
 	}
 
+	const UInt32 DataSize = UncompressedSize;
+	const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + CompressedSize;
+
+	cByteBuffer LengthHeaderBuffer(
+		cByteBuffer::GetVarIntSize(PacketSize) +
+		cByteBuffer::GetVarIntSize(DataSize)
+	);
+
+	LengthHeaderBuffer.WriteVarInt32(PacketSize);
+	LengthHeaderBuffer.WriteVarInt32(DataSize);
+
 	AString LengthData;
-	cByteBuffer Buffer(20);
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
+	LengthHeaderBuffer.ReadAll(LengthData);
 
-	Buffer.WriteVarInt32(static_cast<UInt32>(CompressedSize + LengthData.size()));
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
-
-	a_CompressedData.clear();
-	a_CompressedData.reserve(LengthData.size() + CompressedSize);
+	a_CompressedData.reserve(LengthData.size() + DataSize);
 	a_CompressedData.append(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
+
 	return true;
 }
 
@@ -3150,22 +3197,16 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 	m_OutPacketBuffer.ReadAll(PacketData);
 	m_OutPacketBuffer.CommitRead();
 
-	if ((m_State == 3) && (PacketLen >= 256))
+	if (m_State == 3)
 	{
 		// Compress the packet payload:
 		if (!cProtocol_1_8_0::CompressPacket(PacketData, CompressedPacket))
 		{
 			return;
 		}
-	}
-	else if (m_State == 3)
-	{
-		// The packet is not compressed, indicate this in the packet header:
-		m_OutPacketLenBuffer.WriteVarInt32(PacketLen + 1);
-		m_OutPacketLenBuffer.WriteVarInt32(0);
-		AString LengthData;
-		m_OutPacketLenBuffer.ReadAll(LengthData);
-		SendData(LengthData.data(), LengthData.size());
+
+		// Send the packet's payload compressed:
+		SendData(CompressedPacket.data(), CompressedPacket.size());
 	}
 	else
 	{
@@ -3174,17 +3215,10 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		AString LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
 		SendData(LengthData.data(), LengthData.size());
-	}
 
-	// Send the packet's payload, either direct or compressed:
-	if (CompressedPacket.empty())
-	{
+		// Send the packet's payload directly:
 		m_OutPacketLenBuffer.CommitRead();
 		SendData(PacketData.data(), PacketData.size());
-	}
-	else
-	{
-		SendData(CompressedPacket.data(), CompressedPacket.size());
 	}
 
 	// Log the comm into logfile:
