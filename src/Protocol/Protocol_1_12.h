@@ -37,7 +37,6 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
-	/** Returns 1.12. */
 	virtual Version GetProtocolVersion() override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer);
@@ -64,7 +63,6 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
-	/** Returns 1.12.1. */
 	virtual Version GetProtocolVersion() override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 };
@@ -84,7 +82,6 @@ public:
 
 protected:
 
-	/** Returns 1.12.2. */
 	virtual Version GetProtocolVersion() override;
 	virtual void HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer) override;
 	virtual void SendKeepAlive(UInt32 a_PingID) override;

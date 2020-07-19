@@ -32,7 +32,6 @@ protected:
 
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 
-	/** Returns 1.10. */
 	virtual Version GetProtocolVersion() override;
 	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer) override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;

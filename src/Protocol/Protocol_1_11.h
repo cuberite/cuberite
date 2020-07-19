@@ -66,6 +66,5 @@ public:
 
 protected:
 
-	/** Returns 1.11.1. */
 	virtual Version GetProtocolVersion() override;
 };

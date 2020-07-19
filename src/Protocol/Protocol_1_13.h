@@ -5,6 +5,10 @@
 Declares the 1.13 protocol classes:
 	- cProtocol_1_13
 		- release 1.13 protocol (#393)
+	- cProtocol_1_13_1
+		- release 1.13.1 protocol (#401)
+	- cProtocol_1_13_2
+		- release 1.13.2 protocol (#404)
 (others may be added later in the future for the 1.13 release series)
 */
 
@@ -96,7 +100,6 @@ protected:
 	virtual void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 
-	/** Returns 1.13.1 */
 	virtual Version GetProtocolVersion() override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage) override;
@@ -117,7 +120,6 @@ public:
 
 protected:
 
-	/** Returns 1.13.2 */
 	virtual Version GetProtocolVersion() override;
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
