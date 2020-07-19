@@ -74,11 +74,21 @@ Implements the 1.13 protocol classes:
 
 void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	SendBlockChange<&Palette_1_13::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+template <auto Palette>
+void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta))));  // TODO: Palette
+	Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta)));
 }
 
 
@@ -87,31 +97,28 @@ void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, B
 
 void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChanges);
-	Pkt.WriteBEInt32(a_ChunkX);
-	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
-	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
-	{
-		Int16 Coords = static_cast<Int16>(itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
-		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(itr->m_BlockType, itr->m_BlockMeta))));  // TODO: Palette
-	}  // for itr - a_Changes[]
+	SendBlockChanges<&Palette_1_13::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 
 
 
 
-void cProtocol_1_13::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+template <auto Palette>
+void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_13, a_ChunkX, a_ChunkZ);
-	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		Pkt.WriteBEInt16(Coords);
+		Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(Change.m_BlockType, Change.m_BlockMeta)));
+	}  // for itr - a_Changes[]
 }
 
 
@@ -1176,6 +1183,24 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13_1:
+
+void cProtocol_1_13_1::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	Super::SendBlockChange<&Palette_1_13_1::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+void cProtocol_1_13_1::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	Super::SendBlockChanges<&Palette_1_13_1::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
+}
+
+
+
+
 
 cProtocol::Version cProtocol_1_13_1::GetProtocolVersion()
 {
