@@ -638,7 +638,7 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, 
 
 
 
-void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, size_t a_NumElements)
+void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_IntArray);
 	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));

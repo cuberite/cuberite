@@ -4,7 +4,7 @@
 /*
 Declares the 1.8 protocol classes:
 	- cProtocol_1_8_0
-		- release 1.8 protocol (#47)
+		- release 1.8 protocol (#47), also used by 1.8.1 to 1.8.9
 */
 
 

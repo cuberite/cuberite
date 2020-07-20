@@ -12,6 +12,7 @@ target_sources(
 	Protocol_1_11.cpp
 	Protocol_1_12.cpp
 	Protocol_1_13.cpp
+	Protocol_1_14.cpp
 	ProtocolRecognizer.cpp
 	RecipeMapper.cpp
 
@@ -27,6 +28,7 @@ target_sources(
 	Protocol_1_11.h
 	Protocol_1_12.h
 	Protocol_1_13.h
+	Protocol_1_14.h
 	ProtocolRecognizer.h
 	RecipeMapper.h
 )

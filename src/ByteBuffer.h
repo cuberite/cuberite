@@ -69,7 +69,8 @@ public:
 	bool ReadVarInt64       (UInt64 & a_Value);
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool ReadLEInt          (int & a_Value);
-	bool ReadPosition64     (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXYZPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXZYPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
 	bool ReadUUID           (cUUID & a_Value);
 
 	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double, ...) */
@@ -100,7 +101,8 @@ public:
 	bool WriteVarInt64       (UInt64 a_Value);
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteLEInt32        (Int32 a_Value);
-	bool WritePosition64     (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
+	bool WriteXYZPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
+	bool WriteXZYPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
 
 	/** Reads a_Count bytes into a_Buffer; returns true if successful */
 	bool ReadBuf(void * a_Buffer, size_t a_Count);

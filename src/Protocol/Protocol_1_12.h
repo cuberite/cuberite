@@ -9,7 +9,6 @@ Declares the 1.12 protocol classes:
 		- release 1.12.1 protocol (#338)
 	- cProtocol_1_12_2
 		- release 1.12.2 protocol (#340)
-(others may be added later in the future for the 1.12 release series)
 */
 
 

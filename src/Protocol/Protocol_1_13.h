@@ -9,7 +9,6 @@ Declares the 1.13 protocol classes:
 		- release 1.13.1 protocol (#401)
 	- cProtocol_1_13_2
 		- release 1.13.2 protocol (#404)
-(others may be added later in the future for the 1.13 release series)
 */
 
 
@@ -19,6 +18,8 @@ Declares the 1.13 protocol classes:
 #pragma once
 
 #include "Protocol_1_12.h"
+#include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 
 
@@ -35,11 +36,27 @@ public:
 
 protected:
 
-	// Packet sending:
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	template <auto Palette> void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // Template to avoid virtual calls in tight loops
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	template <auto Palette>void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);  // Template to avoid virtual calls in tight loops
+
+	/** Common implementation of multiblock change sending, templated to avoid virtual calls in tight loops. */
+	template <auto Palette>void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+	{
+		ASSERT(m_State == 3);  // In game mode?
+
+		cPacketizer Pkt(*this, pktBlockChanges);
+		Pkt.WriteBEInt32(a_ChunkX);
+		Pkt.WriteBEInt32(a_ChunkZ);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+		for (const auto & Change : a_Changes)
+		{
+			Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+			Pkt.WriteBEInt16(Coords);
+			Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(Change.m_BlockType, Change.m_BlockMeta)));
+		}  // for itr - a_Changes[]
+	}
+
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
@@ -49,7 +66,7 @@ protected:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 
-	// Outgoing packet type translation:
+	/** Translates outgoing packet types. */
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
 
 	/** Returns 1.13. */
@@ -63,7 +80,6 @@ protected:
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage);
 
-	// Packet receiving:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 
