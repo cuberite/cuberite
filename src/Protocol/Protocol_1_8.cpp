@@ -8,9 +8,7 @@ Implements the 1.8 protocol classes:
 */
 
 #include "Globals.h"
-#include "json/json.h"
 #include "Protocol_1_8.h"
-#include "ChunkDataSerializer.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 

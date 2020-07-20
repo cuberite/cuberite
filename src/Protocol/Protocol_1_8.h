@@ -15,7 +15,6 @@ Declares the 1.8 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
-#include "../World.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"

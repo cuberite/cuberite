@@ -22,7 +22,6 @@ Declares the 1.9 protocol classes:
 #include "Protocol.h"
 #include "Protocol_1_8.h"
 #include "../ByteBuffer.h"
-#include "../World.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"

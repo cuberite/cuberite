@@ -8,8 +8,6 @@ Implements the 1.13 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_13.h"
-#include "ProtocolRecognizer.h"
-#include "ChunkDataSerializer.h"
 #include "Packetizer.h"
 
 #include "../Entities/Boat.h"
@@ -199,15 +197,6 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-cProtocol::Version cProtocol_1_13::GetProtocolVersion()
-{
-	return Version::Version_1_13;
-}
-
-
-
-
-
 bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	if (m_State != 3)
@@ -280,6 +269,15 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_13::GetProtocolVersion()
+{
+	return Version::Version_1_13;
 }
 
 

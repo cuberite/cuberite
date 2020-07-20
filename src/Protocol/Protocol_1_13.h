@@ -19,14 +19,6 @@ Declares the 1.13 protocol classes:
 #pragma once
 
 #include "Protocol_1_12.h"
-#include "../World.h"
-
-
-
-
-
-// fwd:
-class BlockTypePalette;
 
 
 
@@ -45,9 +37,9 @@ protected:
 
 	// Packet sending:
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	template <auto Palette> void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // Template to avoid virutal calls in tight loops
+	template <auto Palette> void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // Template to avoid virtual calls in tight loops
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	template <auto Palette>void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);  // Template to avoid virutal calls in tight loops
+	template <auto Palette>void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);  // Template to avoid virtual calls in tight loops
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
@@ -57,15 +49,11 @@ protected:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 
-	/** Returns 1.13. */
-	virtual Version GetProtocolVersion() override;
-
-	// Packet receiving:
-	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
-
 	// Outgoing packet type translation:
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
+
+	/** Returns 1.13. */
+	virtual Version GetProtocolVersion() override;
 
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
@@ -74,6 +62,10 @@ protected:
 	virtual UInt8 GetEntityMetadataID(eEntityMetadataType a_FieldType);
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage);
+
+	// Packet receiving:
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;

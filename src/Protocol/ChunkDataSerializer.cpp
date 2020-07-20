@@ -93,13 +93,13 @@ void cChunkDataSerializer::SendToClients(const std::unordered_set<cClientHandle 
 			}
 			case cProtocol::Version::Version_1_13:
 			{
-				Serialize393And401<&Palette_1_13::FromBlock>(Entry.second);  // This version didn't last very long xD
+				Serialize393<&Palette_1_13::FromBlock>(Entry.second);  // This version didn't last very long xD
 				continue;
 			}
 			case cProtocol::Version::Version_1_13_1:
 			case cProtocol::Version::Version_1_13_2:
 			{
-				Serialize393And401<&Palette_1_13_1::FromBlock>(Entry.second);
+				Serialize393<&Palette_1_13_1::FromBlock>(Entry.second);
 				continue;
 			}
 		}
@@ -391,7 +391,7 @@ void cChunkDataSerializer::Serialize110(const std::vector<cClientHandle *> & a_S
 
 
 template <auto Palette>
-void cChunkDataSerializer::Serialize393And401(const std::vector<cClientHandle *> & a_SendTo)
+void cChunkDataSerializer::Serialize393(const std::vector<cClientHandle *> & a_SendTo)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 

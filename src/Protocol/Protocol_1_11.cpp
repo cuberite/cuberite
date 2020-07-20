@@ -11,7 +11,6 @@ Implements the 1.11 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_11.h"
-#include "ProtocolRecognizer.h"
 #include "Packetizer.h"
 
 #include "../WorldStorage/FastNBT.h"

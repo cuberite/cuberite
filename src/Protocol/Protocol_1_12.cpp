@@ -8,7 +8,6 @@ Implements the 1.12 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_12.h"
-#include "ProtocolRecognizer.h"
 #include "Packetizer.h"
 
 #include "../Entities/Boat.h"

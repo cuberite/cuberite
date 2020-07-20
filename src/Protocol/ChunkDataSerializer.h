@@ -38,7 +38,7 @@ protected:
 	void Serialize110(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.9.4
 
 	template <auto Palette>
-	void Serialize393And401(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.1
+	void Serialize393(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.1
 
 	/** Finalises the data, compresses it if required, and delivers it to all clients. */
 	void CompressAndSend(cByteBuffer & a_Packet, const std::vector<cClientHandle *> & a_SendTo);
