@@ -341,7 +341,8 @@ public:
 		Version_1_12_2 = 340,
 		Version_1_13   = 393,
 		Version_1_13_1 = 401,
-		Version_1_13_2 = 404  // TODO: this constant should be in WebServer
+		Version_1_13_2 = 404,  // TODO: this constant should be in WebServer
+		Version_1_14   = 477
 	};
 
 	/** Called when client sends some data */

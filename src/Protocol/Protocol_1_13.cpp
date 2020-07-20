@@ -4,11 +4,12 @@
 /*
 Implements the 1.13 protocol classes:
 - release 1.13 protocol (#393)
+- release 1.13.1 protocol (#401)
+- release 1.13.2 protocol (#404)
 */
 
 #include "Globals.h"
 #include "Protocol_1_13.h"
-#include "Packetizer.h"
 
 #include "../Entities/Boat.h"
 #include "../Entities/Minecart.h"
@@ -29,7 +30,6 @@ Implements the 1.13 protocol classes:
 
 #include "../Bindings/PluginManager.h"
 
-#include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"
 
@@ -85,7 +85,7 @@ void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, B
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta)));
 }
 
@@ -96,27 +96,6 @@ void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, B
 void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	SendBlockChanges<&Palette_1_13::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
-}
-
-
-
-
-
-template <auto Palette>
-void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChanges);
-	Pkt.WriteBEInt32(a_ChunkX);
-	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
-	for (const auto & Change : a_Changes)
-	{
-		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
-		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(Change.m_BlockType, Change.m_BlockMeta)));
-	}  // for itr - a_Changes[]
 }
 
 

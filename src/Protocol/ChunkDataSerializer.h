@@ -36,9 +36,12 @@ protected:
 	void Serialize47 (const std::vector<cClientHandle *> & a_SendTo);  // Release 1.8
 	void Serialize107(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.9
 	void Serialize110(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.9.4
+	template <auto Palette> void Serialize393(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.1
+	void Serialize477(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.1
 
-	template <auto Palette>
-	void Serialize393(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.1
+	/** Writes all blocks in a chunk section into a series of Int64.
+	Writes start from the bit directly subsequent to the previous write's end, possibly crossing over to the next Int64. */
+	inline void WriteSectionDataSeamless(cByteBuffer & a_Packet, const cChunkData::sChunkSection & a_Section, const UInt8 a_BitsPerEntry);
 
 	/** Finalises the data, compresses it if required, and delivers it to all clients. */
 	void CompressAndSend(cByteBuffer & a_Packet, const std::vector<cClientHandle *> & a_SendTo);

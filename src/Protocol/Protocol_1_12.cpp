@@ -4,6 +4,8 @@
 /*
 Implements the 1.12 protocol classes:
 - release 1.12 protocol (#335)
+- release 1.12.1 protocol (#338)
+- release 1.12.2 protocol (#340)
 */
 
 #include "Globals.h"

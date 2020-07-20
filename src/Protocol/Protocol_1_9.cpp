@@ -285,7 +285,7 @@ void cProtocol_1_9_0::SendPaintingSpawn(const cPainting & a_Painting)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName());
-	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
 
@@ -680,7 +680,7 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -696,7 +696,7 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -873,7 +873,7 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2171,7 +2171,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
@@ -2218,7 +2218,7 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 	// 1.9.4 removed the update sign packet and now uses Update Block Entity
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
 
 	cFastNBTWriter Writer;

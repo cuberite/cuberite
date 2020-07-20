@@ -224,7 +224,7 @@ void cProtocol_1_8_0::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockAction);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
 	Pkt.WriteVarInt32(a_BlockType);
@@ -240,7 +240,7 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_
 
 	cPacketizer Pkt(*this, pktBlockBreakAnim);
 	Pkt.WriteVarInt32(a_EntityID);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Stage);
 }
 
@@ -253,7 +253,7 @@ void cProtocol_1_8_0::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
 
@@ -410,7 +410,7 @@ void cProtocol_1_8_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktEditSign);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -776,7 +776,7 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
@@ -826,7 +826,7 @@ void cProtocol_1_8_0::SendPaintingSpawn(const cPainting & a_Painting)
 	cPacketizer Pkt(*this, pktSpawnPainting);
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName());
-	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
 
@@ -1339,7 +1339,7 @@ void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, int a_S
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WritePosition64(a_SrcX, a_SrcY, a_SrcZ);
+	Pkt.WriteXYZPosition64(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -1526,7 +1526,7 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WritePosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
@@ -1553,7 +1553,7 @@ void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateSign);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 
 	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
@@ -1574,7 +1574,7 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 	cPacketizer Pkt(*this, pktUseBed);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -2471,7 +2471,7 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2487,7 +2487,7 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2805,7 +2805,7 @@ void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
