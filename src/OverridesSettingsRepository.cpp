@@ -2,9 +2,9 @@
 #include "Globals.h"
 #include "OverridesSettingsRepository.h"
 
-cOverridesSettingsRepository::cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, std::unique_ptr<cSettingsRepositoryInterface> a_Overrides) :
+cOverridesSettingsRepository::cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, cSettingsRepositoryInterface & a_Overrides) :
 	m_Main(std::move(a_Main)),
-	m_Overrides(std::move(a_Overrides))
+	m_Overrides(&a_Overrides)
 {
 }
 

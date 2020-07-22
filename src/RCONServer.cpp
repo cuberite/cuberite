@@ -295,7 +295,7 @@ bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_Packet
 
 			AString cmd(a_Payload, a_PayloadLength);
 			LOGD("RCON command from %s: \"%s\"", m_IPAddress.c_str(), cmd.c_str());
-			cRoot::Get()->ExecuteConsoleCommand(cmd, *(new cRCONCommandOutput(*this, a_RequestID)));
+			cRoot::Get()->QueueExecuteConsoleCommand(cmd, *(new cRCONCommandOutput(*this, a_RequestID)));
 
 			// Send an empty response:
 			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, nullptr);

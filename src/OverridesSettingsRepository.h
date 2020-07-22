@@ -7,7 +7,7 @@ class cOverridesSettingsRepository : public cSettingsRepositoryInterface
 {
 
 public:
-	cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, std::unique_ptr<cSettingsRepositoryInterface> a_Overrides);
+	cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, cSettingsRepositoryInterface & a_Overrides);
 
 	virtual ~cOverridesSettingsRepository() override = default;
 
@@ -44,7 +44,7 @@ public:
 private:
 
 	std::unique_ptr<cSettingsRepositoryInterface> m_Main;
-	std::unique_ptr<cSettingsRepositoryInterface> m_Overrides;
+	cSettingsRepositoryInterface * m_Overrides;
 
 };
 
