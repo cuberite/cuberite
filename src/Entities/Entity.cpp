@@ -917,6 +917,143 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+class cSolidHitCallbacks :
+	public cLineBlockTracer::cCallbacks
+{
+public:
+
+	cSolidHitCallbacks(cEntity & a_Entity, const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, eBlockFace & a_CBHitBlockFace) :
+		m_HitBlockFace(a_CBHitBlockFace),
+		m_Entity(a_Entity),
+		m_Start(a_CBStart),
+		m_End(a_CBEnd),
+		m_HitCoords(a_CBHitCoords)
+	{
+	}
+
+	eBlockFace & m_HitBlockFace;
+
+private:
+
+	template <typename EachLambdaType>
+	static void ForEachBlockToTest(const cBoundingBox & a_Around, Vector3d a_Direction, EachLambdaType Each)
+	{
+		const auto BoxStart = a_Around.GetMin().Floor();
+		const auto BoxEnd = a_Around.GetMax().Ceil();
+
+		// This checks all blocks within the hitbox. Hopefully we don't have too many Giants.
+
+		for (int i = BoxStart.x; i < BoxEnd.x; i++)
+		{
+			for (int j = BoxStart.y; j < BoxEnd.y; j++)
+			{
+				for (int k = BoxStart.z; k < BoxEnd.z; k++)
+				{
+					Each({ i, j, k });
+				}
+			}
+		}
+	}
+
+	static double CalculateRetardation(const eBlockFace a_EntryFace, const cBoundingBox & a_Intersection, const cBoundingBox & a_Block, const Vector3d a_Direction)
+	{
+		switch (a_EntryFace)
+		{
+			case BLOCK_FACE_NONE: return 0;
+			case BLOCK_FACE_XM: return (a_Intersection.GetMaxX() - a_Block.GetMinX()) / a_Direction.x;
+			case BLOCK_FACE_XP: return (a_Intersection.GetMinX() - a_Block.GetMaxX()) / a_Direction.x;
+			case BLOCK_FACE_YM: return (a_Intersection.GetMaxY() - a_Block.GetMinY()) / a_Direction.y;
+			case BLOCK_FACE_YP: return (a_Intersection.GetMinY() - a_Block.GetMaxY()) / a_Direction.y;
+			case BLOCK_FACE_ZM: return (a_Intersection.GetMaxZ() - a_Block.GetMinZ()) / a_Direction.z;
+			case BLOCK_FACE_ZP: return (a_Intersection.GetMinZ() - a_Block.GetMaxZ()) / a_Direction.z;
+		}
+
+		UNREACHABLE("Unexpected block face during collision test");
+	}
+
+	void TestBoundingBoxCollisionWithEnvironment(const Vector3d a_TraceIntersection)
+	{
+		cBoundingBox Entity(a_TraceIntersection, m_Entity.GetWidth() / 2, m_Entity.GetHeight());
+
+		ASSERT(m_End != m_Start);
+
+		auto Direction = m_End - m_Start;
+		auto Backoff = std::make_pair(0.0, BLOCK_FACE_NONE);
+
+		ForEachBlockToTest(Entity, Direction, [this, &Backoff, &Direction, &Entity](const Vector3i Test)
+		{
+			cChunk * Chunk;
+			Vector3i Relative;
+			if (
+				!m_Entity.GetParentChunk()->GetChunkAndRelByAbsolute(Test, &Chunk, Relative) ||
+				!cBlockInfo::IsSolid(Chunk->GetBlock(Relative))
+				)
+			{
+				return;
+			}
+
+			cBoundingBox Intersection{ Vector3d(), Vector3d() };
+			cBoundingBox Block(Test, Test + Vector3i(1, 1, 1));
+			if (Block.Intersect(Entity, Intersection))
+			{
+				const auto Centre = (Intersection.GetMax() - Intersection.GetMin()) / 2 + Intersection.GetMin();
+				double IgnoredCoefficient;
+				eBlockFace EntryFace;
+
+				VERIFY(Block.CalcLineIntersection(Centre - Direction, Centre + Direction, IgnoredCoefficient, EntryFace));
+
+				Backoff = std::max(
+					Backoff,
+					std::make_pair(CalculateRetardation(EntryFace, Intersection, Block, Direction), EntryFace)
+				);
+			}
+		});
+
+		m_HitCoords = a_TraceIntersection - Direction * Backoff.first;
+		m_HitBlockFace = Backoff.second;
+	}
+
+	virtual void OnNoMoreHits() override
+	{
+		TestBoundingBoxCollisionWithEnvironment(m_End);
+	}
+
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	{
+		// TODO: comment
+		// We hit a solid block, calculate the exact hit coords and abort trace:
+		m_HitBlockFace = a_EntryFace;
+
+		double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+		eBlockFace Face;  // Face hit
+		cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
+
+		// First calculate line intersection
+		if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
+		{
+			// Maths rounding errors have caused the calculation to miss the block completely
+			m_HitCoords = m_End;
+			m_HitBlockFace = BLOCK_FACE_NONE;
+			return true;
+		}
+
+		// Check bbox collision, setting final values
+		// Line tracer hit position is used as a starting point:
+		TestBoundingBoxCollisionWithEnvironment(m_Start + (m_End - m_Start) * LineCoeff);
+
+		return m_HitBlockFace != BLOCK_FACE_NONE;
+	}
+
+	cEntity & m_Entity;
+	const Vector3d & m_Start;
+	const Vector3d & m_End;
+	Vector3d & m_HitCoords;
+};
+
+
+
+
+
 void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	int BlockX = POSX_TOINT;
@@ -1040,140 +1177,6 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
 	NextSpeed += m_WaterSpeed;
-
-	class cSolidHitCallbacks :
-		public cLineBlockTracer::cCallbacks
-	{
-	public:
-		cSolidHitCallbacks(cEntity & a_Entity, const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, eBlockFace & a_CBHitBlockFace) :
-			m_HitBlockFace(a_CBHitBlockFace),
-			m_Entity(a_Entity),
-			m_Start(a_CBStart),
-			m_End(a_CBEnd),
-			m_HitCoords(a_CBHitCoords)
-		{
-		}
-
-		eBlockFace & m_HitBlockFace;
-
-	private:
-
-		auto GetBlocksToTestAround(const cBoundingBox & a_Around)
-		{
-			auto bstart = a_Around.GetMin().Floor();
-			auto bend = a_Around.GetMax().Floor();
-
-			std::unordered_set<Vector3i, VectorHasher<int>> Checks;
-
-			// TODO: checks too much, very inefficient
-			for (int i = bstart.x; i <= bend.x; i++)
-			{
-				for (int j = bstart.y; j <= bend.y; j++)
-				{
-					for (int k = bstart.z; k <= bend.z; k++)
-					{
-						Checks.emplace(Vector3i(i, j, k));
-					}
-				}
-			}
-
-			return Checks;
-		}
-
-		static double CalculateRetardation(const eBlockFace a_EntryFace, const cBoundingBox & a_Intersection, const cBoundingBox & a_Block, const Vector3d a_Direction)
-		{
-			switch (a_EntryFace)
-			{
-				case BLOCK_FACE_NONE: return 0;
-				case BLOCK_FACE_XM: return (a_Intersection.GetMaxX() - a_Block.GetMinX()) / a_Direction.x;
-				case BLOCK_FACE_XP: return (a_Intersection.GetMinX() - a_Block.GetMaxX()) / a_Direction.x;
-				case BLOCK_FACE_YM: return (a_Intersection.GetMaxY() - a_Block.GetMinY()) / a_Direction.y;
-				case BLOCK_FACE_YP: return (a_Intersection.GetMinY() - a_Block.GetMaxY()) / a_Direction.y;
-				case BLOCK_FACE_ZM: return (a_Intersection.GetMaxZ() - a_Block.GetMinZ()) / a_Direction.z;
-				case BLOCK_FACE_ZP: return (a_Intersection.GetMinZ() - a_Block.GetMaxZ()) / a_Direction.z;
-			}
-		}
-
-		void TestBoundingBoxCollisionWithEnvironment(const Vector3d a_TraceIntersection)
-		{
-			cBoundingBox Entity(a_TraceIntersection, m_Entity.GetWidth() / 2, m_Entity.GetHeight());
-			Entity.Expand(0.0, 0.001, 0.0);
-
-			ASSERT(m_End != m_Start);
-
-			auto Direction = m_End - m_Start;
-			auto Backoff = std::make_pair(0.0, BLOCK_FACE_NONE);
-
-			for (const auto & Test : GetBlocksToTestAround(Entity))
-			{
-				cChunk * Chunk;
-				Vector3i Relative;
-				if (
-					!m_Entity.GetParentChunk()->GetChunkAndRelByAbsolute(Test, &Chunk, Relative) ||
-					!cBlockInfo::IsSolid(Chunk->GetBlock(Relative))
-				)
-				{
-					continue;
-				}
-
-				cBoundingBox Intersection{Vector3d(), Vector3d()};
-				cBoundingBox Block(Test, Test + Vector3i(1, 1, 1));
-				if (Block.Intersect(Entity, Intersection))
-				{
-					const auto Centre = (Intersection.GetMax() - Intersection.GetMin()) / 2 + Intersection.GetMin();
-					double IgnoredCoefficient;
-					eBlockFace EntryFace;
-
-					VERIFY(Block.CalcLineIntersection(Centre - Direction, Centre + Direction, IgnoredCoefficient, EntryFace));
-
-					Backoff = std::max(
-						Backoff,
-						std::make_pair(CalculateRetardation(EntryFace, Intersection, Block, Direction), EntryFace)
-					);
-				}
-			}
-
-			m_HitCoords = a_TraceIntersection - Direction * Backoff.first;
-			m_HitBlockFace = Backoff.second;
-		}
-
-		virtual void OnNoMoreHits() override
-		{
-			TestBoundingBoxCollisionWithEnvironment(m_End);
-		}
-
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
-		{
-			// TODO: comment
-			// We hit a solid block, calculate the exact hit coords and abort trace:
-			m_HitBlockFace = a_EntryFace;
-
-			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
-			eBlockFace Face;  // Face hit
-			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
-
-			// First calculate line intersection
-			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
-			{
-				// Maths rounding errors have caused the calculation to miss the block completely
-				m_HitCoords = m_End;
-				m_HitBlockFace = BLOCK_FACE_NONE;
-				return true;
-			}
-
-			// Check bbox collision, setting final values
-			// Line tracer hit position is used as a starting point:
-			TestBoundingBoxCollisionWithEnvironment(m_Start + (m_End - m_Start) * LineCoeff);
-
-			return m_HitBlockFace != BLOCK_FACE_NONE;
-		}
-
-	protected:
-		cEntity & m_Entity;
-		const Vector3d & m_Start;
-		const Vector3d & m_End;
-		Vector3d & m_HitCoords;
-	};
 
 	// TODO: comment
 	while ((DtSec > 0.001) && (NextSpeed.SqrLength() > 0.001))
