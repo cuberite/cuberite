@@ -1474,7 +1474,7 @@ bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cB
 	{
 		return false;
 	}
-	return Chunk->DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithBlockEntityAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1492,7 +1492,7 @@ bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeacon
 	{
 		return false;
 	}
-	return Chunk->DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithBeaconAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1510,7 +1510,7 @@ bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallba
 	{
 		return false;
 	}
-	return Chunk->DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithBedAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1528,7 +1528,7 @@ bool cChunkMap::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	{
 		return false;
 	}
-	return Chunk->DoWithBrewingstandAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithBrewingstandAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1546,7 +1546,7 @@ bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCa
 	{
 		return false;
 	}
-	return Chunk->DoWithChestAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithChestAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1564,7 +1564,7 @@ bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDis
 	{
 		return false;
 	}
-	return Chunk->DoWithDispenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithDispenserAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1582,7 +1582,7 @@ bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropp
 	{
 		return false;
 	}
-	return Chunk->DoWithDropperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithDropperAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1600,7 +1600,7 @@ bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cD
 	{
 		return false;
 	}
-	return Chunk->DoWithDropSpenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithDropSpenserAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1618,7 +1618,7 @@ bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurna
 	{
 		return false;
 	}
-	return Chunk->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithFurnaceAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1636,7 +1636,7 @@ bool cChunkMap::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopper
 	{
 		return false;
 	}
-	return Chunk->DoWithHopperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithHopperAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1654,7 +1654,7 @@ bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNot
 	{
 		return false;
 	}
-	return Chunk->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithNoteBlockAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1672,7 +1672,7 @@ bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	{
 		return false;
 	}
-	return Chunk->DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithCommandBlockAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1690,7 +1690,7 @@ bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHe
 	{
 		return false;
 	}
-	return Chunk->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithMobHeadAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1708,7 +1708,7 @@ bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlo
 	{
 		return false;
 	}
-	return Chunk->DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return Chunk->DoWithFlowerPotAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
@@ -1726,7 +1726,7 @@ bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString &
 	{
 		return false;
 	}
-	return Chunk->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
+	return Chunk->GetSignLines({ BlockX, BlockY, BlockZ }, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 

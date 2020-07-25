@@ -1999,10 +1999,10 @@ bool cChunk::ForEachFurnace(cFurnaceCallback a_Callback)
 
 
 template <class tyEntity, BLOCKTYPE... tBlocktype>
-bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFunctionRef<bool(tyEntity &)> a_Callback)
+bool cChunk::GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(tyEntity &)> a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	cBlockEntity * Block = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	cBlockEntity * Block = GetBlockEntityRel(a_Position);
 	if (Block == nullptr)
 	{
 		return false;  // No block entity here
@@ -2021,165 +2021,165 @@ bool cChunk::GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
-bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cChunk::DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback)
 {
-	return GenericDoWithBlockEntityAt<cBlockEntity>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return GenericDoWithBlockEntityAt<cBlockEntity>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
+bool cChunk::DoWithBeaconAt(Vector3i a_Position, cBeaconCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBeaconEntity,
 		E_BLOCK_BEACON
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
+bool cChunk::DoWithBedAt(Vector3i a_Position, cBedCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBedEntity,
 		E_BLOCK_BED
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
+bool cChunk::DoWithBrewingstandAt(Vector3i a_Position, cBrewingstandCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBrewingstandEntity,
 		E_BLOCK_BREWING_STAND
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
+bool cChunk::DoWithChestAt(Vector3i a_Position, cChestCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cChestEntity,
 		E_BLOCK_CHEST,
 		E_BLOCK_TRAPPED_CHEST
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
+bool cChunk::DoWithDispenserAt(Vector3i a_Position, cDispenserCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDispenserEntity,
 		E_BLOCK_DISPENSER
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
+bool cChunk::DoWithDropperAt(Vector3i a_Position, cDropperCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDropperEntity,
 		E_BLOCK_DROPPER
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
+bool cChunk::DoWithDropSpenserAt(Vector3i a_Position, cDropSpenserCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cDropSpenserEntity,
 		E_BLOCK_DISPENSER,
 		E_BLOCK_DROPPER
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
+bool cChunk::DoWithFurnaceAt(Vector3i a_Position, cFurnaceCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cFurnaceEntity,
 		E_BLOCK_FURNACE,
 		E_BLOCK_LIT_FURNACE
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
+bool cChunk::DoWithHopperAt(Vector3i a_Position, cHopperCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cHopperEntity,
 		E_BLOCK_HOPPER
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
+bool cChunk::DoWithNoteBlockAt(Vector3i a_Position, cNoteBlockCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cNoteEntity,
 		E_BLOCK_NOTE_BLOCK
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
+bool cChunk::DoWithCommandBlockAt(Vector3i a_Position, cCommandBlockCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cCommandBlockEntity,
 		E_BLOCK_COMMAND_BLOCK
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
+bool cChunk::DoWithMobHeadAt(Vector3i a_Position, cMobHeadCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cMobHeadEntity,
 		E_BLOCK_HEAD
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
+bool cChunk::DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cFlowerPotEntity,
 		E_BLOCK_FLOWER_POT
-	>(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	>(a_Position, a_Callback);
 }
 
 
 
 
 
-bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+bool cChunk::GetSignLines(Vector3i a_Position, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	auto Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	auto Entity = GetBlockEntity(a_Position);
 	if (Entity == nullptr)
 	{
 		return false;  // Not a block entity

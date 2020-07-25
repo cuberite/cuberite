@@ -306,52 +306,52 @@ public:
 	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
 	Accessible only from within Chunk.cpp */
 	template <class tyEntity, BLOCKTYPE... tBlocktype>
-	bool GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFunctionRef<bool(tyEntity &)> a_Callback);
+	bool GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(tyEntity &)> a_Callback);
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);  // Lua-acessible
+	bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Lua-acessible
+	bool DoWithBeaconAt(Vector3i a_Position, cBeaconCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback);  // Lua-acessible
+	bool DoWithBrewingstandAt(Vector3i a_Position, cBrewingstandCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback);  // Lua-acessible
+	bool DoWithBedAt(Vector3i a_Position, cBedCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
-	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback);  // Lua-acessible
+	bool DoWithChestAt(Vector3i a_Position, cChestCallback a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback);
+	bool DoWithDispenserAt(Vector3i a_Position, cDispenserCallback a_Callback);
 
 	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
-	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback);
+	bool DoWithDropperAt(Vector3i a_Position, cDropperCallback a_Callback);
 
 	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
-	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback);
+	bool DoWithDropSpenserAt(Vector3i a_Position, cDropSpenserCallback a_Callback);
 
 	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
-	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Lua-accessible
+	bool DoWithFurnaceAt(Vector3i a_Position, cFurnaceCallback a_Callback);  // Lua-accessible
 
 	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
-	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Lua-accessible
+	bool DoWithHopperAt(Vector3i a_Position, cHopperCallback a_Callback);  // Lua-accessible
 
 	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
-	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);
+	bool DoWithNoteBlockAt(Vector3i a_Position, cNoteBlockCallback a_Callback);
 
 	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback);
+	bool DoWithCommandBlockAt(Vector3i a_Position, cCommandBlockCallback a_Callback);
 
 	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback);
+	bool DoWithMobHeadAt(Vector3i a_Position, cMobHeadCallback a_Callback);
 
 	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
-	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);
+	bool DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callback);
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
-	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
+	bool GetSignLines (Vector3i a_Position, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
@@ -536,9 +536,7 @@ public:
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
-
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
-	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
 
 	/** Returns the block entity at the specified (absolute) coords.
 	Returns nullptr if no such BE or outside this chunk. */
@@ -643,7 +641,6 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
-
 	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
 
 	/** If greater than zero, the chunk is ticked even if it has no clients.
