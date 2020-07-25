@@ -76,33 +76,41 @@ private:
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
 	{
-		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);
-		if (m_World != nullptr)
+
+		if (m_World == nullptr)
 		{
-			cWindow * Window = GetWindow();
-			if (
-				(Window == nullptr) &&
-				(m_Neighbour != nullptr)
-			)
-			{
-				// Neighbour might own the window
-				Window = m_Neighbour->GetWindow();
-			}
-
-			if (Window != nullptr)
-			{
-				Window->BroadcastWholeWindow();
-			}
-
-			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-			m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-				{
-					m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
-					return true;
-				}
-			);
+			return;
 		}
+
+		// Have cBlockEntityWithItems update redstone and try to broadcast our window:
+		Super::OnSlotChanged(a_Grid, a_SlotNum);
+
+		cWindow * Window = GetWindow();
+		if ((Window == nullptr) && (m_Neighbour != nullptr))
+		{
+			// Window was null, Super will have failed.
+			// Neighbour might own the window:
+			Window = m_Neighbour->GetWindow();
+		}
+
+		if (Window != nullptr)
+		{
+			Window->BroadcastWholeWindow();
+		}
+
+		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+		m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
+		{
+			auto & Simulator = *m_World->GetRedstoneSimulator();
+
+			// Notify comparators:
+			Simulator.WakeUp(m_Pos + Vector3i(1, 0, 0), &a_Chunk);
+			Simulator.WakeUp(m_Pos + Vector3i(-1, 0, 0), &a_Chunk);
+			Simulator.WakeUp(m_Pos + Vector3i(0, 0, 1), &a_Chunk);
+			Simulator.WakeUp(m_Pos + Vector3i(0, 0, -1), &a_Chunk);
+			return true;
+		});
 	}
 
 } ;  // tolua_export

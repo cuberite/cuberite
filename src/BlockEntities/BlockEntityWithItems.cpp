@@ -41,19 +41,27 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 {
 	UNUSED(a_SlotNum);
 	ASSERT(a_Grid == &m_Contents);
-	if (m_World != nullptr)
-	{
-		if (GetWindow() != nullptr)
-		{
-			GetWindow()->BroadcastWholeWindow();
-		}
 
-		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-		m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-			{
-				m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
-				return true;
-			}
-		);
+	if (m_World == nullptr)
+	{
+		return;
 	}
+
+	if (GetWindow() != nullptr)
+	{
+		GetWindow()->BroadcastWholeWindow();
+	}
+
+	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+	m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
+	{
+		auto & Simulator = *m_World->GetRedstoneSimulator();
+
+		// Notify comparators:
+		Simulator.WakeUp(m_Pos + Vector3i(1, 0, 0), &a_Chunk);
+		Simulator.WakeUp(m_Pos + Vector3i(-1, 0, 0), &a_Chunk);
+		Simulator.WakeUp(m_Pos + Vector3i(0, 0, 1), &a_Chunk);
+		Simulator.WakeUp(m_Pos + Vector3i(0, 0, -1), &a_Chunk);
+		return true;
+	});
 }
