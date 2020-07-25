@@ -21,18 +21,6 @@
 void cSimulator::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
 {
 	AddBlock(a_Block, a_Chunk);
-	AddBlock(a_Block + Vector3i(-1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x - 1, a_Block.z));
-	AddBlock(a_Block + Vector3i( 1, 0, 0), a_Chunk->GetNeighborChunk(a_Block.x + 1, a_Block.z));
-	AddBlock(a_Block + Vector3i(0, 0, -1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z - 1));
-	AddBlock(a_Block + Vector3i(0, 0,  1), a_Chunk->GetNeighborChunk(a_Block.x, a_Block.z + 1));
-	if (a_Block.y > 0)
-	{
-		AddBlock(a_Block + Vector3i(0, -1, 0), a_Chunk);
-	}
-	if (a_Block.y < cChunkDef::Height - 1)
-	{
-		AddBlock(a_Block + Vector3i(0, 1, 0), a_Chunk);
-	}
 }
 
 
