@@ -33,31 +33,37 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = DirectionToMetadata(a_ClickedBlockFace);
 
-		return true;
-	}
-
-
-
-
-
-	inline static NIBBLETYPE DirectionToMetadata(eBlockFace a_Direction)
-	{
-		switch (a_Direction)
+		switch (a_ClickedBlockFace)
 		{
-			case BLOCK_FACE_XM: return 0x1;
-			case BLOCK_FACE_XP: return 0x3;
-			case BLOCK_FACE_ZM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x0;
+			case BLOCK_FACE_XM:
+			{
+				a_BlockMeta = 0x1;
+				return true;
+			}
+			case BLOCK_FACE_XP:
+			{
+				a_BlockMeta = 0x3;
+				return true;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				a_BlockMeta = 0x2;
+				return true;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				a_BlockMeta = 0x0;
+				return true;
+			}
 			case BLOCK_FACE_NONE:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				ASSERT(!"Unhandled tripwire hook direction!");
-				return 0x0;
+				return false;
 			}
 		}
+
 		UNREACHABLE("Unsupported block face");
 	}
 
@@ -83,14 +89,15 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
 	{
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto NeighborPos = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
-		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		const auto Meta = a_Chunk.GetMeta(a_RelPos);
+		const auto RearPosition = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
+
+		BLOCKTYPE NeighborBlockType;
+		if (!a_Chunk.UnboundedRelGetBlockType(RearPosition, NeighborBlockType))
 		{
 			return false;
 		}
-		BLOCKTYPE NeighborBlockType;
-		a_Chunk.UnboundedRelGetBlockType(a_RelPos, NeighborBlockType);
+
 		return cBlockInfo::FullyOccupiesVoxel(NeighborBlockType);
 	}
 
