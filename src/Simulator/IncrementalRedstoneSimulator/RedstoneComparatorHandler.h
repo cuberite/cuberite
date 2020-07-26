@@ -22,7 +22,7 @@ public:
 		else
 		{
 			// Comparison mode
-			return (std::max(a_HighestSidePowerLevel, a_HighestRearPowerLevel) == a_HighestSidePowerLevel) ? 0 : a_HighestRearPowerLevel;
+			return (a_HighestRearPowerLevel < a_HighestSidePowerLevel) ? 0 : a_HighestRearPowerLevel;
 		}
 	}
 
