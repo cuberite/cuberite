@@ -1221,10 +1221,12 @@ namespace PaletteUpgrade
 			case (175 << 4) | 3: return LargeFern::LargeFern(LargeFern::Half::Lower);
 			case (175 << 4) | 4: return RoseBush::RoseBush(RoseBush::Half::Lower);
 			case (175 << 4) | 5: return Peony::Peony(Peony::Half::Lower);
-			case (175 << 4) | 8: return Peony::Peony(Peony::Half::Upper);
-			case (175 << 4) | 9: return Peony::Peony(Peony::Half::Upper);
-			case (175 << 4) | 10: return Peony::Peony(Peony::Half::Upper);
-			case (175 << 4) | 11: return Peony::Peony(Peony::Half::Upper);
+			case (175 << 4) | 8: return Sunflower::Sunflower(Sunflower::Half::Upper);
+			case (175 << 4) | 9: return Lilac::Lilac(Lilac::Half::Upper);
+			case (175 << 4) | 10: return TallGrass::TallGrass(TallGrass::Half::Upper);
+			case (175 << 4) | 11: return LargeFern::LargeFern(LargeFern::Half::Upper);
+			case (175 << 4) | 12: return RoseBush::RoseBush(RoseBush::Half::Upper);
+			case (175 << 4) | 13: return Peony::Peony(Peony::Half::Upper);
 			case (176 << 4) | 0: return WhiteBanner::WhiteBanner(0);
 			case (176 << 4) | 1: return WhiteBanner::WhiteBanner(1);
 			case (176 << 4) | 2: return WhiteBanner::WhiteBanner(2);
