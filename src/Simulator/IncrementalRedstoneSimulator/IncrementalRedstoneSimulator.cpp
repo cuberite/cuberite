@@ -152,7 +152,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 		const auto NeighbourChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(CurrentLocation);
 		if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 		{
-			return;
+			continue;
 		}
 
 		ProcessWorkItem(*NeighbourChunk, *a_Chunk, CurrentLocation);
@@ -170,17 +170,15 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 
 void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
 {
-	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(Chunk.GetRedstoneSimulatorData());
-
 	BLOCKTYPE CurrentBlock;
 	NIBBLETYPE CurrentMeta;
 	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
 
 	auto CurrentHandler = GetComponentHandler(CurrentBlock);
-	if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
+	if (CurrentHandler == nullptr)
 	{
-		// Clean up cached PowerData for CurrentPosition
-		ChunkData.ErasePowerData(Position);
+		// Block at Position doesn't have a corresponding redstone handler
+		// ErasePowerData will have been called in AddBlock
 		return;
 	}
 
@@ -229,7 +227,7 @@ void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & Tic
 void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 {
 	// Can't inspect block, ignore:
-	if ((a_Chunk == nullptr) || (!a_Chunk->IsValid()))
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
