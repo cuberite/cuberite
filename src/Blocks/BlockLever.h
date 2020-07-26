@@ -3,6 +3,7 @@
 #include "BlockHandler.h"
 #include "../Chunk.h"
 #include "Mixins.h"
+#include "BlockButton.h"
 #include "BlockSlab.h"
 
 
@@ -35,7 +36,7 @@ public:
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x08);
 
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
-		a_WorldInterface.WakeUpSimulators(a_BlockPos);
+		cBlockButtonHandler::WakeUpSimulators(a_WorldInterface, a_BlockPos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
