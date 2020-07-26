@@ -59,23 +59,23 @@ public:
 
 	void WakeUp(const Vector3i & a_Position)
 	{
-		ActiveBlocks.push(a_Position);
+		m_ActiveBlocks.push(a_Position);
 	}
 
 	auto & GetActiveBlocks()
 	{
-		return ActiveBlocks;
+		return m_ActiveBlocks;
 	}
 
 	const PoweringData GetCachedPowerData(const Vector3i Position) const
 	{
-		auto Result = CachedPowerLevels.find(Position);
-		return (Result == CachedPowerLevels.end()) ? PoweringData() : Result->second;
+		auto Result = m_CachedPowerLevels.find(Position);
+		return (Result == m_CachedPowerLevels.end()) ? PoweringData() : Result->second;
 	}
 
 	void SetCachedPowerData(const Vector3i Position, PoweringData PoweringData)
 	{
-		CachedPowerLevels[Position] = PoweringData;
+		m_CachedPowerLevels[Position] = PoweringData;
 	}
 
 	std::pair<int, bool> * GetMechanismDelayInfo(const Vector3i Position)
@@ -87,17 +87,17 @@ public:
 	/** Erase all cached redstone data for position. */
 	void ErasePowerData(const Vector3i Position)
 	{
-		CachedPowerLevels.erase(Position);
+		m_CachedPowerLevels.erase(Position);
 		m_MechanismDelays.erase(Position);
 		AlwaysTickedPositions.erase(Position);
 	}
 
 	PoweringData ExchangeUpdateOncePowerData(const Vector3i & a_Position, PoweringData a_PoweringData)
 	{
-		auto Result = CachedPowerLevels.find(a_Position);
-		if (Result == CachedPowerLevels.end())
+		auto Result = m_CachedPowerLevels.find(a_Position);
+		if (Result == m_CachedPowerLevels.end())
 		{
-			CachedPowerLevels[a_Position] = a_PoweringData;
+			m_CachedPowerLevels[a_Position] = a_PoweringData;
 			return PoweringData();
 		}
 		std::swap(Result->second, a_PoweringData);
@@ -122,11 +122,11 @@ public:
 
 private:
 
-	std::stack<Vector3i, std::vector<Vector3i>> ActiveBlocks;
+	std::stack<Vector3i, std::vector<Vector3i>> m_ActiveBlocks;
 
 	// TODO: map<Vector3i, int> -> Position of torch + it's heat level
 
-	std::unordered_map<Vector3i, PoweringData, VectorHasher<int>> CachedPowerLevels;
+	std::unordered_map<Vector3i, PoweringData, VectorHasher<int>> m_CachedPowerLevels;
 
 	friend class cRedstoneHandlerFactory;
 
