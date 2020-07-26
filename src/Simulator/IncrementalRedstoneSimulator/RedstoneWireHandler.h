@@ -7,11 +7,8 @@
 
 
 
-class cRedstoneWireHandler:
-	public cRedstoneHandler
+class cRedstoneWireHandler final : public cRedstoneHandler
 {
-	using Super = cRedstoneHandler;
-
 public:
 
 	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
@@ -40,133 +37,170 @@ public:
 		}
 	}
 
-	cVector3iArray GetTerracingConnectionOffsets(cWorld & a_World, const Vector3i a_Position) const
+	template <class OffsetCallback>
+	static bool ForTerracingConnectionOffsets(cChunk & a_Chunk, const Vector3i a_Position, OffsetCallback Callback)
 	{
-		auto RelativePositions = GetRelativeLaterals();
-		const auto YPTerraceBlock = a_World.GetBlock(a_Position + OffsetYP());
+		const auto YPTerraceBlock = a_Chunk.GetBlock(a_Position + OffsetYP);
 		const bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
 
-		for (const auto & Adjacent : GetRelativeLaterals())
+		for (const auto Adjacent : RelativeLaterals)
 		{
-			if (
-				// A block above us blocks all YP terracing, so the check is static in the loop
-				!IsYPTerracingBlocked &&
-				(a_World.GetBlock(a_Position + Adjacent + OffsetYP()) == E_BLOCK_REDSTONE_WIRE)
-			)
+			// All laterals are counted as terracing, duh
+			if (Callback(Adjacent))
 			{
-				RelativePositions.emplace_back(Adjacent + OffsetYP());
+				return true;
 			}
 
-			const auto YMTerraceBlock = a_World.GetBlock(a_Position + Adjacent);
 			if (
-				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
-				(!cBlockInfo::IsSolid(YMTerraceBlock) || cBlockInfo::IsTransparent(YMTerraceBlock)) &&
-				(a_World.GetBlock(a_Position + Adjacent + OffsetYM()) == E_BLOCK_REDSTONE_WIRE)
+				BLOCKTYPE YPBlock;
+
+				// A block above us blocks all YP terracing, so the check is static in the loop
+				!IsYPTerracingBlocked &&
+				a_Chunk.UnboundedRelGetBlockType(a_Position + Adjacent + OffsetYP, YPBlock) &&
+				(YPBlock == E_BLOCK_REDSTONE_WIRE)
 			)
 			{
-				RelativePositions.emplace_back(Adjacent + OffsetYM());
+				if (Callback(Adjacent + OffsetYP))
+				{
+					return true;
+				}
+			}
+
+			if (
+				BLOCKTYPE YMTerraceBlock, YMDiagonalBlock;
+
+				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
+				a_Chunk.UnboundedRelGetBlockType(a_Position + Adjacent, YMTerraceBlock) &&
+				(!cBlockInfo::IsSolid(YMTerraceBlock) || cBlockInfo::IsTransparent(YMTerraceBlock)) &&
+
+				a_Chunk.UnboundedRelGetBlockType(a_Position + Adjacent + OffsetYM, YMDiagonalBlock) &&
+				(YMDiagonalBlock == E_BLOCK_REDSTONE_WIRE)
+			)
+			{
+				if (Callback(Adjacent + OffsetYM))
+				{
+					return true;
+				}
 			}
 		}
 
-		return RelativePositions;
+		return false;
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
-		if (a_QueryPosition == (a_Position + OffsetYP()))
+		if (a_QueryPosition == (a_Position + OffsetYP))
 		{
 			// Wires do not power things above them
 			return 0;
 		}
 
-		if (a_QueryBlockType != E_BLOCK_REDSTONE_WIRE)
+		if (a_QueryBlockType == E_BLOCK_REDSTONE_WIRE)
 		{
 			// For mechanisms, wire of power one will still power them
-			a_Meta++;
+			// But for wire-to-wire connections, power level decreases by 1
+			return (a_Meta != 0) ? --a_Meta : a_Meta;
 		}
 
 		// Wires always deliver power to the block underneath, and any directly connecting mechanisms
 		if (
-			(a_QueryPosition != (a_Position + OffsetYM())) &&
-			!IsDirectlyConnectingMechanism(a_QueryBlockType, a_World.GetBlockMeta(a_QueryPosition), a_QueryPosition - a_Position)
+			NIBBLETYPE QueryMeta;
+
+			(a_QueryPosition == (a_Position + OffsetYM)) ||
+			(a_Chunk.UnboundedRelGetBlockMeta(a_QueryPosition, QueryMeta) && IsDirectlyConnectingMechanism(a_QueryBlockType, QueryMeta, a_QueryPosition - a_Position))
 		)
 		{
-			/*
-			Okay, we do not directly connect to the wire.
-			If there are no DC mechanisms at all, the wire powers all laterals. Great, we fall out the loop.
-			If there is one DC mechanism, the wire "goes straight" along the axis of the wire and mechanism.
-			The only possible way for us to be powered is for us to be on the opposite end, with the wire pointing towards us.
-			If there is more than one DC, no non-DCs are powered.
-			*/
+			return a_Meta;
+		}
 
-			Vector3i PotentialOffset;
-			bool FoundOneBorderingMechanism = false;
+		/*
+		Okay, we do not directly connect to the wire.
+		If there are no DC mechanisms at all, the wire powers all laterals. Great, we fall out the loop.
+		If there is one DC mechanism, the wire "goes straight" along the axis of the wire and mechanism.
+		The only possible way for us to be powered is for us to be on the opposite end, with the wire pointing towards us.
+		If there is more than one DC, no non-DCs are powered.
+		*/
 
-			for (const auto & Offset : GetTerracingConnectionOffsets(a_World, a_Position))
+		Vector3i PotentialOffset;
+		bool FoundOneBorderingMechanism = false;
+
+		if (
+			ForTerracingConnectionOffsets(a_Chunk, a_Position, [&a_Chunk, a_Position, &FoundOneBorderingMechanism, &PotentialOffset](const Vector3i Offset)
 			{
 				BLOCKTYPE Block;
 				NIBBLETYPE Meta;
 
 				if (
-					!a_World.GetBlockTypeMeta(Offset + a_Position, Block, Meta) ||
+					!a_Chunk.UnboundedRelGetBlock(Offset + a_Position, Block, Meta) ||
 					!IsDirectlyConnectingMechanism(Block, Meta, Offset)
 				)
 				{
-					continue;
+					return false;
 				}
 
 				if (FoundOneBorderingMechanism)
 				{
 					// Case 3
-					return 0;
+					return true;
 				}
 
 				// Potential case 2
 				FoundOneBorderingMechanism = true;
 				PotentialOffset = { -Offset.x, 0, -Offset.z };
-			}
 
-			if (FoundOneBorderingMechanism && (a_QueryPosition != (a_Position + PotentialOffset)))
-			{
-				// Case 2 fail
-				return 0;
-			}
-
-			// Case 1
-			// Case 2 success
+				return false;
+			})
+		)
+		{
+			// Case 3
+			return 0;
 		}
 
-		return (a_Meta != 0) ? --a_Meta : a_Meta;
-	}
+		if (FoundOneBorderingMechanism && (a_QueryPosition != (a_Position + PotentialOffset)))
+		{
+			// Case 2 fail
+			return 0;
+		}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_World);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
+		// Case 1
+		// Case 2 success
+
 		return a_Meta;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
-		UNUSED(a_BlockType);
 		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
 
 		if (a_Meta != a_PoweringData.PowerLevel)
 		{
-			a_World.SetBlockMeta(a_Position, a_PoweringData.PowerLevel);
-			return GetAdjustedRelatives(a_Position, StaticAppend(StaticAppend(GetRelativeLaterals(), GetTerracingConnectionOffsets(a_World, a_Position)), cVector3iArray{ OffsetYM() }));
-		}
+			a_Chunk.SetMeta(a_Position, a_PoweringData.PowerLevel);
 
-		return {};
+			// Notify block below us to update:
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + OffsetYM);
+
+			// Notify all terracing positions:
+			ForTerracingConnectionOffsets(a_Chunk, a_Position, [&a_Chunk, &CurrentlyTicking, a_Position](const Vector3i Offset)
+			{
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + Offset);
+				return false;
+			});
+		}
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 
-		return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeAdjacents(), GetTerracingConnectionOffsets(a_World, a_Position)));
+		Callback(a_Position + OffsetYP);
+		Callback(a_Position + OffsetYM);
+
+		ForTerracingConnectionOffsets(a_Chunk, a_Position, [&Callback, a_Position](const Vector3i Offset)
+		{
+			Callback(a_Position + Offset);
+			return false;
+		});
 	}
 };

@@ -7,7 +7,7 @@
 
 
 
-class cRedstoneNoopSimulator:
+class cRedstoneNoopSimulator final :
 	public cRedstoneSimulator
 {
 	using Super = cRedstoneSimulator;

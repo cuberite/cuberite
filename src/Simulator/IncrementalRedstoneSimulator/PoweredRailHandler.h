@@ -7,11 +7,8 @@
 
 
 
-class cPoweredRailHandler:
-	public cRedstoneHandler
+class cPoweredRailHandler final : public cRedstoneHandler
 {
-	using Super = cRedstoneHandler;
-
 public:
 
 	static Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
@@ -32,27 +29,20 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		UNUSED(a_QueryBlockType);
 
 		auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
 		if (((Offset + a_Position) == a_QueryPosition) || ((-Offset + a_Position) == a_QueryPosition))
 		{
-			auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
+			auto Power = DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
 			return (Power <= 7) ? 0 : --Power;
 		}
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		return static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating tracky the rail (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -66,33 +56,37 @@ public:
 					SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_MyType);
 				}
 				*/
-				return {};
+				return;
 			}
 			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_POWERED_RAIL:
 			{
 				auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
-				if (a_PoweringData != static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
+				if (a_PoweringData != DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
 				{
-					a_World.SetBlockMeta(a_Position, (a_PoweringData.PowerLevel == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
-					return cVector3iArray{ { Offset + a_Position }, { -Offset + a_Position } };
+					a_Chunk.SetMeta(a_Position, (a_PoweringData.PowerLevel == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
+
+					UpdateAdjustedRelatives(a_Chunk, CurrentlyTickingChunk, a_Position + Offset);
+					UpdateAdjustedRelatives(a_Chunk, CurrentlyTickingChunk, a_Position + -Offset);
 				}
 
-				return {};
+				return;
 			}
 			default:
 			{
 				ASSERT(!"Unhandled type of rail in passed to rail handler!");
-				return {};
 			}
 		}
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
-		UNUSED(a_World);
-		UNUSED(a_BlockType);
+		UNUSED(a_Chunk);
 		UNUSED(a_Meta);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+
+		if ((a_BlockType == E_BLOCK_POWERED_RAIL) || (a_BlockType == E_BLOCK_ACTIVATOR_RAIL))
+		{
+			InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
+		}
 	}
 };

@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "../../World.h"
+#include "../../Chunk.h"
+#include "RedstoneSimulatorChunkData.h"
 
 
 
@@ -14,50 +15,11 @@ public:
 	cRedstoneHandler() = default;
 	DISALLOW_COPY_AND_ASSIGN(cRedstoneHandler);
 
-	struct PoweringData
-	{
-	public:
-		PoweringData(BLOCKTYPE a_PoweringBlock, unsigned char a_PowerLevel) :
-			PoweringBlock(a_PoweringBlock),
-			PowerLevel(a_PowerLevel)
-		{
-		}
+	using SourceCallback = cFunctionRef<void(Vector3i)>;
 
-		PoweringData(void) :
-			PoweringBlock(E_BLOCK_AIR),
-			PowerLevel(0)
-		{
-		}
-
-		BLOCKTYPE PoweringBlock;
-		unsigned char PowerLevel;
-
-		inline friend bool operator < (const PoweringData & a_Lhs, const PoweringData & a_Rhs)
-		{
-			return (
-				(a_Lhs.PowerLevel < a_Rhs.PowerLevel) ||
-				(
-					(a_Lhs.PowerLevel == a_Rhs.PowerLevel) &&
-					((a_Lhs.PoweringBlock == E_BLOCK_REDSTONE_WIRE) && (a_Rhs.PoweringBlock != E_BLOCK_REDSTONE_WIRE))
-				)
-			);
-		}
-
-		inline friend bool operator == (const PoweringData & a_Lhs, const PoweringData & a_Rhs)
-		{
-			return (a_Lhs.PowerLevel == a_Rhs.PowerLevel);
-		}
-
-		inline friend bool operator != (const PoweringData & a_Lhs, const PoweringData & a_Rhs)
-		{
-			return !operator ==(a_Lhs, a_Rhs);
-		}
-	};
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const = 0;
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const = 0;
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const = 0;
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const = 0;
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const = 0;
+	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const = 0;
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const = 0;
 
 	// Force a virtual destructor
 	virtual ~cRedstoneHandler() {}
@@ -72,15 +34,9 @@ protected:
 		return ToReturn;
 	}
 
-	inline static Vector3i OffsetYP()
-	{
-		return Vector3i(0, 1, 0);
-	}
+	inline static Vector3i OffsetYP{ 0, 1, 0 };
 
-	inline static Vector3i OffsetYM()
-	{
-		return Vector3i(0, -1, 0);
-	}
+	inline static Vector3i OffsetYM{ 0, -1, 0 };
 
 	static cVector3iArray GetAdjustedRelatives(Vector3i a_Position, cVector3iArray a_Relatives)
 	{
@@ -91,31 +47,68 @@ protected:
 		return a_Relatives;
 	}
 
-	inline static cVector3iArray GetRelativeAdjacents()
+	inline static cIncrementalRedstoneSimulatorChunkData & DataForChunk(cChunk & a_Chunk)
 	{
-		return
-		{
-			{
-				{ 1, 0, 0 },
-				{ -1, 0, 0 },
-				{ 0, 1, 0 },
-				{ 0, -1, 0 },
-				{ 0, 0, 1 },
-				{ 0, 0, -1 },
-			}
-		};
+		return *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 	}
 
-	inline static cVector3iArray GetRelativeLaterals()
+	template <typename... ArrayTypes>
+	static void UpdateAdjustedRelatives(cChunk & From, cChunk & To, const Vector3i Position)
 	{
-		return
+		DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position));
+	}
+
+	template <typename ArrayType, typename... ArrayTypes>
+	static void UpdateAdjustedRelatives(cChunk & From, cChunk & To, const Vector3i Position, const ArrayType & Relative, const ArrayTypes &... Relatives)
+	{
+		for (const auto Offset : Relative)
 		{
-			{
-				{ 1, 0, 0 },
-				{ -1, 0, 0 },
-				{ 0, 0, 1 },
-				{ 0, 0, -1 },
-			}
-		};
+			DataForChunk(To).GetActiveBlocks().push(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + Offset));
+		}
+
+		UpdateAdjustedRelatives(From, To, Position, Relatives...);
+	}
+
+	template <typename ArrayType, typename... ArrayTypes>
+	static void InvokeForAdjustedRelatives(SourceCallback Callback, Vector3i Position, const ArrayType & Relative, const ArrayTypes &... Relatives)
+	{
+		for (const auto Offset : Relative)
+		{
+			Callback(Position + Offset);
+		}
+
+		InvokeForAdjustedRelatives(Callback, Position, Relatives...);
+	}
+
+	inline static std::array<Vector3i, 6> RelativeAdjacents
+	{
+		{
+			{ 1, 0, 0 },
+			{ -1, 0, 0 },
+			{ 0, 1, 0 },
+			{ 0, -1, 0 },
+			{ 0, 0, 1 },
+			{ 0, 0, -1 },
+		}
+	};
+
+	inline static std::array<Vector3i, 4> RelativeLaterals
+	{
+		{
+			{ 1, 0, 0 },
+			{ -1, 0, 0 },
+			{ 0, 0, 1 },
+			{ 0, 0, -1 },
+		}
+	};
+
+private:
+
+	static void UpdateAdjustedRelatives(cVector3iArray &, Vector3i)
+	{
+	}
+
+	static void InvokeForAdjustedRelatives(SourceCallback, Vector3i)
+	{
 	}
 };

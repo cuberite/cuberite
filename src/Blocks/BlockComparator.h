@@ -34,10 +34,13 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
+		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+
 		// Toggle the 3rd bit (addition / subtraction):
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-		Meta ^= 0x04;
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta ^ 0x04);
+
+		// Update simulators:
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		return true;
 	}
 
@@ -56,6 +59,7 @@ public:
 		UNUSED(a_ChunkInterface);
 		UNUSED(a_BlockFace);
 
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 
@@ -114,15 +118,6 @@ public:
 	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x4) == 0x4);
-	}
-
-
-
-
-
-	inline static bool IsOn(NIBBLETYPE a_Meta)
-	{
-		return ((a_Meta & 0x8) == 0x8);
 	}
 
 

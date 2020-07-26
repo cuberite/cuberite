@@ -7,7 +7,6 @@
 
 #include "CommandBlockHandler.h"
 #include "DoorHandler.h"
-#include "RedstoneHandler.h"
 #include "RedstoneTorchHandler.h"
 #include "RedstoneWireHandler.h"
 #include "RedstoneRepeaterHandler.h"
@@ -31,9 +30,10 @@
 
 
 
+
 const cRedstoneHandler * cIncrementalRedstoneSimulator::GetComponentHandler(BLOCKTYPE a_BlockType)
 {
-	struct sComponents:
+	struct sComponents :
 		public std::array<std::unique_ptr<cRedstoneHandler>, 256>
 	{
 		sComponents()
@@ -128,76 +128,98 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 
 
 
-void cIncrementalRedstoneSimulator::Simulate(float a_dt)
+void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
-	for (auto & DelayInfo : m_Data.m_MechanismDelays)
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
+	for (auto & DelayInfo : ChunkData.m_MechanismDelays)
 	{
 		if ((--DelayInfo.second.first) == 0)
 		{
-			m_Data.GetActiveBlocks().emplace_back(DelayInfo.first);
+			ChunkData.WakeUp(DelayInfo.first);
 		}
 	}
 
 	// Build our work queue
-	cVector3iArray WorkQueue;
-	std::swap(WorkQueue, m_Data.GetActiveBlocks());
+	auto & WorkQueue = ChunkData.GetActiveBlocks();
 
 	// Process the work queue
 	while (!WorkQueue.empty())
 	{
 		// Grab the first element and remove it from the list
-		Vector3i CurrentLocation = WorkQueue.back();
-		WorkQueue.pop_back();
+		Vector3i CurrentLocation = WorkQueue.top();
+		WorkQueue.pop();
 
-		BLOCKTYPE CurrentBlock;
-		NIBBLETYPE CurrentMeta;
-		if (!m_World.GetBlockTypeMeta(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z, CurrentBlock, CurrentMeta))
+		const auto NeighbourChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(CurrentLocation);
+		if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 		{
-			continue;
+			return;
 		}
 
-		auto CurrentHandler = GetComponentHandler(CurrentBlock);
-		if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
-		{
-			// Clean up cached PowerData for CurrentPosition
-			GetChunkData()->ErasePowerData(CurrentLocation);
-			continue;
-		}
-
-		cRedstoneHandler::PoweringData Power;
-		for (const auto & Location : CurrentHandler->GetValidSourcePositions(m_World, CurrentLocation, CurrentBlock, CurrentMeta))
-		{
-			if (!cChunk::IsValidHeight(Location.y))
-			{
-				continue;
-			}
-
-			BLOCKTYPE PotentialBlock;
-			NIBBLETYPE PotentialMeta;
-			if (!m_World.GetBlockTypeMeta(Location.x, Location.y, Location.z, PotentialBlock, PotentialMeta))
-			{
-				continue;
-			}
-
-			auto PotentialSourceHandler = GetComponentHandler(PotentialBlock);
-			if (PotentialSourceHandler == nullptr)
-			{
-				continue;
-			}
-
-			decltype(Power) PotentialPower(PotentialBlock, PotentialSourceHandler->GetPowerDeliveredToPosition(m_World, Location, PotentialBlock, PotentialMeta, CurrentLocation, CurrentBlock));
-			Power = std::max(Power, PotentialPower);
-		}
-
-		// Inform the handler to update
-		cVector3iArray Updates = CurrentHandler->Update(m_World, CurrentLocation, CurrentBlock, CurrentMeta, Power);
-		WorkQueue.insert(WorkQueue.end(), Updates.begin(), Updates.end());
-
-		if (IsAlwaysTicked(CurrentBlock))
-		{
-			m_Data.GetActiveBlocks().emplace_back(CurrentLocation);
-		}
+		ProcessWorkItem(*NeighbourChunk, *a_Chunk, CurrentLocation);
 	}
+
+	for (const auto Position : ChunkData.AlwaysTickedPositions)
+	{
+		ChunkData.WakeUp(Position);
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
+{
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(Chunk.GetRedstoneSimulatorData());
+
+	BLOCKTYPE CurrentBlock;
+	NIBBLETYPE CurrentMeta;
+	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
+
+	auto CurrentHandler = GetComponentHandler(CurrentBlock);
+	if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
+	{
+		// Clean up cached PowerData for CurrentPosition
+		ChunkData.ErasePowerData(Position);
+		return;
+	}
+
+	PoweringData Power;
+	CurrentHandler->ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, [&Chunk, Position, CurrentBlock, &Power](Vector3i Location)
+	{
+		if (!cChunk::IsValidHeight(Location.y))
+		{
+			return;
+		}
+
+		const auto NeighbourChunk = Chunk.GetRelNeighborChunkAdjustCoords(Location);
+		if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
+		{
+			return;
+		}
+
+		BLOCKTYPE PotentialBlock;
+		NIBBLETYPE PotentialMeta;
+		NeighbourChunk->GetBlockTypeMeta(Location, PotentialBlock, PotentialMeta);
+
+		auto PotentialSourceHandler = GetComponentHandler(PotentialBlock);
+		if (PotentialSourceHandler == nullptr)
+		{
+			return;
+		}
+
+		const PoweringData PotentialPower(
+			PotentialBlock,
+			PotentialSourceHandler->GetPowerDeliveredToPosition(
+				*NeighbourChunk, Location, PotentialBlock, PotentialMeta,
+				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(Chunk, *NeighbourChunk, Position), CurrentBlock
+			)
+		);
+		Power = std::max(Power, PotentialPower);
+	});
+
+	// Inform the handler to update
+	CurrentHandler->Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Power);
 }
 
 
@@ -206,27 +228,31 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 
 void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 {
-	// Can't inspect block, so queue update anyway
-	if (a_Chunk == nullptr)
+	// Can't inspect block, ignore:
+	if ((a_Chunk == nullptr) || (!a_Chunk->IsValid()))
 	{
-		m_Data.WakeUp(a_Block);
 		return;
 	}
 
-	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
-	const auto CurBlock = a_Chunk->GetBlock(RelPos);
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
+	const auto Relative = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
+	const auto CurrentBlock = a_Chunk->GetBlock(Relative);
 
 	// Always update redstone devices
-	if (IsRedstone(CurBlock))
+	if (IsRedstone(CurrentBlock))
 	{
-		m_Data.WakeUp(a_Block);
+		if (IsAlwaysTicked(CurrentBlock))
+		{
+			ChunkData.AlwaysTickedPositions.emplace(Relative);
+		}
+		ChunkData.WakeUp(Relative);
 		return;
 	}
 
 	// Never update blocks without a handler
-	if (GetComponentHandler(CurBlock) == nullptr)
+	if (GetComponentHandler(CurrentBlock) == nullptr)
 	{
-		GetChunkData()->ErasePowerData(a_Block);
+		ChunkData.ErasePowerData(Relative);
 		return;
 	}
 
@@ -235,14 +261,14 @@ void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	{
 		for (int y = -1; y < 2; ++y)
 		{
-			if (!cChunkDef::IsValidHeight(RelPos.y + y))
+			if (!cChunkDef::IsValidHeight(Relative.y + y))
 			{
 				continue;
 			}
 
 			for (int z = -1; z < 2; ++z)
 			{
-				auto CheckPos = RelPos + Vector3i{x, y, z};
+				auto CheckPos = Relative + Vector3i{x, y, z};
 				BLOCKTYPE Block;
 				NIBBLETYPE Meta;
 
@@ -252,7 +278,7 @@ void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 					IsRedstone(Block)
 				)
 				{
-					m_Data.WakeUp(a_Block);
+					ChunkData.WakeUp(Relative);
 					return;
 				}
 			}

@@ -8,43 +8,53 @@
 
 
 
-class cTripwireHookHandler:
-	public cRedstoneHandler
+class cTripwireHookHandler final : public cRedstoneHandler
 {
-	using Super = cRedstoneHandler;
-
 public:
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
+		UNUSED(a_BlockType);
 		UNUSED(a_QueryBlockType);
 		UNUSED(a_QueryPosition);
 
-		return (GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta) == 15) ? 15 : 0;
+		return (GetPowerLevel(a_Chunk, a_Position, a_Meta) == 15) ? 15 : 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
-		UNUSED(a_BlockType);
-
 		bool FoundActivated = false;
-		auto Position = a_Position;
-		eBlockFace FaceToGoTowards = cBlockTripwireHookHandler::MetadataToDirection(a_Meta);
+		const auto FaceToGoTowards = cBlockTripwireHookHandler::MetadataToDirection(a_Meta);
 
 		for (int i = 0; i < 40; ++i)  // Tripwires can be connected up to 40 blocks
 		{
 			BLOCKTYPE Type;
 			NIBBLETYPE Meta;
 
-			AddFaceDirection(Position.x, Position.y, Position.z, FaceToGoTowards);
-			a_World.GetBlockTypeMeta(Position.x, Position.y, Position.z, Type, Meta);
+			a_Position = AddFaceDirection(a_Position, FaceToGoTowards);
+			if (!a_Chunk.UnboundedRelGetBlock(a_Position, Type, Meta))
+			{
+				return 0;
+			}
 
 			if (Type == E_BLOCK_TRIPWIRE)
 			{
-				if (!a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [](cEntity &) { return true; }))
+				if (FoundActivated)
+				{
+					continue;
+				}
+
+				if (
+					!a_Chunk.ForEachEntityInBox(
+						cBoundingBox(Vector3d(0.5, 0, 0.5) + cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()), 0.5, 0.5),
+						[](cEntity &) { return true; }
+					)
+				)
 				{
 					FoundActivated = true;
 				}
+
+				continue;
 			}
 			else if (Type == E_BLOCK_TRIPWIRE_HOOK)
 			{
@@ -53,27 +63,20 @@ public:
 					// Other hook facing in opposite direction - circuit completed!
 					return FoundActivated ? 15 : 1;
 				}
-				else
-				{
-					// Tripwire hook not connected at all
-					return 0;
-				}
 			}
-			else
-			{
-				// Tripwire hook not connected at all
-				return 0;
-			}
+
+			// Tripwire hook not connected at all
+			return 0;
 		}
 
 		return 0;
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating hooky the tripwire hook (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
+		const auto Power = GetPowerLevel(a_Chunk, a_Position, a_Meta);
 		NIBBLETYPE Meta;
 		if (Power == 0)
 		{
@@ -91,25 +94,22 @@ public:
 		}
 		else
 		{
-			ASSERT(!"Unexpected tripwire hook power level!");
-			return {};
+			UNREACHABLE("Unexpected tripwire hook power level!");
 		}
 
 		if (Meta != a_Meta)
 		{
-			a_World.SetBlockMeta(a_Position, Meta);
-			return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+			a_Chunk.SetMeta(a_Position, Meta);
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 		}
-
-		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		UNUSED(a_Position);
-		return {};
+		UNUSED(Callback);
 	}
 };

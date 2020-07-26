@@ -2,26 +2,29 @@
 #pragma once
 
 #include "../RedstoneSimulator.h"
+#include "RedstoneHandler.h"
 #include "RedstoneSimulatorChunkData.h"
 
 
 
 
 
-class cIncrementalRedstoneSimulator:
+class cIncrementalRedstoneSimulator final :
 	public cRedstoneSimulator
 {
 	using Super = cRedstoneSimulator;
 
 public:
 
-	cIncrementalRedstoneSimulator(cWorld & a_World):
+	cIncrementalRedstoneSimulator(cWorld & a_World) :
 		Super(a_World)
 	{
 	}
 
-	virtual void Simulate(float a_dt) override;
-	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override {}
+	virtual void Simulate(float Dt) override {};
+	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
+
+	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
 
 	virtual cIncrementalRedstoneSimulatorChunkData * CreateChunkData() override
 	{
@@ -36,8 +39,7 @@ public:
 	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)
-	Used by torches to determine if they will power a block
-	*/
+	Used by torches to determine if they will power a block */
 	inline static bool IsMechanism(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -158,14 +160,9 @@ public:
 		}
 	}
 
-	cIncrementalRedstoneSimulatorChunkData * GetChunkData() { return &m_Data; }
-
 	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
 
 private:
 
 	static std::unique_ptr<cRedstoneHandler> CreateComponent(BLOCKTYPE a_BlockType);
-
-	// oh yea its crazy time
-	cIncrementalRedstoneSimulatorChunkData m_Data;
 } ;

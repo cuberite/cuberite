@@ -5,7 +5,7 @@
 
 
 
-class cRedstoneLampHandler : public cRedstoneHandler
+class cRedstoneLampHandler final : public cRedstoneHandler
 {
 public:
 
@@ -14,17 +14,12 @@ public:
 		return (a_BlockType == E_BLOCK_REDSTONE_LAMP_ON);
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		return 0;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating lamp (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -32,25 +27,23 @@ public:
 		{
 			if (!IsOn(a_BlockType))
 			{
-				a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, E_BLOCK_REDSTONE_LAMP_ON, 0);
+				a_Chunk.FastSetBlock(a_Position, E_BLOCK_REDSTONE_LAMP_ON, 0);
 			}
 		}
 		else
 		{
 			if (IsOn(a_BlockType))
 			{
-				a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, E_BLOCK_REDSTONE_LAMP_OFF, 0);
+				a_Chunk.FastSetBlock(a_Position, E_BLOCK_REDSTONE_LAMP_OFF, 0);
 			}
 		}
-
-		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_Meta);
 		UNUSED(a_BlockType);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };

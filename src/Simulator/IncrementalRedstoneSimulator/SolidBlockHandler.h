@@ -14,41 +14,34 @@ class cSolidBlockHandler:
 
 public:
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
 	{
-		// TODO: wire isn't linked powered only if the source was a wire, not just because it is a wire
+		const auto SolidBlock = DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 		return (
 			!cIncrementalRedstoneSimulator::IsRedstone(a_QueryBlockType) ||
 			(
 				(a_QueryBlockType == E_BLOCK_REDSTONE_WIRE) &&
-				(static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PoweringBlock == E_BLOCK_REDSTONE_WIRE)
+				(SolidBlock.PoweringBlock == E_BLOCK_REDSTONE_WIRE)
 			)
-		) ? 0 : GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
+		) ? 0 : SolidBlock.PowerLevel;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		return static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		// LOGD("Evaluating blocky the generic block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, a_PoweringData);
+		auto PreviousPower = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, a_PoweringData);
 		if ((a_PoweringData != PreviousPower) || (a_PoweringData.PoweringBlock != PreviousPower.PoweringBlock))
 		{
-			return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 		}
-
-		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 
@@ -64,6 +57,6 @@ public:
 			}
 		}
 		*/
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };
