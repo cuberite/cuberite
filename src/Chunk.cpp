@@ -1314,6 +1314,10 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	m_ToTickBlocks.push_back(a_RelPos);
 	QueueTickBlockNeighbors(a_RelPos);
 
+	// TODO: use relative coordinates, cChunk reference
+	// Wake up the simulators for this block:
+	GetWorld()->GetSimulatorManager()->WakeUp(RelativeToAbsolute(a_RelPos), this);
+
 	// If there was a block entity, remove it:
 	cBlockEntity * BlockEntity = GetBlockEntityRel(a_RelPos);
 	if (BlockEntity != nullptr)

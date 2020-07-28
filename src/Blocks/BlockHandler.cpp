@@ -585,22 +585,18 @@ void cBlockHandler::Check(
 	cChunk & a_Chunk
 )
 {
-	if (!CanBeAt(a_ChunkInterface, a_RelPos, a_Chunk))
+	if (CanBeAt(a_ChunkInterface, a_RelPos, a_Chunk))
 	{
-		if (DoesDropOnUnsuitable())
-		{
-			a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
-		}
-		else
-		{
-			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
-		}
+		return;
+	}
+
+	if (DoesDropOnUnsuitable())
+	{
+		a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
 	}
 	else
 	{
-		// Wake up the simulators for this block:
-		auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 	}
 }
 
