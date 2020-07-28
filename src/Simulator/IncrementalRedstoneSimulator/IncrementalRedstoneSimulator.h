@@ -21,6 +21,10 @@ public:
 	{
 	}
 
+private:
+
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+
 	virtual void Simulate(float Dt) override {};
 	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
 
@@ -36,7 +40,7 @@ public:
 		return IsRedstone(a_BlockType);
 	}
 
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)
 	Used by torches to determine if they will power a block */

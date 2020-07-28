@@ -28,7 +28,7 @@ public:
 		UNUSED(a_Chunk);
 	}
 	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType) override { return false; }
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override
 	{
 		UNUSED(a_Block);
 		UNUSED(a_Chunk);

@@ -27,6 +27,7 @@ class cSandSimulator :
 	public cSimulator
 {
 public:
+
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
 	// cSimulator overrides:
@@ -56,11 +57,12 @@ public:
 	);
 
 protected:
+
 	bool m_IsInstantFall;  // If set to true, blocks don't fall using cFallingBlock entity, but instantly instead
 
 	int  m_TotalBlocks;    // Total number of blocks currently in the queue for simulating
 
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 
 	/** Performs the instant fall of the block - removes it from top, Finishes it at the bottom */
 	void DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

@@ -111,7 +111,6 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 		// The protocol recogniser succesfully identified, switch mode:
 		HandleIncomingData = [this](cClientHandle &, const std::string_view a_In)
 		{
-			// TODO: make it take our a_ReceivedData
 			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
 		};
 	}

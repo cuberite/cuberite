@@ -55,7 +55,8 @@ public:
 	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
 
 	// cSimulator overrides:
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 	virtual void Simulate(float a_Dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }

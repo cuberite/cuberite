@@ -239,7 +239,7 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 
 
-void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
 	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{

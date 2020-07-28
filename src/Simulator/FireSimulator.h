@@ -43,8 +43,7 @@ protected:
 	/** Chance [0..100000] of a fuel burning out being replaced by a new fire block instead of an air block */
 	int m_ReplaceFuelChance;
 
-
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
 	int GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos);

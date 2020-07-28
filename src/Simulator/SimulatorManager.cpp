@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SimulatorManager.h"
+#include "../Chunk.h"
 #include "../World.h"
 
 
@@ -58,11 +59,13 @@ void cSimulatorManager::SimulateChunk(std::chrono::milliseconds a_Dt, int a_Chun
 
 
 
-void cSimulatorManager::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
+void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 {
+	ASSERT(a_Chunk.IsValid());
+
 	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)
 	{
-		itr->first->WakeUp(a_Block, a_Chunk);
+		itr->first->WakeUp(a_Chunk, a_Position, a_Chunk.GetBlock(a_Position));
 	}
 }
 
@@ -70,11 +73,11 @@ void cSimulatorManager::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
 
 
 
-void cSimulatorManager::WakeUpArea(const cCuboid & a_Area)
+void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 {
-	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)
+	for (const auto Item : m_Simulators)
 	{
-		itr->first->WakeUpArea(a_Area);
+		Item.first->WakeUp(a_Area);
 	}
 }
 
@@ -86,7 +89,3 @@ void cSimulatorManager::RegisterSimulator(cSimulator * a_Simulator, int a_Rate)
 {
 	m_Simulators.push_back(std::make_pair(a_Simulator, a_Rate));
 }
-
-
-
-

@@ -78,19 +78,8 @@ cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Flu
 
 
 
-void cDelayedFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if ((a_Block.y < 0) || (a_Block.y >= cChunkDef::Height))
-	{
-		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
-		return;
-	}
-
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-
 	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
@@ -156,3 +145,14 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 
 
+
+void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+{
+	if (!cChunkDef::IsValidHeight(a_Position.y))
+	{
+		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
+		return;
+	}
+
+	Super::WakeUp(a_Chunk, a_Position, a_Block);
+}
