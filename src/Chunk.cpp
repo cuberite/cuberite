@@ -1379,27 +1379,14 @@ void cChunk::QueueTickBlock(Vector3i a_RelPos)
 void cChunk::QueueTickBlockNeighbors(Vector3i a_RelPos)
 {
 	// Contains our direct adjacents
-	// and one block above and below the laterals (for redstone components)
 	static const Vector3i Offsets[] =
 	{
-		{ 1,  1,  0},
-		{ 1,  0,  0},
-		{ 1, -1,  0},
-
-		{-1,  1,  0},
-		{-1,  0,  0},
-		{-1, -1,  0},
-
-		{ 0,  1,  1},
-		{ 0,  0,  1},
-		{ 0, -1,  1},
-
-		{ 0,  1, -1},
-		{ 0,  0, -1},
-		{ 0, -1, -1},
-
-		{ 0,  1,  0},
-		{ 0, -1,  0},
+		{  1,  0,  0 },
+		{ -1,  0,  0 },
+		{  0,  1,  0 },
+		{  0, -1,  0 },
+		{  0,  0,  1 },
+		{  0,  0, -1 },
 	};
 
 	for (const auto & Offset : Offsets)
