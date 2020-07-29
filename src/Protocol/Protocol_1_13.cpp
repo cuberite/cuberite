@@ -151,13 +151,15 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 	cPacketizer Pkt(*this, pktScoreboardObjective);
 
 	// max unique name length = 16
-	if (a_Name.length() > 16) {
+	if (a_Name.length() > 16)
+	{
 		return;
 	}
 	Pkt.WriteString(a_Name);
 	Pkt.WriteBEUInt8(a_Mode);
 	// on delete end here
-	if (a_Mode == 1) {
+	if (a_Mode == 1)
+	{
 		return;
 	}
 	Pkt.WriteString(a_DisplayName);
