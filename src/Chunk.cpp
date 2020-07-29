@@ -1241,40 +1241,12 @@ void cChunk::WakeUpSimulators(void)
 
 		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
 		{
-			auto BlockType = Section->m_BlockTypes[BlockIdx];
+			const auto BlockType = Section->m_BlockTypes[BlockIdx];
+			const auto Position = IndexToCoordinate(BlockIdx);
 
-			// Defer calculation until it's actually needed
-			auto WorldPos = [&]
-			{
-				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				return RelativeToAbsolute(RelPos);
-			};
-
-			// The redstone sim takes multiple blocks, use the inbuilt checker
-			if (RedstoneSimulator->IsAllowedBlock(BlockType))
-			{
-				RedstoneSimulator->AddBlock(WorldPos(), this);
-				continue;
-			}
-
-			switch (BlockType)
-			{
-				case E_BLOCK_WATER:
-				{
-					WaterSimulator->AddBlock(WorldPos(), this);
-					break;
-				}
-				case E_BLOCK_LAVA:
-				{
-					LavaSimulator->AddBlock(WorldPos(), this);
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}  // switch (BlockType)
+			RedstoneSimulator->AddBlock(*this, Position, BlockType);
+			WaterSimulator->AddBlock(*this, Position, BlockType);
+			LavaSimulator->AddBlock(*this, Position, BlockType);
 		}
 	}
 }
@@ -1316,7 +1288,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 	// TODO: use relative coordinates, cChunk reference
 	// Wake up the simulators for this block:
-	GetWorld()->GetSimulatorManager()->WakeUp(RelativeToAbsolute(a_RelPos), this);
+	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
 	// If there was a block entity, remove it:
 	cBlockEntity * BlockEntity = GetBlockEntityRel(a_RelPos);

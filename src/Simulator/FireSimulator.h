@@ -19,18 +19,19 @@ class cFireSimulator :
 	public cSimulator
 {
 public:
+
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
-	virtual ~cFireSimulator() override;
-
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 
 	static bool IsFuel   (BLOCKTYPE a_BlockType);
 	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
 
-protected:
+private:
+
+	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+
+	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+
 	/** Time (in msec) that a fire block takes to burn with a fuel block into the next step */
 	unsigned m_BurnStepTimeFuel;
 

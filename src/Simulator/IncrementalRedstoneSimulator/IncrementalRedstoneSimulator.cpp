@@ -273,26 +273,18 @@ void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & Tic
 
 void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	// Can't inspect block, ignore:
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
+
+	if (!IsRedstone(a_Block))
 	{
 		return;
 	}
 
-	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
-	const auto Relative = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
-	const auto CurrentBlock = a_Chunk->GetBlock(Relative);
-
-	if (!IsRedstone(CurrentBlock))
+	if (IsAlwaysTicked(a_Block))
 	{
-		return;
-	}
-
-	if (IsAlwaysTicked(CurrentBlock))
-	{
-		ChunkData.AlwaysTickedPositions.emplace(Relative);
+		ChunkData.AlwaysTickedPositions.emplace(a_Position);
 	}
 
 	// Always update redstone devices:
-	ChunkData.WakeUp(Relative);
+	ChunkData.WakeUp(a_Position);
 }

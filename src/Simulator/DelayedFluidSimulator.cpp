@@ -78,27 +78,15 @@ cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Flu
 
 
 
-void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
-	if (BlockType != m_FluidBlock)
+	if (!cChunkDef::IsValidHeight(a_Position.y))
 	{
+		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
 		return;
 	}
 
-	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
-	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
-	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
-
-	// Add, if not already present:
-	if (!Slot.Add(RelX, a_Block.y, RelZ))
-	{
-		return;
-	}
-
-	++m_TotalBlocks;
+	Super::WakeUp(a_Chunk, a_Position, a_Block);
 }
 
 
@@ -146,13 +134,22 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 
 
-void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_Position.y))
+	if (a_Block != m_FluidBlock)
 	{
-		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
 		return;
 	}
 
-	Super::WakeUp(a_Chunk, a_Position, a_Block);
+	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk.GetWaterSimulatorData() : a_Chunk.GetLavaSimulatorData();
+	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
+	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
+
+	// Add, if not already present:
+	if (!Slot.Add(a_Position.x, a_Position.y, a_Position.z))
+	{
+		return;
+	}
+
+	++m_TotalBlocks;
 }

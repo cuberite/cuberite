@@ -23,11 +23,13 @@ class cVaporizeFluidSimulator:
 
 public:
 
-	cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
+	using Super::cFluidSimulator;
 
-	// cSimulator overrides:
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+private:
+
 	virtual void Simulate(float a_Dt) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
 } ;
 
 

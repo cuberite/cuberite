@@ -32,6 +32,7 @@ public:
 protected:
 
 	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
+	friend class cSimulatorManager;  // Class reponsible for dispatching calls to the various slave Simulators
 
 	virtual void Simulate(float a_Dt) = 0;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
@@ -42,11 +43,8 @@ protected:
 		UNUSED(a_Chunk);
 	}
 
-	/** Returns true if the specified block type is "interesting" for this simulator. */
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) = 0;
-
 	/** Called to simulate a new block. Unlike WakeUp this function will perform minimal checking.
-	It queues the block to be simulated as fast as possible, only making sure that the block type IsAllowedBlock. */
+	It queues the block to be simulated as fast as possible, suitable for area wakeups. */
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) = 0;
 
 	/** Called to simulate a single new block, typically as a result of a single block break or change.

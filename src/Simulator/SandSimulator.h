@@ -30,11 +30,6 @@ public:
 
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
-	// cSimulator overrides:
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
-
 	/** Returns true if a falling-able block can start falling through the specified block type */
 	static bool CanStartFallingThrough(BLOCKTYPE a_BlockType);
 
@@ -56,7 +51,12 @@ public:
 		BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
 	);
 
-protected:
+private:
+
+	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+
+	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
 
 	bool m_IsInstantFall;  // If set to true, blocks don't fall using cFallingBlock entity, but instantly instead
 

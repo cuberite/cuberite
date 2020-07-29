@@ -227,7 +227,8 @@ void cChunkMap::WakeUpSimulators(Vector3i a_Block)
 	{
 		return;
 	}
-	m_World->GetSimulatorManager()->WakeUp(a_Block, Chunk);
+
+	m_World->GetSimulatorManager()->WakeUp(*Chunk, cChunkDef::AbsoluteToRelative(a_Block, Chunk->GetPos()));
 }
 
 
@@ -644,7 +645,6 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
 
 		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, chunk);
 		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
 	}
 }
@@ -867,7 +867,6 @@ bool cChunkMap::DigBlock(Vector3i a_BlockPos)
 		}
 
 		destChunk->SetBlock(relPos, E_BLOCK_AIR, 0);
-		m_World->GetSimulatorManager()->WakeUp(a_BlockPos, destChunk);
 	}
 	return true;
 }

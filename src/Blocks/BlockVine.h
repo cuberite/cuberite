@@ -196,8 +196,7 @@ public:
 		}
 		else
 		{
-			auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-			a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
+			a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(a_Chunk, a_RelPos);
 		}
 	}
 
