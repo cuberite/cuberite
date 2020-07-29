@@ -812,23 +812,21 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks()
 {
-	if (m_ToTickBlocks.empty())
-	{
-		return;
-	}
-	std::vector<Vector3i> ToTickBlocks;
-	std::swap(m_ToTickBlocks, ToTickBlocks);
-
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*m_World);
 
-	for (std::vector<Vector3i>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
+	// Process a limited number of blocks since cBlockHandler::Check may queue more to tick
+	auto Count = m_ToTickBlocks.size();
+
+	while (Count != 0)
 	{
-		Vector3i Pos = (*itr);
+		Vector3i Pos = m_ToTickBlocks.front();
+		m_ToTickBlocks.pop();
+		Count--;
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
 		Handler->Check(ChunkInterface, PluginInterface, Pos, *this);
-	}  // for itr - ToTickBlocks[]
+	}
 }
 
 

@@ -594,7 +594,7 @@ private:
 	bool m_IsSaving;       // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 
-	std::vector<Vector3i> m_ToTickBlocks;
+	std::queue<Vector3i>  m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
