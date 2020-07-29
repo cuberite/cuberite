@@ -82,7 +82,6 @@ enum eStatistic
 
 // 12xx12_begin
 /*
- * https://wiki.vg/Protocol#Statistics
  * added for better readability in transmission code
  */
 enum statisticType{
@@ -122,11 +121,16 @@ enum statisticType{
 	 	statItemsDropped,				// 20
 	 	statDamageDealt,				// 21
 		statDamageDealtAbsorbed,		// 22 Todo: implement this
+	 	// added in 1.13.1
 		statDamageDealtResisted,		// 23 Todo: implement this
+	 	// added in 1.13.1
 		statDamageTaken,				// 24 Todo: implement this
 		statDamageBlockedShield,		// 25 Todo: implement this
+	 	// added in 1.13.1
 	 	statDamageAbsorbed, 			// 26 Todo: implement this
+	 	// added in 1.13.1
 	 	statDamageResisted,				// 27 Todo: implement this
+	 	// added in 1.13.1
 	 	statDeaths,						// 28 Todo: implement this
 		statMobKills,					// 29
 	 	statAnimalsBred,				// 30
