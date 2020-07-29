@@ -133,7 +133,7 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	// ASSERT(m_state == 3);  // In game mode? - breaks my compiler :/
+	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
