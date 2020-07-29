@@ -2182,18 +2182,12 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 
 
-void cWorld::SetBlocks(const sSetBlockVector & a_Blocks)
+void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlocks(a_Blocks);
-}
+	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
-
-
-
-
-void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
-{
-	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockInfo::GetHandler(a_BlockType)->OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2211,17 +2205,18 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(Vector3i a_BlockPos)
 {
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
-	cChunkInterface chunkInterface(GetChunkMap());
-	auto blockHandler = cBlockInfo::GetHandler(blockType);
-	blockHandler->OnBreaking(chunkInterface, *this, a_BlockPos);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+
 	if (!m_ChunkMap->DigBlock(a_BlockPos))
 	{
 		return false;
 	}
-	blockHandler->OnBroken(chunkInterface, *this, a_BlockPos, blockType, blockMeta);
+
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockInfo::GetHandler(BlockType)->OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
+
 	return true;
 }
 

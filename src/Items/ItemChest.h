@@ -54,7 +54,6 @@ public:
 		Vector3i PlacePos;
 		if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 		{
-			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, a_ClickedBlockPos);
 			PlacePos = a_ClickedBlockPos;
 		}
 		else
@@ -75,7 +74,6 @@ public:
 			{
 				return false;
 			}
-			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, PlacePos);
 		}
 
 		// Check that there is at most one single neighbor of the same chest type:

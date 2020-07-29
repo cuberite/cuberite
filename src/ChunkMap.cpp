@@ -479,34 +479,6 @@ void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLET
 
 
 
-void cChunkMap::SetBlocks(const sSetBlockVector & a_Blocks)
-{
-	cCSLock lock(m_CSChunks);
-	cChunkPtr chunk = nullptr;
-	int lastChunkX = 0x7fffffff;  // Bogus coords so that chunk is updated on first pass
-	int lastChunkZ = 0x7fffffff;
-	for (auto block: a_Blocks)
-	{
-		// Update the chunk, if different from last time:
-		if ((block.m_ChunkX != lastChunkX) || (block.m_ChunkZ != lastChunkZ))
-		{
-			lastChunkX = block.m_ChunkX;
-			lastChunkZ = block.m_ChunkZ;
-			chunk = GetChunk(lastChunkX, lastChunkZ);
-		}
-
-		// If the chunk is valid, set the block:
-		if (chunk != nullptr)
-		{
-			chunk->SetBlock({block.m_RelX, block.m_RelY, block.m_RelZ}, block.m_BlockType, block.m_BlockMeta);
-		}
-	}  // for block - a_Blocks[]
-}
-
-
-
-
-
 void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 {
 	int BlockX = static_cast<int>(a_Player.GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
@@ -637,15 +609,7 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 	auto chunk = GetChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((chunk != nullptr) && chunk->IsValid())
 	{
-		BLOCKTYPE blockType;
-		NIBBLETYPE blockMeta;
-		GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
-		cChunkInterface ChunkInterface(this);
-
-		BlockHandler(blockType)->OnBroken(ChunkInterface, *m_World, a_BlockPos, blockType, blockMeta);
-
 		chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
-		BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, *m_World, a_BlockPos, a_BlockType, a_BlockMeta);
 	}
 }
 
@@ -686,28 +650,6 @@ bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBL
 		return true;
 	}
 	return false;
-}
-
-
-
-
-
-void cChunkMap::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
-{
-	cCSLock Lock(m_CSChunks);
-	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
-	{
-		auto chunk = GetChunk(itr->m_ChunkX, itr->m_ChunkZ);
-		if ((chunk == nullptr) || !chunk->IsValid())
-		{
-			continue;
-		}
-		Vector3i relPos(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
-		if (chunk->GetBlock(relPos) == a_FilterBlockType)
-		{
-			chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
-		}
-	}
 }
 
 

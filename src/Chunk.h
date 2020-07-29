@@ -158,10 +158,6 @@ public:
 	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	/** Queues the position itself, and all 6 neighbors of the specified position for ticking (m_ToTickQueue).
-	If any are outside the chunk, relays the checking to the proper neighboring chunk. */
-	void QueueTickBlockNeighbors(Vector3i a_Position);
-
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
 	{

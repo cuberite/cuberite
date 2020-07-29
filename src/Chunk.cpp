@@ -820,7 +820,7 @@ void cChunk::CheckBlocks()
 
 	while (Count != 0)
 	{
-		Vector3i Pos = m_ToTickBlocks.front();
+		const auto Pos = m_ToTickBlocks.front();
 		m_ToTickBlocks.pop();
 		Count--;
 
@@ -1263,8 +1263,8 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 {
 	FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 
-	// Tick this block and its neighbors:
-	QueueTickBlockNeighbors(a_RelPos);
+	// Tick this block's neighbors via cBlockHandler::Check:
+	m_ToTickBlocks.push(a_RelPos);
 
 	// Wake up the simulators for this block:
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
@@ -1305,33 +1305,6 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 			break;
 		}
 	}  // switch (a_BlockType)
-}
-
-
-
-
-
-void cChunk::QueueTickBlockNeighbors(Vector3i a_Position)
-{
-	m_ToTickBlocks.push(a_Position);
-
-	for (const auto & Offset : cSimulator::AdjacentOffsets)
-	{
-		auto Relative = a_Position + Offset;
-
-		if (!cChunkDef::IsValidHeight(Relative.y))
-		{
-			continue;
-		}
-
-		auto Chunk = GetRelNeighborChunkAdjustCoords(Relative);
-		if ((Chunk == nullptr) || !Chunk->IsValid())
-		{
-			continue;
-		}
-
-		Chunk->m_ToTickBlocks.push(Relative);
-	}
 }
 
 
