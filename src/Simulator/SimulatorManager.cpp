@@ -63,9 +63,29 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 {
 	ASSERT(a_Chunk.IsValid());
 
-	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)
+	for (const auto Item : m_Simulators)
 	{
-		itr->first->WakeUp(a_Chunk, a_Position, a_Chunk.GetBlock(a_Position));
+		Item.first->WakeUp(a_Chunk, a_Position, a_Chunk.GetBlock(a_Position));
+	}
+
+	for (const auto Offset : cSimulator::AdjacentOffsets)
+	{
+		auto Relative = a_Position + Offset;
+		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+
+		if ((Chunk == nullptr) || !Chunk->IsValid())
+		{
+			continue;
+		}
+
+		// Stored block to give to simulators for performance
+		// Since they all need this we save them querying it themselves
+		const auto Block = Chunk->GetBlock(Relative);
+
+		for (const auto Item : m_Simulators)
+		{
+			Item.first->WakeUp(*Chunk, Relative, Offset, Block);
+		}
 	}
 }
 

@@ -128,53 +128,6 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 
 
 
-void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
-{
-	Super::WakeUp(a_Chunk, a_Position, a_Block);
-
-	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
-
-	// Never update blocks without a handler:
-	if (GetComponentHandler(a_Block) == nullptr)
-	{
-		ChunkData.ErasePowerData(a_Position);
-		return;
-	}
-
-	// Only update others if there is a redstone device nearby
-	for (int x = -1; x < 2; ++x)
-	{
-		for (int y = -1; y < 2; ++y)
-		{
-			if (!cChunkDef::IsValidHeight(a_Position.y + y))
-			{
-				continue;
-			}
-
-			for (int z = -1; z < 2; ++z)
-			{
-				auto CheckPos = a_Position + Vector3i{ x, y, z };
-				BLOCKTYPE Block;
-				NIBBLETYPE Meta;
-
-				// If we can't read the block, assume it is a mechanism
-				if (
-					!a_Chunk.UnboundedRelGetBlock(CheckPos, Block, Meta) ||
-					IsRedstone(Block)
-				)
-				{
-					ChunkData.WakeUp(a_Position);
-					return;
-				}
-			}
-		}
-	}
-}
-
-
-
-
-
 void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
@@ -273,12 +226,15 @@ void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & Tic
 
 void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
-
 	if (!IsRedstone(a_Block))
 	{
 		return;
 	}
+
+	// Never update blocks without a handler:
+	ASSERT(GetComponentHandler(a_Block) != nullptr);
+
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 
 	if (IsAlwaysTicked(a_Block))
 	{
@@ -287,4 +243,35 @@ void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Positi
 
 	// Always update redstone devices:
 	ChunkData.WakeUp(a_Position);
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+{
+	// Having WakeUp called on us directly means someone called SetBlock (or WakeUp)
+	// Since the simulator never does this, something external changed. Clear cached data:
+	static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData())->ErasePowerData(a_Position);
+
+	// Queue the block, in case the set block was redstone:
+	AddBlock(a_Chunk, a_Position, a_Block);
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block)
+{
+	// This is an automatic cross-coords wakeup by cSimulatorManager
+	// There is no need to erase power data; if a component was destroyed the 3-arg WakeUp will handle it
+
+	AddBlock(a_Chunk, a_Position, a_Block);
+
+	// The only thing to do go one block farther than this cross-coord, in the direction of Offset
+	// in order to notify linked-powered positions that there was a change
+
+	// TODO: use a_Offset, exclude a_Position and a_Position - a_Offset
 }

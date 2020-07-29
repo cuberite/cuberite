@@ -13,9 +13,9 @@ class cCuboid;
 Each descendant provides an implementation of what needs to be done on each world tick.
 The descendant may choose to do all processing in a single call for the entire world (Simulate())
 or do per-chunk calculations (SimulateChunk()).
-Whenever a block is changed, the WakeUp() or WakeUpArea() functions are called to notify all simulators.
-The functions add all affected blocks and all their direct neighbors using the AddBlock() function. The simulator
-may update its internal state based on this call. */
+Whenever a block is changed, the WakeUp() functions are called to notify all simulators by the simulator manager.
+The functions are invoked to add all affected blocks and their direct neighbors using the AddBlock() function.
+The simulator may update its internal state based on this call. */
 class cSimulator
 {
 public:
@@ -27,7 +27,18 @@ public:
 
 	virtual ~cSimulator() {}
 
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block);
+	// Contains our direct adjacents
+	inline static std::array<Vector3i, 6> AdjacentOffsets
+	{
+		{
+			{  1,  0,  0 },
+			{ -1,  0,  0 },
+			{  0,  1,  0 },
+			{  0, -1,  0 },
+			{  0,  0,  1 },
+			{  0,  0, -1 },
+		}
+	};
 
 protected:
 

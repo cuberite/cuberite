@@ -38,8 +38,8 @@ public:
 	/** Called in each tick for each chunk, a_Dt is the time passed since the last tick, in msec; direct access to chunk data available. */
 	void SimulateChunk(std::chrono::milliseconds a_DT, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk);
 
-	/* Called when a single block changes, wakes all simulators up for the block.
-	The simulator implementation may also decide to wake the block's face-neighbors or blocks farther away. */
+	/* Called when a single block changes, wakes all simulators up for the block and its face-neighbors.
+	The simulator implementation may also decide to wake blocks farther away. */
 	void WakeUp(cChunk & a_Chunk, Vector3i a_Position);
 
 	/** Does the same processing as WakeUp, but for all blocks within the specified area.
