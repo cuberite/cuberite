@@ -133,15 +133,11 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	// 12xx12_begin
-
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
 	Pkt.WriteString(a_Message);
-
-	// 12xx12_end
 }
 
 
@@ -150,8 +146,6 @@ void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString 
 
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	// 12xx12_begin
-
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktScoreboardObjective);
@@ -167,8 +161,6 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 	// there could be a type of objective specified but isn't send as parameter
 	// Todo: add type of objective to message
 	// 0 -> integer		1 -> hearts
-
-	// 12xx12_end
 }
 
 
@@ -332,11 +324,6 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 		case pktSoundEffect:          return 0x1a;
 		case pktSoundParticleEffect:  return 0x23;
 		case pktSpawnPosition:        return 0x49;
-		// 12xx12_begin
-		case pktStatistics:			  return 0x07;
-			// I added pktStatistics to get PacketID because i couldn't find it
-			// anywhere
-		// 12xx12_end
 		case pktTabCompletionResults: return 0x10;
 		case pktTeleportEntity:       return 0x50;
 		case pktTimeUpdate:           return 0x4a;
