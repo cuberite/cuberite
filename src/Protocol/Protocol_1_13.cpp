@@ -133,7 +133,11 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	// TODO
+	// ASSERT(m_state == 3);  // In game mode? - breaks my compiler :/
+
+	cPacketizer Pkt(*this, pktPluginMessage);
+	Pkt.WriteString(a_Channel);
+	Pkt.WriteString(a_Message);
 }
 
 
@@ -240,7 +244,7 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		m_Client->SetClientBrand(Brand);
 
 		// Send back our brand, including the length:
-		SendPluginMessage("minecraft:brand", "\x08""Cuberite");
+		SendPluginMessage("minecraft:brand", "Cuberite");
 		return;
 	}
 
