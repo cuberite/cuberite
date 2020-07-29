@@ -1159,23 +1159,6 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, 
 
 
 
-void cChunk::UnboundedQueueTickBlock(Vector3i a_RelPos)
-{
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
-	{
-		return;
-	}
-	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
-	if ((chunk != nullptr) && chunk->IsValid())
-	{
-		chunk->QueueTickBlock(a_RelPos);
-	}
-}
-
-
-
-
-
 int cChunk::GetHeight(int a_X, int a_Z)
 {
 	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
@@ -1283,10 +1266,8 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 
 	// Tick this block and its neighbors:
-	m_ToTickBlocks.push_back(a_RelPos);
 	QueueTickBlockNeighbors(a_RelPos);
 
-	// TODO: use relative coordinates, cChunk reference
 	// Wake up the simulators for this block:
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
@@ -1332,38 +1313,26 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 
 
-void cChunk::QueueTickBlock(Vector3i a_RelPos)
+void cChunk::QueueTickBlockNeighbors(Vector3i a_Position)
 {
-	ASSERT(IsValidRelPos(a_RelPos));
+	m_ToTickBlocks.push(a_Position);
 
-	if (!IsValid())
+	for (const auto & Offset : cSimulator::AdjacentOffsets)
 	{
-		return;
-	}
+		auto Relative = a_Position + Offset;
 
-	m_ToTickBlocks.push_back(a_RelPos);
-}
+		if (!cChunkDef::IsValidHeight(Relative.y))
+		{
+			continue;
+		}
 
+		auto Chunk = GetRelNeighborChunkAdjustCoords(Relative);
+		if ((Chunk == nullptr) || !Chunk->IsValid())
+		{
+			continue;
+		}
 
-
-
-
-void cChunk::QueueTickBlockNeighbors(Vector3i a_RelPos)
-{
-	// Contains our direct adjacents
-	static const Vector3i Offsets[] =
-	{
-		{  1,  0,  0 },
-		{ -1,  0,  0 },
-		{  0,  1,  0 },
-		{  0, -1,  0 },
-		{  0,  0,  1 },
-		{  0,  0, -1 },
-	};
-
-	for (const auto & Offset : Offsets)
-	{
-		UnboundedQueueTickBlock(a_RelPos + Offset);
+		Chunk->m_ToTickBlocks.push(Relative);
 	}
 }
 

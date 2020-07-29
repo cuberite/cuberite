@@ -158,18 +158,9 @@ public:
 	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	/** Queues block for ticking (m_ToTickQueue) */
-	void QueueTickBlock(Vector3i a_RelPos);
-
-	/** OBSOLETE, use the Vector3i-based overload instead.
-	Queues block for ticking (m_ToTickQueue) */
-	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
-	{
-		return QueueTickBlock({a_RelX, a_RelY, a_RelZ});
-	}
-
-	/** Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk */
-	void QueueTickBlockNeighbors(Vector3i a_RelPos);
+	/** Queues the position itself, and all 6 neighbors of the specified position for ticking (m_ToTickQueue).
+	If any are outside the chunk, relays the checking to the proper neighboring chunk. */
+	void QueueTickBlockNeighbors(Vector3i a_Position);
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
@@ -524,10 +515,6 @@ public:
 	{
 		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
 	}
-
-	/** Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case)
-	Ignores unsuccessful attempts */
-	void UnboundedQueueTickBlock(Vector3i a_RelPos);
 
 
 

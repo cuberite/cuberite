@@ -401,9 +401,6 @@ public:
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
-	/** Queues the specified block for ticking (block update) */
-	void QueueTickBlock(Vector3i a_AbsPos);
-
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSChunks; }
 

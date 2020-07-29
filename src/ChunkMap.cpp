@@ -2191,23 +2191,6 @@ void cChunkMap::ChunkValidated(void)
 
 
 
-void cChunkMap::QueueTickBlock(Vector3i a_AbsPos)
-{
-	auto chunkCoords = cChunkDef::BlockToChunk(a_AbsPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_AbsPos, chunkCoords);
-
-	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(chunkCoords);
-	if (Chunk != nullptr)
-	{
-		Chunk->QueueTickBlock(relPos);
-	}
-}
-
-
-
-
-
 void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
 {
 	cCSLock Lock(m_CSChunks);
