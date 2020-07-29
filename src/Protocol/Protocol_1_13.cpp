@@ -146,7 +146,21 @@ void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString 
 
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	// TODO
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktScoreboardObjective);
+
+	// max unique name length = 16
+	if (a_Name.length() > 16) return;
+	Pkt.WriteString(a_Name);
+	Pkt.WriteBEUInt8(a_Mode);
+	// on delete end here
+	if (a_Mode == 1) return;
+	Pkt.WriteString(a_DisplayName);
+
+	// there could be a type of objective specified but isn't send as parameter
+	// Todo: add type of objective to message
+	// 0 -> integer		1 -> hearts
 }
 
 
