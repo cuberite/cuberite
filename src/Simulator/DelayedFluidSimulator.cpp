@@ -121,7 +121,7 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if (a_Block != m_FluidBlock)
+	if ((a_Block != m_FluidBlock) && (a_Block != m_StationaryFluidBlock))
 	{
 		return;
 	}

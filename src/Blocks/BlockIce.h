@@ -19,10 +19,6 @@ public:
 	{
 	}
 
-
-
-
-
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
 		// Only drop self when using silk-touch:
@@ -36,10 +32,6 @@ public:
 		}
 	}
 
-
-
-
-
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
@@ -51,18 +43,13 @@ public:
 		{
 			return;
 		}
-		auto blockTypeBelow = a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1));
-		if (cBlockInfo::FullyOccupiesVoxel(blockTypeBelow) || IsBlockLiquid(blockTypeBelow))
+
+		const auto Below = a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1));
+		if (cBlockInfo::FullyOccupiesVoxel(Below) || IsBlockLiquid(Below))
 		{
-			// Setting air with FastSetBlock prevents SetBlock recursively calling OnBroken.
-			a_ChunkInterface.FastSetBlock(a_BlockPos, E_BLOCK_AIR, 0);
 			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_WATER, 0);
 		}
 	}
-
-
-
-
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{

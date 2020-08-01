@@ -651,8 +651,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		return;
 	}
 
-	BroadcastPendingBlockChanges();
-
 	CheckBlocks();
 
 	// Tick simulators:
@@ -716,6 +714,8 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	}  // for itr - m_Entitites[]
 
 	ApplyWeatherToTop();
+
+	BroadcastPendingBlockChanges();
 }
 
 

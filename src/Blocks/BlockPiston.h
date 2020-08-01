@@ -155,10 +155,5 @@ public:
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) override;
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		// No pickups
-		// Also with 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...
-		return {};
-	}
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override;
 } ;

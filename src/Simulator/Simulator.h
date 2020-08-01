@@ -28,7 +28,7 @@ public:
 	virtual ~cSimulator() {}
 
 	// Contains our direct adjacents
-	inline static std::array<Vector3i, 6> AdjacentOffsets
+	static constexpr std::array<Vector3i, 6> AdjacentOffsets
 	{
 		{
 			{  1,  0,  0 },

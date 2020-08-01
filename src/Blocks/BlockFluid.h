@@ -43,32 +43,6 @@ public:
 
 
 
-	virtual void Check(
-		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
-		Vector3i a_RelPos,
-		cChunk & a_Chunk
-	) override
-	{
-		switch (m_BlockType)
-		{
-			case E_BLOCK_STATIONARY_LAVA:
-			{
-				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_LAVA, a_Chunk.GetMeta(a_RelPos));
-				break;
-			}
-			case E_BLOCK_STATIONARY_WATER:
-			{
-				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_WATER, a_Chunk.GetMeta(a_RelPos));
-				break;
-			}
-		}
-		Super::Check(a_ChunkInterface, a_PluginInterface, a_RelPos, a_Chunk);
-	}
-
-
-
-
-
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);

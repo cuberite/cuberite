@@ -1036,12 +1036,11 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
 
-	m_ChunkMap->Tick(a_Dt);
-	TickMobs(a_Dt);
-	m_MapManager.TickMaps();
-
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
+	m_ChunkMap->Tick(a_Dt);  // Tick chunk after clients to apply at least one round of queued ticks (e.g. cBlockHandler::Check) this tick
+	TickMobs(a_Dt);
+	m_MapManager.TickMaps();
 	TickQueuedTasks();
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
