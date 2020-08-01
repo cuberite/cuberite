@@ -114,7 +114,7 @@ int TestRequest1()
 {
 	LOG("Running test 1");
 	auto evtFinished = std::make_shared<cEvent>();
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), options);
@@ -138,7 +138,7 @@ int TestRequest2()
 {
 	LOG("Running test 2");
 	auto evtFinished = std::make_shared<cEvent>();
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks));
 	if (res.first)
 	{
@@ -160,7 +160,7 @@ int TestRequest3()
 {
 	LOG("Running test 3");
 	auto evtFinished = std::make_shared<cEvent>();
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), options);
@@ -184,7 +184,7 @@ int TestRequest4()
 {
 	LOG("Running test 4");
 	auto evtFinished = std::make_shared<cEvent>();
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks));
 	if (res.first)
 	{

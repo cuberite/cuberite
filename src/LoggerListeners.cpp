@@ -211,7 +211,7 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 {
 	if (a_IsService)
 	{
-		return cpp14::make_unique<cNullConsoleListener>();
+		return std::make_unique<cNullConsoleListener>();
 	}
 
 	#ifdef _WIN32
@@ -223,24 +223,24 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 			HANDLE Console = GetStdHandle(STD_OUTPUT_HANDLE);
 			GetConsoleScreenBufferInfo(Console, &sbi);
 			WORD DefaultConsoleAttrib = sbi.wAttributes;
-			return cpp14::make_unique<cWindowsConsoleListener>(Console, DefaultConsoleAttrib);
+			return std::make_unique<cWindowsConsoleListener>(Console, DefaultConsoleAttrib);
 		}
 		else
 		{
-			return cpp14::make_unique<cVanillaCPPConsoleListener>();
+			return std::make_unique<cVanillaCPPConsoleListener>();
 		}
 	#elif defined (__linux) || defined (__APPLE__)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
 		{
-			return cpp14::make_unique<cANSIConsoleListener>();
+			return std::make_unique<cANSIConsoleListener>();
 		}
 		else
 		{
-			return cpp14::make_unique<cVanillaCPPConsoleListener>();
+			return std::make_unique<cVanillaCPPConsoleListener>();
 		}
 	#else
-		return cpp14::make_unique<cVanillaCPPConsoleListener>();
+		return std::make_unique<cVanillaCPPConsoleListener>();
 	#endif
 }
 
@@ -323,7 +323,7 @@ private:
 
 std::pair<bool, std::unique_ptr<cLogger::cListener>> MakeFileListener()
 {
-	auto listener = cpp14::make_unique<cFileListener>();
+	auto listener = std::make_unique<cFileListener>();
 	if (!listener->Open())
 	{
 		return {false, nullptr};

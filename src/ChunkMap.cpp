@@ -39,8 +39,8 @@
 cChunkMap::cChunkMap(cWorld * a_World) :
 	m_World(a_World),
 	m_Pool(
-		cpp14::make_unique<cListAllocationPool<cChunkData::sChunkSection>>(
-			cpp14::make_unique<cStarvationCallbacks>(), 1600u, 5000u
+		std::make_unique<cListAllocationPool<cChunkData::sChunkSection>>(
+			std::make_unique<cStarvationCallbacks>(), 1600u, 5000u
 		)
 	)
 {
@@ -71,7 +71,7 @@ cChunkPtr cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 		return (
 			*m_Chunks.emplace(
 				ChunkCoordinate{ a_ChunkX, a_ChunkZ },
-				cpp14::make_unique<cChunk>(
+				std::make_unique<cChunk>(
 					a_ChunkX,
 					a_ChunkZ,
 					this,

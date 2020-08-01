@@ -967,7 +967,7 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 		{
 			return L.ApiParamError("Cannot read the CallbacksTable parameter at idx %d", a_UrlStackIdx + 1);
 		}
-		urlClientCallbacks = cpp14::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
+		urlClientCallbacks = std::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
 	}
 	else if (lua_isfunction(L, a_UrlStackIdx + 1))
 	{
@@ -975,7 +975,7 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 		{
 			return L.ApiParamError("Cannot read the CallbackFn parameter at idx %d", a_UrlStackIdx + 1);
 		}
-		urlClientCallbacks = cpp14::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
+		urlClientCallbacks = std::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
 	}
 	else
 	{

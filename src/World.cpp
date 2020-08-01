@@ -225,7 +225,7 @@ cWorld::cWorld(
 
 	cFile::CreateFolderRecursive(m_DataPath);
 
-	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	m_ChunkMap = std::make_unique<cChunkMap>(this);
 	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// Load the scoreboard
@@ -419,11 +419,11 @@ cWorld::cWorld(
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
+	m_SimulatorManager  = std::make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
+	m_SandSimulator     = std::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = std::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
@@ -1988,7 +1988,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
-		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
+		auto Pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
@@ -2007,7 +2007,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 			continue;
 		}
 
-		auto pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
+		auto pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
 		auto pickupPtr = pickup.get();
 		pickupPtr->Initialize(std::move(pickup), *this);
 	}
@@ -2019,7 +2019,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 
 UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine)
 {
-	auto pickup = cpp14::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
+	auto pickup = std::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
 	auto pickupPtr = pickup.get();
 	if (!pickupPtr->Initialize(std::move(pickup), *this))
 	{
@@ -2034,7 +2034,7 @@ UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_
 
 UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	auto fallingBlock = cpp14::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
+	auto fallingBlock = std::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
 	auto fallingBlockPtr = fallingBlock.get();
 	auto ID = fallingBlock->GetUniqueID();
 	if (!fallingBlockPtr->Initialize(std::move(fallingBlock), *this))
@@ -2056,7 +2056,7 @@ UInt32 cWorld::SpawnExperienceOrb(Vector3d a_Pos, int a_Reward)
 		return cEntity::INVALID_ID;
 	}
 
-	auto expOrb = cpp14::make_unique<cExpOrb>(a_Pos, a_Reward);
+	auto expOrb = std::make_unique<cExpOrb>(a_Pos, a_Reward);
 	auto expOrbPtr = expOrb.get();
 	if (!expOrbPtr->Initialize(std::move(expOrb), *this))
 	{
@@ -2091,7 +2091,7 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Rewar
 	auto & Random = GetRandomProvider();
 	for (auto Reward : Rewards)
 	{
-		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_Pos, Reward);
+		auto ExpOrb = std::make_unique<cExpOrb>(a_Pos, Reward);
 		auto ExpOrbPtr = ExpOrb.get();
 		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
 		double SpeedY = Random.RandReal(0.5);
@@ -2117,11 +2117,11 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>  (a_Pos); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_Pos); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>    (a_Pos); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper> (a_Pos); break;
+		case E_ITEM_MINECART:             Minecart = std::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = std::make_unique<cMinecartWithChest>  (a_Pos); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = std::make_unique<cMinecartWithFurnace>(a_Pos); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = std::make_unique<cMinecartWithTNT>    (a_Pos); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = std::make_unique<cMinecartWithHopper> (a_Pos); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
@@ -2142,7 +2142,7 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 
 UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
-	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);
+	auto Boat = std::make_unique<cBoat>(a_Pos, a_Material);
 	auto BoatPtr = Boat.get();
 	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
@@ -2157,7 +2157,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff, bool a_ShouldPlayFuseSound)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
+	auto TNT = std::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
@@ -3594,7 +3594,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
+	auto SetChunkData = std::make_unique<cSetChunkData>(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed

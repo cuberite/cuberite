@@ -177,7 +177,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		m_SettingsFilename = a_OverridesRepo->GetValue("Server","ConfigFile");
 	}
 
-	auto IniFile = cpp14::make_unique<cIniFile>();
+	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
 
 	if (IsNewIniFile)
@@ -187,7 +187,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
 	}
 
-	auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(a_OverridesRepo));
+	auto settingsRepo = std::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(a_OverridesRepo));
 
 	LOG("Starting server...");
 
