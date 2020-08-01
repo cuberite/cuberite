@@ -69,7 +69,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			Vector3d Speed = GetLookVector() * 20;
 			Speed.y = Speed.y + 1;
 
-			auto FireCharge = cpp14::make_unique<cFireChargeEntity>(this, GetPosition().addedY(1), Speed);
+			auto FireCharge = std::make_unique<cFireChargeEntity>(this, GetPosition().addedY(1), Speed);
 			auto FireChargePtr = FireCharge.get();
 			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
 

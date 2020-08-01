@@ -307,7 +307,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	ASSERT(chunkCoords != nullptr);  // If the table was invalid, GetStackValues() would have failed
 
 	// Read the chunk coords:
-	auto chunkStay = cpp14::make_unique<cLuaChunkStay>();
+	auto chunkStay = std::make_unique<cLuaChunkStay>();
 	if (!chunkStay->AddChunks(*chunkCoords))
 	{
 		return 0;
@@ -732,7 +732,7 @@ static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 	cWorld * world = nullptr;
 	int chunkX = 0;
 	int chunkZ = 0;
-	auto Callback = cpp14::make_unique<cCallback>();
+	auto Callback = std::make_unique<cCallback>();
 	L.GetStackValues(1, world, chunkX, chunkZ, Callback->m_LuaCallback);
 	if (world == nullptr)
 	{

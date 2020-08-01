@@ -236,7 +236,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	// If the chunk is not lighted, queue it for relighting and get notified when it's ready:
 	if (!m_World.IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
-		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ, cpp14::make_unique<cNotifyChunkSender>(*this, m_World));
+		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ, std::make_unique<cNotifyChunkSender>(*this, m_World));
 		return;
 	}
 

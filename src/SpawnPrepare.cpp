@@ -59,7 +59,7 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	{
 		int chunkX, chunkZ;
 		prep->DecodeChunkCoords(i, chunkX, chunkZ);
-		a_World.PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(prep));
+		a_World.PrepareChunk(chunkX, chunkZ, std::make_unique<cSpawnPrepareCallback>(prep));
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
@@ -107,7 +107,7 @@ void cSpawnPrepare::PreparedChunkCallback(int a_ChunkX, int a_ChunkZ)
 	{
 		int chunkX, chunkZ;
 		DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
-		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(shared_from_this()));
+		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, std::make_unique<cSpawnPrepareCallback>(shared_from_this()));
 		m_NextIdx += 1;
 	}
 

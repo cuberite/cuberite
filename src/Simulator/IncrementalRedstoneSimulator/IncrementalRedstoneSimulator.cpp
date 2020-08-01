@@ -60,18 +60,18 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 	{
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL: return cpp14::make_unique<cPoweredRailHandler>();
+		case E_BLOCK_POWERED_RAIL: return std::make_unique<cPoweredRailHandler>();
 
 		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_INACTIVE_COMPARATOR: return cpp14::make_unique<cRedstoneComparatorHandler>();
+		case E_BLOCK_INACTIVE_COMPARATOR: return std::make_unique<cRedstoneComparatorHandler>();
 
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER: return cpp14::make_unique<cDropSpenserHandler>();
+		case E_BLOCK_DROPPER: return std::make_unique<cDropSpenserHandler>();
 
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>();
+		case E_BLOCK_WOODEN_PRESSURE_PLATE: return std::make_unique<cPressurePlateHandler>();
 
 		case E_BLOCK_ACACIA_FENCE_GATE:
 		case E_BLOCK_BIRCH_FENCE_GATE:
@@ -80,44 +80,44 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_JUNGLE_FENCE_GATE:
 		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>();
+		case E_BLOCK_TRAPDOOR: return std::make_unique<cSmallGateHandler>();
 
 		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON: return cpp14::make_unique<cRedstoneLampHandler>();
+		case E_BLOCK_REDSTONE_LAMP_ON: return std::make_unique<cRedstoneLampHandler>();
 
 		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON: return cpp14::make_unique<cRedstoneRepeaterHandler>();
+		case E_BLOCK_REDSTONE_REPEATER_ON: return std::make_unique<cRedstoneRepeaterHandler>();
 
 		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>();
+		case E_BLOCK_REDSTONE_TORCH_ON: return std::make_unique<cRedstoneTorchHandler>();
 
-		case E_BLOCK_OBSERVER: return cpp14::make_unique<cObserverHandler>();
+		case E_BLOCK_OBSERVER: return std::make_unique<cObserverHandler>();
 
 		case E_BLOCK_PISTON:
-		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>();
+		case E_BLOCK_STICKY_PISTON: return std::make_unique<cPistonHandler>();
 
 		case E_BLOCK_LEVER:
 		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_WOODEN_BUTTON: return cpp14::make_unique<cRedstoneToggleHandler>();
+		case E_BLOCK_WOODEN_BUTTON: return std::make_unique<cRedstoneToggleHandler>();
 
-		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>();
-		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>();
-		case E_BLOCK_HOPPER: return cpp14::make_unique<cHopperHandler>();
-		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>();
-		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>();
-		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>();
-		case E_BLOCK_TRAPPED_CHEST: return cpp14::make_unique<cTrappedChestHandler>();
-		case E_BLOCK_TRIPWIRE_HOOK: return cpp14::make_unique<cTripwireHookHandler>();
+		case E_BLOCK_BLOCK_OF_REDSTONE: return std::make_unique<cRedstoneBlockHandler>();
+		case E_BLOCK_COMMAND_BLOCK: return std::make_unique<cCommandBlockHandler>();
+		case E_BLOCK_HOPPER: return std::make_unique<cHopperHandler>();
+		case E_BLOCK_NOTE_BLOCK: return std::make_unique<cNoteBlockHandler>();
+		case E_BLOCK_REDSTONE_WIRE: return std::make_unique<cRedstoneWireHandler>();
+		case E_BLOCK_TNT: return std::make_unique<cTNTHandler>();
+		case E_BLOCK_TRAPPED_CHEST: return std::make_unique<cTrappedChestHandler>();
+		case E_BLOCK_TRIPWIRE_HOOK: return std::make_unique<cTripwireHookHandler>();
 		default:
 		{
 			if (cBlockDoorHandler::IsDoorBlockType(a_BlockType))
 			{
-				return cpp14::make_unique<cDoorHandler>();
+				return std::make_unique<cDoorHandler>();
 			}
 
 			if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
 			{
-				return cpp14::make_unique<cSolidBlockHandler>();
+				return std::make_unique<cSolidBlockHandler>();
 			}
 			return nullptr;
 		}

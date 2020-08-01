@@ -256,7 +256,7 @@ static DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
 	while (!cRoot::m_TerminateEventRaised)
 	{
 		// Do the normal startup
-		UniversalMain(cpp14::make_unique<cMemorySettingsRepository>());
+		UniversalMain(std::make_unique<cMemorySettingsRepository>());
 	}
 
 	return ERROR_SUCCESS;
@@ -380,7 +380,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 		cmd.parse(argc, argv);
 
 		// Copy the parsed args' values into a settings repository:
-		auto repo = cpp14::make_unique<cMemorySettingsRepository>();
+		auto repo = std::make_unique<cMemorySettingsRepository>();
 		if (confArg.isSet())
 		{
 			AString conf_file = confArg.getValue();
@@ -441,7 +441,7 @@ static std::unique_ptr<cMemorySettingsRepository> ParseArguments(int argc, char 
 	catch (const TCLAP::ArgException & exc)
 	{
 		fmt::print("Error reading command line {0} for arg {1}", exc.error(), exc.argId());
-		return cpp14::make_unique<cMemorySettingsRepository>();
+		return std::make_unique<cMemorySettingsRepository>();
 	}
 }
 

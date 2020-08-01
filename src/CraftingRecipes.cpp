@@ -464,7 +464,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		return;
 	}
 
-	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = cpp14::make_unique<cCraftingRecipes::cRecipe>();
+	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = std::make_unique<cCraftingRecipes::cRecipe>();
 
 	AStringVector RecipeSplit = StringSplit(Sides[0], ":");
 	const auto * resultPart = &RecipeSplit[0];
@@ -852,7 +852,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	}  // for y, for x
 
 	// The recipe has matched. Create a copy of the recipe and set its coords to match the crafting grid:
-	std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
+	std::unique_ptr<cRecipe> Recipe = std::make_unique<cRecipe>();
 	Recipe->m_Result = a_Recipe->m_Result;
 	Recipe->m_Width  = a_Recipe->m_Width;
 	Recipe->m_Height = a_Recipe->m_Height;
