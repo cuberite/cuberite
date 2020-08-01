@@ -692,6 +692,9 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		// Broadcast the window, we sometimes move items to different locations than Vanilla, causing needless desyncs:
 		m_ParentWindow.BroadcastWholeWindow();
 
+		// Added achievements processing
+		HandleCraftItem(Result, a_Player);
+
 		// If the recipe has changed, bail out:
 		if (!Recipe.GetResult().IsEqual(Result))
 		{

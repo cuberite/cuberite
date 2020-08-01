@@ -107,7 +107,7 @@ public:
 		// New knot? needs to init and produce sound effect
 		else
 		{
-			auto NewLeashKnot = cpp14::make_unique<cLeashKnot>(a_BlockFace, a_BlockPos);
+			auto NewLeashKnot = std::make_unique<cLeashKnot>(a_BlockFace, a_BlockPos);
 			auto NewLeashKnotPtr = NewLeashKnot.get();
 
 			NewLeashKnotPtr->TiePlayersLeashedMobs(a_Player, KnotAlreadyExists);

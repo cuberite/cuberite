@@ -327,12 +327,7 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
-// TODO: Replace cpp14 with std at point of use
 
-namespace cpp14
-{
-using std::make_unique;
-}
 
 // a tick is 50 ms
 using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;

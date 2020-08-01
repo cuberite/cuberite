@@ -356,7 +356,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 	cWorld * World;
 	{
 		// Spawn player (only serversided, so data is loaded)
-		m_PlayerPtr = cpp14::make_unique<cPlayer>(m_Self, GetUsername());
+		m_PlayerPtr = std::make_unique<cPlayer>(m_Self, GetUsername());
 		m_Player = m_PlayerPtr.get();
 		/*
 		LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",

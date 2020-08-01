@@ -1181,13 +1181,13 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			return cpp14::make_unique<cMagmaCube>(1 << Random.RandInt(2));  // Size 1, 2 or 4
+			return std::make_unique<cMagmaCube>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
 		case mtSlime:
 		{
-			return cpp14::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
+			return std::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtVillager: return cpp14::make_unique<cVillager>(cVillager::GetRandomProfession());
+		case mtVillager: return std::make_unique<cVillager>(cVillager::GetRandomProfession());
 		case mtHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
@@ -1202,40 +1202,40 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 				HorseType = 0;
 			}
 
-			return cpp14::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
+			return std::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
 		case mtZombieVillager:
 		{
-			return cpp14::make_unique<cZombieVillager>(cVillager::GetRandomProfession());
+			return std::make_unique<cZombieVillager>(cVillager::GetRandomProfession());
 		}
-		case mtBat:            return cpp14::make_unique<cBat>();
-		case mtBlaze:          return cpp14::make_unique<cBlaze>();
-		case mtCaveSpider:     return cpp14::make_unique<cCaveSpider>();
-		case mtChicken:        return cpp14::make_unique<cChicken>();
-		case mtCow:            return cpp14::make_unique<cCow>();
-		case mtCreeper:        return cpp14::make_unique<cCreeper>();
-		case mtEnderDragon:    return cpp14::make_unique<cEnderDragon>();
-		case mtEnderman:       return cpp14::make_unique<cEnderman>();
-		case mtGhast:          return cpp14::make_unique<cGhast>();
-		case mtGiant:          return cpp14::make_unique<cGiant>();
-		case mtGuardian:       return cpp14::make_unique<cGuardian>();
-		case mtIronGolem:      return cpp14::make_unique<cIronGolem>();
-		case mtMooshroom:      return cpp14::make_unique<cMooshroom>();
-		case mtOcelot:         return cpp14::make_unique<cOcelot>();
-		case mtPig:            return cpp14::make_unique<cPig>();
-		case mtRabbit:         return cpp14::make_unique<cRabbit>();
-		case mtSheep:          return cpp14::make_unique<cSheep>();
-		case mtSilverfish:     return cpp14::make_unique<cSilverfish>();
-		case mtSkeleton:       return cpp14::make_unique<cSkeleton>();
-		case mtSnowGolem:      return cpp14::make_unique<cSnowGolem>();
-		case mtSpider:         return cpp14::make_unique<cSpider>();
-		case mtSquid:          return cpp14::make_unique<cSquid>();
-		case mtWitch:          return cpp14::make_unique<cWitch>();
-		case mtWither:         return cpp14::make_unique<cWither>();
-		case mtWitherSkeleton: return cpp14::make_unique<cWitherSkeleton>();
-		case mtWolf:           return cpp14::make_unique<cWolf>();
-		case mtZombie:         return cpp14::make_unique<cZombie>();
-		case mtZombiePigman:   return cpp14::make_unique<cZombiePigman>();
+		case mtBat:            return std::make_unique<cBat>();
+		case mtBlaze:          return std::make_unique<cBlaze>();
+		case mtCaveSpider:     return std::make_unique<cCaveSpider>();
+		case mtChicken:        return std::make_unique<cChicken>();
+		case mtCow:            return std::make_unique<cCow>();
+		case mtCreeper:        return std::make_unique<cCreeper>();
+		case mtEnderDragon:    return std::make_unique<cEnderDragon>();
+		case mtEnderman:       return std::make_unique<cEnderman>();
+		case mtGhast:          return std::make_unique<cGhast>();
+		case mtGiant:          return std::make_unique<cGiant>();
+		case mtGuardian:       return std::make_unique<cGuardian>();
+		case mtIronGolem:      return std::make_unique<cIronGolem>();
+		case mtMooshroom:      return std::make_unique<cMooshroom>();
+		case mtOcelot:         return std::make_unique<cOcelot>();
+		case mtPig:            return std::make_unique<cPig>();
+		case mtRabbit:         return std::make_unique<cRabbit>();
+		case mtSheep:          return std::make_unique<cSheep>();
+		case mtSilverfish:     return std::make_unique<cSilverfish>();
+		case mtSkeleton:       return std::make_unique<cSkeleton>();
+		case mtSnowGolem:      return std::make_unique<cSnowGolem>();
+		case mtSpider:         return std::make_unique<cSpider>();
+		case mtSquid:          return std::make_unique<cSquid>();
+		case mtWitch:          return std::make_unique<cWitch>();
+		case mtWither:         return std::make_unique<cWither>();
+		case mtWitherSkeleton: return std::make_unique<cWitherSkeleton>();
+		case mtWolf:           return std::make_unique<cWolf>();
+		case mtZombie:         return std::make_unique<cZombie>();
+		case mtZombiePigman:   return std::make_unique<cZombiePigman>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");

@@ -85,7 +85,7 @@ public:
 		};
 
 		auto PaintingTitle = gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)];
-		auto Painting = cpp14::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, PlacePos);
+		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, PlacePos);
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{

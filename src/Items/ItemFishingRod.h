@@ -88,7 +88,7 @@ public:
 			// Cast a hook:
 			auto & Random = GetRandomProvider();
 			auto CountDownTime = Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100);
-			auto Floater = cpp14::make_unique<cFloater>(
+			auto Floater = std::make_unique<cFloater>(
 				a_Player->GetEyePosition(), a_Player->GetLookVector() * 15,
 				a_Player->GetUniqueID(),
 				CountDownTime
