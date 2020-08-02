@@ -392,6 +392,147 @@ public:
 
 
 
+/** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
+selects the direction bits from the block's meta values. */
+template <class Base,
+	NIBBLETYPE BitMask = 0x0F,
+	NIBBLETYPE South = 0x00,
+	NIBBLETYPE SouthSouthWest = 0x01,
+	NIBBLETYPE SouthWest = 0x02,
+	NIBBLETYPE WestSouthWest = 0x03,
+	NIBBLETYPE West = 0x04,
+	NIBBLETYPE WestNorthWest = 0x05,
+	NIBBLETYPE NorthWest = 0x06,
+	NIBBLETYPE NorthNorthWest = 0x07,
+	NIBBLETYPE North = 0x08,
+	NIBBLETYPE NorthNorthEast = 0x09,
+	NIBBLETYPE NorthEast = 0x0a,
+	NIBBLETYPE EastNorthEast = 0x0b,
+	NIBBLETYPE East = 0x0c,
+	NIBBLETYPE EastSouthEast = 0x0d,
+	NIBBLETYPE SouthEast = 0x0e,
+	NIBBLETYPE SouthSouthEast = 0x0f,
+	bool AssertIfNotMatched = false>
+class cYawRotatorFine:
+	public cMetaRotatorFine<Base, BitMask,
+		North, NorthNorthEast, NorthEast, EastNorthEast,
+		East, EastSouthEast, SouthEast, SouthSouthEast,
+		South, SouthSouthWest, SouthWest, WestSouthWest,
+		West, WestNorthWest, NorthWest, NorthNorthWest, AssertIfNotMatched>
+{
+	using Super = cMetaRotatorFine<Base, BitMask,
+		North, NorthNorthEast, NorthEast, EastNorthEast,
+		East, EastSouthEast, SouthEast, SouthSouthEast,
+		South, SouthSouthWest, SouthWest, WestSouthWest,
+		West, WestNorthWest, NorthWest, NorthNorthWest, AssertIfNotMatched>;
+  public:
+
+	cYawRotatorFine(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
+	{
+	}
+
+
+
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
+	{
+		NIBBLETYPE BaseMeta;
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockPos, a_BlockFace, a_CursorPos, a_BlockType, BaseMeta))
+		{
+			return false;
+		}
+
+		a_BlockMeta = (BaseMeta & ~BitMask) | YawToMetaData(a_Player.GetYaw());
+		return true;
+	}
+
+
+
+
+
+	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
+	value for a block placed by a player facing that way */
+	static NIBBLETYPE YawToMetaData(double a_Rotation)
+	{
+		if ((a_Rotation >= - 11.25f) && (a_Rotation < 11.25f))
+		{
+			return South
+		}
+		else if ((a_Rotation >= 11.25f) && (a_Rotation < 33.75f))
+		{
+			return SouthSouthWest
+		}
+		else if ((a_Rotation >= 23.75f) && (a_Rotation < 56.25f))
+		{
+			return SouthWest
+		}
+		else if ((a_Rotation >= 56.25f) && (a_Rotation < 78.75f))
+		{
+			return WestSouthWest
+		}
+		else if ((a_Rotation >= 78.75f) && (a_Rotation < 101.25f))
+		{
+			return West
+		}
+		else if ((a_Rotation >= 101.25f) && (a_Rotation < 123.75f))
+		{
+			return WestNorthWest
+		}
+		else if ((a_Rotation >= 123.75f) && (a_Rotation < 146.25f))
+		{
+			return NorthWest
+		}
+		else if ((a_Rotation >= 146.25f) && (a_Rotation < 168.75f))
+		{
+			return NorthNorthWest
+		}
+		else if ((a_Rotation >= -168.75f) && (a_Rotation < -146.25f))
+		{
+			return NorthNorthEast
+		}
+		else if ((a_Rotation >= -146.25f) && (a_Rotation < -123.75f))
+		{
+			return NorthEast
+		}
+		else if ((a_Rotation >= -123.75f) && (a_Rotation < -101.25f))
+		{
+			return EastNorthEast
+		}
+		else if ((a_Rotation >= -101.25) && (a_Rotation < -78.75f))
+		{
+			return East
+		}
+		else if ((a_Rotation >= -78.75) && (a_Rotation < -56.25f))
+		{
+			return EastSouthEast
+		}
+		else if ((a_Rotation >= -56.25f) && (a_Rotation < -33.75f))
+		{
+			return SouthEast
+		}
+		else if ((a_Rotation >= -33.75f) && (a_Rotation < -11.25f))
+		{
+			return SouthSouthEast
+		}
+		else // degrees jumping from 180 to -180
+		{
+			return North
+		}
+	}
+};
+
+
+
+
+
 /** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
 template <
