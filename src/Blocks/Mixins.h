@@ -170,6 +170,153 @@ public:
 
 
 
+/** Mixin for rotations and reflections following the standard pattern of "apply mask, then use a switch".
+Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in
+North, NorthNorthEast, NorthEast, EastNorthEast,
+East, EastSouthEast, SouthEast, SouthSouthEast,
+South, SouthSouthWest, SouthWest, WestSouthWest
+West, WestNorthWest, NorthWest, NorthNorthWest.
+There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE NorthNorthEast, NIBBLETYPE NorthEast, NIBBLETYPE EastNorthEast,
+	NIBBLETYPE East, NIBBLETYPE EastSouthEast, NIBBLETYPE SouthEast, NIBBLETYPE SouthSouthEast,
+	NIBBLETYPE South, NIBBLETYPE SouthSouthWest, NIBBLETYPE SouthWest, NIBBLETYPE WestSouthWest,
+	NIBBLETYPE West, NIBBLETYPE WestNorthWest, NIBBLETYPE NorthWest, NIBBLETYPE NorthNorthWest, bool AssertIfNotMatched = false>
+class cMetaRotatorFine:
+	public Base
+{
+  public:
+
+	cMetaRotatorFine(BLOCKTYPE a_BlockType):
+		Base(a_BlockType)
+	{}
+
+
+
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case North: return NorthNorthEast | OtherMeta;
+			case NorthNorthEast: return NorthEast | OtherMeta;
+			case NorthEast: return EastNorthEast | OtherMeta;
+			case EastNorthEast: return East | OtherMeta;
+			case East: return EastSouthEast | OtherMeta;
+			case EastSouthEast: return SouthEast | OtherMeta;
+			case SouthEast: return SouthSouthEast | OtherMeta;
+			case SouthSouthEast: return South | OtherMeta;
+			case South: return SouthSouthWest | OtherMeta;
+			case SouthSouthWest: return SouthWest | OtherMeta;
+			case SouthWest: return WestSouthWest | OtherMeta;
+			case WestSouthWest: return West | OtherMeta;
+			case West: return WestNorthWest | OtherMeta;
+			case WestNorthWest: return NorthWest | OtherMeta;
+			case NorthWest: return NorthNorthWest | OtherMeta;
+			case NorthNorthWest: return North | OtherMeta;
+		}
+		if (AssertIfNotMatched)
+		{
+			ASSERT(!"Invalid Meta value");
+		}
+		return a_Meta;
+	}
+
+
+
+
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case North: return NorthNorthWest | OtherMeta;
+			case NorthNorthWest: return NorthWest | OtherMeta;
+			case NorthWest: return WestNorthWest | OtherMeta;
+			case WestNorthWest: return West | OtherMeta;
+			case West: return WestSouthWest | OtherMeta;
+			case WestSouthWest: return SouthWest | OtherMeta;
+			case SouthWest: return SouthSouthWest | OtherMeta;
+			case SouthSouthWest: return South | OtherMeta;
+			case South: return SouthSouthEast | OtherMeta;
+			case SouthSouthEast: return SouthEast | OtherMeta;
+			case SouthEast: return EastSouthEast | OtherMeta;
+			case EastSouthEast: return East | OtherMeta;
+			case East: return EastNorthEast | OtherMeta;
+			case EastNorthEast: return NorthEast | OtherMeta;
+			case NorthEast: return NorthNorthEast | OtherMeta;
+			case NorthNorthEast: return North | OtherMeta;
+		}
+		if (AssertIfNotMatched)
+		{
+			ASSERT(!"Invalid Meta value");
+		}
+		return a_Meta;
+	}
+
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case North: return South | OtherMeta;
+			case NorthNorthEast: return SouthSouthEast | OtherMeta;
+			case NorthEast: return SouthEast | OtherMeta;
+			case EastNorthEast: return EastSouthEast | OtherMeta;
+			case EastSouthEast: return EastNorthEast | OtherMeta;
+			case SouthEast: return NorthEast | OtherMeta;
+			case SouthSouthEast: return NorthNorthEast | OtherMeta;
+			case South: return North | OtherMeta;
+			case SouthSouthWest: return NorthNorthWest;
+			case SouthWest: return NorthWest;
+			case WestSouthWest: return WestNorthWest;
+			case WestNorthWest: return WestSouthWest;
+			case NorthWest: return SouthWest;
+			case NorthNorthWest: return SouthSouthWest;
+		}
+		// Facing East or West; No Change
+		return a_Meta;
+	}
+
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case NorthNorthEast: return NorthNorthWest;
+			case NorthEast: return NorthWest;
+			case EastNorthEast: return WestNorthWest;
+			case East: return West;
+			case EastSouthEast: return WestSouthWest;
+			case SouthEast: return SouthWest;
+			case SouthSouthEast: return SouthSouthWest;
+			case SouthSouthWest: return SouthSouthEast;
+			case SouthWest: return SouthEast;
+			case WestSouthWest: return EastSouthEast;
+			case West: return East;
+			case WestNorthWest: return EastNorthEast;
+			case NorthWest: return NorthEast;
+			case NorthNorthWest: return NorthNorthEast;
+		}
+		// Facing North or South; No change.
+		return a_Meta;
+	}
+};
+
+
+
+
+
 /** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
 selects the direction bits from the block's meta values. */
 template <
