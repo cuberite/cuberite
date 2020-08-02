@@ -24,7 +24,30 @@ private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(StemPickupType, 1, 0);
+		/**
+		 * Use correct percent:
+		 * https://minecraft.gamepedia.com/Melon_Seeds#Breaking
+		 * https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
+		 * Good new: Melon & Pumpkin have same random values !
+		 */
+
+		// Age > 7 (Impossible)
+		if (a_BlockMeta > 7 || a_BlockMeta < 0)
+		{
+			return cItem(StemPickupType, 1, 0);
+		}
+
+		auto & rand = GetRandomProvider();
+		float randomValue = rand.RandReal<float>(100);
+		float max = 0;
+		int count = 0;
+		for (; count < 3; count++)
+		{
+			max += vals[a_BlockMeta][count];
+			if (max > randomValue)
+				break;
+		}
+		return cItem(StemPickupType, count, 0);
 	}
 
 
@@ -152,6 +175,37 @@ private:
 		}
 		return false;
 	}
+
+private:
+	// https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
+	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
+	float vals[8][3] =
+	{
+		{
+			81.3, 17.42, 1.24
+		},
+		{
+			65.1, 30.04, 4.62
+		},
+		{
+			51.2, 38.4, 9.6
+		},
+		{
+			39.44, 43.02, 15.64
+		},
+		{
+			29.13, 44.44, 22.22
+		},
+		{
+			21.6, 43.2, 28.8
+		},
+		{
+			15.17, 39.82, 34.84
+		},
+		{
+			10.16, 34.84, 39.82
+		}
+	};
 } ;
 
 using cBlockMelonStemHandler   = cBlockStemsHandler<E_BLOCK_MELON,   E_ITEM_MELON_SEEDS>;
