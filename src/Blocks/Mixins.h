@@ -174,7 +174,7 @@ public:
 Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in
 North, NorthNorthEast, NorthEast, EastNorthEast,
 East, EastSouthEast, SouthEast, SouthSouthEast,
-South, SouthSouthWest, SouthWest, WestSouthWest
+South, SouthSouthWest, SouthWest, WestSouthWest,
 West, WestNorthWest, NorthWest, NorthNorthWest.
 There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
 template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE NorthNorthEast, NIBBLETYPE NorthEast, NIBBLETYPE EastNorthEast,
@@ -184,7 +184,7 @@ template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE NorthNort
 class cMetaRotatorFine:
 	public Base
 {
-  public:
+public:
 
 	cMetaRotatorFine(BLOCKTYPE a_BlockType):
 		Base(a_BlockType)
