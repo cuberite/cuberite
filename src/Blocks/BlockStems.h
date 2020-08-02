@@ -43,7 +43,7 @@ private:
 		int count = 0;
 		for (; count < 3; count++)
 		{
-			max += Vals[a_BlockMeta][count];
+			max += m_Vals[a_BlockMeta][count];
 			if (max > randomValue)
 			{
 				break;
@@ -184,7 +184,7 @@ private:
 private:
 	// https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
 	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
-	float Vals[8][3] =
+	float m_Vals[8][3] =
 	{
 		{
 			81.3, 17.42, 1.24
