@@ -243,7 +243,13 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 		return;
 	}
 
-	cChunkDef::BlockNibbles BlockLight, SkyLight;
+	// Wrap the output lighting data into a structure so that we can use it in a unique_ptr:
+	struct OutputLightingData
+	{
+		cChunkDef::BlockNibbles mBlockLight;
+		cChunkDef::BlockNibbles mSkyLight;
+	};
+	auto Output = std::make_unique<OutputLightingData>();
 
 	ReadChunks(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 
@@ -312,10 +318,10 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	}
 	//*/
 
-	CompressLight(m_BlockLight, BlockLight);
-	CompressLight(m_SkyLight, SkyLight);
+	CompressLight(m_BlockLight, Output->mBlockLight);
+	CompressLight(m_SkyLight, Output->mSkyLight);
 
-	m_World.ChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ, BlockLight, SkyLight);
+	m_World.ChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ, Output->mBlockLight, Output->mSkyLight);
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{

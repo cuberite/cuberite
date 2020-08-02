@@ -155,27 +155,33 @@ void cComposableGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef:
 
 void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 {
+	// Wrap a cChunkDesc::Shape into a structure so that we can make a unique_ptr out of it:
+	struct ShapeHelper
+	{
+		cChunkDesc::Shape mShape;
+	};
+	auto shape = std::make_unique<ShapeHelper>();
+
 	if (a_ChunkDesc.IsUsingDefaultBiomes())
 	{
 		m_BiomeGen->GenBiomes(a_ChunkDesc.GetChunkCoords(), a_ChunkDesc.GetBiomeMap());
 	}
 
-	cChunkDesc::Shape shape;
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
-		m_ShapeGen->GenShape(a_ChunkDesc.GetChunkCoords(), shape);
-		a_ChunkDesc.SetHeightFromShape(shape);
+		m_ShapeGen->GenShape(a_ChunkDesc.GetChunkCoords(), shape->mShape);
+		a_ChunkDesc.SetHeightFromShape(shape->mShape);
 	}
 	else
 	{
 		// Convert the heightmap in a_ChunkDesc into shape:
-		a_ChunkDesc.GetShapeFromHeight(shape);
+		a_ChunkDesc.GetShapeFromHeight(shape->mShape);
 	}
 
 	bool ShouldUpdateHeightmap = false;
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
-		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape);
+		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape->mShape);
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())

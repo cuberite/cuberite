@@ -245,17 +245,17 @@ void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords)
 	ASSERT(m_PluginInterface != nullptr);
 	ASSERT(m_ChunkSink != nullptr);
 
-	cChunkDesc ChunkDesc(a_Coords);
-	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);
-	m_Generator->Generate(ChunkDesc);
-	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
+	auto ChunkDesc = std::make_unique<cChunkDesc>(a_Coords);
+	m_PluginInterface->CallHookChunkGenerating(*ChunkDesc);
+	m_Generator->Generate(*ChunkDesc);
+	m_PluginInterface->CallHookChunkGenerated(*ChunkDesc);
 
 	#ifdef _DEBUG
 		// Verify that the generator has produced valid data:
-		ChunkDesc.VerifyHeightmap();
+		ChunkDesc->VerifyHeightmap();
 	#endif
 
-	m_ChunkSink->OnChunkGenerated(ChunkDesc);
+	m_ChunkSink->OnChunkGenerated(*ChunkDesc);
 }
 
 

@@ -361,15 +361,20 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const AString & a_RawChunkData)
 {
 	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
-	cChunkDef::BlockTypes   BlockTypes;
-	cChunkDef::BlockNibbles MetaData;
-	cChunkDef::BlockNibbles BlockLight;
-	cChunkDef::BlockNibbles SkyLight;
+	struct cChunkData
+	{
+		cChunkDef::BlockTypes   mBlockTypes;
+		cChunkDef::BlockNibbles mMetaData;
+		cChunkDef::BlockNibbles mBlockLight;
+		cChunkDef::BlockNibbles mSkyLight;
+	};
 
-	memset(BlockTypes, 0,    sizeof(BlockTypes));
-	memset(MetaData,   0,    sizeof(MetaData));
-	memset(SkyLight,   0xff, sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
-	memset(BlockLight, 0x00, sizeof(BlockLight));
+	auto ChunkData = std::make_unique<cChunkData>();
+
+	memset(ChunkData->mBlockTypes, 0,    sizeof(ChunkData->mBlockTypes));
+	memset(ChunkData->mMetaData,   0,    sizeof(ChunkData->mMetaData));
+	memset(ChunkData->mSkyLight,   0xff, sizeof(ChunkData->mSkyLight));  // By default, data not present in the NBT means air, which means full skylight
+	memset(ChunkData->mBlockLight, 0x00, sizeof(ChunkData->mBlockLight));
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -403,10 +408,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		{
 			continue;
 		}
-		CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(BlockTypes[y * 4096])), 4096);
-		CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(MetaData[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "SkyLight",   reinterpret_cast<char *>(&(SkyLight[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "BlockLight", reinterpret_cast<char *>(&(BlockLight[y * 2048])), 2048);
+		CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(ChunkData->mBlockTypes[y * 4096])), 4096);
+		CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(ChunkData->mMetaData[y   * 2048])), 2048);
+		CopyNBTData(a_NBT, Child, "SkyLight",   reinterpret_cast<char *>(&(ChunkData->mSkyLight[y   * 2048])), 2048);
+		CopyNBTData(a_NBT, Child, "BlockLight", reinterpret_cast<char *>(&(ChunkData->mBlockLight[y * 2048])), 2048);
 	}  // for itr - LevelSections[]
 
 	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
@@ -422,7 +427,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	cEntityList      Entities;
 	cBlockEntities   BlockEntities;
 	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes, MetaData);
+	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), ChunkData->mBlockTypes, ChunkData->mMetaData);
 
 	bool IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 
@@ -464,9 +469,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 	auto SetChunkData = std::make_unique<cSetChunkData>(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-		BlockTypes, MetaData,
-		IsLightValid ? BlockLight : nullptr,
-		IsLightValid ? SkyLight : nullptr,
+		ChunkData->mBlockTypes, ChunkData->mMetaData,
+		IsLightValid ? ChunkData->mBlockLight : nullptr,
+		IsLightValid ? ChunkData->mSkyLight : nullptr,
 		nullptr, Biomes,
 		std::move(Entities), std::move(BlockEntities),
 		false

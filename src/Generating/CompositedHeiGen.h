@@ -32,13 +32,18 @@ public:
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override
 	{
-		cChunkDesc::Shape shape;
-		m_ShapeGen->GenShape(a_ChunkCoords, shape);
-		cChunkDesc desc(a_ChunkCoords);
-		m_BiomeGen->GenBiomes(a_ChunkCoords, desc.GetBiomeMap());  // Need to initialize biomes for the composition gen
-		desc.SetHeightFromShape(shape);
-		m_CompositionGen->ComposeTerrain(desc, shape);
-		memcpy(a_HeightMap, desc.GetHeightMap(), sizeof(a_HeightMap));
+		// Wrap the cChunkDesc::Shape into a struct so that we can make a unique_ptr out of it:
+		struct ShapeHelper
+		{
+			cChunkDesc::Shape mShape;
+		};
+		auto shape = std::make_unique<ShapeHelper>();
+		m_ShapeGen->GenShape(a_ChunkCoords, shape->mShape);
+		auto desc = std::make_unique<cChunkDesc>(a_ChunkCoords);
+		m_BiomeGen->GenBiomes(a_ChunkCoords, desc->GetBiomeMap());  // Need to initialize biomes for the composition gen
+		desc->SetHeightFromShape(shape->mShape);
+		m_CompositionGen->ComposeTerrain(*desc, shape->mShape);
+		memcpy(a_HeightMap, desc->GetHeightMap(), sizeof(a_HeightMap));
 	}
 
 protected:

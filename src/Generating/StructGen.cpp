@@ -20,7 +20,14 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	cChunkDesc WorkerDesc({ChunkX, ChunkZ});
+	// Wrap the cChunkDesc::Shape into a structure, so that we can make a unique_ptr out of it:
+	struct ShapeHelper
+	{
+		cChunkDesc::Shape mShape;
+	};
+
+	auto WorkerDesc = std::make_unique<cChunkDesc>(a_ChunkDesc.GetChunkCoords());
+	auto WorkerShape = std::make_unique<ShapeHelper>();
 
 	// Generate trees:
 	for (int x = 0; x <= 2; x++)
@@ -34,16 +41,12 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 
 			if ((x != 1) || (z != 1))
 			{
-				Dest = &WorkerDesc;
-				WorkerDesc.SetChunkCoords({BaseX, BaseZ});
-
-				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
-
-				cChunkDesc::Shape workerShape;
-				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc.GetBiomeMap());
-				m_ShapeGen->GenShape            ({BaseX, BaseZ}, workerShape);
-				WorkerDesc.SetHeightFromShape   (workerShape);
-				m_CompositionGen->ComposeTerrain(WorkerDesc, workerShape);
+				Dest = WorkerDesc.get();
+				WorkerDesc->SetChunkCoords({BaseX, BaseZ});
+				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc->GetBiomeMap());
+				m_ShapeGen->GenShape            ({BaseX, BaseZ}, WorkerShape->mShape);
+				WorkerDesc->SetHeightFromShape   (WorkerShape->mShape);
+				m_CompositionGen->ComposeTerrain(*WorkerDesc, WorkerShape->mShape);
 			}
 			else
 			{
