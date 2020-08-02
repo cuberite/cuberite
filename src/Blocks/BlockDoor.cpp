@@ -18,20 +18,25 @@ cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType):
 
 void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
 {
+	// A part of the multiblock door was broken; the relevant half will drop any pickups as required.
+	// All that is left to do is to delete the other half of the multiblock.
+
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
-		// Was upper part of door
-		if ((a_BlockPos.y > 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1))))
+		const auto Lower = a_BlockPos.addedY(-1);
+		if ((Lower.y >= 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(Lower)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(-1));
+			// Was upper part of door, remove lower:
+			a_ChunkInterface.SetBlock(Lower, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
-		// Was lower part
-		if ((a_BlockPos.y < cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(1))))
+		const auto Upper = a_BlockPos.addedY(1);
+		if ((Upper.y <= cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(Upper)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(1));
+			// Was lower part, remove upper:
+			a_ChunkInterface.SetBlock(Upper, E_BLOCK_AIR, 0);
 		}
 	}
 }
