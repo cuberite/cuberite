@@ -64,6 +64,7 @@ private:
 			}
 			case E_BLOCK_CROPS:
 			{
+				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
 				res.Add(E_ITEM_WHEAT);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_SEEDS, SeedCount);
@@ -71,17 +72,20 @@ private:
 			}
 			case E_BLOCK_CARROTS:
 			{
+				// https://minecraft.gamepedia.com/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
+				// https://minecraft.gamepedia.com/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
-					// With a 2% chance, drop a poisonous potato as well
+					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
+					// With a 2% chance, drop a poisonous potato as well:
 					res.Add(E_ITEM_POISONOUS_POTATO);
 				}
 				break;
@@ -131,8 +135,30 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
 
+
+
+
+
+private:
+
+	/**
+		Generate a random number using a binomial distribution
+		See https://minecraft.gamepedia.com/Fortune#Seeds
+	*/
+	int GenerateAmountSeedDrop(int a_Min, int a_Count, double a_Probability, MTRand &a_Rand)
+	{
+		int SeedCount = a_Min;
+		for (int i(0); i < a_Count; i++)
+		{
+			if (a_Rand.RandBool(a_Probability))
+			{
+				SeedCount++;
+			}
+		}
+		return SeedCount;
+	}
+} ;
 
 
 
