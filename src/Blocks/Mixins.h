@@ -425,7 +425,7 @@ class cYawRotatorFine:
 		East, EastSouthEast, SouthEast, SouthSouthEast,
 		South, SouthSouthWest, SouthWest, WestSouthWest,
 		West, WestNorthWest, NorthWest, NorthNorthWest, AssertIfNotMatched>;
-  public:
+public:
 
 	cYawRotatorFine(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
@@ -522,7 +522,7 @@ class cYawRotatorFine:
 		{
 			return SouthSouthEast
 		}
-		else // degrees jumping from 180 to -180
+		else  // degrees jumping from 180 to -180
 		{
 			return North
 		}
@@ -553,6 +553,112 @@ class cPitchYawRotator:
 public:
 
 	cPitchYawRotator(BLOCKTYPE a_BlockType):
+		Super(a_BlockType)
+	{
+	}
+
+
+
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
+	{
+		NIBBLETYPE BaseMeta;
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, BaseMeta))
+		{
+			return false;
+		}
+
+		a_BlockMeta = (BaseMeta & ~BitMask) |  PitchYawToMetaData(a_Player.GetYaw(), a_Player.GetPitch());
+		return true;
+	}
+
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case Down: return Up | OtherMeta;  // Down -> Up
+			case Up: return Down | OtherMeta;  // Up -> Down
+		}
+		// Not Facing Up or Down; No change.
+		return a_Meta;
+	}
+
+
+
+
+
+	/** Converts the rotation and pitch values as returned by cPlayer::GetYaw() and cPlayer::GetPitch()
+	respectively to the appropriate metadata value for a block placed by a player facing that way */
+	static NIBBLETYPE PitchYawToMetaData(double a_Rotation, double a_Pitch)
+	{
+		if (a_Pitch >= 50)
+		{
+			return Up;
+		}
+		else if (a_Pitch <= -50)
+		{
+			return Down;
+		}
+
+		return Super::YawToMetaData(a_Rotation);
+	}
+};
+
+
+
+
+/** Mixin for blocks whose meta on placement depends on the yaw of the player placing the block. BitMask
+selects the direction bits from the block's meta values. */
+template <class Base,
+	NIBBLETYPE BitMask = 0x0F,
+	NIBBLETYPE South = 0x00,
+	NIBBLETYPE SouthSouthWest = 0x01,
+	NIBBLETYPE SouthWest = 0x02,
+	NIBBLETYPE WestSouthWest = 0x03,
+	NIBBLETYPE West = 0x04,
+	NIBBLETYPE WestNorthWest = 0x05,
+	NIBBLETYPE NorthWest = 0x06,
+	NIBBLETYPE NorthNorthWest = 0x07,
+	NIBBLETYPE North = 0x08,
+	NIBBLETYPE NorthNorthEast = 0x09,
+	NIBBLETYPE NorthEast = 0x0a,
+	NIBBLETYPE EastNorthEast = 0x0b,
+	NIBBLETYPE East = 0x0c,
+	NIBBLETYPE EastSouthEast = 0x0d,
+	NIBBLETYPE SouthEast = 0x0e,
+	NIBBLETYPE SouthSouthEast = 0x0f,
+	NIBBLETYPE Up = 0x00,
+	NIBBLETYPE Down = 0x01
+>
+class cPitchYawRotatorFine:
+	public cYawRotatorFine<Base, BitMask,
+		North, NorthNorthEast, NorthEast, EastNorthEast,
+		East, EastSouthEast, SouthEast, SouthSouthEast,
+		South, SouthSouthWest, SouthWest, WestSouthWest,
+		West, WestNorthWest, NorthWest, NorthNorthWest>
+{
+	using Super = cYawRotatorFine<Base, BitMask,
+		North, NorthNorthEast, NorthEast, EastNorthEast,
+		East, EastSouthEast, SouthEast, SouthSouthEast,
+		South, SouthSouthWest, SouthWest, WestSouthWest,
+		West, WestNorthWest, NorthWest, NorthNorthWest>;
+
+public:
+
+	cPitchYawRotatorFine(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
 	{
 	}
