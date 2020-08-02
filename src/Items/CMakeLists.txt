@@ -5,6 +5,7 @@ target_sources(
 
 	ItemArmor.h
 	ItemAxe.h
+	ItemBanner.h
 	ItemBed.h
 	ItemBigFlower.h
 	ItemBoat.h

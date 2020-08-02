@@ -8,6 +8,7 @@ target_sources(
 	ChunkInterface.cpp
 
 	BlockAnvil.h
+	BlockBanner.h
 	BlockBed.h
 	BlockBigFlower.h
 	BlockBookShelf.h
