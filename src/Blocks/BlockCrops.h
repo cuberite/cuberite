@@ -3,6 +3,7 @@
 
 #include "BlockPlant.h"
 #include "../FastRandom.h"
+#include <iostream>
 
 
 
@@ -53,6 +54,13 @@ private:
 
 		// Fully grown, drop the crop's produce:
 		cItems res;
+		// Get current fortune level
+		int fortune = 0;
+		if (a_Tool)
+		{
+			fortune = a_Tool->m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchFortune);
+		}
+
 		switch (m_BlockType)
 		{
 			case E_BLOCK_BEETROOTS:
