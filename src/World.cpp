@@ -1792,6 +1792,15 @@ int cWorld::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 
 
 
+bool cWorld::IsFullGrownPlantAt(Vector3i a_BlockPos)
+{
+	return m_ChunkMap->IsFullGrownPlantAt(a_BlockPos);
+}
+
+
+
+
+
 bool cWorld::GrowRipePlant(Vector3i a_BlockPos)
 {
 	return (GrowPlantAt(a_BlockPos, 16) > 0);

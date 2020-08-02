@@ -978,6 +978,16 @@ int cChunk::GrowPlantAt(Vector3i a_RelPos, int a_NumStages)
 
 
 
+bool cChunk::IsFullGrownPlantAt(Vector3i a_RelPos)
+{
+	auto blockHandler = BlockHandler(GetBlock(a_RelPos));
+	return blockHandler->IsFullGrown(*this, a_RelPos);
+}
+
+
+
+
+
 bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	if (!cChunkDef::IsValidHeight(a_RelPos.y))

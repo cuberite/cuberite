@@ -351,6 +351,9 @@ public:
 	Returns the number of stages the plant has grown, 0 if not a plant. */
 	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
 
+	/** Check if the plant at the specified position is full grown */
+	bool IsFullGrownPlantAt(Vector3i a_BlockPos);
+
 	/** Causes the specified block to be ticked on the next Tick() call.
 	Plugins can use this via the cWorld:SetNextBlockToTick() API.
 	Only one block coord per chunk may be set, a second call overwrites the first call */

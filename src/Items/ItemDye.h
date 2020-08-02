@@ -128,13 +128,20 @@ public:
 
 			case E_BLOCK_BEETROOTS:
 			{
+				// Fix #4805
+				if (a_World.IsFullGrownPlantAt(a_BlockPos))
+				{
+					return false;
+				}
 				// 75% chance of 1-stage growth:
 				if (GetRandomProvider().RandBool(0.75))
 				{
-					if (a_World.GrowPlantAt(a_BlockPos, 1) > 0)
+					if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 					{
-						a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
+						// Fix #4805
+						return false;
 					}
+					a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
 				}
 				return true;
 			}  // case beetroots
@@ -150,7 +157,7 @@ public:
 					}
 				}
 				return true;
-			}
+			}  // case sapling
 
 			case E_BLOCK_BIG_FLOWER:
 			{

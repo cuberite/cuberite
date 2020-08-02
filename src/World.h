@@ -851,6 +851,9 @@ public:
 	Returns the number of stages the plant has grown, 0 if not a plant. */
 	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
 
+	/** Check if the plant at the specified position is full grown */
+	bool IsFullGrownPlantAt(Vector3i a_BlockPos);
+
 	/** Grows the plant at the specified block to its ripe stage.
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
 	bool GrowRipePlant(Vector3i a_BlockPos);
