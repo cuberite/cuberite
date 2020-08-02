@@ -41,7 +41,7 @@ class cBlockBannerHandler :
 {
 	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;
 
-  public:
+public:
 
 	cBlockBannerHandler(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
