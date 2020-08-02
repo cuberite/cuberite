@@ -464,67 +464,67 @@ public:
 	{
 		if ((a_Rotation >= - 11.25f) && (a_Rotation < 11.25f))
 		{
-			return South
+			return South;
 		}
 		else if ((a_Rotation >= 11.25f) && (a_Rotation < 33.75f))
 		{
-			return SouthSouthWest
+			return SouthSouthWest;
 		}
 		else if ((a_Rotation >= 23.75f) && (a_Rotation < 56.25f))
 		{
-			return SouthWest
+			return SouthWest;
 		}
 		else if ((a_Rotation >= 56.25f) && (a_Rotation < 78.75f))
 		{
-			return WestSouthWest
+			return WestSouthWest;
 		}
 		else if ((a_Rotation >= 78.75f) && (a_Rotation < 101.25f))
 		{
-			return West
+			return West;
 		}
 		else if ((a_Rotation >= 101.25f) && (a_Rotation < 123.75f))
 		{
-			return WestNorthWest
+			return WestNorthWest;
 		}
 		else if ((a_Rotation >= 123.75f) && (a_Rotation < 146.25f))
 		{
-			return NorthWest
+			return NorthWest;
 		}
 		else if ((a_Rotation >= 146.25f) && (a_Rotation < 168.75f))
 		{
-			return NorthNorthWest
+			return NorthNorthWest;
 		}
 		else if ((a_Rotation >= -168.75f) && (a_Rotation < -146.25f))
 		{
-			return NorthNorthEast
+			return NorthNorthEast;
 		}
 		else if ((a_Rotation >= -146.25f) && (a_Rotation < -123.75f))
 		{
-			return NorthEast
+			return NorthEast;
 		}
 		else if ((a_Rotation >= -123.75f) && (a_Rotation < -101.25f))
 		{
-			return EastNorthEast
+			return EastNorthEast;
 		}
 		else if ((a_Rotation >= -101.25) && (a_Rotation < -78.75f))
 		{
-			return East
+			return East;
 		}
 		else if ((a_Rotation >= -78.75) && (a_Rotation < -56.25f))
 		{
-			return EastSouthEast
+			return EastSouthEast;
 		}
 		else if ((a_Rotation >= -56.25f) && (a_Rotation < -33.75f))
 		{
-			return SouthEast
+			return SouthEast;
 		}
 		else if ((a_Rotation >= -33.75f) && (a_Rotation < -11.25f))
 		{
-			return SouthSouthEast
+			return SouthSouthEast;
 		}
 		else  // degrees jumping from 180 to -180
 		{
-			return North
+			return North;
 		}
 	}
 };
