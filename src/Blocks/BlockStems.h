@@ -25,14 +25,14 @@ private:
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		/**
-		 * Use correct percent:
-		 * https://minecraft.gamepedia.com/Melon_Seeds#Breaking
-		 * https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
-		 * Good new: Melon & Pumpkin have same random values !
-		 */
+			Use correct percent:
+			https://minecraft.gamepedia.com/Melon_Seeds#Breaking
+			https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
+			Good new: Melon & Pumpkin have same random values !
+		*/
 
 		// Age > 7 (Impossible)
-		if (a_BlockMeta > 7 || a_BlockMeta < 0)
+		if ((a_BlockMeta > 7) || (a_BlockMeta < 0))
 		{
 			return cItem(StemPickupType, 1, 0);
 		}
@@ -43,9 +43,11 @@ private:
 		int count = 0;
 		for (; count < 3; count++)
 		{
-			max += vals[a_BlockMeta][count];
+			max += Vals[a_BlockMeta][count];
 			if (max > randomValue)
+			{
 				break;
+			}
 		}
 		return cItem(StemPickupType, count, 0);
 	}
@@ -176,10 +178,13 @@ private:
 		return false;
 	}
 
+
+
+
 private:
 	// https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
 	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
-	float vals[8][3] =
+	float Vals[8][3] =
 	{
 		{
 			81.3, 17.42, 1.24
