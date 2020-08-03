@@ -10,6 +10,7 @@
 #include "../Entities/ProjectileEntity.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Items/ItemSpawnEgg.h"
+#include "../Items/ItemDye.h"
 
 
 
@@ -211,7 +212,8 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 				DropFromSlot(a_Chunk, a_SlotNum);
 				break;
 			}
-			if (m_World->GrowRipePlant(dispAbsCoord.x, dispAbsCoord.y, dispAbsCoord.z, true))
+			// Simulate a right-click with bonemeal
+			if (cItemDyeHandler::FertilizePlant(*m_World, {dispAbsCoord.x, dispAbsCoord.y, dispAbsCoord.z}))
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
