@@ -2343,6 +2343,23 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
 			},
+			IsFullGrownPlantAt =
+			{
+				Params =
+				{
+					{
+						Name = "BlockPos",
+						Type = "Vector3i",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns whether the plant at specific position is full grown. If block at specific position is not a plant, return true.",
+			},
 			IsGameModeAdventure =
 			{
 				Returns =
