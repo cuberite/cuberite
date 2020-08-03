@@ -42,6 +42,7 @@ Implements the 1.8 protocol classes:
 #include "../UI/Window.h"
 #include "../UI/HorseWindow.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
@@ -1531,12 +1532,14 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
-		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
-		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
-		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
-		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
+		case E_BLOCK_MOB_SPAWNER:     Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:   Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:          Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:            Action = 4; break;  // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:      Action = 5; break;  // Update flower pot
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER: Action = 6; break;  // Update Banner
+		case E_BLOCK_BED:             Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
@@ -3448,6 +3451,30 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			Writer.AddString("id", "MobSpawner");
 			break;
+		}
+
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER:
+		{
+			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BannerEntity.GetPosX());
+			Writer.AddInt("y", BannerEntity.GetPosY());
+			Writer.AddInt("z", BannerEntity.GetPosZ());
+			Writer.AddString("id", "Banner");
+			if (BannerEntity.HasPatterns())
+			{
+				cFastNBTWriter PatternWriter;
+				auto PatternContainer = BannerEntity.GetPatternContainer();
+				for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
+				{
+					auto Pattern = PatternContainer->GetPattern(i);
+					PatternWriter.AddString("Pattern", cBannerPattern::GetPatternTag(Pattern->GetPattern()));
+					PatternWriter.AddShort("Color", Pattern->GetPatternColor());
+				}
+				PatternWriter.Finish();
+				Writer.AddByteArray("Patterns", PatternWriter.GetResult().data(), Writer.GetResult().size());
+			}
+			Writer.AddInt("Base", BannerEntity.GetBaseColor());
 		}
 
 		default:

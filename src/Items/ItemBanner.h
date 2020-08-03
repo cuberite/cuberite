@@ -14,7 +14,7 @@ class cItemBannerHandler: public cItemHandler
 {
 	using Super = cItemHandler;
 
-  public:
+public:
 
 	cItemBannerHandler(int a_ItemType): Super(a_ItemType)
 	{
@@ -46,8 +46,8 @@ class cItemBannerHandler: public cItemHandler
 		/*
 			may have 16 colors
 			can be placed in item frame - just shows the item model
-			If renamed retains its name on adding/removing pattern
-			keeps its name on building/breaking
+			If renamed retains its name on adding and removing pattern
+			keeps its name on building and breaking
 
 			Banners can be copied using blank banner
 			may be crated together with shield to display the banner
