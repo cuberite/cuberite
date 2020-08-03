@@ -62,18 +62,53 @@ public:
 		// Placing on the floor
 		else if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
-			/*
-			NIBBLETYPE BlockMeta = cBlockBannerHandler::YawToMetaData(a_Player.GetYaw());
+
+			NIBBLETYPE BlockMeta = 0x00;
+			double Rotation = a_Player.GetYaw();
+			if ((Rotation >= -135) && (Rotation < -45))
+			{
+				BlockMeta |= 0x00;
+			}
+			else if ((Rotation >= -45) && (Rotation < 45))
+			{
+				BlockMeta |= 0x04;
+			}
+			else if ((Rotation >= 45) && (Rotation < 135))
+			{
+				BlockMeta |= 0x08;
+			}
+			else  // degrees jumping from 180 to -180
+			{
+				BlockMeta |= 0x0ab;
+			}
 			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_STANDING_BANNER, BlockMeta);
-			*/
 		}
 		// placing on the sides
+		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
+		{
+			NIBBLETYPE BlockMeta = 0x00;
+			double Rotation = a_Player.GetYaw();
+			if ((Rotation >= -135) && (Rotation < -45))
+			{
+				BlockMeta |= 0x00;
+			}
+			else if ((Rotation >= -45) && (Rotation < 45))
+			{
+				BlockMeta |= 0x04;
+			}
+			else if ((Rotation >= 45) && (Rotation < 135))
+			{
+				BlockMeta |= 0x08;
+			}
+			else  // degrees jumping from 180 to -180
+			{
+				BlockMeta |= 0x0ab;
+			}
+			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_WALL_BANNER, BlockMeta);
+		}
 		else
 		{
-			/*
-			NIBBLETYPE BlockMeta = cBlockBannerHandler::YawToMetaData(a_Player.GetYaw());
-			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_WALL_BANNER, BlockMeta);
-			*/
+			return false;
 		}
 		return true;
 	}

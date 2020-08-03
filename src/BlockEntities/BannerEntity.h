@@ -134,4 +134,6 @@ public:
 protected:
 	cBannerPattern m_Patterns[16];
 	short m_PatternCount = 0;
+
+	friend class cBannerEntity;
 };

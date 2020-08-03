@@ -13,6 +13,7 @@
 #include "Server.h"
 #include "zlib/zlib.h"
 #include "Defines.h"
+#include "BlockEntities/BannerEntity.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/BedEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"

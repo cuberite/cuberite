@@ -42,6 +42,12 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBannerEntity &>(a_Src);
 	m_BaseColor = src.m_BaseColor;
+	m_PatternContainer = new cBannerPatternContainer();
+	m_PatternContainer->m_PatternCount = src.m_PatternContainer->m_PatternCount;
+	for (auto i = 0; i < m_PatternContainer->GetPatternCount(); i++)
+	{
+		m_PatternContainer->m_Patterns[i] = src.m_PatternContainer->m_Patterns[i];
+	}
 	// Todo: properly copy
 }
 
@@ -51,6 +57,8 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 
 void cBannerEntity::SendTo(cClientHandle & a_Client)
 {
+	cWorld * World = a_Client.GetPlayer()->GetWorld();
+	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, World->GetBlockMeta(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 
@@ -164,6 +172,7 @@ const char * cBannerPattern::GetPatternTag(BannerPattern a_Pattern)
 		case BannerPattern::Mojang: return "moj";
 		case BannerPattern::Globe: return "glb";
 		case BannerPattern::Piglin: return "pig";
+		default: return "";
 	}
 }
 

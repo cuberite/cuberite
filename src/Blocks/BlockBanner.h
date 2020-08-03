@@ -7,6 +7,8 @@
 #include "Mixins.h"
 #include "ChunkInterface.h"
 
+#include "../BlockEntities/BannerEntity.h"
+
 
 class cEntity;
 class cPlayer;
@@ -19,6 +21,7 @@ class cWorldInterface;
 	water and lava flow around banners (water goes through the bottom part if placed onto a wall)
 	lava can spawn fire blocks next to the banner but doesn't burn the banner
 	cannot be moved by pistons
+	breaks if block below is broken
 
 	sounds:
 		Description                            |sound             | Volume | Pitch |dist
@@ -37,14 +40,14 @@ class cWorldInterface;
 
 
 class cBlockBannerHandler :
-	public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
+	public cBlockEntityHandler
 {
-	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;
+	using Entity = cBlockEntityHandler;
 
 public:
 
 	cBlockBannerHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+		Entity(a_BlockType)
 	{
 	}
 
@@ -52,31 +55,33 @@ public:
 
 
 
-	// Overrides:
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		const Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override;
-
-	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override;
-
 	virtual cItems ConvertToPickups(
 		NIBBLETYPE a_BlockMeta,
 		cBlockEntity * a_BlockEntity,
 		const cEntity * a_Digger,
 		const cItem * a_Tool
-	) override;
+	) override
+	{
+		if ((a_BlockEntity == nullptr) || (a_BlockEntity->GetBlockType() != E_BLOCK_STANDING_BANNER) ||(a_BlockEntity->GetBlockType() != E_BLOCK_WALL_BANNER))
+		{
+			return {};
+		}
+		// transfer cBannerPatternContainer back to the item
+		auto BannerEntity = static_cast<cBannerEntity *>(a_BlockEntity);
+
+		return cItem(E_ITEM_BANNER, 1, a_BlockMeta);
+	}
+
+
+
+
 
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
 		const sSetBlock & a_BlockChange
-	) override;
+	) override
+	{
+	}
 
 
 
@@ -85,10 +90,7 @@ public:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
-		return 28;
+		// Todo: find out which color is which
+		return 0;
 	}
 } ;
-
-
-
-
