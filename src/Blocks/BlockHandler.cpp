@@ -6,6 +6,7 @@
 #include "../Chunk.h"
 #include "BlockPluginInterface.h"
 #include "BlockAnvil.h"
+#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -356,6 +357,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:            return new cBlockStairsHandler            (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:                 return new cBlockGlassHandler             (a_BlockType);
 		case E_BLOCK_STAINED_GLASS_PANE:            return new cBlockGlassHandler             (a_BlockType);
+		case E_BLOCK_STANDING_BANNER:               return new cBlockBannerHandler            (a_BlockType);
 		case E_BLOCK_STATIONARY_LAVA:               return new cBlockLavaHandler              (a_BlockType);
 		case E_BLOCK_STATIONARY_WATER:              return new cBlockFluidHandler             (a_BlockType);
 		case E_BLOCK_STICKY_PISTON:                 return new cBlockPistonHandler            (a_BlockType);
@@ -373,6 +375,7 @@ static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TRIPWIRE:                      return new cBlockTripwireHandler          (a_BlockType);
 		case E_BLOCK_TRIPWIRE_HOOK:                 return new cBlockTripwireHookHandler      (a_BlockType);
 		case E_BLOCK_VINES:                         return new cBlockVineHandler              (a_BlockType);
+		case E_BLOCK_WALL_BANNER:                   return new cBlockBannerHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:                      return new cBlockWallSignHandler          (a_BlockType);
 		case E_BLOCK_WATER:                         return new cBlockFluidHandler             (a_BlockType);
 		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:       return new cBlockGlazedTerracottaHandler  (a_BlockType);

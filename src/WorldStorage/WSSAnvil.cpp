@@ -18,6 +18,7 @@
 #include "../BlockType.h"
 #include "../JsonUtils.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -638,6 +639,8 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 	switch (a_BlockType)
 	{
 		// Specific entity loaders:
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:   return LoadBannerFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_BEACON:        return LoadBeaconFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_BED:           return LoadBedFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_BREWING_STAND: return LoadBrewingstandFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
@@ -885,6 +888,49 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 		a_Pos
 	);
 	return false;
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});
+	if(!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+	LOG("Found Banner");
+	auto Banner = std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+
+	// Reads custom name from NBT
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "id");
+	if (CurrentLine >= 0)
+	{
+		auto id = a_NBT.GetString(CurrentLine);
+		Banner->SetId(id);
+	}
+
+	// Reads patterns from NBT
+	int Pattern = a_NBT.FindChildByName(a_TagIdx, "Pattern");
+	if ((Pattern >= 0) && (a_NBT.GetType(Pattern) == TAG_List))
+	{
+		for (int Child = a_NBT.GetFirstChild(Pattern); Child != -1; Child = a_NBT.GetNextSibling(Child))
+		{
+			// LOG(a_NBT.GetString(Child));
+		}
+	}
+
+	// Reads base color from NBT
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
+	if (CurrentLine >= 0)
+	{
+		auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		Banner->SetBaseColor(Color);
+	}
+
+	return std::move(Banner);
 }
 
 

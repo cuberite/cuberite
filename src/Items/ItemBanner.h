@@ -4,7 +4,8 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Blocks/BlockBanner.h"
+// #include "../Blocks/BlockBanner.h"
+#include "../BlockEntities/BannerEntity.h"
 
 
 
@@ -44,7 +45,6 @@ public:
 	) override
 	{
 		/*
-			may have 16 colors
 			can be placed in item frame - just shows the item model
 			If renamed retains its name on adding and removing pattern
 			keeps its name on building and breaking
@@ -56,101 +56,95 @@ public:
 		*/
 
 		NIBBLETYPE BlockMeta = 0x00;
-		LOG(std::to_string(a_EquippedItem.m_ItemDamage));
 		double Rotation = a_Player.GetYaw();
-		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
-		{
-			return false;
-		}
 		// Placing on the floor
-		else if (a_ClickedBlockFace == BLOCK_FACE_TOP)
+		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
 			if ((Rotation >= - 11.25f) && (Rotation < 11.25f))
 			{
 				// South
-				BlockMeta |= 0x00;
+				BlockMeta |= 0x08;
 			}
 			else if ((Rotation >= 11.25f) && (Rotation < 33.75f))
 			{
 				// SouthSouthWest
-				BlockMeta |= 0x01;
+				BlockMeta |= 0x09;
 			}
 			else if ((Rotation >= 23.75f) && (Rotation < 56.25f))
 			{
 				// SouthWest
-				BlockMeta |= 0x02;
+				BlockMeta |= 0x0a;
 			}
 			else if ((Rotation >= 56.25f) && (Rotation < 78.75f))
 			{
 				// WestSouthWest
-				BlockMeta |= 0x03;
+				BlockMeta |= 0x0b;
 			}
 			else if ((Rotation >= 78.75f) && (Rotation < 101.25f))
 			{
 				// West
-				BlockMeta |= 0x04;
+				BlockMeta |= 0x0c;
 			}
 			else if ((Rotation >= 101.25f) && (Rotation < 123.75f))
 			{
 				// WestNorthWest
-				BlockMeta |= 0x05;
+				BlockMeta |= 0x0d;
 			}
 			else if ((Rotation >= 123.75f) && (Rotation < 146.25f))
 			{
 				// NorthWest
-				BlockMeta |= 0x06;
+				BlockMeta |= 0x0e;
 			}
 			else if ((Rotation >= 146.25f) && (Rotation < 168.75f))
 			{
 				// NorthNorthWest
-				BlockMeta |= 0x07;
+				BlockMeta |= 0x0f;
 			}
 			else if ((Rotation >= -168.75f) && (Rotation < -146.25f))
 			{
 				// NorthNorthEast
-				BlockMeta |= 0x09;
+				BlockMeta |= 0x01;
 			}
 			else if ((Rotation >= -146.25f) && (Rotation < -123.75f))
 			{
 				// NorthEast
-				BlockMeta |= 0x0a;
+				BlockMeta |= 0x02;
 			}
 			else if ((Rotation >= -123.75f) && (Rotation < -101.25f))
 			{
 				// EastNorthEast
-				BlockMeta |= 0x0b;
+				BlockMeta |= 0x03;
 			}
 			else if ((Rotation >= -101.25) && (Rotation < -78.75f))
 			{
 				// East
-				BlockMeta |= 0x0c;
+				BlockMeta |= 0x04;
 			}
 			else if ((Rotation >= -78.75) && (Rotation < -56.25f))
 			{
 				// EastSouthEast
-				BlockMeta |= 0x0d;
+				BlockMeta |= 0x05;
 			}
 			else if ((Rotation >= -56.25f) && (Rotation < -33.75f))
 			{
 				// SouthEast
-				BlockMeta |= 0x0e;
+				BlockMeta |= 0x06;
 			}
 			else if ((Rotation >= -33.75f) && (Rotation < -11.25f))
 			{
 				// SouthSouthEast
-				BlockMeta |= 0x0f;
+				BlockMeta |= 0x07;
 			}
 			else  // degrees jumping from 180 to -180
 			{
 				// North
-				BlockMeta |= 0x08;
+				BlockMeta |= 0x00;
 			}
 			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_STANDING_BANNER, BlockMeta);
 		}
 		// placing on the sides
 		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			NIBBLETYPE BlockMeta = 0x00;
 			if ((Rotation >= -135) && (Rotation < -45))
 			{
 				BlockMeta |= 0x00;
@@ -173,6 +167,52 @@ public:
 		{
 			return false;
 		}
+		LOG("Placing Banner at %d %d %d", a_PlacedBlockPos.x, a_PlacedBlockPos.y, a_PlacedBlockPos.z);
+		return true;
+	}
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) override
+	{
+		// Cannot place a banner at "no face" and from the bottom:
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
+		{
+			return true;
+		}
+
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		{
+			return false;
+		}
+		return PlaceBannerEntity(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos);
+	}
+	/** Tries to place a Banner BlockEntity to  */
+	bool PlaceBannerEntity(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		Vector3i a_PlacePos
+		)
+	{
+		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
+		a_World.DoWithBlockEntityAt(a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z, [&](cBlockEntity & a_BlockEntity)
+			{
+				LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
+				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
+				{
+					return false;
+				}
+				auto & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
+
+				BannerEntity.SetBaseColor(static_cast<unsigned char>(a_EquippedItem.m_ItemDamage));
+				BannerEntity.GetWorld()->BroadcastBlockEntity(BannerEntity.GetPos());
+				return true;
+			}
+		);
 		return true;
 	}
 };

@@ -382,18 +382,20 @@ public:
 			AddBasicTileEntity(a_Entity,"Banner");
 			if (a_Entity->HasPatterns())
 			{
-				cFastNBTWriter PatternWriter;
-				auto PatternContainer = a_Entity->GetPatternContainer();
-				for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
-				{
-					auto Pattern = PatternContainer->GetPattern(i);
-					PatternWriter.AddString("Pattern", cBannerPattern::GetPatternTag(Pattern->GetPattern()));
-					PatternWriter.AddShort("Color", Pattern->GetPatternColor());
-				}
-				PatternWriter.Finish();
-				mWriter.AddByteArray("Patterns", PatternWriter.GetResult().data(), PatternWriter.GetResult().size());
+				mWriter.BeginList("Patterns", TAG_Compound);
+					auto PatternContainer = a_Entity->GetPatternContainer();
+					for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
+					{
+						mWriter.BeginCompound(std::to_string(i));
+						auto Pattern = PatternContainer->GetPattern(i);
+						mWriter.AddString("Pattern", cBannerPattern::GetPatternTag(Pattern->GetPattern()));
+						mWriter.AddByte("Color", Pattern->GetPatternColor());
+						mWriter.EndCompound();
+					}
+				mWriter.EndList();
 			}
-			mWriter.AddInt("Base", a_Entity->GetBaseColor());
+			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+		mWriter.EndCompound();
 	}
 
 

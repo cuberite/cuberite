@@ -42,12 +42,12 @@ class cWorldInterface;
 class cBlockBannerHandler :
 	public cBlockEntityHandler
 {
-	using Entity = cBlockEntityHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 
 	cBlockBannerHandler(BLOCKTYPE a_BlockType):
-		Entity(a_BlockType)
+		Super(a_BlockType)
 	{
 	}
 

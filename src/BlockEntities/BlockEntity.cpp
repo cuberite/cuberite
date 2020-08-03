@@ -99,8 +99,8 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETY
 		case E_BLOCK_SIGN_POST:       return std::make_unique<cSignEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_STANDING_BANNER: return std::make_unique<cBannerEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_TRAPPED_CHEST:   return std::make_unique<cChestEntity       >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_WALLSIGN:        return std::make_unique<cSignEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_WALL_BANNER:     return std::make_unique<cBannerEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_WALLSIGN:        return std::make_unique<cSignEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		default:
 		{
 			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",

@@ -66,6 +66,25 @@ void cBannerEntity::SendTo(cClientHandle & a_Client)
 
 
 
+void cBannerEntity::SetBaseColor(unsigned char a_Color)
+{
+	m_BaseColor = a_Color;
+	LOG("Setting to color: %s",std::to_string(a_Color));
+}
+
+
+
+
+
+void cBannerEntity::SetId(AString a_Id)
+{
+	m_Id = a_Id;
+}
+
+
+
+
+
 bool cBannerEntity::HasPatterns() const
 {
 	return m_PatternContainer->HasPatterns();
@@ -84,7 +103,7 @@ const cBannerPatternContainer * cBannerEntity::GetPatternContainer() const
 
 
 
-short cBannerEntity::GetBaseColor() const
+unsigned char cBannerEntity::GetBaseColor() const
 {
 	return m_BaseColor;
 }
