@@ -11,6 +11,7 @@
 #include "../UUID.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -207,6 +208,8 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
+			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_WALL_BANNER:   AddBannerEntity      (static_cast<cBannerEntity *>      (a_Entity)); break;
 			case E_BLOCK_BEACON:        AddBeaconEntity      (static_cast<cBeaconEntity *>      (a_Entity)); break;
 			case E_BLOCK_BED:           AddBedEntity         (static_cast<cBedEntity *>         (a_Entity)); break;
 			case E_BLOCK_BREWING_STAND: AddBrewingstandEntity(static_cast<cBrewingstandEntity *>(a_Entity)); break;
@@ -367,6 +370,30 @@ public:
 		mWriter.AddInt   ("y",  a_Entity->GetPosY());
 		mWriter.AddInt   ("z",  a_Entity->GetPosZ());
 		mWriter.AddString("id", a_EntityTypeID);
+	}
+
+
+
+
+
+	void AddBannerEntity(cBannerEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity,"Banner");
+			if (a_Entity->HasPatterns())
+			{
+				cFastNBTWriter PatternWriter;
+				auto PatternContainer = a_Entity->GetPatternContainer();
+				for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
+				{
+					auto Pattern = PatternContainer->GetPattern(i);
+					PatternWriter.AddString("Pattern", cBannerPattern::GetPatternTag(Pattern->GetPattern()));
+					PatternWriter.AddShort("Color", Pattern->GetPatternColor());
+				}
+				PatternWriter.Finish();
+				mWriter.AddByteArray("Patterns", PatternWriter.GetResult().data(), PatternWriter.GetResult().size());
+			}
+			mWriter.AddInt("Base", a_Entity->GetBaseColor());
 	}
 
 

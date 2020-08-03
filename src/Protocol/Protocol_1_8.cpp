@@ -3472,7 +3472,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 					PatternWriter.AddShort("Color", Pattern->GetPatternColor());
 				}
 				PatternWriter.Finish();
-				Writer.AddByteArray("Patterns", PatternWriter.GetResult().data(), Writer.GetResult().size());
+				Writer.AddByteArray("Patterns", PatternWriter.GetResult().data(), PatternWriter.GetResult().size());
 			}
 			Writer.AddInt("Base", BannerEntity.GetBaseColor());
 		}
