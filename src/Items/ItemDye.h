@@ -151,11 +151,9 @@ public:
 				// 45% chance of growing to the next stage / full tree:
 				if (GetRandomProvider().RandBool(0.45))
 				{
-					if (a_World.GrowPlantAt(a_BlockPos, 1) > 0)
-					{
-						a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
-					}
+					a_World.GrowPlantAt(a_BlockPos, 1);
 				}
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
 				return true;
 			}  // case sapling
 
