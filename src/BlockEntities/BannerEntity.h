@@ -15,7 +15,7 @@
 #include "../Defines.h"
 
 
-enum class BannerPattern
+enum class eBannerPattern
 {
 	BottomStripe,
 	TopStripe,
@@ -56,7 +56,8 @@ enum class BannerPattern
 	Flower,
 	Mojang,
 	Globe,
-	Piglin
+	Piglin,
+	None
 };
 
 class cBannerPatternContainer;
@@ -94,7 +95,7 @@ public:  // tolua_export
 
 protected:
 
-	unsigned char m_BaseColor = 1;
+	short m_BaseColor = 1;
 	AString * m_Id;
 	cBannerPatternContainer * m_PatternContainer;
 
@@ -103,20 +104,10 @@ protected:
 
 
 
-/** class representing a Pattern */
-class cBannerPattern
+/** struct representing a Pattern */
+struct BannerPattern
 {
-public:
-	cBannerPattern();
-	cBannerPattern(BannerPattern a_Pattern, short a_Color);
-
-	const BannerPattern GetPattern() const;
-	const short GetPatternColor() const;
-
-	static const char * GetPatternTag(BannerPattern a_Pattern);
-
-private:
-	BannerPattern m_Pattern;
+	eBannerPattern m_Pattern;
 	short m_Color;
 };
 
@@ -130,15 +121,17 @@ class cBannerPatternContainer
 public:
 	cBannerPatternContainer();
 
-	bool AddPattern(cBannerPattern a_Pattern, bool a_ByCommand);
+	bool AddPattern(BannerPattern & a_Pattern, bool a_ByCommand = false);
 	bool HasPatterns() const;
 	const short GetPatternCount() const;
-	const cBannerPattern * GetPattern(short a_Pattern) const;
+	const BannerPattern * GetPattern(short a_Pattern) const;
 
 	void ClearAll();
 
+	static const char * cBannerPatternContainer::GetPatternTag(eBannerPattern a_Pattern);
+
 protected:
-	cBannerPattern m_Patterns[16];
+	BannerPattern m_Patterns[16];
 	short m_PatternCount = 0;
 
 	friend class cBannerEntity;

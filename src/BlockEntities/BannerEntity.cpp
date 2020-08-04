@@ -110,93 +110,6 @@ unsigned char cBannerEntity::GetBaseColor() const
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cBannerPattern
-
-
-cBannerPattern::cBannerPattern() {}
-
-
-
-
-
-cBannerPattern::cBannerPattern(BannerPattern a_Pattern, short a_Color)
-{
-	m_Pattern = a_Pattern;
-	m_Color = a_Color;
-}
-
-
-
-
-
-const BannerPattern cBannerPattern::GetPattern() const
-{
-	return m_Pattern;
-}
-
-
-
-
-
-const short cBannerPattern::GetPatternColor() const
-{
-	return m_Color;
-}
-
-
-
-
-
-const char * cBannerPattern::GetPatternTag(BannerPattern a_Pattern)
-{
-	switch (a_Pattern)
-	{
-		case BannerPattern::BottomStripe: return "bs";
-		case BannerPattern::TopStripe: return "ts";
-		case BannerPattern::LeftStripe: return "ls";
-		case BannerPattern::RightStripe: return "rs";
-		case BannerPattern::CenterStripeVertical: return "cs";
-		case BannerPattern::MiddleStripeHorizontal: return "ms";
-		case BannerPattern::DownRightStripe: return "drs";
-		case BannerPattern::DownLeftStripe: return "dls";
-		case BannerPattern::SmallVerticalStripes: return "ss";
-		case BannerPattern::DiagonalCross: return "cr";
-		case BannerPattern::SquareCross: return "sc";
-		case BannerPattern::LeftOfDiagonal: return "ld";
-		case BannerPattern::RightOfUpsideDownDiagonal: return "rud";
-		case BannerPattern::LeftOfUpsideDownDiagonal: return "lud";
-		case BannerPattern::RightOfDiagonal: return "rd";
-		case BannerPattern::VerticalHalfLeft: return "vh";
-		case BannerPattern::VerticalHalfRight: return "vhr";
-		case BannerPattern::HorizontalHalfTop: return "hh";
-		case BannerPattern::HorizontalHalfBottom: return "hhb";
-		case BannerPattern::BottomLeftCorner: return "bl";
-		case BannerPattern::BottomRightCorner: return "br";
-		case BannerPattern::TopLeftCorner: return "tl";
-		case BannerPattern::TopRightCorner: return "tr";
-		case BannerPattern::BottomTriangle: return "bt";
-		case BannerPattern::TopTriangle: return "tt";
-		case BannerPattern::BottomTriangleSawtooth: return "bts";
-		case BannerPattern::TopTriangleSawtooth: return "tts";
-		case BannerPattern::MiddleCircle: return "mc";
-		case BannerPattern::MiddleRhombus: return "mr";
-		case BannerPattern::Border: return "bo";
-		case BannerPattern::CurlyBorder: return "cbo";
-		case BannerPattern::Brick: return "bri";
-		case BannerPattern::Gradient: return "gra";
-		case BannerPattern::GradientUpsideDown: return "gru";
-		case BannerPattern::Creeper: return "cre";
-		case BannerPattern::Skull: return "sku";
-		case BannerPattern::Flower: return "flo";
-		case BannerPattern::Mojang: return "moj";
-		case BannerPattern::Globe: return "glb";
-		case BannerPattern::Piglin: return "pig";
-		default: return "";
-	}
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cBannerPatternContainer
 
 
@@ -206,7 +119,7 @@ cBannerPatternContainer::cBannerPatternContainer() {}
 
 
 
-bool cBannerPatternContainer::AddPattern(cBannerPattern a_Pattern, bool a_ByCommand)
+bool cBannerPatternContainer::AddPattern(BannerPattern & a_Pattern, bool a_ByCommand)
 {
 	// check if there is space for another pattern - with crating max is 6 and by command 16
 	if (((a_ByCommand) && (m_PatternCount == 16)) || ((!a_ByCommand) && (m_PatternCount == 6)))
@@ -240,7 +153,7 @@ const short cBannerPatternContainer::GetPatternCount() const
 
 
 
-const cBannerPattern * cBannerPatternContainer::GetPattern(short a_Pattern) const
+const BannerPattern * cBannerPatternContainer::GetPattern(short a_Pattern) const
 {
 	return & m_Patterns[a_Pattern];
 }
@@ -254,6 +167,58 @@ void cBannerPatternContainer::ClearAll()
 	// only clean the used ones
 	for (short i = 0; i < m_PatternCount; i++)
 	{
-		m_Patterns[i] = cBannerPattern();
+		m_Patterns[i] = {};
+	}
+}
+
+
+
+
+
+const char * cBannerPatternContainer::GetPatternTag(eBannerPattern a_Pattern)
+{
+	switch (a_Pattern)
+	{
+		case eBannerPattern::BottomStripe: return "bs";
+		case eBannerPattern::TopStripe: return "ts";
+		case eBannerPattern::LeftStripe: return "ls";
+		case eBannerPattern::RightStripe: return "rs";
+		case eBannerPattern::CenterStripeVertical: return "cs";
+		case eBannerPattern::MiddleStripeHorizontal: return "ms";
+		case eBannerPattern::DownRightStripe: return "drs";
+		case eBannerPattern::DownLeftStripe: return "dls";
+		case eBannerPattern::SmallVerticalStripes: return "ss";
+		case eBannerPattern::DiagonalCross: return "cr";
+		case eBannerPattern::SquareCross: return "sc";
+		case eBannerPattern::LeftOfDiagonal: return "ld";
+		case eBannerPattern::RightOfUpsideDownDiagonal: return "rud";
+		case eBannerPattern::LeftOfUpsideDownDiagonal: return "lud";
+		case eBannerPattern::RightOfDiagonal: return "rd";
+		case eBannerPattern::VerticalHalfLeft: return "vh";
+		case eBannerPattern::VerticalHalfRight: return "vhr";
+		case eBannerPattern::HorizontalHalfTop: return "hh";
+		case eBannerPattern::HorizontalHalfBottom: return "hhb";
+		case eBannerPattern::BottomLeftCorner: return "bl";
+		case eBannerPattern::BottomRightCorner: return "br";
+		case eBannerPattern::TopLeftCorner: return "tl";
+		case eBannerPattern::TopRightCorner: return "tr";
+		case eBannerPattern::BottomTriangle: return "bt";
+		case eBannerPattern::TopTriangle: return "tt";
+		case eBannerPattern::BottomTriangleSawtooth: return "bts";
+		case eBannerPattern::TopTriangleSawtooth: return "tts";
+		case eBannerPattern::MiddleCircle: return "mc";
+		case eBannerPattern::MiddleRhombus: return "mr";
+		case eBannerPattern::Border: return "bo";
+		case eBannerPattern::CurlyBorder: return "cbo";
+		case eBannerPattern::Brick: return "bri";
+		case eBannerPattern::Gradient: return "gra";
+		case eBannerPattern::GradientUpsideDown: return "gru";
+		case eBannerPattern::Creeper: return "cre";
+		case eBannerPattern::Skull: return "sku";
+		case eBannerPattern::Flower: return "flo";
+		case eBannerPattern::Mojang: return "moj";
+		case eBannerPattern::Globe: return "glb";
+		case eBannerPattern::Piglin: return "pig";
+		default: return "";
 	}
 }

@@ -47,7 +47,6 @@ public:
 		sSetBlockVector & a_BlocksToPlace
 	) override
 	{
-		LOG("Get Blocks To Place");
 		/*
 			can be placed in item frame - just shows the item model
 			If renamed retains its name on adding and removing pattern
@@ -61,6 +60,7 @@ public:
 
 		NIBBLETYPE BlockMeta = 0x00;
 		double Rotation = a_Player.GetYaw();
+		LOG(std::to_string(a_ClickedBlockFace));
 		// Placing on the floor
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
@@ -149,31 +149,36 @@ public:
 		// placing on the sides
 		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			if ((Rotation >= -135) && (Rotation < -45))
+			LOG("Viewing direction %d", a_ClickedBlockFace);
+			if (a_ClickedBlockFace == BLOCK_FACE_EAST)
 			{
-				BlockMeta |= 0x00;
+				BlockMeta |= 0x05;
 			}
-			else if ((Rotation >= -45) && (Rotation < 45))
+			else if (a_ClickedBlockFace == BLOCK_FACE_WEST)
 			{
 				BlockMeta |= 0x04;
 			}
-			else if ((Rotation >= 45) && (Rotation < 135))
+			else if (a_ClickedBlockFace == BLOCK_FACE_NORTH)
 			{
-				BlockMeta |= 0x08;
+				BlockMeta |= 0x02;
 			}
 			else  // degrees jumping from 180 to -180
 			{
-				BlockMeta |= 0x0ab;
+				BlockMeta |= 0x03;
 			}
+			LOG(std::to_string(BlockMeta));
 			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_WALL_BANNER, BlockMeta);
 		}
 		else
 		{
 			return false;
 		}
-		LOG("Placing Banner at %d %d %d", a_PlacedBlockPos.x, a_PlacedBlockPos.y, a_PlacedBlockPos.z);
 		return true;
 	}
+
+
+
+
 
 	virtual bool OnPlayerPlace(
 		cWorld & a_World,
@@ -189,7 +194,7 @@ public:
 		{
 			return true;
 		}
-		if(!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_ClickedBlockPos))
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_ClickedBlockPos))
 		{
 			return false;
 		}
@@ -201,8 +206,6 @@ public:
 		bool IsReplacingClickedBlock = BlockHandler(ClickedBlockType)->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
 		auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
-		LOG("On Player Place");
-		LOG("Placing Banner at %d %d %d", BannerPos.x, BannerPos.y, BannerPos.z);
 		PlaceBannerEntity(a_World, a_Player, a_EquippedItem, BannerPos);
 		return true;
 	}
@@ -216,10 +219,8 @@ public:
 		Vector3i a_PlacePos
 		)
 	{
-		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
 		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
 			{
-				LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
 				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
 				{
 					return false;
@@ -230,6 +231,5 @@ public:
 				return true;
 			}
 		);
-		LOG("Did Nothig to banner entity");
 	}
 };

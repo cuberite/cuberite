@@ -388,8 +388,8 @@ public:
 					{
 						mWriter.BeginCompound(std::to_string(i));
 						auto Pattern = PatternContainer->GetPattern(i);
-						mWriter.AddString("Pattern", cBannerPattern::GetPatternTag(Pattern->GetPattern()));
-						mWriter.AddByte("Color", Pattern->GetPatternColor());
+						mWriter.AddString("Pattern", cBannerPatternContainer::GetPatternTag(Pattern->m_Pattern));
+						mWriter.AddByte("Color", Pattern->m_Color);
 						mWriter.EndCompound();
 					}
 				mWriter.EndList();
