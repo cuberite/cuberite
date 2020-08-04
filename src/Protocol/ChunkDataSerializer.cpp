@@ -527,7 +527,6 @@ void cChunkDataSerializer::Serialize477(const std::vector<cClientHandle *> & a_S
 
 	// Write the chunk size in bytes:
 	const UInt8 BitsPerEntry = 14;
-	const size_t Mask = (1 << BitsPerEntry) - 1;
 	const size_t ChunkSectionDataArraySize = (cChunkData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 	const size_t ChunkSectionSize = (
 		2 +  // Block count, BEInt16, 2 bytes
