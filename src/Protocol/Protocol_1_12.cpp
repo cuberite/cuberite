@@ -980,7 +980,7 @@ void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
 	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
 	if (CuberiteRecipeId.has_value())
 	{
-		m_Client->HandleCraftRecipe(CuberiteRecipeId.value());
+		m_Client->HandleCraftRecipe(*CuberiteRecipeId);
 	}
 }
 
@@ -1320,7 +1320,7 @@ void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
 		Pkt.WriteBool(true);
 		Pkt.WriteBool(false);
 		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(*ProtocolRecipeId);
 	}
 }
 
@@ -1350,8 +1350,8 @@ void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
 	else
 	{
 		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(*ProtocolRecipeId);
 		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(*ProtocolRecipeId);
 	}
 }
