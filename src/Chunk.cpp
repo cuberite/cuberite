@@ -1278,33 +1278,10 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	}
 
 	// If the new block is a block entity, create the entity object:
-	switch (a_BlockType)
+	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 	{
-		case E_BLOCK_BEACON:
-		case E_BLOCK_BED:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:
-		case E_BLOCK_HEAD:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_FLOWER_POT:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_BREWING_STAND:
-		{
-			// Fast set block has already marked dirty
-			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
-			break;
-		}
-	}  // switch (a_BlockType)
+		AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
+	}
 }
 
 
