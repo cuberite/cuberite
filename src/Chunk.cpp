@@ -2046,6 +2046,17 @@ bool cChunk::DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Cal
 
 
 
+bool cChunk::DoWithBannerAt(Vector3i a_Position, cBannerCallback a_Callback)
+{
+	return GenericDoWithBlockEntityAt<cBannerEntity,
+		E_BLOCK_WALL_BANNER, E_BLOCK_STANDING_BANNER
+	>(a_Position, a_Callback);
+}
+
+
+
+
+
 bool cChunk::DoWithBeaconAt(Vector3i a_Position, cBeaconCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBeaconEntity,

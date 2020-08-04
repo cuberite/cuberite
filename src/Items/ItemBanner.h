@@ -190,7 +190,8 @@ public:
 		{
 			return false;
 		}
-		return PlaceBannerEntity(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos);
+		LOG(std::to_string(PlaceBannerEntity(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos)));
+		return true;
 	}
 	/** Tries to place a Banner BlockEntity to  */
 	bool PlaceBannerEntity(
@@ -198,21 +199,20 @@ public:
 		Vector3i a_PlacePos
 		)
 	{
-		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
-		a_World.DoWithBlockEntityAt(a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z, [&](cBlockEntity & a_BlockEntity)
+		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z);
+		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
 			{
 				LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
 				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
 				{
 					return false;
 				}
-				auto & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
 
-				BannerEntity.SetBaseColor(static_cast<unsigned char>(a_EquippedItem.m_ItemDamage));
-				BannerEntity.GetWorld()->BroadcastBlockEntity(BannerEntity.GetPos());
+				a_BlockEntity.SetBaseColor(static_cast<unsigned char>(a_EquippedItem.m_ItemDamage));
+				a_BlockEntity.GetWorld()->BroadcastBlockEntity(a_BlockEntity.GetPos());
 				return true;
 			}
 		);
-		return true;
+		LOG("Did Nothig to banner entity");
 	}
 };
