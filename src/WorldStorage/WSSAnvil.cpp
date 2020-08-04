@@ -901,7 +901,6 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_Tag
 	{
 		return nullptr;
 	}
-	LOG("Found Banner");
 	auto Banner = std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	// Reads custom name from NBT

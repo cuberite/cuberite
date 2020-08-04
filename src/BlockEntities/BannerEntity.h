@@ -81,7 +81,7 @@ public:  // tolua_export
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
-	virtual bool UsedBy(cPlayer * a_Player) override { return false; }
+	virtual bool UsedBy(cPlayer * a_Player) override { return true; }
 	virtual void SendTo(cClientHandle & a_Client) override;
 
 	void SetBaseColor(unsigned char a_Color);

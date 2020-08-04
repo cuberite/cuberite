@@ -66,21 +66,9 @@ public:
 		{
 			return {};
 		}
-		// transfer cBannerPatternContainer back to the item
+		// Todo: transfer cBannerPatternContainer back to the item
 		auto BannerEntity = static_cast<cBannerEntity *>(a_BlockEntity);
-
 		return cItem(E_ITEM_BANNER, 1, a_BlockMeta);
-	}
-
-
-
-
-
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const sSetBlock & a_BlockChange
-	) override
-	{
 	}
 
 

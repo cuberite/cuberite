@@ -4,20 +4,23 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-// #include "../Blocks/BlockBanner.h"
+#include "../Blocks/BlockHandler.h"
 #include "../BlockEntities/BannerEntity.h"
+#include "../Blocks/ChunkInterface.h"
 
 
 
 
 
-class cItemBannerHandler: public cItemHandler
+class cItemBannerHandler:
+	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemBannerHandler(int a_ItemType): Super(a_ItemType)
+	cItemBannerHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -44,6 +47,7 @@ public:
 		sSetBlockVector & a_BlocksToPlace
 	) override
 	{
+		LOG("Get Blocks To Place");
 		/*
 			can be placed in item frame - just shows the item model
 			If renamed retains its name on adding and removing pattern
@@ -185,22 +189,35 @@ public:
 		{
 			return true;
 		}
-
-		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		if(!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_ClickedBlockPos))
 		{
 			return false;
 		}
-		LOG(std::to_string(PlaceBannerEntity(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos)));
+		// Checks if the banner replaced the block
+		BLOCKTYPE ClickedBlockType;
+		NIBBLETYPE ClickedBlockMeta;
+		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		bool IsReplacingClickedBlock = BlockHandler(ClickedBlockType)->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
+		auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+
+		LOG("On Player Place");
+		LOG("Placing Banner at %d %d %d", BannerPos.x, BannerPos.y, BannerPos.z);
+		PlaceBannerEntity(a_World, a_Player, a_EquippedItem, BannerPos);
 		return true;
 	}
-	/** Tries to place a Banner BlockEntity to  */
+
+
+
+
+	/** Tries to place a Banner BlockEntity to the given position */
 	bool PlaceBannerEntity(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		Vector3i a_PlacePos
 		)
 	{
-		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z);
-		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y + 1, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
+		LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
+		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
 			{
 				LOG("Placing Banner Entity at %d %d %d", a_PlacePos.x, a_PlacePos.y, a_PlacePos.z);
 				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
