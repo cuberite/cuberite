@@ -33,7 +33,7 @@ void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInter
 	else
 	{
 		const auto Upper = a_BlockPos.addedY(1);
-		if ((Upper.y <= cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(Upper)))
+		if ((Upper.y < cChunkDef::Height) && IsDoorBlockType(a_ChunkInterface.GetBlock(Upper)))
 		{
 			// Was lower part, remove upper:
 			a_ChunkInterface.SetBlock(Upper, E_BLOCK_AIR, 0);
