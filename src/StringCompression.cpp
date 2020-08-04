@@ -57,7 +57,7 @@ int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compres
 
 	a_Compressed.reserve(a_Length);
 
-	char Buffer[64 KiB];
+	char Buffer[4 KiB];
 	z_stream strm;
 	memset(&strm, 0, sizeof(strm));
 	strm.next_in = reinterpret_cast<Bytef *>(const_cast<char *>(a_Data));
@@ -121,7 +121,7 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 
 	a_Uncompressed.reserve(a_Length);
 
-	char Buffer[64 KiB];
+	char Buffer[4 KiB];
 	z_stream strm;
 	memset(&strm, 0, sizeof(strm));
 	strm.next_in = reinterpret_cast<Bytef *>(const_cast<char *>(a_Data));
