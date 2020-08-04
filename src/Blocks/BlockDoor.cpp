@@ -75,11 +75,13 @@ bool cBlockDoorHandler::OnUse(
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 			break;
 		}
-		// Prevent iron door from opening on player click
 		case E_BLOCK_IRON_DOOR:
 		{
+			// Prevent iron door from opening on player click (#2415):
 			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockPos, a_BlockFace);
-			break;
+
+			// Allow placement actions to instead take place:
+			return false;
 		}
 	}
 
