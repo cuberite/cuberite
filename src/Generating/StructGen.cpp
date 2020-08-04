@@ -45,7 +45,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				WorkerDesc->SetChunkCoords({BaseX, BaseZ});
 				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc->GetBiomeMap());
 				m_ShapeGen->GenShape            ({BaseX, BaseZ}, WorkerShape->mShape);
-				WorkerDesc->SetHeightFromShape   (WorkerShape->mShape);
+				WorkerDesc->SetHeightFromShape  (WorkerShape->mShape);
 				m_CompositionGen->ComposeTerrain(*WorkerDesc, WorkerShape->mShape);
 			}
 			else

@@ -158,7 +158,7 @@ void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 	// Wrap a cChunkDesc::Shape into a structure so that we can make a unique_ptr out of it:
 	struct ShapeHelper
 	{
-		cChunkDesc::Shape mShape;
+		cChunkDesc::Shape m_Shape;
 	};
 	auto shape = std::make_unique<ShapeHelper>();
 
@@ -169,19 +169,19 @@ void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
-		m_ShapeGen->GenShape(a_ChunkDesc.GetChunkCoords(), shape->mShape);
-		a_ChunkDesc.SetHeightFromShape(shape->mShape);
+		m_ShapeGen->GenShape(a_ChunkDesc.GetChunkCoords(), shape->m_Shape);
+		a_ChunkDesc.SetHeightFromShape(shape->m_Shape);
 	}
 	else
 	{
 		// Convert the heightmap in a_ChunkDesc into shape:
-		a_ChunkDesc.GetShapeFromHeight(shape->mShape);
+		a_ChunkDesc.GetShapeFromHeight(shape->m_Shape);
 	}
 
 	bool ShouldUpdateHeightmap = false;
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
-		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape->mShape);
+		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape->m_Shape);
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())
