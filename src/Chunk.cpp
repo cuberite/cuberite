@@ -1325,7 +1325,6 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	// If the new block is a block entity, create the entity object:
 	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 	{
-		// Fast set block has already marked dirty
 		AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
 	}
 }
