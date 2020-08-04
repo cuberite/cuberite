@@ -6,8 +6,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "BannerEntity.h"
 
+#include <utility>
+
 #include "../Root.h"
 #include "../World.h"
+#include "../Entities/Player.h"
 #include "../BlockType.h"
 #include "../WorldStorage/FastNBT.h"
 #include "../ClientHandle.h"
@@ -76,9 +79,9 @@ void cBannerEntity::SetBaseColor(unsigned char a_Color)
 
 
 
-void cBannerEntity::SetId(AString a_Id)
+void cBannerEntity::SetId(AString * a_Id)
 {
-	m_Id = a_Id;
+	m_Id = std::move(a_Id);
 }
 
 

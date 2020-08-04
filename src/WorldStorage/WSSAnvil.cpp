@@ -909,7 +909,7 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_Tag
 	if (CurrentLine >= 0)
 	{
 		auto id = a_NBT.GetString(CurrentLine);
-		Banner->SetId(id);
+		Banner->SetId(&id);
 	}
 
 	// Reads patterns from NBT

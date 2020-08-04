@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Globals.h"
+
 #include "BlockEntity.h"
 #include "../Defines.h"
 
@@ -83,9 +85,9 @@ public:  // tolua_export
 	virtual void SendTo(cClientHandle & a_Client) override;
 
 	void SetBaseColor(unsigned char a_Color);
-	void SetId(AString a_Id);
+	void SetId(AString * a_Id);
 
-	// Functions for sending with network
+	// Functions for sending with network and storing to disk
 	bool HasPatterns() const;
 	unsigned char GetBaseColor() const;
 	const cBannerPatternContainer * GetPatternContainer() const;
@@ -93,7 +95,7 @@ public:  // tolua_export
 protected:
 
 	unsigned char m_BaseColor = 1;
-	AString m_Id = "Banner";
+	AString * m_Id;
 	cBannerPatternContainer * m_PatternContainer;
 
 } ;  // tolua_export
