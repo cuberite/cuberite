@@ -439,39 +439,21 @@ void cBlockHandler::OnUpdate(
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
+void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
 {
-	OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockChange.GetAbsolutePos(), a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta);
-}
+	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); }))
+	{
+		return;
+	}
 
-
-
-
-
-void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	// Notify the neighbors
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX(-1), BLOCK_FACE_XP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX( 1), BLOCK_FACE_XM);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY(-1), BLOCK_FACE_YP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY( 1), BLOCK_FACE_YM);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ(-1), BLOCK_FACE_ZP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ( 1), BLOCK_FACE_ZM);
-}
-
-
-
-
-
-void cBlockHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
-{
-	// Notify the neighbors
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX(-1), BLOCK_FACE_XP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedX( 1), BLOCK_FACE_XM);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY(-1), BLOCK_FACE_YP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedY( 1), BLOCK_FACE_YM);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ(-1), BLOCK_FACE_ZP);
-	NeighborChanged(a_ChunkInterface, a_BlockPos.addedZ( 1), BLOCK_FACE_ZM);
+	if (DoesDropOnUnsuitable())
+	{
+		a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
+	}
+	else
+	{
+		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_AIR, 0);
+	}
 }
 
 
@@ -588,23 +570,13 @@ void cBlockHandler::Check(
 	cChunk & a_Chunk
 )
 {
-	if (!CanBeAt(a_ChunkInterface, a_RelPos, a_Chunk))
-	{
-		if (DoesDropOnUnsuitable())
-		{
-			a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
-		}
-		else
-		{
-			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
-		}
-	}
-	else
-	{
-		// Wake up the simulators for this block:
-		auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
-	}
+	const auto Position = cChunkDef::RelativeToAbsolute(a_RelPos, a_Chunk.GetPos());
+	NeighborChanged(a_ChunkInterface, Position.addedX(-1), BLOCK_FACE_XP);
+	NeighborChanged(a_ChunkInterface, Position.addedX(1), BLOCK_FACE_XM);
+	NeighborChanged(a_ChunkInterface, Position.addedY(-1), BLOCK_FACE_YP);
+	NeighborChanged(a_ChunkInterface, Position.addedY(1), BLOCK_FACE_YM);
+	NeighborChanged(a_ChunkInterface, Position.addedZ(-1), BLOCK_FACE_ZP);
+	NeighborChanged(a_ChunkInterface, Position.addedZ(1), BLOCK_FACE_ZM);
 }
 
 

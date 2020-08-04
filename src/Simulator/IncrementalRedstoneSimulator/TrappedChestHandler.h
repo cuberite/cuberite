@@ -49,7 +49,7 @@ public:
 
 		if (Power != PreviousPower.PowerLevel)
 		{
-			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, OffsetYM);
+			UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, OffsetYM);
 			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeLaterals);
 		}
 	}

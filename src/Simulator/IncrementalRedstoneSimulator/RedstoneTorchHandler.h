@@ -79,7 +79,7 @@ public:
 			{
 				if (Adjacent != GetOffsetAttachedTo(a_Position, a_Meta))
 				{
-					UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + Adjacent);
+					UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + Adjacent);
 				}
 			}
 		}

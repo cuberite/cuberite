@@ -1,33 +1,38 @@
 
 #include "Globals.h"
 
-#include "../World.h"
-#include "../Defines.h"
+#include "Simulator.h"
 #include "../Chunk.h"
 #include "../Cuboid.h"
-
-#ifdef __clang__
-	#pragma clang diagnostic ignored "-Wweak-template-vtables"
-#endif  // __clang__
-
-
-
-#include "Simulator.h"
+#include "../World.h"
 
 
 
 
 
-void cSimulator::WakeUp(Vector3i a_Block, cChunk * a_Chunk)
+void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	AddBlock(a_Block, a_Chunk);
+	ASSERT(a_Chunk.IsValid());
+
+	AddBlock(a_Chunk, a_Position, a_Block);
 }
 
 
 
 
 
-void cSimulator::WakeUpArea(const cCuboid & a_Area)
+void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block)
+{
+	ASSERT(a_Chunk.IsValid());
+
+	WakeUp(a_Chunk, a_Position, a_Block);
+}
+
+
+
+
+
+void cSimulator::WakeUp(const cCuboid & a_Area)
 {
 	cCuboid area(a_Area);
 	area.Sort();
@@ -60,7 +65,8 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 						{
 							for (int x = startX; x <= endX; ++x)
 							{
-								AddBlock({x, y, z}, &a_CBChunk);
+								const auto Position = cChunkDef::AbsoluteToRelative({ x, y, z });
+								AddBlock(a_CBChunk, Position, a_CBChunk.GetBlock(Position));
 							}  // for x
 						}  // for z
 					}  // for y
@@ -70,7 +76,3 @@ void cSimulator::WakeUpArea(const cCuboid & a_Area)
 		}  // for cx
 	}  // for cz
 }
-
-
-
-

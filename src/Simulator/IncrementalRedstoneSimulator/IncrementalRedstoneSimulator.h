@@ -21,22 +21,7 @@ public:
 	{
 	}
 
-	virtual void Simulate(float Dt) override {};
-	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
-
-	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
-
-	virtual cIncrementalRedstoneSimulatorChunkData * CreateChunkData() override
-	{
-		return new cIncrementalRedstoneSimulatorChunkData;
-	}
-
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override
-	{
-		return IsRedstone(a_BlockType);
-	}
-
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)
 	Used by torches to determine if they will power a block */
@@ -160,7 +145,21 @@ public:
 		}
 	}
 
-	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
+private:
+
+	virtual void Simulate(float Dt) override {};
+	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
+
+	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
+
+	virtual cIncrementalRedstoneSimulatorChunkData * CreateChunkData() override
+	{
+		return new cIncrementalRedstoneSimulatorChunkData;
+	}
+
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block) override;
 
 private:
 

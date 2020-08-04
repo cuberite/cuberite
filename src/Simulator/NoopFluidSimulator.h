@@ -22,18 +22,17 @@ class cNoopFluidSimulator:
 
 public:
 
-	cNoopFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid):
-		Super(a_World, a_Fluid, a_StationaryFluid)
-	{
-	}
+	using Super::cFluidSimulator;
 
-	// cSimulator overrides:
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override
+private:
+
+	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override
 	{
 		UNUSED(a_Block);
 		UNUSED(a_Chunk);
 	}
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}
+	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
 } ;
 
 

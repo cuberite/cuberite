@@ -97,31 +97,25 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 
 
-void cSandSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cSandSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, a_Block.y, RelZ)))
+	if (!IsAllowedBlock(a_Block))
 	{
 		return;
 	}
 
 	// Check for duplicates:
-	cSandSimulatorChunkData & ChunkData = a_Chunk->GetSandSimulatorData();
+	cSandSimulatorChunkData & ChunkData = a_Chunk.GetSandSimulatorData();
 	for (cSandSimulatorChunkData::iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
+		if ((itr->x == a_Position.x) && (itr->y == a_Position.y) && (itr->z == a_Position.z))
 		{
 			return;
 		}
 	}
 
 	m_TotalBlocks += 1;
-	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ));
+	ChunkData.push_back(cCoordWithInt(a_Position.x, a_Position.y, a_Position.z));
 }
 
 

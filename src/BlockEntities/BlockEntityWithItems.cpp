@@ -58,10 +58,10 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 		auto & Simulator = *m_World->GetRedstoneSimulator();
 
 		// Notify comparators:
-		Simulator.WakeUp(m_Pos + Vector3i(1, 0, 0), &a_Chunk);
-		Simulator.WakeUp(m_Pos + Vector3i(-1, 0, 0), &a_Chunk);
-		Simulator.WakeUp(m_Pos + Vector3i(0, 0, 1), &a_Chunk);
-		Simulator.WakeUp(m_Pos + Vector3i(0, 0, -1), &a_Chunk);
+		m_World->WakeUpSimulators(m_Pos + Vector3i(1, 0, 0));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(-1, 0, 0));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(0, 0, 1));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(0, 0, -1));
 		return true;
 	});
 }

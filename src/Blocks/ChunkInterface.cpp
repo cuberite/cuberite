@@ -12,6 +12,15 @@
 
 
 
+bool cChunkInterface::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
+{
+	return m_ChunkMap->DoWithChunkAt(a_BlockPos, a_Callback);
+}
+
+
+
+
+
 BLOCKTYPE cChunkInterface::GetBlock(Vector3i a_Pos)
 {
 	return m_ChunkMap->GetBlock(a_Pos);
@@ -95,16 +104,16 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 
 bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
-	auto handler = cBlockInfo::GetHandler(blockType);
-	handler->OnBreaking(*this, a_WorldInterface, a_BlockPos);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+
 	if (!m_ChunkMap->DigBlock(a_BlockPos))
 	{
 		return false;
 	}
-	handler->OnBroken(*this, a_WorldInterface, a_BlockPos, blockType, blockMeta);
+
+	cBlockInfo::GetHandler(BlockType)->OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta);
 	return true;
 }
 

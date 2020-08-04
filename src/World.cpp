@@ -1036,12 +1036,11 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
 
-	m_ChunkMap->Tick(a_Dt);
-	TickMobs(a_Dt);
-	m_MapManager.TickMaps();
-
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
+	m_ChunkMap->Tick(a_Dt);  // Tick chunk after clients to apply at least one round of queued ticks (e.g. cBlockHandler::Check) this tick
+	TickMobs(a_Dt);
+	m_MapManager.TickMaps();
 	TickQueuedTasks();
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
@@ -1327,7 +1326,7 @@ void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinB
 
 void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 {
-	m_SimulatorManager->WakeUpArea(a_Area);
+	m_SimulatorManager->WakeUp(a_Area);
 }
 
 
@@ -2191,18 +2190,12 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 
 
-void cWorld::SetBlocks(const sSetBlockVector & a_Blocks)
+void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlocks(a_Blocks);
-}
+	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
-
-
-
-
-void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
-{
-	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockInfo::GetHandler(a_BlockType)->OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2220,17 +2213,18 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(Vector3i a_BlockPos)
 {
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
-	cChunkInterface chunkInterface(GetChunkMap());
-	auto blockHandler = cBlockInfo::GetHandler(blockType);
-	blockHandler->OnBreaking(chunkInterface, *this, a_BlockPos);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+
 	if (!m_ChunkMap->DigBlock(a_BlockPos))
 	{
 		return false;
 	}
-	blockHandler->OnBroken(chunkInterface, *this, a_BlockPos, blockType, blockMeta);
+
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockInfo::GetHandler(BlockType)->OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
+
 	return true;
 }
 

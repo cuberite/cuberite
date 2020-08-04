@@ -134,11 +134,6 @@ public:
 	If the chunk is invalid, the operation is ignored silently. */
 	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
-	Is more efficient than calling SetBlock() multiple times.
-	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
-	void SetBlocks(const sSetBlockVector & a_Blocks);
-
 	/** Makes the specified player collect all the pickups around them. */
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
@@ -156,9 +151,6 @@ public:
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
-
-	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
-	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
@@ -407,9 +399,6 @@ public:
 	size_t GetNumUnusedDirtyChunks(void);
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
-
-	/** Queues the specified block for ticking (block update) */
-	void QueueTickBlock(Vector3i a_AbsPos);
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSChunks; }

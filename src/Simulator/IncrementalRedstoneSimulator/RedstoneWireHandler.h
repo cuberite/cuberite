@@ -177,12 +177,12 @@ public:
 			a_Chunk.SetMeta(a_Position, a_PoweringData.PowerLevel);
 
 			// Notify block below us to update:
-			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + OffsetYM);
+			UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + OffsetYM);
 
 			// Notify all terracing positions:
 			ForTerracingConnectionOffsets(a_Chunk, a_Position, [&a_Chunk, &CurrentlyTicking, a_Position](const Vector3i Offset)
 			{
-				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + Offset);
+				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + Offset);
 				return false;
 			});
 		}

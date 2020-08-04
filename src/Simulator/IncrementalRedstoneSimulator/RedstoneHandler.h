@@ -53,7 +53,7 @@ protected:
 	}
 
 	template <typename... ArrayTypes>
-	static void UpdateAdjustedRelatives(cChunk & From, cChunk & To, const Vector3i Position)
+	static void UpdateAdjustedRelative(cChunk & From, cChunk & To, const Vector3i Position)
 	{
 		DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position));
 	}
@@ -70,7 +70,7 @@ protected:
 	}
 
 	template <typename ArrayType, typename... ArrayTypes>
-	static void InvokeForAdjustedRelatives(SourceCallback Callback, Vector3i Position, const ArrayType & Relative, const ArrayTypes &... Relatives)
+	static void InvokeForAdjustedRelatives(SourceCallback Callback, const Vector3i Position, const ArrayType & Relative, const ArrayTypes &... Relatives)
 	{
 		for (const auto Offset : Relative)
 		{
@@ -104,11 +104,11 @@ protected:
 
 private:
 
-	static void UpdateAdjustedRelatives(cVector3iArray &, Vector3i)
+	static void UpdateAdjustedRelatives(cChunk &, cChunk &, const Vector3i)
 	{
 	}
 
-	static void InvokeForAdjustedRelatives(SourceCallback, Vector3i)
+	static void InvokeForAdjustedRelatives(SourceCallback, const Vector3i)
 	{
 	}
 };

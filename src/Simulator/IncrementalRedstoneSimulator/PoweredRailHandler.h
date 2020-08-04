@@ -66,8 +66,8 @@ public:
 				{
 					a_Chunk.SetMeta(a_Position, (a_PoweringData.PowerLevel == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
 
-					UpdateAdjustedRelatives(a_Chunk, CurrentlyTickingChunk, a_Position + Offset);
-					UpdateAdjustedRelatives(a_Chunk, CurrentlyTickingChunk, a_Position + -Offset);
+					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position + Offset);
+					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position + -Offset);
 				}
 
 				return;

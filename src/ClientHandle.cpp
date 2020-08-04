@@ -1373,7 +1373,6 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	auto blockHandler = BlockHandler(a_OldBlock);
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
-	blockHandler->OnPlayerBreakingBlock(ChunkInterface, *World, *m_Player, absPos);
 	if (m_Player->IsGameModeSurvival())
 	{
 		World->DropBlockAsPickups(absPos, m_Player, &m_Player->GetEquippedItem());
