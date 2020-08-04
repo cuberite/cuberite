@@ -1901,7 +1901,6 @@ bool cChunk::GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(t
 	cBlockEntity * Block = GetBlockEntityRel(a_Position);
 	if (Block == nullptr)
 	{
-		LOG("no block entity found here");
 		return false;  // No block entity here
 	}
 	if (
@@ -1910,9 +1909,7 @@ bool cChunk::GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(t
 	)
 	{
 		return false;  // Not any of the given tBlocktypes
-		LOG("no given block entity found here");
 	}
-	LOG("found entity");
 	return !a_Callback(*static_cast<tyEntity *>(Block));
 }
 

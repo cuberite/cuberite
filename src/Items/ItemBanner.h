@@ -60,7 +60,6 @@ public:
 
 		NIBBLETYPE BlockMeta = 0x00;
 		double Rotation = a_Player.GetYaw();
-		LOG(std::to_string(a_ClickedBlockFace));
 		// Placing on the floor
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
@@ -149,7 +148,6 @@ public:
 		// placing on the sides
 		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			LOG("Viewing direction %d", a_ClickedBlockFace);
 			if (a_ClickedBlockFace == BLOCK_FACE_EAST)
 			{
 				BlockMeta |= 0x05;
@@ -166,7 +164,6 @@ public:
 			{
 				BlockMeta |= 0x03;
 			}
-			LOG(std::to_string(BlockMeta));
 			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_WALL_BANNER, BlockMeta);
 		}
 		else

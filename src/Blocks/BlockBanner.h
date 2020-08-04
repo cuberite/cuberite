@@ -68,7 +68,8 @@ public:
 		}
 		// Todo: transfer cBannerPatternContainer back to the item
 		auto BannerEntity = static_cast<cBannerEntity *>(a_BlockEntity);
-		return cItem(E_ITEM_BANNER, 1, a_BlockMeta);
+		NIBBLETYPE BlockMeta = static_cast<NIBBLETYPE>(BannerEntity->GetBaseColor());
+		return cItem(E_ITEM_BANNER, 1, BlockMeta);
 	}
 
 
