@@ -96,6 +96,12 @@ public:
 
 
 
+	static void SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition);
+
+
+
+
+
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
