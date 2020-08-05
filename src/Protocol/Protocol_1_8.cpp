@@ -3464,11 +3464,10 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			if (BannerEntity.HasPatterns())
 			{
 				cFastNBTWriter PatternWriter;
-				auto PatternContainer = BannerEntity.GetPatternContainer();
-				for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
+				for (short i = 0; i < BannerEntity.GetPatternCount(); i++)
 				{
-					auto Pattern = PatternContainer->GetPattern(i);
-					PatternWriter.AddString("Pattern", cBannerPatternContainer::GetPatternTag(Pattern->m_Pattern));
+					auto Pattern = BannerEntity.GetPattern(i);
+					PatternWriter.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
 					PatternWriter.AddShort("Color", Pattern->m_Color);
 				}
 				PatternWriter.Finish();

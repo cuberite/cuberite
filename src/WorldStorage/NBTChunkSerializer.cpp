@@ -383,12 +383,11 @@ public:
 			if (a_Entity->HasPatterns())
 			{
 				mWriter.BeginList("Patterns", TAG_Compound);
-					auto PatternContainer = a_Entity->GetPatternContainer();
-					for (short i = 0; i < PatternContainer->GetPatternCount(); i++)
+					for (short i = 0; i < a_Entity->GetPatternCount(); i++)
 					{
 						mWriter.BeginCompound(std::to_string(i));
-						auto Pattern = PatternContainer->GetPattern(i);
-						mWriter.AddString("Pattern", cBannerPatternContainer::GetPatternTag(Pattern->m_Pattern));
+						auto Pattern = a_Entity->GetPattern(i);
+						mWriter.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
 						mWriter.AddByte("Color", Pattern->m_Color);
 						mWriter.EndCompound();
 					}

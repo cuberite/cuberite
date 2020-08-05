@@ -22,16 +22,6 @@ cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vect
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
 {
 	ASSERT((a_BlockType == E_BLOCK_WALL_BANNER) || (a_BlockType == E_BLOCK_STANDING_BANNER));
-	m_PatternContainer = new cBannerPatternContainer();
-}
-
-
-
-
-
-cBannerEntity::~cBannerEntity()
-{
-	delete [] m_PatternContainer;
 }
 
 
@@ -43,13 +33,11 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBannerEntity &>(a_Src);
 	m_BaseColor = src.m_BaseColor;
-	m_PatternContainer = new cBannerPatternContainer();
-	m_PatternContainer->m_PatternCount = src.m_PatternContainer->m_PatternCount;
-	for (auto i = 0; i < m_PatternContainer->GetPatternCount(); i++)
+	m_PatternCount = src.m_PatternCount;
+	for (auto i = 0; i < src.m_PatternCount; i++)
 	{
-		m_PatternContainer->m_Patterns[i] = src.m_PatternContainer->m_Patterns[i];
+		m_Patterns[i] = src.m_Patterns[i];
 	}
-	// Todo: properly copy
 }
 
 
@@ -87,16 +75,7 @@ void cBannerEntity::SetId(AString * a_Id)
 
 bool cBannerEntity::HasPatterns() const
 {
-	return m_PatternContainer->HasPatterns();
-}
-
-
-
-
-
-const cBannerPatternContainer * cBannerEntity::GetPatternContainer() const
-{
-	return m_PatternContainer;
+	return m_PatternCount > 0;
 }
 
 
@@ -109,17 +88,10 @@ unsigned char cBannerEntity::GetBaseColor() const
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// cBannerPatternContainer
-
-
-cBannerPatternContainer::cBannerPatternContainer() {}
 
 
 
-
-
-bool cBannerPatternContainer::AddPattern(BannerPattern & a_Pattern, bool a_ByCommand)
+bool cBannerEntity::AddPattern(BannerPattern & a_Pattern, bool a_ByCommand)
 {
 	// check if there is space for another pattern - with crating max is 6 and by command 16
 	if (((a_ByCommand) && (m_PatternCount == 16)) || ((!a_ByCommand) && (m_PatternCount == 6)))
@@ -135,16 +107,7 @@ bool cBannerPatternContainer::AddPattern(BannerPattern & a_Pattern, bool a_ByCom
 
 
 
-bool cBannerPatternContainer::HasPatterns() const
-{
-	return m_PatternCount > 0;
-}
-
-
-
-
-
-const short cBannerPatternContainer::GetPatternCount() const
+const short cBannerEntity::GetPatternCount() const
 {
 	return m_PatternCount;
 }
@@ -153,7 +116,7 @@ const short cBannerPatternContainer::GetPatternCount() const
 
 
 
-const BannerPattern * cBannerPatternContainer::GetPattern(short a_Pattern) const
+const BannerPattern * cBannerEntity::GetPattern(short a_Pattern) const
 {
 	return & m_Patterns[a_Pattern];
 }
@@ -162,7 +125,7 @@ const BannerPattern * cBannerPatternContainer::GetPattern(short a_Pattern) const
 
 
 
-void cBannerPatternContainer::ClearAll()
+void cBannerEntity::ClearAll()
 {
 	// only clean the used ones
 	for (short i = 0; i < m_PatternCount; i++)
@@ -175,7 +138,7 @@ void cBannerPatternContainer::ClearAll()
 
 
 
-const char * cBannerPatternContainer::GetPatternTag(eBannerPattern a_Pattern)
+const char * cBannerEntity::GetPatternTag(eBannerPattern a_Pattern)
 {
 	switch (a_Pattern)
 	{

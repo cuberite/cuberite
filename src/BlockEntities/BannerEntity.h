@@ -14,6 +14,7 @@
 #include "BlockEntity.h"
 #include "../Defines.h"
 
+// tolua_begin
 
 enum class eBannerPattern
 {
@@ -60,10 +61,19 @@ enum class eBannerPattern
 	None
 };
 
-class cBannerPatternContainer;
-class cBannerPattern;
 
-// tolua_begin
+
+
+/** struct representing a Pattern */
+struct BannerPattern
+{
+	eBannerPattern m_Pattern;
+	short m_Color;
+};
+
+
+
+
 
 class cBannerEntity :
 	public cBlockEntity
@@ -78,7 +88,6 @@ public:  // tolua_export
 
 	/** Creates a new empty Banner entity */
 	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	~cBannerEntity();
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -91,48 +100,23 @@ public:  // tolua_export
 	// Functions for sending with network and storing to disk
 	bool HasPatterns() const;
 	unsigned char GetBaseColor() const;
-	const cBannerPatternContainer * GetPatternContainer() const;
 
-protected:
-
-	short m_BaseColor = 1;
-	AString * m_Id;
-	cBannerPatternContainer * m_PatternContainer;
-
-} ;  // tolua_export
-
-
-
-
-/** struct representing a Pattern */
-struct BannerPattern
-{
-	eBannerPattern m_Pattern;
-	short m_Color;
-};
-
-
-
-
-/** class to store the patterns contained in a banner */
-class cBannerPatternContainer
-{
-
-public:
-	cBannerPatternContainer();
-
+	// Pattern handling
 	bool AddPattern(BannerPattern & a_Pattern, bool a_ByCommand = false);
-	bool HasPatterns() const;
 	const short GetPatternCount() const;
 	const BannerPattern * GetPattern(short a_Pattern) const;
-
 	void ClearAll();
 
-	static const char * cBannerPatternContainer::GetPatternTag(eBannerPattern a_Pattern);
+	static const char * GetPatternTag(eBannerPattern a_Pattern);
+
 
 protected:
+
 	BannerPattern m_Patterns[16];
 	short m_PatternCount = 0;
 
-	friend class cBannerEntity;
-};
+	short m_BaseColor = 1;
+	AString * m_Id;
+
+
+} ;  // tolua_export
