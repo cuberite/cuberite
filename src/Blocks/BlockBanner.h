@@ -62,19 +62,14 @@ public:
 		const cItem * a_Tool
 	) override
 	{
-		LOG("Destroying Banner queued");
-		LOG(std::to_string(a_BlockEntity->GetBlockType()));
-		LOG(std::to_string(E_BLOCK_STANDING_BANNER));
-		LOG(std::to_string(E_BLOCK_WALL_BANNER));
 		if ((a_BlockEntity == nullptr) || ((a_BlockEntity->GetBlockType() != E_BLOCK_STANDING_BANNER) && (a_BlockEntity->GetBlockType() != E_BLOCK_WALL_BANNER)))
 		{
 			return {};
 		}
-		LOG("Destroying Banner");
 		// Todo: transfer cBannerPatternContainer back to the item
 		auto BannerEntity = static_cast<cBannerEntity *>(a_BlockEntity);
 		NIBBLETYPE BlockMeta = static_cast<NIBBLETYPE>(BannerEntity->GetBaseColor());
-		return cItem(BannerEntity->GetBlockType(), 1, BlockMeta);
+		return cItem(E_ITEM_BANNER, 1, BlockMeta);
 	}
 
 
