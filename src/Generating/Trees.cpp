@@ -1035,11 +1035,11 @@ void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	for (int i = 0; i < LeavesRingCount; i++)
 	{
 		unsigned int Val = (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * i)) / 23) % 8;
-		if ((Val < 4) && RingRadius <= 3)
+		if ((Val < 4) && RingRadius < 3)
 		{
 			RingRadius++;
 		}
-		else if ((Val >= 7) && (RingRadius <= 0))
+		else if ((Val == 7) && (RingRadius > 0))
 		{
 			RingRadius--;
 		}
