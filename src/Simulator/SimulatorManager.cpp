@@ -71,8 +71,12 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 	for (const auto Offset : cSimulator::AdjacentOffsets)
 	{
 		auto Relative = a_Position + Offset;
-		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+		if (!cChunkDef::IsValidHeight(Relative.y))
+		{
+			continue;
+		}
 
+		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
 		if ((Chunk == nullptr) || !Chunk->IsValid())
 		{
 			continue;

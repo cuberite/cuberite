@@ -1187,14 +1187,14 @@ void cChunk::CreateBlockEntities(void)
 			auto BlockType = Section->m_BlockTypes[BlockIdx];
 			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
-				auto relPos = IndexToCoordinate(BlockIdx);
-				relPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				auto absPos = RelativeToAbsolute(relPos);
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
+				const auto AbsPos = RelativeToAbsolute(RelPos);
 
-				if (!HasBlockEntityAt(absPos))
+				if (!HasBlockEntityAt(AbsPos))
 				{
 					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-						BlockType, GetMeta(relPos), absPos, m_World
+						BlockType, GetMeta(RelPos), AbsPos, m_World
 					));
 				}
 			}
@@ -1223,7 +1223,8 @@ void cChunk::WakeUpSimulators(void)
 		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
 		{
 			const auto BlockType = Section->m_BlockTypes[BlockIdx];
-			const auto Position = IndexToCoordinate(BlockIdx);
+			auto Position = IndexToCoordinate(BlockIdx);
+			Position.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
 
 			RedstoneSimulator->AddBlock(*this, Position, BlockType);
 			WaterSimulator->AddBlock(*this, Position, BlockType);
