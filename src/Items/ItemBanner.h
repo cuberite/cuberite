@@ -216,13 +216,14 @@ public:
 		Vector3i a_PlacePos
 		)
 	{
+		short color = static_cast<short>(a_EquippedItem.m_ItemDamage);
 		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
 			{
 				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
 				{
 					return false;
 				}
-				a_BlockEntity.SetBaseColor(static_cast<short>(a_EquippedItem.m_ItemDamage));
+				a_BlockEntity.SetBaseColor(color);
 				a_BlockEntity.GetWorld()->BroadcastBlockEntity(a_BlockEntity.GetPos());
 				return true;
 			}
