@@ -186,6 +186,8 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
+		cItem ItemCopy(a_EquippedItem);  // Make a copy in case this is the player's last banner item and OnPlayerPlace removes it
+
 		// Cannot place a banner at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
 		{
@@ -202,9 +204,7 @@ public:
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 		bool IsReplacingClickedBlock = BlockHandler(ClickedBlockType)->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
 		auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-
-		PlaceBannerEntity(a_World, a_Player, a_EquippedItem, BannerPos);
-		return true;
+		return PlaceBannerEntity(a_World, a_Player, ItemCopy, BannerPos);
 	}
 
 
@@ -222,7 +222,6 @@ public:
 				{
 					return false;
 				}
-
 				a_BlockEntity.SetBaseColor(static_cast<short>(a_EquippedItem.m_ItemDamage));
 				a_BlockEntity.GetWorld()->BroadcastBlockEntity(a_BlockEntity.GetPos());
 				return true;
