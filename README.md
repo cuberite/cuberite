@@ -66,7 +66,7 @@ You can also help with documentation by contributing to the [User's Manual][12].
 
 For other stuff, check out the [homepage][13], the [Users' Manual][14], the [forums][15], and the [Plugin API][16].
 
-Support Us on [Liberapay][17] or [Bountysource][18]
+Support the Cuberite development team on [Liberapay][17]
 
 [1]: https://cuberite.org/news/#subscribe
 [2]: https://cuberite.org/
@@ -84,4 +84,3 @@ Support Us on [Liberapay][17] or [Bountysource][18]
 [15]: https://forum.cuberite.org/
 [16]: https://api.cuberite.org/
 [17]: https://liberapay.com/Cuberite
-[18]: https://bountysource.com/teams/cuberite
