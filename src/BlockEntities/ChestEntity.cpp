@@ -225,3 +225,42 @@ bool cChestEntity::IsBlocked()
 
 
 
+
+void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+{
+	ASSERT(a_Grid == &m_Contents);
+
+	if (m_World == nullptr)
+	{
+		return;
+	}
+
+	// Have cBlockEntityWithItems update redstone and try to broadcast our window:
+	Super::OnSlotChanged(a_Grid, a_SlotNum);
+
+	cWindow * Window = GetWindow();
+	if ((Window == nullptr) && (m_Neighbour != nullptr))
+	{
+		// Window was null, Super will have failed.
+		// Neighbour might own the window:
+		Window = m_Neighbour->GetWindow();
+	}
+
+	if (Window != nullptr)
+	{
+		Window->BroadcastWholeWindow();
+	}
+
+	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+	m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
+	{
+		auto & Simulator = *m_World->GetRedstoneSimulator();
+
+		// Notify comparators:
+		m_World->WakeUpSimulators(m_Pos + Vector3i(1, 0, 0));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(-1, 0, 0));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(0, 0, 1));
+		m_World->WakeUpSimulators(m_Pos + Vector3i(0, 0, -1));
+		return true;
+	});
+}

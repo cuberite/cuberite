@@ -129,7 +129,7 @@ public:
 				Data.m_MechanismDelays.erase(a_Position);
 
 				// Assume that an update (to front power) is needed:
-				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3));
+				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3));
 			}
 		}
 	}

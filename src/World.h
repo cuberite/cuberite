@@ -661,22 +661,18 @@ public:
 
 	// tolua_end
 
-	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
-	Is more efficient than calling SetBlock() multiple times.
+	/** Replaces the specified block with another, and calls the OnPlaced block handler.
+	Callers MUST ensure the replaced block was destroyed or can handle replacement correctly. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
-	void SetBlocks(const sSetBlockVector & a_Blocks);
-
-	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
-	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
+	void PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
 
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
 	// tolua_begin
 
-	/** Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
-	Wakes up the simulators.
-	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
+	/** Replaces the specified block with air, and calls the OnBroken block handler.
+	Wakes up the simulators. Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
 	bool DigBlock(Vector3i a_BlockPos);
 

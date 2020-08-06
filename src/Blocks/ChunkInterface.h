@@ -2,12 +2,14 @@
 #pragma once
 
 #include "../ForEachChunkProvider.h"
+#include "../FunctionRef.h"
 
 
 
 
 // fwd:
 class cItem;
+class cChunk;
 class cChunkMap;
 class cWorldInterface;
 class cPlayer;
@@ -22,6 +24,8 @@ class cChunkInterface:
 public:
 
 	cChunkInterface(cChunkMap * a_ChunkMap) : m_ChunkMap(a_ChunkMap) {}
+
+	bool DoWithChunkAt(Vector3i a_BlockPos, cFunctionRef<bool(cChunk &)> a_Callback);
 
 	BLOCKTYPE GetBlock(Vector3i a_Pos);
 	NIBBLETYPE GetBlockMeta(Vector3i a_Pos);

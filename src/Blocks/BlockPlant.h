@@ -44,7 +44,7 @@ public:
 			}
 			case paDeath:
 			{
-				a_ChunkInterface.DigBlock(a_WorldInterface, a_Chunk.RelativeToAbsolute(a_RelPos));
+				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), E_BLOCK_AIR, 0);
 				break;
 			}
 			case paStay: break;  // do nothing

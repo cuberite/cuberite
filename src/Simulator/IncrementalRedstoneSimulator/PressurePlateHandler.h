@@ -72,8 +72,8 @@ public:
 
 	static void UpdatePlate(cChunk & Chunk, cChunk & CurrentlyTicking, Vector3i Position)
 	{
+		UpdateAdjustedRelative(Chunk, CurrentlyTicking, Position + OffsetYM);
 		UpdateAdjustedRelatives(Chunk, CurrentlyTicking, Position, RelativeLaterals);
-		UpdateAdjustedRelatives(Chunk, CurrentlyTicking, Position + OffsetYM);
 	}
 
 	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override

@@ -79,14 +79,6 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 
 
 
-cFireSimulator::~cFireSimulator()
-{
-}
-
-
-
-
-
 void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	cCoordWithIntList & Data = a_Chunk->GetFireSimulatorData();
@@ -239,30 +231,23 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 
 
-void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-
-	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelPos);
-	if (!IsAllowedBlock(BlockType))
+	if (!IsAllowedBlock(a_Block))
 	{
 		return;
 	}
 
 	// Check for duplicates:
-	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
+	cFireSimulatorChunkData & ChunkData = a_Chunk.GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
 		const Vector3i ItrPos{itr->x, itr->y, itr->z};
-		if (ItrPos == RelPos)
+		if (ItrPos == a_Position)
 		{
 			// Block already present, check if burn step should decrease
 			// This means if fuel is removed, then the fire burns out sooner
-			const auto NewBurnStep = GetBurnStepTime(a_Chunk, RelPos);
+			const auto NewBurnStep = GetBurnStepTime(&a_Chunk, a_Position);
 			if (itr->Data > NewBurnStep)
 			{
 				FIRE_FLOG("FS: Block lost its fuel at {0}", a_Block);
@@ -274,7 +259,7 @@ void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	}  // for itr - ChunkData[]
 
 	FIRE_FLOG("FS: Adding block {0}", a_Block);
-	ChunkData.push_back(cCoordWithInt(RelPos.x, RelPos.y, RelPos.z, 100));
+	ChunkData.push_back(cCoordWithInt(a_Position.x, a_Position.y, a_Position.z, 100));
 }
 
 

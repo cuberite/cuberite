@@ -63,7 +63,8 @@ public:
 				// FastSetBlock doesn't wake simulators, so manually update ourselves:
 				Update(a_Chunk, CurrentlyTicking, a_Position, NewType, a_Meta, a_PoweringData);
 
-				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
+				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta), RelativeAdjacents);
 			}
 		}
 	}

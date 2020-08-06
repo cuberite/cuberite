@@ -98,6 +98,7 @@ cd $BUILDDIR
 "$CMAKE" $BASEDIR/../android -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$1" \
     -DANDROID_NATIVE_API_LEVEL="$APILEVEL" \
-    -DCMAKE_BUILD_TYPE="$TYPE"
+    -DCMAKE_BUILD_TYPE="$TYPE" \
+	-DWHOLE_PROGRAM_OPTIMISATION=No
 
 make -j "$THREADS"

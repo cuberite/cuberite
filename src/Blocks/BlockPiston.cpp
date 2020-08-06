@@ -32,14 +32,19 @@ void cBlockPistonHandler::OnBroken(
 	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 )
 {
-	// If the piston is extended, destroy the extension as well
-	if (IsExtended(a_OldBlockMeta))
+	if (!IsExtended(a_OldBlockMeta))
 	{
-		auto extPos = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
-		if (a_ChunkInterface.GetBlock(extPos) == E_BLOCK_PISTON_EXTENSION)
-		{
-			a_ChunkInterface.DropBlockAsPickups(extPos);
-		}
+		return;
+	}
+
+	const auto Extension = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
+	if (
+		cChunkDef::IsValidHeight(Extension.y) &&
+		(a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION)
+	)
+	{
+		// If the piston is extended, destroy the extension as well:
+		a_ChunkInterface.SetBlock(Extension, E_BLOCK_AIR, 0);
 	}
 }
 
@@ -75,7 +80,7 @@ void cBlockPistonHandler::PushBlocks(
 	cWorld & a_World, const Vector3i & a_PushDir
 )
 {
-	// Sort blocks to move the blocks first, which are farest away from the piston
+	// Sort blocks to move the blocks first, which are farthest away from the piston
 	// This prevents the overwriting of existing blocks
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
 	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
@@ -281,8 +286,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 				return;
 			}
 
-			// Remove extension, update base state. Calling FastSetBlock inhibits OnBroken being called by SetBlock.
-			World.FastSetBlock(extensionPos, E_BLOCK_AIR, 0);
+			// Remove extension, update base state:
 			World.SetBlock(extensionPos, E_BLOCK_AIR, 0);
 			World.SetBlock(a_BlockPos, pistonBlock, pistonMeta & ~(8));
 
@@ -334,11 +338,17 @@ void cBlockPistonHeadHandler::OnBroken(
 	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 )
 {
-	// Drop the base of the piston:
-	auto basePos = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
-	if (cChunkDef::IsValidHeight(basePos.y))
+	const auto Base = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
+	if (!cChunkDef::IsValidHeight(Base.y))
 	{
-		a_ChunkInterface.DropBlockAsPickups(basePos);
+		return;
+	}
+
+	const auto Block = a_ChunkInterface.GetBlock(Base);
+	if ((Block == E_BLOCK_PISTON) || (Block == E_BLOCK_STICKY_PISTON))
+	{
+		// Remove the base of the piston:
+		a_ChunkInterface.SetBlock(Base, E_BLOCK_AIR, 0);
 	}
 }
 
@@ -346,3 +356,9 @@ void cBlockPistonHeadHandler::OnBroken(
 
 
 
+cItems cBlockPistonHeadHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	// Give a normal\sticky piston base, not piston extension
+	// With 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...
+	return { cItem(((a_BlockMeta & 0x8) == 0x8) ? E_BLOCK_STICKY_PISTON : E_BLOCK_PISTON) };
+}

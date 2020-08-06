@@ -87,12 +87,6 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		// Top part of a door doesn't drop anything:
-		if ((a_BlockMeta & 0x08) != 0)
-		{
-			return {};
-		}
-
 		switch (m_BlockType)
 		{
 			case E_BLOCK_OAK_DOOR:      return cItem(E_ITEM_WOODEN_DOOR);

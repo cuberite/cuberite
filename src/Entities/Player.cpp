@@ -2910,22 +2910,20 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		}
 	}  // for blk - a_Blocks[]
 
-	// Set the blocks:
-	m_World->SetBlocks(a_Blocks);
-
-	// Notify the blockhandlers:
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	for (auto blk: a_Blocks)
 	{
+		// Set the blocks:
+		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
+
+		// Notify the blockhandlers:
 		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
 		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
-	}
 
-	// Call the "placed" hooks:
-	for (auto blk: a_Blocks)
-	{
+		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, blk);
 	}
+
 	return true;
 }
 

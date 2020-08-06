@@ -162,12 +162,12 @@ public:
 
 
 
-	virtual void Check(
-		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
-		Vector3i a_RelPos,
-		cChunk & a_Chunk
-	) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
 	{
+		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
+		{
+
+		const auto a_RelPos = a_Chunk.AbsoluteToRelative(a_BlockPos);
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelPos);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelPos);
 
@@ -190,15 +190,13 @@ public:
 					a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
 				}
 				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
-				return;
+				return false;
 			}
 			a_Chunk.SetBlock(a_RelPos, m_BlockType, Common);
 		}
-		else
-		{
-			auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-			a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
-		}
+
+		return false;
+		});
 	}
 
 

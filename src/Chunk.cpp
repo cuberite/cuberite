@@ -651,8 +651,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		return;
 	}
 
-	BroadcastPendingBlockChanges();
-
 	CheckBlocks();
 
 	// Tick simulators:
@@ -716,6 +714,8 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 	}  // for itr - m_Entitites[]
 
 	ApplyWeatherToTop();
+
+	BroadcastPendingBlockChanges();
 }
 
 
@@ -812,23 +812,21 @@ void cChunk::BroadcastPendingBlockChanges(void)
 
 void cChunk::CheckBlocks()
 {
-	if (m_ToTickBlocks.empty())
-	{
-		return;
-	}
-	std::vector<Vector3i> ToTickBlocks;
-	std::swap(m_ToTickBlocks, ToTickBlocks);
-
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*m_World);
 
-	for (std::vector<Vector3i>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
+	// Process a limited number of blocks since cBlockHandler::Check may queue more to tick
+	auto Count = m_ToTickBlocks.size();
+
+	while (Count != 0)
 	{
-		Vector3i Pos = (*itr);
+		const auto Pos = m_ToTickBlocks.front();
+		m_ToTickBlocks.pop();
+		Count--;
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
 		Handler->Check(ChunkInterface, PluginInterface, Pos, *this);
-	}  // for itr - ToTickBlocks[]
+	}
 }
 
 
@@ -1159,23 +1157,6 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, 
 
 
 
-void cChunk::UnboundedQueueTickBlock(Vector3i a_RelPos)
-{
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
-	{
-		return;
-	}
-	auto chunk = GetRelNeighborChunkAdjustCoords(a_RelPos);
-	if ((chunk != nullptr) && chunk->IsValid())
-	{
-		chunk->QueueTickBlock(a_RelPos);
-	}
-}
-
-
-
-
-
 int cChunk::GetHeight(int a_X, int a_Z)
 {
 	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
@@ -1206,14 +1187,14 @@ void cChunk::CreateBlockEntities(void)
 			auto BlockType = Section->m_BlockTypes[BlockIdx];
 			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
 			{
-				auto relPos = IndexToCoordinate(BlockIdx);
-				relPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				auto absPos = RelativeToAbsolute(relPos);
+				auto RelPos = IndexToCoordinate(BlockIdx);
+				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
+				const auto AbsPos = RelativeToAbsolute(RelPos);
 
-				if (!HasBlockEntityAt(absPos))
+				if (!HasBlockEntityAt(AbsPos))
 				{
 					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-						BlockType, GetMeta(relPos), absPos, m_World
+						BlockType, GetMeta(RelPos), AbsPos, m_World
 					));
 				}
 			}
@@ -1241,40 +1222,13 @@ void cChunk::WakeUpSimulators(void)
 
 		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
 		{
-			auto BlockType = Section->m_BlockTypes[BlockIdx];
+			const auto BlockType = Section->m_BlockTypes[BlockIdx];
+			auto Position = IndexToCoordinate(BlockIdx);
+			Position.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
 
-			// Defer calculation until it's actually needed
-			auto WorldPos = [&]
-			{
-				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				return RelativeToAbsolute(RelPos);
-			};
-
-			// The redstone sim takes multiple blocks, use the inbuilt checker
-			if (RedstoneSimulator->IsAllowedBlock(BlockType))
-			{
-				RedstoneSimulator->AddBlock(WorldPos(), this);
-				continue;
-			}
-
-			switch (BlockType)
-			{
-				case E_BLOCK_WATER:
-				{
-					WaterSimulator->AddBlock(WorldPos(), this);
-					break;
-				}
-				case E_BLOCK_LAVA:
-				{
-					LavaSimulator->AddBlock(WorldPos(), this);
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}  // switch (BlockType)
+			RedstoneSimulator->AddBlock(*this, Position, BlockType);
+			WaterSimulator->AddBlock(*this, Position, BlockType);
+			LavaSimulator->AddBlock(*this, Position, BlockType);
 		}
 	}
 }
@@ -1310,9 +1264,11 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 {
 	FastSetBlock(a_RelPos, a_BlockType, a_BlockMeta);
 
-	// Tick this block and its neighbors:
-	m_ToTickBlocks.push_back(a_RelPos);
-	QueueTickBlockNeighbors(a_RelPos);
+	// Tick this block's neighbors via cBlockHandler::Check:
+	m_ToTickBlocks.push(a_RelPos);
+
+	// Wake up the simulators for this block:
+	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
 	// If there was a block entity, remove it:
 	cBlockEntity * BlockEntity = GetBlockEntityRel(a_RelPos);
@@ -1323,84 +1279,9 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	}
 
 	// If the new block is a block entity, create the entity object:
-	switch (a_BlockType)
+	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 	{
-		case E_BLOCK_BEACON:
-		case E_BLOCK_BED:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:
-		case E_BLOCK_HEAD:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_FLOWER_POT:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_BREWING_STAND:
-		{
-			// Fast set block has already marked dirty
-			AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
-			break;
-		}
-	}  // switch (a_BlockType)
-}
-
-
-
-
-
-void cChunk::QueueTickBlock(Vector3i a_RelPos)
-{
-	ASSERT(IsValidRelPos(a_RelPos));
-
-	if (!IsValid())
-	{
-		return;
-	}
-
-	m_ToTickBlocks.push_back(a_RelPos);
-}
-
-
-
-
-
-void cChunk::QueueTickBlockNeighbors(Vector3i a_RelPos)
-{
-	// Contains our direct adjacents
-	// and one block above and below the laterals (for redstone components)
-	static const Vector3i Offsets[] =
-	{
-		{ 1,  1,  0},
-		{ 1,  0,  0},
-		{ 1, -1,  0},
-
-		{-1,  1,  0},
-		{-1,  0,  0},
-		{-1, -1,  0},
-
-		{ 0,  1,  1},
-		{ 0,  0,  1},
-		{ 0, -1,  1},
-
-		{ 0,  1, -1},
-		{ 0,  0, -1},
-		{ 0, -1, -1},
-
-		{ 0,  1,  0},
-		{ 0, -1,  0},
-	};
-
-	for (const auto & Offset : Offsets)
-	{
-		UnboundedQueueTickBlock(a_RelPos + Offset);
+		AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
 	}
 }
 

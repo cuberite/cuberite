@@ -65,21 +65,12 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	);
+	) {};
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange
-	);
-
-	/** Called just before the player breaks the block.
-	The block is still valid in the world.
-	By default does nothing special; descendants may provide further behavior. */
-	virtual void OnPlayerBreakingBlock(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		Vector3i a_BlockPos
-	) {}
+	) {};
 
 	/** Called just after the player breaks the block.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
@@ -91,14 +82,6 @@ public:
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) {}
 
-	/** Called before a block gets broken (replaced with air), either by player or by natural means.
-	If by player, it is called after the OnPlayerBreakingBlock() callback.
-	By default does nothing. */
-	virtual void OnBreaking(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos
-	) {}
-
 	/** Called after a block gets broken (replaced with air), either by player or by natural means.
 	If by player, it is called before the OnPlayerBrokeBlock() callback.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
@@ -107,13 +90,13 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	);
+	) {};
 
 	/** Called when a direct neighbor of this block has been changed.
 	The position is the block's own position, NOT the changed neighbor's position.
 	a_WhichNeighbor indicates which neighbor has changed. For example, BLOCK_FACE_YP meant the neighbor above has changed.
 	BLOCK_FACE_NONE means that it is a neighbor not directly adjacent (diagonal, etc.) */
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) {}
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor);
 
 	/** Notifies the specified neighbor that the current block has changed.
 	a_NeighborPos are the coords of the neighbor to be notified
@@ -208,7 +191,7 @@ public:
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops (DropBlockAsPickup() / SetBlock()) if the position is no longer suitable (CanBeAt(), DoesDropOnUnsuitable()),
 	otherwise wakes up all simulators on the block. */
-	virtual void Check(
+	void Check(
 		cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface,
 		Vector3i a_RelPos,
 		cChunk & a_Chunk

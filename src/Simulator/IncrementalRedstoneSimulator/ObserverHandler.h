@@ -87,7 +87,7 @@ public:
 			a_Chunk.SetMeta(a_Position, a_Meta & ~0x8);
 		}
 
-		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
 	}
 
 	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
