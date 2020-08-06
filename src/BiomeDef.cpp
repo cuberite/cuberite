@@ -223,6 +223,29 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 
 
 
+bool IsMountainBiome(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biExtremeHills:
+		case biExtremeHillsEdge:
+		case biExtremeHillsM:
+		case biExtremeHillsPlus:
+		case biExtremeHillsPlusM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
 int GetSnowStartHeight(EMCSBiome a_Biome)
 {
 	switch (a_Biome)
