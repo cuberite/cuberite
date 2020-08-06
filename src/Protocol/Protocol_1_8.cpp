@@ -3475,6 +3475,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 				Writer.EndList();
 			}
 			Writer.AddInt("Base", BannerEntity.GetBaseColor());
+			break;
 		}
 
 		default:
