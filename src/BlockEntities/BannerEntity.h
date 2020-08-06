@@ -94,15 +94,13 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override { return true; }
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	void SetBaseColor(unsigned char a_Color);
-	void SetId(AString * a_Id);
-
 	// Functions for sending with network and storing to disk
 	bool HasPatterns() const;
+	void SetBaseColor(short a_Color);
 	unsigned char GetBaseColor() const;
 
 	// Pattern handling
-	bool AddPattern(BannerPattern & a_Pattern, bool a_ByCommand = false);
+	bool AddPattern(BannerPattern a_Pattern, bool a_ByCommand = false);
 	const short GetPatternCount() const;
 	const BannerPattern * GetPattern(short a_Pattern) const;
 	void ClearAll();
@@ -116,7 +114,6 @@ protected:
 	short m_PatternCount = 0;
 
 	short m_BaseColor = 1;
-	AString * m_Id;
 
 
 } ;  // tolua_export

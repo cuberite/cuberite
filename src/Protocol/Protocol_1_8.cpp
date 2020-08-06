@@ -3463,15 +3463,16 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddString("id", "Banner");
 			if (BannerEntity.HasPatterns())
 			{
-				cFastNBTWriter PatternWriter;
-				for (short i = 0; i < BannerEntity.GetPatternCount(); i++)
+				Writer.BeginList("Patterns", TAG_Compound);
+				for (int i = 0; i < BannerEntity.GetPatternCount(); ++i)
 				{
 					auto Pattern = BannerEntity.GetPattern(i);
-					PatternWriter.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
-					PatternWriter.AddShort("Color", Pattern->m_Color);
+					Writer.BeginCompound(std::to_string(i));
+						Writer.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
+						Writer.AddInt("Color", static_cast<int>(Pattern->m_Color));
+					Writer.EndCompound();
 				}
-				PatternWriter.Finish();
-				Writer.AddByteArray("Patterns", PatternWriter.GetResult().data(), PatternWriter.GetResult().size());
+				Writer.EndList();
 			}
 			Writer.AddInt("Base", BannerEntity.GetBaseColor());
 		}

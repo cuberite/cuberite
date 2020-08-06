@@ -55,27 +55,18 @@ void cBannerEntity::SendTo(cClientHandle & a_Client)
 
 
 
-void cBannerEntity::SetBaseColor(unsigned char a_Color)
-{
-	m_BaseColor = a_Color;
-}
-
-
-
-
-
-void cBannerEntity::SetId(AString * a_Id)
-{
-	m_Id = std::move(a_Id);
-}
-
-
-
-
-
 bool cBannerEntity::HasPatterns() const
 {
 	return m_PatternCount > 0;
+}
+
+
+
+
+
+void cBannerEntity::SetBaseColor(short a_Color)
+{
+	m_BaseColor = a_Color;
 }
 
 
@@ -91,14 +82,14 @@ unsigned char cBannerEntity::GetBaseColor() const
 
 
 
-bool cBannerEntity::AddPattern(BannerPattern & a_Pattern, bool a_ByCommand)
+bool cBannerEntity::AddPattern(BannerPattern a_Pattern, bool a_ByCommand)
 {
 	// check if there is space for another pattern - with crating max is 6 and by command 16
 	if (((a_ByCommand) && (m_PatternCount == 16)) || ((!a_ByCommand) && (m_PatternCount == 6)))
 	{
 		return false;
 	}
-	m_Patterns[m_PatternCount - 1] = a_Pattern;
+	m_Patterns[m_PatternCount] = a_Pattern;
 	m_PatternCount++;
 	return true;
 }

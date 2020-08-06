@@ -223,7 +223,7 @@ public:
 					return false;
 				}
 
-				a_BlockEntity.SetBaseColor(static_cast<unsigned char>(a_EquippedItem.m_ItemDamage));
+				a_BlockEntity.SetBaseColor(static_cast<short>(a_EquippedItem.m_ItemDamage));
 				a_BlockEntity.GetWorld()->BroadcastBlockEntity(a_BlockEntity.GetPos());
 				return true;
 			}

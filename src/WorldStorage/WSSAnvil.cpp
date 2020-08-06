@@ -903,26 +903,22 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_Tag
 	}
 	auto Banner = std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
-	// Reads custom name from NBT
-	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "id");
-	if (CurrentLine >= 0)
-	{
-		auto id = a_NBT.GetString(CurrentLine);
-		Banner->SetId(&id);
-	}
-
 	// Reads patterns from NBT
-	int Pattern = a_NBT.FindChildByName(a_TagIdx, "Pattern");
-	if ((Pattern >= 0) && (a_NBT.GetType(Pattern) == TAG_List))
+	int Patterns = a_NBT.FindChildByName(a_TagIdx, "Patterns");
+	if ((Patterns >= 0) && (a_NBT.GetType(Patterns) == TAG_List))
 	{
-		for (int Child = a_NBT.GetFirstChild(Pattern); Child != -1; Child = a_NBT.GetNextSibling(Child))
+		int i = 0;
+		for (int Child = a_NBT.GetFirstChild(Patterns); Child != -1; Child = a_NBT.GetNextSibling(Child))
 		{
-			// LOG(a_NBT.GetString(Child));
+			int Pattern = a_NBT.FindChildByName(Child, "Pattern");
+			int Color = a_NBT.FindChildByName(Child, "Color");
+			Banner->AddPattern({eBannerPattern::Border, static_cast<short>(a_NBT.GetInt(Color))}, true);
+			i++;
 		}
 	}
 
 	// Reads base color from NBT
-	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
 		auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
