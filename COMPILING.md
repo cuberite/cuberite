@@ -260,10 +260,10 @@ Disables optimizations for the build host. This is important when building on a 
 Disables use of the system lua, uses a compiled version instead. Useful if compiling on a system that doesn't already have lua installed. This option is incompatible with cross-compilation.
 
 ###### UNITY_BUILDS
-Controls use of unity builds, an optimisation that improves compile times at the expense of system compatibility and error message utility. Some systems may need to have this disabled in order to compile properly.
+Controls use of unity builds, an optimisation that improves compile times at the expense of system compatibility and error message utility. Some systems may need to have this disabled in order to compile properly. Unity builds are only supported on CMake versions >= 3.16, if you have an old version unity builds will always be disabled and this flag has no effect.
 
 ###### PRECOMPILE_HEADERS
-Controls use of precompiled headers, an optimisation that improves compile times at the expense of system compatibility. Some systems may need to have this disabled in order to compile properly.
+Controls use of precompiled headers, an optimisation that improves compile times at the expense of system compatibility. Some systems may need to have this disabled in order to compile properly. Precompiled headers are only supported on CMake versions >= 3.16, if you have an old version precompiled headers will always be disabled and this flag has no effect.
 
 ###### WHOLE_PROGRAM_OPTIMISATION
 Controls use of link time optimisation (LTO), which slightly improves the generated binary file at the expense of compilation speed and system compatibility. Some systems may need to have this disabled in order to compile properly.
