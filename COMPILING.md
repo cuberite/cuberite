@@ -256,6 +256,19 @@ Forces the build to use 32 bit builds on *nix systems. Define as ON to enable. D
 ###### NO_NATIVE_OPTIMIZATION
 Disables optimizations for the build host. This is important when building on a different machine from the one you will run Cuberite on as the build machine may support instructions the final machine does not. This flag only has any effect on linux. Define as ON to enable. Define as OFF to disable.
 
+###### DISABLE_SYSTEM_LUA
+Disables use of the system lua, uses a compiled version instead. Useful if compiling on a system that doesn't already have lua installed. This option is incompatible with cross-compilation.
+
+###### UNITY_BUILDS
+Controls use of unity builds, an optimisation that improves compile times at the expense of system compatibility and error message utility. Some systems may need to have this disabled in order to compile properly.
+
+###### PRECOMPILE_HEADERS
+Controls use of precompiled headers, an optimisation that improves compile times at the expense of system compatibility. Some systems may need to have this disabled in order to compile properly.
+
+###### WHOLE_PROGRAM_OPTIMISATION
+Controls use of link time optimisation (LTO), which slightly improves the generated binary file at the expense of compilation speed and system compatibility. Some systems may need to have this disabled in order to compile properly.
+
+
 [1]: https://www.visualstudio.com/downloads/
 [2]: https://cmake.org/download/
 [3]: https://git-for-windows.github.io/
