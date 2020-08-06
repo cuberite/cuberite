@@ -136,6 +136,15 @@ bool cHopperEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cHopperEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Hopper");
+}
+
+
+
+
+
 void cHopperEntity::OpenNewWindow(void)
 {
 	OpenWindow(new cHopperWindow(this));

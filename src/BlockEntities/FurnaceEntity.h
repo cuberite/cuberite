@@ -51,6 +51,7 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	/** Restarts cooking
 	Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active

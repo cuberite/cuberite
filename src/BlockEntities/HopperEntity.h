@@ -59,6 +59,7 @@ protected:
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	/** Opens a new chest window for this chest. Scans for neighbors to open a double chest window, if appropriate. */
 	void OpenNewWindow(void);

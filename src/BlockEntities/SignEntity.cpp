@@ -91,3 +91,12 @@ void cSignEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateSign(m_Pos.x, m_Pos.y, m_Pos.z, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
 }
+
+
+
+
+
+void cSignEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Sign");
+}

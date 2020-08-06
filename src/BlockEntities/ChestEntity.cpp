@@ -135,6 +135,15 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cChestEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Chest");
+}
+
+
+
+
+
 void cChestEntity::ScanNeighbours()
 {
 	// Callback for finding neighbouring chest:

@@ -112,6 +112,15 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+void cMobSpawnerEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Mob Spawner");
+}
+
+
+
+
+
 void cMobSpawnerEntity::ResetTimer(void)
 {
 	m_SpawnDelay = GetRandomProvider().RandInt<short>(200, 800);

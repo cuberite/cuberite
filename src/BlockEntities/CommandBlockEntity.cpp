@@ -39,6 +39,14 @@ bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cCommandBlockEntity::SerializeBlockEntity(cFastNBTWriter & a_Nbt) const
+{
+	LOG("Test Command Block");
+}
+
+
+
+
 
 void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 {

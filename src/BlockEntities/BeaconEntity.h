@@ -35,6 +35,7 @@ public:  // tolua_export
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	/** Modify the beacon level. (It is needed to load the beacon corectly) */
 	void SetBeaconLevel(char a_Level) { m_BeaconLevel = a_Level; }

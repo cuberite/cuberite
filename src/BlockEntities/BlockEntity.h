@@ -32,6 +32,7 @@ class cChunk;
 class cPlayer;
 class cWorld;
 class cBlockEntity;
+class cFastNBTWriter;
 
 using OwnedBlockEntity = std::unique_ptr<cBlockEntity>;
 using cBlockEntities = std::unordered_map<size_t, OwnedBlockEntity>;
@@ -139,6 +140,8 @@ public:
 		return false;
 	}
 
+	/** serialized the event for sending, saving, loading */
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const = 0;
 
 protected:
 

@@ -162,6 +162,14 @@ bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cFurnaceEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Furnace");
+}
+
+
+
+
 bool cFurnaceEntity::ContinueCooking(void)
 {
 	UpdateInput();

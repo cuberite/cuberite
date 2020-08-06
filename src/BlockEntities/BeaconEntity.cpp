@@ -7,6 +7,7 @@
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
 #include "../ClientHandle.h"
+#include "../WorldStorage/FastNBT.h"
 
 
 
@@ -324,3 +325,14 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 
 
 
+
+void cBeaconEntity::SerializeBlockEntity(cFastNBTWriter & a_Nbt) const
+{
+	a_Nbt.AddInt("x",         GetPosX());
+	a_Nbt.AddInt("y",         GetPosY());
+	a_Nbt.AddInt("z",         GetPosZ());
+	a_Nbt.AddInt("Primary",   GetPrimaryEffect());
+	a_Nbt.AddInt("Secondary", GetSecondaryEffect());
+	a_Nbt.AddInt("Levels",    GetBeaconLevel());
+	a_Nbt.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+}

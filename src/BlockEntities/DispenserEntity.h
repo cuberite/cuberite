@@ -22,6 +22,8 @@ public:  // tolua_export
 	/** Constructor used for normal operation */
 	cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
+
 	// tolua_begin
 
 	/** Spawns a projectile of the given kind in front of the dispenser with the specified speed.

@@ -48,6 +48,13 @@ void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 
 
 
+void cEnderChestEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Enderchest");
+}
+
+
+
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	if (

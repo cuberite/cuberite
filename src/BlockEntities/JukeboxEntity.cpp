@@ -81,6 +81,15 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cJukeboxEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Jukebox");
+}
+
+
+
+
+
 bool cJukeboxEntity::PlayRecord(int a_Record)
 {
 	if (!IsRecordItem(a_Record))

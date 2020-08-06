@@ -50,6 +50,7 @@ public:  // tolua_export
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	static bool IsFlower(short m_ItemType, short m_ItemData);
 

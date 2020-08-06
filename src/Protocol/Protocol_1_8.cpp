@@ -3369,19 +3369,14 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 		case E_BLOCK_BEACON:
 		{
 			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x",         BeaconEntity.GetPosX());
-			Writer.AddInt("y",         BeaconEntity.GetPosY());
-			Writer.AddInt("z",         BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			BeaconEntity.SerializeBlockEntity(Writer);
 			break;
 		}
 
 		case E_BLOCK_COMMAND_BLOCK:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
+			CommandBlockEntity.SerializeBlockEntity(Writer);
 			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
 			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());

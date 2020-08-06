@@ -85,6 +85,14 @@ void cFlowerPotEntity::SendTo(cClientHandle & a_Client)
 
 
 
+void cFlowerPotEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test FlowerPot");
+}
+
+
+
+
 bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 {
 	switch (m_ItemType)

@@ -27,6 +27,7 @@ public:  // tolua_export
 	// cBlockEntity overrides:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	static void LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid);
 	static void SaveToJson(Json::Value & a_Value, const cItemGrid & a_Grid);

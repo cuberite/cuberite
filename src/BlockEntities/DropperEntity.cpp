@@ -20,6 +20,15 @@ cDropperEntity::cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
+void cDropperEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Dropper");
+}
+
+
+
+
+
 void cDropperEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
 	DropFromSlot(a_Chunk, a_SlotNum);

@@ -375,11 +375,12 @@ public:
 
 	void AddBeaconEntity(cBeaconEntity * a_Entity)
 	{
-		mWriter.BeginCompound("");
+		mWriter.BeginCompound(""); /*
 			AddBasicTileEntity(a_Entity, "Beacon");
 			mWriter.AddInt("Levels", a_Entity->GetBeaconLevel());
 			mWriter.AddInt("Primary", static_cast<int>(a_Entity->GetPrimaryEffect()));
-			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect()));
+			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect())); */
+			a_Entity->SerializeBlockEntity(mWriter);
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();

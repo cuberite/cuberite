@@ -45,6 +45,7 @@ public:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 	/** Search horizontally adjacent blocks for neighbouring chests of the same type and links them together. */
 	void ScanNeighbours();

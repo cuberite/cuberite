@@ -41,6 +41,7 @@ public:  // tolua_export
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override { return false; }
 	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 private:
 	short m_Color;

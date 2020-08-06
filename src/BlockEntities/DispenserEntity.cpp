@@ -23,6 +23,15 @@ cDispenserEntity::cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 
 
 
+void cDispenserEntity::SerializeBlockEntity(cFastNBTWriter & a_Nbt) const
+{
+	LOG("Test Dispenser");
+}
+
+
+
+
+
 void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
 	Vector3i dispRelCoord(GetRelPos());

@@ -56,3 +56,12 @@ void cBedEntity::SetColor(short a_Color)
 		a_World.BroadcastBlockEntity(Pos);
 	});
 }
+
+
+
+
+
+void cBedEntity::SerializeBlockEntity(cFastNBTWriter & a_Nbt) const
+{
+	LOG("Test Bed");
+}

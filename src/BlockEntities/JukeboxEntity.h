@@ -51,6 +51,7 @@ public:  // tolua_export
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
+	virtual void SerializeBlockEntity(cFastNBTWriter & a_Nbt) const override;
 
 private:
 	int m_Record;

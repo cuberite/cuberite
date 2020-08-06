@@ -51,6 +51,15 @@ bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cMobHeadEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Mob Head");
+}
+
+
+
+
+
 void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))

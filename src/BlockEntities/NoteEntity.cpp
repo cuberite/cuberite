@@ -43,6 +43,15 @@ bool cNoteEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cNoteEntity::SerializeBlockEntity(cFastNBTWriter &a_Nbt) const
+{
+	LOG("Test Noteblock");
+}
+
+
+
+
+
 void cNoteEntity::MakeSound(void)
 {
 	char instrument;
