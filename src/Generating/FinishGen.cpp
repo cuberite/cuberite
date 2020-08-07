@@ -1782,7 +1782,16 @@ void cFinishGenOreNests::GenerateOre(
 		nestRnd /= cChunkDef::Width;
 		int BaseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		// if the NestSize is smaller then four this breaks
+		int NestSize;
+		if (a_NestSize >= 4)
+		{
+			NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		}
+		else
+		{
+			NestSize = a_NestSize;
+		}
 		int Num = 0;
 		while (Num < NestSize)
 		{
@@ -1792,6 +1801,7 @@ void cFinishGenOreNests::GenerateOre(
 			int ysize = (rnd / 4) % 2;
 			int zsize = (rnd / 16) % 2;
 			rnd >>= 8;
+			if (a_OreType == E_BLOCK_EMERALD_ORE) {LOG(std::to_string(xsize));}
 			for (int x = xsize; x >= 0; --x)
 			{
 				int BlockX = BaseX + x;
