@@ -1715,7 +1715,7 @@ OwnedEntity cChunk::RemoveEntity(cEntity & a_Entity)
 
 
 
-bool cChunk::HasEntity(UInt32 a_EntityID)
+bool cChunk::HasEntity(UInt32 a_EntityID) const
 {
 	for (const auto & Entity : m_Entities)
 	{
@@ -1731,7 +1731,7 @@ bool cChunk::HasEntity(UInt32 a_EntityID)
 
 
 
-bool cChunk::ForEachEntity(cEntityCallback a_Callback)
+bool cChunk::ForEachEntity(cEntityCallback a_Callback) const
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
@@ -1748,7 +1748,7 @@ bool cChunk::ForEachEntity(cEntityCallback a_Callback)
 
 
 
-bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback)
+bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) const
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
@@ -1774,7 +1774,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Ca
 
 
 
-bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult)
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult) const
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (const auto & Entity : m_Entities)
