@@ -9,14 +9,12 @@
 
 class cRedstoneTorchHandler final : public cRedstoneHandler
 {
-public:
-
 	inline static bool IsOn(BLOCKTYPE a_Block)
 	{
 		return (a_Block == E_BLOCK_REDSTONE_TORCH_ON);
 	}
 
-	inline static Vector3i GetOffsetAttachedTo(Vector3i a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetOffsetAttachedTo(const NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -33,17 +31,20 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
+		const auto QueryOffset = a_QueryPosition - a_Position;
+
 		if (
-			IsOn(a_BlockType) &&
-			(a_QueryPosition != (a_Position + GetOffsetAttachedTo(a_Position, a_Meta))) &&
-			(cIncrementalRedstoneSimulator::IsMechanism(a_QueryBlockType) || (cBlockInfo::FullyOccupiesVoxel(a_QueryBlockType) && (a_QueryPosition == (a_Position + OffsetYP))))
+			!IsOn(a_BlockType) ||
+			(QueryOffset == GetOffsetAttachedTo(a_Chunk.GetMeta(a_Position))) ||
+			(IsLinked && (QueryOffset != OffsetYP))
 		)
 		{
-			return 15;
+			return 0;
 		}
-		return 0;
+
+		return 15;
 	}
 
 	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
@@ -55,40 +56,42 @@ public:
 
 		if (DelayInfo == nullptr)
 		{
-			bool ShouldBeOn = (a_PoweringData.PowerLevel == 0);
+			const bool ShouldBeOn = (a_PoweringData.PowerLevel == 0);
 			if (ShouldBeOn != IsOn(a_BlockType))
 			{
 				Data.m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);
 			}
+
+			return;
 		}
-		else
+
+		int DelayTicks;
+		bool ShouldPowerOn;
+		std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
+
+		if (DelayTicks != 0)
 		{
-			int DelayTicks;
-			bool ShouldPowerOn;
-			std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
+			return;
+		}
 
-			if (DelayTicks != 0)
+		a_Chunk.FastSetBlock(a_Position, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
+		Data.m_MechanismDelays.erase(a_Position);
+
+		for (const auto Adjacent : RelativeAdjacents)
+		{
+			// Update all adjacents (including linked power positions)
+			// apart from our attachment, which can't possibly need an update:
+			if (Adjacent != GetOffsetAttachedTo(a_Meta))
 			{
-				return;
-			}
-
-			a_Chunk.SetBlock(a_Position, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
-			Data.m_MechanismDelays.erase(a_Position);
-
-			for (const auto Adjacent : RelativeAdjacents)
-			{
-				if (Adjacent != GetOffsetAttachedTo(a_Position, a_Meta))
-				{
-					UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + Adjacent);
-				}
+				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, Adjacent);
 			}
 		}
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
-		Callback(a_Position + GetOffsetAttachedTo(a_Position, a_Meta));
+		Callback(a_Position + GetOffsetAttachedTo(a_Meta));
 	}
 };

@@ -48,7 +48,7 @@ public:
 		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta, false);
-		WakeUpSimulators(a_WorldInterface, a_BlockPos);
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
 		// Queue a button reset (unpress)
@@ -186,34 +186,13 @@ public:
 		}
 
 		a_World.SetBlockMeta(Pos, Meta | 0x08, false);
-		WakeUpSimulators(a_World, Pos);
+		a_World.WakeUpSimulators(Pos);
 
 		// sound name is ok to be wood, because only wood gets triggered by arrow
 		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
 
 		// Queue a button reset
 		QueueButtonRelease(a_World, Pos, Type);
-	}
-
-	/** Notify, mainly the redstone simulator, that this toggle component has updated. */
-	template <class WorldType>
-	static void WakeUpSimulators(WorldType & a_World, const Vector3i a_Position)
-	{
-		// Contains our direct adjacents
-		static const Vector3i Offsets[] =
-		{
-			{ 1, 0, 0 },
-			{ -1, 0, 0 },
-			{ 0, 1, 0 },
-			{ 0, -1, 0 },
-			{ 0, 0, 1 },
-			{ 0, 0, -1 }
-		};
-
-		for (const auto & Offset : Offsets)
-		{
-			a_World.WakeUpSimulators(a_Position + Offset);
-		}
 	}
 
 private:
@@ -250,7 +229,7 @@ private:
 				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
 
 				a_World.SetBlockMeta(a_Position, Meta & 0x07, false);
-				WakeUpSimulators(a_World, a_Position);
+				a_World.WakeUpSimulators(a_Position);
 				a_World.BroadcastSoundEffect(SoundToPlayOnRelease, a_Position, 0.5f, 0.5f);
 			}
 		);

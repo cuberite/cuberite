@@ -8,19 +8,14 @@
 
 
 
-class cTrappedChestHandler:
-	public cRedstoneHandler
+class cTrappedChestHandler final : public cRedstoneHandler
 {
-	using Super = cRedstoneHandler;
-
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		UNUSED(IsLinked);
 
 		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
 	}
@@ -49,12 +44,11 @@ public:
 
 		if (Power != PreviousPower.PowerLevel)
 		{
-			UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, OffsetYM);
-			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeLaterals);
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 		}
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

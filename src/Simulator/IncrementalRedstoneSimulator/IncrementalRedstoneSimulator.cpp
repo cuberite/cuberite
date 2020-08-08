@@ -1,9 +1,8 @@
 
-
 #include "Globals.h"
 
 #include "IncrementalRedstoneSimulator.h"
-#include "../../Chunk.h"
+#include "ForEachSourceCallback.h"
 
 #include "CommandBlockHandler.h"
 #include "DoorHandler.h"
@@ -11,7 +10,6 @@
 #include "RedstoneWireHandler.h"
 #include "RedstoneRepeaterHandler.h"
 #include "RedstoneToggleHandler.h"
-#include "SolidBlockHandler.h"
 #include "RedstoneLampHandler.h"
 #include "RedstoneBlockHandler.h"
 #include "PistonHandler.h"
@@ -115,10 +113,6 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 				return std::make_unique<cDoorHandler>();
 			}
 
-			if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
-			{
-				return std::make_unique<cSolidBlockHandler>();
-			}
 			return nullptr;
 		}
 	}
@@ -182,42 +176,11 @@ void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & Tic
 		return;
 	}
 
-	PoweringData Power;
-	CurrentHandler->ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, [&Chunk, Position, CurrentBlock, &Power](Vector3i Location)
-	{
-		if (!cChunk::IsValidHeight(Location.y))
-		{
-			return;
-		}
-
-		const auto NeighbourChunk = Chunk.GetRelNeighborChunkAdjustCoords(Location);
-		if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
-		{
-			return;
-		}
-
-		BLOCKTYPE PotentialBlock;
-		NIBBLETYPE PotentialMeta;
-		NeighbourChunk->GetBlockTypeMeta(Location, PotentialBlock, PotentialMeta);
-
-		auto PotentialSourceHandler = GetComponentHandler(PotentialBlock);
-		if (PotentialSourceHandler == nullptr)
-		{
-			return;
-		}
-
-		const PoweringData PotentialPower(
-			PotentialBlock,
-			PotentialSourceHandler->GetPowerDeliveredToPosition(
-				*NeighbourChunk, Location, PotentialBlock, PotentialMeta,
-				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(Chunk, *NeighbourChunk, Position), CurrentBlock
-			)
-		);
-		Power = std::max(Power, PotentialPower);
-	});
+	ForEachSourceCallback Callback(Chunk, Position, CurrentBlock);
+	CurrentHandler->ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, Callback);
 
 	// Inform the handler to update
-	CurrentHandler->Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Power);
+	CurrentHandler->Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Callback.Power);
 }
 
 
@@ -239,6 +202,12 @@ void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Positi
 	if (IsAlwaysTicked(a_Block))
 	{
 		ChunkData.AlwaysTickedPositions.emplace(a_Position);
+	}
+
+	// Temporary: in the absence of block state support calculate our own:
+	if (a_Block == E_BLOCK_REDSTONE_WIRE)
+	{
+		static_cast<const cRedstoneWireHandler *>(GetComponentHandler(a_Block))->SetWireState(a_Chunk, a_Position);
 	}
 
 	// Always update redstone devices:
@@ -273,5 +242,21 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 	// The only thing to do go one block farther than this cross-coord, in the direction of Offset
 	// in order to notify linked-powered positions that there was a change
 
-	// TODO: use a_Offset, exclude a_Position and a_Position - a_Offset
+	for (const auto Offset : cSimulator::GetLinkedOffsets(a_Offset))
+	{
+		auto Relative = a_Position - a_Offset + Offset;
+		if (!cChunkDef::IsValidHeight(Relative.y))
+		{
+			continue;
+		}
+
+		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+		if ((Chunk == nullptr) || !Chunk->IsValid())
+		{
+			continue;
+		}
+
+		const auto Block = Chunk->GetBlock(Relative);
+		AddBlock(*Chunk, Relative, Block);
+	}
 }

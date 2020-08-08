@@ -10,8 +10,6 @@
 
 class cDropSpenserHandler final : public cRedstoneHandler
 {
-public:
-
 	inline static bool IsActivated(NIBBLETYPE a_Meta)
 	{
 		return (a_Meta & E_META_DROPSPENSER_ACTIVATED) != 0;
@@ -29,14 +27,14 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		UNUSED(IsLinked);
 		return 0;
 	}
 
@@ -63,7 +61,7 @@ public:
 		}
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

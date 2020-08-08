@@ -4,6 +4,7 @@
 #include <stack>
 
 #include "../RedstoneSimulator.h"
+#include "../../Chunk.h"
 
 
 
@@ -53,7 +54,7 @@ public:
 
 
 
-class cIncrementalRedstoneSimulatorChunkData : public cRedstoneSimulatorChunkData
+class cIncrementalRedstoneSimulatorChunkData final : public cRedstoneSimulatorChunkData
 {
 public:
 
@@ -90,6 +91,7 @@ public:
 		m_CachedPowerLevels.erase(Position);
 		m_MechanismDelays.erase(Position);
 		AlwaysTickedPositions.erase(Position);
+		WireStates.erase(Position);
 	}
 
 	PoweringData ExchangeUpdateOncePowerData(const Vector3i & a_Position, PoweringData a_PoweringData)
@@ -105,7 +107,7 @@ public:
 	}
 
 	/** Adjust From-relative coordinates into To-relative coordinates. */
-	inline static Vector3i RebaseRelativePosition(cChunk & From, cChunk & To, const Vector3i Position)
+	inline static Vector3i RebaseRelativePosition(const cChunk & From, const cChunk & To, const Vector3i Position)
 	{
 		return
 		{
@@ -115,9 +117,12 @@ public:
 		};
 	}
 
+	/** Temporary, should be chunk data: wire block store, to avoid recomputing states every time. */
+	std::unordered_map<Vector3i, short, VectorHasher<int>> WireStates;
+
 	std::unordered_set<Vector3i, VectorHasher<int>> AlwaysTickedPositions;
 
-	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on */
+	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on. */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;
 
 private:
