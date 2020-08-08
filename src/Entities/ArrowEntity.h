@@ -104,4 +104,7 @@ protected:
 	virtual void CollectedBy(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
+	// cEntity overrides:
+	virtual bool DoesPreventBlockPlacement(void) const override;
+
 };  // tolua_export

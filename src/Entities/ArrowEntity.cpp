@@ -195,3 +195,12 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
+
+
+
+
+
+bool cArrowEntity::DoesPreventBlockPlacement(void) const
+{
+	return false;
+}
