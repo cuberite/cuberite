@@ -1801,7 +1801,6 @@ void cFinishGenOreNests::GenerateOre(
 			int ysize = (rnd / 4) % 2;
 			int zsize = (rnd / 16) % 2;
 			rnd >>= 8;
-			if (a_OreType == E_BLOCK_EMERALD_ORE) {LOG(std::to_string(xsize));}
 			for (int x = xsize; x >= 0; --x)
 			{
 				int BlockX = BaseX + x;
