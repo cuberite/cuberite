@@ -8,16 +8,23 @@
 
 
 
-class cRedstoneRepeaterHandler:
-	public cRedstoneHandler
+class cRedstoneRepeaterHandler final : public cRedstoneHandler
 {
-	using Super = cRedstoneHandler;
-
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
-		return ((a_QueryPosition == (a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta))) && IsOn(a_BlockType)) ? 15 : 0;
+		if (!IsOn(a_BlockType))
+		{
+			return 0;
+		}
+
+		const auto FrontOffset = cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Chunk.GetMeta(a_Position));
+		const auto FrontPosition = a_Position + FrontOffset;
+		if (a_QueryPosition == FrontPosition)
+		{
+			return 15;
+		}
+
+		return 0;
 	}
 
 	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
@@ -45,36 +52,35 @@ public:
 			{
 				Data.m_MechanismDelays[a_Position] = std::make_pair((((a_Meta & 0xC) >> 0x2) + 1), ShouldBeOn);
 			}
+
+			return;
 		}
-		else
+
+		int DelayTicks;
+		bool ShouldPowerOn;
+		std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
+
+		if (DelayTicks != 0)
 		{
-			int DelayTicks;
-			bool ShouldPowerOn;
-			std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				const auto NewType = ShouldPowerOn ? E_BLOCK_REDSTONE_REPEATER_ON : E_BLOCK_REDSTONE_REPEATER_OFF;
-				a_Chunk.FastSetBlock(a_Position, NewType, a_Meta);
-				Data.m_MechanismDelays.erase(a_Position);
-
-				// While sleeping, we ignore any power changes and apply our saved ShouldBeOn when sleep expires
-				// Now, we need to recalculate to be aware of any new changes that may e.g. cause a new output change
-				// FastSetBlock doesn't wake simulators, so manually update ourselves:
-				Update(a_Chunk, CurrentlyTicking, a_Position, NewType, a_Meta, a_PoweringData);
-
-				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
-				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position + cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta), RelativeAdjacents);
-			}
+			return;
 		}
+
+		const auto NewType = ShouldPowerOn ? E_BLOCK_REDSTONE_REPEATER_ON : E_BLOCK_REDSTONE_REPEATER_OFF;
+		a_Chunk.FastSetBlock(a_Position, NewType, a_Meta);
+		Data.m_MechanismDelays.erase(a_Position);
+
+		// While sleeping, we ignore any power changes and apply our saved ShouldBeOn when sleep expires
+		// Now, we need to recalculate to be aware of any new changes that may e.g. cause a new output change
+		// FastSetBlock doesn't wake simulators, so manually update ourselves:
+		Update(a_Chunk, CurrentlyTicking, a_Position, NewType, a_Meta, a_PoweringData);
+
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		Callback(cBlockRedstoneRepeaterHandler::GetRearCoordinateOffset(a_Meta) + a_Position);
 	}
-
-private:
 
 	inline static bool IsOn(BLOCKTYPE a_Block)
 	{

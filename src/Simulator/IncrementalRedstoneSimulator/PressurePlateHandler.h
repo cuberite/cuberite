@@ -11,19 +11,18 @@
 
 class cPressurePlateHandler final : public cRedstoneHandler
 {
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
 
-		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
+		// Plates only link power blocks below
+		// Retrieve and return the cached power calculated by Update for performance:
+		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
 	}
 
-	static unsigned char GetPowerLevel(cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
+	static unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
 		unsigned NumberOfEntities = 0;
 		bool FoundPlayer = false;
@@ -70,12 +69,6 @@ public:
 		}
 	}
 
-	static void UpdatePlate(cChunk & Chunk, cChunk & CurrentlyTicking, Vector3i Position)
-	{
-		UpdateAdjustedRelative(Chunk, CurrentlyTicking, Position + OffsetYM);
-		UpdateAdjustedRelatives(Chunk, CurrentlyTicking, Position, RelativeLaterals);
-	}
-
 	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
@@ -107,7 +100,9 @@ public:
 
 			// Immediately depress plate
 			a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
-			return UpdatePlate(a_Chunk, CurrentlyTicking, a_Position);
+
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
+			return;
 		}
 
 		// Not a resting state
@@ -137,7 +132,7 @@ public:
 			{
 				// Yes. Update power
 				ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
-				return UpdatePlate(a_Chunk, CurrentlyTicking, a_Position);
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 			}
 
 			return;
@@ -159,7 +154,7 @@ public:
 			{
 				// Yes. Update power
 				ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
-				return UpdatePlate(a_Chunk, CurrentlyTicking, a_Position);
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 			}
 
 			// Yes, but player's still on the plate, do nothing
@@ -173,10 +168,10 @@ public:
 		ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
 
 		a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
-		return UpdatePlate(a_Chunk, CurrentlyTicking, a_Position);
+		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

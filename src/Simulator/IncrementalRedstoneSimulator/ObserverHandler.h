@@ -10,8 +10,6 @@
 
 class cObserverHandler final : public cRedstoneHandler
 {
-public:
-
 	inline static bool IsOn(NIBBLETYPE a_Meta)
 	{
 		return (a_Meta & 0x8) == 0x8;
@@ -34,14 +32,10 @@ public:
 		return (Previous.PoweringBlock != Observed.PoweringBlock) || (Previous.PowerLevel != Observed.PowerLevel);
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
-		if (IsOn(a_Meta) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Meta))))
-		{
-			return 15;
-		}
-
-		return 0;
+		const auto Meta = a_Chunk.GetMeta(a_Position);
+		return (IsOn(Meta) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(Meta)))) ? 15 : 0;
 	}
 
 	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
@@ -87,10 +81,10 @@ public:
 			a_Chunk.SetMeta(a_Position, a_Meta & ~0x8);
 		}
 
-		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

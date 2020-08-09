@@ -27,7 +27,7 @@ public:
 
 	virtual ~cSimulator() {}
 
-	// Contains our direct adjacents
+	/** Contains offsets for direct adjacents of any position. */
 	static constexpr std::array<Vector3i, 6> AdjacentOffsets
 	{
 		{
@@ -39,6 +39,9 @@ public:
 			{  0,  0, -1 },
 		}
 	};
+
+	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset position, excluding the old position. */
+	static std::array<Vector3i, 5> GetLinkedOffsets(Vector3i Offset);
 
 protected:
 

@@ -16,58 +16,11 @@ class cIncrementalRedstoneSimulator final :
 
 public:
 
-	cIncrementalRedstoneSimulator(cWorld & a_World) :
-		Super(a_World)
-	{
-	}
+	using Super::cRedstoneSimulator;
 
 	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
 
-	/** Returns if a block is a mechanism (something that accepts power and does something)
-	Used by torches to determine if they will power a block */
-	inline static bool IsMechanism(BLOCKTYPE Block)
-	{
-		switch (Block)
-		{
-			case E_BLOCK_ACACIA_DOOR:
-			case E_BLOCK_ACACIA_FENCE_GATE:
-			case E_BLOCK_ACTIVATOR_RAIL:
-			case E_BLOCK_ACTIVE_COMPARATOR:
-			case E_BLOCK_BIRCH_DOOR:
-			case E_BLOCK_BIRCH_FENCE_GATE:
-			case E_BLOCK_COMMAND_BLOCK:
-			case E_BLOCK_DARK_OAK_DOOR:
-			case E_BLOCK_DARK_OAK_FENCE_GATE:
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_FENCE_GATE:
-			case E_BLOCK_HOPPER:
-			case E_BLOCK_INACTIVE_COMPARATOR:
-			case E_BLOCK_IRON_DOOR:
-			case E_BLOCK_IRON_TRAPDOOR:
-			case E_BLOCK_JUNGLE_DOOR:
-			case E_BLOCK_JUNGLE_FENCE_GATE:
-			case E_BLOCK_NOTE_BLOCK:
-			case E_BLOCK_OBSERVER:
-			case E_BLOCK_PISTON:
-			case E_BLOCK_POWERED_RAIL:
-			case E_BLOCK_REDSTONE_LAMP_OFF:
-			case E_BLOCK_REDSTONE_LAMP_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_WIRE:
-			case E_BLOCK_SPRUCE_DOOR:
-			case E_BLOCK_SPRUCE_FENCE_GATE:
-			case E_BLOCK_STICKY_PISTON:
-			case E_BLOCK_TNT:
-			case E_BLOCK_TRAPDOOR:
-			case E_BLOCK_WOODEN_DOOR:
-			{
-				return true;
-			}
-			default: return false;
-		}
-	}
+private:
 
 	/** Returns if a redstone device is always ticked due to influence by its environment */
 	inline static bool IsAlwaysTicked(BLOCKTYPE a_Block)
@@ -133,7 +86,6 @@ public:
 			case E_BLOCK_TRAPDOOR:
 			case E_BLOCK_TRAPPED_CHEST:
 			case E_BLOCK_TRIPWIRE_HOOK:
-			case E_BLOCK_TRIPWIRE:
 			case E_BLOCK_WOODEN_BUTTON:
 			case E_BLOCK_WOODEN_DOOR:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
@@ -144,8 +96,6 @@ public:
 			default: return false;
 		}
 	}
-
-private:
 
 	virtual void Simulate(float Dt) override {};
 	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;

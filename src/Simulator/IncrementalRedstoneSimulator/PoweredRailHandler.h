@@ -9,8 +9,6 @@
 
 class cPoweredRailHandler final : public cRedstoneHandler
 {
-public:
-
 	static Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
 	{
 		switch (a_Meta & 0x7)
@@ -29,11 +27,12 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_QueryBlockType);
 
-		auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
+		const auto Meta = a_Chunk.GetMeta(a_Position);
+		const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(Meta);
 		if (((Offset + a_Position) == a_QueryPosition) || ((-Offset + a_Position) == a_QueryPosition))
 		{
 			auto Power = DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
@@ -66,8 +65,8 @@ public:
 				{
 					a_Chunk.SetMeta(a_Position, (a_PoweringData.PowerLevel == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
 
-					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position + Offset);
-					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position + -Offset);
+					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, Offset);
+					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, -Offset);
 				}
 
 				return;
@@ -79,7 +78,7 @@ public:
 		}
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Meta);

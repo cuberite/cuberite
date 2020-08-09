@@ -1,16 +1,17 @@
 target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
+	ForEachSourceCallback.cpp
 	IncrementalRedstoneSimulator.cpp
 
 	CommandBlockHandler.h
 	DoorHandler.h
 	DropSpenserHandler.h
+	ForEachSourceCallback.h
 	HopperHandler.h
 	IncrementalRedstoneSimulator.h
 	RedstoneHandler.h
 	RedstoneSimulatorChunkData.h
-	SolidBlockHandler.h
 	RedstoneComparatorHandler.h
 	RedstoneRepeaterHandler.h
 	RedstoneBlockHandler.h

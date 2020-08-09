@@ -10,6 +10,90 @@
 
 
 
+std::array<Vector3i, 5> cSimulator::GetLinkedOffsets(const Vector3i Offset)
+{
+	if (Offset.x == -1)
+	{
+		return
+		{
+			{
+				{ -2,  0,  0 },
+				{ -1, -1,  0 },
+				{ -1,  1,  0 },
+				{ -1,  0, -1 },
+				{ -1,  0,  1 }
+			}
+		};
+	}
+	else if (Offset.x == 1)
+	{
+		return
+		{
+			{
+				{  2,  0,  0 },
+				{  1, -1,  0 },
+				{  1,  1,  0 },
+				{  1,  0, -1 },
+				{  1,  0,  1 }
+			}
+		};
+	}
+	else if (Offset.y == -1)
+	{
+		return
+		{
+			{
+				{  0, -2,  0 },
+				{ -1, -1,  0 },
+				{  1, -1,  0 },
+				{  0, -1, -1 },
+				{  0, -1,  1 }
+			}
+		};
+	}
+	else if (Offset.y == 1)
+	{
+		return
+		{
+			{
+				{  0,  2,  0 },
+				{ -1,  1,  0 },
+				{  1,  1,  0 },
+				{  0,  1, -1 },
+				{  0,  1,  1 }
+			}
+		};
+	}
+	else if (Offset.z == -1)
+	{
+		return
+		{
+			{
+				{  0,  0, -2 },
+				{ -1,  0, -1 },
+				{  1,  0, -1 },
+				{  0, -1, -1 },
+				{  0,  1, -1 }
+			}
+		};
+	}
+
+	return
+	{
+		{
+			{  0,  0,  2 },
+			{ -1,  0,  1 },
+			{  1,  0,  1 },
+			{  0, -1,  1 },
+			{  0,  1,  1 }
+		}
+	};
+}
+
+
+
+
+
 void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
 	ASSERT(a_Chunk.IsValid());

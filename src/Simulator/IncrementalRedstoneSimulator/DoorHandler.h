@@ -10,22 +10,35 @@
 
 class cDoorHandler final : public cRedstoneHandler
 {
-public:
+	// "Doormammu, I've come to bargain"
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		UNUSED(IsLinked);
 		return 0;
 	}
 
 	virtual void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
 	{
 		// LOGD("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+
+		if ((a_Meta & 0x8) == 0x8)
+		{
+			// We're treating the bottom half as the source of truth, so ignore updates to the top:
+			return;
+		}
+
+		const auto TopPosition = a_Position + OffsetYP;
+		ForEachSourceCallback Callback(a_Chunk, TopPosition, a_BlockType);
+		ForValidSourcePositions(a_Chunk, TopPosition, a_BlockType, a_Meta, Callback);
+
+		// Factor in what the upper half is getting:
+		a_PoweringData = std::max(a_PoweringData, Callback.Power);
 
 		cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
 		const bool ShouldBeOpen = a_PoweringData.PowerLevel != 0;
@@ -39,7 +52,7 @@ public:
 		}
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

@@ -8,9 +8,9 @@
 
 
 class cBlockEnderchestHandler :
-	public cYawRotator<cBlockEntityHandler>
+	public cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
-	using Super = cYawRotator<cBlockEntityHandler>;
+	using Super = cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
 public:
 

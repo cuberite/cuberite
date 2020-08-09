@@ -10,8 +10,6 @@
 
 class cRedstoneComparatorHandler : public cRedstoneHandler
 {
-public:
-
 	static unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
 	{
 		if (cBlockComparatorHandler::IsInSubtractionMode(a_Meta))
@@ -26,13 +24,14 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
 
+		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (
-			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) == a_QueryPosition) ?
+			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, Meta & 0x3) == a_QueryPosition) ?
 			DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel : 0
 		);
 	}
@@ -71,11 +70,8 @@ public:
 			return false;
 		});
 
-		BLOCKTYPE RearType;
-		NIBBLETYPE RearMeta;
-		RearChunk->GetBlockTypeMeta(RearCoordinate, RearType, RearMeta);
-
-		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
+		const auto RearType = RearChunk->GetBlock(RearCoordinate);
+		const auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
 		if (PotentialSourceHandler == nullptr)
 		{
 			return SignalStrength;
@@ -84,8 +80,8 @@ public:
 		return std::max(
 			SignalStrength,
 			PotentialSourceHandler->GetPowerDeliveredToPosition(
-				*RearChunk, RearCoordinate, RearType, RearMeta,
-				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, *RearChunk, Position), BlockType
+				*RearChunk, RearCoordinate, RearType,
+				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, *RearChunk, Position), BlockType, false
 			)
 		);
 	}
@@ -110,31 +106,33 @@ public:
 			{
 				Data.m_MechanismDelays[a_Position] = std::make_pair(1, bool());
 			}
+
+			return;
 		}
-		else
+
+		int DelayTicks;
+		std::tie(DelayTicks, std::ignore) = *DelayInfo;
+
+		if (DelayTicks != 0)
 		{
-			int DelayTicks;
-			std::tie(DelayTicks, std::ignore) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
-				const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
-				const auto NewMeta = (FrontPower > 0) ? (a_Meta | 0x8) : (a_Meta & 0x7);
-
-				// Don't care about the previous power level so return value ignored
-				Data.ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
-
-				a_Chunk.SetMeta(a_Position, NewMeta);
-				Data.m_MechanismDelays.erase(a_Position);
-
-				// Assume that an update (to front power) is needed:
-				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3));
-			}
+			return;
 		}
+
+		const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
+		const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
+		const auto NewMeta = (FrontPower > 0) ? (a_Meta | 0x8) : (a_Meta & 0x7);
+
+		// Don't care about the previous power level so return value ignored
+		Data.ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
+
+		a_Chunk.SetMeta(a_Position, NewMeta);
+		Data.m_MechanismDelays.erase(a_Position);
+
+		// Assume that an update (to front power) is needed:
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) - a_Position);
 	}
 
-	virtual void ForValidSourcePositions(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
