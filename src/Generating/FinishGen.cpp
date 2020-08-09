@@ -1769,6 +1769,25 @@ void cFinishGenOreNests::GenerateOre(
 		}
 	}
 
+	// Gold ores are generated more often in Mesa-Type-Biommes:
+	// https://minecraft.gamepedia.com/Gold_Ore
+	if (a_OreType == E_BLOCK_GOLD_ORE)
+	{
+		auto BiomeSampleOne =    a_ChunkDesc.GetBiome( 4,  4);
+		auto BiomeSampleTwo =    a_ChunkDesc.GetBiome( 4, 12);
+		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
+		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
+
+		if ((IsBiomeMesa(BiomeSampleOne)) ||
+			(IsBiomeMesa(BiomeSampleTwo)) ||
+			(IsBiomeMesa(BiomeSampleThree)) ||
+			(IsBiomeMesa(BiomeSampleFour)))
+		{
+			a_MaxHeight = 76;
+			a_NumNests = 22;  // 2 time default + 20 times mesa bonus
+		}
+	}
+
 	auto chunkX = a_ChunkDesc.GetChunkX();
 	auto chunkZ = a_ChunkDesc.GetChunkZ();
 	auto & blockTypes = a_ChunkDesc.GetBlockTypes();

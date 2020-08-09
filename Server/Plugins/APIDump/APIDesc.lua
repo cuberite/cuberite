@@ -13647,6 +13647,23 @@ end
 					},
 					Notes = "Returns if the biome is a mountain type biome. So mutations of the extreme hills biome"
 				},
+				IsBiomeMesa =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						}
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is Mesa-Type (mutations of the extreme Mesa biome)."
+				},
 				IsValidBlock =
 				{
 					Params =
