@@ -78,8 +78,19 @@ private:
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
-		auto meta = std::min(oldMeta + a_NumStages, 7);
-		a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(meta));  // Update the stem
+		auto meta = oldMeta + a_NumStages;
+		a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(std::min(meta, 7)));  // Update the stem
+		if (meta > 7)
+		{
+			if (growProduce(a_Chunk, a_RelPos))
+			{
+				return 8 - oldMeta;
+			}
+			else
+			{
+				return 7 - oldMeta;
+			}
+		}
 		return meta - oldMeta;
 	}
 
