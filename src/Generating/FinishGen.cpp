@@ -1769,7 +1769,7 @@ void cFinishGenOreNests::GenerateOre(
 		}
 	}
 
-	// Gold ores are generated more often in Mesa-Type-Biommes:
+	// Gold ores are generated more often in Mesa-Type-Biomes:
 	// https://minecraft.gamepedia.com/Gold_Ore
 	if (a_OreType == E_BLOCK_GOLD_ORE)
 	{

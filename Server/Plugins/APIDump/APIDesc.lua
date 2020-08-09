@@ -13662,7 +13662,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the biome is Mesa-Type (mutations of the extreme Mesa biome)."
+					Notes = "Returns true if the biome is Mesa-Type (mutations of the Mesa biome)."
 				},
 				IsValidBlock =
 				{
