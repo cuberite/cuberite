@@ -3,7 +3,6 @@
 
 #include "BlockPlant.h"
 #include "../FastRandom.h"
-#include <iostream>
 
 
 
@@ -157,7 +156,7 @@ private:
 	int GenerateAmountSeedDrop(int a_Min, int a_Count, double a_Probability, MTRand &a_Rand)
 	{
 		int SeedCount = a_Min;
-		for (int i(0); i < a_Count; i++)
+		for (int i = 0; i < a_Count; i++)
 		{
 			if (a_Rand.RandBool(a_Probability))
 			{
