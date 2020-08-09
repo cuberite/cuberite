@@ -13630,7 +13630,7 @@ end
 					},
 					Notes = "Returns true if the biome is very cold (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere). Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those.",
 				},
-				IsMountainBiome =
+				IsBiomeMountain =
 				{
 					Params =
 					{
