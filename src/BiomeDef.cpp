@@ -223,7 +223,7 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 
 
 
-bool IsMountainBiome(EMCSBiome a_Biome)
+bool IsBiomeMountain(EMCSBiome a_Biome)
 {
 	switch (a_Biome)
 	{

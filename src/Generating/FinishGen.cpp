@@ -1760,10 +1760,10 @@ void cFinishGenOreNests::GenerateOre(
 		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
 		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
 
-		if (! (IsMountainBiome(BiomeSampleOne) ||
-			(IsMountainBiome(BiomeSampleTwo)) ||
-			(IsMountainBiome(BiomeSampleThree)) ||
-			(IsMountainBiome(BiomeSampleFour))))
+		if (! (IsBiomeMountain(BiomeSampleOne) ||
+			(IsBiomeMountain(BiomeSampleTwo)) ||
+			(IsBiomeMountain(BiomeSampleThree)) ||
+			(IsBiomeMountain(BiomeSampleFour))))
 		{
 			return;
 		}
