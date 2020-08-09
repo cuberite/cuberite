@@ -118,6 +118,11 @@ public:
 			{
 				// Grow by 2 - 5 stages:
 				auto numStages = GetRandomProvider().RandInt(2, 5);
+				// No longer create a melon / pumpkin block when right-clicking on a grown melon / pumpkin seed
+				if (a_World.IsFullGrownPlantAt(a_BlockPos))
+				{
+					return false;
+				}
 				if (a_World.GrowPlantAt(a_BlockPos, numStages) <= 0)
 				{
 					return false;

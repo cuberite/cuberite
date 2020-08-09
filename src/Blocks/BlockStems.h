@@ -80,18 +80,18 @@ private:
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
 		auto meta = oldMeta + a_NumStages;
 		a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(std::min(meta, 7)));  // Update the stem
-		if (meta > 7)
+		if (oldMeta == 7)
 		{
 			if (growProduce(a_Chunk, a_RelPos))
 			{
-				return 8 - oldMeta;
+				return 0;
 			}
-			else
-			{
-				return 7 - oldMeta;
-			}
+			return 1;
 		}
-		return meta - oldMeta;
+		else
+		{
+			return meta - oldMeta;
+		}
 	}
 
 	/** Grows the final produce next to the stem at the specified pos.
