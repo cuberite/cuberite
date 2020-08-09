@@ -13630,6 +13630,23 @@ end
 					},
 					Notes = "Returns true if the biome is very cold (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere). Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those.",
 				},
+				IsBiomeMountain =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						}
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns if the biome is a mountain type biome. So mutations of the extreme hills biome"
+				},
 				IsValidBlock =
 				{
 					Params =

@@ -1622,6 +1622,7 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 		{E_BLOCK_REDSTONE_ORE, 0,        16,        8,        7},
 		{E_BLOCK_DIAMOND_ORE,  0,        15,        1,        7},
 		{E_BLOCK_LAPIS_ORE,    0,        30,        1,        6},
+		{E_BLOCK_EMERALD_ORE,  0,        32,       11,        1},
 	};
 	return res;
 }
@@ -1750,6 +1751,24 @@ void cFinishGenOreNests::GenerateOre(
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
 	// Only "terraformable" blocks get replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
 
+	// If there is a try to generate Emerald ores in chunk where there's no mountains biome abort
+	// There are just four points sampled to avoid searching the whole 16 * 16 Blocks
+	if (a_OreType == E_BLOCK_EMERALD_ORE)
+	{
+		auto BiomeSampleOne =    a_ChunkDesc.GetBiome( 4,  4);
+		auto BiomeSampleTwo =    a_ChunkDesc.GetBiome( 4, 12);
+		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
+		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
+
+		if (! (IsBiomeMountain(BiomeSampleOne) ||
+			(IsBiomeMountain(BiomeSampleTwo)) ||
+			(IsBiomeMountain(BiomeSampleThree)) ||
+			(IsBiomeMountain(BiomeSampleFour))))
+		{
+			return;
+		}
+	}
+
 	auto chunkX = a_ChunkDesc.GetChunkX();
 	auto chunkZ = a_ChunkDesc.GetChunkZ();
 	auto & blockTypes = a_ChunkDesc.GetBlockTypes();
@@ -1763,7 +1782,16 @@ void cFinishGenOreNests::GenerateOre(
 		nestRnd /= cChunkDef::Width;
 		int BaseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		// if the NestSize is smaller then four this breaks
+		int NestSize;
+		if (a_NestSize >= 4)
+		{
+			NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		}
+		else
+		{
+			NestSize = a_NestSize;
+		}
 		int Num = 0;
 		while (Num < NestSize)
 		{
