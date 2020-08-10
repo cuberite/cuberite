@@ -1778,10 +1778,12 @@ void cFinishGenOreNests::GenerateOre(
 		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
 		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
 
-		if ((IsBiomeMesa(BiomeSampleOne)) ||
-			(IsBiomeMesa(BiomeSampleTwo)) ||
-			(IsBiomeMesa(BiomeSampleThree)) ||
-			(IsBiomeMesa(BiomeSampleFour)))
+		if (
+			IsBiomeMesa(BiomeSampleOne) ||
+			IsBiomeMesa(BiomeSampleTwo) ||
+			IsBiomeMesa(BiomeSampleThree) ||
+			IsBiomeMesa(BiomeSampleFour)
+			)
 		{
 			a_MaxHeight = 76;
 			a_NumNests = 22;  // 2 time default + 20 times mesa bonus

@@ -154,7 +154,7 @@ extern bool IsBiomeCold(EMCSBiome a_Biome);
 /** Returns true if the biome is a mountain type */
 extern bool IsBiomeMountain(EMCSBiome a_Biome);
 
-/** Return true if the biome is Mesa or one of its mutation. */
+/** Returns true if the biome is Mesa or one of its mutations. */
 extern bool IsBiomeMesa(EMCSBiome a_Biome);
 
 /** Returns the height when a biome when a biome starts snowing. */
