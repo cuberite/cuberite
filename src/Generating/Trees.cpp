@@ -1300,7 +1300,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	}
 
 	int numBranches = (a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 10) % 3 + 1;
-	int branchStartHeight = 8 + Height % 10;
+	int branchStartHeight = 6 + Height % 10;
 	int branchInterval = (Height - branchStartHeight) / numBranches;
 	for (int i = branchStartHeight; i < (Height - 6); i += branchInterval)
 	{
@@ -1308,7 +1308,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		Vector3d BranchStartDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i), a_Seq);
 		Vector3d BranchDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i * a_Seq), a_Seq) / 3;
 
-		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockPos * a_Seq) % 3;
+		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockPos * a_Seq) % 2;
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockPos.addedY(i), BranchLength, BranchStartDirection, BranchDirection, a_LogBlocks).Floor();
 		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
@@ -1316,7 +1316,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	}
 
 	// Place the canopy.
-	int CanopyHeight = a_BlockPos.y + Height -1;
+	int CanopyHeight = a_BlockPos.y + Height - 2;
 	for (size_t i = 0; i < ARRAYCOUNT(BigOJungleLayers); i++)
 	{
 		PushCoordBlocks(a_BlockPos.x, CanopyHeight++, a_BlockPos.z, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
