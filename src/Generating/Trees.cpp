@@ -1266,11 +1266,12 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		{2,  1, 2}, {2,  0, 2},  // East face
 	};
 
-	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
+	int Height = 10 + ((a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 20);
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
 	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO5Jungle) + ARRAYCOUNT(BigO4Jungle) + ARRAYCOUNT(BigO3Jungle) + static_cast<size_t>(Height) * 4 + 50);
 
+	// Generates the main trunk
 	for (int i = 0; i < Height; i++)
 	{
 		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_JUNGLE));
@@ -1288,7 +1289,6 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedXZ(VinesTrunk[j].x, VinesTrunk[j].z).addedY(i), E_BLOCK_VINES, VinesTrunk[j].Meta));
 		}
 	}
-	int hei = a_BlockPos.y + Height - 2;
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
@@ -1299,8 +1299,8 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
 	}
 
-	int numBranches = (a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 11) % 3 + 1;
-	int branchStartHeight = 8 + Height % 11;
+	int numBranches = (a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 10) % 3 + 1;
+	int branchStartHeight = 8 + Height % 10;
 	int branchInterval = (Height - branchStartHeight) / numBranches;
 	for (int i = branchStartHeight; i < (Height - 6); i += branchInterval)
 	{
@@ -1308,7 +1308,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		Vector3d BranchStartDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i), a_Seq);
 		Vector3d BranchDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i * a_Seq), a_Seq) / 3;
 
-		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockPos * a_Seq) % 2;
+		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockPos * a_Seq) % 3;
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockPos.addedY(i), BranchLength, BranchStartDirection, BranchDirection, a_LogBlocks).Floor();
 		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
@@ -1316,9 +1316,10 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	}
 
 	// Place the canopy.
+	int CanopyHeight = a_BlockPos.y + Height -1;
 	for (size_t i = 0; i < ARRAYCOUNT(BigOJungleLayers); i++)
 	{
-		PushCoordBlocks(a_BlockPos.x, hei++, a_BlockPos.z, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		PushCoordBlocks(a_BlockPos.x, CanopyHeight++, a_BlockPos.z, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 	}
 }
 
