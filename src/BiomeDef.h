@@ -151,7 +151,7 @@ extern bool IsBiomeVeryCold(EMCSBiome a_Biome);
 Doesn't report Very Cold biomes, use IsBiomeVeryCold() for those. */
 extern bool IsBiomeCold(EMCSBiome a_Biome);
 
-/** Returns true if the biome is a mountain type */
+/** Returns true if the biome is mountainous (mutations of the extreme hills biome) */
 extern bool IsBiomeMountain(EMCSBiome a_Biome);
 
 /** Returns true if the biome is Mesa or one of its mutations. */

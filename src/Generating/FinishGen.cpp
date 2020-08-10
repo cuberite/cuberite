@@ -1803,16 +1803,7 @@ void cFinishGenOreNests::GenerateOre(
 		nestRnd /= cChunkDef::Width;
 		int BaseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		// if the NestSize is smaller then four this breaks
-		int NestSize;
-		if (a_NestSize >= 4)
-		{
-			NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
-		}
-		else
-		{
-			NestSize = a_NestSize;
-		}
+		int NestSize = a_NestSize + (nestRnd % (std::max(a_NestSize, 4) / 4));  // The actual nest size may be up to 1 / 4 larger
 		int Num = 0;
 		while (Num < NestSize)
 		{
