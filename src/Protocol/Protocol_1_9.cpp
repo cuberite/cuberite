@@ -24,7 +24,6 @@ Implements the 1.9 protocol classes:
 #include "../World.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
-#include "../Statistics.h"
 #include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"

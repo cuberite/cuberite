@@ -155,7 +155,45 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 
 void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
 {
-	// TODO
+	ASSERT(m_State == 3);  // In game mode?
+
+	UInt32 Size = 0;
+	a_Manager.ForEachStatisticType([this, &Size](const auto & Store)
+	{
+		for (const auto & Item : Store)
+		{
+			// Client balks at out-of-range values so there is no good default value
+			// We're forced to not send the statistics this protocol version doesn't support
+
+			if (GetProtocolStatisticType(Item.first) != static_cast<UInt32>(-1))
+			{
+				Size++;
+			}
+		}
+	});
+
+	// No need to check Size != 0
+	// Assume that the vast majority of the time there's at least one statistic to send
+
+	cPacketizer Pkt(*this, pktStatistics);
+	Pkt.WriteVarInt32(Size);
+
+	a_Manager.ForEachStatisticType([this, &Pkt](const cStatManager::CustomStore & Store)
+	{
+		for (const auto & Item : Store)
+		{
+			const auto ID = GetProtocolStatisticType(Item.first);
+			if (ID == static_cast<UInt32>(-1))
+			{
+				// Unsupported, don't send:
+				continue;
+			}
+
+			Pkt.WriteVarInt32(8);  // "Custom" category
+			Pkt.WriteVarInt32(ID);
+			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
+		}
+	});
 }
 
 
@@ -557,6 +595,15 @@ std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolI
 UInt32 cProtocol_1_13::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13::GetProtocolStatisticType(Statistic a_Statistic)
+{
+	return Palette_1_13::From(a_Statistic);
 }
 
 
@@ -1204,6 +1251,15 @@ std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_Protoco
 UInt32 cProtocol_1_13_1::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_13_1::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13_1::GetProtocolStatisticType(Statistic a_Statistic)
+{
+	return Palette_1_13_1::From(a_Statistic);
 }
 
 

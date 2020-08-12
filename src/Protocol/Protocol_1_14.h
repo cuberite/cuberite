@@ -53,6 +53,7 @@ protected:
 
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage) override;
+	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override {}
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override {}
