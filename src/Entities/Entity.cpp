@@ -544,7 +544,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
+		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
 	m_Health -= a_TDI.FinalDamage;
@@ -1426,7 +1426,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimNether)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchPortal);
 						}
 
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
@@ -1505,7 +1505,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimEnd)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchTheEnd);
 						}
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}

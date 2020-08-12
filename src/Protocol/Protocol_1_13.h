@@ -79,6 +79,7 @@ protected:
 	virtual UInt8 GetEntityMetadataID(eEntityMetadataType a_FieldType);
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage);
+	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic);
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
@@ -111,6 +112,7 @@ protected:
 	virtual Version GetProtocolVersion() override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
 	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage) override;
+	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 };
 
 

@@ -303,3 +303,12 @@ UInt32 cProtocol_1_14::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
+{
+	return Palette_1_14::From(a_Statistic);
+}

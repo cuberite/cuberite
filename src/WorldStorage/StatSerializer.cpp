@@ -4,15 +4,17 @@
 
 #include "Globals.h"
 #include "StatSerializer.h"
-
 #include "../Statistics.h"
-#include "../JsonUtils.h"
+#include "NamespaceSerializer.h"
+
+#include <fstream>
+#include <json/json.h>
 
 
 
 
 
-cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_PlayerName, const AString & a_FileName, cStatManager * a_Manager)
+cStatSerializer::cStatSerializer(cStatManager & a_Manager, const AString & a_WorldName, const AString & a_FileName)
 	: m_Manager(a_Manager)
 {
 	// Even though stats are shared between worlds, they are (usually) saved
@@ -21,8 +23,7 @@ cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_
 	AString StatsPath;
 	Printf(StatsPath, "%s%cstats", a_WorldName.c_str(), cFile::PathSeparator());
 
-	m_LegacyPath = StatsPath + "/" + a_PlayerName + ".json";
-	m_Path = StatsPath + "/" + a_FileName + ".json";
+	m_Path = StatsPath + cFile::PathSeparator() + a_FileName + ".json";
 
 	// Ensure that the directory exists.
 	cFile::CreateFolder(StatsPath);
@@ -32,49 +33,26 @@ cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_
 
 
 
-bool cStatSerializer::Load(void)
+void cStatSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(m_Path);
-	if (Data.empty())
-	{
-		Data = cFile::ReadWholeFile(m_LegacyPath);
-		if (Data.empty())
-		{
-			return false;
-		}
-	}
-
 	Json::Value Root;
+	std::ifstream(m_Path) >> Root;
 
-	if (JsonUtils::ParseString(Data, Root))
-	{
-		return LoadStatFromJSON(Root);
-	}
-
-	return false;
+	LoadCustomStatFromJSON(Root["stats"]["custom"]);
 }
 
 
 
 
 
-bool cStatSerializer::Save(void)
+void cStatSerializer::Save(void)
 {
 	Json::Value Root;
-	SaveStatToJSON(Root);
 
-	cFile File;
-	if (!File.Open(m_Path, cFile::fmWrite))
-	{
-		return false;
-	}
+	SaveStatToJSON(Root["stats"]);
+	Root["DataVersion"] = NamespaceSerializer::DataVersion();
 
-	AString JsonData = JsonUtils::WriteStyledString(Root);
-
-	File.Write(JsonData.data(), JsonData.size());
-	File.Close();
-
-	return true;
+	std::ofstream(m_Path) << Root;
 }
 
 
@@ -83,68 +61,50 @@ bool cStatSerializer::Save(void)
 
 void cStatSerializer::SaveStatToJSON(Json::Value & a_Out)
 {
-	for (unsigned int i = 0; i < static_cast<unsigned int>(statCount); ++i)
+	m_Manager.ForEachStatisticType([&a_Out](const cStatManager::CustomStore & Store)
 	{
-		StatValue Value = m_Manager->GetValue(static_cast<eStatistic>(i));
-
-		if (Value != 0)
+		if (Store.empty())
 		{
-			const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
-
-			a_Out[StatName] = Value;
+			// Avoid saving "custom": null to disk:
+			return;
 		}
 
-		// TODO 2014-05-11 xdot: Save "progress"
-	}
+		auto & Custom = a_Out["custom"];
+		for (const auto & Item : Store)
+		{
+			Custom[NamespaceSerializer::From(Item.first)] = Item.second;
+		}
+	});
 }
 
 
 
 
 
-bool cStatSerializer::LoadStatFromJSON(const Json::Value & a_In)
+void cStatSerializer::LoadCustomStatFromJSON(const Json::Value & a_In)
 {
-	m_Manager->Reset();
-
-	for (Json::Value::const_iterator it = a_In.begin() ; it != a_In.end() ; ++it)
+	for (auto it = a_In.begin() ; it != a_In.end() ; ++it)
 	{
-		AString StatName = it.key().asString();
-
-		eStatistic StatType = cStatInfo::GetType(StatName);
-
-		if (StatType == statInvalid)
+		const auto & Key = it.key().asString();
+		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
+		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
 		{
-			LOGWARNING("Invalid statistic type \"%s\"", StatName.c_str());
+			// Ignore non-Vanilla, non-Cuberite namespaces for now:
 			continue;
 		}
 
-		const Json::Value & Node = *it;
-
-		if (Node.isInt())
+		const auto & StatName = StatInfo.second;
+		try
 		{
-			m_Manager->SetValue(StatType, Node.asInt());
+			m_Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), it->asInt());
 		}
-		else if (Node.isObject())
+		catch (const std::out_of_range & Oops)
 		{
-			StatValue Value = Node.get("value", 0).asInt();
-
-			// TODO 2014-05-11 xdot: Load "progress"
-
-			m_Manager->SetValue(StatType, Value);
+			FLOGWARNING("Invalid statistic type \"{}\"", StatName);
 		}
-		else
+		catch (const Json::LogicError & Oops)
 		{
-			LOGWARNING("Invalid statistic value for type \"%s\"", StatName.c_str());
+			FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
 		}
 	}
-
-	return true;
 }
-
-
-
-
-
-
-
-
