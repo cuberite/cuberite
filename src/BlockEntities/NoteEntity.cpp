@@ -244,9 +244,37 @@ void cNoteEntity::MakeSound(void)
 	}
 
 	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
-
-	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
-	float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
+	
+	float calcPitch;
+	switch (m_Pitch)
+	{
+		case 0: calcPitch = 0.5f;
+		case 1: calcPitch = 0.5297315471796477f;
+		case 2: calcPitch = 0.5612310241546865f;
+		case 3: calcPitch = 0.5946035575013605f;
+		case 4: calcPitch = 0.6299605249474366f;
+		case 5: calcPitch = 0.6674199270850172f;
+		case 6: calcPitch = 0.7071067811865476f;
+		case 7: calcPitch = 0.7491535384383408f;
+		case 8: calcPitch = 0.7937005259840998f;
+		case 9: calcPitch = 0.8408964152537145f;
+		case 10: calcPitch = 0.8908987181403393f;
+		case 11: calcPitch = 0.9438743126816935f;
+		case 12: calcPitch = 1.0f;
+		case 13: calcPitch = 1.0594630943592953f;
+		case 14: calcPitch = 1.122462048309373f;
+		case 15: calcPitch = 1.189207115002721f;
+		case 16: calcPitch = 1.2599210498948732f;
+		case 17: calcPitch = 1.3348398541700344f;
+		case 18: calcPitch = 1.4142135623730951f;
+		case 19: calcPitch = 1.4983070768766815f;
+		case 20: calcPitch = 1.5874010519681994f;
+		case 21: calcPitch = 1.681792830507429f;
+		case 22: calcPitch = 1.7817974362806785f;
+		case 23: calcPitch = 1.887748625363387f;
+		case 24: calcPitch = 2.0f;
+		default: LOGWARNING("UNKNOWN PITCH")
+	}
 	m_World->BroadcastSoundEffect(
 		sampleName,
 		m_Pos,
