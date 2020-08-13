@@ -244,7 +244,7 @@ void cNoteEntity::MakeSound(void)
 	}
 
 	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
-	
+
 	float calcPitch;
 	switch (m_Pitch)
 	{
@@ -273,7 +273,6 @@ void cNoteEntity::MakeSound(void)
 		case 22: calcPitch = 1.7817974362806785f;
 		case 23: calcPitch = 1.887748625363387f;
 		case 24: calcPitch = 2.0f;
-		default: LOGWARNING("UNKNOWN PITCH")
 	}
 	m_World->BroadcastSoundEffect(
 		sampleName,
