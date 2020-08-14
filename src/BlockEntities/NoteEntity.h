@@ -56,6 +56,10 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 
+	/** Calculates the pitch to be send to the players
+	from a pitch value from 0 to 24 as incremented by the IncrementPitch function */
+	static float CalculatePitch(char a_Pitch);
+
 private:
 	char m_Pitch;
 } ;  // tolua_export
