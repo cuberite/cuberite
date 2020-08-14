@@ -314,5 +314,5 @@ float cNoteEntity::CalculatePitch(char a_Pitch)
 		case 23: return 1.887748625363387f;
 		case 24: return 2.0f;
 		default: LOGWARNING("Converted unknown pitch value"); return 1.0f;
-	}	
+	}
 }
