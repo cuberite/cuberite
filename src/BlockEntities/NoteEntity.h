@@ -58,10 +58,10 @@ public:  // tolua_export
 
 	/** Calculates the pitch to be send to the players
 	from a pitch value from 0 to 24 as incremented by the IncrementPitch function */
-	static float CalculatePitch(char a_Pitch);
+	static float CalculatePitch(char a_Note);
 
 private:
-	char m_Pitch;
+	char m_Note;
 } ;  // tolua_export
 
 
