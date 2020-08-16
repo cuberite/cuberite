@@ -11,7 +11,7 @@
 
 cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Note(0)
+	m_Pitch(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
 }
@@ -24,7 +24,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cNoteEntity &>(a_Src);
-	m_Note = src.m_Note;
+	m_Pitch = src.m_Pitch;
 }
 
 
@@ -45,8 +45,8 @@ bool cNoteEntity::UsedBy(cPlayer * a_Player)
 
 void cNoteEntity::MakeSound(void)
 {
-	char instrument;
-	AString sampleName;
+	char Instrument;
+	AString SampleName;
 
 	switch (m_World->GetBlock(m_Pos.addedY(-1)))
 	{
@@ -96,8 +96,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_WOODEN_SLAB:
 		{
-			instrument = E_INST_DOUBLE_BASS;
-			sampleName = "block.note.bass";
+			Instrument = E_INST_DOUBLE_BASS;
+			SampleName = "block.note.bass";
 			break;
 		}
 
@@ -105,8 +105,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_SAND:
 		case E_BLOCK_SOULSAND:
 		{
-			instrument = E_INST_SNARE_DRUM;
-			sampleName = "block.note.snare";
+			Instrument = E_INST_SNARE_DRUM;
+			SampleName = "block.note.snare";
 			break;
 		}
 
@@ -118,8 +118,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_STAINED_GLASS:
 		case E_BLOCK_STAINED_GLASS_PANE:
 		{
-			instrument = E_INST_CLICKS;
-			sampleName = "block.note.hat";
+			Instrument = E_INST_CLICKS;
+			SampleName = "block.note.hat";
 			break;
 		}
 
@@ -195,61 +195,61 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_WHITE_SHULKER_BOX:
 		case E_BLOCK_YELLOW_SHULKER_BOX:
 		{
-			instrument = E_INST_BASS_DRUM;
-			sampleName = "block.note.basedrum";
+			Instrument = E_INST_BASS_DRUM;
+			SampleName = "block.note.basedrum";
 			break;
 		}
 
 		case E_BLOCK_CLAY:
 		{
-			instrument = E_INST_FLUTE;
-			sampleName = "block.note.flute";
+			Instrument = E_INST_FLUTE;
+			SampleName = "block.note.flute";
 			break;
 		}
 
 		case E_BLOCK_GOLD_BLOCK:
 		{
-			instrument = E_INST_BELL;
-			sampleName = "block.note.bell";
+			Instrument = E_INST_BELL;
+			SampleName = "block.note.bell";
 			break;
 		}
 
 		case E_BLOCK_WOOL:
 		{
-			instrument = E_INST_GUITAR;
-			sampleName = "block.note.guitar";
+			Instrument = E_INST_GUITAR;
+			SampleName = "block.note.guitar";
 			break;
 		}
 
 		case E_BLOCK_PACKED_ICE:
 		{
-			instrument = E_INST_CHIME;
-			sampleName = "block.note.chime";
+			Instrument = E_INST_CHIME;
+			SampleName = "block.note.chime";
 			break;
 		}
 
 		case E_BLOCK_BONE_BLOCK:
 		{
-			instrument = E_INST_XYLOPHONE;
-			sampleName = "block.note.xylophone";
+			Instrument = E_INST_XYLOPHONE;
+			SampleName = "block.note.xylophone";
 			break;
 		}
 
 		default:
 		{
-			instrument = E_INST_HARP_PIANO;
-			sampleName = "block.note.harp";
+			Instrument = E_INST_HARP_PIANO;
+			SampleName = "block.note.harp";
 			break;
 		}
 	}
 
-	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(instrument), static_cast<Byte>(m_Note), E_BLOCK_NOTE_BLOCK);
+	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
 
 	m_World->BroadcastSoundEffect(
-		sampleName,
+		SampleName,
 		m_Pos,
 		3.0f,
-		CalculatePitch(m_Note)
+		GetPitch(m_Pitch)
 	);
 }
 
@@ -259,7 +259,7 @@ void cNoteEntity::MakeSound(void)
 
 char cNoteEntity::GetPitch(void)
 {
-	return m_Note;
+	return m_Pitch;
 }
 
 
@@ -268,7 +268,7 @@ char cNoteEntity::GetPitch(void)
 
 void cNoteEntity::SetPitch(char a_Pitch)
 {
-	m_Note = a_Pitch % 25;
+	m_Pitch = a_Pitch % 25;
 }
 
 
@@ -277,16 +277,19 @@ void cNoteEntity::SetPitch(char a_Pitch)
 
 void cNoteEntity::IncrementPitch(void)
 {
-	SetPitch(m_Note + 1);
+	SetPitch(m_Pitch + 1);
 }
 
 
 
 
 
-float cNoteEntity::CalculatePitch(char a_Note)
+float cNoteEntity::GetPitch(char a_Pitch)
 {
-	switch (a_Note)
+	// This replaces the calculation of:
+	// float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
+	// So 2 ^ ((m_Pitch - 12) / 12)
+	switch (a_Pitch)
 	{
 		case 0: return 0.5f;
 		case 1: return 0.5297315471796477f;

@@ -7,7 +7,7 @@
 
 
 
-enum ENUM_NOTE_INSTRUMENTS
+enum ENUm_Pitch_INSTRUMENTS
 {
 	E_INST_HARP_PIANO  = 0,
 	E_INST_DOUBLE_BASS = 1,
@@ -58,10 +58,10 @@ public:  // tolua_export
 
 	/** Calculates the pitch to be send to the players
 	from a pitch value from 0 to 24 as incremented by the IncrementPitch function */
-	static float CalculatePitch(char a_Note);
+	static float GetPitch(char a_Note);
 
 private:
-	char m_Note;
+	char m_Pitch;
 } ;  // tolua_export
 
 
