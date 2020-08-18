@@ -3369,6 +3369,31 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER:
+		{
+			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BannerEntity.GetPosX());
+			Writer.AddInt("y", BannerEntity.GetPosY());
+			Writer.AddInt("z", BannerEntity.GetPosZ());
+			Writer.AddString("id", "Banner");
+			if (BannerEntity.HasPatterns())
+			{
+				Writer.BeginList("Patterns", TAG_Compound);
+				for (int i = 0; i < BannerEntity.GetPatternCount(); ++i)
+				{
+					auto Pattern = BannerEntity.GetPattern(i);
+					Writer.BeginCompound(std::to_string(i));
+					Writer.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
+					Writer.AddInt("Color", static_cast<int>(Pattern->m_Color));
+					Writer.EndCompound();
+				}
+				Writer.EndList();
+			}
+			Writer.AddInt("Base", BannerEntity.GetBaseColor());
+			break;
+		}
+
 		case E_BLOCK_BEACON:
 		{
 			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
@@ -3450,31 +3475,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:
-		{
-			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BannerEntity.GetPosX());
-			Writer.AddInt("y", BannerEntity.GetPosY());
-			Writer.AddInt("z", BannerEntity.GetPosZ());
-			Writer.AddString("id", "Banner");
-			if (BannerEntity.HasPatterns())
-			{
-				Writer.BeginList("Patterns", TAG_Compound);
-				for (int i = 0; i < BannerEntity.GetPatternCount(); ++i)
-				{
-					auto Pattern = BannerEntity.GetPattern(i);
-					Writer.BeginCompound(std::to_string(i));
-						Writer.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
-						Writer.AddInt("Color", static_cast<int>(Pattern->m_Color));
-					Writer.EndCompound();
-				}
-				Writer.EndList();
-			}
-			Writer.AddInt("Base", BannerEntity.GetBaseColor());
 			break;
 		}
 
