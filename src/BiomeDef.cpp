@@ -246,6 +246,30 @@ bool IsBiomeMountain(EMCSBiome a_Biome)
 
 
 
+bool IsBiomeMesa(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biMesa:
+		case biMesaPlateauF:
+		case biMesaPlateau:
+		case biMesaBryce:
+		case biMesaPlateauFM:
+		case biMesaPlateauM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
 int GetSnowStartHeight(EMCSBiome a_Biome)
 {
 	switch (a_Biome)
