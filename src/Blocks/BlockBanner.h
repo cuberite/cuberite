@@ -76,6 +76,20 @@ public:
 
 
 
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	{
+		if (a_RelPos.y <= 0)
+		{
+			return false;
+		}
+		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		return (cBlockInfo::IsSolid(Type));
+	}
+
+
+
+
+
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
