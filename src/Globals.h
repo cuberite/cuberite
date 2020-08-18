@@ -173,6 +173,7 @@ template class SizeChecker<UInt8,  1>;
 #include <chrono>
 #include <condition_variable>
 #include <deque>
+#include <fstream>
 #include <limits>
 #include <list>
 #include <map>
