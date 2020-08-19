@@ -1751,19 +1751,21 @@ void cFinishGenOreNests::GenerateOre(
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
 	// Only "terraformable" blocks get replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
 
-	// If there is a try to generate Emerald ores in chunk where there's no mountains biome abort
-	// There are just four points sampled to avoid searching the whole 16 * 16 Blocks
+	// If there is an attempt to generate Emerald ores in a chunk with no mountains biome abort
+	// There are just four points sampled to avoid searching all 16 * 16 blocks:
 	if (a_OreType == E_BLOCK_EMERALD_ORE)
 	{
-		auto BiomeSampleOne =    a_ChunkDesc.GetBiome( 4,  4);
-		auto BiomeSampleTwo =    a_ChunkDesc.GetBiome( 4, 12);
-		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
-		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
 
-		if (! (IsBiomeMountain(BiomeSampleOne) ||
-			(IsBiomeMountain(BiomeSampleTwo)) ||
-			(IsBiomeMountain(BiomeSampleThree)) ||
-			(IsBiomeMountain(BiomeSampleFour))))
+		if (
+			!IsBiomeMountain(BiomeSampleOne) &&
+			!IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) &&
+			!IsBiomeMountain(BiomeSampleFour)
+		)
 		{
 			return;
 		}
@@ -1773,20 +1775,20 @@ void cFinishGenOreNests::GenerateOre(
 	// https://minecraft.gamepedia.com/Gold_Ore
 	if (a_OreType == E_BLOCK_GOLD_ORE)
 	{
-		auto BiomeSampleOne =    a_ChunkDesc.GetBiome( 4,  4);
-		auto BiomeSampleTwo =    a_ChunkDesc.GetBiome( 4, 12);
-		auto BiomeSampleThree =  a_ChunkDesc.GetBiome(12,  4);
-		auto BiomeSampleFour =   a_ChunkDesc.GetBiome(12, 12);
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
 
 		if (
 			IsBiomeMesa(BiomeSampleOne) ||
 			IsBiomeMesa(BiomeSampleTwo) ||
 			IsBiomeMesa(BiomeSampleThree) ||
 			IsBiomeMesa(BiomeSampleFour)
-			)
+		)
 		{
 			a_MaxHeight = 76;
-			a_NumNests = 22;  // 2 time default + 20 times mesa bonus
+			a_NumNests = 22;  // 2 times default + 20 times mesa bonus
 		}
 	}
 

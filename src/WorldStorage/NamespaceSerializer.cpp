@@ -258,14 +258,14 @@ namespace NamespaceSerializer
 		const auto NamespaceIndex = ID.find(':');
 		if (NamespaceIndex == std::string_view::npos)
 		{
-			// No explicit namespace default to the Minecraft namespace:
+			// No explicit namespace defaults to the Minecraft namespace:
 			return { Namespace::Minecraft, ID };
 		}
 
 		const auto Namespace = ID.substr(0, NamespaceIndex);
 		if (Namespace == "minecraft")
 		{
-			// An unprefixed ID in the vanilla Minecraft namespace
+			// An unprefixed ID in the vanilla Minecraft namespace.
 			const auto Value = ID.substr(NamespaceIndex + 1);
 
 			return { Namespace::Minecraft, Value };
