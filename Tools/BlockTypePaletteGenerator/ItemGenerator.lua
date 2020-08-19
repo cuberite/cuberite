@@ -198,25 +198,38 @@ local function writeItems(registry)
 end
 
 local function writeGlobalPalette(registry)
-	io.write("UInt32 FromItem(Statistic ID)\n{\nswitch (ID)\n{")
+	io.write("UInt32 From(const Statistic ID)\n{\nswitch (ID)\n{")
 	for itemName, id in spairs(registry) do
 		io.write("\ncase Statistic::", makeTitleCase(itemName), ": return ", id, ";")
 	end
-	io.write("\ndefault: return 0;\n}\n}")
+	io.write("\ndefault: return -1;\n}\n}")
 end
 
 local function writeReverseGlobalPalette(registry)
-	io.write("Item ToStatistic(UInt32 ID)\n{\nswitch (ID)\n{")
+	io.write("Item ToStatistic(const UInt32 ID)\n{\nswitch (ID)\n{")
 	for itemName, id in spairs(registry) do
 		io.write("\ncase ", id, ": return Item::", makeTitleCase(itemName), ";")
 	end
 	io.write("\ndefault: return Statistic::Air;\n}\n}")
 end
 
-if true then
-	writeItems(registry)
-else
-	writeGlobalPalette(registry)
-	io.write("\n\n")
-	writeReverseGlobalPalette(registry)
+local function writeReverseSerializer(registry)
+	for itemName in spairs(registry) do
+		io.write("{ \"", itemName, "\", Statistic::", makeTitleCase(itemName), " },\n")
+	end
 end
+
+local function writeSerializer(registry)
+	io.write("const char * From(const Statistic ID)\n{\nswitch (ID)\n{")
+	for itemName in spairs(registry) do
+		io.write("\ncase Statistic::", makeTitleCase(itemName), ": return \"", itemName, "\";")
+	end
+end
+
+-- writeSerializer(registry)
+
+-- writeItems(registry)
+
+writeGlobalPalette(registry)
+-- io.write("\n\n")
+-- writeReverseGlobalPalette(registry)
