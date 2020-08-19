@@ -27,7 +27,6 @@ Implements the 1.13 protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../JsonUtils.h"
-#include "../WorldStorage/FastNBT.h"
 
 #include "../Bindings/PluginManager.h"
 
