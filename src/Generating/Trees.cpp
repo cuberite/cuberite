@@ -59,7 +59,7 @@ static const Vector3d & pickBranchDirection(const cNoise a_Noise, Vector3i a_Blo
 		}
 	};
 
-	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq)) % directions.size();
+	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos * a_Seq)) % directions.size();
 	return directions[index];
 }
 
@@ -1302,10 +1302,10 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	int NumBranches = std::max(
 		(a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 10) % 4,  // The Original Calculation
-		FloorC(Height / (Height / 2.0f))                                               // Just to assure that no massive trees spawn with just one branch
+		FloorC(Height / 10.0f)                                                         // Just to assure that no massive trees spawn with just one branch
 		);
 	int BranchStartHeight = 6 + Height % 5;                                            // 6 < BranchStartHeight < 10
-	int BranchInterval = (Height - BranchStartHeight) / NumBranches;
+	int BranchInterval = (Height - 6 - BranchStartHeight) / NumBranches;
 	for (int i = BranchStartHeight; i < (Height - 6); i += BranchInterval)             // Stop 6 blocks before reaching the top
 	{
 		// Get a direction for the trunk to go to.
@@ -1315,7 +1315,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockPos.addedY(i), BranchLength, BranchStartDirection, BranchDirection, a_LogBlocks).Floor();
 
 		// There's a chance that there is a third leaf level on a branch
-		if (a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq) % 3 > 2)  // A quarter chance
+		if (a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq) == 0)  // A quarter chance
 		{
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
