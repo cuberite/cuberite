@@ -173,7 +173,32 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
 
 void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
-	// TODO
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	cFastNBTWriter Writer;
+
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+
+	Byte Action = 0;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_MOB_SPAWNER:   Action = 1;  break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2;  break;  // Update command block text
+		case E_BLOCK_BEACON:        Action = 3;  break;  // Update beacon entity
+		case E_BLOCK_HEAD:          Action = 4;  break;  // Update Mobhead entity
+		// case E_BLOCK_CONDUIT:       Action = 5;  break;  // Update Conduit entity
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:   Action = 6;  break;  // Update banner entity
+		// case structure tile entity: Action = 7;  break;  // Update Structure tile entity
+		case E_BLOCK_END_GATEWAY:   Action = 8;  break;  // Update destination for a end gateway entity
+		case E_BLOCK_SIGN_POST:     Action = 9;  break;  // Update sign entity
+		// case E_BLOCK_SHULKER_BOX:   Action = 10; break; // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
+		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
+		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+	}
+	Pkt.WriteBEUInt8(Action);
+
+	WriteBlockEntity(Pkt, a_BlockEntity);
 }
 
 
@@ -217,6 +242,7 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x1b: HandlePacketCraftingBookData(a_ByteBuffer); return true;
 		case 0x1d: break;  // Resource pack status - not yet implemented
 		case 0x1e: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+		case 0x20: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x21: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x24: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x26: HandlePacketUpdateSign(a_ByteBuffer); return true;
@@ -252,6 +278,17 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	AString Data;
 	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
+}
+
+
+
+
+
+void cProtocol_1_13::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
+	m_Client->HandleBeaconSelection(Effect1, Effect2);
 }
 
 
