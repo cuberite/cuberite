@@ -8,6 +8,12 @@ Classes to support the generation of single piece prefab structures
 
 #pragma once
 
+#include "Globals.h"
+#include "ChunkDesc.h"
+#include "HeiGen.h"
+#include "../BlockInfo.h"a
+
+
 /** Enum of all implemented Structures */
 enum class PrefabSingleStructure
 {
@@ -26,7 +32,7 @@ public:
 	cPrefabSinglePiece();
 
 	/** Reads the Prefab from file and stores it as a INSERT DATATYPE */
-	void ReadFromFile(AString a_Filename);
+	void ReadFromFile(AString & a_Filename);
 
 	// Todo: store the Prefab in memory
 };
@@ -49,7 +55,7 @@ class cPrefabSingleStructure:
 	);
 
 	/** cGridStructGen::cStructure override */
-	void DrawIntoChunk(cChunkDesc &a_ChunkDesc) override;
+	virtual void DrawIntoChunk(cChunkDesc &a_ChunkDesc) override;
 
 protected:
 	/** Seed for the random functions */

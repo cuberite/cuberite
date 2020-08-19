@@ -1,6 +1,7 @@
 
-#include "Globals.h"
 #include "PrefabSingleStructureGen.h"
+
+#include "GridStructGen.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // cPrefabSinglePiece
@@ -14,7 +15,7 @@ cPrefabSinglePiece::cPrefabSinglePiece()
 
 
 
-void cPrefabSinglePiece::ReadFromFile(AString a_Filename)
+void cPrefabSinglePiece::ReadFromFile(AString & a_Filename)
 {
 	// TODO
 }
