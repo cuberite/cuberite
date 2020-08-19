@@ -720,7 +720,7 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_beginmodule(tolua_S, "cNoteEntity");
 		tolua_function(tolua_S, "GetPitch", tolua_AllToLua_cNoteEntity_GetNote00);
 		tolua_function(tolua_S, "SetPitch", tolua_AllToLua_cNoteEntity_SetNote00);
-		tolua_function(tolua_S, "IncrementNote", tolua_AllToLua_cNoteEntity_IncrementNote00);
+		tolua_function(tolua_S, "IncrementPitch", tolua_AllToLua_cNoteEntity_IncrementNote00);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);
