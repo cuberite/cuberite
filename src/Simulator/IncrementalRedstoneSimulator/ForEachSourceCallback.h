@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "ForEachSourceCallback.h"
 #include "RedstoneSimulatorChunkData.h"
 
 class ForEachSourceCallback

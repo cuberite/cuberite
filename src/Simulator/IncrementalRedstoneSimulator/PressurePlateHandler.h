@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../BoundingBox.h"
 #include "../../Entities/Pickup.h"
 
@@ -9,20 +8,9 @@
 
 
 
-class cPressurePlateHandler final : public cRedstoneHandler
+namespace PressurePlateHandler
 {
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
-	{
-		UNUSED(a_BlockType);
-		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
-
-		// Plates only link power blocks below
-		// Retrieve and return the cached power calculated by Update for performance:
-		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
-	}
-
-	static unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
+	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
 		unsigned NumberOfEntities = 0;
 		bool FoundPlayer = false;
@@ -69,7 +57,52 @@ class cPressurePlateHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline const char * GetClickOnSound(BLOCKTYPE a_BlockType)
+	{
+		// manage on-sound
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_on";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_on";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_on";
+			default:
+			{
+				ASSERT(!"No on sound for this one!");
+				return "";
+			}
+		}
+	}
+
+	inline const char * GetClickOffSound(BLOCKTYPE a_BlockType)
+	{
+		// manage off-sound
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_off";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_off";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_off";
+			default:
+			{
+				ASSERT(!"No off sound for this one!");
+				return "";
+			}
+		}
+	}
+
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	{
+		UNUSED(a_BlockType);
+		UNUSED(a_QueryPosition);
+		UNUSED(a_QueryBlockType);
+
+		// Plates only link power blocks below
+		// Retrieve and return the cached power calculated by Update for performance:
+		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
+	}
+
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -171,48 +204,12 @@ class cPressurePlateHandler final : public cRedstoneHandler
 		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
 		UNUSED(Callback);
-	}
-
-private:
-
-	static const char * GetClickOnSound(BLOCKTYPE a_BlockType)
-	{
-		// manage on-sound
-		switch (a_BlockType)
-		{
-			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_on";
-			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_on";
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_on";
-			default:
-			{
-				ASSERT(!"No on sound for this one!");
-				return "";
-			}
-		}
-	}
-
-	static const char * GetClickOffSound(BLOCKTYPE a_BlockType)
-	{
-		// manage off-sound
-		switch (a_BlockType)
-		{
-			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_off";
-			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_off";
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_off";
-			default:
-			{
-				ASSERT(!"No off sound for this one!");
-				return "";
-			}
-		}
 	}
 };

@@ -1,16 +1,15 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../BlockEntities/ChestEntity.h"
 
 
 
 
 
-class cTrappedChestHandler final : public cRedstoneHandler
+namespace TrappedChestHandler
 {
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
@@ -20,7 +19,7 @@ class cTrappedChestHandler final : public cRedstoneHandler
 		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
 	}
 
-	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position)
+	inline unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position)
 	{
 		int NumberOfPlayers = 0;
 		VERIFY(
@@ -35,7 +34,7 @@ class cTrappedChestHandler final : public cRedstoneHandler
 		return static_cast<unsigned char>(std::min(NumberOfPlayers, 15));
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -48,7 +47,7 @@ class cTrappedChestHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

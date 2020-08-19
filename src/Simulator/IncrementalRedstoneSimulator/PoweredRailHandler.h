@@ -1,15 +1,13 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 
 
 
 
-
-class cPoweredRailHandler final : public cRedstoneHandler
+namespace PoweredRailHandler
 {
-	static Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
+	Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
 	{
 		switch (a_Meta & 0x7)
 		{
@@ -27,7 +25,7 @@ class cPoweredRailHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryBlockType);
 
@@ -41,7 +39,7 @@ class cPoweredRailHandler final : public cRedstoneHandler
 		return 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating tracky the rail (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -78,7 +76,7 @@ class cPoweredRailHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Meta);

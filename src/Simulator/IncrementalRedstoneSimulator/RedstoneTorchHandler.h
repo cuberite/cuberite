@@ -1,20 +1,18 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 
 
 
 
-
-class cRedstoneTorchHandler final : public cRedstoneHandler
+namespace RedstoneTorchHandler
 {
-	inline static bool IsOn(BLOCKTYPE a_Block)
+	inline bool IsOn(BLOCKTYPE a_Block)
 	{
 		return (a_Block == E_BLOCK_REDSTONE_TORCH_ON);
 	}
 
-	inline static Vector3i GetOffsetAttachedTo(const NIBBLETYPE a_Meta)
+	inline Vector3i GetOffsetAttachedTo(const NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -31,7 +29,7 @@ class cRedstoneTorchHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		const auto QueryOffset = a_QueryPosition - a_Position;
 
@@ -47,7 +45,7 @@ class cRedstoneTorchHandler final : public cRedstoneHandler
 		return 15;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -88,7 +86,7 @@ class cRedstoneTorchHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

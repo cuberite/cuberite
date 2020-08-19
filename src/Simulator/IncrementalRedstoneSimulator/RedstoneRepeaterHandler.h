@@ -1,16 +1,87 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockRedstoneRepeater.h"
 
 
 
 
 
-class cRedstoneRepeaterHandler final : public cRedstoneHandler
+namespace RedstoneRepeaterHandler
 {
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline bool IsOn(BLOCKTYPE a_Block)
+	{
+		return (a_Block == E_BLOCK_REDSTONE_REPEATER_ON);
+	}
+
+	/** Returns a pair with first element indicating if the block at the given position is an activated repeater.
+	If it is activated, the second element is the repeater metadata. */
+	inline std::pair<bool, NIBBLETYPE> IsOnRepeater(cChunk & Chunk, const Vector3i a_Position)
+	{
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+
+		if (!Chunk.UnboundedRelGetBlock(a_Position, Type, Meta))
+		{
+			return std::make_pair(false, 0);
+		}
+
+		return std::make_pair(IsOn(Type), Meta);
+	}
+
+	/** Determine, from the metadata of a repeater on our left side, if they lock us.
+	To test a repeater on our right, simply invert the order of arguments provided.
+	"Left" is relative to the direction the repeater output faces, naturally. */
+	inline bool DoesLhsLockMe(NIBBLETYPE a_MetaLhs, NIBBLETYPE a_MyMeta)
+	{
+		// Get the direction bits
+		a_MetaLhs &= E_META_REDSTONE_REPEATER_FACING_MASK;
+		a_MyMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
+
+		/*
+		Check for a valid locking configuration, where they are perpendicular and one snuggles into the other.
+
+		Order of comparisons:
+			XP >^ ZM
+			ZP |_ XP
+			XM <| ZP
+			ZP ^< xM
+
+		Key:
+			^ Facing up
+			_ Facing right
+			| Facing down
+			< Facing left
+		*/
+		return
+			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_XP) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_ZM)) ||
+			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_ZP) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_XP)) ||
+			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_XM) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_ZP)) ||
+			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_ZM) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_XM))
+		;
+	}
+
+	/** Determine if a repeater is locked.
+	A locked repeater is one with another powered repeater facing them, to their immediate left or right sides.
+	"Left" is relative to the direction the repeater output faces, naturally. */
+	inline bool IsLocked(cChunk & Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta)
+	{
+		// The left hand side offset. Will be negated to get the rhs offset
+		const auto LhsOffset = cBlockRedstoneRepeaterHandler::GetLeftCoordinateOffset(a_Meta);
+
+		// Test the block to the left of us
+		const auto Lhs = IsOnRepeater(Chunk, LhsOffset + a_Position);
+		if (Lhs.first && DoesLhsLockMe(Lhs.second, a_Meta))
+		{
+			return true;
+		}
+
+		// Test the right side, flipping the argument order to DoesLhsLockMe
+		const auto Rhs = IsOnRepeater(Chunk, -LhsOffset + a_Position);
+		return Rhs.first && DoesLhsLockMe(a_Meta, Rhs.second);
+	}
+
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		if (!IsOn(a_BlockType))
 		{
@@ -27,7 +98,7 @@ class cRedstoneRepeaterHandler final : public cRedstoneHandler
 		return 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating loopy the repeater (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -77,80 +148,8 @@ class cRedstoneRepeaterHandler final : public cRedstoneHandler
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		Callback(cBlockRedstoneRepeaterHandler::GetRearCoordinateOffset(a_Meta) + a_Position);
-	}
-
-	inline static bool IsOn(BLOCKTYPE a_Block)
-	{
-		return (a_Block == E_BLOCK_REDSTONE_REPEATER_ON);
-	}
-
-	/** Returns a pair with first element indicating if the block at the given position is an activated repeater.
-	If it is activated, the second element is the repeater metadata. */
-	static std::pair<bool, NIBBLETYPE> IsOnRepeater(cChunk & Chunk, const Vector3i a_Position)
-	{
-		BLOCKTYPE Type;
-		NIBBLETYPE Meta;
-
-		if (!Chunk.UnboundedRelGetBlock(a_Position, Type, Meta))
-		{
-			return std::make_pair(false, 0);
-		}
-
-		return std::make_pair(IsOn(Type), Meta);
-	}
-
-	/** Determine if a repeater is locked.
-	A locked repeater is one with another powered repeater facing them, to their immediate left or right sides.
-	"Left" is relative to the direction the repeater output faces, naturally. */
-	inline static bool IsLocked(cChunk & Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta)
-	{
-		// The left hand side offset. Will be negated to get the rhs offset
-		const auto LhsOffset = cBlockRedstoneRepeaterHandler::GetLeftCoordinateOffset(a_Meta);
-
-		// Test the block to the left of us
-		const auto Lhs = IsOnRepeater(Chunk, LhsOffset + a_Position);
-		if (Lhs.first && DoesLhsLockMe(Lhs.second, a_Meta))
-		{
-			return true;
-		}
-
-		// Test the right side, flipping the argument order to DoesLhsLockMe
-		const auto Rhs = IsOnRepeater(Chunk, -LhsOffset + a_Position);
-		return Rhs.first && DoesLhsLockMe(a_Meta, Rhs.second);
-	}
-
-	/** Determine, from the metadata of a repeater on our left side, if they lock us.
-	To test a repeater on our right, simply invert the order of arguments provided.
-	"Left" is relative to the direction the repeater output faces, naturally. */
-	static bool DoesLhsLockMe(NIBBLETYPE a_MetaLhs, NIBBLETYPE a_MyMeta)
-	{
-		// Get the direction bits
-		a_MetaLhs &= E_META_REDSTONE_REPEATER_FACING_MASK;
-		a_MyMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
-
-		/*
-		Check for a valid locking configuration, where they are perpendicular and one snuggles into the other.
-
-		Order of comparisons:
-			XP >^ ZM
-			ZP |_ XP
-			XM <| ZP
-			ZP ^< xM
-
-		Key:
-			^ Facing up
-			_ Facing right
-			| Facing down
-			< Facing left
-		*/
-		return
-			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_XP) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_ZM)) ||
-			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_ZP) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_XP)) ||
-			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_XM) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_ZP)) ||
-			((a_MetaLhs == E_META_REDSTONE_REPEATER_FACING_ZM) && (a_MyMeta == E_META_REDSTONE_REPEATER_FACING_XM))
-		;
 	}
 };

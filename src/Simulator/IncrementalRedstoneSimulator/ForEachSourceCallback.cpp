@@ -2,9 +2,10 @@
 #include "Globals.h"
 
 #include "ForEachSourceCallback.h"
-#include "IncrementalRedstoneSimulator.h"
 #include "../../BlockInfo.h"
 #include "../../Chunk.h"
+#include "IncrementalRedstoneSimulator.h"
+#include "RedstoneHandler.h"
 
 
 
@@ -67,16 +68,10 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 
 PoweringData ForEachSourceCallback::QueryPower(const cChunk & Chunk, const Vector3i SourcePosition, const BLOCKTYPE SourceBlock, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const bool IsLinked)
 {
-	const auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(SourceBlock);
-	if (PotentialSourceHandler == nullptr)
-	{
-		return {};
-	}
-
 	return
 	{
 		SourceBlock,
-		PotentialSourceHandler->GetPowerDeliveredToPosition(
+		RedstoneHandler::GetPowerDeliveredToPosition(
 			Chunk, SourcePosition, SourceBlock,
 			QueryPosition, QueryBlock, IsLinked
 		)

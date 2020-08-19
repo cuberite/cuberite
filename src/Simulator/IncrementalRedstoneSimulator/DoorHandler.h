@@ -1,18 +1,17 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockDoor.h"
 
 
 
 
 
-class cDoorHandler final : public cRedstoneHandler
+namespace DoorHandler
 {
 	// "Doormammu, I've come to bargain"
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -23,7 +22,7 @@ class cDoorHandler final : public cRedstoneHandler
 		return 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
 	{
 		// LOGD("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -35,7 +34,7 @@ class cDoorHandler final : public cRedstoneHandler
 
 		const auto TopPosition = a_Position + OffsetYP;
 		ForEachSourceCallback Callback(a_Chunk, TopPosition, a_BlockType);
-		ForValidSourcePositions(a_Chunk, TopPosition, a_BlockType, a_Meta, Callback);
+		RedstoneHandler::ForValidSourcePositions(a_Chunk, TopPosition, a_BlockType, a_Meta, Callback);
 
 		// Factor in what the upper half is getting:
 		a_PoweringData = std::max(a_PoweringData, Callback.Power);
@@ -52,7 +51,7 @@ class cDoorHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
