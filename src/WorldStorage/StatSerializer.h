@@ -25,7 +25,7 @@ class cStatSerializer
 {
 public:
 
-	cStatSerializer(cStatManager & a_Manager, const AString & a_WorldName, const AString & a_FileName);
+	cStatSerializer(cStatManager & Manager, const std::string & WorldPath, std::string FileName);
 
 	/* Try to load the player statistics. */
 	void Load(void);
@@ -37,9 +37,11 @@ private:
 
 	void SaveStatToJSON(Json::Value & a_Out);
 
+	void LoadLegacyFromJSON(const Json::Value & In);
+
 	void LoadCustomStatFromJSON(const Json::Value & a_In);
 
 	cStatManager & m_Manager;
 
-	AString m_Path;
+	std::string m_Path;
 } ;
