@@ -83,6 +83,7 @@ protected:
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
