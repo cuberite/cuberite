@@ -176,7 +176,6 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	cFastNBTWriter Writer;
 
 	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
