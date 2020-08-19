@@ -45,6 +45,7 @@ Implements the 1.9 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/HorseWindow.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
