@@ -8,7 +8,7 @@ Classes to support the generation of single piece prefab structures
 
 #pragma once
 
-/** Enum of all implemented Structures*/
+/** Enum of all implemented Structures */
 enum class PrefabSingleStructure
 {
 	DesertTemple,

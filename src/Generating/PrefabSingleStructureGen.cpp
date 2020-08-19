@@ -14,7 +14,6 @@ cPrefabSinglePiece::cPrefabSinglePiece()
 
 
 
-
 void cPrefabSinglePiece::ReadFromFile(AString a_Filename)
 {
 	// TODO
