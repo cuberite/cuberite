@@ -7,7 +7,7 @@
 
 
 
-enum ENUm_Pitch_INSTRUMENTS
+enum ENUM_NOTE_INSTRUMENTS
 {
 	E_INST_HARP_PIANO  = 0,
 	E_INST_DOUBLE_BASS = 1,
@@ -44,9 +44,9 @@ public:  // tolua_export
 
 	// tolua_begin
 
-	char GetPitch(void);
-	void SetPitch(char a_Pitch);
-	void IncrementPitch(void);
+	char GetNote(void);
+	void SetNote(char a_Note);
+	void IncrementNote(void);
 	void MakeSound(void);
 
 	// tolua_end
@@ -56,12 +56,12 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 
-	/** Calculates the pitch to be send to the players
-	from a pitch value from 0 to 24 as incremented by the IncrementPitch function */
-	static float GetPitch(char a_Note);
+	/** Returns the relative pitch (used in the protocol)
+	from a note value between 0 and 24 (used in m_Note). */
+	static float PitchFromNote(char a_Note);
 
 private:
-	char m_Pitch;
+	char m_Note;
 } ;  // tolua_export
 
 

@@ -11,7 +11,7 @@
 
 cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Pitch(0)
+	m_Note(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
 }
@@ -24,7 +24,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cNoteEntity &>(a_Src);
-	m_Pitch = src.m_Pitch;
+	m_Note = src.m_Note;
 }
 
 
@@ -34,7 +34,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 bool cNoteEntity::UsedBy(cPlayer * a_Player)
 {
 	UNUSED(a_Player);
-	IncrementPitch();
+	IncrementNote();
 	MakeSound();
 	return true;
 }
@@ -243,13 +243,13 @@ void cNoteEntity::MakeSound(void)
 		}
 	}
 
-	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
+	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Note), E_BLOCK_NOTE_BLOCK);
 
 	m_World->BroadcastSoundEffect(
 		SampleName,
 		m_Pos,
 		3.0f,
-		GetPitch(m_Pitch)
+		PitchFromNote(m_Note)
 	);
 }
 
@@ -257,38 +257,38 @@ void cNoteEntity::MakeSound(void)
 
 
 
-char cNoteEntity::GetPitch(void)
+char cNoteEntity::GetNote(void)
 {
-	return m_Pitch;
+	return m_Note;
 }
 
 
 
 
 
-void cNoteEntity::SetPitch(char a_Pitch)
+void cNoteEntity::SetNote(char a_Note)
 {
-	m_Pitch = a_Pitch % 25;
+	m_Note = a_Note % 25;
 }
 
 
 
 
 
-void cNoteEntity::IncrementPitch(void)
+void cNoteEntity::IncrementNote(void)
 {
-	SetPitch(m_Pitch + 1);
+	SetNote(m_Note + 1);
 }
 
 
 
 
 
-float cNoteEntity::GetPitch(char a_Pitch)
+float cNoteEntity::PitchFromNote(char a_Pitch)
 {
 	// This replaces the calculation of:
-	// float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
-	// So 2 ^ ((m_Pitch - 12) / 12)
+	// float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Note - 12.0f) / 12.0f));
+	// So 2 ^ ((m_Note - 12) / 12)
 	switch (a_Pitch)
 	{
 		case 0: return 0.5f;

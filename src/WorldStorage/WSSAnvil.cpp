@@ -1419,7 +1419,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 	int note = a_NBT.FindChildByName(a_TagIdx, "note");
 	if (note >= 0)
 	{
-		NoteBlock->SetPitch(static_cast<char>(a_NBT.GetByte(note)));
+		NoteBlock->SetNote(static_cast<char>(a_NBT.GetByte(note)));
 	}
 	return NoteBlock;
 }
