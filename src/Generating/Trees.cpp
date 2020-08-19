@@ -59,8 +59,7 @@ static const Vector3d & pickBranchDirection(const cNoise a_Noise, Vector3i a_Blo
 		}
 	};
 
-	// Old: size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos.x, a_BlockPos.y + a_Seq, a_BlockPos.z)) % directions.size();
-	size_t index = static_cast<size_t>(GetRandomProvider().RandInt(directions.size() - 1));
+	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq)) % directions.size();
 	return directions[index];
 }
 
@@ -1316,7 +1315,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockPos.addedY(i), BranchLength, BranchStartDirection, BranchDirection, a_LogBlocks).Floor();
 
 		// There's a chance that there is a third leaf level on a branch
-		if (GetRandomProvider().RandBool(0.25))
+		if (a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq) % 3 > 2)  // A quarter chance
 		{
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
