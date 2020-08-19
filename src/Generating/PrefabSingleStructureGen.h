@@ -9,9 +9,8 @@ Classes to support the generation of single piece prefab structures
 #pragma once
 
 #include "Globals.h"
-#include "ChunkDesc.h"
-#include "HeiGen.h"
-#include "../BlockInfo.h"a
+#include "GridStructGen.h"
+#include "../BlockInfo.h"
 
 
 /** Enum of all implemented Structures */
