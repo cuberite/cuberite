@@ -6,6 +6,7 @@
 #include "BlockEntity.h"
 #include "Mixins.h"
 #include "ChunkInterface.h"
+#include "../BlockInfo.h"
 
 #include "../BlockEntities/BannerEntity.h"
 
