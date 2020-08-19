@@ -192,7 +192,7 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case structure tile entity: Action = 7;  break;  // Update Structure tile entity
 		case E_BLOCK_END_GATEWAY:   Action = 8;  break;  // Update destination for a end gateway entity
 		case E_BLOCK_SIGN_POST:     Action = 9;  break;  // Update sign entity
-		// case E_BLOCK_SHULKER_BOX:   Action = 10; break; // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
+		// case E_BLOCK_SHULKER_BOX:   Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
 		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
