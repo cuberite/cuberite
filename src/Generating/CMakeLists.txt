@@ -20,6 +20,7 @@ target_sources(
 	PiecePool.cpp
 	PieceStructuresGen.cpp
 	Prefab.cpp
+        PrefabSingleStructureGen.cpp
 	PrefabPiecePool.cpp
 	PrefabStructure.cpp
 	Ravines.cpp
@@ -54,6 +55,7 @@ target_sources(
 	Prefab.h
 	PrefabPiecePool.h
 	PrefabStructure.h
+        PrefabSingleStructureGen.h
 	ProtIntGen.h
 	Ravines.h
 	RoughRavines.h

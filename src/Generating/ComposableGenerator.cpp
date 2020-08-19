@@ -27,6 +27,7 @@
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
 #include "RoughRavines.h"
+#include "PrefabSingleStructureGen.h"
 #include "VillageGen.h"
 #include "PieceStructuresGen.h"
 
@@ -669,6 +670,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
 			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
 			m_FinishGens.push_back(cFinishGenPtr(new cStructGenWormNestCaves(m_Seed, Size, Grid, MaxOffset)));
+		}
+		else if (NoCaseCompare(finisher, "Desert Temple") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cPrefabSingleStructureGen(m_Seed, 100, 100, 100, m_BiomeGen, m_CompositedHeightCache, seaLevel, PrefabSingleStructure::DesertTemple)));
 		}
 		else
 		{
