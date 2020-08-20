@@ -1452,6 +1452,35 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Sets a new note for the block.",
 			},
+			GetPitch =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes = "Returns the current pitch set for the block",
+			},
+			IncrementPitch =
+			{
+				Notes = "Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher.",
+			},
+			MakeSound =
+			{
+				Notes = "Plays the sound for all {{cClientHandle|clients}} near this block.",
+			},
+			SetPitch =
+			{
+				Params =
+				{
+					{
+						Name = "Pitch",
+						Type = "number",
+					},
+				},
+				Notes = "Sets a new note for the block.",
+			},
 		},
 		Inherits = "cBlockEntity",
 	},
