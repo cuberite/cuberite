@@ -70,38 +70,6 @@ void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_B
 
 
 
-void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	SendBlockChange<&Palette_1_14::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-template <auto Palette>
-void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta)));
-}
-
-
-
-
-
-void cProtocol_1_14::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
-{
-	cProtocol_1_13::SendBlockChanges<&Palette_1_14::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
-}
-
-
-
-
-
 void cProtocol_1_14::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
@@ -299,7 +267,16 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 
 
-UInt32 cProtocol_1_14::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
+UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }

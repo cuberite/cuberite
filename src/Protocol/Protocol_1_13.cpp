@@ -72,21 +72,9 @@ Implements the 1.13 protocol classes:
 
 void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	SendBlockChange<&Palette_1_13::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-template <auto Palette>
-void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta)));
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
 }
 
 
@@ -95,7 +83,18 @@ void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, B
 
 void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	SendBlockChanges<&Palette_1_13::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		Pkt.WriteBEInt16(Coords);
+		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_BlockType, Change.m_BlockMeta));
+	}  // for itr - a_Changes[]
 }
 
 
@@ -628,7 +627,16 @@ std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 
 
-UInt32 cProtocol_1_13::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
+UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
@@ -699,7 +707,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 
 	// Normal item
-	a_Pkt.WriteBEInt16(GetProtocolIDFromItem(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteBEInt16(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
@@ -1248,24 +1256,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13_1:
 
-void cProtocol_1_13_1::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	Super::SendBlockChange<&Palette_1_13_1::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-void cProtocol_1_13_1::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
-{
-	Super::SendBlockChanges<&Palette_1_13_1::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
-}
-
-
-
-
-
 cProtocol::Version cProtocol_1_13_1::GetProtocolVersion()
 {
 	return Version::Version_1_13_1;
@@ -1284,7 +1274,16 @@ std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_Protoco
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
+UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
 	return Palette_1_13_1::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
@@ -1371,7 +1370,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	a_Pkt.WriteBool(true);
 
 	// Normal item
-	a_Pkt.WriteVarInt32(GetProtocolIDFromItem(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
