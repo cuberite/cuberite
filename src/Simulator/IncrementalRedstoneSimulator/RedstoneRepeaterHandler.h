@@ -81,7 +81,7 @@ namespace RedstoneRepeaterHandler
 		return Rhs.first && DoesLhsLockMe(a_Meta, Rhs.second);
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		if (!IsOn(a_BlockType))
 		{
@@ -98,7 +98,7 @@ namespace RedstoneRepeaterHandler
 		return 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating loopy the repeater (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -118,7 +118,7 @@ namespace RedstoneRepeaterHandler
 
 		if (DelayInfo == nullptr)
 		{
-			bool ShouldBeOn = (a_PoweringData.PowerLevel != 0);
+			bool ShouldBeOn = (Power != 0);
 			if (ShouldBeOn != IsOn(a_BlockType))
 			{
 				Data.m_MechanismDelays[a_Position] = std::make_pair((((a_Meta & 0xC) >> 0x2) + 1), ShouldBeOn);
@@ -143,7 +143,7 @@ namespace RedstoneRepeaterHandler
 		// While sleeping, we ignore any power changes and apply our saved ShouldBeOn when sleep expires
 		// Now, we need to recalculate to be aware of any new changes that may e.g. cause a new output change
 		// FastSetBlock doesn't wake simulators, so manually update ourselves:
-		Update(a_Chunk, CurrentlyTicking, a_Position, NewType, a_Meta, a_PoweringData);
+		Update(a_Chunk, CurrentlyTicking, a_Position, NewType, a_Meta, Power);
 
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockRedstoneRepeaterHandler::GetFrontCoordinateOffset(a_Meta));
 	}

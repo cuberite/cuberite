@@ -23,21 +23,36 @@ namespace ObserverHandler
 			return false;
 		}
 
-		// Cache the last seen block type and meta in the power data for this position
-		auto Observed = PoweringData(BlockType, BlockMeta);
-		auto Previous = a_Data.ExchangeUpdateOncePowerData(a_Position, Observed);
+		auto & ObserverCache = a_Data.ObserverCache;
+		const auto FindResult = ObserverCache.find(a_Position);
+		const auto Observed = std::make_pair(BlockType, BlockMeta);
+
+		if (FindResult == ObserverCache.end())
+		{
+			// Cache the last seen block for this position:
+			ObserverCache.emplace(a_Position, Observed);
+
+			// Definitely should signal update:
+			return true;
+		}
+
+		// The block this observer previously saw.
+		const auto Previous = FindResult->second;
+
+		// Update the last seen block:
+		FindResult->second = Observed;
 
 		// Determine if to signal an update based on the block previously observed changed
-		return (Previous.PoweringBlock != Observed.PoweringBlock) || (Previous.PowerLevel != Observed.PowerLevel);
+		return Previous != Observed;
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (IsOn(Meta) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(Meta)))) ? 15 : 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating Lenny the observer (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 

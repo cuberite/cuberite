@@ -60,7 +60,7 @@ namespace TripwireHookHandler
 		return 0;
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryBlockType);
@@ -69,22 +69,22 @@ namespace TripwireHookHandler
 		return (GetPowerLevel(a_Chunk, a_Position, a_Chunk.GetMeta(a_Position)) == 15) ? 15 : 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating hooky the tripwire hook (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const auto Power = GetPowerLevel(a_Chunk, a_Position, a_Meta);
+		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position, a_Meta);
 		NIBBLETYPE Meta;
-		if (Power == 0)
+		if (PowerLevel == 0)
 		{
 			Meta = (a_Meta & 0x3);
 		}
-		else if (Power == 1)
+		else if (PowerLevel == 1)
 		{
 			// Connected but not activated, AND away the highest bit
 			Meta = (a_Meta & 0x7) | 0x4;
 		}
-		else if (Power == 15)
+		else if (PowerLevel == 15)
 		{
 			// Connected and activated, set the 3rd and 4th highest bits
 			Meta = (a_Meta | 0xC);

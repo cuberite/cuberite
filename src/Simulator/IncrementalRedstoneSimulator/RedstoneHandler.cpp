@@ -87,7 +87,7 @@
 
 namespace RedstoneHandler
 {
-	unsigned char GetPowerDeliveredToPosition(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType, const Vector3i QueryPosition, const BLOCKTYPE QueryBlockType, const bool IsLinked)
+	PowerLevel GetPowerDeliveredToPosition(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType, const Vector3i QueryPosition, const BLOCKTYPE QueryBlockType, const bool IsLinked)
 	{
 		INVOKE_FOR_HANDLERS(GetPowerDeliveredToPosition(Chunk, Position, BlockType, QueryPosition, QueryBlockType, IsLinked));
 
@@ -99,27 +99,15 @@ namespace RedstoneHandler
 		return 0;
 	}
 
-
-
-
-
-	void Update(cChunk & Chunk, cChunk & CurrentlyTicking, const Vector3i Position, const BLOCKTYPE BlockType, const NIBBLETYPE Meta, const PoweringData PoweringData)
+	void Update(cChunk & Chunk, cChunk & CurrentlyTicking, const Vector3i Position, const BLOCKTYPE BlockType, const NIBBLETYPE Meta, const PowerLevel PowerLevel)
 	{
-		INVOKE_FOR_HANDLERS(Update(Chunk, CurrentlyTicking, Position, BlockType, Meta, PoweringData));
+		INVOKE_FOR_HANDLERS(Update(Chunk, CurrentlyTicking, Position, BlockType, Meta, PowerLevel));
 	}
-
-
-
-
 
 	void ForValidSourcePositions(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType, const NIBBLETYPE Meta, ForEachSourceCallback & Callback)
 	{
 		INVOKE_FOR_HANDLERS(ForValidSourcePositions(Chunk, Position, BlockType, Meta, Callback));
 	}
-
-
-
-
 
 	void SetWireState(const cChunk & Chunk, const Vector3i Position)
 	{

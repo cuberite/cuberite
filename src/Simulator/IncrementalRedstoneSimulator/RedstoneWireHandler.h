@@ -189,7 +189,7 @@ namespace RedstoneWireHandler
 		DataForChunk(Chunk).WireStates[Position] = Block;
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		// Starts off as the wire's meta value, modified appropriately and returned
 		auto Power = a_Chunk.GetMeta(a_Position);
@@ -253,16 +253,16 @@ namespace RedstoneWireHandler
 		return Power;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
+		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
-		if (a_Meta == a_PoweringData.PowerLevel)
+		if (a_Meta == Power)
 		{
 			return;
 		}
 
-		a_Chunk.SetMeta(a_Position, a_PoweringData.PowerLevel);
+		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
 		for (const auto Offset : RelativeAdjacents)

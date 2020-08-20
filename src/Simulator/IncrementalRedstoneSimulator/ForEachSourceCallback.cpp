@@ -12,6 +12,7 @@
 
 
 ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE CurrentBlock) :
+	Power(0),
 	m_Chunk(Chunk),
 	m_Position(Position),
 	m_CurrentBlock(CurrentBlock)
@@ -26,8 +27,13 @@ bool ForEachSourceCallback::ShouldQueryLinkedPosition(const Vector3i Location, c
 {
 	switch (Block)
 	{
+		// Normally we don't ask solid blocks for power because they don't have any (store, dirt, etc.)
+		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
 		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_OBSERVER:
 		case E_BLOCK_TRAPPED_CHEST: return false;
+
+		// If a mechanism asks for power from a block, redirect the query to linked positions if:
 		default: return cBlockInfo::IsSolid(Block);
 	}
 }
@@ -58,7 +64,13 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 	}
 	else
 	{
-		Power = std::max(Power, QueryPower(*NeighbourChunk, Location, PotentialSourceBlock, NeighbourRelativeQueryPosition, m_CurrentBlock, false));
+		Power = std::max(
+			Power,
+			RedstoneHandler::GetPowerDeliveredToPosition(
+				*NeighbourChunk, Location, PotentialSourceBlock,
+				NeighbourRelativeQueryPosition, m_CurrentBlock, false
+			)
+		);
 	}
 }
 
@@ -66,26 +78,11 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 
 
 
-PoweringData ForEachSourceCallback::QueryPower(const cChunk & Chunk, const Vector3i SourcePosition, const BLOCKTYPE SourceBlock, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const bool IsLinked)
+PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
 {
-	return
-	{
-		SourceBlock,
-		RedstoneHandler::GetPowerDeliveredToPosition(
-			Chunk, SourcePosition, SourceBlock,
-			QueryPosition, QueryBlock, IsLinked
-		)
-	};
-}
+	PowerLevel Power = 0;
 
-
-
-
-
-PoweringData ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
-{
-	PoweringData Power;
-
+	// Loop through all linked powerable offsets in the direction requested:
 	for (const auto Offset : cSimulator::GetLinkedOffsets(SolidBlockPosition - QueryPosition))
 	{
 		auto SourcePosition = QueryPosition + Offset;
@@ -100,8 +97,17 @@ PoweringData ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const
 			continue;
 		}
 
+		// Conduit block's position, relative to NeighbourChunk.
 		const auto NeighbourRelativeSolidBlockPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(Chunk, *NeighbourChunk, SolidBlockPosition);
-		Power = std::max(Power, QueryPower(*NeighbourChunk, SourcePosition, NeighbourChunk->GetBlock(SourcePosition), NeighbourRelativeSolidBlockPosition, QueryBlock, true));
+
+		// Do a standard power query, but the requester's position is actually the solid block that will conduct power:
+		Power = std::max(
+			Power,
+			RedstoneHandler::GetPowerDeliveredToPosition(
+				*NeighbourChunk, SourcePosition, NeighbourChunk->GetBlock(SourcePosition),
+				NeighbourRelativeSolidBlockPosition, QueryBlock, true
+			)
+		);
 	}
 
 	return Power;

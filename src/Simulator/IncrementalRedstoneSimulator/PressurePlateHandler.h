@@ -91,7 +91,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
@@ -99,10 +99,10 @@ namespace PressurePlateHandler
 
 		// Plates only link power blocks below
 		// Retrieve and return the cached power calculated by Update for performance:
-		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
+		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -110,13 +110,13 @@ namespace PressurePlateHandler
 
 		const auto PreviousPower = ChunkData.GetCachedPowerData(a_Position);
 		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
-		const auto Power = GetPowerLevel(a_Chunk, Absolute, a_BlockType);  // Get the current power of the platey
+		const auto PowerLevel = GetPowerLevel(a_Chunk, Absolute, a_BlockType);  // Get the current power of the platey
 		const auto DelayInfo = ChunkData.GetMechanismDelayInfo(a_Position);
 
 		// Resting state?
 		if (DelayInfo == nullptr)
 		{
-			if (Power == 0)
+			if (PowerLevel == 0)
 			{
 				// Nothing happened, back to rest
 				return;
@@ -129,7 +129,7 @@ namespace PressurePlateHandler
 			a_Chunk.GetWorld()->BroadcastSoundEffect(GetClickOnSound(a_BlockType), Absolute, 0.5f, 0.6f);
 
 			// Update power
-			ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+			ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 
 			// Immediately depress plate
 			a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
@@ -148,7 +148,7 @@ namespace PressurePlateHandler
 		if (DelayTicks > 0)
 		{
 			// Nothing changes, if there is nothing on it anymore, because the state is locked.
-			if (Power == 0)
+			if (PowerLevel == 0)
 			{
 				return;
 			}
@@ -161,10 +161,10 @@ namespace PressurePlateHandler
 			}
 
 			// Did the power level change and is still above zero?
-			if (Power != PreviousPower.PowerLevel)
+			if (PowerLevel != PreviousPower)
 			{
 				// Yes. Update power
-				ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 			}
 
@@ -175,7 +175,7 @@ namespace PressurePlateHandler
 		if (HasExitedMinimumOnDelayPhase)
 		{
 			// Yep, initial delay elapsed. Has the player gotten off?
-			if (Power == 0)
+			if (PowerLevel == 0)
 			{
 				// Yes. Go into subsequent release delay, for a further 0.5 seconds
 				*DelayInfo = std::make_pair(5, false);
@@ -183,10 +183,10 @@ namespace PressurePlateHandler
 			}
 
 			// Did the power level change and is still above zero?
-			if (Power != PreviousPower.PowerLevel)
+			if (PowerLevel != PreviousPower)
 			{
 				// Yes. Update power
-				ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+				ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 			}
 
@@ -198,7 +198,7 @@ namespace PressurePlateHandler
 		ChunkData.m_MechanismDelays.erase(a_Position);
 
 		a_Chunk.GetWorld()->BroadcastSoundEffect(GetClickOffSound(a_BlockType), Absolute, 0.5f, 0.5f);
-		ChunkData.SetCachedPowerData(a_Position, PoweringData(a_BlockType, Power));
+		ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 
 		a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
 		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);

@@ -9,7 +9,7 @@
 
 namespace PistonHandler
 {
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -20,11 +20,11 @@ namespace PistonHandler
 		return 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const bool ShouldBeExtended = a_PoweringData.PowerLevel != 0;
+		const bool ShouldBeExtended = Power != 0;
 		if (ShouldBeExtended == cBlockPistonHandler::IsExtended(a_Meta))
 		{
 			return;

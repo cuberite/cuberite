@@ -15,13 +15,11 @@ public:
 	/** Callback invoked for each potential source position of the redstone component. */
 	void operator()(Vector3i Location);
 
-	/** Asks a redstone component at the source position how much power it will deliver to the querying position. */
-	static PoweringData QueryPower(const cChunk & Chunk, Vector3i SourcePosition, BLOCKTYPE SourceBlock, Vector3i QueryPosition, BLOCKTYPE QueryBlock, bool IsLinked);
+	/** Asks redstone handlers adjacent to a solid block how much power they will deliver to the querying position, via the solid block.
+	Both QueryPosition and SolidBlockPosition are relative to Chunk. */
+	static PowerLevel QueryLinkedPower(const cChunk & Chunk, Vector3i QueryPosition, BLOCKTYPE QueryBlock, Vector3i SolidBlockPosition);
 
-	/** Asks redstone handlers adjacent to a solid block how much power they will deliver to the querying position, via the solid block. */
-	static PoweringData QueryLinkedPower(const cChunk & Chunk, Vector3i QueryPosition, BLOCKTYPE QueryBlock, Vector3i SolidBlockPosition);
-
-	PoweringData Power;
+	PowerLevel Power;
 
 private:
 

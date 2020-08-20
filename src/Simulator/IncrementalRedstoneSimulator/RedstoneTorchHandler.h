@@ -29,7 +29,7 @@ namespace RedstoneTorchHandler
 		}
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		const auto QueryOffset = a_QueryPosition - a_Position;
 
@@ -45,7 +45,7 @@ namespace RedstoneTorchHandler
 		return 15;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -54,7 +54,7 @@ namespace RedstoneTorchHandler
 
 		if (DelayInfo == nullptr)
 		{
-			const bool ShouldBeOn = (a_PoweringData.PowerLevel == 0);
+			const bool ShouldBeOn = (Power == 0);
 			if (ShouldBeOn != IsOn(a_BlockType))
 			{
 				Data.m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);

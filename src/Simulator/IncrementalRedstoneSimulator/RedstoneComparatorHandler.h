@@ -23,7 +23,7 @@ namespace RedstoneComparatorHandler
 		}
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
@@ -31,7 +31,7 @@ namespace RedstoneComparatorHandler
 		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (
 			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, Meta & 0x3) == a_QueryPosition) ?
-			DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel : 0
+			DataForChunk(a_Chunk).GetCachedPowerData(a_Position) : 0
 		);
 	}
 
@@ -79,9 +79,9 @@ namespace RedstoneComparatorHandler
 		);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// Note that a_PoweringData here contains the maximum * side * power level, as specified by GetValidSourcePositions
+		// Note that Power here contains the maximum * side * power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & Data = DataForChunk(a_Chunk);
@@ -91,9 +91,9 @@ namespace RedstoneComparatorHandler
 		if (DelayInfo == nullptr)
 		{
 			const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
-			const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
+			const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
 			const auto PreviousFrontPower = Data.GetCachedPowerData(a_Position);
-			const bool ShouldUpdate = (FrontPower != PreviousFrontPower.PowerLevel);  // "Business logic" (:P) - determined by side and rear power levels
+			const bool ShouldUpdate = (FrontPower != PreviousFrontPower);  // "Business logic" (:P) - determined by side and rear power levels
 
 			if (ShouldUpdate)
 			{
@@ -112,11 +112,11 @@ namespace RedstoneComparatorHandler
 		}
 
 		const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
-		const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
+		const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
 		const auto NewMeta = (FrontPower > 0) ? (a_Meta | 0x8) : (a_Meta & 0x7);
 
 		// Don't care about the previous power level so return value ignored
-		Data.ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
+		Data.ExchangeUpdateOncePowerData(a_Position, FrontPower);
 
 		a_Chunk.SetMeta(a_Position, NewMeta);
 		Data.m_MechanismDelays.erase(a_Position);

@@ -11,7 +11,7 @@ namespace DoorHandler
 {
 	// "Doormammu, I've come to bargain"
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -22,7 +22,7 @@ namespace DoorHandler
 		return 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PowerLevel Power)
 	{
 		// LOGD("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -37,10 +37,10 @@ namespace DoorHandler
 		RedstoneHandler::ForValidSourcePositions(a_Chunk, TopPosition, a_BlockType, a_Meta, Callback);
 
 		// Factor in what the upper half is getting:
-		a_PoweringData = std::max(a_PoweringData, Callback.Power);
+		Power = std::max(Power, Callback.Power);
 
 		cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
-		const bool ShouldBeOpen = a_PoweringData.PowerLevel != 0;
+		const bool ShouldBeOpen = Power != 0;
 		const auto AbsolutePosition = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
 		const bool IsOpen = cBlockDoorHandler::IsOpen(ChunkInterface, AbsolutePosition);
 

@@ -25,7 +25,7 @@ namespace PoweredRailHandler
 		}
 	}
 
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryBlockType);
 
@@ -33,13 +33,13 @@ namespace PoweredRailHandler
 		const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(Meta);
 		if (((Offset + a_Position) == a_QueryPosition) || ((-Offset + a_Position) == a_QueryPosition))
 		{
-			auto Power = DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
-			return (Power <= 7) ? 0 : --Power;
+			const auto Power = DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
+			return (Power <= 7) ? 0 : (Power - 1);
 		}
 		return 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating tracky the rail (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -58,10 +58,10 @@ namespace PoweredRailHandler
 			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_POWERED_RAIL:
 			{
-				auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
-				if (a_PoweringData != DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
+				const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
+				if (Power != DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power))
 				{
-					a_Chunk.SetMeta(a_Position, (a_PoweringData.PowerLevel == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
+					a_Chunk.SetMeta(a_Position, (Power == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
 
 					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, Offset);
 					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, -Offset);

@@ -9,14 +9,14 @@
 
 namespace TrappedChestHandler
 {
-	inline unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
 		UNUSED(IsLinked);
 
-		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel;
+		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 	}
 
 	inline unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position)
@@ -34,14 +34,14 @@ namespace TrappedChestHandler
 		return static_cast<unsigned char>(std::min(NumberOfPlayers, 15));
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData)
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const auto Power = GetPowerLevel(a_Chunk, a_Position);
-		const auto PreviousPower = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
+		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
+		const auto PreviousPower = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, PowerLevel);
 
-		if (Power != PreviousPower.PowerLevel)
+		if (PowerLevel != PreviousPower)
 		{
 			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 		}
