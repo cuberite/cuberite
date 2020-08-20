@@ -77,7 +77,7 @@ echo Cuberite "$CUBERITE_BUILD_SERIES_NAME-$CUBERITE_BUILD_ID\n$BUILD_URL" > Ser
 # T: files-from (list of server files accepted for release archives)
 # f: file (output file location)
 pushd Server
-tar -hzcv -T Install/UnixExecutables.list --exclude .git -f ../Cuberite.tar.gz
+tar -hzcv --exclude .git -T Install/UnixExecutables.list -f ../Cuberite.tar.gz
 popd
 sha1sum Cuberite.tar.gz > Cuberite.tar.gz.sha1
 
