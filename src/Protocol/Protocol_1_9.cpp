@@ -564,7 +564,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 
 cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 {
-	return Version::Version_1_9_0;
+	return Version::v1_9_0;
 }
 
 
@@ -2189,7 +2189,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 {
-	return Version::Version_1_9_1;
+	return Version::v1_9_1;
 }
 
 
@@ -2201,7 +2201,7 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 
 cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 {
-	return Version::Version_1_9_2;
+	return Version::v1_9_2;
 }
 
 
@@ -2249,7 +2249,7 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 cProtocol::Version cProtocol_1_9_4::GetProtocolVersion()
 {
-	return Version::Version_1_9_4;
+	return Version::v1_9_4;
 }
 
 

@@ -70,41 +70,41 @@ void cChunkDataSerializer::SendToClients(const std::unordered_set<cClientHandle 
 	{
 		switch (Entry.first)
 		{
-			case cProtocol::Version::Version_1_8_0:
+			case cProtocol::Version::v1_8_0:
 			{
 				Serialize47(Entry.second);
 				continue;
 			}
-			case cProtocol::Version::Version_1_9_0:
-			case cProtocol::Version::Version_1_9_1:
-			case cProtocol::Version::Version_1_9_2:
+			case cProtocol::Version::v1_9_0:
+			case cProtocol::Version::v1_9_1:
+			case cProtocol::Version::v1_9_2:
 			{
 				Serialize107(Entry.second);
 				continue;
 			}
-			case cProtocol::Version::Version_1_9_4:
-			case cProtocol::Version::Version_1_10_0:
-			case cProtocol::Version::Version_1_11_0:
-			case cProtocol::Version::Version_1_11_1:
-			case cProtocol::Version::Version_1_12:
-			case cProtocol::Version::Version_1_12_1:
-			case cProtocol::Version::Version_1_12_2:
+			case cProtocol::Version::v1_9_4:
+			case cProtocol::Version::v1_10_0:
+			case cProtocol::Version::v1_11_0:
+			case cProtocol::Version::v1_11_1:
+			case cProtocol::Version::v1_12:
+			case cProtocol::Version::v1_12_1:
+			case cProtocol::Version::v1_12_2:
 			{
 				Serialize110(Entry.second);
 				continue;
 			}
-			case cProtocol::Version::Version_1_13:
+			case cProtocol::Version::v1_13:
 			{
 				Serialize393<&Palette_1_13::FromBlock>(Entry.second);  // This version didn't last very long xD
 				continue;
 			}
-			case cProtocol::Version::Version_1_13_1:
-			case cProtocol::Version::Version_1_13_2:
+			case cProtocol::Version::v1_13_1:
+			case cProtocol::Version::v1_13_2:
 			{
 				Serialize393<&Palette_1_13_1::FromBlock>(Entry.second);
 				continue;
 			}
-			case cProtocol::Version::Version_1_14:
+			case cProtocol::Version::v1_14:
 			{
 				Serialize477(Entry.second);
 				continue;

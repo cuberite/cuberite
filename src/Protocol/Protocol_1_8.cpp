@@ -2212,7 +2212,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 
 cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
 {
-	return Version::Version_1_8_0;
+	return Version::v1_8_0;
 }
 
 

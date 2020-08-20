@@ -208,7 +208,7 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
 
 cProtocol::Version cProtocol_1_14::GetProtocolVersion()
 {
-	return Version::Version_1_14;
+	return Version::v1_14;
 }
 
 

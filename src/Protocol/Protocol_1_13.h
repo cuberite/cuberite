@@ -56,8 +56,8 @@ protected:
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
-	virtual UInt8 GetEntityMetadataID(eEntityMetadata a_Metadata);
-	virtual UInt8 GetEntityMetadataID(eEntityMetadataType a_FieldType);
+	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata);
+	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType);
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage);
@@ -69,7 +69,7 @@ protected:
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const eEntityMetadata a_Metadata, const eEntityMetadataType a_FieldType);
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType);
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
 };
