@@ -22,10 +22,6 @@
 #include "DeadlockDetect.h"
 #include "BlockEntities/BlockEntity.h"
 
-#ifndef _WIN32
-	#include <cstdlib>  // abs
-#endif
-
 #include "zlib/zlib.h"
 #include "json/json.h"
 
@@ -65,27 +61,11 @@ cChunkMap::~cChunkMap()
 
 cChunkPtr cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 {
-	auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if (Chunk == nullptr)
-	{
-		return (
-			*m_Chunks.emplace(
-				ChunkCoordinate{ a_ChunkX, a_ChunkZ },
-				std::make_unique<cChunk>(
-					a_ChunkX,
-					a_ChunkZ,
-					this,
-					GetWorld(),
-					FindChunk(a_ChunkX - 1, a_ChunkZ),
-					FindChunk(a_ChunkX + 1, a_ChunkZ),
-					FindChunk(a_ChunkX, a_ChunkZ - 1),
-					FindChunk(a_ChunkX, a_ChunkZ + 1),
-					*m_Pool
-				)
-			).first
-		).second.get();
-	}
-	return Chunk;
+	// If not exists insert. Then, return the chunk at these coordinates:
+	return &m_Chunks.try_emplace(
+		ChunkCoordinate{ a_ChunkX, a_ChunkZ },
+		a_ChunkX, a_ChunkZ, this, m_World, *m_Pool
+	).first->second;
 }
 
 
@@ -151,7 +131,7 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
 
 	auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
-	return (Chunk == m_Chunks.end()) ? nullptr : Chunk->second.get();
+	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
 }
 
 
@@ -936,9 +916,9 @@ void cChunkMap::RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_
 void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSChunks);
-	for (const auto & Chunk : m_Chunks)
+	for (auto & Chunk : m_Chunks)
 	{
-		Chunk.second->RemoveClient(a_Client);
+		Chunk.second.RemoveClient(a_Client);
 	}
 }
 
@@ -985,12 +965,12 @@ void cChunkMap::AddEntityIfNotPresent(OwnedEntity a_Entity)
 
 
 
-bool cChunkMap::HasEntity(UInt32 a_UniqueID)
+bool cChunkMap::HasEntity(UInt32 a_UniqueID) const
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid() && Chunk.second->HasEntity(a_UniqueID))
+		if (Chunk.second.IsValid() && Chunk.second.HasEntity(a_UniqueID))
 		{
 			return true;
 		}
@@ -1020,12 +1000,12 @@ OwnedEntity cChunkMap::RemoveEntity(cEntity & a_Entity)
 
 
 
-bool cChunkMap::ForEachEntity(cEntityCallback a_Callback)
+bool cChunkMap::ForEachEntity(cEntityCallback a_Callback) const
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid() && !Chunk.second->ForEachEntity(a_Callback))
+		if (Chunk.second.IsValid() && !Chunk.second.ForEachEntity(a_Callback))
 		{
 			return false;
 		}
@@ -1281,13 +1261,13 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 
 
-bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
+bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback) const
 {
 	cCSLock Lock(m_CSChunks);
 	bool res = false;
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid() && Chunk.second->DoWithEntityByID(a_UniqueID, a_Callback, res))
+		if (Chunk.second.IsValid() && Chunk.second.DoWithEntityByID(a_UniqueID, a_Callback, res))
 		{
 			return res;
 		}
@@ -1876,12 +1856,12 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 
 
 
-bool cChunkMap::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback)
+bool cChunkMap::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) const
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid())
+		if (Chunk.second.IsValid())
 		{
 			if (a_Callback(Chunk.first.ChunkX, Chunk.first.ChunkZ))
 			{
@@ -1934,7 +1914,7 @@ bool cChunkMap::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBl
 
 
 
-void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
+void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const
 {
 	a_NumChunksValid = 0;
 	a_NumChunksDirty = 0;
@@ -1942,7 +1922,7 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 	for (const auto & Chunk : m_Chunks)
 	{
 		a_NumChunksValid++;
-		if (Chunk.second->IsDirty())
+		if (Chunk.second.IsDirty())
 		{
 			a_NumChunksDirty++;
 		}
@@ -1990,14 +1970,14 @@ void cChunkMap::SetNextBlockToTick(const Vector3i a_BlockPos)
 void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 {
 	cCSLock Lock(m_CSChunks);
-	for (const auto & Chunk : m_Chunks)
+	for (auto & Chunk : m_Chunks)
 	{
 		// We do count every Mobs in the world. But we are assuming that every chunk not loaded by any client
 		// doesn't affect us. Normally they should not have mobs because every "too far" mobs despawn
 		// If they have (f.i. when player disconnect) we assume we don't have to make them live or despawn
-		if (Chunk.second->IsValid() && Chunk.second->HasAnyClients())
+		if (Chunk.second.IsValid() && Chunk.second.HasAnyClients())
 		{
-			Chunk.second->CollectMobCensus(a_ToFill);
+			Chunk.second.CollectMobCensus(a_ToFill);
 		}
 	}
 }
@@ -2009,12 +1989,12 @@ void cChunkMap::CollectMobCensus(cMobCensus & a_ToFill)
 void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	cCSLock Lock(m_CSChunks);
-	for (const auto & Chunk : m_Chunks)
+	for (auto & Chunk : m_Chunks)
 	{
 		// We only spawn close to players
-		if (Chunk.second->IsValid() && Chunk.second->HasAnyClients())
+		if (Chunk.second.IsValid() && Chunk.second.HasAnyClients())
 		{
-			Chunk.second->SpawnMobs(a_MobSpawner);
+			Chunk.second.SpawnMobs(a_MobSpawner);
 		}
 	}
 }
@@ -2026,12 +2006,12 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSChunks);
-	for (const auto & Chunk : m_Chunks)
+	for (auto & Chunk : m_Chunks)
 	{
 		// Only tick chunks that are valid and should be ticked:
-		if (Chunk.second->IsValid() && Chunk.second->ShouldBeTicked())
+		if (Chunk.second.IsValid() && Chunk.second.ShouldBeTicked())
 		{
-			Chunk.second->Tick(a_Dt);
+			Chunk.second.Tick(a_Dt);
 		}
 	}
 }
@@ -2063,7 +2043,7 @@ void cChunkMap::UnloadUnusedChunks(void)
 	for (auto itr = m_Chunks.begin(); itr != m_Chunks.end();)
 	{
 		if (
-			(itr->second->CanUnload()) &&  // Can unload
+			(itr->second.CanUnload()) &&  // Can unload
 			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.ChunkX, itr->first.ChunkZ)  // Plugins agree
 		)
 		{
@@ -2080,12 +2060,12 @@ void cChunkMap::UnloadUnusedChunks(void)
 
 
 
-void cChunkMap::SaveAllChunks(void)
+void cChunkMap::SaveAllChunks(void) const
 {
 	cCSLock Lock(m_CSChunks);
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid() && Chunk.second->IsDirty())
+		if (Chunk.second.IsValid() && Chunk.second.IsDirty())
 		{
 			GetWorld()->GetStorage().QueueSaveChunk(Chunk.first.ChunkX, Chunk.first.ChunkZ);
 		}
@@ -2096,7 +2076,7 @@ void cChunkMap::SaveAllChunks(void)
 
 
 
-size_t cChunkMap::GetNumChunks(void)
+size_t cChunkMap::GetNumChunks(void) const
 {
 	cCSLock Lock(m_CSChunks);
 	return m_Chunks.size();
@@ -2106,13 +2086,13 @@ size_t cChunkMap::GetNumChunks(void)
 
 
 
-size_t cChunkMap::GetNumUnusedDirtyChunks(void)
+size_t cChunkMap::GetNumUnusedDirtyChunks(void) const
 {
 	cCSLock Lock(m_CSChunks);
 	size_t res = 0;
 	for (const auto & Chunk : m_Chunks)
 	{
-		if (Chunk.second->IsValid() && Chunk.second->CanUnloadAfterSaving())
+		if (Chunk.second.IsValid() && Chunk.second.CanUnloadAfterSaving())
 		{
 			res += 1;
 		}

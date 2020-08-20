@@ -64,7 +64,6 @@ public:
 	cChunk(
 		int a_ChunkX, int a_ChunkZ,   // Chunk coords
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
-		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
 	);
 	cChunk(cChunk & other) = delete;
@@ -89,10 +88,10 @@ public:
 	/** Returns true iff the chunk has changed since it was last saved. */
 	bool IsDirty(void) const {return m_IsDirty; }
 
-	bool CanUnload(void);
+	bool CanUnload(void) const;
 
 	/** Returns true if the chunk could have been unloaded if it weren't dirty */
-	bool CanUnloadAfterSaving(void);
+	bool CanUnloadAfterSaving(void) const;
 
 	bool IsLightValid(void) const {return m_IsLightValid; }
 
@@ -673,7 +672,7 @@ private:
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);
 
 	/** Check m_Entities for cPlayer objects. */
-	bool HasPlayerEntities();
+	bool HasPlayerEntities() const;
 };
 
 typedef cChunk * cChunkPtr;

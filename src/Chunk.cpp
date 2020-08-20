@@ -56,7 +56,6 @@
 cChunk::cChunk(
 	int a_ChunkX, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
-	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ):
 	m_Presence(cpInvalid),
@@ -71,30 +70,31 @@ cChunk::cChunk(
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
 	m_ChunkData(a_Pool),
-	m_NeighborXM(a_NeighborXM),
-	m_NeighborXP(a_NeighborXP),
-	m_NeighborZM(a_NeighborZM),
-	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
 	m_AlwaysTicked(0)
 {
-	if (a_NeighborXM != nullptr)
+	m_NeighborXM = a_ChunkMap->FindChunk(a_ChunkX - 1, a_ChunkZ);
+	m_NeighborXP = a_ChunkMap->FindChunk(a_ChunkX + 1, a_ChunkZ);
+	m_NeighborZM = a_ChunkMap->FindChunk(a_ChunkX, a_ChunkZ - 1);
+	m_NeighborZP = a_ChunkMap->FindChunk(a_ChunkX, a_ChunkZ + 1);
+
+	if (m_NeighborXM != nullptr)
 	{
-		a_NeighborXM->m_NeighborXP = this;
+		m_NeighborXM->m_NeighborXP = this;
 	}
-	if (a_NeighborXP != nullptr)
+	if (m_NeighborXP != nullptr)
 	{
-		a_NeighborXP->m_NeighborXM = this;
+		m_NeighborXP->m_NeighborXM = this;
 	}
-	if (a_NeighborZM != nullptr)
+	if (m_NeighborZM != nullptr)
 	{
-		a_NeighborZM->m_NeighborZP = this;
+		m_NeighborZM->m_NeighborZP = this;
 	}
-	if (a_NeighborZP != nullptr)
+	if (m_NeighborZP != nullptr)
 	{
-		a_NeighborZP->m_NeighborZM = this;
+		m_NeighborZP->m_NeighborZM = this;
 	}
 }
 
@@ -188,10 +188,11 @@ void cChunk::MarkRegenerating(void)
 
 
 
-bool cChunk::HasPlayerEntities()
+bool cChunk::HasPlayerEntities() const
 {
-	return std::any_of(m_Entities.begin(), m_Entities.end(),
-		[](std::unique_ptr<cEntity>& Entity)
+	return std::any_of(
+		m_Entities.begin(), m_Entities.end(),
+		[](const auto & Entity)
 		{
 			return Entity->IsPlayer();
 		}
@@ -202,7 +203,7 @@ bool cChunk::HasPlayerEntities()
 
 
 
-bool cChunk::CanUnload(void)
+bool cChunk::CanUnload(void) const
 {
 	return
 		m_LoadedByClient.empty() &&  // The chunk is not used by any client
@@ -216,7 +217,7 @@ bool cChunk::CanUnload(void)
 
 
 
-bool cChunk::CanUnloadAfterSaving(void)
+bool cChunk::CanUnloadAfterSaving(void) const
 {
 	return
 		m_LoadedByClient.empty() &&  // The chunk is not used by any client
