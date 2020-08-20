@@ -66,7 +66,7 @@ public:
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
 	);
-	cChunk(cChunk & other) = delete;
+	cChunk(const cChunk & Other) = delete;
 	~cChunk();
 
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
