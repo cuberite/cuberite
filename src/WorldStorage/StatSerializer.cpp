@@ -104,114 +104,118 @@ static const std::unordered_map<std::string_view, Statistic> LegacyMapping
 
 
 
-cStatSerializer::cStatSerializer(cStatManager & Manager, const std::string & WorldPath, std::string FileName) :
-	m_Manager(Manager),
-	m_Path(WorldPath + cFile::GetPathSeparator() + "stats")
+namespace StatSerializer
 {
-	// Even though stats are shared between worlds, they are (usually) saved
-	// inside the folder of the default world.
-
-	// Ensure that the directory exists.
-	cFile::CreateFolder(m_Path);
-
-	m_Path += cFile::GetPathSeparator() + std::move(FileName) + ".json";
-}
-
-
-
-
-
-void cStatSerializer::Load(void)
-{
-	Json::Value Root;
-	InputFileStream(m_Path) >> Root;
-
-	LoadLegacyFromJSON(Root);
-	LoadCustomStatFromJSON(Root["stats"]["custom"]);
-}
-
-
-
-
-
-void cStatSerializer::Save(void)
-{
-	Json::Value Root;
-
-	SaveStatToJSON(Root["stats"]);
-	Root["DataVersion"] = NamespaceSerializer::DataVersion();
-
-	OutputFileStream(m_Path) << Root;
-}
-
-
-
-
-
-void cStatSerializer::SaveStatToJSON(Json::Value & a_Out)
-{
-	m_Manager.ForEachStatisticType([&a_Out](const cStatManager::CustomStore & Store)
+	auto MakeStatisticsDirectory(const std::string & WorldPath, std::string FileName)
 	{
-		if (Store.empty())
-		{
-			// Avoid saving "custom": null to disk:
-			return;
-		}
+		// Even though stats are shared between worlds, they are (usually) saved
+		// inside the folder of the default world.
 
-		auto & Custom = a_Out["custom"];
-		for (const auto & Item : Store)
-		{
-			Custom[NamespaceSerializer::From(Item.first)] = Item.second;
-		}
-	});
-}
+		// Path to the world's statistics folder.
+		const auto Path = WorldPath + cFile::GetPathSeparator() + "stats";
+
+		// Ensure that the directory exists.
+		cFile::CreateFolder(Path);
+
+		return Path + cFile::GetPathSeparator() + std::move(FileName) + ".json";
+	}
 
 
 
 
 
-void cStatSerializer::LoadLegacyFromJSON(const Json::Value & In)
-{
-	for (auto Entry = In.begin(); Entry != In.end(); ++Entry)
+	void SaveStatToJSON(const cStatManager & Manager, Json::Value & a_Out)
 	{
-		const auto & Key = Entry.key().asString();
-		const auto FindResult = LegacyMapping.find(Key);
-
-		if ((FindResult != LegacyMapping.end()) && Entry->isInt())
+		Manager.ForEachStatisticType([&a_Out](const cStatManager::CustomStore & Store)
 		{
-			m_Manager.SetValue(FindResult->second, Entry->asInt());
+			if (Store.empty())
+			{
+				// Avoid saving "custom": null to disk:
+				return;
+			}
+
+			auto & Custom = a_Out["custom"];
+			for (const auto & Item : Store)
+			{
+				Custom[NamespaceSerializer::From(Item.first)] = Item.second;
+			}
+		});
+	}
+
+
+
+
+
+	void LoadLegacyFromJSON(cStatManager & Manager, const Json::Value & In)
+	{
+		for (auto Entry = In.begin(); Entry != In.end(); ++Entry)
+		{
+			const auto & Key = Entry.key().asString();
+			const auto FindResult = LegacyMapping.find(Key);
+
+			if ((FindResult != LegacyMapping.end()) && Entry->isInt())
+			{
+				Manager.SetValue(FindResult->second, Entry->asInt());
+			}
 		}
 	}
-}
 
 
 
 
 
-void cStatSerializer::LoadCustomStatFromJSON(const Json::Value & a_In)
-{
-	for (auto it = a_In.begin() ; it != a_In.end() ; ++it)
+	void LoadCustomStatFromJSON(cStatManager & Manager, const Json::Value & a_In)
 	{
-		const auto & Key = it.key().asString();
-		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
-		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+		for (auto it = a_In.begin(); it != a_In.end(); ++it)
 		{
-			// Ignore non-Vanilla, non-Cuberite namespaces for now:
-			continue;
-		}
+			const auto & Key = it.key().asString();
+			const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
+			if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+			{
+				// Ignore non-Vanilla, non-Cuberite namespaces for now:
+				continue;
+			}
 
-		const auto & StatName = StatInfo.second;
-		try
-		{
-			m_Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), it->asInt());
+			const auto & StatName = StatInfo.second;
+			try
+			{
+				Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), it->asInt());
+			}
+			catch (const std::out_of_range & Oops)
+			{
+				FLOGWARNING("Invalid statistic type \"{}\"", StatName);
+			}
+			catch (const Json::LogicError & Oops)
+			{
+				FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
+			}
 		}
-		catch (const std::out_of_range & Oops)
-		{
-			FLOGWARNING("Invalid statistic type \"{}\"", StatName);
-		}
-		catch (const Json::LogicError & Oops)
-		{
-			FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
-		}
+	}
+
+
+
+
+
+	void Load(cStatManager & Manager, const std::string & WorldPath, std::string FileName)
+	{
+		Json::Value Root;
+		InputFileStream(MakeStatisticsDirectory(WorldPath, FileName)) >> Root;
+
+		LoadLegacyFromJSON(Manager, Root);
+		LoadCustomStatFromJSON(Manager, Root["stats"]["custom"]);
+	}
+
+
+
+
+
+	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string FileName)
+	{
+		Json::Value Root;
+
+		SaveStatToJSON(Manager, Root["stats"]);
+		Root["DataVersion"] = NamespaceSerializer::DataVersion();
+
+		OutputFileStream(MakeStatisticsDirectory(WorldPath, FileName)) << Root;
 	}
 }

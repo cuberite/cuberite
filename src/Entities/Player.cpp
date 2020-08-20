@@ -2327,8 +2327,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	{
 		// Load the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		cStatSerializer StatSerializer(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
-		StatSerializer.Load();
+		StatSerializer::Load(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2476,8 +2475,7 @@ bool cPlayer::SaveToDisk()
 	{
 		// Save the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		cStatSerializer StatSerializer(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
-		StatSerializer.Save();
+		StatSerializer::Save(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
 	}
 	catch (...)
 	{
