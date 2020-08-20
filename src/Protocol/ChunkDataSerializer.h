@@ -42,6 +42,7 @@ protected:
 
 	/** Writes all blocks in a chunk section into a series of Int64.
 	Writes start from the bit directly subsequent to the previous write's end, possibly crossing over to the next Int64. */
+	template <auto Palette>
 	inline void WriteSectionDataSeamless(cByteBuffer & a_Packet, const cChunkData::sChunkSection & a_Section, const UInt8 a_BitsPerEntry);
 
 	/** Finalises the data, compresses it if required, and delivers it to all clients. */

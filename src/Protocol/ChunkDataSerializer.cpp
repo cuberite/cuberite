@@ -34,6 +34,33 @@ void ForEachSection(const cChunkData & a_Data, Func a_Func)
 
 
 
+namespace
+{
+	auto PaletteLegacy(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	{
+		return (a_BlockType << 4) | a_Meta;
+	}
+
+	auto Palette393(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	{
+		return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	}
+
+	auto Palette401(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	{
+		return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	}
+
+	auto Palette477(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	{
+		return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkDataSerializer:
 
@@ -95,13 +122,13 @@ void cChunkDataSerializer::SendToClients(const std::unordered_set<cClientHandle 
 			}
 			case cProtocol::Version::v1_13:
 			{
-				Serialize393<&Palette_1_13::FromBlock>(Entry.second);  // This version didn't last very long xD
+				Serialize393<&Palette393>(Entry.second);  // This version didn't last very long xD
 				continue;
 			}
 			case cProtocol::Version::v1_13_1:
 			case cProtocol::Version::v1_13_2:
 			{
-				Serialize393<&Palette_1_13_1::FromBlock>(Entry.second);
+				Serialize393<&Palette401>(Entry.second);
 				continue;
 			}
 			case cProtocol::Version::v1_14:
@@ -111,8 +138,7 @@ void cChunkDataSerializer::SendToClients(const std::unordered_set<cClientHandle 
 			}
 		}
 
-		LOGERROR("cChunkDataSerializer::Serialize(): Unknown version: %d", Entry.first);
-		ASSERT(!"Unknown chunk data serialization version");
+		UNREACHABLE("Unknown chunk data serialization version");
 	}
 }
 
@@ -192,8 +218,7 @@ void cChunkDataSerializer::Serialize107(const std::vector<cClientHandle *> & a_S
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 	// Write the chunk size:
-	const size_t BitsPerEntry = 13;
-	const size_t Mask = (1 << BitsPerEntry) - 1;  // Creates a mask that is 13 bits long, ie 0b1111111111111
+	const UInt8 BitsPerEntry = 13;
 	const size_t ChunkSectionDataArraySize = (cChunkData::SectionBlockCount * BitsPerEntry) / 8 / 8;  // Convert from bit count to long count
 	size_t ChunkSectionSize = (
 		1 +                                // Bits per block - set to 13, so the global palette is used and the palette has a length of 0
@@ -219,53 +244,10 @@ void cChunkDataSerializer::Serialize107(const std::vector<cClientHandle *> & a_S
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
+			Packet.WriteBEUInt8(BitsPerEntry);
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-
-			UInt64 TempLong = 0;  // Temporary value that will be stored into
-			UInt64 CurrentlyWrittenIndex = 0;  // "Index" of the long that would be written to
-
-			for (size_t Index = 0; Index < cChunkData::SectionBlockCount; Index++)
-			{
-				UInt64 Value = static_cast<UInt64>(a_Section.m_BlockTypes[Index] << 4);
-				if (Index % 2 == 0)
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] & 0x0f;
-				}
-				else
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] >> 4;
-				}
-				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
-
-				// Painful part where we write data into the long array.  Based off of the normal code.
-				size_t BitPosition = Index * BitsPerEntry;
-				size_t FirstIndex = BitPosition / 64;
-				size_t SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
-				size_t BitOffset = BitPosition % 64;
-
-				if (FirstIndex != CurrentlyWrittenIndex)
-				{
-					// Write the current data before modifiying it.
-					Packet.WriteBEUInt64(TempLong);
-					TempLong = 0;
-					CurrentlyWrittenIndex = FirstIndex;
-				}
-
-				TempLong |= (Value << BitOffset);
-
-				if (FirstIndex != SecondIndex)
-				{
-					// Part of the data is now in the second long; write the first one first
-					Packet.WriteBEUInt64(TempLong);
-					CurrentlyWrittenIndex = SecondIndex;
-
-					TempLong = (Value >> (64 - BitOffset));
-				}
-			}
-			// The last long will generally not be written
-			Packet.WriteBEUInt64(TempLong);
+			WriteSectionDataSeamless<&PaletteLegacy>(Packet, a_Section, BitsPerEntry);
 
 			// Write lighting:
 			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
@@ -299,8 +281,7 @@ void cChunkDataSerializer::Serialize110(const std::vector<cClientHandle *> & a_S
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 	// Write the chunk size:
-	const size_t BitsPerEntry = 13;
-	const size_t Mask = (1 << BitsPerEntry) - 1;  // Creates a mask that is 13 bits long, ie 0b1111111111111
+	const UInt8 BitsPerEntry = 13;
 	const size_t ChunkSectionDataArraySize = (cChunkData::SectionBlockCount * BitsPerEntry) / 8 / 8;  // Convert from bit count to long count
 	size_t ChunkSectionSize = (
 		1 +                                // Bits per block - set to 13, so the global palette is used and the palette has a length of 0
@@ -326,53 +307,10 @@ void cChunkDataSerializer::Serialize110(const std::vector<cClientHandle *> & a_S
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
+			Packet.WriteBEUInt8(BitsPerEntry);
 			Packet.WriteVarInt32(0);  // Palette length is 0
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-
-			UInt64 TempLong = 0;  // Temporary value that will be stored into
-			UInt64 CurrentlyWrittenIndex = 0;  // "Index" of the long that would be written to
-
-			for (size_t Index = 0; Index < cChunkData::SectionBlockCount; Index++)
-			{
-				UInt64 Value = static_cast<UInt64>(a_Section.m_BlockTypes[Index] << 4);
-				if (Index % 2 == 0)
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] & 0x0f;
-				}
-				else
-				{
-					Value |= a_Section.m_BlockMetas[Index / 2] >> 4;
-				}
-				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
-
-				// Painful part where we write data into the long array.  Based off of the normal code.
-				size_t BitPosition = Index * BitsPerEntry;
-				size_t FirstIndex = BitPosition / 64;
-				size_t SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
-				size_t BitOffset = BitPosition % 64;
-
-				if (FirstIndex != CurrentlyWrittenIndex)
-				{
-					// Write the current data before modifiying it.
-					Packet.WriteBEUInt64(TempLong);
-					TempLong = 0;
-					CurrentlyWrittenIndex = FirstIndex;
-				}
-
-				TempLong |= (Value << BitOffset);
-
-				if (FirstIndex != SecondIndex)
-				{
-					// Part of the data is now in the second long; write the first one first
-					Packet.WriteBEUInt64(TempLong);
-					CurrentlyWrittenIndex = SecondIndex;
-
-					TempLong = (Value >> (64 - BitOffset));
-				}
-			}
-			// The last long will generally not be written
-			Packet.WriteBEUInt64(TempLong);
+			WriteSectionDataSeamless<&PaletteLegacy>(Packet, a_Section, BitsPerEntry);
 
 			// Write lighting:
 			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
@@ -411,8 +349,7 @@ void cChunkDataSerializer::Serialize393(const std::vector<cClientHandle *> & a_S
 	Packet.WriteVarInt32(m_Data.GetSectionBitmask());
 
 	// Write the chunk size in bytes:
-	const size_t BitsPerEntry = 14;
-	const size_t Mask = (1 << BitsPerEntry) - 1;
+	const UInt8 BitsPerEntry = 14;
 	const size_t ChunkSectionDataArraySize = (cChunkData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 	size_t ChunkSectionSize = (
 		1 +  // Bits per entry, BEUInt8, 1 byte
@@ -437,46 +374,9 @@ void cChunkDataSerializer::Serialize393(const std::vector<cClientHandle *> & a_S
 	// Write each chunk section...
 	ForEachSection(m_Data, [&](const cChunkData::sChunkSection & a_Section)
 		{
-			Packet.WriteBEUInt8(static_cast<UInt8>(BitsPerEntry));
+			Packet.WriteBEUInt8(BitsPerEntry);
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-
-			UInt64 TempLong = 0;  // Temporary value that will be stored into
-			UInt64 CurrentlyWrittenIndex = 0;  // "Index" of the long that would be written to
-
-			for (size_t Index = 0; Index < cChunkData::SectionBlockCount; Index++)
-			{
-				UInt32 blockType = a_Section.m_BlockTypes[Index];
-				UInt32 blockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
-				UInt64 Value = Palette(PaletteUpgrade::FromBlock(blockType, blockMeta));
-				Value &= Mask;  // It shouldn't go out of bounds, but it's still worth being careful
-
-				// Painful part where we write data into the long array.  Based off of the normal code.
-				size_t BitPosition = Index * BitsPerEntry;
-				size_t FirstIndex = BitPosition / 64;
-				size_t SecondIndex = ((Index + 1) * BitsPerEntry - 1) / 64;
-				size_t BitOffset = BitPosition % 64;
-
-				if (FirstIndex != CurrentlyWrittenIndex)
-				{
-					// Write the current data before modifiying it.
-					Packet.WriteBEUInt64(TempLong);
-					TempLong = 0;
-					CurrentlyWrittenIndex = FirstIndex;
-				}
-
-				TempLong |= (Value << BitOffset);
-
-				if (FirstIndex != SecondIndex)
-				{
-					// Part of the data is now in the second long; write the first one first
-					Packet.WriteBEUInt64(TempLong);
-					CurrentlyWrittenIndex = SecondIndex;
-
-					TempLong = (Value >> (64 - BitOffset));
-				}
-			}
-			// The last long will generally not be written
-			Packet.WriteBEUInt64(TempLong);
+			WriteSectionDataSeamless<Palette>(Packet, a_Section, BitsPerEntry);
 
 			// Write lighting:
 			Packet.WriteBuf(a_Section.m_BlockLight, sizeof(a_Section.m_BlockLight));
@@ -548,7 +448,7 @@ void cChunkDataSerializer::Serialize477(const std::vector<cClientHandle *> & a_S
 			Packet.WriteBEInt16(-1);
 			Packet.WriteBEUInt8(BitsPerEntry);
 			Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteSectionDataSeamless(Packet, a_Section, BitsPerEntry);
+			WriteSectionDataSeamless<&Palette477>(Packet, a_Section, BitsPerEntry);
 		}
 	);
 
@@ -568,6 +468,7 @@ void cChunkDataSerializer::Serialize477(const std::vector<cClientHandle *> & a_S
 
 
 
+template <auto Palette>
 void cChunkDataSerializer::WriteSectionDataSeamless(cByteBuffer & a_Packet, const cChunkData::sChunkSection & a_Section, const UInt8 a_BitsPerEntry)
 {
 	// https://wiki.vg/Chunk_Format#Data_structure
@@ -582,7 +483,7 @@ void cChunkDataSerializer::WriteSectionDataSeamless(cByteBuffer & a_Packet, cons
 	{
 		const UInt32 BlockType = a_Section.m_BlockTypes[Index];
 		const UInt32 BlockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
-		const UInt32 Value = Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(BlockType, BlockMeta));
+		const UInt32 Value = Palette(BlockType, BlockMeta);
 
 		// Write as much as possible of Value, starting from BitIndex, into Buffer:
 		Buffer |= static_cast<UInt64>(Value) << BitIndex;
