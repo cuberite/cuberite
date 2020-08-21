@@ -11,6 +11,7 @@
 
 #include "GridStructGen.h"
 #include "PiecePool.h"
+#include "../Item.h"
 
 
 
@@ -48,4 +49,26 @@ protected:
 
 
 
+
+/** Descendant of cPrefabStructure containing chests that will be filled */
+class cPrefabChestStructure:
+	public cPrefabStructure
+{
+	using Super = cPrefabStructure;
+
+public:
+	cPrefabChestStructure(
+		int a_GridX, int a_GridZ,
+		int a_OriginX, int a_OriginZ,
+		cPlacedPieces && a_Pieces,
+		cTerrainHeightGenPtr a_HeightGen,
+		const cLootProbab * a_LootProbab
+	);
+
+protected:
+	// cGridStructGen::cStructure overrides:
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override;
+
+	const cLootProbab * m_LootProbab;
+};
 

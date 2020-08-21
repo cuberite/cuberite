@@ -27,7 +27,7 @@
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
 #include "RoughRavines.h"
-#include "PrefabSingleStructureGen.h"
+#include "SinglePieceStructureGen.h"
 #include "VillageGen.h"
 #include "PieceStructuresGen.h"
 
@@ -227,7 +227,8 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"DeadBushes, "
 				"NaturalPatches, "
 				"PreSimulator, "
-				"Animals"
+				"Animals, "
+				"SinglePieceStructures: JungleTemple|WitchHut|DesertWell"
 			);
 			break;
 		}  // dimOverworld
@@ -607,6 +608,20 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				GridSize, MaxOffset
 			)));
 		}
+		else if (NoCaseCompare(finisher, "SinglePieceStructures") == 0)
+		{
+			if (split.size() < 2)
+			{
+				LOGWARNING("The SinglePieceStructures generator needs the structures to use. Example: \"SinglePieceStructures: DesertTemple\".");
+				continue;
+			}
+
+			auto Gen = std::make_shared<cSinglePieceStructureGen>(m_Seed);
+			if (Gen->Initialize(split[1], seaLevel, m_BiomeGen, m_CompositedHeightCache))
+			{
+				m_FinishGens.push_back(Gen);
+			}
+		}
 		else if (NoCaseCompare(finisher, "SoulsandRims") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSoulsandRims(m_Seed)));
@@ -670,10 +685,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
 			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
 			m_FinishGens.push_back(cFinishGenPtr(new cStructGenWormNestCaves(m_Seed, Size, Grid, MaxOffset)));
-		}
-		else if (NoCaseCompare(finisher, "Desert Temple") == 0)
-		{
-			m_FinishGens.push_back(cFinishGenPtr(new cPrefabSingleStructureGen(m_Seed, 100, 100, 100, m_BiomeGen, m_CompositedHeightCache, seaLevel, PrefabSingleStructure::DesertTemple)));
 		}
 		else
 		{
