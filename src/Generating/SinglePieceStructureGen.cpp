@@ -1,7 +1,6 @@
 
 #include "SinglePieceStructureGen.h"
 
-#include "Globals.h"
 #include "PrefabStructure.h"
 #include "PrefabPiecePool.h"
 #include "../IniFile.h"

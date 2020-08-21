@@ -8,6 +8,8 @@ Classes to support the generation of single piece prefab structures
 
 #pragma once
 
+#include "Globals.h"
+
 #include "ComposableGenerator.h"
 #include "PrefabPiecePool.h"
 
