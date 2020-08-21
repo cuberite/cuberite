@@ -1743,7 +1743,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		LengthHeaderBuffer.ReadAll(LengthData);
 
 		a_CompressedData.reserve(LengthData.size() + UncompressedSize);
-		a_CompressedData.append(LengthData.data(), LengthData.size());
+		a_CompressedData.assign(LengthData.data(), LengthData.size());
 		a_CompressedData.append(a_Packet);
 
 		return true;
@@ -1794,8 +1794,8 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	AString LengthData;
 	LengthHeaderBuffer.ReadAll(LengthData);
 
-	a_CompressedData.reserve(LengthData.size() + DataSize);
-	a_CompressedData.append(LengthData.data(), LengthData.size());
+	a_CompressedData.reserve(LengthData.size() + CompressedSize);
+	a_CompressedData.assign(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
 
 	return true;
