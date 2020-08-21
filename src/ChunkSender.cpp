@@ -11,7 +11,6 @@
 #include "ChunkSender.h"
 #include "World.h"
 #include "BlockEntities/BlockEntity.h"
-#include "Protocol/ChunkDataSerializer.h"
 #include "ClientHandle.h"
 #include "Chunk.h"
 
@@ -61,7 +60,8 @@ public:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
 	Super("ChunkSender"),
-	m_World(a_World)
+	m_World(a_World),
+	m_Serializer(m_World.GetDimension())
 {
 }
 
@@ -246,11 +246,8 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 		return;
 	}
 
-	{
-		// Send:
-		cChunkDataSerializer Data(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, m_World.GetDimension());
-		Data.SendToClients(a_Clients);
-	}
+	// Send:
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, a_Clients);
 
 	for (const auto Client : a_Clients)
 	{

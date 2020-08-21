@@ -2479,7 +2479,8 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const std::string_
 	{
 		// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
 		// It's not a big issue anyway, just means that some chunks may be compressed several times
-		// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+		// LOG("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", a_ChunkX, a_ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+		// 2020 08 21: seems to happen going through nether portals on 1.8.9
 		return;
 	}
 
