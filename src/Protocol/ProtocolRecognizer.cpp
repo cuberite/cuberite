@@ -63,21 +63,21 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 {
 	switch (a_ProtocolVersion)
 	{
-		case cProtocol::Version::Version_1_8_0:   return "1.8";
-		case cProtocol::Version::Version_1_9_0:   return "1.9";
-		case cProtocol::Version::Version_1_9_1:   return "1.9.1";
-		case cProtocol::Version::Version_1_9_2:   return "1.9.2";
-		case cProtocol::Version::Version_1_9_4:   return "1.9.4";
-		case cProtocol::Version::Version_1_10_0:  return "1.10";
-		case cProtocol::Version::Version_1_11_0:  return "1.11";
-		case cProtocol::Version::Version_1_11_1:  return "1.11.1";
-		case cProtocol::Version::Version_1_12:    return "1.12";
-		case cProtocol::Version::Version_1_12_1:  return "1.12.1";
-		case cProtocol::Version::Version_1_12_2:  return "1.12.2";
-		case cProtocol::Version::Version_1_13:    return "1.13";
-		case cProtocol::Version::Version_1_13_1:  return "1.13.1";
-		case cProtocol::Version::Version_1_13_2:  return "1.13.2";
-		case cProtocol::Version::Version_1_14:    return "1.14";
+		case cProtocol::Version::v1_8_0:   return "1.8";
+		case cProtocol::Version::v1_9_0:   return "1.9";
+		case cProtocol::Version::v1_9_1:   return "1.9.1";
+		case cProtocol::Version::v1_9_2:   return "1.9.2";
+		case cProtocol::Version::v1_9_4:   return "1.9.4";
+		case cProtocol::Version::v1_10_0:  return "1.10";
+		case cProtocol::Version::v1_11_0:  return "1.11";
+		case cProtocol::Version::v1_11_1:  return "1.11.1";
+		case cProtocol::Version::v1_12:    return "1.12";
+		case cProtocol::Version::v1_12_1:  return "1.12.1";
+		case cProtocol::Version::v1_12_2:  return "1.12.2";
+		case cProtocol::Version::v1_13:    return "1.13";
+		case cProtocol::Version::v1_13_1:  return "1.13.1";
+		case cProtocol::Version::v1_13_2:  return "1.13.2";
+		case cProtocol::Version::v1_14:    return "1.14";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -287,21 +287,21 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 
 	switch (static_cast<cProtocol::Version>(ProtocolVersion))
 	{
-		case cProtocol::Version::Version_1_8_0:  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_9_0:  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_9_1:  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_9_2:  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_9_4:  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_10_0: return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_11_0: return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_11_1: return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_12:   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_13:   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::Version_1_14:   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_8_0:  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_9_0:  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_9_1:  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_9_2:  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_9_4:  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_10_0: return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_11_0: return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_11_1: return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_12:   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_13:   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_14:   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, ServerPort, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

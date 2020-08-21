@@ -10,45 +10,7 @@
 
 
 
-struct PoweringData
-{
-public:
-	PoweringData(BLOCKTYPE a_PoweringBlock, unsigned char a_PowerLevel) :
-		PoweringBlock(a_PoweringBlock),
-		PowerLevel(a_PowerLevel)
-	{
-	}
-
-	PoweringData(void) :
-		PoweringBlock(E_BLOCK_AIR),
-		PowerLevel(0)
-	{
-	}
-
-	BLOCKTYPE PoweringBlock;
-	unsigned char PowerLevel;
-
-	inline friend bool operator < (const PoweringData & Lhs, const PoweringData & Rhs)
-	{
-		return (
-			(Lhs.PowerLevel < Rhs.PowerLevel) ||
-			(
-				(Lhs.PowerLevel == Rhs.PowerLevel) &&
-				((Lhs.PoweringBlock == E_BLOCK_REDSTONE_WIRE) && (Rhs.PoweringBlock != E_BLOCK_REDSTONE_WIRE))
-			)
-		);
-	}
-
-	inline friend bool operator == (const PoweringData & Lhs, const PoweringData & Rhs)
-	{
-		return (Lhs.PowerLevel == Rhs.PowerLevel);
-	}
-
-	inline friend bool operator != (const PoweringData & Lhs, const PoweringData & Rhs)
-	{
-		return !operator ==(Lhs, Rhs);
-	}
-};
+using PowerLevel = unsigned char;
 
 
 
@@ -68,15 +30,15 @@ public:
 		return m_ActiveBlocks;
 	}
 
-	const PoweringData GetCachedPowerData(const Vector3i Position) const
+	PowerLevel GetCachedPowerData(const Vector3i Position) const
 	{
 		auto Result = m_CachedPowerLevels.find(Position);
-		return (Result == m_CachedPowerLevels.end()) ? PoweringData() : Result->second;
+		return (Result == m_CachedPowerLevels.end()) ? 0 : Result->second;
 	}
 
-	void SetCachedPowerData(const Vector3i Position, PoweringData PoweringData)
+	void SetCachedPowerData(const Vector3i Position, const PowerLevel PowerLevel)
 	{
-		m_CachedPowerLevels[Position] = PoweringData;
+		m_CachedPowerLevels[Position] = PowerLevel;
 	}
 
 	std::pair<int, bool> * GetMechanismDelayInfo(const Vector3i Position)
@@ -92,18 +54,21 @@ public:
 		m_MechanismDelays.erase(Position);
 		AlwaysTickedPositions.erase(Position);
 		WireStates.erase(Position);
+		ObserverCache.erase(Position);
 	}
 
-	PoweringData ExchangeUpdateOncePowerData(const Vector3i & a_Position, PoweringData a_PoweringData)
+	PowerLevel ExchangeUpdateOncePowerData(const Vector3i & a_Position, PowerLevel Power)
 	{
 		auto Result = m_CachedPowerLevels.find(a_Position);
+
 		if (Result == m_CachedPowerLevels.end())
 		{
-			m_CachedPowerLevels[a_Position] = a_PoweringData;
-			return PoweringData();
+			m_CachedPowerLevels[a_Position] = Power;
+			return 0;
 		}
-		std::swap(Result->second, a_PoweringData);
-		return a_PoweringData;
+
+		std::swap(Result->second, Power);
+		return Power;
 	}
 
 	/** Adjust From-relative coordinates into To-relative coordinates. */
@@ -122,6 +87,9 @@ public:
 
 	std::unordered_set<Vector3i, VectorHasher<int>> AlwaysTickedPositions;
 
+	/** Structure storing an observer's last seen block. */
+	std::unordered_map<Vector3i, std::pair<BLOCKTYPE, NIBBLETYPE>, VectorHasher<int>> ObserverCache;
+
 	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on. */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;
 
@@ -131,8 +99,7 @@ private:
 
 	// TODO: map<Vector3i, int> -> Position of torch + it's heat level
 
-	std::unordered_map<Vector3i, PoweringData, VectorHasher<int>> m_CachedPowerLevels;
+	std::unordered_map<Vector3i, PowerLevel, VectorHasher<int>> m_CachedPowerLevels;
 
 	friend class cRedstoneHandlerFactory;
-
 };

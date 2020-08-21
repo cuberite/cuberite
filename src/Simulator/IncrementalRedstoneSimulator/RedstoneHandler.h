@@ -1,89 +1,26 @@
 
 #pragma once
 
-#include "../../Chunk.h"
-#include "ForEachSourceCallback.h"
 #include "RedstoneSimulatorChunkData.h"
 
+class cChunk;
+class ForEachSourceCallback;
 
-
-
-
-class cRedstoneHandler
+namespace RedstoneHandler
 {
-public:
+	/** Asks a redstone component at the source position how much power it will deliver to the querying position.
+	If IsLinked is true, QueryPosition should point to the intermediate conduit block.
+	The Position and QueryPosition are both relative to Chunk. */
+	PowerLevel GetPowerDeliveredToPosition(const cChunk & Chunk, Vector3i Position, BLOCKTYPE BlockType, Vector3i QueryPosition, BLOCKTYPE QueryBlockType, bool IsLinked);
 
-	cRedstoneHandler() = default;
-	DISALLOW_COPY_AND_ASSIGN(cRedstoneHandler);
+	/** Tells a redstone component at this position to update itself.
+	PowerLevel represents the maximum power level all of its source positions gave to it.
+	Position is relative to Chunk, but if the component needs to queue neighbour updates, they are queued to CurrentlyTicking. */
+	void Update(cChunk & Chunk, cChunk & CurrentlyTicking, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta, PowerLevel PowerLevel);
 
-	using SourceCallback = ForEachSourceCallback &;
+	/** Invokes Callback for each position this component can accept power from. */
+	void ForValidSourcePositions(const cChunk & Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta, ForEachSourceCallback & Callback);
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const = 0;
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const = 0;
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const = 0;
-
-	// Force a virtual destructor
-	virtual ~cRedstoneHandler() {}
-
-protected:
-
-	inline static auto & DataForChunk(const cChunk & a_Chunk)
-	{
-		return *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
-	}
-
-	template <typename... ArrayTypes>
-	static void UpdateAdjustedRelative(const cChunk & From, const cChunk & To, const Vector3i Position, const Vector3i Offset)
-	{
-		DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + Offset));
-
-		for (const auto LinkedOffset : cSimulator::GetLinkedOffsets(Offset))
-		{
-			DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + LinkedOffset));
-		}
-	}
-
-	template <typename ArrayType>
-	static void UpdateAdjustedRelatives(const cChunk & From, const cChunk & To, const Vector3i Position, const ArrayType & Relative)
-	{
-		for (const auto Offset : Relative)
-		{
-			UpdateAdjustedRelative(From, To, Position, Offset);
-		}
-	}
-
-	template <typename ArrayType>
-	static void InvokeForAdjustedRelatives(SourceCallback Callback, const Vector3i Position, const ArrayType & Relative)
-	{
-		for (const auto Offset : Relative)
-		{
-			Callback(Position + Offset);
-		}
-	}
-
-	inline static Vector3i OffsetYP{ 0, 1, 0 };
-
-	inline static Vector3i OffsetYM{ 0, -1, 0 };
-
-	inline static std::array<Vector3i, 6> RelativeAdjacents
-	{
-		{
-			{ 1, 0, 0 },
-			{ -1, 0, 0 },
-			{ 0, 1, 0 },
-			{ 0, -1, 0 },
-			{ 0, 0, 1 },
-			{ 0, 0, -1 },
-		}
-	};
-
-	inline static std::array<Vector3i, 4> RelativeLaterals
-	{
-		{
-			{ 1, 0, 0 },
-			{ -1, 0, 0 },
-			{ 0, 0, 1 },
-			{ 0, 0, -1 },
-		}
-	};
-};
+	/** Temporary: compute and set the block state of a redstone wire. */
+	void SetWireState(const cChunk & Chunk, Vector3i Position);
+}

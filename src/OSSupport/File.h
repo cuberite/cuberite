@@ -185,3 +185,19 @@ private:
 
 
 
+
+/** A wrapper for file streams that enables exceptions. */
+template <class StreamType>
+class FileStream final : public StreamType
+{
+public:
+
+	FileStream(const std::string & Path);
+};
+
+
+
+
+
+using InputFileStream = FileStream<std::ifstream>;
+using OutputFileStream = FileStream<std::ofstream>;

@@ -15,6 +15,7 @@ Declares the 1.8 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../Registries/Statistics.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -254,5 +255,10 @@ private:
 
 	/** Converts an entity to a protocol-specific entity type.
 	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
-	UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+
+	/** Converts a statistic to a protocol-specific string.
+	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
+	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
+	static const char * GetProtocolStatisticName(Statistic a_Statistic);
 } ;

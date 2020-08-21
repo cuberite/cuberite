@@ -1,16 +1,15 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockPiston.h"
 
 
 
 
 
-class cPistonHandler final: public cRedstoneHandler
+namespace PistonHandler
 {
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -21,11 +20,11 @@ class cPistonHandler final: public cRedstoneHandler
 		return 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const bool ShouldBeExtended = a_PoweringData.PowerLevel != 0;
+		const bool ShouldBeExtended = Power != 0;
 		if (ShouldBeExtended == cBlockPistonHandler::IsExtended(a_Meta))
 		{
 			return;
@@ -46,7 +45,7 @@ class cPistonHandler final: public cRedstoneHandler
 		// However, this delay is already present: as a side effect of the implementation of piston animation in Blocks\BlockPiston.cpp
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

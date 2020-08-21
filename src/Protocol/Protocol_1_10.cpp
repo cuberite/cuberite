@@ -329,7 +329,7 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 
 cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
 {
-	return Version::Version_1_10_0;
+	return Version::v1_10_0;
 }
 
 

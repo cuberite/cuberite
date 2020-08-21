@@ -5,4 +5,5 @@ target_sources(
 
 	Blocks.h
 	Items.h
+	Statistics.h
 )

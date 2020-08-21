@@ -1,162 +1,59 @@
 
 // Statistics.h
 
-
-
-
 #pragma once
 
+#include "Registries/Statistics.h"
 
+/* Hello fellow developer !
+In case you are trying to add new statistics to Cuberite you need to do a few things:
+---------------------------------------------------------------------------
+1. add a new entry to the enum class Statistic in Registries\Statistics.h file
+2. add this to serialization functions in WorldStorage\NamespaceSerializer.cpp
+	The String in the above is used for saving on disk!
+	so use the same string!
 
+In case you want to add a mapping of network IDs to the used stats
+you will find a lua script in ../Tools/BlockTypePaletteGenerator/ExportStatMapping.lua
+it will provide you with information how to use it. you need a registries.json
+exported from the server https://wiki.vg/Data_Generators
 
-// tolua_begin
-enum eStatistic
-{
-	// The order must match the order of cStatInfo::ms_Info
+		Greetings 12xx12 */
 
-	statInvalid = -1,
-
-	/* Achievements */
-	achOpenInv,           /* Taking Inventory     */
-	achMineWood,          /* Getting Wood         */
-	achCraftWorkbench,    /* Benchmarking         */
-	achCraftPickaxe,      /* Time to Mine!        */
-	achCraftFurnace,      /* Hot Topic            */
-	achAcquireIron,       /* Acquire Hardware     */
-	achCraftHoe,          /* Time to Farm!        */
-	achMakeBread,         /* Bake Bread           */
-	achBakeCake,          /* The Lie              */
-	achCraftBetterPick,   /* Getting an Upgrade   */
-	achCookFish,          /* Delicious Fish       */
-	achOnARail,           /* On A Rail            */
-	achCraftSword,        /* Time to Strike!      */
-	achKillMonster,       /* Monster Hunter       */
-	achKillCow,           /* Cow Tipper           */
-	achFlyPig,            /* When Pigs Fly        */
-	achSnipeSkeleton,     /* Sniper Duel          */
-	achDiamonds,          /* DIAMONDS!            */
-	achEnterPortal,       /* We Need to Go Deeper */
-	achReturnToSender,    /* Return to Sender     */
-	achBlazeRod,          /* Into Fire            */
-	achBrewPotion,        /* Local Brewery        */
-	achEnterTheEnd,       /* The End?             */
-	achDefeatDragon,      /* The End.             */
-	achCraftEnchantTable, /* Enchanter            */
-	achOverkill,          /* Overkill             */
-	achBookshelf,         /* Librarian            */
-	achExploreAllBiomes,  /* Adventuring Time     */
-	achSpawnWither,       /* The Beginning?       */
-	achKillWither,        /* The Beginning.       */
-	achFullBeacon,        /* Beaconator           */
-	achBreedCow,          /* Repopulation         */
-	achThrowDiamonds,     /* Diamonds to you!     */
-
-	/* Statistics */
-	statGamesQuit,
-	statMinutesPlayed,
-	statDistWalked,
-	statDistSwum,
-	statDistFallen,
-	statDistClimbed,
-	statDistFlown,
-	statDistDove,
-	statDistMinecart,
-	statDistBoat,
-	statDistPig,
-	statDistHorse,
-	statJumps,
-	statItemsDropped,
-	statDamageDealt,
-	statDamageTaken,
-	statDeaths,
-	statMobKills,
-	statAnimalsBred,
-	statPlayerKills,
-	statFishCaught,
-	statJunkFished,
-	statTreasureFished,
-
-	statCount
-};
-// tolua_end
-
-
-
-
-
-/** Class used to store and query statistic-related information. */
-class cStatInfo
-{
-public:
-
-	cStatInfo();
-
-	cStatInfo(const eStatistic a_Type, const AString & a_Name, const eStatistic a_Depends = statInvalid);
-
-	/** Type -> Name */
-	static const AString & GetName(const eStatistic a_Type);
-
-	/** Name -> Type */
-	static eStatistic GetType(const AString & a_Name);
-
-	/** Returns stat prerequisite. (Used for achievements) */
-	static eStatistic GetPrerequisite(const eStatistic a_Type);
-
-private:
-
-	eStatistic m_Type;
-
-	AString m_Name;
-
-	eStatistic m_Depends;
-
-	static cStatInfo ms_Info[statCount];
-};
-
-
-
-
-/* Signed (?) integral value. */
-typedef int StatValue;  // tolua_export
 
 
 
 
 /** Class that manages the statistics and achievements of a single player. */
-// tolua_begin
 class cStatManager
 {
 public:
-	// tolua_end
 
-	cStatManager();
+	typedef unsigned StatValue;
+	typedef std::unordered_map<Statistic, StatValue> CustomStore;
 
-	// tolua_begin
+	/** Set the value of the specified statistic. */
+	void SetValue(Statistic a_Stat, StatValue a_Value);
 
-	/** Return the value of the specified stat. */
-	StatValue GetValue(const eStatistic a_Stat) const;
+	/** Increments the specified statistic. Returns the new value. */
+	StatValue AddValue(Statistic a_Stat, StatValue a_Delta = 1);
 
-	/** Set the value of the specified stat. */
-	void SetValue(const eStatistic a_Stat, const StatValue a_Value);
+	/** Returns whether the prerequisite for awarding an achievement are satisfied. */
+	bool SatisfiesPrerequisite(Statistic a_Stat);
 
-	/** Reset everything. */
-	void Reset();
-
-	/** Increments the specified stat.
-	Returns the new value.
-	*/
-	StatValue AddValue(const eStatistic a_Stat, const StatValue a_Delta = 1);
-
-	// tolua_end
+	/** Invokes the given callbacks for each category of tracked statistics. */
+	template <class CustomCallback>
+	void ForEachStatisticType(CustomCallback a_Custom) const
+	{
+		a_Custom(m_CustomStatistics);
+	}
 
 private:
 
-	StatValue m_MainStats[statCount];
+	/** Returns if a statistic is both present and has nonzero value. */
+	bool IsStatisticPresent(Statistic a_Stat) const;
 
-	// TODO 10-05-2014 xdot: Use, mine, craft statistics
+	// TODO: Block tallies, entities killed, all the others
 
-
-};  // tolua_export
-
-
-
+	CustomStore m_CustomStatistics;
+};

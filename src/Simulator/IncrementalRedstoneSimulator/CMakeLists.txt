@@ -3,6 +3,7 @@ target_sources(
 
 	ForEachSourceCallback.cpp
 	IncrementalRedstoneSimulator.cpp
+	RedstoneHandler.cpp
 
 	CommandBlockHandler.h
 	DoorHandler.h
@@ -13,6 +14,7 @@ target_sources(
 	RedstoneHandler.h
 	RedstoneSimulatorChunkData.h
 	RedstoneComparatorHandler.h
+	RedstoneDataHelper.h
 	RedstoneRepeaterHandler.h
 	RedstoneBlockHandler.h
 	RedstoneTorchHandler.h

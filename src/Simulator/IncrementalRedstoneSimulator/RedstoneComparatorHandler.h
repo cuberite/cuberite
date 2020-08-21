@@ -1,16 +1,15 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockComparator.h"
 
 
 
 
 
-class cRedstoneComparatorHandler : public cRedstoneHandler
+namespace RedstoneComparatorHandler
 {
-	static unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
+	inline unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
 	{
 		if (cBlockComparatorHandler::IsInSubtractionMode(a_Meta))
 		{
@@ -24,7 +23,7 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
@@ -32,11 +31,11 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (
 			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, Meta & 0x3) == a_QueryPosition) ?
-			DataForChunk(a_Chunk).GetCachedPowerData(a_Position).PowerLevel : 0
+			DataForChunk(a_Chunk).GetCachedPowerData(a_Position) : 0
 		);
 	}
 
-	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta)
+	inline unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta)
 	{
 		UInt8 SignalStrength = 0;
 		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(Position, Meta & 0x3);
@@ -71,24 +70,18 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		});
 
 		const auto RearType = RearChunk->GetBlock(RearCoordinate);
-		const auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
-		if (PotentialSourceHandler == nullptr)
-		{
-			return SignalStrength;
-		}
-
 		return std::max(
 			SignalStrength,
-			PotentialSourceHandler->GetPowerDeliveredToPosition(
+			RedstoneHandler::GetPowerDeliveredToPosition(
 				*RearChunk, RearCoordinate, RearType,
 				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, *RearChunk, Position), BlockType, false
 			)
 		);
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// Note that a_PoweringData here contains the maximum * side * power level, as specified by GetValidSourcePositions
+		// Note that Power here contains the maximum * side * power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & Data = DataForChunk(a_Chunk);
@@ -98,9 +91,9 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		if (DelayInfo == nullptr)
 		{
 			const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
-			const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
+			const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
 			const auto PreviousFrontPower = Data.GetCachedPowerData(a_Position);
-			const bool ShouldUpdate = (FrontPower != PreviousFrontPower.PowerLevel);  // "Business logic" (:P) - determined by side and rear power levels
+			const bool ShouldUpdate = (FrontPower != PreviousFrontPower);  // "Business logic" (:P) - determined by side and rear power levels
 
 			if (ShouldUpdate)
 			{
@@ -119,11 +112,11 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		}
 
 		const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
-		const auto FrontPower = GetFrontPowerLevel(a_Meta, a_PoweringData.PowerLevel, RearPower);
+		const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
 		const auto NewMeta = (FrontPower > 0) ? (a_Meta | 0x8) : (a_Meta & 0x7);
 
 		// Don't care about the previous power level so return value ignored
-		Data.ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
+		Data.ExchangeUpdateOncePowerData(a_Position, FrontPower);
 
 		a_Chunk.SetMeta(a_Position, NewMeta);
 		Data.m_MechanismDelays.erase(a_Position);
@@ -132,7 +125,7 @@ class cRedstoneComparatorHandler : public cRedstoneHandler
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) - a_Position);
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

@@ -292,7 +292,7 @@ public:
 				double Dist = (a_Player.GetPosition() - Pos).Length();
 				if (Dist < 50.0)
 				{
-					a_Player.AwardAchievement(achSpawnWither);
+					a_Player.AwardAchievement(Statistic::AchSpawnWither);
 				}
 				return false;
 			}

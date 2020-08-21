@@ -8,7 +8,7 @@
 
 
 
-class cRedstoneWireHandler final : public cRedstoneHandler
+namespace RedstoneWireHandler
 {
 	/** A unified representation of wire direction. */
 	enum class TemporaryDirection
@@ -17,32 +17,10 @@ class cRedstoneWireHandler final : public cRedstoneHandler
 		Side
 	};
 
-	/** Adjusts a given wire block so that the direction represented by Offset has state Direction. */
-	inline static void SetDirectionState(const Vector3i Offset, short & Block, TemporaryDirection Direction)
-	{
-		Block = DoWithDirectionState(Offset, Block, [Direction](auto, auto & Front, auto)
-		{
-			using FrontState = std::remove_reference_t<decltype(Front)>;
-			switch (Direction)
-			{
-				case TemporaryDirection::Up:
-				{
-					Front = FrontState::Up;
-					return;
-				}
-				case TemporaryDirection::Side:
-				{
-					Front = FrontState::Side;
-					return;
-				}
-			}
-		});
-	}
-
 	/** Invokes Callback with the wire's left, front, and right direction state corresponding to Offset.
 	Returns a new block constructed from the directions that the callback may have modified. */
 	template <class OffsetCallback>
-	inline static short DoWithDirectionState(const Vector3i Offset, short Block, OffsetCallback Callback)
+	inline short DoWithDirectionState(const Vector3i Offset, short Block, OffsetCallback Callback)
 	{
 		auto North = Block::RedstoneWire::North(Block);
 		auto South = Block::RedstoneWire::South(Block);
@@ -70,11 +48,58 @@ class cRedstoneWireHandler final : public cRedstoneHandler
 		return Block::RedstoneWire::RedstoneWire(East, North, 0, South, West);
 	}
 
-public:
+	/** Adjusts a given wire block so that the direction represented by Offset has state Direction. */
+	inline void SetDirectionState(const Vector3i Offset, short & Block, TemporaryDirection Direction)
+	{
+		Block = DoWithDirectionState(Offset, Block, [Direction](auto, auto & Front, auto)
+		{
+			using FrontState = std::remove_reference_t<decltype(Front)>;
+			switch (Direction)
+			{
+				case TemporaryDirection::Up:
+				{
+					Front = FrontState::Up;
+					return;
+				}
+				case TemporaryDirection::Side:
+				{
+					Front = FrontState::Side;
+					return;
+				}
+			}
+		});
+	}
+
+	inline bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
+	{
+		switch (a_Block)
+		{
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			{
+				a_BlockMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
+				if ((a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XP) || (a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XM))
+				{
+					// Wire connects to repeater if repeater is aligned along X
+					// and wire is in front or behind it (#4639)
+					return a_Offset.x != 0;
+				}
+
+				return a_Offset.z != 0;
+			}
+			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_INACTIVE_COMPARATOR:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_REDSTONE_WIRE: return true;
+			default: return false;
+		}
+	}
 
 	/** Temporary. Discovers a wire's connection state, including terracing, storing the block inside redstone chunk data.
 	TODO: once the server supports block states this should go in the block handler, with data saved in the world. */
-	void SetWireState(const cChunk & Chunk, const Vector3i Position) const
+	inline void SetWireState(const cChunk & Chunk, const Vector3i Position)
 	{
 		auto Block = Block::RedstoneWire::RedstoneWire();
 		const auto YPTerraceBlock = Chunk.GetBlock(Position + OffsetYP);
@@ -164,36 +189,7 @@ public:
 		DataForChunk(Chunk).WireStates[Position] = Block;
 	}
 
-private:
-
-	inline static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
-	{
-		switch (a_Block)
-		{
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			{
-				a_BlockMeta &= E_META_REDSTONE_REPEATER_FACING_MASK;
-				if ((a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XP) || (a_BlockMeta == E_META_REDSTONE_REPEATER_FACING_XM))
-				{
-					// Wire connects to repeater if repeater is aligned along X
-					// and wire is in front or behind it (#4639)
-					return a_Offset.x != 0;
-				}
-
-				return a_Offset.z != 0;
-			}
-			case E_BLOCK_ACTIVE_COMPARATOR:
-			case E_BLOCK_INACTIVE_COMPARATOR:
-			case E_BLOCK_BLOCK_OF_REDSTONE:
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			case E_BLOCK_REDSTONE_WIRE: return true;
-			default: return false;
-		}
-	}
-
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		// Starts off as the wire's meta value, modified appropriately and returned
 		auto Power = a_Chunk.GetMeta(a_Position);
@@ -257,16 +253,16 @@ private:
 		return Power;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
+		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
-		if (a_Meta == a_PoweringData.PowerLevel)
+		if (a_Meta == Power)
 		{
 			return;
 		}
 
-		a_Chunk.SetMeta(a_Position, a_PoweringData.PowerLevel);
+		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
 		for (const auto Offset : RelativeAdjacents)
@@ -280,7 +276,7 @@ private:
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
