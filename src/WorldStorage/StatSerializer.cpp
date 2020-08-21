@@ -106,7 +106,7 @@ static const std::unordered_map<std::string_view, Statistic> LegacyMapping
 
 namespace StatSerializer
 {
-	auto MakeStatisticsDirectory(const std::string & WorldPath, std::string FileName)
+	auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
 	{
 		// Even though stats are shared between worlds, they are (usually) saved
 		// inside the folder of the default world.
@@ -196,10 +196,10 @@ namespace StatSerializer
 
 
 
-	void Load(cStatManager & Manager, const std::string & WorldPath, std::string FileName)
+	void Load(cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
 	{
 		Json::Value Root;
-		InputFileStream(MakeStatisticsDirectory(WorldPath, FileName)) >> Root;
+		InputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) >> Root;
 
 		LoadLegacyFromJSON(Manager, Root);
 		LoadCustomStatFromJSON(Manager, Root["stats"]["custom"]);
@@ -209,13 +209,13 @@ namespace StatSerializer
 
 
 
-	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string FileName)
+	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
 	{
 		Json::Value Root;
 
 		SaveStatToJSON(Manager, Root["stats"]);
 		Root["DataVersion"] = NamespaceSerializer::DataVersion();
 
-		OutputFileStream(MakeStatisticsDirectory(WorldPath, FileName)) << Root;
+		OutputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) << Root;
 	}
 }
