@@ -228,7 +228,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"NaturalPatches, "
 				"PreSimulator, "
 				"Animals, "
-				"SinglePieceStructures: JungleTemple|WitchHut|DesertWell"
+				"SinglePieceStructures: JungleTemple|WitchHut|DesertTemple|DesertWell"
 			);
 			break;
 		}  // dimOverworld

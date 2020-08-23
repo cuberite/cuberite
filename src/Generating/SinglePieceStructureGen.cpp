@@ -112,18 +112,7 @@ public:
 		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ);
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
-		if (NoCaseCompare(m_Name, "DesertTemple") == 0)
-		{
-			return std::make_shared<cPrefabStructure>(static_cast<cPrefabStructure>(cPrefabChestStructure(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen, DesertTemple::LootProbab)));
-		}
-		else if (NoCaseCompare(m_Name, "JungleTemple") == 0)
-		{
-			return std::make_shared<cPrefabStructure>(static_cast<cPrefabStructure>(cPrefabChestStructure(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen, JungleTemple::LootProbab)));
-		}
-		else
-		{
-			return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);
-		}
+		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);
 	}
 
 
