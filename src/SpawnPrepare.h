@@ -17,6 +17,11 @@ public:
 
 	static void PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance);
 
+	static void PrepareChunks(cWorld & a_World, cChunkCoords a_SpawnChunk, int a_PrepareDistance)
+	{
+		PrepareChunks(a_World, a_SpawnChunk.m_ChunkX, a_SpawnChunk.m_ChunkZ, a_PrepareDistance);
+	}
+
 protected:
 	cWorld & m_World;
 	int m_SpawnChunkX;

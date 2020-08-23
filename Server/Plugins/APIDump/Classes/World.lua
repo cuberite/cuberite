@@ -1739,7 +1739,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "number",
 					},
 				},
-				Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!",
+				Notes = "<b>DEPRECATED</b>, use TryGetHeight instead. Returns the maximum height of the particular block column in the world. If the chunk is not loaded, this function used to block until the chunk was loaded, leading to possible deadlock. Now it returns 0 instead.",
 			},
 			GetIniFileName =
 			{
@@ -1996,6 +1996,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns the Z coord of the default spawn",
+			},
+			GetSpawnPos =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3d"
+					},
+				},
+				Notes = "Returns the default spawn position",
 			},
 			GetStorageLoadQueueLength =
 			{
@@ -2549,7 +2559,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false.",
+				Notes = "Returns true if the specified location has wet weather (rain or storm), using the same logic as IsWeatherWetAt, except that any rain-blocking blocks above the specified position will block the precipitation and this function will return false. Note if the chunk is unloaded then it is treated as a chunk full of air and doesn't block precipitation.",
 			},
 			PickupsFromBlock =
 			{

@@ -121,7 +121,7 @@ public:
 	bool IsWaterInNear(cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
 		const auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		if (a_Chunk.GetWorld()->IsWeatherWetAtXYZ(WorldPos))
+		if (a_Chunk.GetWorld()->IsWeatherWetAtXYZ(WorldPos).value_or(false))
 		{
 			// Rain hydrates farmland, too
 			return true;
