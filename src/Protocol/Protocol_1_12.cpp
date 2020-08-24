@@ -1011,7 +1011,7 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
-	return Version::Version_1_12;
+	return Version::v1_12;
 }
 
 
@@ -1161,7 +1161,7 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 
 cProtocol::Version cProtocol_1_12_1::GetProtocolVersion()
 {
-	return Version::Version_1_12_1;
+	return Version::v1_12_1;
 }
 
 
@@ -1267,7 +1267,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 
 cProtocol::Version cProtocol_1_12_2::GetProtocolVersion()
 {
-	return Version::Version_1_12_2;
+	return Version::v1_12_2;
 }
 
 

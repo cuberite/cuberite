@@ -209,14 +209,14 @@ public:
 	void AddEntityIfNotPresent(OwnedEntity a_Entity);
 
 	/** Returns true if the entity with specified ID is present in the chunks */
-	bool HasEntity(UInt32 a_EntityID);
+	bool HasEntity(UInt32 a_EntityID) const;
 
 	/** Removes the entity from its appropriate chunk
 	Returns an owning reference to the found entity. */
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
-	bool ForEachEntity(cEntityCallback a_Callback);  // Lua-accessible
+	bool ForEachEntity(cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback);  // Lua-accessible
@@ -231,7 +231,7 @@ public:
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback);  // Lua-accessible
+	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback for each block entity in the specified chunk.
 	Returns true if all block entities processed, false if the callback aborted by returning true. */
@@ -352,13 +352,13 @@ public:
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
-	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback);
+	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) const;
 
 	/** Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer cBlockArea::Write() instead. */
 	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Returns the number of valid chunks and the number of dirty chunks */
-	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
+	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const;
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -382,14 +382,14 @@ public:
 	void TickBlock(const Vector3i a_BlockPos);
 
 	void UnloadUnusedChunks(void);
-	void SaveAllChunks(void);
+	void SaveAllChunks(void) const;
 
-	cWorld * GetWorld(void) { return m_World; }
+	cWorld * GetWorld(void) const { return m_World; }
 
-	size_t GetNumChunks(void);
+	size_t GetNumChunks(void) const;
 
 	/** Returns the number of unused dirty chunks. Those are chunks that we can save and then unload */
-	size_t GetNumUnusedDirtyChunks(void);
+	size_t GetNumUnusedDirtyChunks(void) const;
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
@@ -453,9 +453,9 @@ private:
 
 	mutable cCriticalSection m_CSChunks;
 
-	/** A map of chunk coordinates to chunk pointers
-	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
-	std::map<ChunkCoordinate, std::unique_ptr<cChunk>, ChunkCoordinate::Comparer> m_Chunks;
+	/** A map of chunk coordinates to chunks.
+	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster. */
+	std::map<ChunkCoordinate, cChunk, ChunkCoordinate::Comparer> m_Chunks;
 
 	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 

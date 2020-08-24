@@ -206,7 +206,7 @@ void cBeaconEntity::UpdateBeacon(void)
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player.AwardAchievement(eStatistic::achFullBeacon);
+					a_Player.AwardAchievement(Statistic::AchFullBeacon);
 				}
 				return false;
 			}

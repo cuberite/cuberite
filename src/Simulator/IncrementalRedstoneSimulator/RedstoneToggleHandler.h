@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockButton.h"
 #include "../../Blocks/BlockLever.h"
 
@@ -9,9 +8,9 @@
 
 
 
-class cRedstoneToggleHandler final : public cRedstoneHandler
+namespace RedstoneToggleHandler
 {
-	inline static Vector3i GetOffsetAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	inline Vector3i GetOffsetAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		switch (a_BlockType)
 		{
@@ -60,22 +59,7 @@ class cRedstoneToggleHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
-	{
-		UNUSED(a_QueryBlockType);
-
-		const auto Meta = a_Chunk.GetMeta(a_Position);
-		const auto QueryOffset = a_QueryPosition - a_Position;
-
-		if (IsLinked && (QueryOffset != GetOffsetAttachedTo(a_Position, a_BlockType, Meta)))
-		{
-			return 0;
-		}
-
-		return GetPowerLevel(a_BlockType, Meta);
-	}
-
-	static unsigned char GetPowerLevel(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	inline unsigned char GetPowerLevel(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		switch (a_BlockType)
 		{
@@ -90,12 +74,27 @@ class cRedstoneToggleHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	{
+		UNUSED(a_QueryBlockType);
+
+		const auto Meta = a_Chunk.GetMeta(a_Position);
+		const auto QueryOffset = a_QueryPosition - a_Position;
+
+		if (IsLinked && (QueryOffset != GetOffsetAttachedTo(a_Position, a_BlockType, Meta)))
+		{
+			return 0;
+		}
+
+		return GetPowerLevel(a_BlockType, Meta);
+	}
+
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating templatio<> the lever/button (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

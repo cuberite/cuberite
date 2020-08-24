@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../ByteBuffer.h"
 #include "../ChunkData.h"
 #include "../Defines.h"
 
@@ -18,46 +19,67 @@ Caches the serialized data for as long as this object lives, so that the same da
 other clients using the same protocol. */
 class cChunkDataSerializer
 {
+	using ClientHandles = std::unordered_set<cClientHandle *>;
+
+	/** Enum to collapse protocol versions into a contiguous index. */
+	enum class CacheVersion
+	{
+		v47,
+		v107,
+		v110,
+		v393,
+		v401,
+		v477,
+
+		Count
+	};
+
+	/** A single cache entry containing the raw data, compressed data, and a validity flag. */
+	struct ChunkDataCache
+	{
+		std::string PacketData;
+		std::string ToSend;
+		bool Engaged = false;
+	};
+
 public:
 
-	cChunkDataSerializer(
-		int                                         a_ChunkX,
-		int                                         a_ChunkZ,
-		const cChunkData &                          a_Data,
-		const unsigned char *                       a_BiomeData,
-		const eDimension                            a_Dimension
-	);
+	cChunkDataSerializer(eDimension a_Dimension);
 
-	/** For each client, serializes the chunk into their protocol version and sends it. */
-	void SendToClients(const std::unordered_set<cClientHandle *> & a_SendTo);
+	/** For each client, serializes the chunk into their protocol version and sends it.
+	Parameters are the coordinates of the chunk to serialise, and the data and biome data read from the chunk. */
+	void SendToClients(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const ClientHandles & a_SendTo);
 
 protected:
 
-	void Serialize47 (const std::vector<cClientHandle *> & a_SendTo);  // Release 1.8
-	void Serialize107(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.9
-	void Serialize110(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.9.4
+	/** Serialises the given chunk, storing the result into the given cache entry, and sends the data.
+	If the cache entry is already present, simply re-uses it. */
+	inline void Serialize(cClientHandle * a_Client, int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, CacheVersion a_CacheVersion);
+
+	inline void Serialize47 (int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.8
+	inline void Serialize107(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.9
+	inline void Serialize110(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.9.4
 	template <auto Palette>
-	void Serialize393(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.13 - 1.13.2
-	void Serialize477(const std::vector<cClientHandle *> & a_SendTo);  // Release 1.14 - 1.14.4
+	inline void Serialize393(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.13 - 1.13.2
+	inline void Serialize477(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.14 - 1.14.4
 
 	/** Writes all blocks in a chunk section into a series of Int64.
 	Writes start from the bit directly subsequent to the previous write's end, possibly crossing over to the next Int64. */
-	inline void WriteSectionDataSeamless(cByteBuffer & a_Packet, const cChunkData::sChunkSection & a_Section, const UInt8 a_BitsPerEntry);
+	template <auto Palette>
+	inline void WriteSectionDataSeamless(const cChunkData::sChunkSection & a_Section, const UInt8 a_BitsPerEntry);
 
-	/** Finalises the data, compresses it if required, and delivers it to all clients. */
-	void CompressAndSend(cByteBuffer & a_Packet, const std::vector<cClientHandle *> & a_SendTo);
+	/** Finalises the data, compresses it if required, and stores it into cache. */
+	inline void CompressPacketInto(ChunkDataCache & a_Cache);
 
-	/** The coordinates of the chunk to serialise. */
-	int m_ChunkX, m_ChunkZ;
+	/** A staging area used to construct the chunk packet, persistent to avoid reallocating. */
+	cByteBuffer m_Packet;
 
-	/** The data read from the chunk, to be serialized. */
-	const cChunkData & m_Data;
-
-	/** The biomes in the chunk, to be serialized. */
-	const unsigned char * m_BiomeData;
-
-	/** The dimension where the chunk resides. */
+	/** The dimension for the World this Serializer is tied to. */
 	const eDimension m_Dimension;
+
+	/** A cache, mapping protocol version to a fully serialised chunk.
+	It is used during a single invocation of SendToClients with more than one client. */
+	std::array<ChunkDataCache, static_cast<size_t>(CacheVersion::Count)> m_Cache;
 } ;
 
 

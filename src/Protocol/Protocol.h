@@ -139,7 +139,7 @@ public:
 		pktWindowProperty
 	};
 
-	enum class eEntityMetadata
+	enum class EntityMetadata
 	{
 		EntityFlags,
 		EntityAir,
@@ -303,7 +303,7 @@ public:
 		TNTPrimedFuseTime
 	};
 
-	enum class eEntityMetadataType
+	enum class EntityMetadataType
 	{
 		Byte,
 		VarInt,
@@ -328,21 +328,21 @@ public:
 
 	enum class Version
 	{
-		Version_1_8_0  = 47,
-		Version_1_9_0  = 107,
-		Version_1_9_1  = 108,
-		Version_1_9_2  = 109,
-		Version_1_9_4  = 110,
-		Version_1_10_0 = 210,
-		Version_1_11_0 = 315,
-		Version_1_11_1 = 316,
-		Version_1_12   = 335,
-		Version_1_12_1 = 338,
-		Version_1_12_2 = 340,
-		Version_1_13   = 393,
-		Version_1_13_1 = 401,
-		Version_1_13_2 = 404,  // TODO: this constant should be in WebServer
-		Version_1_14   = 477
+		v1_8_0  = 47,
+		v1_9_0  = 107,
+		v1_9_1  = 108,
+		v1_9_2  = 109,
+		v1_9_4  = 110,
+		v1_10_0 = 210,
+		v1_11_0 = 315,
+		v1_11_1 = 316,
+		v1_12   = 335,
+		v1_12_1 = 338,
+		v1_12_2 = 340,
+		v1_13   = 393,
+		v1_13_1 = 401,
+		v1_13_2 = 404,  // TODO: this constant should be in WebServer
+		v1_14   = 477
 	};
 
 	/** Called when client sends some data */

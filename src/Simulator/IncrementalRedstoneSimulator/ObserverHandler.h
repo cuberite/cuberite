@@ -1,21 +1,20 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../Blocks/BlockObserver.h"
 
 
 
 
 
-class cObserverHandler final : public cRedstoneHandler
+namespace ObserverHandler
 {
-	inline static bool IsOn(NIBBLETYPE a_Meta)
+	inline bool IsOn(NIBBLETYPE a_Meta)
 	{
 		return (a_Meta & 0x8) == 0x8;
 	}
 
-	static bool ShouldPowerOn(cChunk & Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta, cIncrementalRedstoneSimulatorChunkData & a_Data)
+	inline bool ShouldPowerOn(cChunk & Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta, cIncrementalRedstoneSimulatorChunkData & a_Data)
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
@@ -24,21 +23,36 @@ class cObserverHandler final : public cRedstoneHandler
 			return false;
 		}
 
-		// Cache the last seen block type and meta in the power data for this position
-		auto Observed = PoweringData(BlockType, BlockMeta);
-		auto Previous = a_Data.ExchangeUpdateOncePowerData(a_Position, Observed);
+		auto & ObserverCache = a_Data.ObserverCache;
+		const auto FindResult = ObserverCache.find(a_Position);
+		const auto Observed = std::make_pair(BlockType, BlockMeta);
+
+		if (FindResult == ObserverCache.end())
+		{
+			// Cache the last seen block for this position:
+			ObserverCache.emplace(a_Position, Observed);
+
+			// Definitely should signal update:
+			return true;
+		}
+
+		// The block this observer previously saw.
+		const auto Previous = FindResult->second;
+
+		// Update the last seen block:
+		FindResult->second = Observed;
 
 		// Determine if to signal an update based on the block previously observed changed
-		return (Previous.PoweringBlock != Observed.PoweringBlock) || (Previous.PowerLevel != Observed.PowerLevel);
+		return Previous != Observed;
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (IsOn(Meta) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(Meta)))) ? 15 : 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating Lenny the observer (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -84,7 +98,7 @@ class cObserverHandler final : public cRedstoneHandler
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

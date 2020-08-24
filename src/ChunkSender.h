@@ -27,6 +27,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #include "OSSupport/IsThread.h"
 #include "ChunkDataCallback.h"
+#include "Protocol/ChunkDataSerializer.h"
 
 
 
@@ -108,6 +109,9 @@ protected:
 	};
 
 	cWorld & m_World;
+
+	/** An instance of a chunk serializer, held to maintain its internal cache. */
+	cChunkDataSerializer m_Serializer;
 
 	cCriticalSection  m_CS;
 	std::priority_queue<sChunkQueue> m_SendChunks;

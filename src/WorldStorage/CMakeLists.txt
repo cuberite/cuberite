@@ -5,6 +5,7 @@ target_sources(
 	FastNBT.cpp
 	FireworksSerializer.cpp
 	MapSerializer.cpp
+	NamespaceSerializer.cpp
 	NBTChunkSerializer.cpp
 	SchematicFileSerializer.cpp
 	ScoreboardSerializer.cpp
@@ -16,6 +17,7 @@ target_sources(
 	FastNBT.h
 	FireworksSerializer.h
 	MapSerializer.h
+	NamespaceSerializer.h
 	NBTChunkSerializer.h
 	SchematicFileSerializer.h
 	ScoreboardSerializer.h

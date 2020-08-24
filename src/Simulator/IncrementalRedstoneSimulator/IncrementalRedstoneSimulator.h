@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../RedstoneSimulator.h"
-#include "RedstoneHandler.h"
 #include "RedstoneSimulatorChunkData.h"
 
 
@@ -17,8 +16,6 @@ class cIncrementalRedstoneSimulator final :
 public:
 
 	using Super::cRedstoneSimulator;
-
-	static const cRedstoneHandler * GetComponentHandler(BLOCKTYPE a_BlockType);
 
 private:
 
@@ -110,8 +107,4 @@ private:
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block) override;
-
-private:
-
-	static std::unique_ptr<cRedstoneHandler> CreateComponent(BLOCKTYPE a_BlockType);
 } ;
