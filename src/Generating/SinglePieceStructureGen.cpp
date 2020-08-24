@@ -4,6 +4,7 @@
 #include "PrefabStructure.h"
 #include "PrefabPiecePool.h"
 #include "../IniFile.h"
+#include "../Item.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Loot tables for different Structures
