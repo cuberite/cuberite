@@ -45,3 +45,7 @@ protected:
 	Ground level is assumed to be represented by the first connector in the piece. */
 	void PlacePieceOnGround(cPlacedPiece & a_Piece);
 };
+
+
+
+
