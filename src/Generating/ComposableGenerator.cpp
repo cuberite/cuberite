@@ -27,7 +27,7 @@
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
 #include "RoughRavines.h"
-#include "SinglePieceStructureGen.h"
+#include "SinglePieceStructuresGen.h"
 #include "VillageGen.h"
 #include "PieceStructuresGen.h"
 
@@ -616,7 +616,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				continue;
 			}
 
-			auto Gen = std::make_shared<cSinglePieceStructureGen>(m_Seed);
+			auto Gen = std::make_shared<cSinglePieceStructuresGen>(m_Seed);
 			if (Gen->Initialize(split[1], seaLevel, m_BiomeGen, m_CompositedHeightCache))
 			{
 				m_FinishGens.push_back(Gen);

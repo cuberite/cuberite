@@ -52,6 +52,7 @@ set (GENERATING_SRCS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceStructuresGen.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabStructure.cpp
@@ -119,6 +120,7 @@ set (GENERATING_HDRS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceStructuresGen.h
+	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabStructure.h

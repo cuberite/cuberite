@@ -1,5 +1,5 @@
 
-#include "SinglePieceStructureGen.h"
+#include "SinglePieceStructuresGen.h"
 
 #include "PrefabStructure.h"
 #include "PrefabPiecePool.h"
@@ -60,9 +60,9 @@ namespace JungleTemple
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cSinglePieceStructureGen::cGen
+// cSinglePieceStructuresGen::cGen
 
-class cSinglePieceStructureGen::cGen :
+class cSinglePieceStructuresGen::cGen :
 	public cGridStructGen
 {
 	using Super = cGridStructGen;
@@ -191,9 +191,9 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cSinglePieceStructureGen
+// cSinglePieceStructuresGen
 
-cSinglePieceStructureGen::cSinglePieceStructureGen(int a_Seed) :
+cSinglePieceStructuresGen::cSinglePieceStructuresGen(int a_Seed) :
 	m_Seed(a_Seed)
 {
 }
@@ -202,7 +202,7 @@ cSinglePieceStructureGen::cSinglePieceStructureGen(int a_Seed) :
 
 
 
-bool cSinglePieceStructureGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
+bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
 {
 	// Load each piecepool:
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
@@ -240,7 +240,7 @@ bool cSinglePieceStructureGen::Initialize(const AString & a_Prefabs, int a_SeaLe
 
 
 
-void cSinglePieceStructureGen::GenFinish(cChunkDesc & a_Chunk)
+void cSinglePieceStructuresGen::GenFinish(cChunkDesc & a_Chunk)
 {
 	for (auto & Gen: m_Gens)
 	{

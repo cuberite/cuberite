@@ -18,13 +18,13 @@ Classes to support the generation of single piece prefab structures
 	This is similar to the Piece Structure Generator but only placing one possible structure
 	The Exported cubeset MUST have all possible structures as start structures
 	else it isn't accessible from the m_Piecepool. */
-class cSinglePieceStructureGen :
+class cSinglePieceStructuresGen :
 	public cFinishGen
 {
 using Super = cFinishGen;
 
 public:
-	cSinglePieceStructureGen(int a_Seed);
+  cSinglePieceStructuresGen(int a_Seed);
 
 	/** Initializes the generator based on the specified prefab sets.
 	a_Prefabs contains the list of prefab sets that should be activated, "|"-separated.
