@@ -22,8 +22,10 @@ namespace SmallGateHandler
 	{
 		// LOGD("Evaluating gateydory the fence gate/trapdoor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
+		// Use redstone data rather than block state so players can override redstone control
+		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
+		const bool IsOpen = (Previous != 0);
 		const bool ShouldBeOpen = Power != 0;
-		const bool IsOpen = (a_Meta & 0x4) == 0x4;
 
 		if (ShouldBeOpen != IsOpen)
 		{
