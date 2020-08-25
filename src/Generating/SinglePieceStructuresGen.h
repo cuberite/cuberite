@@ -24,7 +24,7 @@ class cSinglePieceStructuresGen :
 using Super = cFinishGen;
 
 public:
-  cSinglePieceStructuresGen(int a_Seed);
+	cSinglePieceStructuresGen(int a_Seed);
 
 	/** Initializes the generator based on the specified prefab sets.
 	a_Prefabs contains the list of prefab sets that should be activated, "|"-separated.

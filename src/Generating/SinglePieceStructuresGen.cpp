@@ -2,61 +2,8 @@
 #include "SinglePieceStructuresGen.h"
 
 #include "PrefabStructure.h"
-#include "PrefabPiecePool.h"
 #include "../IniFile.h"
 #include "../Item.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// Loot tables for different Structures
-
-namespace DesertTemple
-{
-// https://minecraft-el.gamepedia.com/Desert_temple#Loot
-static const cLootProbab LootProbab[] =
-	{
-		// Item,                             MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_BONE),                1,         8,         708 },
-		{ cItem(E_ITEM_ROTTEN_FLESH),        1,         8,         708 },
-		{ cItem(E_ITEM_GUNPOWDER),           1,         8,         590 },
-		{ cItem(E_BLOCK_SAND),               1,         8,         590 },
-		{ cItem(E_ITEM_STRING),              1,         8,         590 },
-		{ cItem(E_ITEM_SPIDER_EYE),          1,         3,         287 },
-		{ cItem(E_ITEM_SADDLE),              1,         1,         235 },
-		{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         235 },
-		{ cItem(E_ITEM_GOLD),                2,         7,         180 },
-		{ cItem(E_ITEM_IRON),                1,         3,         180 },
-		{ cItem(E_ITEM_EMERALD),             1,         3,         180 },
-		{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         180 },
-		{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         123 },
-		{ cItem(E_ITEM_DIAMOND),             1,         3,          63 },
-		{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         3,          63 }
-		// { cItem(E_ITEM_ENCHANTED_APPLE),     1,         1,          26 }
-	} ;
-}
-
-
-
-
-
-namespace JungleTemple
-{
-	// https://minecraft.gamepedia.com/Jungle_pyramid#Loot
-	static const cLootProbab LootProbab[] =
-	{
-		// Item,                             MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_BONE),                4,         6,         20 },
-		{ cItem(E_ITEM_ROTTEN_FLESH),        3,         7,         16 },
-		{ cItem(E_ITEM_GOLD),                2,         7,         15 },
-		// { cItem(E_ITEM_BAMBOO),              1,         3,         15 }  TODO: Add when implemented
-		{ cItem(E_ITEM_IRON),                1,         5,         10 },
-		{ cItem(E_ITEM_DIAMOND),             1,         3,          3 },
-		{ cItem(E_ITEM_SADDLE),              1,         1,          2 },
-		{ cItem(E_ITEM_EMERALD),             1,         3,          2 },
-		{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,          1 },
-		{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,          1 },
-		{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,          1 }
-	} ;
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
