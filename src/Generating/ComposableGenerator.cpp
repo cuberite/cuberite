@@ -218,6 +218,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"Mineshafts, "
 				"Trees, "
 				"Villages, "
+				"SinglePieceStructures: JungleTemple|WitchHut|DesertTemple|DesertWell, "
 				"TallGrass, "
 				"SprinkleFoliage, "
 				"Ice, "
@@ -227,8 +228,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"DeadBushes, "
 				"NaturalPatches, "
 				"PreSimulator, "
-				"Animals, "
-				"SinglePieceStructures: JungleTemple|WitchHut|DesertTemple|DesertWell"
+				"Animals"
 			);
 			break;
 		}  // dimOverworld

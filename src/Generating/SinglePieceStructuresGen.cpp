@@ -57,6 +57,7 @@ public:
 	// cGridStructGen override
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override
 	{
+		// Todo: remove this when development is over
 		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ);
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
