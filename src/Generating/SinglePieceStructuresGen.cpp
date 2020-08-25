@@ -64,13 +64,13 @@ public:
 		m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 		// Checks if the biome at the origin position is allowed
-		if (m_PiecePool.IsBiomeAllowed(Biomes[a_OriginX + cChunkDef::Width * a_OriginZ]))
+		if (!m_PiecePool.IsBiomeAllowed(Biomes[ChunkX + cChunkDef::Width * ChunkZ]))
 		{
 			return cStructurePtr();
 		}
 
 		// Todo: remove this when development is over
-		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ);
+		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_OriginX, a_OriginZ);
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
 		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);
