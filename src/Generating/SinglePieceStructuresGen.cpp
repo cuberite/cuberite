@@ -57,6 +57,25 @@ public:
 	// cGridStructGen override
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override
 	{
+		// Generate the biomes for the chunk surrounding the origin:
+		int ChunkX, ChunkZ;
+		cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
+		cChunkDef::BiomeMap Biomes;
+		m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
+
+		// Checks if the chunk chosen contains any of AllowedBiomes in the m_PiecePool
+		bool Allowed = false;
+		for (auto Biome: Biomes)
+		{
+			LOG(std::to_string(Biome));
+			Allowed |= m_PiecePool.IsBiomeAllowed(Biome);
+		}
+
+		if (!Allowed)
+		{
+			return cStructurePtr();
+		}
+
 		// Todo: remove this when development is over
 		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ);
 		cPlacedPieces OutPiece;
