@@ -63,15 +63,8 @@ public:
 		cChunkDef::BiomeMap Biomes;
 		m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
 
-		// Checks if the chunk chosen contains any of AllowedBiomes in the m_PiecePool
-		bool Allowed = false;
-		for (auto Biome: Biomes)
-		{
-			LOG(std::to_string(Biome));
-			Allowed |= m_PiecePool.IsBiomeAllowed(Biome);
-		}
-
-		if (!Allowed)
+		// Checks if the biome at the origin position is allowed
+		if (m_PiecePool.IsBiomeAllowed(Biomes[a_OriginX + cChunkDef::Width * a_OriginZ]))
 		{
 			return cStructurePtr();
 		}
