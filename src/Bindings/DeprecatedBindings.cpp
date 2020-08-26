@@ -518,6 +518,120 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
+/** Function: cWorld:GrowTree.
+Exported manually because of the obsolete int-based overload.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTree(lua_State * a_LuaState)
+{
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
+	{
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTree function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTree({BlockX, BlockY, BlockZ}));
+		return 1;
+	}
+
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	LuaState.Push(Self->GrowTree(BlockPos));
+	return 1;
+}
+
+
+
+
+
+/** Function: cWorld:GrowTreeByBiome.
+Exported manually because of the obsolete int-based overload.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTreeByBiome(lua_State * a_LuaState)
+{
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
+	{
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTreeByBiome function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTreeByBiome({BlockX, BlockY, BlockZ}));
+		return 1;
+	}
+
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	LuaState.Push(Self->GrowTreeByBiome(BlockPos));
+	return 1;
+}
+
+
+
+
+
+/** Function: cWorld:GrowTreeFromSapling.
+Exported manually because of the obsolete int-based overload and obsolete SaplingMeta parameter.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTreeFromSapling(lua_State * a_LuaState)
+{
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
+	{
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTreeFromSapling function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTreeFromSapling({BlockX, BlockY, BlockZ}));
+		return 1;
+	}
+
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	if (lua_isnumber(LuaState, 3))
+	{
+		// There's an extra parameter, the obsolete SaplingMeta
+		LOGWARNING("Warning: cWorld:GrowTreeFromSapling function no longer has the SaplingMeta parameter. Ignoring it now.");
+		LuaState.LogStackTrace(0);
+	}
+	LuaState.Push(Self->GrowTreeFromSapling(BlockPos));
+	return 1;
+}
+
+
+
+
+
 /** function: cWorld:SetNextBlockTick */
 static int tolua_cWorld_SetNextBlockTick(lua_State * tolua_S)
 {
@@ -595,8 +709,11 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cWorld");
-		tolua_function(tolua_S, "SetNextBlockTick", tolua_cWorld_SetNextBlockTick);
-		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
+		tolua_function(tolua_S, "GrowTree",            tolua_cWorld_GrowTree);
+		tolua_function(tolua_S, "GrowTreeByBiome",     tolua_cWorld_GrowTreeByBiome);
+		tolua_function(tolua_S, "GrowTreeFromSapling", tolua_cWorld_GrowTreeFromSapling);
+		tolua_function(tolua_S, "SetNextBlockTick",    tolua_cWorld_SetNextBlockTick);
+		tolua_function(tolua_S, "UpdateSign",          tolua_cWorld_SetSignLines);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);

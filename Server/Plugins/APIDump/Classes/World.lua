@@ -2178,7 +2178,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "BlockPos",
-							Type = "number",
+							Type = "Vector3i",
 						},
 					},
 					Returns =
@@ -2224,16 +2224,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
 				Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome.",
@@ -2243,16 +2235,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
 				Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords.",
@@ -2262,23 +2246,11 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "SaplingMeta",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present).",
+				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta. If the sapling is part of a 2x2 sapling area, grows a large tree.",
 			},
 			IsBlockDirectlyWatered =
 			{

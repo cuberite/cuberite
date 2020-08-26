@@ -829,30 +829,25 @@ public:
 	Returns true if the tree is imprinted successfully, false otherwise. */
 	bool GrowTreeImage(const sSetBlockVector & a_Blocks);
 
-	// tolua_begin
-
 	/** Grows a tree at the specified coords.
 	If the specified block is a sapling, the tree is grown from that sapling.
 	Otherwise a tree is grown based on the biome.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTree(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTree(const Vector3i a_BlockPos);
 
-	/** Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(Vector3i a_BlockPos, NIBBLETYPE a_SaplingMeta)
-	{
-		// TODO: Change the implementation to use Vector3i, once cTree uses Vector3i-based functions
-		return GrowTreeFromSapling(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_SaplingMeta);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	/** Grows a tree from the sapling at the specified coords.
+	If the sapling is a part of a large-tree sapling (2x2), a large tree growth is attempted.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload and obsolete additional SaplingMeta param. */
+	bool GrowTreeFromSapling(Vector3i a_BlockPos);
 
 	/** Grows a tree at the specified coords, based on the biome in the place.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeByBiome(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTreeByBiome(const Vector3i a_BlockPos);
+
+	// tolua_begin
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -1381,7 +1376,7 @@ private:
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
-	If so, adjusts the X and Z coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
+	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
 	Returns false if not a part of large-tree sapling. */
-	bool GetLargeTreeAdjustment(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_SaplingMeta);
 };  // tolua_export
