@@ -336,6 +336,10 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_Stats.AddValue(Statistic::PlayOneMinute);
 	m_Stats.AddValue(Statistic::TimeSinceDeath);
+	if (IsCrouched())
+	{
+		m_Stats.AddValue(Statistic::SneakTime);
+	}
 
 	// Handle the player detach, when the player is in spectator mode
 	if (
