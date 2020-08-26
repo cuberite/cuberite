@@ -2801,18 +2801,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Name = "BlockMeta",
 							Type = "number",
 						},
-						{
-							Name = "ShouldMarkChunkDirty",
-							Type = "boolean",
-							IsOptional = true,
-						},
-						{
-							Name = "ShouldSendToClients",
-							Type = "boolean",
-							IsOptional = true,
-						},
 					},
-					Notes = "Sets the meta for the block at the specified coords. If ShouldMarkChunkDirty is true (default), the chunk is marked dirty and will be saved later on. If ShouldSendToClients is true (default), the change is broadcast to all clients who have the chunk loaded, if false, the change is kept server-side only.",
+					Notes = "Sets the meta for the block at the specified coords.",
 				},
 				{
 					Params =

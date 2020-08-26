@@ -141,10 +141,8 @@ public:
 	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);

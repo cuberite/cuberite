@@ -1912,9 +1912,9 @@ void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_B
 
 
 
-void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
 }
 
 

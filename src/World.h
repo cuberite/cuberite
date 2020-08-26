@@ -456,19 +456,15 @@ public:
 	}
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
 	{
-		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData);
 	}
 
 	/** Returns the sky light value at the specified block position.

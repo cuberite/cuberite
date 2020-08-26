@@ -562,7 +562,7 @@ NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos)
 
 
 
-void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -572,7 +572,7 @@ void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a
 	auto chunk = GetChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((chunk != nullptr) && chunk->IsValid())
 	{
-		chunk->SetMeta(relPos, a_BlockMeta, a_ShouldMarkDirty, a_ShouldInformClients);
+		chunk->SetMeta(relPos, a_BlockMeta);
 	}
 }
 
