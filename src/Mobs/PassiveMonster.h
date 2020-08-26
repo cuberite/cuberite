@@ -60,6 +60,8 @@ protected:
 	/** The monster's breeding partner. */
 	cPassiveMonster * m_LovePartner;
 
+	cPlayer * m_Feeder;
+
 	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
 	int m_LoveTimer;
 
