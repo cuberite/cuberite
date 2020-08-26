@@ -516,9 +516,10 @@ exit 0
 # Called via hack in line 2.
 :windows_detected
 @echo off
+cls
 echo This script is not available for Windows yet, sorry.
 echo You can still download the Windows binaries from: https://cuberite.org/
 echo You can also manually compile for Windows. See: https://github.com/cuberite/cuberite
 rem windows_exit
-exit
+goto :EOF
 }
