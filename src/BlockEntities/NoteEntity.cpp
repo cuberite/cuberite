@@ -33,7 +33,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 
 bool cNoteEntity::UsedBy(cPlayer * a_Player)
 {
-	UNUSED(a_Player);
+	a_Player->GetStatManager().AddValue(Statistic::TuneNoteblock);
 	IncrementPitch();
 	MakeSound();
 	return true;

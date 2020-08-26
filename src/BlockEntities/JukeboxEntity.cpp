@@ -70,6 +70,8 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 		const cItem & HeldItem = a_Player->GetEquippedItem();
 		if (PlayRecord(HeldItem.m_ItemType) && !a_Player->IsGameModeCreative())
 		{
+			a_Player->GetStatManager().AddValue(Statistic::PlayRecord);
+
 			a_Player->GetInventory().RemoveOneEquippedItem();
 			return true;
 		}
