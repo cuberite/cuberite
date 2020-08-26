@@ -4,6 +4,7 @@
 #include "NoteEntity.h"
 #include "../World.h"
 #include "json/value.h"
+#include "../Entities/Player.h"
 
 
 
