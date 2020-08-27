@@ -15,7 +15,7 @@ Cubeset =
 	{
 		CubesetFormatVersion = 1,
 		ExportDate = "2020-08-27 09:03:41",
-		["AllowedBiomes"] = "Swamp, SwampHills",
+		["AllowedBiomes"] = "Swampland, SwamplandM",
 		["GridSizeX"] = "1500",
 		["GridSizeZ"] = "1500",
 		["IntendedUse"] = "SinglePieceStructures",
