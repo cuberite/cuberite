@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2020-08-26 21:48:52",
+		ExportDate = "2020-08-27 09:03:41",
 		["AllowedBiomes"] = "Jungle, JungleHills, BambooJungle, BambooJungleHills",
 		["GridSizeX"] = "1000",
 		["GridSizeZ"] = "1000",
