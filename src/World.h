@@ -834,7 +834,7 @@ public:
 	Otherwise a tree is grown based on the biome.
 	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
 	Exported in DeprecatedBindings due to the obsolete int-based overload. */
-	bool GrowTree(const Vector3i a_BlockPos);
+	bool GrowTree(Vector3i a_BlockPos);
 
 	/** Grows a tree from the sapling at the specified coords.
 	If the sapling is a part of a large-tree sapling (2x2), a large tree growth is attempted.
@@ -845,7 +845,7 @@ public:
 	/** Grows a tree at the specified coords, based on the biome in the place.
 	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
 	Exported in DeprecatedBindings due to the obsolete int-based overload. */
-	bool GrowTreeByBiome(const Vector3i a_BlockPos);
+	bool GrowTreeByBiome(Vector3i a_BlockPos);
 
 	// tolua_begin
 
