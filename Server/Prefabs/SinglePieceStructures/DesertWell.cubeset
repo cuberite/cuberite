@@ -1,0 +1,128 @@
+
+-- DesertWell.cubeset
+
+-- Defines the prefabs in the group DesertWell
+
+-- NOTE: This file has been generated automatically by GalExport!
+-- Any manual changes will be overwritten by the next automatic export!
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+		ExportDate = "2020-08-26 21:48:52",
+		["AllowedBiomes"] = "Desert, DesertM, DesertHills",
+		["GridSizeX"] = "1500",
+		["GridSizeZ"] = "1500",
+		["IntendedUse"] = "SinglePieceStructures",
+		["MaxOffsetX"] = "100",
+		["MaxOffsetZ"] = "100",
+		["SeedOffset"] = "58612835",
+	},
+
+	Pieces =
+	{
+		{
+			OriginData =
+			{
+				ExportName   = "DesertWell",
+				Name         = "DesertWell",
+				GalleryName  = "Desert",
+				GalleryIndex = "221",
+				ID           = "1702",
+				CreatorName  = "12xx12",
+			},
+			Size =
+			{
+				x = 5,
+				y = 6,
+				z = 5,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 5,
+				MaxZ = 4,
+			},
+			Connectors =
+			{
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-5",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 24: 0",  -- sandstone
+				"b:  8: 0",  -- water
+				"c: 44: 1",  -- stone_slab
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaa",  --  0
+				"aaaaa",  --  1
+				"aaaaa",  --  2
+				"aaaaa",  --  3
+				"aaaaa",  --  4
+
+				-- Level 1
+				"aaaaa",  --  0
+				"aaaaa",  --  1
+				"aabaa",  --  2
+				"aaaaa",  --  3
+				"aaaaa",  --  4
+
+				-- Level 2
+				"aacaa",  --  0
+				"aa.aa",  --  1
+				"c...c",  --  2
+				"aa.aa",  --  3
+				"aacaa",  --  4
+
+				-- Level 3
+				".....",  --  0
+				".a.a.",  --  1
+				".....",  --  2
+				".a.a.",  --  3
+				".....",  --  4
+
+				-- Level 4
+				".....",  --  0
+				".a.a.",  --  1
+				".....",  --  2
+				".a.a.",  --  3
+				".....",  --  4
+
+				-- Level 5
+				".....",  --  0
+				".ccc.",  --  1
+				".cac.",  --  2
+				".ccc.",  --  3
+				".....",  --  4
+
+			},
+		},  -- DesertWell
+	},  -- Pieces
+}
+
+
+
+

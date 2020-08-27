@@ -1,0 +1,961 @@
+
+-- DesertTemple.cubeset
+
+-- Defines the prefabs in the group DesertTemple
+
+-- NOTE: This file has been generated automatically by GalExport!
+-- Any manual changes will be overwritten by the next automatic export!
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+		ExportDate = "2020-08-26 21:48:52",
+		["AllowedBiomes"] = "Desert, DesertM, DesertHills",
+		["GridSizeX"] = "1000",
+		["GridSizeZ"] = "1000",
+		["IntendedUse"] = "SinglePieceStructures",
+		["MaxOffsetX"] = "100",
+		["MaxOffsetZ"] = "100",
+		["SeedOffset"] = "47260503",
+	},
+
+	Pieces =
+	{
+		{
+			OriginData =
+			{
+				ExportName   = "DesertTemple",
+				Name         = "DesertTemple",
+				GalleryName  = "Desert",
+				GalleryIndex = "222",
+				ID           = "1706",
+				CreatorName  = "12xx12",
+			},
+			Size =
+			{
+				x = 15,
+				y = 23,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 22,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "400",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Fixed|53",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 46: 0",  -- tnt
+				"b: 24: 0",  -- sandstone
+				"c: 24: 2",  -- sandstone
+				"d: 24: 1",  -- sandstone
+				"e: 54: 3",  -- chest
+				"f: 54: 5",  -- chest
+				"g: 70: 0",  -- stonepressureplate
+				"h: 54: 4",  -- chest
+				"i: 54: 2",  -- chest
+				"j:128: 7",  -- sandstonestairs
+				"k:128: 5",  -- sandstonestairs
+				"l:128: 4",  -- sandstonestairs
+				"m: 19: 0",  -- sponge
+				"n:128: 6",  -- sandstonestairs
+				"o:159: 1",  -- whiteterracotta
+				"p:159:11",  -- whiteterracotta
+				"q:128: 3",  -- sandstonestairs
+				"r:128: 2",  -- sandstonestairs
+				"s:128: 0",  -- sandstonestairs
+				"t:128: 1",  -- sandstonestairs
+				"u: 44: 9",  -- stone_slab
+				"v: 44: 1",  -- stone_slab
+			},
+			BlockData =
+			{
+				-- Level 0
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmmmmmmmmmm",  --  5
+				"mmmmmmaaammmmmm",  --  6
+				"mmmmmmaaammmmmm",  --  7
+				"mmmmmmaaammmmmm",  --  8
+				"mmmmmmmmmmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 1
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmmbmmmmmmm",  --  5
+				"mmmmmmcccmmmmmm",  --  6
+				"mmmmmbcbcbmmmmm",  --  7
+				"mmmmmmcccmmmmmm",  --  8
+				"mmmmmmmbmmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 2
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmbmmmmmmm",  --  4
+				"mmmmmmdedmmmmmm",  --  5
+				"mmmmmd...dmmmmm",  --  6
+				"mmmmbf.g.hbmmmm",  --  7
+				"mmmmmd...dmmmmm",  --  8
+				"mmmmmmdidmmmmmm",  --  9
+				"mmmmmmmbmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 3
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmcjcmmmmmm",  --  5
+				"mmmmmc...cmmmmm",  --  6
+				"mmmmmk...lmmmmm",  --  7
+				"mmmmmc...cmmmmm",  --  8
+				"mmmmmmcncmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 4
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmdcdmmmmmm",  --  5
+				"mmmmmd...dmmmmm",  --  6
+				"mmmmmc...cmmmmm",  --  7
+				"mmmmmd...dmmmmm",  --  8
+				"mmmmmmdcdmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 5
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmcccmmmmmm",  --  5
+				"mmmmmc...cmmmmm",  --  6
+				"mmmmmc...cmmmmm",  --  7
+				"mmmmmc...cmmmmm",  --  8
+				"mmmmmmcccmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 6
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmcdcmmmmmm",  --  5
+				"mmmmmc...cmmmmm",  --  6
+				"mmmmmd...dmmmmm",  --  7
+				"mmmmmc...cmmmmm",  --  8
+				"mmmmmmcdcmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 7
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmdcdmmmmmm",  --  5
+				"mmmmmd...dmmmmm",  --  6
+				"mmmmmc...cmmmmm",  --  7
+				"mmmmmd...dmmmmm",  --  8
+				"mmmmmmdcdmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 8
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmbbbmmmmmm",  --  5
+				"mmmmmb...bmmmmm",  --  6
+				"mmmmmb...bmmmmm",  --  7
+				"mmmmmb...bmmmmm",  --  8
+				"mmmmmmbbbmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 9
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmbbbmmmmmm",  --  5
+				"mmmmmb...bmmmmm",  --  6
+				"mmmmmb...bmmmmm",  --  7
+				"mmmmmb...bmmmmm",  --  8
+				"mmmmmmbbbmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 10
+				"mmmmmmmmmmmmmmm",  --  0
+				"mmmmmmmmmmmmmmm",  --  1
+				"mmmmmmmmmmmmmmm",  --  2
+				"mmmmmmmmmmmmmmm",  --  3
+				"mmmmmmmmmmmmmmm",  --  4
+				"mmmmmmbbbmmmmmm",  --  5
+				"mmmmmb...bmmmmm",  --  6
+				"mmmmmb...bmmmmm",  --  7
+				"mmmmmb...bmmmmm",  --  8
+				"mmmmmmbbbmmmmmm",  --  9
+				"mmmmmmmmmmmmmmm",  -- 10
+				"mmmmmmmmmmmmmmm",  -- 11
+				"mmmmmmmmmmmmmmm",  -- 12
+				"mmmmmmmmmmmmmmm",  -- 13
+				"mmmmmmmmmmmmmmm",  -- 14
+
+				-- Level 11
+				"bbbbbbbbbbbbbbb",  --  0
+				"bbbbbbbbbbbbbbb",  --  1
+				"bbbbbbbbbbbbbbb",  --  2
+				"bbbbbbbbbbbbbbb",  --  3
+				"bbbbobobbbobbbb",  --  4
+				"bbbbbobbbobbbbb",  --  5
+				"bbbbbbobobbbbbb",  --  6
+				"bbbbbbbpbbbbbbb",  --  7
+				"bbbbbbobobbbbbb",  --  8
+				"bbbbbobbbobbbbb",  --  9
+				"bbbbobobbbobbbb",  -- 10
+				"bbbbbbbbbbbbbbb",  -- 11
+				"bbbbbbbbbbbbbbb",  -- 12
+				"bbbbbbbbbbbbbbb",  -- 13
+				"bbbbbbbbbbbbbbb",  -- 14
+
+				-- Level 12
+				"bbbbbbbbbbbbbbb",  --  0
+				"b.........bbbbb",  --  1
+				"b.........bq.bb",  --  2
+				"b.........b..bb",  --  3
+				"b....r.....b.bb",  --  4
+				"b...sbt.......b",  --  5
+				"b....q........b",  --  6
+				"b..............",  --  7
+				"b....r........b",  --  8
+				"b...sbt.......b",  --  9
+				"b....q.....b.bb",  -- 10
+				"b.........b..bb",  -- 11
+				"b.........br.bb",  -- 12
+				"b.........bbbbb",  -- 13
+				"bbbbbbbbbbbbbbb",  -- 14
+
+				-- Level 13
+				"bbbbbbbbbbbbbbb",  --  0
+				"b.........b.sbb",  --  1
+				"b.........b..bo",  --  2
+				"b.........b..bb",  --  3
+				"b..........b.bb",  --  4
+				"b....b........b",  --  5
+				"b.............b",  --  6
+				"b..............",  --  7
+				"b.............b",  --  8
+				"b....b........b",  --  9
+				"b..........b.bb",  -- 10
+				"b.........b..bb",  -- 11
+				"b.........b..bo",  -- 12
+				"b.........b.sbb",  -- 13
+				"bbbbbbbbbbbbbbb",  -- 14
+
+				-- Level 14
+				"..........bbbbb",  --  0
+				".bbbbbbbbbb...b",  --  1
+				".bu......ub..ro",  --  2
+				".b........b.ubb",  --  3
+				".b.........bbbb",  --  4
+				".b...b......ubv",  --  5
+				".b..........ubb",  --  6
+				".b...........ub",  --  7
+				".b..........ubb",  --  8
+				".b...b......ubv",  --  9
+				".b.........bbbb",  -- 10
+				".b........b.ubb",  -- 11
+				".bu......ub..qo",  -- 12
+				".bbbbbbbbbb...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 15
+				"..........bbbbb",  --  0
+				"..........b...b",  --  1
+				"..bbbbbbbbbb..o",  --  2
+				"..bbbbbbbbbbt.b",  --  3
+				"..bbbbbbbbbbbbb",  --  4
+				"..bbbbbbbbbbb..",  --  5
+				"..bbbb...bbbbv.",  --  6
+				"..bbbb...bbbbbv",  --  7
+				"..bbbb...bbbbv.",  --  8
+				"..bbbbbbbbbbb..",  --  9
+				"..bbbbbbbbbbbbb",  -- 10
+				"..bbbbbbbbbbt.b",  -- 11
+				"..bbbbbbbbbb..o",  -- 12
+				"..........b...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 16
+				"..........bbbbb",  --  0
+				"..........b...b",  --  1
+				"..............o",  --  2
+				"...bbbb.bbb...b",  --  3
+				"...bu.....ubbbb",  --  4
+				"...b.b.....b...",  --  5
+				"...b.......b...",  --  6
+				"...b.......bv..",  --  7
+				"...b.......b...",  --  8
+				"...b.b.....b...",  --  9
+				"...bu.....ubbbb",  -- 10
+				"...bbbb.bbb...b",  -- 11
+				"..............o",  -- 12
+				"..........b...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 17
+				"..........bbbbb",  --  0
+				"..........b...b",  --  1
+				"..............o",  --  2
+				"......b.b.b...b",  --  3
+				"....bbb.bbbbbbb",  --  4
+				"....bb....b....",  --  5
+				"....b.....b....",  --  6
+				"....b.....b....",  --  7
+				"....b.....b....",  --  8
+				"....bb....b....",  --  9
+				"....bbb.bbbbbbb",  -- 10
+				"......b.b.b...b",  -- 11
+				"..............o",  -- 12
+				"..........b...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 18
+				"..........bbbbb",  --  0
+				"..........b...o",  --  1
+				"..........b...o",  --  2
+				".......v..b...o",  --  3
+				"......vbv.bbbbb",  --  4
+				".....bbbbb.....",  --  5
+				".....bu.ub.....",  --  6
+				".....b...b.....",  --  7
+				".....bu.ub.....",  --  8
+				".....bbbbb.....",  --  9
+				"......vbv.bbbbb",  -- 10
+				".......v..b...o",  -- 11
+				"..........b...o",  -- 12
+				"..........b...o",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 19
+				"..........bbbbb",  --  0
+				"..........b...b",  --  1
+				"..........b...o",  --  2
+				"..........b...b",  --  3
+				"..........bbbbb",  --  4
+				"...............",  --  5
+				"......bbb......",  --  6
+				"......bbb......",  --  7
+				"......bbb......",  --  8
+				"...............",  --  9
+				"..........bbbbb",  -- 10
+				"..........b...b",  -- 11
+				"..........b...o",  -- 12
+				"..........b...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 20
+				"..........bbbbb",  --  0
+				"..........b...b",  --  1
+				"..........b...b",  --  2
+				"..........b...b",  --  3
+				"..........bbbbb",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				".......b.......",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"..........bbbbb",  -- 10
+				"..........b...b",  -- 11
+				"..........b...b",  -- 12
+				"..........b...b",  -- 13
+				"..........bbbbb",  -- 14
+
+				-- Level 21
+				"..........vrvrv",  --  0
+				"..........sbbbt",  --  1
+				"..........vbbbv",  --  2
+				"..........sbbbt",  --  3
+				"..........vqvqv",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"..........vrvrv",  -- 10
+				"..........sbbbt",  -- 11
+				"..........vbbbv",  -- 12
+				"..........sbbbt",  -- 13
+				"..........vqvqv",  -- 14
+
+				-- Level 22
+				"...............",  --  0
+				"...............",  --  1
+				"............v..",  --  2
+				"...............",  --  3
+				"...............",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"...............",  -- 10
+				"...............",  -- 11
+				"............v..",  -- 12
+				"...............",  -- 13
+				"...............",  -- 14
+
+			},
+		},  -- DesertTemple
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "SandyDesertTemple",
+				Name         = "SandyDesertTemple",
+				GalleryName  = "Desert",
+				GalleryIndex = "223",
+				ID           = "1707",
+				CreatorName  = "12xx12",
+			},
+			Size =
+			{
+				x = 15,
+				y = 23,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 22,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Fixed|53",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a:  1: 0",  -- stone
+				"b: 46: 0",  -- tnt
+				"c: 24: 0",  -- sandstone
+				"d: 24: 2",  -- sandstone
+				"e: 54: 3",  -- chest
+				"f: 54: 5",  -- chest
+				"g: 70: 0",  -- stonepressureplate
+				"h: 54: 4",  -- chest
+				"i: 54: 2",  -- chest
+				"j:128: 7",  -- sandstonestairs
+				"k:128: 5",  -- sandstonestairs
+				"l:128: 4",  -- sandstonestairs
+				"m: 19: 0",  -- sponge
+				"n:128: 6",  -- sandstonestairs
+				"o: 24: 1",  -- sandstone
+				"p: 12: 0",  -- sand
+				"q:159: 1",  -- whiteterracotta
+				"r:159:11",  -- whiteterracotta
+				"s:128: 3",  -- sandstonestairs
+				"t:128: 2",  -- sandstonestairs
+				"u:128: 0",  -- sandstonestairs
+				"v:128: 1",  -- sandstonestairs
+				"w: 44: 9",  -- stone_slab
+				"x: 44: 1",  -- stone_slab
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaaaaaaaaaaa",  --  5
+				"aaaaaabbbaaaaaa",  --  6
+				"aaaaaabbbaaaaaa",  --  7
+				"aaaaaabbbaaaaaa",  --  8
+				"aaaaaaaaaaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 1
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaaacaaaaaaa",  --  5
+				"aaaaaadddaaaaaa",  --  6
+				"aaaaacdcdcaaaaa",  --  7
+				"aaaaaadddaaaaaa",  --  8
+				"aaaaaaacaaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 2
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaacaaaaaaa",  --  4
+				"aaaaaacecaaaaaa",  --  5
+				"aaaaac...caaaaa",  --  6
+				"aaaacf.g.hcaaaa",  --  7
+				"aaaaac...caaaaa",  --  8
+				"aaaaaacicaaaaaa",  --  9
+				"aaaaaaacaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 3
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaacjcaaaaaa",  --  5
+				"aaaaac...caaaaa",  --  6
+				"aaaaak...laaaaa",  --  7
+				"aaaaac...caaaaa",  --  8
+				"aaaaaacncaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 4
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaaocoaaaaaa",  --  5
+				"aaaaao...oaaaaa",  --  6
+				"aaaaac...caaaaa",  --  7
+				"aaaaao...oaaaaa",  --  8
+				"aaaaaaocoaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 5
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaadddaaaaaa",  --  5
+				"aaaaad...daaaaa",  --  6
+				"aaaaad...daaaaa",  --  7
+				"aaaaad...daaaaa",  --  8
+				"aaaaaadddaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 6
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaadodaaaaaa",  --  5
+				"aaaaad...daaaaa",  --  6
+				"aaaaao...oaaaaa",  --  7
+				"aaaaad...daaaaa",  --  8
+				"aaaaaadodaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 7
+				"aaaaaaaaaaaaaaa",  --  0
+				"aaaaaaaaaaaaaaa",  --  1
+				"aaaaaaaaaaaaaaa",  --  2
+				"aaaaaaaaaaaaaaa",  --  3
+				"aaaaaaaaaaaaaaa",  --  4
+				"aaaaaaodoaaaaaa",  --  5
+				"aaaaao...oaaaaa",  --  6
+				"aaaaad...daaaaa",  --  7
+				"aaaaao...oaaaaa",  --  8
+				"aaaaaaodoaaaaaa",  --  9
+				"aaaaaaaaaaaaaaa",  -- 10
+				"aaaaaaaaaaaaaaa",  -- 11
+				"aaaaaaaaaaaaaaa",  -- 12
+				"aaaaaaaaaaaaaaa",  -- 13
+				"aaaaaaaaaaaaaaa",  -- 14
+
+				-- Level 8
+				"ppppppppppppppp",  --  0
+				"ppppppppppppppp",  --  1
+				"ppppppppppppppp",  --  2
+				"ppppppppppppppp",  --  3
+				"ppppppppppppppp",  --  4
+				"ppppppcccpppppp",  --  5
+				"pppppc...cppppp",  --  6
+				"pppppc...cppppp",  --  7
+				"pppppc...cppppp",  --  8
+				"ppppppcccpppppp",  --  9
+				"ppppppppppppppp",  -- 10
+				"ppppppppppppppp",  -- 11
+				"ppppppppppppppp",  -- 12
+				"ppppppppppppppp",  -- 13
+				"ppppppppppppppp",  -- 14
+
+				-- Level 9
+				"ppppppppppppppp",  --  0
+				"ppppppppppppppp",  --  1
+				"ppppppppppppppp",  --  2
+				"ppppppppppppppp",  --  3
+				"ppppppppppppppp",  --  4
+				"ppppppcccpppppp",  --  5
+				"pppppc...cppppp",  --  6
+				"pppppc...cppppp",  --  7
+				"pppppc...cppppp",  --  8
+				"ppppppcccpppppp",  --  9
+				"ppppppppppppppp",  -- 10
+				"ppppppppppppppp",  -- 11
+				"ppppppppppppppp",  -- 12
+				"ppppppppppppppp",  -- 13
+				"ppppppppppppppp",  -- 14
+
+				-- Level 10
+				"ppppppppppppppp",  --  0
+				"ppppppppppppppp",  --  1
+				"ppppppppppppppp",  --  2
+				"ppppppppppppppp",  --  3
+				"ppppppppppppppp",  --  4
+				"ppppppcccpppppp",  --  5
+				"pppppc...cppppp",  --  6
+				"pppppc...cppppp",  --  7
+				"pppppc...cppppp",  --  8
+				"ppppppcccpppppp",  --  9
+				"ppppppppppppppp",  -- 10
+				"ppppppppppppppp",  -- 11
+				"ppppppppppppppp",  -- 12
+				"ppppppppppppppp",  -- 13
+				"ppppppppppppppp",  -- 14
+
+				-- Level 11
+				"ccccccccccccccc",  --  0
+				"ccccccccccccccc",  --  1
+				"ccccccccccccccc",  --  2
+				"ccccccccccccccc",  --  3
+				"ccccqcqcccqcccc",  --  4
+				"cccccqcccqccccc",  --  5
+				"ccccccqcqcccccc",  --  6
+				"cccccccrccccccc",  --  7
+				"ccccccqcqcccccc",  --  8
+				"cccccqcccqccccc",  --  9
+				"ccccqcqcccqcccc",  -- 10
+				"ccccccccccccccc",  -- 11
+				"ccccccccccccccc",  -- 12
+				"ccccccccccccccc",  -- 13
+				"ccccccccccccccc",  -- 14
+
+				-- Level 12
+				"ccccccccccccccc",  --  0
+				"c.........ccccc",  --  1
+				"c.........cspcc",  --  2
+				"c......pp.c..cc",  --  3
+				"c....t...p.c.cc",  --  4
+				"c...ucvpp.....c",  --  5
+				"c...pspppp..ppc",  --  6
+				"c....pppppp.ppp",  --  7
+				"c....tpppp..ppc",  --  8
+				"c...ucv.p.p...c",  --  9
+				"c....s.p...c.cc",  -- 10
+				"c.........c..cc",  -- 11
+				"c.........ctpcc",  -- 12
+				"c.........ccccc",  -- 13
+				"ccccccccccccccc",  -- 14
+
+				-- Level 13
+				"ccccccccccccccc",  --  0
+				"c.........cpucc",  --  1
+				"c.........c.pcq",  --  2
+				"c.........c..cc",  --  3
+				"c..........c.cc",  --  4
+				"c....c........c",  --  5
+				"c......pp....pc",  --  6
+				"c.....pppp...pp",  --  7
+				"c......pp.....c",  --  8
+				"c....c........c",  --  9
+				"c..........c.cc",  -- 10
+				"c.........c..cc",  -- 11
+				"c.........c.pcq",  -- 12
+				"c.........cpucc",  -- 13
+				"ccccccccccccccc",  -- 14
+
+				-- Level 14
+				"..........ccccc",  --  0
+				".ccccccccccpppc",  --  1
+				".cw......wc.ptq",  --  2
+				".c........c.wcc",  --  3
+				".c.........cccc",  --  4
+				".c...c......wcx",  --  5
+				".c......p...wcc",  --  6
+				".c....p......wc",  --  7
+				".c.....p....wcc",  --  8
+				".c...c......wcx",  --  9
+				".c.........cccc",  -- 10
+				".c........c.wcc",  -- 11
+				".cw......wc.psq",  -- 12
+				".ccccccccccpppc",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 15
+				"..........ccccc",  --  0
+				"..........cp..c",  --  1
+				"..ccccccccccp.q",  --  2
+				"..ccccccccccvpc",  --  3
+				"..ccccccccccccc",  --  4
+				"..ccccccccccc..",  --  5
+				"..cccc..pccccx.",  --  6
+				"..ccccp..cccccx",  --  7
+				"..cccc.p.ccccx.",  --  8
+				"..ccccccccccc..",  --  9
+				"..ccccccccccccc",  -- 10
+				"..ccccccccccvpc",  -- 11
+				"..ccccccccccppq",  -- 12
+				"..........cpp.c",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 16
+				"..........ccccc",  --  0
+				"..........c...c",  --  1
+				".......p..pp..q",  --  2
+				"...ccccpcccpp.c",  --  3
+				"...cwpppppwcccc",  --  4
+				"...c.cpppp.c...",  --  5
+				"...c.p...ppc...",  --  6
+				"...cpp...ppcx..",  --  7
+				"...cpp...ppc...",  --  8
+				"...c.cpppppc...",  --  9
+				"...cw.ppppwcccc",  -- 10
+				"...ccccpcccpp.c",  -- 11
+				".........pppp.q",  -- 12
+				"..........c...c",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 17
+				"..........ccccc",  --  0
+				"..........c...c",  --  1
+				"..........pp..q",  --  2
+				"......cpcpc...c",  --  3
+				"....cccpccccccc",  --  4
+				"....cc.p..c....",  --  5
+				"....c.....c....",  --  6
+				"....cp....c....",  --  7
+				"....c.....c....",  --  8
+				"....cc..p.c....",  --  9
+				"....cccpccccccc",  -- 10
+				"......cpc.c.p.c",  -- 11
+				"..........pp..q",  -- 12
+				"..........c...c",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 18
+				"..........ccccc",  --  0
+				"..........c...q",  --  1
+				"..........c...q",  --  2
+				".......x..c...q",  --  3
+				"......xcx.ccccc",  --  4
+				".....ccccc.....",  --  5
+				".....cw.wc.....",  --  6
+				".....c...c.....",  --  7
+				".....cw.wc.....",  --  8
+				".....ccccc.....",  --  9
+				"......xcx.ccccc",  -- 10
+				".......x..c...q",  -- 11
+				"..........c...q",  -- 12
+				"..........c...q",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 19
+				"..........ccccc",  --  0
+				"..........c...c",  --  1
+				"..........c...q",  --  2
+				"..........c...c",  --  3
+				"..........ccccc",  --  4
+				"...............",  --  5
+				"......ccc......",  --  6
+				"......c.c......",  --  7
+				"......ccc......",  --  8
+				"...............",  --  9
+				"..........ccccc",  -- 10
+				"..........c...c",  -- 11
+				"..........c...q",  -- 12
+				"..........c...c",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 20
+				"..........ccccc",  --  0
+				"..........c...c",  --  1
+				"..........c...c",  --  2
+				"..........c...c",  --  3
+				"..........ccccc",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"..........ccccc",  -- 10
+				"..........c...c",  -- 11
+				"..........c...c",  -- 12
+				"..........c...c",  -- 13
+				"..........ccccc",  -- 14
+
+				-- Level 21
+				"..........xtxtx",  --  0
+				"..........ucccv",  --  1
+				"..........xcccx",  --  2
+				"..........ucccv",  --  3
+				"..........xsxsx",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"..........xtxtx",  -- 10
+				"..........ucccv",  -- 11
+				"..........xcccx",  -- 12
+				"..........ucccv",  -- 13
+				"..........xsxsx",  -- 14
+
+				-- Level 22
+				"...............",  --  0
+				"...............",  --  1
+				"............x..",  --  2
+				"...............",  --  3
+				"...............",  --  4
+				"...............",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"...............",  --  9
+				"...............",  -- 10
+				"...............",  -- 11
+				"............x..",  -- 12
+				"...............",  -- 13
+				"...............",  -- 14
+
+			},
+		},  -- SandyDesertTemple
+	},  -- Pieces
+}
+
+
+
+
