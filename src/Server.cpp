@@ -455,7 +455,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
 
-	// "help" and "reload" are to be handled by MCS, so that they work no matter what
+	// "help" and "reload" are to be handled by Cuberite, so that they work no matter what
 	if (split[0] == "help")
 	{
 		PrintHelp(split, a_Output);
@@ -472,6 +472,13 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		cPluginManager::Get()->ReloadPlugins();
 		a_Output.Out("Plugins reloaded");
+		a_Output.Finished();
+		return;
+	}
+	else if (split[0] == "reloadweb")
+	{
+		cRoot::Get()->GetWebAdmin()->Reload();
+		a_Output.Out("WebAdmin configuration reloaded");
 		a_Output.Finished();
 		return;
 	}
@@ -617,6 +624,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 	cPluginManager * PlgMgr = cPluginManager::Get();
 	PlgMgr->BindConsoleCommand("help",            nullptr, handler, "Shows the available commands");
 	PlgMgr->BindConsoleCommand("reload",          nullptr, handler, "Reloads all plugins");
+	PlgMgr->BindConsoleCommand("reloadweb",       nullptr, handler, "Reloads the webadmin configuration");
 	PlgMgr->BindConsoleCommand("restart",         nullptr, handler, "Restarts the server cleanly");
 	PlgMgr->BindConsoleCommand("stop",            nullptr, handler, "Stops the server cleanly");
 	PlgMgr->BindConsoleCommand("chunkstats",      nullptr, handler, "Displays detailed chunk memory statistics");
