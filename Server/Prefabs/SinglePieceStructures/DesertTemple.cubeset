@@ -72,7 +72,6 @@ Cubeset =
 				["ExpandFloorStrategy"] = "RepeatBottomTillNonAir",
 				["IsStarting"] = "1",
 				["MergeStrategy"] = "msSpongePrint",
-				["MoveToGround"] = "1",
 				["ShouldExpandFloor"] = "1",
 				["VerticalStrategy"] = "Fixed|51",
 			},
