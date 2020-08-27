@@ -14,7 +14,7 @@ Cubeset =
 	Metadata =
 	{
 		CubesetFormatVersion = 1,
-		ExportDate = "2020-08-27 09:03:41",
+		ExportDate = "2020-08-27 10:42:17",
 		["AllowedBiomes"] = "Swampland, SwamplandM",
 		["GridSizeX"] = "750",
 		["GridSizeZ"] = "750",
@@ -29,8 +29,8 @@ Cubeset =
 		{
 			OriginData =
 			{
-				ExportName   = "WhitchHut",
-				Name         = "WhitchHut",
+				ExportName   = "WitchHut",
+				Name         = "WitchHut",
 				GalleryName  = "Cube",
 				GalleryIndex = "161",
 				ID           = "1704",
@@ -74,7 +74,6 @@ Cubeset =
 				["MergeStrategy"] = "msSpongePrint",
 				["MoveToGround"] = "0",
 				["VerticalStrategy"] = "TerrainOrOceanTop",
-				["ExpandBottom"] = "1",
 			},
 			BlockDefinitions =
 			{
@@ -139,7 +138,7 @@ Cubeset =
 				"hjjjjjjj.",  --  6
 
 			},
-		},  -- WhitchHut
+		},  -- WitchHut
 	},  -- Pieces
 }
 
