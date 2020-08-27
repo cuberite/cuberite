@@ -16,7 +16,7 @@ Classes to support the generation of single piece prefab structures
 /** The Single Prefab Structure Generator:
 This uses the cGridStructGen to generate the structures on the map
 This is similar to the Piece Structure Generator but only placing one possible structure
-The Exported cubeset MUST have all possible structures as start structures or NONE at all
+The Exported cubeset MUST have all possible structures as start structures or the server crashes on generation
 else it isn't accessible from the m_Piecepool. */
 class cSinglePieceStructuresGen :
 	public cFinishGen

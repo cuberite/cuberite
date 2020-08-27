@@ -69,8 +69,6 @@ public:
 			return cStructurePtr();
 		}
 
-		// Todo: remove this when development is over
-		LOG("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_OriginX, a_OriginZ);
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
 		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);
@@ -168,7 +166,6 @@ bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaL
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
 	for (const auto & S: Structures)
 	{
-		LOG(S);
 		auto FileName = Printf("Prefabs%cSinglePieceStructures%c%s.cubeset", cFile::PathSeparator(), cFile::PathSeparator(), S.c_str());
 		if (!cFile::IsFile(FileName))
 		{
