@@ -724,12 +724,8 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == nullptr)
 	{
-		Neighbor = m_ChunkMap->GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-		if (Neighbor == nullptr)  // This will assert inside GetChunk in debug builds
-		{
-			LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
-			return;
-		}
+		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
+		return;
 	}
 
 	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
@@ -2151,7 +2147,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 		int ChunkX, ChunkZ;
 		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
-		return m_ChunkMap->GetChunkNoLoad(ChunkX, ChunkZ);
+		return m_ChunkMap->FindChunk(ChunkX, ChunkZ);
 	}
 
 	// Walk the neighbors:

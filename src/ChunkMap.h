@@ -401,7 +401,7 @@ public:
 
 private:
 
-	// Chunks query their neighbors using GetChunk(), while being ticked
+	// Chunks query their neighbors using FindChunk(), while being ticked
 	friend class cChunk;
 
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
