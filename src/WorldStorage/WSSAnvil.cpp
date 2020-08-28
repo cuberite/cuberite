@@ -25,6 +25,7 @@
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -645,6 +646,7 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 		case E_BLOCK_COMMAND_BLOCK: return LoadCommandBlockFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_DISPENSER:     return LoadDispenserFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_DROPPER:       return LoadDropperFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_ENDER_CHEST:   return LoadEnderChestFromNBT  (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_FLOWER_POT:    return LoadFlowerPotFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_FURNACE:       return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_HEAD:          return LoadMobHeadFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
@@ -656,9 +658,6 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-
-		// Blocktypes that have block entities but don't load their contents from disk:
-		case E_BLOCK_ENDER_CHEST:   return nullptr;
 
 		default:
 		{
@@ -1119,6 +1118,21 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	auto Dropper = std::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
 	return Dropper;
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadEnderChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "EnderChest", "minecraft:ender_chest" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+	return std::make_unique<cEnderChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 }
 
 

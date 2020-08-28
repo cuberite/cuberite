@@ -581,7 +581,7 @@ private:
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	std::vector<OwnedEntity> m_Entities;
-	cBlockEntities               m_BlockEntities;
+	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	unsigned m_StayCount;
@@ -623,12 +623,6 @@ private:
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
 
-	/** Add a block entity to the chunk without marking the chunk dirty */
-	void AddBlockEntityClean(OwnedBlockEntity a_BlockEntity);
-
-	/** Creates a block entity for each block that needs a block entity and doesn't have one already */
-	void CreateBlockEntities(void);
-
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
 
@@ -659,11 +653,3 @@ private:
 	/** Check m_Entities for cPlayer objects. */
 	bool HasPlayerEntities() const;
 };
-
-typedef cChunk * cChunkPtr;
-
-typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-

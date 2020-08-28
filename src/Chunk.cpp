@@ -322,9 +322,6 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 		KeyPair.second->SetWorld(m_World);
 	}
 
-	// Create block entities that the loader didn't load; fill them with defaults
-	CreateBlockEntities();
-
 	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
 	SetPresence(cpPresent);
 
@@ -455,7 +452,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			}
 			auto clone = be->Clone({posX, posY, posZ});
 			clone->SetWorld(m_World);
-			AddBlockEntityClean(std::move(clone));
+			AddBlockEntity(std::move(clone));
 			m_World->BroadcastBlockEntity({posX, posY, posZ});
 		}
 	}
@@ -1152,40 +1149,6 @@ int cChunk::GetHeight(int a_X, int a_Z)
 
 
 
-void cChunk::CreateBlockEntities(void)
-{
-	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
-	{
-		const auto * Section = m_ChunkData.GetSection(SectionIdx);
-		if (Section == nullptr)
-		{
-			continue;
-		}
-
-		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
-		{
-			auto BlockType = Section->m_BlockTypes[BlockIdx];
-			if (cBlockEntity::IsBlockEntityBlockType(BlockType))
-			{
-				auto RelPos = IndexToCoordinate(BlockIdx);
-				RelPos.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
-				const auto AbsPos = RelativeToAbsolute(RelPos);
-
-				if (!HasBlockEntityAt(AbsPos))
-				{
-					AddBlockEntityClean(cBlockEntity::CreateByBlockType(
-						BlockType, GetMeta(RelPos), AbsPos, m_World
-					));
-				}
-			}
-		}
-	}
-}
-
-
-
-
-
 void cChunk::WakeUpSimulators(void)
 {
 	auto * WaterSimulator = m_World->GetWaterSimulator();
@@ -1261,7 +1224,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	// If the new block is a block entity, create the entity object:
 	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 	{
-		AddBlockEntityClean(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
+		AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
 	}
 }
 
@@ -1374,19 +1337,10 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 {
-	MarkDirty();
-	AddBlockEntityClean(std::move(a_BlockEntity));
-}
-
-
-
-
-
-void cChunk::AddBlockEntityClean(OwnedBlockEntity a_BlockEntity)
-{
-	int Idx = MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ());
-	auto Result = m_BlockEntities.emplace(Idx, std::move(a_BlockEntity));
-	UNUSED(Result);
+	[[maybe_unused]] const auto Result = m_BlockEntities.emplace(
+		MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()),
+		std::move(a_BlockEntity)
+	);
 	ASSERT(Result.second);  // No block entity already at this position
 }
 
