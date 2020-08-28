@@ -2870,15 +2870,6 @@ void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 
 
 
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
-{
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
 void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter)
 {
 	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, std::move(a_CallAfter));
@@ -2980,7 +2971,6 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
-
 	m_Generator.QueueGenerateChunk({a_ChunkX, a_ChunkZ}, true);
 }
 

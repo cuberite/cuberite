@@ -1603,16 +1603,6 @@ bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString &
 
 
 
-void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSChunks);
-	GetChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
 void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_Callback)
 {
 	cCSLock Lock(m_CSChunks);
@@ -1636,76 +1626,10 @@ void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkC
 
 
 
-bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+void cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
-	if (Chunk == nullptr)
-	{
-		// Generic error while getting the chunk - out of memory?
-		return false;
-	}
-
-	// Try loading the chunk:
-	if ((Chunk == nullptr) || (!Chunk->IsValid()))
-	{
-		Chunk->SetPresence(cChunk::cpQueued);
-		class cPrepareLoadCallback: public cChunkCoordCallback
-		{
-		public:
-			cPrepareLoadCallback(cWorld & a_CBWorld, cChunkMap & a_CBChunkMap, cChunkCoordCallback * a_CBCallback):
-				m_World(a_CBWorld),
-				m_ChunkMap(a_CBChunkMap),
-				m_Callback(a_CBCallback)
-			{
-			}
-
-			// cChunkCoordCallback override:
-			virtual void Call(cChunkCoords a_Coords, bool a_CBIsSuccess) override
-			{
-				// If success is reported, the chunk is already valid, no need to do anything else:
-				if (a_CBIsSuccess)
-				{
-					if (m_Callback != nullptr)
-					{
-						m_Callback->Call(a_Coords, true);
-					}
-					return;
-				}
-
-				// The chunk failed to load, generate it:
-				cCSLock CBLock(m_ChunkMap.m_CSChunks);
-				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
-
-				if (CBChunk == nullptr)
-				{
-					// An error occurred, but we promised to call the callback, so call it even when there's no real chunk data:
-					if (m_Callback != nullptr)
-					{
-						m_Callback->Call(a_Coords, false);
-					}
-					return;
-				}
-
-				CBChunk->SetPresence(cChunk::cpQueued);
-				m_World.GetGenerator().QueueGenerateChunk(a_Coords, false, m_Callback);
-			}
-
-		protected:
-			cWorld & m_World;
-			cChunkMap & m_ChunkMap;
-			cChunkCoordCallback * m_Callback;
-		};
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, new cPrepareLoadCallback(*m_World, *this, a_Callback));
-		return true;
-	}
-
-	// The chunk is valid, just call the callback:
-	if (a_Callback != nullptr)
-	{
-		a_Callback->Call({a_ChunkX, a_ChunkZ}, true);
-	}
-	return true;
+	GetChunk(a_ChunkX, a_ChunkZ);  // Touches the chunk, loading or generating it
 }
 
 

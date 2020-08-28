@@ -59,7 +59,6 @@ cChunk::cChunk(
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ):
 	m_Presence(cpInvalid),
-	m_ShouldGenerateIfLoadFailed(false),
 	m_IsLightValid(false),
 	m_IsDirty(false),
 	m_IsSaving(false),
@@ -163,15 +162,6 @@ void cChunk::SetPresence(cChunk::ePresence a_Presence)
 
 
 
-void cChunk::SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed)
-{
-	m_ShouldGenerateIfLoadFailed = a_ShouldGenerateIfLoadFailed;
-}
-
-
-
-
-
 void cChunk::MarkRegenerating(void)
 {
 	// Set as queued again:
@@ -267,15 +257,8 @@ void cChunk::MarkLoadFailed(void)
 {
 	ASSERT(m_Presence == cpQueued);
 
-	// If the chunk is marked as needed, generate it:
-	if (m_ShouldGenerateIfLoadFailed)
-	{
-		m_World->GetGenerator().QueueGenerateChunk({m_PosX, m_PosZ}, false);
-	}
-	else
-	{
-		m_Presence = cpInvalid;
-	}
+	// The chunk is always needed, generate it:
+	m_World->GetGenerator().QueueGenerateChunk({m_PosX, m_PosZ}, false);
 }
 
 

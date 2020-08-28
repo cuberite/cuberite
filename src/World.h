@@ -353,9 +353,6 @@ public:
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
 
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
@@ -377,10 +374,10 @@ public:
 	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
-	/** Regenerate the given chunk: */
+	/** Regenerate the given chunk. */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
-	/** Generates the given chunk */
+	/** Generates the given chunk. */
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */

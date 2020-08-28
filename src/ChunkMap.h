@@ -317,9 +317,6 @@ public:
 	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
@@ -327,12 +324,8 @@ public:
 	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});  // Lua-accessible
 
 	/** Queues the chunk for generating.
-	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating.
-	The specified callback is called after the chunk has been loaded / generated.
-	It is legal to call without the callback.
-	Returns true if successful, false if not (possibly an out-of-memory error).
-	If the return value is true, the callback was / will be called. */
-	bool GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);  // Lua-accessible
+	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating. */
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // Lua-accessible
 
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);

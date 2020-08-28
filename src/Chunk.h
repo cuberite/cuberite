@@ -79,9 +79,6 @@ public:
 	Wakes up any calls to cChunkMap::GetHeight() when setting to cpPresent. */
 	void SetPresence(ePresence a_Presence);
 
-	/** Called to indicate whether the chunk should be queued in the generator if it fails to load. Set by cChunkMap::GetChunk(). */
-	void SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed);
-
 	/** Marks all clients attached to this chunk as wanting this chunk. Also sets presence to cpQueued. */
 	void MarkRegenerating(void);
 
@@ -106,8 +103,7 @@ public:
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 
-	/** Marks the chunk as failed to load.
-	If m_ShouldGenerateIfLoadFailed is set, queues the chunk for generating. */
+	/** Queues the chunk for generating. */
 	void MarkLoadFailed(void);
 
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
@@ -576,8 +572,6 @@ private:
 	/** Holds the presence status of the chunk - if it is present, or in the loader / generator queue, or unloaded */
 	ePresence m_Presence;
 
-	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
-	bool m_ShouldGenerateIfLoadFailed;
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
