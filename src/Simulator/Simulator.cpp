@@ -132,13 +132,6 @@ void cSimulator::WakeUp(const cCuboid & a_Area)
 		{
 			m_World.DoWithChunk(cx, cz, [this, &area](cChunk & a_CBChunk) -> bool
 				{
-					if (!a_CBChunk.IsValid())
-					{
-						LOGWARNING("%s: Trying to wake up inside a non-valid chunk [%d, %d]. Ignoring.",
-							__FUNCTION__, a_CBChunk.GetPosX(), a_CBChunk.GetPosZ()
-						);
-						return true;
-					}
 					int startX = std::max(area.p1.x, a_CBChunk.GetPosX() * cChunkDef::Width);
 					int startZ = std::max(area.p1.z, a_CBChunk.GetPosZ() * cChunkDef::Width);
 					int endX = std::min(area.p2.x, a_CBChunk.GetPosX() * cChunkDef::Width + cChunkDef::Width - 1);

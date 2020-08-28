@@ -42,7 +42,6 @@ class cBoundingBox;
 class cDeadlockDetect;
 
 typedef std::list<cClientHandle *> cClientHandleList;
-typedef cChunk *                   cChunkPtr;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
 using cBeaconCallback       = cFunctionRef<bool(cBeaconEntity       &)>;
 using cBedCallback          = cFunctionRef<bool(cBedEntity          &)>;
@@ -465,31 +464,11 @@ private:
 	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
-	Emplaces this chunk in the chunk map.
-	Developers SHOULD use the GetChunk variants instead of this function. */
-	cChunkPtr ConstructChunk(int a_ChunkX, int a_ChunkZ);
+	Emplaces this chunk in the chunk map. */
+	cChunk & ConstructChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
-	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
-
-	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
-
-	// Deprecated in favor of the vector version
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoGen({a_ChunkX, a_ChunkZ});
-	}
-
-	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(cChunkCoords a_Coords);
-
-	/** OBSOLETE, use the cChunkCoords-based overload instead.
-	Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoLoad({a_ChunkX, a_ChunkZ});
-	}
+	cChunk & GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -503,8 +482,3 @@ private:
 	void DelChunkStay(cChunkStay & a_ChunkStay);
 
 };
-
-
-
-
-

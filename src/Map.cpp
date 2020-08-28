@@ -125,11 +125,6 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	ColorID PixelData;
 	m_World->DoWithChunk(ChunkX, ChunkZ, [&](cChunk & a_Chunk)
 		{
-			if (!a_Chunk.IsValid())
-			{
-				return false;
-			}
-
 			if (GetDimension() == dimNether)
 			{
 				// TODO 2014-02-22 xdot: Nether maps
