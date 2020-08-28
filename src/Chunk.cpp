@@ -1496,42 +1496,6 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 
 
 
-void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
-{
-	auto BoundingBox = a_Player.GetBoundingBox();
-	BoundingBox.Expand(1, 0.5, 1);
-
-	for (auto & Entity : m_Entities)
-	{
-		if ((!Entity->IsPickup()) && (!Entity->IsProjectile()))
-		{
-			continue;  // Only pickups and projectiles can be picked up
-		}
-
-		if (BoundingBox.IsInside(Entity->GetPosition()))
-		{
-			/*
-			LOG("Pickup %d being collected by player \"%s\", distance %f",
-				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
-			);
-			*/
-			MarkDirty();
-			if (Entity->IsPickup())
-			{
-				static_cast<cPickup &>(*Entity).CollectedBy(a_Player);
-			}
-			else
-			{
-				static_cast<cProjectileEntity &>(*Entity).CollectedBy(a_Player);
-			}
-		}
-	}
-}
-
-
-
-
-
 bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	// Also sends update packets to all clients in the chunk

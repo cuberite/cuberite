@@ -418,25 +418,31 @@ void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLET
 
 void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 {
-	int BlockX = static_cast<int>(a_Player.GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
-	int BlockY = static_cast<int>(a_Player.GetPosY());
-	int BlockZ = static_cast<int>(a_Player.GetPosZ());
-	int ChunkX = 0, ChunkZ = 0;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
-	int OtherChunkZ = ChunkZ + ((BlockZ > 8) ? 1 : -1);
-
-	// We suppose that each player keeps their chunks in memory, therefore it makes little sense to try to re-load or even generate them.
-	// The only time the chunks are not valid is when the player is downloading the initial world and they should not call this at that moment
-
 	cCSLock Lock(m_CSChunks);
-	GetChunkNoLoad(ChunkX, ChunkZ)->CollectPickupsByPlayer(a_Player);
 
-	// Check the neighboring chunks as well:
-	GetChunkNoLoad(OtherChunkX, ChunkZ)->CollectPickupsByPlayer     (a_Player);
-	GetChunkNoLoad(OtherChunkX, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
-	GetChunkNoLoad(ChunkX,      ChunkZ)->CollectPickupsByPlayer     (a_Player);
-	GetChunkNoLoad(ChunkX,      OtherChunkZ)->CollectPickupsByPlayer(a_Player);
+	auto BoundingBox = a_Player.GetBoundingBox();
+	BoundingBox.Expand(1, 0.5, 1);
+
+	ForEachEntityInBox(BoundingBox, [&a_Player](cEntity & Entity)
+	{
+		// Only pickups and projectiles can be picked up:
+		if (Entity.IsPickup())
+		{
+			/*
+			LOG("Pickup %d being collected by player \"%s\", distance %f",
+				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
+			);
+			*/
+			static_cast<cPickup &>(Entity).CollectedBy(a_Player);
+		}
+		else if (Entity.IsProjectile())
+		{
+			static_cast<cProjectileEntity &>(Entity).CollectedBy(a_Player);
+		}
+
+		// The entities will MarkDirty when they Destroy themselves
+		return false;
+	});
 }
 
 
