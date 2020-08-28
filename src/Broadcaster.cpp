@@ -316,7 +316,7 @@ void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityPosition(a_Entity);
 		}
