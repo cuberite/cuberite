@@ -6,4 +6,5 @@ target_sources(
 	Blocks.h
 	Items.h
 	Statistics.h
+	LootTables.h
 )

@@ -541,7 +541,7 @@ protected:
 	cLootTablePoolVector m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
-	cLootTableFunctionVector m_LootTableFunctions = {};
+	cLootTableFunctionVector m_LootTableFunctions = cLootTableFunctionVector();
 };
 
 typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cCustomMonsterLootTableMap;
@@ -599,7 +599,6 @@ class cChestLootTable: public cLootTable
 			{
 				{{}, E_ITEM_LEAD, 20},
 				{{}, E_ITEM_GOLDEN_APPLE, 15},
-				{{}, E_ITEM_GOLDEN_APPLE, 2}, // Todo: interpret golden apple
 				{{}, E_ITEM_13_DISC, 15},
 				{{}, E_ITEM_CAT_DISC, 15},
 				{{}, E_ITEM_NAME_TAG, 20},
