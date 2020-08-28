@@ -629,27 +629,6 @@ public:
 
 
 
-/** Provides storage for a set of chunk coords together with a callback.
-Used for chunk queues that notify about processed items. */
-class cChunkCoordsWithCallback
-{
-public:
-	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback):
-		m_ChunkX(a_ChunkX),
-		m_ChunkZ(a_ChunkZ),
-		m_Callback(a_Callback)
-	{
-	}
-
-	int m_ChunkX;
-	int m_ChunkZ;
-	cChunkCoordCallback * m_Callback;
-};
-
-
-
-
-
 /** Generic template that can store any kind of data together with a triplet of 3 coords */
 template <typename X> class cCoordWithData
 {
