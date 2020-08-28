@@ -43,6 +43,7 @@ target_sources(
 	LinearInterpolation.cpp
 	LoggerListeners.cpp
 	Logger.cpp
+	LootTableProvider.cpp
 	Map.cpp
 	MapManager.cpp
 	MemorySettingsRepository.cpp
@@ -123,6 +124,7 @@ target_sources(
 	Logger.h
 	LoggerListeners.h
 	LoggerSimple.h
+	LootTableProvider.h
 	Map.h
 	MapManager.h
 	Matrix4.h
