@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Monster.h"
+#include "../UUID.h"
 
 
 
@@ -61,7 +62,7 @@ protected:
 	cPassiveMonster * m_LovePartner;
 
 	/** Remembers the player is was last fed by for statistics tracking */
-	cPlayer * m_Feeder;
+	cUUID m_Feeder;
 
 	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
 	int m_LoveTimer;
