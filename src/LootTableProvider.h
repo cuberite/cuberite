@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "BlockType.h"
 #include "Mobs/MonsterTypes.h"
@@ -471,8 +473,14 @@ namespace LootTable
 
 
 /** Represents a function for a pool item */
-typedef struct LootTableFunction
+typedef struct cLootTableFunction
 {
+	cLootTableFunction(LootTable::eFunctionType a_Type, AStringMap a_Parameter, AStringMap a_Conditions):
+		m_Parameter(a_Parameter),
+		m_Conditions(a_Conditions)
+	{
+		m_Type = a_Type;
+	}
 	LootTable::eFunctionType m_Type;
 	AStringMap m_Parameter;
 	AStringMap m_Conditions;
@@ -483,13 +491,43 @@ typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
 
 
 
+/** Stores the rolls of a pool */
+typedef struct cLootTablePoolRolls
+{
+	/** Pool rolls with optional bonus roll parameter - steady roll needs to be -1 to activate roll range */
+	cLootTablePoolRolls(int a_Roll, int a_RollsMin, int a_RollsMax, int a_BonusRoll = 0, int a_BonusRollsMin = 0, int a_BonusRollsMax = 0)
+	{
+		m_Roll = a_Roll;
+		m_RollsMin = a_RollsMin;
+		m_RollsMax = a_RollsMax;
+		m_BonusRoll = a_BonusRoll;
+		m_BonusRollsMin = a_BonusRollsMin;
+		m_BonusRollsMax = a_BonusRollsMax;
+	}
+
+	int m_Roll = 0;
+	int m_RollsMin = 0;
+	int m_RollsMax = 0;
+	int m_BonusRoll = 0;
+	int m_BonusRollsMin = 0;
+	int m_BonusRollsMax = 0;
+} cLootTablePoolRolls;
+
+
+
 /** Represents a pool entry */
 typedef struct cLootTablePoolEntry
 {
+	cLootTablePoolEntry(cLootTableFunctionVector a_Functions, cItem a_Item, int a_Weight)
+	{
+		m_Functions = std::move(a_Functions);
+		m_Item = a_Item;
+		m_Weight = a_Weight;
+	}
 	// Todo: Conditions
 	cLootTableFunctionVector m_Functions;
 	// Todo: Add type and think about what is necessary
-	ENUM_ITEM_TYPE m_Item;
+	cItem m_Item;
 	// Todo: Children
 	// Todo: Add expand
 	int m_Weight;
@@ -502,15 +540,19 @@ typedef std::vector<cLootTablePoolEntry> cLootTablePoolEntryVector;
 /** Represents a pool in a loot table */
 typedef struct cLootTablePool
 {
-	int m_Roll;
-	int m_Rolls[2];
-	int m_BonusRoll;
-	int m_BonusRolls[2];
+	/** create a pool with steady roll count */
+	cLootTablePool(cLootTablePoolRolls a_Rolls, cLootTablePoolEntryVector a_Entries):
+		m_Rolls(a_Rolls),
+		m_Entries(std::move(a_Entries))
+	{
+	}
+
+	cLootTablePoolRolls m_Rolls;
 	cLootTablePoolEntryVector m_Entries;
 	// Todo: Conditions
 } cLootTablePool;
 
-typedef std::list<cLootTablePool> cLootTablePoolList;
+typedef std::vector<cLootTablePool> cLootTablePoolVector;
 
 
 /** A individual loot table */
@@ -539,10 +581,10 @@ protected:
 	enum LootTable::eType m_Type;
 
 	/** Vector of loot pools */
-		cLootTablePoolList m_LootTablePools;
+	static cLootTablePoolVector m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
-	cLootTableFunctionVector m_LootTableFunctions = cLootTableFunctionVector();
+	cLootTableFunctionVector m_LootTableFunctions;
 };
 
 typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cCustomMonsterLootTableMap;
@@ -583,30 +625,6 @@ private:
 class cEmptyLootTable: public cLootTable
 {
 	enum LootTable::eType m_Type = LootTable::eType::Empty;
-};
-
-
-
-
-
-class cChestLootTable: public cLootTable
-{
-	enum LootTable::eType m_Type = LootTable::eType::Chest;
-	cLootTablePoolList m_LootTablePools =
-	{
-		{
-			-1, {1, 3},  // Rolls
-			0 , {0, 0},  // Bonus rolls
-			{
-				{{}, E_ITEM_LEAD, 20},
-				{{}, E_ITEM_GOLDEN_APPLE, 15},
-				{{}, E_ITEM_13_DISC, 15},
-				{{}, E_ITEM_CAT_DISC, 15},
-				{{}, E_ITEM_NAME_TAG, 20},
-				{{}, E_ITEM_CHAIN_CHESTPLATE, 10}
-			}
-		}
-	};
 };
 
 

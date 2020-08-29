@@ -49,6 +49,7 @@ local function stringFixer(aString)
 	aString = string.gsub(aString,"_", " ")
 	aString = string.gsub(aString,"(%a)([%w_']*)", tchelper)
 	aString = string.gsub(aString, " ", "")
+	aString = string.gsub(aString,[["]],[[\"]])
 	return aString
 end
 
@@ -56,9 +57,161 @@ end
 local function stringItemFixer(aString)
 	aString = string.gsub(aString,"minecraft:","")
 	aString = string.gsub(aString, "%f[%a]%l+%f[%A]", string.upper)
-	aString = "E_ITEM_"..aString
+	aString = "cItem(E_ITEM_"..aString..")"
+	
 	aString = string.gsub(aString,"E_ITEM_IRON_INGOT","E_ITEM_IRON")
 	aString = string.gsub(aString,"E_ITEM_GOLD_INGOT","E_ITEM_GOLD")
+	aString = string.gsub(aString,"E_ITEM_REDSTONE","E_ITEM_REDSTONE_DUST")
+	
+	aString = string.gsub(aString,"E_ITEM_TORCH","E_BLOCK_TORCH")
+	aString = string.gsub(aString,"E_ITEM_TNT","E_BLOCK_TNT")
+	
+	aString = string.gsub(aString,"E_ITEM_LEATHER_CHESTPLATE","E_ITEM_LEATHER_TUNIC")
+	aString = string.gsub(aString,"E_ITEM_LEATHER_HELMET","E_ITEM_LEATHER_CAP")
+	aString = string.gsub(aString,"E_ITEM_LEATHER_LEGGINGS","E_ITEM_LEATHER_PANTS")
+	
+	aString = string.gsub(aString,"E_ITEM_GOLDEN_HORSE_ARMOR","E_ITEM_GOLD_HORSE_ARMOR")
+	aString = string.gsub(aString,"E_ITEM_GOLDEN_SWORD","E_ITEM_GOLD_SWORD")
+	aString = string.gsub(aString,"E_ITEM_GOLDEN_CHESTPLATE","E_ITEM_GOLD_CHESTPLATE")
+	aString = string.gsub(aString,"E_ITEM_GOLDEN_HELMET","E_ITEM_GOLD_HELMET")
+	
+	aString = string.gsub(aString,"E_ITEM_SAND","E_BLOCK_SAND")
+	aString = string.gsub(aString,"E_ITEM_APPLE","E_ITEM_RED_APPLE")
+	aString = string.gsub(aString,"E_ITEM_OBSIDIAN","E_BLOCK_OBSIDIAN")
+	aString = string.gsub(aString,"E_ITEM_EXPERIENCE_BOTTLE","E_ITEM_BOTTLE_O_ENCHANTING")
+	aString = string.gsub(aString,"E_ITEM_TRIPWIRE_HOOK","E_BLOCK_TRIPWIRE_HOOK")
+	
+	aString = string.gsub(aString,"E_ITEM_PUMPKIN","E_BLOCK_PUMPKIN")
+	aString = string.gsub(aString,"E_BLOCK_PUMPKIN_SEEDS","E_ITEM_PUMPKIN_SEEDS")
+	
+	aString = string.gsub(aString,"E_ITEM_RAIL","E_BLOCK_RAIL")
+	aString = string.gsub(aString,"E_ITEM_POWERED_RAIL","E_BLOCK_POWERED_RAIL")
+	aString = string.gsub(aString,"E_ITEM_DETECTOR_RAIL","E_BLOCK_DETECTOR_RAIL")
+	aString = string.gsub(aString,"E_ITEM_ACTIVATOR_RAIL","E_BLOCK_ACTIVATOR_RAIL")
+	
+	aString = string.gsub(aString,"E_ITEM_MUSIC_DISC_13","E_ITEM_13_DISC")
+	aString = string.gsub(aString,"E_ITEM_MUSIC_DISC_CAT","E_ITEM_CAT_DISC")
+	
+	aString = string.gsub(aString,"E_ITEM_CHAINMAIL_CHESTPLATE","E_ITEM_CHAIN_CHESTPLATE")
+	aString = string.gsub(aString,"E_ITEM_CHAINMAIL_CHESTPLATE","E_ITEM_CHAIN_CHESTPLATE")
+	
+	aString = string.gsub(aString,"E_ITEM_CHICKEN","E_ITEM_RAW_CHICKEN")
+	aString = string.gsub(aString,"E_ITEM_MUTTON","E_ITEM_RAW_MUTTON")
+	aString = string.gsub(aString,"E_ITEM_BEEF","E_ITEM_RAW_BEEF")
+	aString = string.gsub(aString,"E_ITEM_PORKCHOP","E_ITEM_RAW_PORKCHOP")
+	aString = string.gsub(aString,"E_ITEM_RABBIT","E_ITEM_RAW_RABBIT")
+	
+	aString = string.gsub(aString,"E_ITEM_SLIME_BALL","E_ITEM_SLIMEBALL")
+	aString = string.gsub(aString,"E_ITEM_RABBIT_FOOT","E_ITEM_RABBITS_FOOT")
+	aString = string.gsub(aString,"E_ITEM_RAW_RABBIT_HIDE","E_ITEM_RABBIT_HIDE")
+
+	aString = string.gsub(aString,"E_ITEM_ENCHANTED_GOLDEN_APPLE","E_ITEM_GOLDEN_APPLE, 0x01")
+
+	--[[
+	E_META_HEAD_SKELETON = 0,
+	E_META_HEAD_WITHER   = 1,
+	E_META_HEAD_ZOMBIE   = 2,
+	E_META_HEAD_PLAYER   = 3,
+	E_META_HEAD_CREEPER  = 4,
+	E_META_HEAD_DRAGON   = 5,
+	--]]
+	
+	aString = string.gsub(aString,"E_ITEM_WITHER_SKELETON_SKULL","E_ITEM_HEAD, 1, 1")
+	
+	--[[  E_BLOCK_FLOWER
+	E_META_FLOWER_POPPY           = 0,
+	E_META_FLOWER_BLUE_ORCHID     = 1,
+	E_META_FLOWER_ALLIUM          = 2,
+	E_META_FLOWER_RED_TULIP       = 4,
+	E_META_FLOWER_ORANGE_TULIP    = 5,
+	E_META_FLOWER_WHITE_TULIP     = 6,
+	E_META_FLOWER_PINK_TULIP      = 7,
+	E_META_FLOWER_OXEYE_DAISY     = 8,
+	--]]
+	
+	aString = string.gsub(aString,"E_ITEM_POPPY","E_BLOCK_FLOWER, 1, 0")
+	
+	--[[  E_ITEM_DYE
+	E_META_DYE_BLACK      = 0,
+	E_META_DYE_RED        = 1,
+	E_META_DYE_GREEN      = 2,
+	E_META_DYE_BROWN      = 3,
+	E_META_DYE_BLUE       = 4,
+	E_META_DYE_PURPLE     = 5,
+	E_META_DYE_CYAN       = 6,
+	E_META_DYE_LIGHTGRAY  = 7,
+	E_META_DYE_GRAY       = 8,
+	E_META_DYE_PINK       = 9,
+	E_META_DYE_LIGHTGREEN = 10,
+	E_META_DYE_YELLOW     = 11,
+	E_META_DYE_LIGHTBLUE  = 12,
+	E_META_DYE_MAGENTA    = 13,
+	E_META_DYE_ORANGE     = 14,
+	E_META_DYE_WHITE      = 15,
+	--]]
+	aString = string.gsub(aString,"E_ITEM_INK_SAC",     "E_ITEM_DYE")
+	aString = string.gsub(aString,"E_ITEM_LAPIS_LAZULI","E_ITEM_DYE, 1, 4")
+	aString = string.gsub(aString,"E_ITEM_BONE_MEAL",   "E_ITEM_DYE, 1, 15")
+	
+	
+	--[[
+	E_META_LOG_APPLE   = 0,
+	E_META_LOG_CONIFER = 1,
+	E_META_LOG_BIRCH   = 2,
+	E_META_LOG_JUNGLE  = 3,
+	--]]
+	aString = string.gsub(aString,"E_ITEM_OAK_LOG",    "E_BLOCK_LOG")
+	aString = string.gsub(aString,"E_ITEM_SPRUCE_LOG", "E_BLOCK_LOG, 1, 1")
+	aString = string.gsub(aString,"E_ITEM_BIRCH_LOG",  "E_BLOCK_LOG, 1, 2")
+	aString = string.gsub(aString,"E_ITEM_JUNGLE_LOG", "E_BLOCK_LOG, 1, 3")
+	
+	--[[
+	E_META_NEW_LOG_ACACIA_WOOD   = 0,
+	E_META_NEW_LOG_DARK_OAK_WOOD = 1,
+	--]]
+	aString = string.gsub(aString,"E_ITEM_ACACIA_LOG",  "E_BLOCK_NEW_LOG")
+	aString = string.gsub(aString,"E_ITEM_DARK_OAK_LOG","E_BLOCK_NEW_LOG, 1, 1")
+	
+	--[[
+	E_META_PLANKS_OAK      = 0,
+	E_META_PLANKS_SPRUCE   = 1,
+	E_META_PLANKS_BIRCH    = 2,
+	E_META_PLANKS_JUNGLE   = 3,
+	E_META_PLANKS_ACACIA   = 4,
+	E_META_PLANKS_DARK_OAK = 5,
+	--]]
+	
+	aString = string.gsub(aString,"E_ITEM_OAK_PLANKS","E_BLOCK_PLANKS")
+	
+	--[[
+	E_META_RAW_FISH_FISH       = 0,
+	E_META_RAW_FISH_SALMON     = 1,
+	E_META_RAW_FISH_CLOWNFISH  = 2,
+	E_META_RAW_FISH_PUFFERFISH = 3,
+	--]]
+
+	aString = string.gsub(aString,"E_ITEM_SALMON",         "E_ITEM_RAW_FISH, 1, 1")
+	
+	aString = string.gsub(aString,"E_ITEM_PUFFERFISH",     "E_ITEM_RAW_FISH, 1, 3")
+	
+	aString = string.gsub(aString,"E_ITEM_COD",            "E_ITEM_RAW_FISH")  --Todo: exchange for actual fish
+	aString = string.gsub(aString,"E_ITEM_TROPICAL_FISH",  "E_ITEM_RAW_FISH")  --Todo: exchange for actual fish
+	
+	
+	--[[
+	E_META_COOKED_FISH_FISH       = 0,
+	E_META_COOKED_FISH_SALMON     = 1,
+	--]]
+	
+	aString = string.gsub(aString,"E_ITEM_COOKED_SALMON","E_ITEM_COOKED_FISH, 1, 1")
+	aString = string.gsub(aString,"E_ITEM_COOKED_COD",   "E_ITEM_COOKED_FISH")  --Todo: exchange for actual fish
+	
+	--[[
+	E_META_SPONGE_DRY              = 0,
+	E_META_SPONGE_WET              = 1,
+	--]]
+	aString = string.gsub(aString,"E_ITEM_WET_SPONGE","E_BLOCK_SPONGE, 1, 1")
+	
 	return aString
 end
 
@@ -81,7 +234,7 @@ local function parseLootTable(aLootTable, aName)
 
 	poolsString = ""
 	poolStartString =
-	"\tcLootTablePoolList m_LootTablePools =\n"..
+	"\tcLootTablePoolVector m_LootTablePools =\n"..
 			"\t{\n"
 
 	-- on the lowest layer you may have type, pools, functions
@@ -95,15 +248,12 @@ local function parseLootTable(aLootTable, aName)
 				poolString = ""
 				pools = value
 				for _, pool in pairs(pools) do
-					poolString = poolString.."\t\t\t{\n"
 					for entryType, entries in pairs(pool) do
 						if entryType == "rolls" then
 							do
 								if type(entries) == "number" then
 									do
-										rollString =
-											"\t\t"..entries..", {0, 0},  // Rolls\n"..
-											"\t\t0, {0, 0},  // Bonus Rolls\n"
+										rollString = "cLootTablePoolRolls("..entries..", 0, 0)"
 									end
 								elseif type(entries) == "table" then
 									do
@@ -114,9 +264,7 @@ local function parseLootTable(aLootTable, aName)
 											if index == "max" then do max = value end end
 											if index == "type" then do disType = value end end
 										end
-										rollString =
-											"\t\t\t-1, {"..min..", "..max.."},  // Rolls\n"..
-											"\t\t\t0, {0, 0},  // Bonus Rolls\n"
+										rollString = "cLootTablePoolRolls(-1, "..min..", "..max..")"
 									end
 								end
 							end
@@ -199,7 +347,7 @@ local function parseLootTable(aLootTable, aName)
 													end -- function
 													if functionTypeString ~= "" then
 														do
-															functionsString = functionsString.."{"..functionTypeString..", {"..string.sub(functionParamString, 0, #functionParamString-2).."}, {"..string.sub(functionCondString, 0, #functionCondString-2).."}}, "
+															functionsString = functionsString.."cLootTableFunction("..functionTypeString..", {"..string.sub(functionParamString, 0, #functionParamString-2).."}, {"..string.sub(functionCondString, 0, #functionCondString-2).."}), "
 															functionParamString = ""
 															functionCondString = ""
 															functionTypeString = ""
@@ -214,28 +362,28 @@ local function parseLootTable(aLootTable, aName)
 											if functionsString ~= "" then
 												do
 												poolString = poolString..
-												"\t\t\t\t{"..
-												"{"..string.sub(functionsString, 0, #functionsString-2).."}, "..name..", "..weight..
-												"},\n"
-												functionsString = ""
+												"\t\t\t\tcLootTablePoolEntry(\n"..
+												"\t\t\t\t\tcLootTableFunctionVector\n"..
+												"\t\t\t\t\t{\n"..
+												"\t\t\t\t\t\t"..string.sub(functionsString, 0, #functionsString-2)..
+												"\n\t\t\t\t\t},\n"..
+												"\t\t\t\t\t"..name..", "..weight.."\n\t\t\t\t),\n"
+													functionsString = ""
 												end
 											else
 												do
-													poolString = poolString..
-													"\t\t\t\t{"..
-													"{}, "..name..", "..weight..
-													"},\n"
-								
+													poolString = poolString.. "\t\t\t\tcLootTablePoolEntry(".."{}, "..name..", "..weight.. "),\n"
 												end
 											end
 										end
 									end
 								end -- entry in entries
-								poolString = poolString.."\t\t\t},\n"
+								poolString = poolString.."\t\t\t}"
 							end
 						end -- entryType == "entries"
 					end
-					poolsString = poolsString.."\t\t{\n"..rollString..poolString.."\n\t\t},\n"
+						poolsString = poolsString.."\t\tcLootTablePool(\n\t\t\t"..rollString..",\n\t\t\tcLootTablePoolEntryVector\n\t\t\t{\n"..poolString.."\n\t\t),\n"
+					rollString = ""
 					poolString = ""
 				end -- pool in pools
 				poolsString = poolsString.."\t};\n"
