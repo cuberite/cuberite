@@ -42,7 +42,7 @@ namespace LootTable
 
 
 
-	/** Any available type of loot table Type as of 1.16.2*/
+	/** Any available type of loot table Type as of 1.16.2 */
 	enum class eType
 	{
 		Empty,                         // doesnt generate any Loot
@@ -521,13 +521,22 @@ typedef struct cLootTablePoolEntry
 	cLootTablePoolEntry(cLootTableFunctionVector a_Functions, cItem a_Item, int a_Weight)
 	{
 		m_Functions = std::move(a_Functions);
-		m_Item = a_Item;
+		m_Item = std::move(a_Item);
 		m_Weight = a_Weight;
 	}
+
+	cLootTablePoolEntry(cLootTableFunctionVector a_Functions, AString a_Children, int a_Weight)
+	{
+		m_Functions = std::move(a_Functions);
+		m_Children = std::move(a_Children);
+		m_Weight = a_Weight;
+	}
+
 	// Todo: Conditions
 	cLootTableFunctionVector m_Functions;
 	// Todo: Add type and think about what is necessary
 	cItem m_Item;
+	AString m_Children;
 	// Todo: Children
 	// Todo: Add expand
 	int m_Weight;
@@ -558,7 +567,7 @@ typedef std::vector<cLootTablePool> cLootTablePoolVector;
 /** A individual loot table */
 class cLootTable
 {
-  public:
+public:
 	cLootTable();
 
 	/** Creates new loot table from string describing the loot table */
@@ -581,7 +590,7 @@ protected:
 	enum LootTable::eType m_Type;
 
 	/** Vector of loot pools */
-	static cLootTablePoolVector m_LootTablePools;
+	cLootTablePoolVector m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
 	cLootTableFunctionVector m_LootTableFunctions;

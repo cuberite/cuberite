@@ -284,7 +284,25 @@ local function parseLootTable(aLootTable, aName)
 											end
 										elseif index == "name" then
 											do
-												name = stringItemFixer(value)
+												name = stringItemFixer(value)  -- Todo: add those items to the server
+												if 	name == "cItem(E_ITEM_HEART_OF_THE_SEA)" or
+													name == "cItem(E_ITEM_BAMBOO)" or
+													name == "cItem(E_ITEM_CROSSBOW)" or
+													name == "cItem(E_ITEM_SUSPICIOUS_STEW)" or
+													name == "cItem(E_ITEM_PHANTOM_MEMBRANE)" or
+													name == "cItem(E_ITEM_SEAGRASS)" then
+													do
+														pool = ""
+													end
+												elseif name == "cItem(E_ITEM_GAMEPLAY/FISHING/FISH)" then
+													do
+														name = "\"FishingLootTable\""
+													end
+												elseif name == "cItem(E_ITEM_MUSIC_DISCS)" then
+													do
+														name = "\"DiscLootTable\""
+													end
+												end
 											end
 										elseif index == "weight" then
 											do

@@ -202,14 +202,43 @@ void cLootTableProvider::DropLoot(const cMonster & a_Monster) const
 
 
 
-cLootTable::cLootTable() {}
+cLootTable::cLootTable(){}
+
+
+
+
+
 cLootTable::cLootTable(const AString & a_Description) {}
+
+
+
+
+
 cLootTable::cLootTable(const cLootTable & a_Other)
 {
 	m_Type = a_Other.m_Type;
 	m_LootTablePools = a_Other.m_LootTablePools;
 	m_LootTableFunctions = a_Other.m_LootTableFunctions;
 }
+
+
+
+
+
 cLootTable::~cLootTable() {}
+
+
+
+
+
 bool cLootTable::ReadFromString(const AString & a_Description) { return false; }
+
+
+
+
+
 bool cLootTable::FillWithLoot(cBlockEntityWithItems & a_BlockEntity) { return false; }
+
+
+
+
