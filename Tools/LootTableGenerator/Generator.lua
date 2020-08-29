@@ -103,6 +103,7 @@ local function stringItemFixer(aString)
 	
 	aString = string.gsub(aString,"E_ITEM_SLIME_BALL","E_ITEM_SLIMEBALL")
 	aString = string.gsub(aString,"E_ITEM_RABBIT_FOOT","E_ITEM_RABBITS_FOOT")
+	aString = string.gsub(aString,"E_ITEM_RAW_RABBIT_FOOT","E_ITEM_RABBITS_FOOT")
 	aString = string.gsub(aString,"E_ITEM_RAW_RABBIT_HIDE","E_ITEM_RABBIT_HIDE")
 
 	aString = string.gsub(aString,"E_ITEM_ENCHANTED_GOLDEN_APPLE","E_ITEM_GOLDEN_APPLE, 0x01")

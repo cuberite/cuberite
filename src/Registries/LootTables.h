@@ -2588,7 +2588,7 @@ class cRabbitLootTable: public cLootTable
 				cLootTablePoolRolls(1, 0, 0),
 				cLootTablePoolEntryVector
 					{
-						cLootTablePoolEntry({}, cItem(E_ITEM_RAW_RABBIT_FOOT), 0),
+						cLootTablePoolEntry({}, cItem(E_ITEM_RABBITS_FOOT), 0),
 					}
 			),
 		};
