@@ -475,6 +475,7 @@ typedef struct LootTableFunction
 {
 	LootTable::eFunctionType m_Type;
 	AStringMap m_Parameter;
+	AStringMap m_Conditions;
 } cLootTableFunction;
 
 typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
@@ -509,7 +510,7 @@ typedef struct cLootTablePool
 	// Todo: Conditions
 } cLootTablePool;
 
-typedef std::vector<cLootTablePool> cLootTablePoolVector;
+typedef std::list<cLootTablePool> cLootTablePoolList;
 
 
 /** A individual loot table */
@@ -538,7 +539,7 @@ protected:
 	enum LootTable::eType m_Type;
 
 	/** Vector of loot pools */
-	cLootTablePoolVector m_LootTablePools;
+		cLootTablePoolList m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
 	cLootTableFunctionVector m_LootTableFunctions = cLootTableFunctionVector();
@@ -591,7 +592,7 @@ class cEmptyLootTable: public cLootTable
 class cChestLootTable: public cLootTable
 {
 	enum LootTable::eType m_Type = LootTable::eType::Chest;
-	cLootTablePoolVector m_LootTablePools =
+	cLootTablePoolList m_LootTablePools =
 	{
 		{
 			-1, {1, 3},  // Rolls

@@ -57,6 +57,8 @@ local function stringItemFixer(aString)
 	aString = string.gsub(aString,"minecraft:","")
 	aString = string.gsub(aString, "%f[%a]%l+%f[%A]", string.upper)
 	aString = "E_ITEM_"..aString
+	aString = string.gsub(aString,"E_ITEM_IRON_INGOT","E_ITEM_IRON")
+	aString = string.gsub(aString,"E_ITEM_GOLD_INGOT","E_ITEM_GOLD")
 	return aString
 end
 
@@ -74,11 +76,12 @@ local function parseLootTable(aLootTable, aName)
 	-- check for json parser
 	local lj = require("lunajson")
 	local input = lj.decode(aLootTable)
-	local rootTypeString, poolString, rollString, poolStartString
+	local rootTypeString, poolsString, poolString, rollString, poolStartString
 	local weight, name, functionsString
 
+	poolsString = ""
 	poolStartString =
-	"\tcLootTablePoolVector m_LootTablePools =\n"..
+	"\tcLootTablePoolList m_LootTablePools =\n"..
 			"\t{\n"
 
 	-- on the lowest layer you may have type, pools, functions
@@ -92,15 +95,15 @@ local function parseLootTable(aLootTable, aName)
 				poolString = ""
 				pools = value
 				for _, pool in pairs(pools) do
-					poolString = poolString.."\t\t{\n"
+					poolString = poolString.."\t\t\t{\n"
 					for entryType, entries in pairs(pool) do
 						if entryType == "rolls" then
 							do
 								if type(entries) == "number" then
 									do
 										rollString =
-											"\t\t\t"..entries..", {0, 0},  // Rolls\n"..
-											"\t\t\t0, {0, 0},  // Bonus Rolls\n"
+											"\t\t"..entries..", {0, 0},  // Rolls\n"..
+											"\t\t0, {0, 0},  // Bonus Rolls\n"
 									end
 								elseif type(entries) == "table" then
 									do
@@ -123,7 +126,6 @@ local function parseLootTable(aLootTable, aName)
 								functionParamString = ""
 								functionCondString = ""
 								functionTypeString = ""
-								poolString = poolString.."\t\t\t{\n"
 								for _, entry in pairs(entries) do
 									for index, value in pairs(entry) do
 										weight = 0
@@ -153,7 +155,7 @@ local function parseLootTable(aLootTable, aName)
 																	for param, value in pairs(condition) do
 																		if type(value) ~= "table" then
 																			do
-																				functionCondString = functionCondString.."{\""..param.."\", \""..value.."\"}, "
+																				functionCondString = functionCondString.."{\""..param.."\", \""..stringFixer(value).."\"}, "
 																			end
 																		else
 																			do
@@ -197,10 +199,7 @@ local function parseLootTable(aLootTable, aName)
 													end -- function
 													if functionTypeString ~= "" then
 														do
-															functionsString = functionsString.."{"..functionTypeString..", {"..string.sub(functionParamString, 0, #functionParamString-2).."}, {"..functionCondString.."}, "
-															--[[print("functionTypeString: "..functionTypeString)
-															print("functionParamString: "..functionParamString)
-															print("functionCondString: "..functionCondString)--]]
+															functionsString = functionsString.."{"..functionTypeString..", {"..string.sub(functionParamString, 0, #functionParamString-2).."}, {"..string.sub(functionCondString, 0, #functionCondString-2).."}}, "
 															functionParamString = ""
 															functionCondString = ""
 															functionTypeString = ""
@@ -236,24 +235,25 @@ local function parseLootTable(aLootTable, aName)
 							end
 						end -- entryType == "entries"
 					end
-					poolString = poolString.."\t\t},\n"
-				end
-				poolString = poolString..("\t};\n")
+					poolsString = poolsString.."\t\t{\n"..rollString..poolString.."\n\t\t},\n"
+					poolString = ""
+				end -- pool in pools
+				poolsString = poolsString.."\t};\n"
 			end
 		end -- root == "type"
 	end
 	if rollString ~= nil then
 		do
 			io.write(rootTypeString)
-			io.write(poolStartString..rollString..poolString)
+			io.write(poolStartString..poolsString)
 		end
 	else
 		do
-			io.write("\tenum LootTable::eType m_Type = LootTable::eType::None;\n")
+			io.write("\tenum LootTable::eType m_Type = LootTable::eType::Empty;\n};\n")
 			return
 		end
 	end
-	io.write("\n}\n")
+	io.write("};\n")
 end
 
 

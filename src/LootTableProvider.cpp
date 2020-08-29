@@ -2,7 +2,7 @@
 // cLootTableProvider.cpp
 
 #include "LootTableProvider.h"
-// #include "Registries/LootTables.h"
+#include "Registries/LootTables.h"
 
 cLootTableProvider::cLootTableProvider(cWorld * a_World)
 {
