@@ -120,6 +120,9 @@ local function parseLootTable(aLootTable, aName)
 						elseif entryType == "entries" then
 							do
 								functionsString = ""
+								functionParamString = ""
+								functionCondString = ""
+								functionTypeString = ""
 								poolString = poolString.."\t\t\t{\n"
 								for _, entry in pairs(entries) do
 									for index, value in pairs(entry) do
@@ -138,46 +141,94 @@ local function parseLootTable(aLootTable, aName)
 											end
 										elseif index == "functions" then
 											do
-												functionsString = functionsString.."{"
 												for _,functions in pairs(value) do
-													for _, functionDesc in pairs(functions) do
-														if type(functionDesc) == "string" then
+													for functionsDescName, functionDesc in pairs(functions) do
+														if functionsDescName == "function" then
 															do
-																functionsString = functionsString.."LootTable::eFunctionType::"..stringFixer(functionDesc)
+																functionTypeString = "LootTable::eFunctionType::"..stringFixer(functionDesc)
 															end
-														elseif type(functionDesc) == "table" then
+														elseif functionsDescName == "conditions" then
 															do
-																functionsString = functionsString..", {"
-																for param, val in pairs(functionDesc) do
-																	if type(val) == "number" or type(val) == "string" then
-																		do
-																			functionsString = functionsString.."{\""..param.."\", \""..val.."\"}"
-																		end
-																	else
-																		do
-																			print(param)
-																			for a,b in pairs(val) do
-																				print(a)
-																				print(b)
+																for _,condition in pairs(functionDesc) do
+																	for param, value in pairs(condition) do
+																		if type(value) ~= "table" then
+																			do
+																				functionCondString = functionCondString.."{\""..param.."\", \""..value.."\"}, "
+																			end
+																		else
+																			do
+																				for _, flags in pairs(value) do
+																					for a, b in pairs(flags) do
+																						if type(b) == "boolean" then
+																							if b then do b ="true" end
+																							else do b ="false" end end
+																						end
+																						functionCondString = functionCondString.."{\""..a.."\", \""..b.."\"}, "
+																					end
+																				end
 																			end
 																		end
 																	end
 																end
-																functionsString = functionsString.."}"
+															end -- conditions
+														else -- values are function parameters
+															do
+																if type(functionDesc) == "boolean" then
+																	if functionDesc then do functionDesc ="true" end
+																	else do functionDesc ="false" end end
+																end
+																if type(functionDesc) ~= "table" then
+																	do
+																		functionParamString = functionParamString.."{\""..functionsDescName.."\", \""..stringFixer(functionDesc).."\"}, "
+																	end
+																else 
+																	do
+																		for param, val in pairs(functionDesc) do
+																			if type(val) ~= "table" then
+																				do
+																					functionParamString = functionParamString.."{\""..param.."\", \""..stringFixer(val).."\"}, "
+																				end
+																			end
+																		end
+																	end
+																end
 															end
+														end -- function parameters
+													end -- function
+													if functionTypeString ~= "" then
+														do
+															functionsString = functionsString.."{"..functionTypeString..", {"..string.sub(functionParamString, 0, #functionParamString-2).."}, {"..functionCondString.."}, "
+															--[[print("functionTypeString: "..functionTypeString)
+															print("functionParamString: "..functionParamString)
+															print("functionCondString: "..functionCondString)--]]
+															functionParamString = ""
+															functionCondString = ""
+															functionTypeString = ""
 														end
 													end
-												end
+												end -- functions
 											end
 										end
 									end -- index, value in entry
-									if weight > 0 then
+									if pool ~= "" then
 										do
-											poolString = poolString..
+											if functionsString ~= "" then
+												do
+												poolString = poolString..
 												"\t\t\t\t{"..
-												"{"..functionsString.."}, "..name..", "..weight..
+												"{"..string.sub(functionsString, 0, #functionsString-2).."}, "..name..", "..weight..
 												"},\n"
-											functionsString = ""
+												functionsString = ""
+												end
+											else
+												do
+													poolString = poolString..
+													"\t\t\t\t{"..
+													"{}, "..name..", "..weight..
+													"},\n"
+								
+												end
+											end
 										end
 									end
 								end -- entry in entries
