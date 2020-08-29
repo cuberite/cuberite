@@ -1023,13 +1023,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 	for (auto & Entity : EntitiesToAdd)
 	{
-		auto EntityPtr = Entity.get();
-		ASSERT(EntityPtr->GetWorld() == this);
 		m_ChunkMap->AddEntity(std::move(Entity));
-		EntityPtr->OnAddToWorld(*this);
-		ASSERT(!EntityPtr->IsTicking());
-		EntityPtr->SetIsTicking(true);
-		cPluginManager::Get()->CallHookSpawnedEntity(*this, *Entity);
 	}
 	EntitiesToAdd.clear();
 

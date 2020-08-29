@@ -82,11 +82,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 
 cEntity::~cEntity()
 {
-
-	// Before deleting, the entity needs to have been removed from the world, if ever added
-	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
-	ASSERT(!IsTicking());
-
 	/*
 	// DEBUG:
 	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",

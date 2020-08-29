@@ -892,7 +892,17 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 		);
 		return;
 	}
+
+	const auto EntityPtr = a_Entity.get();
+	ASSERT(EntityPtr->GetWorld() == m_World);
+
 	Chunk->AddEntity(std::move(a_Entity));
+
+	EntityPtr->OnAddToWorld(*m_World);
+	ASSERT(!EntityPtr->IsTicking());
+	EntityPtr->SetIsTicking(true);
+
+	cPluginManager::Get()->CallHookSpawnedEntity(*m_World, *EntityPtr);
 }
 
 
