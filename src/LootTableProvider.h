@@ -10,6 +10,19 @@
 #include "Mobs/MonsterTypes.h"
 #include "BlockEntities/BlockEntityWithItems.h"
 
+/*
+This file contains all classes, types, ... used in the loot table functions.
+The default loot tables are from LootTables/ in the root folder
+The custom loot tables are read per world and must be contained in %worldname%/loot_tables
+They follow the vanilla file structure so any possible entry should be respected
+
+Notes:
+	30.08.2020:
+		At the moment only loot tables for item container are supported.
+		There are some functions commented fo the lookup uncomment them and add the code
+*/
+
+/** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 {
 	/** Any available function type as of 1.16.2 */
@@ -62,58 +75,73 @@ namespace LootTable
 
 
 
-	/** Gets the eType from String. Defaults to generic */
-	enum eType eType(const AString & a_Type)
+	/** Any available type of loot table conditions as of 1.16.2 */
+	enum class eConditionType
 	{
-		if (NoCaseCompare(a_Type, "Empty") == 0)
-		{
-			return eType::Empty;
-		}
-		else if (NoCaseCompare(a_Type, "Entity") == 0)
-		{
-			return eType::Entity;
-		}
-		else if (NoCaseCompare(a_Type, "Block") == 0)
-		{
-			return eType::Block;
-		}
-		else if (NoCaseCompare(a_Type, "Chest") == 0)
-		{
-			return eType::Chest;
-		}
-		else if (NoCaseCompare(a_Type, "Fishing") == 0)
-		{
-			return eType::Fishing;
-		}
-		else if (NoCaseCompare(a_Type, "Gift") == 0)
-		{
-			return eType::Gift;
-		}
-		else if (NoCaseCompare(a_Type, "AdvancementReward") == 0)
-		{
-			return eType::AdvancementReward;
-		}
-		else if (NoCaseCompare(a_Type, "Barter") == 0)
-		{
-			return eType::Barter;
-		}
-		else if (NoCaseCompare(a_Type, "Command") == 0)
-		{
-			return eType::Command;
-		}
-		else if (NoCaseCompare(a_Type, "Selector") == 0)
-		{
-			return eType::Selector;
-		}
-		else if (NoCaseCompare(a_Type, "AdvancementEntity") == 0)
-		{
-			return eType::AdvancementEntity;
-		}
-		else
-		{
-			return eType::Generic;
-		}
-	}
+		Alternative,  // Joins conditions from parameter terms with "or".
+		/* terms: A list of conditions to join using 'or'. */
+
+		BlockStateProperty,  // Check properties of a block state.
+		/*  block: A block ID. The test fails if the block doesn't match.
+			properties: (Optional) A map of block property names to values. All values are strings. The test fails if the block doesn't match. */
+
+		DamageSourceProperties,  // Check properties of damage source.
+		/* predicate: Predicate applied to the damage source. */
+
+		EntityProperties,  // Test properties of an entity.
+		/*  entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+			predicate: Predicate applied to entity, uses same structure as advancements. */
+
+		EntityScores,  // Test the scoreboard scores of an entity.
+		/* 	entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+			scores: Scores to check. All specified scores must pass for the condition to pass.
+			A score: Key name is the objective while the value is the exact score value required for the condition to pass.
+			A score: Key name is the objective while the value specifies a range of score values required for the condition to pass.
+			min: Minimum score.
+			max: Maximum score. */
+
+		Inverted,  // Inverts condition from parameter term.
+		/* term: The condition to be negated. */
+
+		KilledByPlayer,  // Test if a killer_player entity is available.
+		/* inverse: If true, the condition passes if killer_player is not available. */
+
+		LocationCheck,  // Checks if the current location matches.
+		/*  offsetX - optional offsets to location
+			offsetY - optional offsets to location
+			offsetZ - optional offsets to location
+			predicate: Predicate applied to location, uses same structure as advancements. */
+
+		MatchTool,  // Checks tool.
+		/* predicate: Predicate applied to item, uses same structure as advancements. */
+
+		RandomChance,  // Test if a random number 0.0 - 1.0 is less than a specified value.
+		/* chance: Success rate as a number 0.0 - 1.0. */
+
+		RandomChanceWithLooting,  // Test if a random number 0.0 - 1.0 is less than a specified value, affected by the level of Looting on the killer entity.
+		/*  chance: Base success rate.
+			looting_multiplier: Looting adjustment to the base success rate. Formula is chance + (looting_level * looting_multiplier). */
+
+		Reference,  // Test if another referred condition (predicate) passes.
+		/* name: The namespaced ID of the condition (predicate) referred to. A cyclic reference causes a parsing failure. */
+
+		SurvivesExplosion,  // Returns true with 1 divided by explosion radius probability.
+
+		TableBonus,  // Passes with probability picked from table, indexed by enchantment level.
+		/*  enchantment: Id of enchantment.
+			chances: List of probabilities for enchantment level, indexed from 0. */
+
+		TimeCheck,  // Checks the current time
+		/*  value: The time value in ticks.
+			min: The minimum value.
+			max: The maximum value.
+			period: If present, time gets modulo-divided by this value (for example, if set to 24000, value operates on a time period of days). */
+
+		WeatherCheck,  // Checks for a current weather state
+		/*  raining: If true, the condition evaluates to true only if it's raining.
+			thundering: If true, the condition evaluates to true only if it's thundering. */
+		None  // Default rule. NOT VANILLA Used for the string comparison if string is unknown
+	};
 
 
 
@@ -161,312 +189,6 @@ namespace LootTable
 		WoodlandMansion,
 		None
 	};
-
-
-
-
-	/** Gets the eChestType from String as of 1.16.2 */
-	enum eChestType eChestType(const AString & a_Type)
-	{
-		if (NoCaseCompare(a_Type, "AbandonedMineshaft") == 0)
-		{
-			return eChestType::AbandonedMineshaft;
-		}
-		else if (NoCaseCompare(a_Type, "BuriedTreasure") == 0)
-		{
-			return eChestType::BuriedTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "DesertPyramid") == 0)
-		{
-			return eChestType::DesertPyramid;
-		}
-		else if (NoCaseCompare(a_Type, "EndCityTreasure") == 0)
-		{
-			return eChestType::EndCityTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "IglooChest") == 0)
-		{
-			return eChestType::IglooChest;
-		}
-		else if (NoCaseCompare(a_Type, "JungleTemple") == 0)
-		{
-			return eChestType::JungleTemple;
-		}
-		else if (NoCaseCompare(a_Type, "JungleTempleDispenser") == 0)
-		{
-			return eChestType::JungleTempleDispenser;
-		}
-		else if (NoCaseCompare(a_Type, "NetherBridge") == 0)
-		{
-			return eChestType::NetherBridge;
-		}
-		else if (NoCaseCompare(a_Type, "PillagerOutpost") == 0)
-		{
-			return eChestType::PillagerOutpost;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckMap") == 0)
-		{
-			return eChestType::ShipwreckMap;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckSupply") == 0)
-		{
-			return eChestType::ShipwreckSupply;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckTreasure") == 0)
-		{
-			return eChestType::ShipwreckTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "SimpleDungeon") == 0)
-		{
-			return eChestType::SimpleDungeon;
-		}
-		else if (NoCaseCompare(a_Type, "SpawnBonusChest") == 0)
-		{
-			return eChestType::SpawnBonusChest;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdCorridor") == 0)
-		{
-			return eChestType::StrongholdCorridor;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdCrossing") == 0)
-		{
-			return eChestType::StrongholdCrossing;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdLibrary") == 0)
-		{
-			return eChestType::StrongholdLibrary;
-		}
-		else if (NoCaseCompare(a_Type, "UnderwaterRuinBig") == 0)
-		{
-			return eChestType::UnderwaterRuinBig;
-		}
-		else if (NoCaseCompare(a_Type, "UnderwaterRuinSmall") == 0)
-		{
-			return eChestType::UnderwaterRuinSmall;
-		}
-
-		/* Village chest types */
-
-		else if (NoCaseCompare(a_Type, "VillageArmorer") == 0)
-		{
-			return eChestType::VillageArmorer;
-		}
-		else if (NoCaseCompare(a_Type, "VillageButcher") == 0)
-		{
-			return eChestType::VillageButcher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageCartographer") == 0)
-		{
-			return eChestType::VillageCartographer;
-		}
-		else if (NoCaseCompare(a_Type, "VillageDesertHouse") == 0)
-		{
-			return eChestType::VillageDesertHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageFisher") == 0)
-		{
-			return eChestType::VillageFisher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageFletcher") == 0)
-		{
-			return eChestType::VillageFletcher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageMason") == 0)
-		{
-			return eChestType::VillageMason;
-		}
-		else if (NoCaseCompare(a_Type, "VillagePlainsHouse") == 0)
-		{
-			return eChestType::VillagePlainsHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageSavannaHouse") == 0)
-		{
-			return eChestType::VillageSavannaHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageShepherd") == 0)
-		{
-			return eChestType::VillageShepherd;
-		}
-		else if (NoCaseCompare(a_Type, "VillageSnowyHouse") == 0)
-		{
-			return eChestType::VillageSnowyHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTaigaHouse") == 0)
-		{
-			return eChestType::VillageTaigaHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTannery") == 0)
-		{
-			return eChestType::VillageTannery;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTemple") == 0)
-		{
-			return eChestType::VillageTemple;
-		}
-		else if (NoCaseCompare(a_Type, "VillageToolsmith") == 0)
-		{
-			return eChestType::VillageToolsmith;
-		}
-		else if (NoCaseCompare(a_Type, "VillageWeaponsmith") == 0)
-		{
-			return eChestType::VillageWeaponsmith;
-		}
-
-		/* Village chest types end */
-
-		else if (NoCaseCompare(a_Type, "WoodlandMansion") == 0)
-		{
-			return eChestType::WoodlandMansion;
-		}
-		else
-		{
-			return eChestType::None;
-		}
-	}
-
-
-
-
-	/** Gets the eMonsterType from String. Defaults to Giant -> no loot */
-	eMonsterType eMonsterType(const AString & a_Type)
-	{
-		if (NoCaseCompare(a_Type, "Bat") == 0)
-		{
-			return mtBat;
-		}
-		else if (NoCaseCompare(a_Type, "Blaze") == 0)
-		{
-			return mtBlaze;
-		}
-		else if (NoCaseCompare(a_Type, "CaveSpider") == 0)
-		{
-			return mtCaveSpider;
-		}
-		else if (NoCaseCompare(a_Type, "mtChicken") == 0)
-		{
-			return mtChicken;
-		}
-		else if (NoCaseCompare(a_Type, "Cow") == 0)
-		{
-			return mtCow;
-		}
-		else if (NoCaseCompare(a_Type, "Creeper") == 0)
-		{
-			return mtCreeper;
-		}
-		else if (NoCaseCompare(a_Type, "EnderDragon") == 0)
-		{
-			return mtEnderDragon;
-		}
-		else if (NoCaseCompare(a_Type, "Enderman") == 0)
-		{
-			return mtEnderman;
-		}
-		else if (NoCaseCompare(a_Type, "Ghast") == 0)
-		{
-			return mtGhast;
-		}
-		else if (NoCaseCompare(a_Type, "Giant") == 0)
-		{
-			return mtGiant;
-		}
-		else if (NoCaseCompare(a_Type, "Guardian") == 0)
-		{
-			return mtGuardian;
-		}
-			else if (NoCaseCompare(a_Type, "Horse") == 0)
-		{
-			return mtHorse;
-		}
-		else if (NoCaseCompare(a_Type, "IronGolem") == 0)
-		{
-			return mtIronGolem;
-		}
-		else if (NoCaseCompare(a_Type, "MagmaCube") == 0)
-		{
-			return mtMagmaCube;
-		}
-		else if (NoCaseCompare(a_Type, "Mooshroom") == 0)
-		{
-			return mtMooshroom;
-		}
-		else if (NoCaseCompare(a_Type, "Ocelot") == 0)
-		{
-			return mtOcelot;
-		}
-		else if (NoCaseCompare(a_Type, "Pig") == 0)
-		{
-		return mtPig;
-		}
-		else if (NoCaseCompare(a_Type, "Rabbit") == 0)
-		{
-			return mtRabbit;
-		}
-		else if (NoCaseCompare(a_Type, "Sheep") == 0)
-		{
-			return mtSheep;
-		}
-		else if (NoCaseCompare(a_Type, "Silverfish") == 0)
-		{
-			return mtSilverfish;
-		}
-		else if (NoCaseCompare(a_Type, "Skeleton") == 0)
-		{
-			return mtSkeleton;
-		}
-		else if (NoCaseCompare(a_Type, "mtSlime") == 0)
-		{
-			return mtSlime;
-		}
-		else if (NoCaseCompare(a_Type, "SnowGolem") == 0)
-		{
-			return mtSnowGolem;
-		}
-		else if (NoCaseCompare(a_Type, "Spider") == 0)
-		{
-			return mtSpider;
-		}
-		else if (NoCaseCompare(a_Type, "Squid") == 0)
-		{
-			return mtSquid;
-		}
-		else if (NoCaseCompare(a_Type, "Villager") == 0)
-		{
-			return mtVillager;
-		}
-		else if (NoCaseCompare(a_Type, "mtWitch") == 0)
-		{
-			return mtWitch;
-		}
-		else if (NoCaseCompare(a_Type, "Wither") == 0)
-		{
-			return mtWither;
-		}
-		else if (NoCaseCompare(a_Type, "WitherSkeleton") == 0)
-		{
-			return mtWitherSkeleton;
-		}
-		else if (NoCaseCompare(a_Type, "Wolf") == 0)
-		{
-			return mtWolf;
-		}
-		else if (NoCaseCompare(a_Type, "Zombie") == 0)
-		{
-			return mtZombie;
-		}
-		else if (NoCaseCompare(a_Type, "ZombiePigman") == 0)
-		{
-			return mtZombiePigman;
-		}
-		else if (NoCaseCompare(a_Type, "ZombieVillager") == 0)
-		{
-			return mtZombieVillager;
-		}
-		else
-		{
-			return mtGiant;
-		}
-	}
 }
 
 
@@ -564,6 +286,9 @@ typedef struct cLootTablePool
 typedef std::vector<cLootTablePool> cLootTablePoolVector;
 
 
+
+
+
 /** A individual loot table */
 class cLootTable
 {
@@ -596,8 +321,8 @@ protected:
 	cLootTableFunctionVector m_LootTableFunctions;
 };
 
-typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cCustomMonsterLootTableMap;
-typedef std::map<enum LootTable::eChestType, std::shared_ptr<cLootTable>> cCustomChestLootTableMap;
+// typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cMonsterLootTableMap;
+typedef std::map<enum LootTable::eChestType, std::shared_ptr<cLootTable>> cChestLootTableMap;
 
 /** The LootTableProvider is used per world to ask for loot tables */
 class cLootTableProvider
@@ -605,24 +330,31 @@ class cLootTableProvider
 public:
 	cLootTableProvider(cWorld * a_World);
 
-	/** Function to load a custom loot tables from specified path */
-	void LoadCustomLootTable(AString a_Path);
+	/** Function to load a loot table from specified path */
+	void LoadLootTable(AString & a_FilePath);
 
 	/** Functions to load loot tables. Custom loot tables are also checked */
+	/*
+	Further information on the string based function:
+	Format:    Type|FurtherInfo
+	example:   Chest|AbandonedMineshaft
+	example:   Monster|Skeleton
+	example:   Block|Stone
+	This is not case sensitive, and removes all spaces */
 	std::shared_ptr<cLootTable> GetLootTable(const AString & a_Name) const;
-	std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block) const;
-	std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block, const ENUM_BLOCK_META) const;
+	// std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block) const;
+	// std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block, const ENUM_BLOCK_META) const;
 	std::shared_ptr<cLootTable> GetLootTable(const enum LootTable::eChestType a_Type) const;
-	std::shared_ptr<cLootTable> GetLootTable(const eMonsterType a_Type) const;
+	// std::shared_ptr<cLootTable> GetLootTable(const eMonsterType a_Type) const;
 
 	/** Drops the loot of a_Monster specified by the loot tables */
-	void DropLoot(const cMonster & a_Monster) const;  // Todo: move to unique id of monster
+	// void DropLoot(const cMonster & a_Monster) const;  // Todo: move to unique id of monster
 
 private:
 
 	/** Maps containing custom loot tables */
-	cCustomChestLootTableMap   m_CustomChestLootTables   = cCustomChestLootTableMap();
-	cCustomMonsterLootTableMap m_CustomMonsterLootTables = cCustomMonsterLootTableMap();
+	cChestLootTableMap   m_CustomChestLootTables   = cChestLootTableMap();
+	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();^
 
 	cWorld * m_World;
 };
