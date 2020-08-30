@@ -476,8 +476,8 @@ namespace LootTable
 typedef struct cLootTableFunction
 {
 	cLootTableFunction(LootTable::eFunctionType a_Type, AStringMap a_Parameter, AStringMap a_Conditions):
-		m_Parameter(a_Parameter),
-		m_Conditions(a_Conditions)
+		m_Parameter(std::move(a_Parameter)),
+		m_Conditions(std::move(a_Conditions))
 	{
 		m_Type = a_Type;
 	}
