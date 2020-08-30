@@ -51,12 +51,12 @@ public:
 		BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
 	);
 
+	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+
 private:
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-
-	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
 
 	bool m_IsInstantFall;  // If set to true, blocks don't fall using cFallingBlock entity, but instantly instead
 

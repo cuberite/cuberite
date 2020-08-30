@@ -8,7 +8,7 @@
 
 
 
-cTNTEntity::cTNTEntity(Vector3d a_Pos, int a_FuseTicks) :
+cTNTEntity::cTNTEntity(Vector3d a_Pos, unsigned a_FuseTicks) :
 	Super(etTNT, a_Pos, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
@@ -33,10 +33,11 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cTNTEntity::Explode(void)
 {
-	m_FuseTicks = 0;
-	Destroy();
 	FLOGD("BOOM at {0}", GetPosition());
-	m_World->DoExplosionAt(4.0, GetPosX(), GetPosY(), GetPosZ(), true, esPrimedTNT, this);
+
+	// TODO centre everything else too
+	m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esPrimedTNT, this);
+	Destroy();
 }
 
 
@@ -51,10 +52,11 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
+
 	BroadcastMovementUpdate();
 
-	m_FuseTicks -= 1;
-	if (m_FuseTicks <= 0)
+	m_FuseTicks -= std::chrono::duration_cast<cTickTime>(a_Dt);
+	if (m_FuseTicks.count() <= 0)
 	{
 		Explode();
 	}

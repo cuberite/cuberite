@@ -74,29 +74,6 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 
 
-bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_ANVIL:
-		case E_BLOCK_CONCRETE_POWDER:
-		case E_BLOCK_DRAGON_EGG:
-		case E_BLOCK_GRAVEL:
-		case E_BLOCK_SAND:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
 void cSandSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
 	if (!IsAllowedBlock(a_Block))
@@ -280,6 +257,29 @@ void cSandSimulator::FinishFalling(
 		static_cast<double>(a_BlockY) + 0.5,
 		static_cast<double>(a_BlockZ) + 0.5
 	);
+}
+
+
+
+
+
+bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ANVIL:
+		case E_BLOCK_CONCRETE_POWDER:
+		case E_BLOCK_DRAGON_EGG:
+		case E_BLOCK_GRAVEL:
+		case E_BLOCK_SAND:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
 }
 
 
