@@ -554,20 +554,20 @@ cLootTableProvider::cLootTableProvider(AString & a_Path):
 {
 	LOG("Loading loot tables...");
 	// Load default loot tables
-	for (const auto & FileName: LootTable::FileNames)
+	for (auto & FileName: LootTable::FileNames)
 	{
 		auto FilePath = Printf(FileName.c_str(), cFile::PathSeparator());
 		auto FilePathWithPrefix = Printf("LootTables%c%s", cFile::PathSeparator(), FilePath.c_str());
 		auto Data = cFile::ReadWholeFile(FilePathWithPrefix);
 		if (Data != "")
 		{
-			LoadLootTable(Data);
+			LoadLootTable(Data, const_cast<AString &>(FileName));
 		}
 		else
 		{
 			// Todo: write better error message
 			LOGERROR("Could not find default loot table: %s! "
-					 "Please make sure the file is readable or download them from cuberite.org", FilePath.c_str());
+			"Please make sure the file is readable or download them from cuberite.org", FilePathWithPrefix.c_str());
 		}
 	}
 	// Check for custom tables
@@ -579,7 +579,7 @@ cLootTableProvider::cLootTableProvider(AString & a_Path):
 
 
 
-void cLootTableProvider::LoadLootTable(const AString & a_String)
+void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Type)
 {
 	AString ErrorMessage;
 	Json::Value JsonObject;
@@ -590,7 +590,21 @@ void cLootTableProvider::LoadLootTable(const AString & a_String)
 	}
 	else
 	{
-		LOG(LootTable::NamespaceConverter(JsonObject["type"].as<AString>()));
+		switch (LootTable::eType(LootTable::NamespaceConverter(JsonObject["type"].as<AString>())))
+		{
+			case LootTable::eType::Chest:
+			{
+				LootTable::Replace(a_Type, "Chests%c", "");
+				auto ChestType = LootTable::eChestType(LootTable::NamespaceConverter(a_Type));
+				m_ChestLootTables.insert(std::pair<enum LootTable::eChestType, std::shared_ptr<cLootTable>>(ChestType, std::make_shared<cLootTable>(JsonObject)));
+				break;
+			}
+			default:
+			{
+				LOGWARNING("This loot table type is not supported: %s", JsonObject["type"].as<AString>().c_str());
+				break;
+			}
+		}
 	}
 }
 
@@ -614,7 +628,11 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 	switch (Type)
 	{
 		case LootTable::eType::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
-		default:                      return std::make_shared<cLootTable>(cLootTable());
+		default:
+		{
+			LOGWARNING("Trying to use unsupported or unknown loot table type: %s", Data[1].c_str());
+			return std::make_shared<cLootTable>(cLootTable());
+		}
 	}
 }
 
@@ -624,7 +642,7 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 
 std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
 {
-	return std::make_shared<cLootTable>(cLootTable());
+	return std::make_shared<cLootTable>();
 }
 
 
@@ -644,7 +662,11 @@ cLootTable::cLootTable()
 
 cLootTable::cLootTable(const Json::Value & a_Description)
 {
-
+	m_Type = LootTable::eType(LootTable::NamespaceConverter(a_Description["type"].asString()));
+	if (m_Type == LootTable::eType::Empty)
+	{
+		return;
+	}
 }
 
 
@@ -665,15 +687,6 @@ cLootTable::cLootTable(const cLootTable & a_Other)
 cLootTable::~cLootTable()
 {
 
-}
-
-
-
-
-
-bool cLootTable::ReadFromString(const AString & a_Description)
-{
-	return false;
 }
 
 

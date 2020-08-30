@@ -402,7 +402,7 @@ typedef std::vector<cLootTablePool> cLootTablePoolVector;
 class cLootTable
 {
 public:
-  	/** Creates a empty loot table with type empty */
+	/** Creates a empty loot table with type empty */
 	cLootTable();
 
 	/** Creates new loot table from string describing the loot table */
@@ -411,9 +411,6 @@ public:
 	cLootTable(const cLootTable & a_Other);
 
 	~cLootTable();
-
-	/** Reads the string and generates a filled loot table from that and returns the success */
-	bool ReadFromString(const AString & a_Description);
 
 	/** Fills the specified block entity at the position with loot and returns the success */
 	bool FillWithLoot(cBlockEntityWithItems & a_BlockEntity);
@@ -439,7 +436,7 @@ public:
 	cLootTableProvider(AString & a_Path);
 
 	/** Function to load a loot table from specified path */
-	void LoadLootTable(const AString & a_String);
+	void LoadLootTable(const AString & a_String, AString & a_Type);
 
 	/** Functions to load loot tables. Custom loot tables are also checked */
 	/*
@@ -461,7 +458,7 @@ public:
 private:
 
 	/** Maps containing custom loot tables */
-	cChestLootTableMap   m_CustomChestLootTables   = cChestLootTableMap();
+	cChestLootTableMap m_ChestLootTables = cChestLootTableMap();
 	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();^
 
 	/** Path to the world folder */
