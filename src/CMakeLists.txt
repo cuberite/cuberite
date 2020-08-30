@@ -252,6 +252,7 @@ set(symlinks
 	Prefabs
 	Protocol
 	webadmin
+	LootTables
 	brewing.txt
 	crafting.txt
 	favicon.png

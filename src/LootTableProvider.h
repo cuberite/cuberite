@@ -6,14 +6,18 @@
 #include <utility>
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "BlockType.h"
 #include "Mobs/MonsterTypes.h"
-#include "BlockEntities/BlockEntityWithItems.h"
+#include "Item.h"
+
+// fwd:
+class cBlockEntityWithItems;
+class cItem;
+class cWorld;
 
 /*
 This file contains all classes, types, ... used in the loot table functions.
 The default loot tables are from LootTables/ in the root folder
-The custom loot tables are read per world and must be contained in %worldname%/loot_tables
+The custom loot tables are read per world and must be contained in %worldname%/LootTables
 They follow the vanilla file structure so any possible entry should be respected
 
 Notes:
@@ -25,6 +29,50 @@ Notes:
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 {
+	/** Expected filenames of loot tables */
+	const AString  FileNames[] =
+	{
+		"Chests%cAbandonedMineshaft.json",
+		"Chests%cBuriedTreasure.json",
+		"Chests%cDesertPyramid.json",
+		"Chests%cEndCityTreasure.json",
+		"Chests%cIglooChest.json",
+		"Chests%cJungleTemple.json",
+		"Chests%cJungleTempleDispenser.json",
+		"Chests%cNetherBridge.json",
+		"Chests%cPillagerOutpost.json",
+		"Chests%cShipwreckMap.json",
+		"Chests%cShipwreckSupply.json",
+		"Chests%cShipwreckTreasure.json",
+		"Chests%cSimpleDungeon.json",
+		"Chests%cSpawnBonusChest.json",
+		"Chests%cStrongholdCorridor.json",
+		"Chests%cStrongholdCrossing.json",
+		"Chests%cStrongholdLibrary.json",
+		"Chests%cUnderwaterRuinBig.json",
+		"Chests%cUnderwaterRuinSmall.json",
+		"Chests%cVillageArmorer.json",
+		"Chests%cVillageButcher.json",
+		"Chests%cVillageCartographer.json",
+		"Chests%cVillageDesertHouse.json",
+		"Chests%cVillageFisher.json",
+		"Chests%cVillageFletcher.json",
+		"Chests%cVillageMason.json",
+		"Chests%cVillagePlainsHouse.json",
+		"Chests%cVillageSavannaHouse.json",
+		"Chests%cVillageShepherd.json",
+		"Chests%cVillageSnowyHouse.json",
+		"Chests%cVillageTaigaHouse.json",
+		"Chests%cVillageTannery.json",
+		"Chests%cVillageTemple.json",
+		"Chests%cVillageToolsmith.json",
+		"Chests%cVillageWeaponsmith.json",
+		"Chests%cWoodlandMansion.json"
+	};
+
+
+
+
 	/** Any available function type as of 1.16.2 */
 	enum class eFunctionType
 	{
@@ -145,6 +193,23 @@ namespace LootTable
 
 
 
+
+	/**  */
+	enum class ePoolEntryType
+	{
+		Item,          // Plain item
+		Tag,           // Descriptor for multiple items. E.g Music Discs, newer arrows...
+		LootTable,     // Another loot table
+		Group,         // Child entries
+		Alternatives,  // Select one entry from the list
+		Sequence,      // Select entries until one cannot be granted
+		Dynamic,       // "generate block specific drops" - whatever that means
+		Empty
+	};
+
+
+
+
 	/** Any available types of chest loots as of 1.16.2 */
 	enum class eChestType
 	{
@@ -194,18 +259,35 @@ namespace LootTable
 
 
 
+
+/** Represents a condition for a pool item */
+typedef struct cLootTableCondition
+{
+	LootTable::eConditionType m_Type;
+	AStringMap m_Parameter;
+} cLootTableCondition;
+
+typedef std::vector<cLootTableCondition> cLootTableConditionVector;
+
+
+
+
 /** Represents a function for a pool item */
 typedef struct cLootTableFunction
 {
-	cLootTableFunction(LootTable::eFunctionType a_Type, AStringMap a_Parameter, AStringMap a_Conditions):
+	cLootTableFunction(
+		LootTable::eFunctionType a_Type,
+		AStringMap a_Parameter,
+		cLootTableConditionVector a_Conditions
+	):
 		m_Parameter(std::move(a_Parameter)),
-		m_Conditions(std::move(a_Conditions))
+		m_Conditions(std::move(a_Conditions)),
+		m_Type(a_Type)
 	{
-		m_Type = a_Type;
 	}
 	LootTable::eFunctionType m_Type;
 	AStringMap m_Parameter;
-	AStringMap m_Conditions;
+	cLootTableConditionVector m_Conditions;
 } cLootTableFunction;
 
 typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
@@ -217,22 +299,29 @@ typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
 typedef struct cLootTablePoolRolls
 {
 	/** Pool rolls with optional bonus roll parameter - steady roll needs to be -1 to activate roll range */
-	cLootTablePoolRolls(int a_Roll, int a_RollsMin, int a_RollsMax, int a_BonusRoll = 0, int a_BonusRollsMin = 0, int a_BonusRollsMax = 0)
+	cLootTablePoolRolls(
+		int a_Roll,
+		int a_RollsMin,
+		int a_RollsMax,
+		int a_BonusRoll = 0,
+		int a_BonusRollsMin = 0,
+		int a_BonusRollsMax = 0
+	):
+		m_Roll(a_Roll),
+		m_RollsMin(a_RollsMin),
+		m_RollsMax(a_RollsMax),
+		m_BonusRoll(a_BonusRoll),
+		m_BonusRollsMin(a_BonusRollsMin),
+		m_BonusRollsMax(a_BonusRollsMax)
 	{
-		m_Roll = a_Roll;
-		m_RollsMin = a_RollsMin;
-		m_RollsMax = a_RollsMax;
-		m_BonusRoll = a_BonusRoll;
-		m_BonusRollsMin = a_BonusRollsMin;
-		m_BonusRollsMax = a_BonusRollsMax;
 	}
 
-	int m_Roll = 0;
-	int m_RollsMin = 0;
-	int m_RollsMax = 0;
-	int m_BonusRoll = 0;
-	int m_BonusRollsMin = 0;
-	int m_BonusRollsMax = 0;
+	int m_Roll;
+	int m_RollsMin;
+	int m_RollsMax;
+	int m_BonusRoll;
+	int m_BonusRollsMin;
+	int m_BonusRollsMax;
 } cLootTablePoolRolls;
 
 
@@ -240,27 +329,42 @@ typedef struct cLootTablePoolRolls
 /** Represents a pool entry */
 typedef struct cLootTablePoolEntry
 {
-	cLootTablePoolEntry(cLootTableFunctionVector a_Functions, cItem a_Item, int a_Weight)
+	cLootTablePoolEntry(
+		cLootTableFunctionVector a_Functions,
+		cItem a_Item,
+		int a_Weight,
+		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+	):
+		m_Functions(std::move(a_Functions)),
+		m_Item(std::move(a_Item)),
+		m_Weight(a_Weight),
+		m_Conditions(std::move(a_Conditions))
 	{
-		m_Functions = std::move(a_Functions);
-		m_Item = std::move(a_Item);
-		m_Weight = a_Weight;
 	}
 
-	cLootTablePoolEntry(cLootTableFunctionVector a_Functions, AString a_Children, int a_Weight)
+
+
+
+
+	cLootTablePoolEntry(
+		cLootTableFunctionVector a_Functions,
+		AString a_Children,
+		int a_Weight,
+		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+	):
+		m_Functions(std::move(a_Functions)),
+		m_Children(std::move(a_Children)),
+		m_Weight(a_Weight),
+		m_Conditions(std::move(a_Conditions))
 	{
-		m_Functions = std::move(a_Functions);
-		m_Children = std::move(a_Children);
-		m_Weight = a_Weight;
 	}
 
-	// Todo: Conditions
+	cLootTableConditionVector m_Conditions;
 	cLootTableFunctionVector m_Functions;
-	// Todo: Add type and think about what is necessary
+	// Todo: Add type
 	cItem m_Item;
-	AString m_Children;
-	// Todo: Children
-	// Todo: Add expand
+	AString m_Children;  // Todo: think about datatype
+	// Todo: Add expand - what ever that does
 	int m_Weight;
 	// Todo: Add quality
 } cLootTablePoolEntry;
@@ -272,15 +376,20 @@ typedef std::vector<cLootTablePoolEntry> cLootTablePoolEntryVector;
 typedef struct cLootTablePool
 {
 	/** create a pool with steady roll count */
-	cLootTablePool(cLootTablePoolRolls a_Rolls, cLootTablePoolEntryVector a_Entries):
+	cLootTablePool(
+		cLootTablePoolRolls a_Rolls,
+		cLootTablePoolEntryVector a_Entries,
+		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		):
 		m_Rolls(a_Rolls),
-		m_Entries(std::move(a_Entries))
+		m_Entries(std::move(a_Entries)),
+		m_Conditions(std::move(a_Conditions))
 	{
 	}
 
 	cLootTablePoolRolls m_Rolls;
 	cLootTablePoolEntryVector m_Entries;
-	// Todo: Conditions
+	cLootTableConditionVector m_Conditions;
 } cLootTablePool;
 
 typedef std::vector<cLootTablePool> cLootTablePoolVector;
@@ -293,16 +402,15 @@ typedef std::vector<cLootTablePool> cLootTablePoolVector;
 class cLootTable
 {
 public:
+  	/** Creates a empty loot table with type empty */
 	cLootTable();
 
 	/** Creates new loot table from string describing the loot table */
-	cLootTable(const AString & a_Description);
+	cLootTable(const Json::Value & a_Description);
 
 	cLootTable(const cLootTable & a_Other);
 
 	~cLootTable();
-
-	// Todo: add json interpreter
 
 	/** Reads the string and generates a filled loot table from that and returns the success */
 	bool ReadFromString(const AString & a_Description);
@@ -328,10 +436,10 @@ typedef std::map<enum LootTable::eChestType, std::shared_ptr<cLootTable>> cChest
 class cLootTableProvider
 {
 public:
-	cLootTableProvider(cWorld * a_World);
+	cLootTableProvider(AString & a_Path);
 
 	/** Function to load a loot table from specified path */
-	void LoadLootTable(AString & a_FilePath);
+	void LoadLootTable(const AString & a_String);
 
 	/** Functions to load loot tables. Custom loot tables are also checked */
 	/*
@@ -356,16 +464,8 @@ private:
 	cChestLootTableMap   m_CustomChestLootTables   = cChestLootTableMap();
 	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();^
 
-	cWorld * m_World;
-};
-
-
-
-
-
-class cEmptyLootTable: public cLootTable
-{
-	enum LootTable::eType m_Type = LootTable::eType::Empty;
+	/** Path to the world folder */
+	AString m_Path;
 };
 
 

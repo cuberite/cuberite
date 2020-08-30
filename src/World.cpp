@@ -215,6 +215,7 @@ cWorld::cWorld(
 	m_TNTShrapnelLevel(slNone),
 	m_MaxViewDistance(12),
 	m_Scoreboard(this),
+	m_LootTableProvider(m_DataPath),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
 	m_ChunkSender(*this),

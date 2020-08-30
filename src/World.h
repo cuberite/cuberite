@@ -23,6 +23,7 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
+#include "LootTableProvider.h"
 
 
 
@@ -1098,6 +1099,8 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
+	cLootTableProvider * GetLootTableProvider() { return & m_LootTableProvider; }
+
 private:
 
 	class cTickThread:
@@ -1318,6 +1321,9 @@ private:
 
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
 	cSetChunkDataPtrs m_SetChunkDataQueue;
+
+	/** Loot table provider */
+	cLootTableProvider m_LootTableProvider;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 

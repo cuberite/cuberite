@@ -1,13 +1,16 @@
 
 // cLootTableProvider.cpp
 
-#include "LootTableProvider.h"
-// #include "Registries/LootTables.h"
+#include "OSSupport/File.h"
+#include "JsonUtils.h"
+#include "json/json.h"
+#include "BlockEntities/BlockEntityWithItems.h"
 
+#include "LootTableProvider.h"
 
 namespace LootTable
 {
-	/** Gets the eType from String. Defaults to generic */
+	/** Gets the eType from String. Defaults to Generic */
 	enum eType eType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Empty") == 0)
@@ -56,7 +59,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("Unknown Loot table type provided: %s. defaulting to Generic", a_Type);
+			LOGWARNING("Unknown Loot table type provided: %s. defaulting to Generic", a_Type.c_str());
 			return eType::Generic;
 		}
 	}
@@ -65,8 +68,8 @@ namespace LootTable
 
 
 
-	/**  */
-	enum eConditionType eConditionType(const AString a_Type)
+	/** Gets the eConditionType from String. Defaults to None */
+	enum eConditionType eConditionType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Alternative") == 0)
 		{
@@ -134,7 +137,53 @@ namespace LootTable
 		}
 		else
 		{
+			LOGWARNING("Unknown loot table condition provided: %s. Using no condition", a_Type.c_str());
 			return eConditionType::None;
+		}
+	}
+
+
+
+
+	/** Gets the ePoolEntryType from String. Defaults to Empty */
+	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
+	{
+		if (NoCaseCompare(a_Type, "Item") == 0)
+		{
+			return ePoolEntryType::Item;
+		}
+		else if (NoCaseCompare(a_Type, "Tag") == 0)
+		{
+			return ePoolEntryType::Tag;
+		}
+		else if (NoCaseCompare(a_Type, "LootTable") == 0)
+		{
+			return ePoolEntryType::LootTable;
+		}
+		else if (NoCaseCompare(a_Type, "Group") == 0)
+		{
+			return ePoolEntryType::Group;
+		}
+		else if (NoCaseCompare(a_Type, "Alternatives") == 0)
+		{
+			return ePoolEntryType::Alternatives;
+		}
+		else if (NoCaseCompare(a_Type, "Sequence") == 0)
+		{
+			return ePoolEntryType::Sequence;
+		}
+		else if (NoCaseCompare(a_Type, "Dynamic") == 0)
+		{
+			return ePoolEntryType::Dynamic;
+		}
+		else if (NoCaseCompare(a_Type, "Empty") == 0)
+		{
+			return ePoolEntryType::Empty;
+		}
+		else
+		{
+			LOGWARNING("Unknown loot table pool entry type provided: %s. Defaulting to Empty", a_Type.c_str());
+			return ePoolEntryType::Empty;
 		}
 	}
 
@@ -500,14 +549,27 @@ namespace LootTable
 
 
 
-cLootTableProvider::cLootTableProvider(cWorld * a_World)
+cLootTableProvider::cLootTableProvider(AString & a_Path):
+	m_Path(a_Path)
 {
-	m_World = a_World;
-
+	LOG("Loading loot tables...");
 	// Load default loot tables
-
-
-	auto Path = m_World->GetDataPath();
+	for (const auto & FileName: LootTable::FileNames)
+	{
+		auto FilePath = Printf(FileName.c_str(), cFile::PathSeparator());
+		auto FilePathWithPrefix = Printf("LootTables%c%s", cFile::PathSeparator(), FilePath.c_str());
+		auto Data = cFile::ReadWholeFile(FilePathWithPrefix);
+		if (Data != "")
+		{
+			LoadLootTable(Data);
+		}
+		else
+		{
+			// Todo: write better error message
+			LOGERROR("Could not find default loot table: %s! "
+					 "Please make sure the file is readable or download them from cuberite.org", FilePath.c_str());
+		}
+	}
 	// Check for custom tables
 
 	// Load if available
@@ -517,9 +579,19 @@ cLootTableProvider::cLootTableProvider(cWorld * a_World)
 
 
 
-void cLootTableProvider::LoadLootTable(AString & a_FilePath)
+void cLootTableProvider::LoadLootTable(const AString & a_String)
 {
-
+	AString ErrorMessage;
+	Json::Value JsonObject;
+	JsonUtils::ParseString(a_String, JsonObject, & ErrorMessage);
+	if ((ErrorMessage != "") || !JsonObject.isObject())
+	{
+		LOGERROR(ErrorMessage);
+	}
+	else
+	{
+		LOG(LootTable::NamespaceConverter(JsonObject["type"].as<AString>()));
+	}
 }
 
 
@@ -533,19 +605,16 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 	if (Data.size() != 2)
 	{
 		LOGWARNING("Got ill formatted string: \"%s\" to look up a loot table.\n"
-			"Please use Type|Subtype. Returning empty loot table!", a_Name);
-		return std::make_shared<cLootTable>(cEmptyLootTable());
+			"Please use Type|Subtype. Returning empty loot table!", a_Name.c_str());
+		return std::make_shared<cLootTable>(cLootTable());
 	}
 
 	auto Type = LootTable::eType(Data[0]);
 
 	switch (Type)
 	{
-		case LootTable::eType::Chest:
-		{
-			return GetLootTable(LootTable::eChestType(Data[1]));
-		}
-		default: return std::make_shared<cLootTable>(cEmptyLootTable());
+		case LootTable::eType::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
+		default:                      return std::make_shared<cLootTable>(cLootTable());
 	}
 }
 
@@ -555,7 +624,7 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 
 std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
 {
-	return std::make_shared<cLootTable>(cEmptyLootTable());
+	return std::make_shared<cLootTable>(cLootTable());
 }
 
 
@@ -564,14 +633,16 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const enum LootTabl
 
 cLootTable::cLootTable()
 {
-
+	m_Type = LootTable::eType::Empty;
+	m_LootTableFunctions = cLootTableFunctionVector();
+	m_LootTablePools = cLootTablePoolVector();
 }
 
 
 
 
 
-cLootTable::cLootTable(const AString & a_Description)
+cLootTable::cLootTable(const Json::Value & a_Description)
 {
 
 }
