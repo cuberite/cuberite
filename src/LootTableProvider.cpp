@@ -1,12 +1,12 @@
 
 // cLootTableProvider.cpp
 
+#include "LootTableProvider.h"
+
 #include "OSSupport/File.h"
 #include "JsonUtils.h"
 #include "json/json.h"
 #include "BlockEntities/BlockEntityWithItems.h"
-
-#include "LootTableProvider.h"
 
 namespace LootTable
 {
