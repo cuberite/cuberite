@@ -652,8 +652,7 @@ namespace LootTable
 
 
 
-cLootTableProvider::cLootTableProvider(AString & a_Path):
-	m_Path(a_Path)
+cLootTableProvider::cLootTableProvider(AString & a_Path)
 {
 	LOG("Loading loot tables...");
 	// Load default loot tables
@@ -673,10 +672,27 @@ cLootTableProvider::cLootTableProvider(AString & a_Path):
 			"Please make sure the file is readable or download them from cuberite.org", FilePathWithPrefix.c_str());
 		}
 	}
-	// Check for custom tables
 
-	// Load if available
+	// Check for custom tables
+	for (auto & FileName: LootTable::FileNames)
+	{
+		auto FilePath = Printf(FileName.c_str(), cFile::PathSeparator());
+		auto FilePathWithPrefix = Printf("LootTables%c%s", cFile::PathSeparator(), FilePath.c_str());
+		auto FilePathWithWorld = Printf("%s%c%s", a_Path.c_str(), cFile::PathSeparator(), FilePathWithPrefix.c_str());
+		auto Data = cFile::ReadWholeFile(FilePathWithWorld);
+		if (Data != "")
+		{
+			LOG("Found custom loot table: %s", FilePathWithWorld);
+			LoadLootTable(Data, const_cast<AString &>(FileName));
+		}
+	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// cLootTableProvider
+
+
+const cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
 
 
 
@@ -697,9 +713,10 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Typ
 		{
 			case LootTable::eType::Chest:
 			{
-				LootTable::Replace(a_Type, "Chests%c", "");
-				auto ChestType = LootTable::eChestType(a_Type);
-				m_ChestLootTables.insert(std::pair<enum LootTable::eChestType, std::shared_ptr<cLootTable>>(ChestType, std::make_shared<cLootTable>(JsonObject)));
+				auto Name = a_Type;
+				LootTable::Replace(Name, "Chests%c", "");
+				auto ChestType = LootTable::eChestType(Name);
+				m_ChestLootTables[ChestType] = cLootTable(JsonObject);
 				break;
 			}
 			default:
@@ -715,7 +732,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Typ
 
 
 
-std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_Name) const
+const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name) const
 {
 	auto Data = StringSplitAndTrim(a_Name,"|");
 
@@ -723,7 +740,7 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 	{
 		LOGWARNING("Got ill formatted string: \"%s\" to look up a loot table.\n"
 			"Please use Type|Subtype. Returning empty loot table!", a_Name.c_str());
-		return std::make_shared<cLootTable>(cLootTable());
+		return & m_EmptyLootTable;
 	}
 
 	auto Type = LootTable::eType(Data[0]);
@@ -734,7 +751,7 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 		default:
 		{
 			LOGWARNING("Trying to use unsupported or unknown loot table type: %s", Data[1].c_str());
-			return std::make_shared<cLootTable>(cLootTable());
+			return & m_EmptyLootTable;
 		}
 	}
 }
@@ -743,13 +760,14 @@ std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const AString & a_N
 
 
 
-std::shared_ptr<cLootTable> cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
+const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
 {
-	return std::make_shared<cLootTable>();
+	// Todo: fix this
+	return & m_ChestLootTables.find(a_Type)->second;
 }
 
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cLootTable
 
 
 cLootTable::cLootTable()
@@ -797,7 +815,18 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems & a_BlockEntity)
+cLootTable::cLootTable(cLootTable & a_Other)
+{
+	m_Type = a_Other.m_Type;
+	m_LootTableFunctions = a_Other.m_LootTableFunctions;
+	m_LootTablePools = a_Other.m_LootTablePools;
+}
+
+
+
+
+
+bool cLootTable::FillWithLoot(cBlockEntityWithItems & a_BlockEntity) const
 {
 	return false;
 }

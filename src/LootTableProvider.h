@@ -32,7 +32,7 @@ namespace LootTable
 	/** Expected filenames of loot tables.
 	This list is used for reference when looking for custom loot tables.
 	The path to the folder is added later on. (global and per world). */
-	const AString  FileNames[] =
+	const AString FileNames[] =
 	{
 		"Chests%cAbandonedMineshaft.json",
 		"Chests%cBuriedTreasure.json",
@@ -426,8 +426,10 @@ public:
 	/** Creates new loot table from string describing the loot table */
 	cLootTable(const Json::Value & a_Description);
 
+	cLootTable(cLootTable & a_Other);
+
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems & a_BlockEntity);
+	bool FillWithLoot(cBlockEntityWithItems & a_BlockEntity) const;
 
 protected:
 	/** Type of loot table */
@@ -454,7 +456,10 @@ private:
 };
 
 // typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cMonsterLootTableMap;
-typedef std::map<enum LootTable::eChestType, std::shared_ptr<cLootTable>> cChestLootTableMap;
+typedef std::map<enum LootTable::eChestType, cLootTable> cChestLootTableMap;
+
+
+
 
 /** The LootTableProvider is used per world to ask for loot tables */
 class cLootTableProvider
@@ -473,10 +478,8 @@ public:
 	example:   Monster|Skeleton
 	example:   Block|Stone
 	This is not case sensitive, and removes all spaces */
-	std::shared_ptr<cLootTable> GetLootTable(const AString & a_Name) const;
-	// std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block) const;
-	// std::shared_ptr<cLootTable> GetLootTable(const BLOCKTYPE a_Block, const ENUM_BLOCK_META) const;
-	std::shared_ptr<cLootTable> GetLootTable(const enum LootTable::eChestType a_Type) const;
+	const cLootTable * GetLootTable(const AString & a_Name) const;
+	const cLootTable * GetLootTable(const enum LootTable::eChestType a_Type) const;
 	// std::shared_ptr<cLootTable> GetLootTable(const eMonsterType a_Type) const;
 
 	/** Drops the loot of a_Monster specified by the loot tables */
@@ -488,8 +491,8 @@ private:
 	cChestLootTableMap m_ChestLootTables = cChestLootTableMap();
 	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();^
 
-	/** Path to the world folder */
-	AString m_Path;
+	/** Empty loot table in case there is an error */
+	static const cLootTable m_EmptyLootTable;
 };
 
 
