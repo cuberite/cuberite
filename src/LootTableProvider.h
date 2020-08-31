@@ -29,7 +29,9 @@ Notes:
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 {
-	/** Expected filenames of loot tables */
+	/** Expected filenames of loot tables.
+	This list is used for reference when looking for custom loot tables.
+	The path to the folder is added later on. (global and per world). */
 	const AString  FileNames[] =
 	{
 		"Chests%cAbandonedMineshaft.json",

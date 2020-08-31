@@ -145,6 +145,106 @@ namespace LootTable
 
 
 
+	enum eFunctionType eFunctionType(const AString & a_Type)
+	{
+		if (NoCaseCompare(a_Type, "ApplyBonus") == 0)
+		{
+			return eFunctionType::ApplyBonus;
+		}
+		else if (NoCaseCompare(a_Type, "CopyName") == 0)
+		{
+			return eFunctionType::CopyName;
+		}
+		else if (NoCaseCompare(a_Type, "CopyNbt") == 0)
+		{
+			return eFunctionType::CopyNbt;
+		}
+		else if (NoCaseCompare(a_Type, "CopyState") == 0)
+		{
+			return eFunctionType::CopyState;
+		}
+		else if (NoCaseCompare(a_Type, "EnchantRandomly") == 0)
+		{
+			return eFunctionType::EnchantRandomly;
+		}
+		else if (NoCaseCompare(a_Type, "EnchantWithLevels") == 0)
+		{
+			return eFunctionType::EnchantWithLevels;
+		}
+		else if (NoCaseCompare(a_Type, "ExplorationMap") == 0)
+		{
+			return eFunctionType::ExplorationMap;
+		}
+		else if (NoCaseCompare(a_Type, "ExplosionDecay") == 0)
+		{
+			return eFunctionType::ExplosionDecay;
+		}
+		else if (NoCaseCompare(a_Type, "FurnaceSmelt") == 0)
+		{
+			return eFunctionType::FurnaceSmelt;
+		}
+		else if (NoCaseCompare(a_Type, "FillPlayerHead") == 0)
+		{
+			return eFunctionType::FillPlayerHead;
+		}
+		else if (NoCaseCompare(a_Type, "LimitCount") == 0)
+		{
+			return eFunctionType::LimitCount;
+		}
+		else if (NoCaseCompare(a_Type, "LootingEnchant") == 0)
+		{
+			return eFunctionType::LootingEnchant;
+		}
+		else if (NoCaseCompare(a_Type, "SetAttributes") == 0)
+		{
+			return eFunctionType::SetAttributes;
+		}
+		else if (NoCaseCompare(a_Type, "SetContents") == 0)
+		{
+			return eFunctionType::SetContents;
+		}
+		else if (NoCaseCompare(a_Type, "SetCount") == 0)
+		{
+			return eFunctionType::SetCount;
+		}
+		else if (NoCaseCompare(a_Type, "SetDamage") == 0)
+		{
+			return eFunctionType::SetDamage;
+		}
+		else if (NoCaseCompare(a_Type, "SetLootTable") == 0)
+		{
+			return eFunctionType::SetLootTable;
+		}
+		else if (NoCaseCompare(a_Type, "SetLore") == 0)
+		{
+			return eFunctionType::SetLore;
+		}
+		else if (NoCaseCompare(a_Type, "SetName") == 0)
+		{
+			return eFunctionType::SetName;
+		}
+		else if (NoCaseCompare(a_Type, "SetNbt") == 0)
+		{
+			return eFunctionType::SetNbt;
+		}
+		else if (NoCaseCompare(a_Type, "SetStewEffect") == 0)
+		{
+			return eFunctionType::SetStewEffect;
+		}
+		else if (NoCaseCompare(a_Type, "None") == 0)
+		{
+			return eFunctionType::None;
+		}
+		else
+		{
+			LOGWARNING("Unknown loot table function provided: %s. Using empty function", a_Type.c_str());
+			return eFunctionType::None;
+		}
+	}
+
+
+
+
 	/** Gets the ePoolEntryType from String. Defaults to Empty */
 	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
 	{
