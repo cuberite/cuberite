@@ -1,5 +1,0 @@
-# Ignore the scripts' inputs and outputs:
-/loot_tables
-*.cpp
-*.h
-
