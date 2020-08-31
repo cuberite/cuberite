@@ -598,15 +598,18 @@ namespace LootTable
 
 
 	/** Replaces a_From with a_To in a_String */
-	bool Replace(AString & a_String, const AString & a_From, const AString & a_To)
+	void Replace(AString & a_String, const AString & a_From, const AString & a_To)
 	{
-		size_t start_pos = a_String.find(a_From);
-		if (start_pos == AString ::npos)
+		size_t start_pos;
+		while (true)
 		{
-			return false;
+			start_pos = a_String.find(a_From);
+			if (start_pos == AString ::npos)
+			{
+				return;
+			}
+			a_String.replace(start_pos, a_From.length(), a_To);
 		}
-		a_String.replace(start_pos, a_From.length(), a_To);
-		return true;
 	}
 
 
@@ -695,7 +698,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Typ
 			case LootTable::eType::Chest:
 			{
 				LootTable::Replace(a_Type, "Chests%c", "");
-				auto ChestType = LootTable::eChestType(LootTable::NamespaceConverter(a_Type));
+				auto ChestType = LootTable::eChestType(a_Type);
 				m_ChestLootTables.insert(std::pair<enum LootTable::eChestType, std::shared_ptr<cLootTable>>(ChestType, std::make_shared<cLootTable>(JsonObject)));
 				break;
 			}
@@ -762,31 +765,32 @@ cLootTable::cLootTable()
 
 cLootTable::cLootTable(const Json::Value & a_Description)
 {
-	m_Type = LootTable::eType(LootTable::NamespaceConverter(a_Description["type"].asString()));
-	if (m_Type == LootTable::eType::Empty)
+	m_LootTablePools = cLootTablePoolVector();
+	m_LootTableFunctions = cLootTableFunctionVector();
+
+	for (auto const & RootId : a_Description.getMemberNames())
 	{
-		return;
+		if (NoCaseCompare(RootId, "type") == 0)
+		{
+			m_Type = LootTable::eType(LootTable::NamespaceConverter(a_Description[RootId].asString()));
+		}
+		else if (NoCaseCompare(RootId, "pools") == 0)
+		{
+			Json::Value Pools = a_Description[RootId];
+			for (auto PoolId = 0; PoolId < Pools.size(); PoolId++)
+			{
+				ReadLootTablePool(Pools[PoolId]);
+			}
+		}
+		else if (NoCaseCompare(RootId, "functions") == 0)
+		{
+			auto FunctionsObject = a_Description[RootId];
+			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			{
+				m_LootTableFunctions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
+			}
+		}
 	}
-}
-
-
-
-
-
-cLootTable::cLootTable(const cLootTable & a_Other)
-{
-	m_Type = a_Other.m_Type;
-	m_LootTablePools = a_Other.m_LootTablePools;
-	m_LootTableFunctions = a_Other.m_LootTableFunctions;
-}
-
-
-
-
-
-cLootTable::~cLootTable()
-{
-
 }
 
 
@@ -796,6 +800,284 @@ cLootTable::~cLootTable()
 bool cLootTable::FillWithLoot(cBlockEntityWithItems & a_BlockEntity)
 {
 	return false;
+}
+
+
+
+
+
+void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
+{
+	cLootTablePoolRolls PoolRolls;
+	cLootTablePoolRolls PoolBonusRolls;
+	cLootTablePoolEntryVector PoolEntries;
+	cLootTableFunctionVector Functions;
+	cLootTableConditionVector Conditions;
+	for (auto & PoolElement : a_Value.getMemberNames())
+	{
+		if (NoCaseCompare(PoolElement, "rolls") == 0)
+		{
+			auto Rolls = a_Value[PoolElement];
+			if (Rolls.isInt())
+			{
+				PoolRolls = cLootTablePoolRolls(Rolls.asInt(), 0, 0);
+			}
+			else
+			{
+				int Min = -1, Max = -1;
+				for (auto & RollEntry: Rolls.getMemberNames())
+				{
+					if (NoCaseCompare(RollEntry, "min") == 0)
+					{
+						Min = Rolls[RollEntry].asInt();
+					}
+					else if (NoCaseCompare(RollEntry, "max") == 0)
+					{
+						Max = Rolls[RollEntry].asInt();
+					}
+					// Todo - add type
+				}
+				// Todo: add info on which file is wrong
+				if (Min == -1)
+				{
+					LOGWARNING("Missing Minimum value in ... Dropping loot table pool.");
+					return;
+				}
+				if (Max == -1)
+				{
+					LOGWARNING("Missing maximum value in ... Dropping loot table pool.");
+					return;
+				}
+				PoolRolls = cLootTablePoolRolls(-1, Min, Max);
+			}
+		}
+		else if (NoCaseCompare(PoolElement, "bonus_rolls") == 0)
+		{
+			// TODO
+		}
+		else if (NoCaseCompare(PoolElement, "entries") == 0)
+		{
+			auto Entries = a_Value[PoolElement];
+			for (auto EntryIndex = 0; EntryIndex < Entries.size(); EntryIndex++)
+			{
+				auto Entry = Entries[EntryIndex];
+				PoolEntries.push_back(ReadLootTablePoolEntry(Entry));
+			}
+		}
+		else if (NoCaseCompare(PoolElement, "functions") == 0)
+		{
+			auto FunctionsObject = a_Value[PoolElement];
+			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			{
+				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
+			}
+		}
+		else if (NoCaseCompare(PoolElement, "conditions") == 0)
+		{
+			auto ConditionsObject = a_Value[PoolElement];
+			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			{
+				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
+			}
+		}
+	}
+	m_LootTablePools.push_back(cLootTablePool(PoolRolls, PoolEntries, Conditions));
+}
+
+
+
+
+
+cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value) const
+{
+	enum LootTable::eFunctionType Type;
+	AStringMap Parameter;
+	cLootTableConditionVector Conditions;
+	for (auto & FunctionInfo : a_Value.getMemberNames())
+	{
+		// TODO: variable depth
+		if (NoCaseCompare(FunctionInfo, "function") == 0)
+		{
+			Type = LootTable::eFunctionType(LootTable::NamespaceConverter(a_Value[FunctionInfo].asString()));
+		}
+		else if (NoCaseCompare(FunctionInfo, "conditions") == 0)
+		{
+			auto ConditionsObject = a_Value[FunctionInfo];
+			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			{
+				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
+			}
+		}
+		// This is a bit messy as the parameters of function come in different shapes
+		else if (a_Value[FunctionInfo].isString())
+		{
+			Parameter.insert(std::pair<AString, AString>(FunctionInfo, a_Value[FunctionInfo].asString()));
+		}
+		else if (a_Value[FunctionInfo].isObject())
+		{
+			auto FunctionParameter = a_Value[FunctionInfo];
+			for (auto & FunctionParameterName : FunctionParameter.getMemberNames())
+			{
+				Parameter.insert(std::pair<AString, AString>(FunctionParameterName, FunctionParameter[FunctionParameterName].asString()));
+			}
+		}
+		else if (a_Value[FunctionInfo].isArray())
+		{
+			auto FunctionParameter = a_Value[FunctionInfo];
+			for (auto FunctionParameterId = 0; FunctionParameterId < FunctionParameter.size(); FunctionParameterId++)
+			{
+				// Todo: find different name
+				auto FunctionParameterAdditionalInfo = FunctionParameter[FunctionParameterId];
+				for (auto & FunctionParameterAdditionalInfoName : FunctionParameterAdditionalInfo.getMemberNames())
+				{
+					if (FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName].isString())
+					{
+
+					}
+					else if (FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName].isObject())
+					{
+						auto ExtraInfo = FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName];
+						for (auto & ExtraInfoName : ExtraInfo.getMemberNames())
+						{
+							Parameter.insert(std::pair<AString, AString>(ExtraInfoName, ExtraInfo[ExtraInfoName].asString()));
+						}
+					}
+					else
+					{
+						LOGWARNING("Unknown function parameter %s", FunctionParameterAdditionalInfoName);
+					}
+				}
+			}
+		}
+	}
+	return cLootTableFunction(Type, Parameter, Conditions);
+}
+
+
+
+
+
+cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Value) const
+{
+	LOGWARNING("Loot table conditions are not yet supported");
+	return cLootTableCondition();
+}
+
+
+
+
+cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Value) const
+{
+	int Weight = 0;
+	enum LootTable::ePoolEntryType Type;
+	AString Parameter;
+	cItem Item;
+	cLootTableFunctionVector Functions;
+	cLootTableConditionVector Conditions;
+	// The type has to be known beforehand
+	if (a_Value.isMember("type"))
+	{
+		Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["type"].asString()));
+	}
+	else if (a_Value.isMember("Type"))
+	{
+		Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["Type"].asString()));
+	}
+	else
+	{
+		Type = LootTable::ePoolEntryType::Empty;
+	}
+
+	for (auto & EntryParameter : a_Value.getMemberNames())
+	{
+		if (NoCaseCompare(EntryParameter, "weight") == 0)
+		{
+			Weight = a_Value[EntryParameter].asInt();
+		}
+		else if (NoCaseCompare(EntryParameter, "name") == 0)
+		{
+			switch (Type)
+			{
+				case LootTable::ePoolEntryType::Item:
+				{
+					StringToItem(LootTable::NamespaceConverter(a_Value[EntryParameter].asString()), Item);
+					break;
+				}
+				case LootTable::ePoolEntryType::Tag:
+				{
+					Parameter = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
+					break;
+				}
+				case LootTable::ePoolEntryType::LootTable:
+				{
+					// TODO
+					LOGWARNING("Unsupported loot table entry type: Loot table. Dropping entry");
+					continue;
+				}
+				case LootTable::ePoolEntryType::Group:
+				{
+					// TODO
+					LOGWARNING("Unsupported loot table entry type: group. Dropping entry");
+					continue;
+				}
+				case LootTable::ePoolEntryType::Alternatives:
+				{
+					// TODO
+					LOGWARNING("Unsupported loot table entry type: alternatives. Dropping entry");
+					continue;
+				}
+				case LootTable::ePoolEntryType::Sequence:
+				{
+					// TODO
+					LOGWARNING("Unsupported loot table entry type: alternatives. Dropping entry");
+					continue;
+				}
+				case LootTable::ePoolEntryType::Dynamic:
+				{
+					Parameter = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
+					break;
+				}
+				case LootTable::ePoolEntryType::Empty:
+				{
+					// Does Nothing
+					break;
+				}
+			}
+		}
+		else if (NoCaseCompare(EntryParameter, "functions") == 0)
+		{
+			auto FunctionsObject = a_Value[EntryParameter];
+			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			{
+				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
+			}
+		}
+		else if (NoCaseCompare(EntryParameter, "conditions") == 0)
+		{
+			// TODO
+		}
+		else if (NoCaseCompare(EntryParameter, "children") == 0)
+		{
+			// TODO
+		}
+		else if (NoCaseCompare(EntryParameter, "expand") == 0)
+		{
+			// TODO
+		}
+		else if (NoCaseCompare(EntryParameter, "quality") == 0)
+		{
+			// TODO
+		}
+	}
+	if (Parameter != "")
+	{
+		return(cLootTablePoolEntry(Functions, Parameter, Weight, Conditions));
+	}
+	else
+	{
+		return(cLootTablePoolEntry(Functions, Item, Weight, Conditions));
+	}
+
 }
 
 

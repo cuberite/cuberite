@@ -205,7 +205,7 @@ namespace LootTable
 		Group,         // Child entries
 		Alternatives,  // Select one entry from the list
 		Sequence,      // Select entries until one cannot be granted
-		Dynamic,       // "generate block specific drops" - whatever that means
+		Dynamic,       // "generate block specific drops": drops the block itself as item
 		Empty
 	};
 
@@ -300,6 +300,19 @@ typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
 /** Stores the rolls of a pool */
 typedef struct cLootTablePoolRolls
 {
+	cLootTablePoolRolls()
+	{
+		m_Roll = 0;
+		m_RollsMin = 0;
+		m_RollsMax = 0;
+		m_BonusRoll = 0;
+		m_BonusRollsMin = 0;
+		m_BonusRollsMax = 0;
+	}
+
+
+
+
 	/** Pool rolls with optional bonus roll parameter - steady roll needs to be -1 to activate roll range */
 	cLootTablePoolRolls(
 		int a_Roll,
@@ -324,6 +337,9 @@ typedef struct cLootTablePoolRolls
 	int m_BonusRoll;
 	int m_BonusRollsMin;
 	int m_BonusRollsMax;
+	// Note: The loot tables specify another value (type) this is usually "Uniform".
+	// I think this is the probability distribution for the random value.
+	// The wiki doesn't have any information in it. So this is left out for now
 } cLootTablePoolRolls;
 
 
@@ -352,7 +368,7 @@ typedef struct cLootTablePoolEntry
 		cLootTableFunctionVector a_Functions,
 		AString a_Children,
 		int a_Weight,
-		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		cLootTableConditionVector a_Conditions
 	):
 		m_Functions(std::move(a_Functions)),
 		m_Children(std::move(a_Children)),
@@ -410,10 +426,6 @@ public:
 	/** Creates new loot table from string describing the loot table */
 	cLootTable(const Json::Value & a_Description);
 
-	cLootTable(const cLootTable & a_Other);
-
-	~cLootTable();
-
 	/** Fills the specified block entity at the position with loot and returns the success */
 	bool FillWithLoot(cBlockEntityWithItems & a_BlockEntity);
 
@@ -426,6 +438,19 @@ protected:
 
 	/** Vector of functions applied to all pools */
 	cLootTableFunctionVector m_LootTableFunctions;
+
+private:
+	/** Reads Loot Table pool from Json */
+	void ReadLootTablePool(const Json::Value & a_Value);
+
+	/** Reads a loot table function from Json */
+	cLootTableFunction ReadLootTableFunction(const Json::Value & a_Value) const;
+
+	/** Reads a loot table condition from Json */
+	cLootTableCondition ReadLootTableCondition(const Json::Value & a_Value) const;
+
+	/** Reads a loot table pool entry from Json */
+	cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value) const;
 };
 
 // typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cMonsterLootTableMap;
