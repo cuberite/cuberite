@@ -1,6 +1,7 @@
 
 // cLootTableProvider.cpp
 
+#include <ShlDisp.h>
 #include "LootTableProvider.h"
 
 #include "OSSupport/File.h"
@@ -764,8 +765,8 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name) cons
 
 const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
 {
-	// Todo: fix this
-	return & m_ChestLootTables.find(a_Type)->second;
+	return &(m_ChestLootTables.at(a_Type));
+	return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1309,8 +1310,11 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & 
 	{
 		for (int i = 0; i < a_Pool.m_Rolls.m_Roll; i++)
 		{
-			auto NewItems = GetItems(a_Pool.m_Entries, a_Noise, a_Pos, a_Player, a_Entity);
-			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			for (const auto & Entry : a_Pool.m_Entries)
+			{
+				auto NewItems = GetItems(Entry, a_Noise, a_Pos, a_Player, a_Entity);
+				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			}
 		}
 	}
 	else  // Roll range
@@ -1318,20 +1322,13 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & 
 		auto RollCount = a_Noise.IntNoise3DInt(a_Pos) % (a_Pool.m_Rolls.m_RollsMax - a_Pool.m_Rolls.m_RollsMin) + a_Pool.m_Rolls.m_RollsMin;
 		for (int i = 0; i < RollCount; i++)
 		{
-			auto NewItems = GetItems(a_Pool.m_Entries, a_Noise, a_Pos, a_Player, a_Entity);
-			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			for (const auto & Entry : a_Pool.m_Entries)
+			{
+				auto NewItems = GetItems(Entry, a_Noise, a_Pos, a_Player, a_Entity);
+				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			}
 		}
 	}
-	return Items;
-}
-
-
-
-
-
-std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntryVector & a_Entries, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
-{
-	auto Items = std::vector<cItem>();
 	return Items;
 }
 
@@ -1341,7 +1338,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntryVector & a_Entr
 
 std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
 {
-	// Todo add luck here, when it's implemented
+	// Todo: add luck here, when it's implemented
 	auto Items = std::vector<cItem>();
 	switch (a_Entry.m_Type)
 	{
@@ -1381,8 +1378,10 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNo
 		}
 		case LootTable::ePoolEntryType::Sequence:
 			break;
+			// TODO
 		case LootTable::ePoolEntryType::Dynamic:
 			break;
+			// TODO
 		case LootTable::ePoolEntryType::Empty:
 		{
 			Items.push_back(cItem(E_BLOCK_AIR));

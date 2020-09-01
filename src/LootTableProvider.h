@@ -543,8 +543,6 @@ private:
 
 	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
 
-	static std::vector<cItem> GetItems(const cLootTablePoolEntryVector & a_Entries, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
-
 	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
 
 	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
@@ -576,16 +574,12 @@ public:
 	This is not case sensitive, and removes all spaces */
 	const cLootTable * GetLootTable(const AString & a_Name) const;
 	const cLootTable * GetLootTable(const enum LootTable::eChestType a_Type) const;
-	// std::shared_ptr<cLootTable> GetLootTable(const eMonsterType a_Type) const;
-
-	/** Drops the loot of a_Monster specified by the loot tables */
-	// void DropLoot(const cMonster & a_Monster) const;  // Todo: move to unique id of monster
 
 private:
 
 	/** Maps containing custom loot tables */
-	cChestLootTableMap m_ChestLootTables = cChestLootTableMap();
-	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();^
+	cChestLootTableMap m_ChestLootTables;
+	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();
 
 	/** Empty loot table in case there is an error */
 	static const cLootTable m_EmptyLootTable;
