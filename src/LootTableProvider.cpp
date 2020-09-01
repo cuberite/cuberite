@@ -3,6 +3,8 @@
 
 #include "LootTableProvider.h"
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "OSSupport/File.h"
 #include "JsonUtils.h"
 #include "json/json.h"
@@ -12,57 +14,57 @@
 
 namespace LootTable
 {
-	/** Gets the eType from String. Defaults to Generic */
-	enum eType eType(const AString & a_Type)
+	/** Gets the Type::eType from String. Defaults to Generic */
+	Type::eType eType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Empty") == 0)
 		{
-			return eType::Empty;
+			return Type::eType::Empty;
 		}
 		else if (NoCaseCompare(a_Type, "Entity") == 0)
 		{
-			return eType::Entity;
+			return Type::eType::Entity;
 		}
 		else if (NoCaseCompare(a_Type, "Block") == 0)
 		{
-			return eType::Block;
+			return Type::eType::Block;
 		}
 		else if (NoCaseCompare(a_Type, "Chest") == 0)
 		{
-			return eType::Chest;
+			return Type::eType::Chest;
 		}
 		else if (NoCaseCompare(a_Type, "Fishing") == 0)
 		{
-			return eType::Fishing;
+			return Type::eType::Fishing;
 		}
 		else if (NoCaseCompare(a_Type, "Gift") == 0)
 		{
-			return eType::Gift;
+			return Type::eType::Gift;
 		}
 		else if (NoCaseCompare(a_Type, "AdvancementReward") == 0)
 		{
-			return eType::AdvancementReward;
+			return Type::eType::AdvancementReward;
 		}
 		else if (NoCaseCompare(a_Type, "Barter") == 0)
 		{
-			return eType::Barter;
+			return Type::eType::Barter;
 		}
 		else if (NoCaseCompare(a_Type, "Command") == 0)
 		{
-			return eType::Command;
+			return Type::eType::Command;
 		}
 		else if (NoCaseCompare(a_Type, "Selector") == 0)
 		{
-			return eType::Selector;
+			return Type::eType::Selector;
 		}
 		else if (NoCaseCompare(a_Type, "AdvancementEntity") == 0)
 		{
-			return eType::AdvancementEntity;
+			return Type::eType::AdvancementEntity;
 		}
 		else
 		{
 			LOGWARNING("Unknown Loot table type provided: %s. defaulting to Generic", a_Type.c_str());
-			return eType::Generic;
+			return Type::eType::Generic;
 		}
 	}
 
@@ -71,176 +73,176 @@ namespace LootTable
 
 
 	/** Gets the eConditionType from String. Defaults to None */
-	enum eConditionType eConditionType(const AString & a_Type)
+	ConditionType::eConditionType eConditionType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Alternative") == 0)
 		{
-			return eConditionType::Alternative;
+			return ConditionType::eConditionType::Alternative;
 		}
 		else if (NoCaseCompare(a_Type, "BlockStateProperty") == 0)
 		{
-			return eConditionType::BlockStateProperty;
+			return ConditionType::eConditionType::BlockStateProperty;
 		}
 		else if (NoCaseCompare(a_Type, "DamageSourceProperties") == 0)
 		{
-			return eConditionType::DamageSourceProperties;
+			return ConditionType::eConditionType::DamageSourceProperties;
 		}
 		else if (NoCaseCompare(a_Type, "EntityProperties") == 0)
 		{
-			return eConditionType::EntityProperties;
+			return ConditionType::eConditionType::EntityProperties;
 		}
 		else if (NoCaseCompare(a_Type, "EntityScores") == 0)
 		{
-			return eConditionType::EntityScores;
+			return ConditionType::eConditionType::EntityScores;
 		}
 		else if (NoCaseCompare(a_Type, "Inverted") == 0)
 		{
-			return eConditionType::Inverted;
+			return ConditionType::eConditionType::Inverted;
 		}
 		else if (NoCaseCompare(a_Type, "KilledByPlayer") == 0)
 		{
-			return eConditionType::KilledByPlayer;
+			return ConditionType::eConditionType::KilledByPlayer;
 		}
 		else if (NoCaseCompare(a_Type, "LocationCheck") == 0)
 		{
-			return eConditionType::LocationCheck;
+			return ConditionType::eConditionType::LocationCheck;
 		}
 		else if (NoCaseCompare(a_Type, "MatchTool") == 0)
 		{
-			return eConditionType::MatchTool;
+			return ConditionType::eConditionType::MatchTool;
 		}
 		else if (NoCaseCompare(a_Type, "RandomChance") == 0)
 		{
-			return eConditionType::RandomChance;
+			return ConditionType::eConditionType::RandomChance;
 		}
 		else if (NoCaseCompare(a_Type, "RandomChanceWithLooting") == 0)
 		{
-			return eConditionType::RandomChanceWithLooting;
+			return ConditionType::eConditionType::RandomChanceWithLooting;
 		}
 		else if (NoCaseCompare(a_Type, "Reference") == 0)
 		{
-			return eConditionType::Reference;
+			return ConditionType::eConditionType::Reference;
 		}
 		else if (NoCaseCompare(a_Type, "SurvivesExplosion") == 0)
 		{
-			return eConditionType::SurvivesExplosion;
+			return ConditionType::eConditionType::SurvivesExplosion;
 		}
 		else if (NoCaseCompare(a_Type, "TableBonus") == 0)
 		{
-			return eConditionType::TableBonus;
+			return ConditionType::eConditionType::TableBonus;
 		}
 		else if (NoCaseCompare(a_Type, "TimeCheck") == 0)
 		{
-			return eConditionType::TimeCheck;
+			return ConditionType::eConditionType::TimeCheck;
 		}
 		else if (NoCaseCompare(a_Type, "WeatherCheck") == 0)
 		{
-			return eConditionType::WeatherCheck;
+			return ConditionType::eConditionType::WeatherCheck;
 		}
 		else
 		{
 			LOGWARNING("Unknown loot table condition provided: %s. Using no condition", a_Type.c_str());
-			return eConditionType::None;
+			return ConditionType::eConditionType::None;
 		}
 	}
 
 
 
 
-	enum eFunctionType eFunctionType(const AString & a_Type)
+	FunctionType::eFunctionType eFunctionType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "ApplyBonus") == 0)
 		{
-			return eFunctionType::ApplyBonus;
+			return FunctionType::eFunctionType::ApplyBonus;
 		}
 		else if (NoCaseCompare(a_Type, "CopyName") == 0)
 		{
-			return eFunctionType::CopyName;
+			return FunctionType::eFunctionType::CopyName;
 		}
 		else if (NoCaseCompare(a_Type, "CopyNbt") == 0)
 		{
-			return eFunctionType::CopyNbt;
+			return FunctionType::eFunctionType::CopyNbt;
 		}
 		else if (NoCaseCompare(a_Type, "CopyState") == 0)
 		{
-			return eFunctionType::CopyState;
+			return FunctionType::eFunctionType::CopyState;
 		}
 		else if (NoCaseCompare(a_Type, "EnchantRandomly") == 0)
 		{
-			return eFunctionType::EnchantRandomly;
+			return FunctionType::eFunctionType::EnchantRandomly;
 		}
 		else if (NoCaseCompare(a_Type, "EnchantWithLevels") == 0)
 		{
-			return eFunctionType::EnchantWithLevels;
+			return FunctionType::eFunctionType::EnchantWithLevels;
 		}
 		else if (NoCaseCompare(a_Type, "ExplorationMap") == 0)
 		{
-			return eFunctionType::ExplorationMap;
+			return FunctionType::eFunctionType::ExplorationMap;
 		}
 		else if (NoCaseCompare(a_Type, "ExplosionDecay") == 0)
 		{
-			return eFunctionType::ExplosionDecay;
+			return FunctionType::eFunctionType::ExplosionDecay;
 		}
 		else if (NoCaseCompare(a_Type, "FurnaceSmelt") == 0)
 		{
-			return eFunctionType::FurnaceSmelt;
+			return FunctionType::eFunctionType::FurnaceSmelt;
 		}
 		else if (NoCaseCompare(a_Type, "FillPlayerHead") == 0)
 		{
-			return eFunctionType::FillPlayerHead;
+			return FunctionType::eFunctionType::FillPlayerHead;
 		}
 		else if (NoCaseCompare(a_Type, "LimitCount") == 0)
 		{
-			return eFunctionType::LimitCount;
+			return FunctionType::eFunctionType::LimitCount;
 		}
 		else if (NoCaseCompare(a_Type, "LootingEnchant") == 0)
 		{
-			return eFunctionType::LootingEnchant;
+			return FunctionType::eFunctionType::LootingEnchant;
 		}
 		else if (NoCaseCompare(a_Type, "SetAttributes") == 0)
 		{
-			return eFunctionType::SetAttributes;
+			return FunctionType::eFunctionType::SetAttributes;
 		}
 		else if (NoCaseCompare(a_Type, "SetContents") == 0)
 		{
-			return eFunctionType::SetContents;
+			return FunctionType::eFunctionType::SetContents;
 		}
 		else if (NoCaseCompare(a_Type, "SetCount") == 0)
 		{
-			return eFunctionType::SetCount;
+			return FunctionType::eFunctionType::SetCount;
 		}
 		else if (NoCaseCompare(a_Type, "SetDamage") == 0)
 		{
-			return eFunctionType::SetDamage;
+			return FunctionType::eFunctionType::SetDamage;
 		}
 		else if (NoCaseCompare(a_Type, "SetLootTable") == 0)
 		{
-			return eFunctionType::SetLootTable;
+			return FunctionType::eFunctionType::SetLootTable;
 		}
 		else if (NoCaseCompare(a_Type, "SetLore") == 0)
 		{
-			return eFunctionType::SetLore;
+			return FunctionType::eFunctionType::SetLore;
 		}
 		else if (NoCaseCompare(a_Type, "SetName") == 0)
 		{
-			return eFunctionType::SetName;
+			return FunctionType::eFunctionType::SetName;
 		}
 		else if (NoCaseCompare(a_Type, "SetNbt") == 0)
 		{
-			return eFunctionType::SetNbt;
+			return FunctionType::eFunctionType::SetNbt;
 		}
 		else if (NoCaseCompare(a_Type, "SetStewEffect") == 0)
 		{
-			return eFunctionType::SetStewEffect;
+			return FunctionType::eFunctionType::SetStewEffect;
 		}
 		else if (NoCaseCompare(a_Type, "None") == 0)
 		{
-			return eFunctionType::None;
+			return FunctionType::eFunctionType::None;
 		}
 		else
 		{
 			LOGWARNING("Unknown loot table function provided: %s. Using empty function", a_Type.c_str());
-			return eFunctionType::None;
+			return FunctionType::eFunctionType::None;
 		}
 	}
 
@@ -248,44 +250,44 @@ namespace LootTable
 
 
 	/** Gets the ePoolEntryType from String. Defaults to Empty */
-	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
+	PoolEntryType::ePoolEntryType ePoolEntryType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Item") == 0)
 		{
-			return ePoolEntryType::Item;
+			return PoolEntryType::ePoolEntryType::Item;
 		}
 		else if (NoCaseCompare(a_Type, "Tag") == 0)
 		{
-			return ePoolEntryType::Tag;
+			return PoolEntryType::ePoolEntryType::Tag;
 		}
 		else if (NoCaseCompare(a_Type, "LootTable") == 0)
 		{
-			return ePoolEntryType::LootTable;
+			return PoolEntryType::ePoolEntryType::LootTable;
 		}
 		else if (NoCaseCompare(a_Type, "Group") == 0)
 		{
-			return ePoolEntryType::Group;
+			return PoolEntryType::ePoolEntryType::Group;
 		}
 		else if (NoCaseCompare(a_Type, "Alternatives") == 0)
 		{
-			return ePoolEntryType::Alternatives;
+			return PoolEntryType::ePoolEntryType::Alternatives;
 		}
 		else if (NoCaseCompare(a_Type, "Sequence") == 0)
 		{
-			return ePoolEntryType::Sequence;
+			return PoolEntryType::ePoolEntryType::Sequence;
 		}
 		else if (NoCaseCompare(a_Type, "Dynamic") == 0)
 		{
-			return ePoolEntryType::Dynamic;
+			return PoolEntryType::ePoolEntryType::Dynamic;
 		}
 		else if (NoCaseCompare(a_Type, "Empty") == 0)
 		{
-			return ePoolEntryType::Empty;
+			return PoolEntryType::ePoolEntryType::Empty;
 		}
 		else
 		{
 			LOGWARNING("Unknown loot table pool entry type provided: %s. Defaulting to Empty", a_Type.c_str());
-			return ePoolEntryType::Empty;
+			return PoolEntryType::ePoolEntryType::Empty;
 		}
 	}
 
@@ -293,161 +295,161 @@ namespace LootTable
 
 
 	/** Gets the eChestType from String as of 1.16.2 */
-	enum eChestType eChestType(const AString & a_Type)
+	ChestType::eChestType eChestType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "AbandonedMineshaft") == 0)
 		{
-			return eChestType::AbandonedMineshaft;
+			return ChestType::eChestType::AbandonedMineshaft;
 		}
 		else if (NoCaseCompare(a_Type, "BuriedTreasure") == 0)
 		{
-			return eChestType::BuriedTreasure;
+			return ChestType::eChestType::BuriedTreasure;
 		}
 		else if (NoCaseCompare(a_Type, "DesertPyramid") == 0)
 		{
-			return eChestType::DesertPyramid;
+			return ChestType::eChestType::DesertPyramid;
 		}
 		else if (NoCaseCompare(a_Type, "EndCityTreasure") == 0)
 		{
-			return eChestType::EndCityTreasure;
+			return ChestType::eChestType::EndCityTreasure;
 		}
 		else if (NoCaseCompare(a_Type, "IglooChest") == 0)
 		{
-			return eChestType::IglooChest;
+			return ChestType::eChestType::IglooChest;
 		}
 		else if (NoCaseCompare(a_Type, "JungleTemple") == 0)
 		{
-			return eChestType::JungleTemple;
+			return ChestType::eChestType::JungleTemple;
 		}
 		else if (NoCaseCompare(a_Type, "JungleTempleDispenser") == 0)
 		{
-			return eChestType::JungleTempleDispenser;
+			return ChestType::eChestType::JungleTempleDispenser;
 		}
 		else if (NoCaseCompare(a_Type, "NetherBridge") == 0)
 		{
-			return eChestType::NetherBridge;
+			return ChestType::eChestType::NetherBridge;
 		}
 		else if (NoCaseCompare(a_Type, "PillagerOutpost") == 0)
 		{
-			return eChestType::PillagerOutpost;
+			return ChestType::eChestType::PillagerOutpost;
 		}
 		else if (NoCaseCompare(a_Type, "ShipwreckMap") == 0)
 		{
-			return eChestType::ShipwreckMap;
+			return ChestType::eChestType::ShipwreckMap;
 		}
 		else if (NoCaseCompare(a_Type, "ShipwreckSupply") == 0)
 		{
-			return eChestType::ShipwreckSupply;
+			return ChestType::eChestType::ShipwreckSupply;
 		}
 		else if (NoCaseCompare(a_Type, "ShipwreckTreasure") == 0)
 		{
-			return eChestType::ShipwreckTreasure;
+			return ChestType::eChestType::ShipwreckTreasure;
 		}
 		else if (NoCaseCompare(a_Type, "SimpleDungeon") == 0)
 		{
-			return eChestType::SimpleDungeon;
+			return ChestType::eChestType::SimpleDungeon;
 		}
 		else if (NoCaseCompare(a_Type, "SpawnBonusChest") == 0)
 		{
-			return eChestType::SpawnBonusChest;
+			return ChestType::eChestType::SpawnBonusChest;
 		}
 		else if (NoCaseCompare(a_Type, "StrongholdCorridor") == 0)
 		{
-			return eChestType::StrongholdCorridor;
+			return ChestType::eChestType::StrongholdCorridor;
 		}
 		else if (NoCaseCompare(a_Type, "StrongholdCrossing") == 0)
 		{
-			return eChestType::StrongholdCrossing;
+			return ChestType::eChestType::StrongholdCrossing;
 		}
 		else if (NoCaseCompare(a_Type, "StrongholdLibrary") == 0)
 		{
-			return eChestType::StrongholdLibrary;
+			return ChestType::eChestType::StrongholdLibrary;
 		}
 		else if (NoCaseCompare(a_Type, "UnderwaterRuinBig") == 0)
 		{
-			return eChestType::UnderwaterRuinBig;
+			return ChestType::eChestType::UnderwaterRuinBig;
 		}
 		else if (NoCaseCompare(a_Type, "UnderwaterRuinSmall") == 0)
 		{
-			return eChestType::UnderwaterRuinSmall;
+			return ChestType::eChestType::UnderwaterRuinSmall;
 		}
 
 			/* Village chest types */
 
 		else if (NoCaseCompare(a_Type, "VillageArmorer") == 0)
 		{
-			return eChestType::VillageArmorer;
+			return ChestType::eChestType::VillageArmorer;
 		}
 		else if (NoCaseCompare(a_Type, "VillageButcher") == 0)
 		{
-			return eChestType::VillageButcher;
+			return ChestType::eChestType::VillageButcher;
 		}
 		else if (NoCaseCompare(a_Type, "VillageCartographer") == 0)
 		{
-			return eChestType::VillageCartographer;
+			return ChestType::eChestType::VillageCartographer;
 		}
 		else if (NoCaseCompare(a_Type, "VillageDesertHouse") == 0)
 		{
-			return eChestType::VillageDesertHouse;
+			return ChestType::eChestType::VillageDesertHouse;
 		}
 		else if (NoCaseCompare(a_Type, "VillageFisher") == 0)
 		{
-			return eChestType::VillageFisher;
+			return ChestType::eChestType::VillageFisher;
 		}
 		else if (NoCaseCompare(a_Type, "VillageFletcher") == 0)
 		{
-			return eChestType::VillageFletcher;
+			return ChestType::eChestType::VillageFletcher;
 		}
 		else if (NoCaseCompare(a_Type, "VillageMason") == 0)
 		{
-			return eChestType::VillageMason;
+			return ChestType::eChestType::VillageMason;
 		}
 		else if (NoCaseCompare(a_Type, "VillagePlainsHouse") == 0)
 		{
-			return eChestType::VillagePlainsHouse;
+			return ChestType::eChestType::VillagePlainsHouse;
 		}
 		else if (NoCaseCompare(a_Type, "VillageSavannaHouse") == 0)
 		{
-			return eChestType::VillageSavannaHouse;
+			return ChestType::eChestType::VillageSavannaHouse;
 		}
 		else if (NoCaseCompare(a_Type, "VillageShepherd") == 0)
 		{
-			return eChestType::VillageShepherd;
+			return ChestType::eChestType::VillageShepherd;
 		}
 		else if (NoCaseCompare(a_Type, "VillageSnowyHouse") == 0)
 		{
-			return eChestType::VillageSnowyHouse;
+			return ChestType::eChestType::VillageSnowyHouse;
 		}
 		else if (NoCaseCompare(a_Type, "VillageTaigaHouse") == 0)
 		{
-			return eChestType::VillageTaigaHouse;
+			return ChestType::eChestType::VillageTaigaHouse;
 		}
 		else if (NoCaseCompare(a_Type, "VillageTannery") == 0)
 		{
-			return eChestType::VillageTannery;
+			return ChestType::eChestType::VillageTannery;
 		}
 		else if (NoCaseCompare(a_Type, "VillageTemple") == 0)
 		{
-			return eChestType::VillageTemple;
+			return ChestType::eChestType::VillageTemple;
 		}
 		else if (NoCaseCompare(a_Type, "VillageToolsmith") == 0)
 		{
-			return eChestType::VillageToolsmith;
+			return ChestType::eChestType::VillageToolsmith;
 		}
 		else if (NoCaseCompare(a_Type, "VillageWeaponsmith") == 0)
 		{
-			return eChestType::VillageWeaponsmith;
+			return ChestType::eChestType::VillageWeaponsmith;
 		}
 
 			/* Village chest types end */
 
 		else if (NoCaseCompare(a_Type, "WoodlandMansion") == 0)
 		{
-			return eChestType::WoodlandMansion;
+			return ChestType::eChestType::WoodlandMansion;
 		}
 		else
 		{
-			return eChestType::None;
+			return ChestType::eChestType::None;
 		}
 	}
 
@@ -620,18 +622,18 @@ namespace LootTable
 	/** Capitalizes any letter following a space */
 	void Capitalize (AString & a_String)
 	{
-		bool cap = true;
+		bool Cap = true;
 
 		for (unsigned int i = 0; i <= a_String.length(); i++)
 		{
-			if (isalpha(a_String[i]) && cap)
+			if (isalpha(a_String[i]) && Cap)
 			{
 				a_String[i] = toupper(a_String[i]);
-				cap = false;
+				Cap = false;
 			}
 			else if (isspace(a_String[i]))
 			{
-				cap = true;
+				Cap = true;
 			}
 		}
 	}
@@ -713,12 +715,13 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Typ
 	{
 		switch (LootTable::eType(LootTable::NamespaceConverter(JsonObject["type"].as<AString>())))
 		{
-			case LootTable::eType::Chest:
+			case LootTable::Type::Chest:
 			{
 				auto Name = a_Type;
 				LootTable::Replace(Name, "Chests%c", "");
-				auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables[ChestType] = cLootTable(JsonObject);
+				const auto ChestType = LootTable::eChestType(Name);
+				m_ChestLootTables[ChestType] = new cLootTable(JsonObject);
+
 				break;
 			}
 			default:
@@ -734,7 +737,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, AString & a_Typ
 
 
 
-const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name) const
+const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 {
 	auto Data = StringSplitAndTrim(a_Name,"|");
 
@@ -749,7 +752,7 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name) cons
 
 	switch (Type)
 	{
-		case LootTable::eType::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
+		case LootTable::Type::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
 		default:
 		{
 			LOGWARNING("Trying to use unsupported or unknown loot table type: %s", Data[1].c_str());
@@ -762,9 +765,9 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name) cons
 
 
 
-const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type) const
+const cLootTable * cLootTableProvider::GetLootTable(const LootTable::ChestType::eChestType a_Type)
 {
-	return &(m_ChestLootTables.at(a_Type));
+	return m_ChestLootTables.at(a_Type);
 	return nullptr;
 }
 
@@ -774,7 +777,7 @@ const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChest
 
 cLootTable::cLootTable()
 {
-	m_Type = LootTable::eType::Empty;
+	m_Type = LootTable::Type::Empty;
 	m_LootTableFunctions = cLootTableFunctionVector();
 	m_LootTablePools = cLootTablePoolVector();
 }
@@ -841,7 +844,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a
 
 
 
-std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity) const
+std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity) const
 {
 	auto Items = std::vector<cItem>();
 	for (const auto & Pool : m_LootTablePools)
@@ -943,7 +946,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 		else if (NoCaseCompare(PoolElement, "entries") == 0)
 		{
 			auto Entries = a_Value[PoolElement];
-			for (auto EntryIndex = 0; EntryIndex < Entries.size(); EntryIndex++)
+			for (unsigned int EntryIndex = 0; EntryIndex < Entries.size(); EntryIndex++)
 			{
 				auto Entry = Entries[EntryIndex];
 				PoolEntries.push_back(ReadLootTablePoolEntry(Entry));
@@ -952,7 +955,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 		else if (NoCaseCompare(PoolElement, "functions") == 0)
 		{
 			auto FunctionsObject = a_Value[PoolElement];
-			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
 				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
 			}
@@ -960,7 +963,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 		else if (NoCaseCompare(PoolElement, "conditions") == 0)
 		{
 			auto ConditionsObject = a_Value[PoolElement];
-			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 			{
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
@@ -975,7 +978,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 
 cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value)
 {
-	enum LootTable::eFunctionType Type;
+	enum LootTable::FunctionType::eFunctionType Type;
 	AStringMap Parameter;
 	cLootTableConditionVector Conditions;
 	for (auto & FunctionInfo : a_Value.getMemberNames())
@@ -987,7 +990,7 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 		else if (NoCaseCompare(FunctionInfo, "conditions") == 0)
 		{
 			auto ConditionsObject = a_Value[FunctionInfo];
-			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 			{
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
@@ -1006,7 +1009,7 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 
 cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Value)
 {
-	enum LootTable::eConditionType Type;
+	LootTable::ConditionType::eConditionType Type;
 	AStringMap Parameter;
 	cLootTableConditionVector SubConditions;
 
@@ -1027,7 +1030,7 @@ cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Val
 
 	switch (Type)
 	{
-		case LootTable::eConditionType::Alternative:
+		case LootTable::ConditionType::eConditionType::Alternative:
 		{
 			Json::Value Terms;
 			if (a_Value.isMember("terms"))
@@ -1043,56 +1046,56 @@ cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Val
 				LOGWARNING("Loot table condition \"Alternative\" is missing sub - conditions. Dropping condition!");
 				return cLootTableCondition();
 			}
-			for (int i = 0; i < Terms.size(); i++)
+			for (unsigned int i = 0; i < Terms.size(); i++)
 			{
 				SubConditions.push_back(ReadLootTableCondition(Terms[i]));
 			}
 			break;
 		}
-		case LootTable::eConditionType::Inverted:
+		case LootTable::ConditionType::eConditionType::Inverted:
 		{
 			Json::Value Term;
 			if (a_Value.isMember("term"))
 			{
 				Term = a_Value["term"];
+				SubConditions.push_back(ReadLootTableCondition(Term));
 			}
 			else if (a_Value.isMember("Term"))
 			{
 				Term = a_Value["Term"];
+				SubConditions.push_back(ReadLootTableCondition(Term));
 			}
 			else
 			{
 				LOGWARNING("Loot table condition \"Inverted\" is missing sub-condition. Dropping condition!");
 				return cLootTableCondition();
 			}
-			SubConditions.push_back(ReadLootTableCondition(Term));
-
 		}
-		case LootTable::eConditionType::Reference:
+		case LootTable::ConditionType::eConditionType::Reference:
 		{
 			LOGWARNING("Type \"Reference\" for loot table conditions is not yet supported. Dropping condition");
 			return cLootTableCondition();
 		}
-		case LootTable::eConditionType::SurvivesExplosion:
+		case LootTable::ConditionType::eConditionType::SurvivesExplosion:
 		{
 			return cLootTableCondition(Type, Parameter, SubConditions);
 		}
-		case LootTable::eConditionType::None:
+		case LootTable::ConditionType::eConditionType::None:
 		{
 			return cLootTableCondition();
 		}
-		case LootTable::eConditionType::BlockStateProperty:
-		case LootTable::eConditionType::DamageSourceProperties:
-		case LootTable::eConditionType::EntityProperties:
-		case LootTable::eConditionType::EntityScores:
-		case LootTable::eConditionType::KilledByPlayer:
-		case LootTable::eConditionType::LocationCheck:
-		case LootTable::eConditionType::MatchTool:
-		case LootTable::eConditionType::RandomChance:
-		case LootTable::eConditionType::RandomChanceWithLooting:
-		case LootTable::eConditionType::TableBonus:
-		case LootTable::eConditionType::TimeCheck:
-		case LootTable::eConditionType::WeatherCheck:
+		case LootTable::ConditionType::eConditionType::BlockStateProperty:
+		case LootTable::ConditionType::eConditionType::DamageSourceProperties:
+		case LootTable::ConditionType::eConditionType::EntityProperties:
+		case LootTable::ConditionType::eConditionType::EntityScores:
+		case LootTable::ConditionType::eConditionType::KilledByPlayer:
+		case LootTable::ConditionType::eConditionType::LocationCheck:
+		case LootTable::ConditionType::eConditionType::MatchTool:
+		case LootTable::ConditionType::eConditionType::RandomChance:
+		case LootTable::ConditionType::eConditionType::RandomChanceWithLooting:
+		case LootTable::ConditionType::eConditionType::TableBonus:
+		case LootTable::ConditionType::eConditionType::TimeCheck:
+		case LootTable::ConditionType::eConditionType::WeatherCheck:
 		{
 			for (const auto & Name : a_Value.getMemberNames())
 			{
@@ -1128,7 +1131,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 {
 	cLootTableConditionVector Conditions;
 	cLootTableFunctionVector Functions;
-	enum LootTable::ePoolEntryType Type;
+	enum LootTable::PoolEntryType::ePoolEntryType Type;
 
 	cItem Item;
 	AString Name;
@@ -1149,7 +1152,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 	}
 	else
 	{
-		Type = LootTable::ePoolEntryType::Empty;
+		Type = LootTable::PoolEntryType::ePoolEntryType::Empty;
 	}
 
 	for (auto & EntryParameter : a_Value.getMemberNames())
@@ -1162,14 +1165,14 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 		{
 			switch (Type)
 			{
-				case LootTable::ePoolEntryType::Item:
+				case LootTable::PoolEntryType::ePoolEntryType::Item:
 				{
 					StringToItem(LootTable::NamespaceConverter(a_Value[EntryParameter].asString()), Item);
 					break;
 				}
-				case LootTable::ePoolEntryType::Tag:
-				case LootTable::ePoolEntryType::LootTable:
-				case LootTable::ePoolEntryType::Dynamic:
+				case LootTable::PoolEntryType::ePoolEntryType::Tag:
+				case LootTable::PoolEntryType::ePoolEntryType::LootTable:
+				case LootTable::PoolEntryType::ePoolEntryType::Dynamic:
 				{
 					Name = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
 					break;
@@ -1180,7 +1183,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 		else if (NoCaseCompare(EntryParameter, "functions") == 0)
 		{
 			auto FunctionsObject = a_Value[EntryParameter];
-			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
 				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
 			}
@@ -1188,7 +1191,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 		else if (NoCaseCompare(EntryParameter, "conditions") == 0)
 		{
 			auto ConditionsObject = a_Value[EntryParameter];
-			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 			{
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
@@ -1197,12 +1200,12 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 		{
 			switch (Type)
 			{
-				case LootTable::ePoolEntryType::Group:
-				case LootTable::ePoolEntryType::Alternatives:
-				case LootTable::ePoolEntryType::Sequence:
+				case LootTable::PoolEntryType::ePoolEntryType::Group:
+				case LootTable::PoolEntryType::ePoolEntryType::Alternatives:
+				case LootTable::PoolEntryType::ePoolEntryType::Sequence:
 				{
 					auto ChildrenObject = a_Value[EntryParameter];
-					for (int ChildrenObjectId = 0; ChildrenObjectId < ChildrenObject.size(); ++ChildrenObjectId)
+					for (unsigned int ChildrenObjectId = 0; ChildrenObjectId < ChildrenObject.size(); ++ChildrenObjectId)
 					{
 						Children.push_back(ReadLootTablePoolEntry(ChildrenObject[ChildrenObjectId]));
 					}
@@ -1222,26 +1225,26 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 	}
 	switch (Type)
 	{
-		case LootTable::ePoolEntryType::Item:
+		case LootTable::PoolEntryType::ePoolEntryType::Item:
 		{
 			return cLootTablePoolEntry(Conditions, Functions, Type, Item, Weight, Quality);
 		}
 
-		case LootTable::ePoolEntryType::Tag:
-		case LootTable::ePoolEntryType::LootTable:
-		case LootTable::ePoolEntryType::Dynamic:
+		case LootTable::PoolEntryType::ePoolEntryType::Tag:
+		case LootTable::PoolEntryType::ePoolEntryType::LootTable:
+		case LootTable::PoolEntryType::ePoolEntryType::Dynamic:
 		{
 			return cLootTablePoolEntry(Conditions, Functions, Type, Name, Expand, Weight, Quality);
 		}
 
-		case LootTable::ePoolEntryType::Group:
-		case LootTable::ePoolEntryType::Alternatives:
-		case LootTable::ePoolEntryType::Sequence:
+		case LootTable::PoolEntryType::ePoolEntryType::Group:
+		case LootTable::PoolEntryType::ePoolEntryType::Alternatives:
+		case LootTable::PoolEntryType::ePoolEntryType::Sequence:
 		{
 			return cLootTablePoolEntry(Conditions, Functions, Type, Children, Weight, Quality);
 		}
 
-		case LootTable::ePoolEntryType::Empty: return cLootTablePoolEntry();
+		case LootTable::PoolEntryType::ePoolEntryType::Empty: return cLootTablePoolEntry();
 		default:                               return cLootTablePoolEntry();
 	}
 }
@@ -1284,7 +1287,7 @@ AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
 	}
 	else if (a_Value.isArray())
 	{
-		for (int i = 0; i < a_Value.size(); i++)
+		for (unsigned int i = 0; i < a_Value.size(); i++)
 		{
 			Result.merge(ReadParameter(a_Value[i]));
 		}
@@ -1341,24 +1344,24 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNo
 	auto Items = std::vector<cItem>();
 	switch (a_Entry.m_Type)
 	{
-		case LootTable::ePoolEntryType::Item:
+		case LootTable::PoolEntryType::ePoolEntryType::Item:
 		{
 			Items.push_back(a_Entry.m_Item);
 			break;
 		}
-		case LootTable::ePoolEntryType::Tag:
+		case LootTable::PoolEntryType::ePoolEntryType::Tag:
 		{
 			// Todo: check what names are used
 			// Todo: add loot tables for that
 			// Todo: return item(s)
 			break;
 		}
-		case LootTable::ePoolEntryType::LootTable:
+		case LootTable::PoolEntryType::ePoolEntryType::LootTable:
 		{
 			// Todo - add loot table lookup
 			break;
 		}
-		case LootTable::ePoolEntryType::Group:
+		case LootTable::PoolEntryType::ePoolEntryType::Group:
 		{
 			for (const auto & Child : a_Entry.m_Children)
 			{
@@ -1367,7 +1370,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNo
 			}
 			break;
 		}
-		case LootTable::ePoolEntryType::Alternatives:
+		case LootTable::PoolEntryType::ePoolEntryType::Alternatives:
 		{
 			// Todo - Choose 1
 			auto Child = a_Entry.m_Children[0];
@@ -1375,13 +1378,13 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNo
 			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			break;
 		}
-		case LootTable::ePoolEntryType::Sequence:
+		case LootTable::PoolEntryType::ePoolEntryType::Sequence:
 			break;
 			// TODO
-		case LootTable::ePoolEntryType::Dynamic:
+		case LootTable::PoolEntryType::ePoolEntryType::Dynamic:
 			break;
 			// TODO
-		case LootTable::ePoolEntryType::Empty:
+		case LootTable::PoolEntryType::ePoolEntryType::Empty:
 		{
 			Items.push_back(cItem(E_BLOCK_AIR));
 			break;
@@ -1412,11 +1415,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cPlay
 {
 	switch (a_Condition.m_Type)
 	{
-		case LootTable::eConditionType::None:
+		case LootTable::ConditionType::eConditionType::None:
 		{
 			return true;
 		}
-		case LootTable::eConditionType::Alternative:
+		case LootTable::ConditionType::eConditionType::Alternative:
 		{
 			bool Success = false;
 			for (const auto & SubCondition: a_Condition.m_SubConditions)
@@ -1425,30 +1428,30 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cPlay
 			}
 			return Success;
 		}
-		case LootTable::eConditionType::BlockStateProperty:
+		case LootTable::ConditionType::eConditionType::BlockStateProperty:
 		{
 			// TODO
 			LOGWARNING("Loot table condition \"BlockStateProperty\" is not yet supported. Assuming it's true.");
 			return true;
 		}
-		case LootTable::eConditionType::DamageSourceProperties:
-		case LootTable::eConditionType::EntityProperties:
-		case LootTable::eConditionType::EntityScores:
-		case LootTable::eConditionType::Inverted:
-		case LootTable::eConditionType::KilledByPlayer:
-		case LootTable::eConditionType::LocationCheck:
-		case LootTable::eConditionType::MatchTool:
-		case LootTable::eConditionType::RandomChance:
-		case LootTable::eConditionType::RandomChanceWithLooting:
-		case LootTable::eConditionType::Reference:
+		case LootTable::ConditionType::eConditionType::DamageSourceProperties:
+		case LootTable::ConditionType::eConditionType::EntityProperties:
+		case LootTable::ConditionType::eConditionType::EntityScores:
+		case LootTable::ConditionType::eConditionType::Inverted:
+		case LootTable::ConditionType::eConditionType::KilledByPlayer:
+		case LootTable::ConditionType::eConditionType::LocationCheck:
+		case LootTable::ConditionType::eConditionType::MatchTool:
+		case LootTable::ConditionType::eConditionType::RandomChance:
+		case LootTable::ConditionType::eConditionType::RandomChanceWithLooting:
+		case LootTable::ConditionType::eConditionType::Reference:
 		{
 			// TODO
 			return true;
 		}
-		case LootTable::eConditionType::SurvivesExplosion:
-		case LootTable::eConditionType::TableBonus:
-		case LootTable::eConditionType::TimeCheck:
-		case LootTable::eConditionType::WeatherCheck:
+		case LootTable::ConditionType::eConditionType::SurvivesExplosion:
+		case LootTable::ConditionType::eConditionType::TableBonus:
+		case LootTable::ConditionType::eConditionType::TimeCheck:
+		case LootTable::ConditionType::eConditionType::WeatherCheck:
 		default: return true;
 	}
 }

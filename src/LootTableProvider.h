@@ -3,10 +3,6 @@
 
 #pragma once
 
-#include <utility>
-
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "Mobs/MonsterTypes.h"
 #include "Item.h"
 
 // fwd:
@@ -83,190 +79,198 @@ namespace LootTable
 	};
 
 
-
-
-	/** Any available function type as of 1.16.2 */
-	enum class eFunctionType
+	namespace FunctionType
 	{
-		ApplyBonus,
-		CopyName,
-		CopyNbt,
-		CopyState,
-		EnchantRandomly,
-		EnchantWithLevels,
-		ExplorationMap,
-		ExplosionDecay,
-		FurnaceSmelt,
-		FillPlayerHead,
-		LimitCount,
-		LootingEnchant,
-		SetAttributes,
-		SetContents,
-		SetCount,
-		SetDamage,
-		SetLootTable,
-		SetLore,
-		SetName,
-		SetNbt,
-		SetStewEffect,
-		None
-	};
+		/** Any available function type as of 1.16.2 */
+		enum eFunctionType
+		{
+			ApplyBonus,
+			CopyName,
+			CopyNbt,
+			CopyState,
+			EnchantRandomly,
+			EnchantWithLevels,
+			ExplorationMap,
+			ExplosionDecay,
+			FurnaceSmelt,
+			FillPlayerHead,
+			LimitCount,
+			LootingEnchant,
+			SetAttributes,
+			SetContents,
+			SetCount,
+			SetDamage,
+			SetLootTable,
+			SetLore,
+			SetName,
+			SetNbt,
+			SetStewEffect,
+			None
+		};
+	}
 
-
-
-
-	/** Any available type of loot table Type as of 1.16.2 */
-	enum class eType
+	namespace Type
 	{
-		Empty,                         // doesnt generate any Loot
-		Entity,                        // Loot from any entity
-		Block,                         // Loot from mined blocks
-		Chest,                         // Loot from chests
-		Fishing,                       // Loot from fishing
-		Gift,                          // Loot gifted to the player from NPCs
-		AdvancementReward,             // Rewards from advancements
-		Barter,                        // Loot from "trading" with Piglins
-		Command,                       // Customizable loot tables for the loot command
-		Selector,                      // ?
-		AdvancementEntity,             // ?
-		Generic                        // ?
-	};
+		/** Any available type of loot table Type as of 1.16.2 */
+		enum eType
+		{
+			Empty,                         // doesnt generate any Loot
+			Entity,                        // Loot from any entity
+			Block,                         // Loot from mined blocks
+			Chest,                         // Loot from chests
+			Fishing,                       // Loot from fishing
+			Gift,                          // Loot gifted to the player from NPCs
+			AdvancementReward,             // Rewards from advancements
+			Barter,                        // Loot from "trading" with Piglins
+			Command,                       // Customizable loot tables for the loot command
+			Selector,                      // ?
+			AdvancementEntity,             // ?
+			Generic                        // ?
+		};
+	}
 
 
 
-
-	/** Any available type of loot table conditions as of 1.16.2 */
-	enum class eConditionType
+	namespace ConditionType
 	{
-		Alternative,  // Joins conditions from parameter terms with "or".
-		/* terms: A list of conditions to join using 'or'. */
+		/** Any available type of loot table conditions as of 1.16.2 */
+		enum eConditionType
+		{
+			Alternative,  // Joins conditions from parameter terms with "or".
+			/* terms: A list of conditions to join using 'or'. */
 
-		BlockStateProperty,  // Check properties of a block state.
-		/*  block: A block ID. The test fails if the block doesn't match.
-			properties: (Optional) A map of block property names to values. All values are strings. The test fails if the block doesn't match. */
+			BlockStateProperty,  // Check properties of a block state.
+			/*  block: A block ID. The test fails if the block doesn't match.
+				properties: (Optional) A map of block property names to values. All values are strings. The test fails if the block doesn't match. */
 
-		DamageSourceProperties,  // Check properties of damage source.
-		/* predicate: Predicate applied to the damage source. */
+			DamageSourceProperties,  // Check properties of damage source.
+			/* predicate: Predicate applied to the damage source. */
 
-		EntityProperties,  // Test properties of an entity.
-		/*  entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
-			predicate: Predicate applied to entity, uses same structure as advancements. */
+			EntityProperties,  // Test properties of an entity.
+			/*  entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+				predicate: Predicate applied to entity, uses same structure as advancements. */
 
-		EntityScores,  // Test the scoreboard scores of an entity.
-		/* 	entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
-			scores: Scores to check. All specified scores must pass for the condition to pass.
-			A score: Key name is the objective while the value is the exact score value required for the condition to pass.
-			A score: Key name is the objective while the value specifies a range of score values required for the condition to pass.
-			min: Minimum score.
-			max: Maximum score. */
+			EntityScores,  // Test the scoreboard scores of an entity.
+			/* 	entity: Specifies the entity to check for the condition. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+				scores: Scores to check. All specified scores must pass for the condition to pass.
+				A score: Key name is the objective while the value is the exact score value required for the condition to pass.
+				A score: Key name is the objective while the value specifies a range of score values required for the condition to pass.
+				min: Minimum score.
+				max: Maximum score. */
 
-		Inverted,  // Inverts condition from parameter term.
-		/* term: The condition to be negated. */
+			Inverted,  // Inverts condition from parameter term.
+			/* term: The condition to be negated. */
 
-		KilledByPlayer,  // Test if a killer_player entity is available.
-		/* inverse: If true, the condition passes if killer_player is not available. */
+			KilledByPlayer,  // Test if a killer_player entity is available.
+			/* inverse: If true, the condition passes if killer_player is not available. */
 
-		LocationCheck,  // Checks if the current location matches.
-		/*  offsetX - optional offsets to location
-			offsetY - optional offsets to location
-			offsetZ - optional offsets to location
-			predicate: Predicate applied to location, uses same structure as advancements. */
+			LocationCheck,  // Checks if the current location matches.
+			/*  offsetX - optional offsets to location
+				offsetY - optional offsets to location
+				offsetZ - optional offsets to location
+				predicate: Predicate applied to location, uses same structure as advancements. */
 
-		MatchTool,  // Checks tool.
-		/* predicate: Predicate applied to item, uses same structure as advancements. */
+			MatchTool,  // Checks tool.
+			/* predicate: Predicate applied to item, uses same structure as advancements. */
 
-		RandomChance,  // Test if a random number 0.0 - 1.0 is less than a specified value.
-		/* chance: Success rate as a number 0.0 - 1.0. */
+			RandomChance,  // Test if a random number 0.0 - 1.0 is less than a specified value.
+			/* chance: Success rate as a number 0.0 - 1.0. */
 
-		RandomChanceWithLooting,  // Test if a random number 0.0 - 1.0 is less than a specified value, affected by the level of Looting on the killer entity.
-		/*  chance: Base success rate.
-			looting_multiplier: Looting adjustment to the base success rate. Formula is chance + (looting_level * looting_multiplier). */
+			RandomChanceWithLooting,  // Test if a random number 0.0 - 1.0 is less than a specified value, affected by the level of Looting on the killer entity.
+			/*  chance: Base success rate.
+				looting_multiplier: Looting adjustment to the base success rate. Formula is chance + (looting_level * looting_multiplier). */
 
-		Reference,  // Test if another referred condition (predicate) passes.
-		/* name: The namespaced ID of the condition (predicate) referred to. A cyclic reference causes a parsing failure. */
+			Reference,  // Test if another referred condition (predicate) passes.
+			/* name: The namespaced ID of the condition (predicate) referred to. A cyclic reference causes a parsing failure. */
 
-		SurvivesExplosion,  // Returns true with 1 divided by explosion radius probability.
+			SurvivesExplosion,  // Returns true with 1 divided by explosion radius probability.
 
-		TableBonus,  // Passes with probability picked from table, indexed by enchantment level.
-		/*  enchantment: Id of enchantment.
-			chances: List of probabilities for enchantment level, indexed from 0. */
+			TableBonus,  // Passes with probability picked from table, indexed by enchantment level.
+			/*  enchantment: Id of enchantment.
+				chances: List of probabilities for enchantment level, indexed from 0. */
 
-		TimeCheck,  // Checks the current time
-		/*  value: The time value in ticks.
-			min: The minimum value.
-			max: The maximum value.
-			period: If present, time gets modulo-divided by this value (for example, if set to 24000, value operates on a time period of days). */
+			TimeCheck,  // Checks the current time
+			/*  value: The time value in ticks.
+				min: The minimum value.
+				max: The maximum value.
+				period: If present, time gets modulo-divided by this value (for example, if set to 24000, value operates on a time period of days). */
 
-		WeatherCheck,  // Checks for a current weather state
-		/*  raining: If true, the condition evaluates to true only if it's raining.
-			thundering: If true, the condition evaluates to true only if it's thundering. */
-		None  // Default rule. NOT VANILLA Used for the string comparison if string is unknown
-	};
+			WeatherCheck,  // Checks for a current weather state
+			/*  raining: If true, the condition evaluates to true only if it's raining.
+				thundering: If true, the condition evaluates to true only if it's thundering. */
+			None  // Default rule. NOT VANILLA Used for the string comparison if string is unknown
+		};
+	}
 
 
 
-
-	/**  */
-	enum class ePoolEntryType
+	namespace PoolEntryType
 	{
-		Item,          // Plain item
-		Tag,           // Descriptor for multiple items. E.g Music Discs, newer arrows...
-		LootTable,     // Another loot table
-		Group,         // Child entries
-		Alternatives,  // Select one entry from the list
-		Sequence,      // Select entries until one cannot be granted
-		Dynamic,       // "generate block specific drops": drops the block itself as item
-		Empty
-	};
+		/** Any available pool entry type as of 1.16.2 */
+		enum ePoolEntryType
+		{
+			Item,          // Plain item
+			Tag,           // Descriptor for multiple items. E.g Music Discs, newer arrows...
+			LootTable,     // Another loot table
+			Group,         // Child entries
+			Alternatives,  // Select one entry from the list
+			Sequence,      // Select entries until one cannot be granted
+			Dynamic,       // "generate block specific drops": drops the block itself as item
+			Empty
+		};
+	}
 
 
 
-
-	/** Any available types of chest loots as of 1.16.2 */
-	enum class eChestType
+	namespace ChestType
 	{
-		AbandonedMineshaft,
-		BuriedTreasure,
-		DesertPyramid,
-		EndCityTreasure,
-		IglooChest,
-		JungleTemple,
-		JungleTempleDispenser,
-		NetherBridge,
-		PillagerOutpost,
-		ShipwreckMap,
-		ShipwreckSupply,
-		ShipwreckTreasure,
-		SimpleDungeon,
-		SpawnBonusChest,
-		StrongholdCorridor,
-		StrongholdCrossing,
-		StrongholdLibrary,
-		UnderwaterRuinBig,
-		UnderwaterRuinSmall,
+		/** Any available types of chest loots as of 1.16.2 */
+		enum eChestType
+		{
+			AbandonedMineshaft,
+			BuriedTreasure,
+			DesertPyramid,
+			EndCityTreasure,
+			IglooChest,
+			JungleTemple,
+			JungleTempleDispenser,
+			NetherBridge,
+			PillagerOutpost,
+			ShipwreckMap,
+			ShipwreckSupply,
+			ShipwreckTreasure,
+			SimpleDungeon,
+			SpawnBonusChest,
+			StrongholdCorridor,
+			StrongholdCrossing,
+			StrongholdLibrary,
+			UnderwaterRuinBig,
+			UnderwaterRuinSmall,
 
-		/* Village chest types */
-		VillageArmorer,
-		VillageButcher,
-		VillageCartographer,
-		VillageDesertHouse,
-		VillageFisher,
-		VillageFletcher,
-		VillageMason,
-		VillagePlainsHouse,
-		VillageSavannaHouse,
-		VillageShepherd,
-		VillageSnowyHouse,
-		VillageTaigaHouse,
-		VillageTannery,
-		VillageTemple,
-		VillageToolsmith,
-		VillageWeaponsmith,
+			/* Village chest types */
+			VillageArmorer,
+			VillageButcher,
+			VillageCartographer,
+			VillageDesertHouse,
+			VillageFisher,
+			VillageFletcher,
+			VillageMason,
+			VillagePlainsHouse,
+			VillageSavannaHouse,
+			VillageShepherd,
+			VillageSnowyHouse,
+			VillageTaigaHouse,
+			VillageTannery,
+			VillageTemple,
+			VillageToolsmith,
+			VillageWeaponsmith,
 
-		WoodlandMansion,
-		None
-	};
+			WoodlandMansion,
+			None
+		};
+	}
 }
+
 
 
 struct cLootTableCondition;
@@ -277,7 +281,7 @@ typedef struct cLootTableCondition
 {
 	cLootTableCondition()
 	{
-		m_Type = LootTable::eConditionType::None;
+		m_Type = LootTable::ConditionType::eConditionType::None;
 	}
 
 
@@ -285,7 +289,7 @@ typedef struct cLootTableCondition
 
 
 	cLootTableCondition(
-		LootTable::eConditionType a_Type,
+		LootTable::ConditionType::eConditionType a_Type,
 		AStringMap a_Parameter,
 		cLootTableConditionVector a_SubConditions
 	):
@@ -295,7 +299,7 @@ typedef struct cLootTableCondition
 	{
 	}
 
-	LootTable::eConditionType m_Type;
+	LootTable::ConditionType::eConditionType m_Type;
 	AStringMap m_Parameter;
 	cLootTableConditionVector m_SubConditions;
 
@@ -308,7 +312,7 @@ typedef struct cLootTableCondition
 typedef struct cLootTableFunction
 {
 	cLootTableFunction(
-		LootTable::eFunctionType a_Type,
+		LootTable::FunctionType::eFunctionType a_Type,
 		AStringMap a_Parameter,
 		cLootTableConditionVector a_Conditions
 	):
@@ -317,9 +321,9 @@ typedef struct cLootTableFunction
 		m_Type(a_Type)
 	{
 	}
-	LootTable::eFunctionType m_Type;
 	AStringMap m_Parameter;
 	cLootTableConditionVector m_Conditions;
+	LootTable::FunctionType::eFunctionType m_Type;
 } cLootTableFunction;
 
 typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
@@ -368,7 +372,7 @@ typedef struct cLootTablePoolEntry
 {
 	cLootTablePoolEntry()
 	{
-		m_Type = LootTable::ePoolEntryType::Empty;
+		m_Type = LootTable::PoolEntryType::ePoolEntryType::Empty;
 	}
 
 
@@ -378,7 +382,7 @@ typedef struct cLootTablePoolEntry
 	cLootTablePoolEntry(
 		cLootTableConditionVector a_Conditions,
 		cLootTableFunctionVector a_Functions,
-		LootTable::ePoolEntryType a_Type,
+		LootTable::PoolEntryType::ePoolEntryType a_Type,
 		cItem a_Item,
 		int a_Weight,
 		int a_Quality
@@ -399,7 +403,7 @@ typedef struct cLootTablePoolEntry
 	cLootTablePoolEntry(
 		cLootTableConditionVector a_Conditions,
 		cLootTableFunctionVector a_Functions,
-		LootTable::ePoolEntryType a_Type,
+		LootTable::PoolEntryType::ePoolEntryType a_Type,
 		AString a_Name,
 		bool a_Expand,
 		int a_Weight,
@@ -422,7 +426,7 @@ typedef struct cLootTablePoolEntry
 	cLootTablePoolEntry(
 		cLootTableConditionVector a_Conditions,
 		cLootTableFunctionVector a_Functions,
-		LootTable::ePoolEntryType a_Type,
+		LootTable::PoolEntryType::ePoolEntryType a_Type,
 		cLootTablePoolEntryVector a_Children,
 		int a_Weight,
 		int a_Quality
@@ -438,7 +442,7 @@ typedef struct cLootTablePoolEntry
 
 	cLootTableConditionVector m_Conditions;
 	cLootTableFunctionVector m_Functions;
-	LootTable::ePoolEntryType m_Type;
+	LootTable::PoolEntryType::ePoolEntryType m_Type;
 	cItem m_Item;
 	AString m_Name;
 	cLootTablePoolEntryVector m_Children;
@@ -457,7 +461,7 @@ typedef struct cLootTablePool
 	cLootTablePool(
 		cLootTablePoolRolls a_Rolls,
 		cLootTablePoolEntryVector a_Entries,
-		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		cLootTableConditionVector a_Conditions
 	):
 		m_Rolls(a_Rolls),
 		m_Entries(std::move(a_Entries)),
@@ -473,7 +477,7 @@ typedef struct cLootTablePool
 		cLootTablePoolRolls a_Rolls,
 		cLootTablePoolRolls a_BonusRolls,
 		cLootTablePoolEntryVector a_Entries,
-		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		cLootTableConditionVector a_Conditions
 		):
 		m_Rolls(a_Rolls),
 		m_BonusRolls(a_BonusRolls),
@@ -514,11 +518,11 @@ public:
 	/** Fills the specified block entity at the position with loot and returns the success */
 	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a_Player) const;
 
-	std::vector<cItem> GetItems(cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
+	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
 
 protected:
 	/** Type of loot table */
-	enum LootTable::eType m_Type;
+	LootTable::Type::eType m_Type;
 
 	/** Vector of loot pools */
 	cLootTablePoolVector m_LootTablePools;
@@ -550,7 +554,8 @@ private:
 	static bool ConditionApplies(const cLootTableCondition & a_Condition, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
 };
 
-typedef std::map<enum LootTable::eChestType, cLootTable> cChestLootTableMap;
+// typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;
+typedef std::unordered_map<LootTable::ChestType::eChestType, const cLootTable *> cChestLootTableMap;
 
 
 
@@ -572,8 +577,8 @@ public:
 	example:   Monster|Skeleton
 	example:   Block|Stone
 	This is not case sensitive, and removes all spaces */
-	const cLootTable * GetLootTable(const AString & a_Name) const;
-	const cLootTable * GetLootTable(const enum LootTable::eChestType a_Type) const;
+	const cLootTable * GetLootTable(const AString & a_Name);
+	const cLootTable * GetLootTable(const LootTable::ChestType::eChestType a_Type);
 
 private:
 
