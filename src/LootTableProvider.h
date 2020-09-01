@@ -552,7 +552,7 @@ private:
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;
-typedef std::unordered_map<LootTable::eChestType, const cLootTable *> cChestLootTableMap;
+typedef std::unordered_map<LootTable::eChestType, cLootTable> cChestLootTableMap;
 
 
 

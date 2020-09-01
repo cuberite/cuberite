@@ -717,7 +717,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 				auto Name = a_Type;
 				LootTable::Replace(Name, "Chests%c", "");
 				const auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables[ChestType] = new cLootTable(JsonObject);
+				m_ChestLootTables[ChestType] = cLootTable(JsonObject);
 
 				break;
 			}
@@ -764,7 +764,7 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 
 const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type)
 {
-	return m_ChestLootTables.at(a_Type);
+	return & (m_ChestLootTables.at(a_Type));
 	return nullptr;
 }
 
