@@ -13,6 +13,8 @@
 class cBlockEntityWithItems;
 class cItem;
 class cWorld;
+class cPlayer;
+class cNoise;
 
 /*
 This file contains all classes, types, ... used in the loot table functions.
@@ -20,10 +22,18 @@ The default loot tables are from LootTables/ in the root folder
 The custom loot tables are read per world and must be contained in %worldname%/LootTables
 They follow the vanilla file structure so any possible entry should be respected
 
+The file names follow the cuberite NamingStructure.
+
 Notes:
 	30.08.2020:
 		At the moment only loot tables for item container are supported.
 		There are some functions commented fo the lookup uncomment them and add the code
+	01.09.2020:
+		Vanilla Minecraft uses a luck value per player that influences the outcome.
+		This is not added to cuberite at the moment.
+
+		When adding you need to:
+		- add the luck processing to GetItem. The value is already parsed and stored
 */
 
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
@@ -259,17 +269,37 @@ namespace LootTable
 }
 
 
-
-
+struct cLootTableCondition;
+typedef std::vector<cLootTableCondition> cLootTableConditionVector;
 
 /** Represents a condition for a pool item */
 typedef struct cLootTableCondition
 {
+	cLootTableCondition()
+	{
+		m_Type = LootTable::eConditionType::None;
+	}
+
+
+
+
+
+	cLootTableCondition(
+		LootTable::eConditionType a_Type,
+		AStringMap a_Parameter,
+		cLootTableConditionVector a_SubConditions
+	):
+		m_Type(a_Type),
+		m_Parameter(std::move(a_Parameter)),
+		m_SubConditions(std::move(a_SubConditions))
+	{
+	}
+
 	LootTable::eConditionType m_Type;
 	AStringMap m_Parameter;
-} cLootTableCondition;
+	cLootTableConditionVector m_SubConditions;
 
-typedef std::vector<cLootTableCondition> cLootTableConditionVector;
+} cLootTableCondition;
 
 
 
@@ -305,58 +335,60 @@ typedef struct cLootTablePoolRolls
 		m_Roll = 0;
 		m_RollsMin = 0;
 		m_RollsMax = 0;
-		m_BonusRoll = 0;
-		m_BonusRollsMin = 0;
-		m_BonusRollsMax = 0;
 	}
 
 
 
 
-	/** Pool rolls with optional bonus roll parameter - steady roll needs to be -1 to activate roll range */
+	/** Pool rolls with optional range roll parameter - steady roll needs to be -1 to activate roll range */
 	cLootTablePoolRolls(
 		int a_Roll,
-		int a_RollsMin,
-		int a_RollsMax,
-		int a_BonusRoll = 0,
-		int a_BonusRollsMin = 0,
-		int a_BonusRollsMax = 0
+		int a_RollsMin = 0,
+		int a_RollsMax = 0
 	):
 		m_Roll(a_Roll),
 		m_RollsMin(a_RollsMin),
-		m_RollsMax(a_RollsMax),
-		m_BonusRoll(a_BonusRoll),
-		m_BonusRollsMin(a_BonusRollsMin),
-		m_BonusRollsMax(a_BonusRollsMax)
+		m_RollsMax(a_RollsMax)
 	{
 	}
 
 	int m_Roll;
 	int m_RollsMin;
 	int m_RollsMax;
-	int m_BonusRoll;
-	int m_BonusRollsMin;
-	int m_BonusRollsMax;
 	// Note: The loot tables specify another value (type) this is usually "Uniform".
 	// I think this is the probability distribution for the random value.
 	// The wiki doesn't have any information in it. So this is left out for now
 } cLootTablePoolRolls;
 
-
+struct cLootTablePoolEntry;
+typedef std::vector<cLootTablePoolEntry> cLootTablePoolEntryVector;
 
 /** Represents a pool entry */
 typedef struct cLootTablePoolEntry
 {
+	cLootTablePoolEntry()
+	{
+		m_Type = LootTable::ePoolEntryType::Empty;
+	}
+
+
+
+
+
 	cLootTablePoolEntry(
+		cLootTableConditionVector a_Conditions,
 		cLootTableFunctionVector a_Functions,
+		LootTable::ePoolEntryType a_Type,
 		cItem a_Item,
 		int a_Weight,
-		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		int a_Quality
 	):
+		m_Conditions(std::move(a_Conditions)),
 		m_Functions(std::move(a_Functions)),
+		m_Type(a_Type),
 		m_Item(std::move(a_Item)),
 		m_Weight(a_Weight),
-		m_Conditions(std::move(a_Conditions))
+		m_Quality(a_Quality)
 	{
 	}
 
@@ -365,49 +397,100 @@ typedef struct cLootTablePoolEntry
 
 
 	cLootTablePoolEntry(
+		cLootTableConditionVector a_Conditions,
 		cLootTableFunctionVector a_Functions,
-		AString a_Children,
+		LootTable::ePoolEntryType a_Type,
+		AString a_Name,
+		bool a_Expand,
 		int a_Weight,
-		cLootTableConditionVector a_Conditions
+		int a_Quality
 	):
+		m_Conditions(std::move(a_Conditions)),
 		m_Functions(std::move(a_Functions)),
+		m_Type(a_Type),
+		m_Name(std::move(a_Name)),
+		m_Expand(a_Expand),
+		m_Weight(a_Weight),
+		m_Quality(a_Quality)
+	{
+	}
+
+
+
+
+
+	cLootTablePoolEntry(
+		cLootTableConditionVector a_Conditions,
+		cLootTableFunctionVector a_Functions,
+		LootTable::ePoolEntryType a_Type,
+		cLootTablePoolEntryVector a_Children,
+		int a_Weight,
+		int a_Quality
+	):
+		m_Conditions(std::move(a_Conditions)),
+		m_Functions(std::move(a_Functions)),
+		m_Type(a_Type),
 		m_Children(std::move(a_Children)),
 		m_Weight(a_Weight),
-		m_Conditions(std::move(a_Conditions))
+		m_Quality(a_Quality)
 	{
 	}
 
 	cLootTableConditionVector m_Conditions;
 	cLootTableFunctionVector m_Functions;
-	// Todo: Add type
+	LootTable::ePoolEntryType m_Type;
 	cItem m_Item;
-	AString m_Children;  // Todo: think about datatype
-	// Todo: Add expand - what ever that does
+	AString m_Name;
+	cLootTablePoolEntryVector m_Children;
+	bool m_Expand;
 	int m_Weight;
-	// Todo: Add quality
+	int m_Quality;
 } cLootTablePoolEntry;
 
 typedef std::vector<cLootTablePoolEntry> cLootTablePoolEntryVector;
 
 
-/** Represents a pool in a loot table */
+/** Represents the rolls in a loot table */
 typedef struct cLootTablePool
 {
-	/** create a pool with steady roll count */
+	/** create a pool with bonus rolls */
 	cLootTablePool(
 		cLootTablePoolRolls a_Rolls,
 		cLootTablePoolEntryVector a_Entries,
 		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
-		):
+	):
 		m_Rolls(a_Rolls),
 		m_Entries(std::move(a_Entries)),
 		m_Conditions(std::move(a_Conditions))
 	{
 	}
 
+
+
+
+	/** create a pool with bonus rolls */
+	cLootTablePool(
+		cLootTablePoolRolls a_Rolls,
+		cLootTablePoolRolls a_BonusRolls,
+		cLootTablePoolEntryVector a_Entries,
+		cLootTableConditionVector a_Conditions = cLootTableConditionVector()
+		):
+		m_Rolls(a_Rolls),
+		m_BonusRolls(a_BonusRolls),
+		m_Entries(std::move(a_Entries)),
+		m_Conditions(std::move(a_Conditions))
+	{
+		for (const auto & Entry : m_Entries)
+		{
+			m_TotalWeight += Entry.m_Weight;
+		}
+	}
+
 	cLootTablePoolRolls m_Rolls;
+	cLootTablePoolRolls m_BonusRolls;
 	cLootTablePoolEntryVector m_Entries;
 	cLootTableConditionVector m_Conditions;
+	int m_TotalWeight;
 } cLootTablePool;
 
 typedef std::vector<cLootTablePool> cLootTablePoolVector;
@@ -429,7 +512,9 @@ public:
 	cLootTable(cLootTable & a_Other);
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a_Player) const;
+
+	std::vector<cItem> GetItems(cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
 
 protected:
 	/** Type of loot table */
@@ -442,21 +527,31 @@ protected:
 	cLootTableFunctionVector m_LootTableFunctions;
 
 private:
-
 	/** Reads Loot Table pool from Json */
 	void ReadLootTablePool(const Json::Value & a_Value);
 
 	/** Reads a loot table function from Json */
-	cLootTableFunction ReadLootTableFunction(const Json::Value & a_Value) const;
+	static cLootTableFunction ReadLootTableFunction(const Json::Value & a_Value);
 
 	/** Reads a loot table condition from Json */
-	cLootTableCondition ReadLootTableCondition(const Json::Value & a_Value) const;
+	static cLootTableCondition ReadLootTableCondition(const Json::Value & a_Value);
 
 	/** Reads a loot table pool entry from Json */
-	cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value) const;
+	static cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value);
+
+	static AStringMap ReadParameter(const Json::Value & a_Value);
+
+	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+
+	static std::vector<cItem> GetItems(const cLootTablePoolEntryVector & a_Entries, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+
+	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+
+	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+
+	static bool ConditionApplies(const cLootTableCondition & a_Condition, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
 };
 
-// typedef std::map<enum eMonsterType,          std::shared_ptr<cLootTable>> cMonsterLootTableMap;
 typedef std::map<enum LootTable::eChestType, cLootTable> cChestLootTableMap;
 
 

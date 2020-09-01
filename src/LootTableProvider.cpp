@@ -8,6 +8,7 @@
 #include "json/json.h"
 #include "BlockEntities/BlockEntityWithItems.h"
 #include "Noise/Noise.h"
+#include "Entities/Player.h"
 
 namespace LootTable
 {
@@ -787,7 +788,7 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 	m_LootTablePools = cLootTablePoolVector();
 	m_LootTableFunctions = cLootTableFunctionVector();
 
-	for (auto const & RootId : a_Description.getMemberNames())
+	for (const auto & RootId : a_Description.getMemberNames())
 	{
 		if (NoCaseCompare(RootId, "type") == 0)
 		{
@@ -827,12 +828,27 @@ cLootTable::cLootTable(cLootTable & a_Other)
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity) const
+bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a_Player) const
 {
 	auto & ItemGrid = a_BlockEntity->GetContents();
 	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
 	auto Noise = cNoise(Seed);
+	auto Items = GetItems(Noise, a_BlockEntity->GetPos(), a_Player);
 	return false;
+}
+
+
+
+
+
+std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity) const
+{
+	auto Items = std::vector<cItem>();
+	for (const auto & Pool : m_LootTablePools)
+	{
+
+	}
+	return Items;
 }
 
 
@@ -853,7 +869,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 			auto Rolls = a_Value[PoolElement];
 			if (Rolls.isInt())
 			{
-				PoolRolls = cLootTablePoolRolls(Rolls.asInt(), 0, 0);
+				PoolRolls = cLootTablePoolRolls(Rolls.asInt());
 			}
 			else
 			{
@@ -881,12 +897,48 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 					LOGWARNING("Missing maximum value in ... Dropping loot table pool.");
 					return;
 				}
+				if (Min > Max)
+				{
+					PoolRolls = cLootTablePoolRolls(Min);
+				}
 				PoolRolls = cLootTablePoolRolls(-1, Min, Max);
 			}
 		}
 		else if (NoCaseCompare(PoolElement, "bonus_rolls") == 0)
 		{
-			// TODO
+			auto Rolls = a_Value[PoolElement];
+			if (Rolls.isInt())
+			{
+				PoolRolls = cLootTablePoolRolls(Rolls.asInt());
+			}
+			else
+			{
+				int Min = -1, Max = -1;
+				for (auto & RollEntry: Rolls.getMemberNames())
+				{
+					if (NoCaseCompare(RollEntry, "min") == 0)
+					{
+						Min = Rolls[RollEntry].asInt();
+					}
+					else if (NoCaseCompare(RollEntry, "max") == 0)
+					{
+						Max = Rolls[RollEntry].asInt();
+					}
+					// Todo - add type
+				}
+				// Todo: add info on which file is wrong
+				if (Min == -1)
+				{
+					LOGWARNING("Missing Minimum value in ... Dropping loot table pool.");
+					return;
+				}
+				if (Max == -1)
+				{
+					LOGWARNING("Missing maximum value in ... Dropping loot table pool.");
+					return;
+				}
+				PoolBonusRolls = cLootTablePoolRolls(-1, Min, Max);
+			}
 		}
 		else if (NoCaseCompare(PoolElement, "entries") == 0)
 		{
@@ -921,14 +973,13 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 
 
 
-cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value) const
+cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value)
 {
 	enum LootTable::eFunctionType Type;
 	AStringMap Parameter;
 	cLootTableConditionVector Conditions;
 	for (auto & FunctionInfo : a_Value.getMemberNames())
 	{
-		// TODO: variable depth
 		if (NoCaseCompare(FunctionInfo, "function") == 0)
 		{
 			Type = LootTable::eFunctionType(LootTable::NamespaceConverter(a_Value[FunctionInfo].asString()));
@@ -941,46 +992,9 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
 		}
-		// This is a bit messy as the parameters of function come in different shapes
-		else if (a_Value[FunctionInfo].isString())
+		else  // Parameters
 		{
-			Parameter.insert(std::pair<AString, AString>(FunctionInfo, a_Value[FunctionInfo].asString()));
-		}
-		else if (a_Value[FunctionInfo].isObject())
-		{
-			auto FunctionParameter = a_Value[FunctionInfo];
-			for (auto & FunctionParameterName : FunctionParameter.getMemberNames())
-			{
-				Parameter.insert(std::pair<AString, AString>(FunctionParameterName, FunctionParameter[FunctionParameterName].asString()));
-			}
-		}
-		else if (a_Value[FunctionInfo].isArray())
-		{
-			auto FunctionParameter = a_Value[FunctionInfo];
-			for (auto FunctionParameterId = 0; FunctionParameterId < FunctionParameter.size(); FunctionParameterId++)
-			{
-				// Todo: find different name
-				auto FunctionParameterAdditionalInfo = FunctionParameter[FunctionParameterId];
-				for (auto & FunctionParameterAdditionalInfoName : FunctionParameterAdditionalInfo.getMemberNames())
-				{
-					if (FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName].isString())
-					{
-
-					}
-					else if (FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName].isObject())
-					{
-						auto ExtraInfo = FunctionParameterAdditionalInfo[FunctionParameterAdditionalInfoName];
-						for (auto & ExtraInfoName : ExtraInfo.getMemberNames())
-						{
-							Parameter.insert(std::pair<AString, AString>(ExtraInfoName, ExtraInfo[ExtraInfoName].asString()));
-						}
-					}
-					else
-					{
-						LOGWARNING("Unknown function parameter %s", FunctionParameterAdditionalInfoName);
-					}
-				}
-			}
+			Parameter.merge(ReadParameter(a_Value[FunctionInfo]));
 		}
 	}
 	return cLootTableFunction(Type, Parameter, Conditions);
@@ -990,23 +1004,140 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 
 
 
-cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Value) const
+cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Value)
 {
-	LOGWARNING("Loot table conditions are not yet supported");
-	return cLootTableCondition();
+	enum LootTable::eConditionType Type;
+	AStringMap Parameter;
+	cLootTableConditionVector SubConditions;
+
+	// Type has to be known beforehand
+	if (a_Value.isMember("condition"))
+	{
+		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["type"].asString()));
+	}
+	else if (a_Value.isMember("Condition"))
+	{
+		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["Type"].asString()));
+	}
+	else
+	{
+		LOGWARNING("Loot table is missing condition type. Dropping condition!");
+		return cLootTableCondition();
+	}
+
+	switch (Type)
+	{
+		case LootTable::eConditionType::Alternative:
+		{
+			Json::Value Terms;
+			if (a_Value.isMember("terms"))
+			{
+				Terms = a_Value["terms"];
+			}
+			else if (a_Value.isMember("Terms"))
+			{
+				Terms = a_Value["Terms"];
+			}
+			else
+			{
+				LOGWARNING("Loot table condition \"Alternative\" is missing sub - conditions. Dropping condition!");
+				return cLootTableCondition();
+			}
+			for (int i = 0; i < Terms.size(); i++)
+			{
+				SubConditions.push_back(ReadLootTableCondition(Terms[i]));
+			}
+			break;
+		}
+		case LootTable::eConditionType::Inverted:
+		{
+			Json::Value Term;
+			if (a_Value.isMember("term"))
+			{
+				Term = a_Value["term"];
+			}
+			else if (a_Value.isMember("Term"))
+			{
+				Term = a_Value["Term"];
+			}
+			else
+			{
+				LOGWARNING("Loot table condition \"Inverted\" is missing sub-condition. Dropping condition!");
+				return cLootTableCondition();
+			}
+			SubConditions.push_back(ReadLootTableCondition(Term));
+
+		}
+		case LootTable::eConditionType::Reference:
+		{
+			LOGWARNING("Type \"Reference\" for loot table conditions is not yet supported. Dropping condition");
+			return cLootTableCondition();
+		}
+		case LootTable::eConditionType::SurvivesExplosion:
+		{
+			return cLootTableCondition(Type, Parameter, SubConditions);
+		}
+		case LootTable::eConditionType::None:
+		{
+			return cLootTableCondition();
+		}
+		case LootTable::eConditionType::BlockStateProperty:
+		case LootTable::eConditionType::DamageSourceProperties:
+		case LootTable::eConditionType::EntityProperties:
+		case LootTable::eConditionType::EntityScores:
+		case LootTable::eConditionType::KilledByPlayer:
+		case LootTable::eConditionType::LocationCheck:
+		case LootTable::eConditionType::MatchTool:
+		case LootTable::eConditionType::RandomChance:
+		case LootTable::eConditionType::RandomChanceWithLooting:
+		case LootTable::eConditionType::TableBonus:
+		case LootTable::eConditionType::TimeCheck:
+		case LootTable::eConditionType::WeatherCheck:
+		{
+			for (const auto & Name : a_Value.getMemberNames())
+			{
+				if (NoCaseCompare(Name, "condition"))
+				{
+					auto ParameterObject = a_Value[Name];
+					Parameter.merge(ReadParameter(ParameterObject));
+				}
+			}
+			return cLootTableCondition(Type, Parameter, SubConditions);
+		}
+	}
+
+	for (const auto & ConditionParameterName: a_Value.getMemberNames())
+	{
+		if (NoCaseCompare(ConditionParameterName, "condition") == 0)
+		{
+			Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value[ConditionParameterName].asString()));
+		}
+		else
+		{
+			Parameter.merge(ReadParameter(a_Value[ConditionParameterName]));
+		}
+	}
+	return cLootTableCondition(Type, Parameter, SubConditions);
 }
 
 
 
 
-cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Value) const
+
+cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Value)
 {
-	int Weight = 0;
-	enum LootTable::ePoolEntryType Type;
-	AString Parameter;
-	cItem Item;
-	cLootTableFunctionVector Functions;
 	cLootTableConditionVector Conditions;
+	cLootTableFunctionVector Functions;
+	enum LootTable::ePoolEntryType Type;
+
+	cItem Item;
+	AString Name;
+	cLootTablePoolEntryVector Children;
+
+	bool Expand;
+	int Weight = 0;
+	int Quality = 0;
+
 	// The type has to be known beforehand
 	if (a_Value.isMember("type"))
 	{
@@ -1037,44 +1168,13 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 					break;
 				}
 				case LootTable::ePoolEntryType::Tag:
-				{
-					Parameter = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
-					break;
-				}
 				case LootTable::ePoolEntryType::LootTable:
-				{
-					// TODO
-					LOGWARNING("Unsupported loot table entry type: Loot table. Dropping entry");
-					continue;
-				}
-				case LootTable::ePoolEntryType::Group:
-				{
-					// TODO
-					LOGWARNING("Unsupported loot table entry type: group. Dropping entry");
-					continue;
-				}
-				case LootTable::ePoolEntryType::Alternatives:
-				{
-					// TODO
-					LOGWARNING("Unsupported loot table entry type: alternatives. Dropping entry");
-					continue;
-				}
-				case LootTable::ePoolEntryType::Sequence:
-				{
-					// TODO
-					LOGWARNING("Unsupported loot table entry type: alternatives. Dropping entry");
-					continue;
-				}
 				case LootTable::ePoolEntryType::Dynamic:
 				{
-					Parameter = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
+					Name = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
 					break;
 				}
-				case LootTable::ePoolEntryType::Empty:
-				{
-					// Does Nothing
-					break;
-				}
+				default: break;
 			}
 		}
 		else if (NoCaseCompare(EntryParameter, "functions") == 0)
@@ -1087,32 +1187,273 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 		}
 		else if (NoCaseCompare(EntryParameter, "conditions") == 0)
 		{
-			// TODO
+			auto ConditionsObject = a_Value[EntryParameter];
+			for (auto ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
+			{
+				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
+			}
 		}
 		else if (NoCaseCompare(EntryParameter, "children") == 0)
 		{
-			// TODO
+			switch (Type)
+			{
+				case LootTable::ePoolEntryType::Group:
+				case LootTable::ePoolEntryType::Alternatives:
+				case LootTable::ePoolEntryType::Sequence:
+				{
+					auto ChildrenObject = a_Value[EntryParameter];
+					for (int ChildrenObjectId = 0; ChildrenObjectId < ChildrenObject.size(); ++ChildrenObjectId)
+					{
+						Children.push_back(ReadLootTablePoolEntry(ChildrenObject[ChildrenObjectId]));
+					}
+					break;
+				}
+				default: break;
+			}
 		}
 		else if (NoCaseCompare(EntryParameter, "expand") == 0)
 		{
-			// TODO
+			Expand = a_Value[EntryParameter].asBool();
 		}
 		else if (NoCaseCompare(EntryParameter, "quality") == 0)
 		{
-			// TODO
+			Quality = a_Value[EntryParameter].asInt();
 		}
 	}
-	if (Parameter != "")
+	switch (Type)
 	{
-		return(cLootTablePoolEntry(Functions, Parameter, Weight, Conditions));
-	}
-	else
-	{
-		return(cLootTablePoolEntry(Functions, Item, Weight, Conditions));
-	}
+		case LootTable::ePoolEntryType::Item:
+		{
+			return cLootTablePoolEntry(Conditions, Functions, Type, Item, Weight, Quality);
+		}
 
+		case LootTable::ePoolEntryType::Tag:
+		case LootTable::ePoolEntryType::LootTable:
+		case LootTable::ePoolEntryType::Dynamic:
+		{
+			return cLootTablePoolEntry(Conditions, Functions, Type, Name, Expand, Weight, Quality);
+		}
+
+		case LootTable::ePoolEntryType::Group:
+		case LootTable::ePoolEntryType::Alternatives:
+		case LootTable::ePoolEntryType::Sequence:
+		{
+			return cLootTablePoolEntry(Conditions, Functions, Type, Children, Weight, Quality);
+		}
+
+		case LootTable::ePoolEntryType::Empty: return cLootTablePoolEntry();
+		default:                               return cLootTablePoolEntry();
+	}
 }
 
+
+
+
+
+AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
+{
+	AStringMap Result;
+	if (a_Value.isObject())
+	{
+		for (const auto & Name : a_Value.getMemberNames())
+		{
+			if (a_Value.isNumeric())
+			{
+				Result[Name] = std::to_string(a_Value[Name].asInt());
+			}
+			else if (a_Value.isBool())
+			{
+				if (a_Value[Name].asBool())
+				{
+					Result[Name] = "true";
+				}
+				else
+				{
+					Result[Name] = "false";
+				}
+			}
+			else if (a_Value.isString())
+			{
+				Result[Name] = a_Value[Name].asString();
+			}
+			else if (a_Value.isObject() ||a_Value.isArray())
+			{
+				Result.merge(ReadParameter(a_Value[Name]));
+			}
+		}
+	}
+	else if (a_Value.isArray())
+	{
+		for (int i = 0; i < a_Value.size(); i++)
+		{
+			Result.merge(ReadParameter(a_Value[i]));
+		}
+	}
+	return Result;
+}
+
+
+
+
+
+std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
+{
+	auto Items = std::vector<cItem>();
+	if (!ConditionsApply(a_Pool.m_Conditions, a_Player))
+	{
+		return Items;
+	}
+
+	// Steady Roll
+	if (a_Pool.m_Rolls.m_Roll > -1)
+	{
+		for (int i = 0; i < a_Pool.m_Rolls.m_Roll; i++)
+		{
+			auto NewItems = GetItems(a_Pool.m_Entries, a_Noise, a_Pos, a_Player, a_Entity);
+			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+		}
+	}
+	else  // Roll range
+	{
+		auto RollCount = a_Noise.IntNoise3DInt(a_Pos) % (a_Pool.m_Rolls.m_RollsMax - a_Pool.m_Rolls.m_RollsMin) + a_Pool.m_Rolls.m_RollsMin;
+		for (int i = 0; i < RollCount; i++)
+		{
+			auto NewItems = GetItems(a_Pool.m_Entries, a_Noise, a_Pos, a_Player, a_Entity);
+			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+		}
+	}
+	return Items;
+}
+
+
+
+
+
+std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntryVector & a_Entries, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
+{
+	auto Items = std::vector<cItem>();
+	return Items;
+}
+
+
+
+
+
+std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
+{
+	// Todo add luck here, when it's implemented
+	auto Items = std::vector<cItem>();
+	switch (a_Entry.m_Type)
+	{
+		case LootTable::ePoolEntryType::Item:
+		{
+			Items.push_back(a_Entry.m_Item);
+			break;
+		}
+		case LootTable::ePoolEntryType::Tag:
+		{
+			// Todo: check what names are used
+			// Todo: add loot tables for that
+			// Todo: return item(s)
+			break;
+		}
+		case LootTable::ePoolEntryType::LootTable:
+		{
+			// Todo - add loot table lookup
+			break;
+		}
+		case LootTable::ePoolEntryType::Group:
+		{
+			for (const auto & Child : a_Entry.m_Children)
+			{
+				auto NewItems = GetItems(Child, a_Noise, a_Pos, a_Player, a_Entity);
+				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			}
+			break;
+		}
+		case LootTable::ePoolEntryType::Alternatives:
+		{
+			// Todo - Choose 1
+			auto Child = a_Entry.m_Children[0];
+			auto NewItems = GetItems(Child, a_Noise, a_Pos, a_Player, a_Entity);
+			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			break;
+		}
+		case LootTable::ePoolEntryType::Sequence:
+			break;
+		case LootTable::ePoolEntryType::Dynamic:
+			break;
+		case LootTable::ePoolEntryType::Empty:
+		{
+			Items.push_back(cItem(E_BLOCK_AIR));
+			break;
+		}
+	}
+	return Items;
+}
+
+
+
+
+
+bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, cPlayer * a_Player, cEntity * a_Entity)
+{
+	bool Success = true;
+	for (const auto & Condition : a_Conditions)
+	{
+		Success &= ConditionApplies(Condition, a_Player, a_Entity);
+	}
+	return Success;
+}
+
+
+
+
+
+bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cPlayer * a_Player, cEntity * a_Entity)
+{
+	switch (a_Condition.m_Type)
+	{
+		case LootTable::eConditionType::None:
+		{
+			return true;
+		}
+		case LootTable::eConditionType::Alternative:
+		{
+			bool Success = false;
+			for (const auto & SubCondition: a_Condition.m_SubConditions)
+			{
+				Success |= ConditionApplies(SubCondition, a_Player, a_Entity);
+			}
+			return Success;
+		}
+		case LootTable::eConditionType::BlockStateProperty:
+		{
+			// TODO
+			LOGWARNING("Loot table condition \"BlockStateProperty\" is not yet supported. Assuming it's true.");
+			return true;
+		}
+		case LootTable::eConditionType::DamageSourceProperties:
+		case LootTable::eConditionType::EntityProperties:
+		case LootTable::eConditionType::EntityScores:
+		case LootTable::eConditionType::Inverted:
+		case LootTable::eConditionType::KilledByPlayer:
+		case LootTable::eConditionType::LocationCheck:
+		case LootTable::eConditionType::MatchTool:
+		case LootTable::eConditionType::RandomChance:
+		case LootTable::eConditionType::RandomChanceWithLooting:
+		case LootTable::eConditionType::Reference:
+		{
+			// TODO
+			return true;
+		}
+		case LootTable::eConditionType::SurvivesExplosion:
+		case LootTable::eConditionType::TableBonus:
+		case LootTable::eConditionType::TimeCheck:
+		case LootTable::eConditionType::WeatherCheck:
+		default: return true;
+	}
+}
 
 
 
