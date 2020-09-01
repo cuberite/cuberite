@@ -7,6 +7,7 @@
 #include "JsonUtils.h"
 #include "json/json.h"
 #include "BlockEntities/BlockEntityWithItems.h"
+#include "Noise/Noise.h"
 
 namespace LootTable
 {
@@ -826,8 +827,11 @@ cLootTable::cLootTable(cLootTable & a_Other)
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems & a_BlockEntity) const
+bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity) const
 {
+	auto & ItemGrid = a_BlockEntity->GetContents();
+	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
+	auto Noise = cNoise(Seed);
 	return false;
 }
 

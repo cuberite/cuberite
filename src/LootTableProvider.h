@@ -429,7 +429,7 @@ public:
 	cLootTable(cLootTable & a_Other);
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems & a_BlockEntity) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity) const;
 
 protected:
 	/** Type of loot table */
@@ -442,6 +442,7 @@ protected:
 	cLootTableFunctionVector m_LootTableFunctions;
 
 private:
+
 	/** Reads Loot Table pool from Json */
 	void ReadLootTablePool(const Json::Value & a_Value);
 
