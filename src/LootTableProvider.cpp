@@ -1266,16 +1266,16 @@ AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
 			{
 				if (a_Value[Name].asBool())
 				{
-					Result[Name] = "true";
+					Result[LootTable::NamespaceConverter(Name)] = "True";
 				}
 				else
 				{
-					Result[Name] = "false";
+					Result[LootTable::NamespaceConverter(Name)] = "False";
 				}
 			}
 			else if (a_Value.isString())
 			{
-				Result[Name] = a_Value[Name].asString();
+				Result[LootTable::NamespaceConverter(Name)] = LootTable::NamespaceConverter(a_Value[Name].asString());
 			}
 			else if (a_Value.isObject() ||a_Value.isArray())
 			{
