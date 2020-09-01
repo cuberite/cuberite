@@ -10,7 +10,7 @@
 class cBlockEntityWithItems;
 class cItem;
 class cWorld;
-class cPlayer;
+class cUUID;
 class cNoise;
 
 /*
@@ -517,9 +517,9 @@ public:
 	cLootTable(cLootTable & a_Other);
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a_Player) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID * a_Player) const;
 
-	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
+	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
 
 protected:
 	/** Type of loot table */
@@ -546,13 +546,13 @@ private:
 
 	static AStringMap ReadParameter(const Json::Value & a_Value);
 
-	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr);
 
-	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr);
 
-	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr);
 
-	static bool ConditionApplies(const cLootTableCondition & a_Condition, cPlayer * a_Player = nullptr, cEntity * a_Entity = nullptr);
+	static bool ConditionApplies(const cLootTableCondition & a_Condition, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr);
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;

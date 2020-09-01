@@ -3,12 +3,13 @@
 
 #include "LootTableProvider.h"
 
-#include "OSSupport/File.h"
+// #include "OSSupport/File.h"
 #include "JsonUtils.h"
 #include "json/json.h"
 #include "BlockEntities/BlockEntityWithItems.h"
 #include "Noise/Noise.h"
 #include "Entities/Player.h"
+#include "Mobs/MonsterTypes.h"
 
 namespace LootTable
 {
@@ -829,7 +830,7 @@ cLootTable::cLootTable(cLootTable & a_Other)
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a_Player) const
+bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID * a_Player) const
 {
 	auto & ItemGrid = a_BlockEntity->GetContents();
 	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
@@ -842,7 +843,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a
 
 
 
-std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity) const
+std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID * a_Player, cEntity * a_Entity) const
 {
 	auto Items = std::vector<cItem>();
 	for (const auto & Pool : m_LootTablePools)
@@ -1297,7 +1298,7 @@ AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
 
 
 
-std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
+std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & a_Noise, Vector3i & a_Pos, cUUID * a_Player, cEntity * a_Entity)
 {
 	auto Items = std::vector<cItem>();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_Player))
@@ -1336,7 +1337,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cNoise & 
 
 
 
-std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cPlayer * a_Player, cEntity * a_Entity)
+std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNoise & a_Noise, Vector3i & a_Pos, cUUID * a_Player, cEntity * a_Entity)
 {
 	// Todo: add luck here, when it's implemented
 	auto Items = std::vector<cItem>();
@@ -1395,7 +1396,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cNo
 
 
 
-bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, cPlayer * a_Player, cEntity * a_Entity)
+bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, cUUID * a_Player, cEntity * a_Entity)
 {
 	bool Success = true;
 	for (const auto & Condition : a_Conditions)
@@ -1409,7 +1410,7 @@ bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions,
 
 
 
-bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cPlayer * a_Player, cEntity * a_Entity)
+bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cUUID * a_Player, cEntity * a_Entity)
 {
 	switch (a_Condition.m_Type)
 	{
