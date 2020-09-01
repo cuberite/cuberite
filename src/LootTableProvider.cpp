@@ -1,7 +1,6 @@
 
 // cLootTableProvider.cpp
 
-#include <ShlDisp.h>
 #include "LootTableProvider.h"
 
 #include "OSSupport/File.h"
@@ -834,7 +833,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cPlayer * a
 	auto & ItemGrid = a_BlockEntity->GetContents();
 	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
 	auto Noise = cNoise(Seed);
-	auto Items = GetItems(Noise, a_BlockEntity->GetPos(), a_Player);
+	auto Items = GetItems(Noise, a_BlockEntity->GetPos(), a_Player, nullptr);
 	return false;
 }
 
