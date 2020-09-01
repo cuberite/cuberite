@@ -3,8 +3,6 @@
 
 #include "LootTableProvider.h"
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-
 #include "OSSupport/File.h"
 #include "JsonUtils.h"
 #include "json/json.h"
