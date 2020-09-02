@@ -1,7 +1,7 @@
 
--- DesertTemple.cubeset
+-- DesertPyramid.cubeset
 
--- Defines the prefabs in the group DesertTemple
+-- Defines the prefabs in the group DesertPyramid
 
 -- NOTE: This file has been generated automatically by GalExport!
 -- Any manual changes will be overwritten by the next automatic export!
@@ -29,8 +29,8 @@ Cubeset =
 		{
 			OriginData =
 			{
-				ExportName   = "DesertTemple",
-				Name         = "DesertTemple",
+				ExportName   = "DesertPyramid",
+				Name         = "DesertPyramid",
 				GalleryName  = "Desert",
 				GalleryIndex = "222",
 				ID           = "1706",
@@ -495,15 +495,15 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  -- 14
 
 			},
-		},  -- DesertTemple
+		},  -- DesertPyramid
 
 
 
 		{
 			OriginData =
 			{
-				ExportName   = "SandyDesertTemple",
-				Name         = "SandyDesertTemple",
+				ExportName   = "SandyDesertPyramid",
+				Name         = "SandyDesertPyramid",
 				GalleryName  = "Desert",
 				GalleryIndex = "223",
 				ID           = "1707",
@@ -970,7 +970,7 @@ Cubeset =
 				"mmmmmmmmmmmmmmm",  -- 14
 
 			},
-		},  -- SandyDesertTemple
+		},  -- SandyDesertPyramid
 	},  -- Pieces
 }
 

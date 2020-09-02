@@ -68,7 +68,6 @@ public:
 		{
 			return cStructurePtr();
 		}
-
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
 		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);

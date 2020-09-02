@@ -218,7 +218,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"Mineshafts, "
 				"Trees, "
 				"Villages, "
-				"SinglePieceStructures: JungleTemple|WitchHut|DesertTemple|DesertWell, "
+				"SinglePieceStructures: JungleTemple|WitchHut|DesertPyramid|DesertWell, "
 				"TallGrass, "
 				"SprinkleFoliage, "
 				"Ice, "
@@ -612,7 +612,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			if (split.size() < 2)
 			{
-				LOGWARNING("The SinglePieceStructures generator needs the structures to use. Example: \"SinglePieceStructures: DesertTemple\".");
+				LOGWARNING("The SinglePieceStructures generator needs the structures to use. Example: \"SinglePieceStructures: DesertPyramid\".");
 				continue;
 			}
 
