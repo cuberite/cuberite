@@ -850,7 +850,6 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value)
 {
 	enum LootTable::eFunctionType Type;
-	AStringMap Parameter;
 	cLootTableConditionVector Conditions;
 	for (auto & FunctionInfo : a_Value.getMemberNames())
 	{
@@ -866,12 +865,8 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
 		}
-		else  // Parameters
-		{
-			Parameter.merge(ReadParameter(a_Value[FunctionInfo]));
-		}
 	}
-	return cLootTableFunction(Type, Parameter, Conditions);
+	return cLootTableFunction(Type, a_Value, Conditions);
 }
 
 
@@ -1365,14 +1360,113 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, const
 // Item in container
 void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player)
 {
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Player))
+	{
+		return;
+	}
+
 	switch (a_Function.m_Type)
 	{
 		case LootTable::eFunctionType::EnchantRandomly:  // Item
 		{
+			cWeightedEnchantments EnchantmentLimiter;
+			if (a_Function.m_Parameter.isMember("enchantments"))
+			{
+				auto Enchantments = a_Function.m_Parameter["enchantments"];
+				for (unsigned int i = 0; i < Enchantments.size(); i++)
+				{
+					EnchantmentLimiter.push_back(cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Enchantments[i].asString())));
+				}
+			}
+			if (a_Function.m_Parameter.isMember("Enchantments"))
+			{
+				auto Enchantments = a_Function.m_Parameter["Enchantments"];
+				for (unsigned int i = 0; i < Enchantments.size(); i++)
+				{
+					EnchantmentLimiter.push_back(cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Enchantments[i].asString())));
+				}
+			}
+			else
+			{
+				// All are possible
+				cWeightedEnchantments Enchantments;
+				cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % 7);
+
+				cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, a_Noise.IntNoise1DInt(a_Noise.GetSeed()));
+				a_Item.m_Enchantments.Add(Enchantment);
+				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
+				break;
+			}
+			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
+			a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
 			break;
 		}
 		case LootTable::eFunctionType::EnchantWithLevels:  // Item
 		{
+			bool Treasure;
+			// TODO: add treasure when implemented - 12xx12 02.09.2020
+			if (a_Function.m_Parameter.isMember("treasure"))
+			{
+				Treasure = a_Function.m_Parameter["treasure"].asBool();
+				LOGWARNING("Treasure enchantments are not yet supported");
+			}
+			else if (a_Function.m_Parameter.isMember("Treasure"))
+			{
+				Treasure = a_Function.m_Parameter["Treasure"].asBool();
+				LOGWARNING("Treasure enchantments are not yet supported");
+			}
+			else
+			{
+				Treasure = false;
+			}
+			Json::Value LevelsObject;
+			if (a_Function.m_Parameter.isMember("levels"))
+			{
+				LevelsObject = a_Function.m_Parameter["levels"];
+			}
+			else if (a_Function.m_Parameter.isMember("Levels"))
+			{
+				LevelsObject = a_Function.m_Parameter["Levels"];
+			}
+			else
+			{
+				LOGWARNING("No levels provided for enchantments in Loot table, dropping function");
+				break;
+			}
+			int Levels;
+			if (LevelsObject.isInt())
+			{
+				Levels = LevelsObject.asInt();
+			}
+			else if (LevelsObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				if (a_Function.m_Parameter.isMember("min"))
+				{
+					 Min = LevelsObject["min"].asInt();
+				}
+				else if (a_Function.m_Parameter.isMember("Min"))
+				{
+					Min = LevelsObject["Min"].asInt();
+				}
+
+				if (a_Function.m_Parameter.isMember("max"))
+				{
+					Max = LevelsObject["max"].asInt();
+				}
+				else if (a_Function.m_Parameter.isMember("Max"))
+				{
+					Max = LevelsObject["Max"].asInt();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+
+				Levels = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+			}
+			a_Item.EnchantByXPLevels(Levels);
 			break;
 		}
 		case LootTable::eFunctionType::ExplorationMap:  // Item

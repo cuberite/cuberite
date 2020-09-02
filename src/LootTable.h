@@ -3,6 +3,7 @@
 
 #include "Item.h"
 #include <variant>
+#include "json/json.h"
 
 // fwd:
 class cBlockEntityWithItems;
@@ -291,18 +292,18 @@ struct cLootTableFunction
 {
 	cLootTableFunction(
 		enum LootTable::eFunctionType a_Type,
-		AStringMap a_Parameter,
+		Json::Value a_Parameter,
 		cLootTableConditionVector a_Conditions
 	):
+		m_Type(a_Type),
 		m_Parameter(std::move(a_Parameter)),
-		m_Conditions(std::move(a_Conditions)),
-		m_Type(a_Type)
+		m_Conditions(std::move(a_Conditions))
 	{
 	}
 
-	AStringMap m_Parameter;
-	cLootTableConditionVector m_Conditions;
 	enum LootTable::eFunctionType m_Type;
+	Json::Value m_Parameter;
+	cLootTableConditionVector m_Conditions;
 };
 
 
