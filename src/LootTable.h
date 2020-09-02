@@ -268,18 +268,28 @@ struct cLootTableCondition
 
 	cLootTableCondition(
 		enum LootTable::eConditionType a_Type,
-		AStringMap a_Parameter,
-		cLootTableConditionVector a_SubConditions
+		cLootTableConditionVector a_Parameter
 	):
 		m_Type(a_Type),
-		m_Parameter(std::move(a_Parameter)),
-		m_SubConditions(std::move(a_SubConditions))
+		m_Parameter(std::move(a_Parameter))
+	{
+	}
+
+
+
+
+
+	cLootTableCondition(
+		enum LootTable::eConditionType a_Type,
+		Json::Value a_Parameter
+		):
+		m_Type(a_Type),
+		m_Parameter(std::move(a_Parameter))
 	{
 	}
 
 	enum LootTable::eConditionType m_Type;
-	AStringMap m_Parameter;
-	cLootTableConditionVector m_SubConditions;
+	std::variant<cLootTableConditionVector, Json::Value> m_Parameter;
 };
 
 
@@ -528,6 +538,9 @@ private:
 	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
 
 	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity);
+
+	/** Applies give function to item for all types */
+	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player);
 
 	/** Applies given function to an item in a Container */
 	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player);
