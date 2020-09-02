@@ -49,6 +49,9 @@ cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
 }
 
 
+
+
+
 const cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
 
 

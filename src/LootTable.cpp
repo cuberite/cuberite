@@ -1186,7 +1186,10 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWo
 	// Todo: add luck here, when it's implemented
 	auto Items = std::vector<cItem>();
 
-	if (ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_Player, a_Entity))
+	if (!ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_Player, a_Entity))
+	{
+		return Items;
+	}
 
 		switch (a_Entry.m_Type)
 		{
@@ -1349,7 +1352,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 {
 	switch (a_Function.m_Type)
 	{
-		case LootTable::eFunctionType::ApplyBonus:  // Block Break, killed Entity
+		case LootTable::eFunctionType::ApplyBonus:
 		{
 			Json::Value EnchantmentObject;
 
@@ -1363,16 +1366,15 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			}
 
 			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
+			int Level;
 
-			const cItem * HandItem;
-
-			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
+			auto Callback = [&] (cPlayer & a_Player)
 			{
-			  HandItem = & (Player.GetEquippedItem());
-			  return true;
-			});
+				Level = a_Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment);
+				return true;
+			};
 
-			int Level = HandItem->m_Enchantments.GetLevel(Enchantment);
+			a_World->DoWithPlayerByUUID(a_Player, Callback);
 
 			AString Formula;
 			if (a_Function.m_Parameter.isMember("formula"))
@@ -1931,13 +1933,14 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
 
 			cItem HandItem;
+			int Level;
 
 			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
 			{
-			  HandItem = Player.GetEquippedItem();
+				HandItem = Player.GetEquippedItem();
+				Level = HandItem.m_Enchantments.GetLevel(Enchantment);
+				return true;
 			});
-
-			int Level = HandItem.m_Enchantments.GetLevel(Enchantment);
 
 			AString Formula;
 			if (a_Function.m_Parameter.isMember("formula"))
@@ -2072,14 +2075,15 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
 
-			cItem HandItem;
+			int Level;
 
-			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
+			auto Callback = [&](cPlayer & a_Player)
 			{
-			  HandItem = Player.GetEquippedItem();
-			});
+				Level = a_Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment);
+				return true;
+			};
 
-			int Level = HandItem.m_Enchantments.GetLevel(Enchantment);
+			a_World->DoWithPlayerByUUID(a_Player, Callback);
 
 			AString Formula;
 			if (a_Function.m_Parameter.isMember("formula"))
