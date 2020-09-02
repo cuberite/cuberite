@@ -482,7 +482,7 @@ public:
 	cLootTable();
 
 	/** Creates new loot table from string describing the loot table */
-	cLootTable(const Json::Value & a_Description);
+	cLootTable(const Json::Value & a_Description, cWorld * a_World);
 
 	cLootTable(const cLootTable & a_Other) = default;
 	cLootTable(cLootTable && a_Other) = default;
@@ -490,9 +490,9 @@ public:
 	cLootTable & operator = (cLootTable && a_Other) = default;
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID * a_Player) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID & a_Player) const;
 
-	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID * a_Player = nullptr, cEntity * a_Entity = nullptr) const;
+	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID & a_Player, cEntity * a_Entity = nullptr) const;
 
 protected:
 	/** Type of loot table */
@@ -521,25 +521,25 @@ private:
 
 	static AStringMap ReadParameter(const Json::Value & a_Value);
 
-	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, const cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID * a_Player = nullptr, const cEntity * a_Entity = nullptr);
+	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
 
-	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, const cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID * a_Player = nullptr, const cEntity * a_Entity = nullptr);
+	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
 
-	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player = nullptr, const cEntity * a_Entity = nullptr);
+	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
 
-	static bool ConditionApplies(const cLootTableCondition & a_Condition, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player, const cEntity * a_Entity);
+	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity);
 
 	/** Applies given function to an item in a Container */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player);
 
 	/** Applies given function to an item dropped from a block */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const cUUID * a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const cUUID & a_Player);
 
 	/** Applies given function to an item dropped from a block entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const cUUID * a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const cUUID & a_Player);
 
 	/** Applies given function to an item dropped from a killed entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cEntity * a_Entity, const cNoise & a_Noise, const cUUID * a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cEntity * a_Entity, const cNoise & a_Noise, const cUUID & a_Player);
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;

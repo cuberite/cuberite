@@ -31,7 +31,7 @@ Notes:
 class cLootTableProvider
 {
 public:
-	cLootTableProvider(AString & a_Path);
+	cLootTableProvider(AString & a_Path, cWorld * a_World);
 
 	/** Function to load a loot table from specified path */
 	void LoadLootTable(const AString & a_String, const AString & a_Type);
@@ -55,6 +55,8 @@ private:
 
 	/** Empty loot table in case there is an error */
 	static const cLootTable m_EmptyLootTable;
+
+	cWorld * m_World;
 };
 
 

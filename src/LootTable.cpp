@@ -9,6 +9,7 @@
 #include "Noise/Noise.h"
 #include "Root.h"
 #include "FurnaceRecipe.h"
+#include "Entities/Player.h"
 
 namespace LootTable
 {
@@ -663,7 +664,8 @@ cLootTable::cLootTable()
 
 
 
-cLootTable::cLootTable(const Json::Value & a_Description)
+cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World):
+	m_World(a_World)
 {
 	for (const auto & RootId : a_Description.getMemberNames())
 	{
@@ -694,7 +696,7 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID * a_Player) const
+bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID & a_Player) const
 {
 	auto & ItemGrid = a_BlockEntity->GetContents();
 	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
@@ -707,7 +709,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID * a_P
 
 
 
-std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID * a_Player, cEntity * a_Entity) const
+std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID & a_Player, cEntity * a_Entity) const
 {
 	auto Items = std::vector<cItem>();
 	for (const auto & Pool : m_LootTablePools)
@@ -1165,7 +1167,7 @@ AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
 
 
 
-std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, const cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID * a_Player, const cEntity * a_Entity)
+std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity)
 {
 	auto Items = std::vector<cItem>();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Player))
@@ -1204,7 +1206,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, const cWo
 
 
 
-std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, const cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID * a_Player, const cEntity * a_Entity)
+std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity)
 {
 	// Todo: add luck here, when it's implemented
 	auto Items = std::vector<cItem>();
@@ -1295,7 +1297,7 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, con
 
 
 
-bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player, const cEntity * a_Entity)
+bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity)
 {
 	bool Success = true;
 	for (const auto & Condition : a_Conditions)
@@ -1309,7 +1311,7 @@ bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions,
 
 
 
-bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player, const cEntity * a_Entity)
+bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity)
 {
 	switch (a_Condition.m_Type)
 	{
@@ -1358,7 +1360,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, const
 
 
 // Item in container
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cNoise & a_Noise, const cUUID * a_Player)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player)
 {
 	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Player))
 	{
@@ -1375,7 +1377,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				auto Enchantments = a_Function.m_Parameter["enchantments"];
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
-					EnchantmentLimiter.push_back(cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Enchantments[i].asString())));
+					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
 				}
 			}
 			if (a_Function.m_Parameter.isMember("Enchantments"))
@@ -1383,7 +1385,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				auto Enchantments = a_Function.m_Parameter["Enchantments"];
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
-					EnchantmentLimiter.push_back(cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Enchantments[i].asString())));
+					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
 				}
 			}
 			else
@@ -1404,7 +1406,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		case LootTable::eFunctionType::EnchantWithLevels:  // Item
 		{
 			bool Treasure;
-			// TODO: add treasure when implemented - 12xx12 02.09.2020
+			// TODO: 02.09.2020 - Add treasure when implemented - 12xx12
 			if (a_Function.m_Parameter.isMember("treasure"))
 			{
 				Treasure = a_Function.m_Parameter["treasure"].asBool();
@@ -1441,20 +1443,20 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 			else if (LevelsObject.isObject())
 			{
 				int Min = 0, Max = 0;
-				if (a_Function.m_Parameter.isMember("min"))
+				if (LevelsObject.isMember("min"))
 				{
 					 Min = LevelsObject["min"].asInt();
 				}
-				else if (a_Function.m_Parameter.isMember("Min"))
+				else if (LevelsObject.isMember("Min"))
 				{
 					Min = LevelsObject["Min"].asInt();
 				}
 
-				if (a_Function.m_Parameter.isMember("max"))
+				if (LevelsObject.isMember("max"))
 				{
 					Max = LevelsObject["max"].asInt();
 				}
-				else if (a_Function.m_Parameter.isMember("Max"))
+				else if (LevelsObject.isMember("Max"))
 				{
 					Max = LevelsObject["Max"].asInt();
 				}
@@ -1471,6 +1473,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::ExplorationMap:  // Item
 		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
 			LOGWARNING("Exploration maps are not implemented, dropping function!");
 			break;
 		}
@@ -1484,47 +1487,156 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::FillPlayerHead:  // All
 		{
+			// TODO: 02.09.2020 - Add actual player head when implemented
+			if (a_Item.m_ItemType == E_ITEM_HEAD)
+			{
+				a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+				LOGWARNING("Setting players head as a item is not supported, setting to default player Design!");
+			}
+			else
+			{
+				LOGWARNING("Wrong Item provided to assign head type!");
+			}
 			break;
 		}
 		case LootTable::eFunctionType::LimitCount:  // All
 		{
+			Json::Value LimitObject;
+			if (a_Function.m_Parameter.isMember("limit"))
+			{
+				LimitObject = a_Function.m_Parameter["limit"];
+			}
+			else if (a_Function.m_Parameter.isMember("Limit"))
+			{
+				LimitObject = a_Function.m_Parameter["Limit"];
+			}
+			else
+			{
+				LOGWARNING("Missing limit, dropping function!");
+			}
+
+			int Limit = -1;
+			if (LimitObject.isInt())
+			{
+				Limit = LimitObject.isInt();
+			}
+			else if (LimitObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				if (LimitObject.isMember("min"))
+				{
+					Min = LimitObject["min"].asInt();
+				}
+				else if (LimitObject.isMember("Min"))
+				{
+					Min = LimitObject["Min"].asInt();
+				}
+
+				if (LimitObject.isMember("max"))
+				{
+					Max = LimitObject["max"].asInt();
+				}
+				else if (LimitObject.isMember("Max"))
+				{
+					Max = LimitObject["Max"].asInt();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+
+				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+			}
+			if (a_Item.m_ItemCount > Limit)
+			{
+				a_Item.m_ItemCount = Limit;
+			}
 			break;
 		}
 		case LootTable::eFunctionType::SetAttributes:  // All
 		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("Attributes for items are not implemented, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetCount:  // All
 		{
-			auto Count = a_Function.m_Parameter.at("Count");
-			// Has no specified range
-			if (Count.empty())
+			Json::Value CountObject;
+			if (a_Function.m_Parameter.isMember("count"))
 			{
-				auto Type = a_Function.m_Parameter.at("Type");
-				if (Type == "Uniform")
+				CountObject = a_Function.m_Parameter["count"];
+			}
+			else if (a_Function.m_Parameter.isMember("Count"))
+			{
+				CountObject = a_Function.m_Parameter["Count"];
+			}
+
+			int Count = 0;
+			if (CountObject.isInt())
+			{
+				Count = CountObject.asInt();
+			}
+			else if (CountObject.isObject())
+			{
+				AString Type;
+				if (CountObject.isMember("type"))
 				{
-					auto MinString = a_Function.m_Parameter.at("Min");
-					auto MaxString = a_Function.m_Parameter.at("Max");
-					if (MinString.empty() || MaxString.empty())
+					Type = CountObject["type"].asString();
+				}
+				else if (CountObject.isMember("Type"))
+				{
+					Type = CountObject["Type"].asString();
+				}
+
+				if ((Type == "Uniform") || (Type == "uniform"))
+				{
+					int Min = 0, Max = 0;
+					if (CountObject.isMember("min"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						Min = CountObject["min"].asInt();
 					}
-					int Min = std::stoi(MinString);
-					int Max = std::stoi(MaxString);
+					else if (CountObject.isMember("Min"))
+					{
+						Min = CountObject["Min"].asInt();
+					}
+
+					if (CountObject.isMember("max"))
+					{
+						Max = CountObject["max"].asInt();
+					}
+					else if (CountObject.isMember("Max"))
+					{
+						Max = CountObject["Max"].asInt();
+					}
+
+					if (Min > Max)
+					{
+						Max = Min;
+					}
 					a_Item.m_ItemCount = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
 				}
-				else if (Type == "Binomial")
+				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
-					auto NString = a_Function.m_Parameter.at("N");
-					auto PString = a_Function.m_Parameter.at("P");
-					if (NString.empty() || PString.empty())
+					int N = 0;
+					float P = 0;
+					if (CountObject.isMember("n"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						N = CountObject["n"].asInt();
 					}
-					int N = std::stoi(NString);
-					float P = std::stof(PString);
+					else if (CountObject.isMember("N"))
+					{
+						N = CountObject["N"].asInt();
+					}
+
+					if (CountObject.isMember("p"))
+					{
+						P = CountObject["p"].asFloat();
+					}
+					else if (CountObject.isMember("P"))
+					{
+						P = CountObject["P"].asFloat();
+					}
 					std::default_random_engine Generator(a_Noise.GetSeed());
 					std::binomial_distribution<int> Dist(N, P);
 					std::vector<int> Values;
@@ -1532,22 +1644,61 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					{
 						Values[i] = Dist(Generator);
 					}
-					a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (N);
+					a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];
 				}
-			}
-			else
-			{
-				a_Item.m_ItemCount = std::stoi(Count);
 			}
 			break;
 		}
 		case LootTable::eFunctionType::SetDamage:  // All
 		{
+			Json::Value DamageObject;
+
+			if (a_Function.m_Parameter.isMember("damage"))
+			{
+				DamageObject = a_Function.m_Parameter["damage"];
+			}
+			else if (a_Function.m_Parameter.isMember("Damage"))
+			{
+				DamageObject = a_Function.m_Parameter["Damage"];
+			}
+			float Damage = 0;
+			if (DamageObject.isNumeric())
+			{
+				Damage = DamageObject.asFloat();
+			}
+			else if (DamageObject.isObject())
+			{
+				float Min = 0.0f, Max = 0.0f;
+				if (DamageObject.isMember("min"))
+				{
+					Min = DamageObject["min"].asFloat();
+				}
+				else if (DamageObject.isMember("Min"))
+				{
+					Min = DamageObject["Min"].asFloat();
+				}
+
+				if (DamageObject.isMember("max"))
+				{
+					Max = DamageObject["max"].asFloat();
+				}
+				else if (DamageObject.isMember("Max"))
+				{
+					Max = DamageObject["Max"].asFloat();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+				Damage = std::fmod(a_Noise.IntNoise1D(a_Noise.GetSeed()), Max - Min) + Min;
+			}
+			a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
 			break;
 		}
 		case LootTable::eFunctionType::SetLootTable:  // All
 		{
-			// TODO: add when implemented
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
 			LOGWARNING("NBT for items is not yet supported, dropping function!");
 			break;
 		}
@@ -1561,13 +1712,13 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::SetNbt:  // Item
 		{
-			// TODO: add when implemented
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
 			LOGWARNING("NBT for items is not yet supported, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetStewEffect:  // Item
 		{
-			// TODO: add when implemented
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
 			LOGWARNING("Stews are not yet supported, dropping function!");
 			break;
 		}
@@ -1577,8 +1728,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		default:
 		{
-			LOGWARNING("Function type if not supported for this entity, dropping function!");
-			// TODO add warning for unsupported function type
+			LOGWARNING("Function type is not supported for this entity, dropping function!");
 			break;
 		}
 	}
@@ -1588,25 +1738,85 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Block
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const cUUID * a_Player)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const cUUID & a_Player)
 {
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Player))
+	{
+		return;
+	}
+
 	switch (a_Function.m_Type)
 	{
 		case LootTable::eFunctionType::ApplyBonus:  // Block Break, killed Entity
 		{
-			auto Enchantment = cEnchantments::StringToEnchantmentID(a_Function.m_Parameter.at("Enchantment"));
-			auto Formula = a_Function.m_Parameter.at("Formula");
+			Json::Value EnchantmentObject;
 
-			// Todo: get enchantment level of tool in player hand
-			int Level = 1;
+			if (a_Function.m_Parameter.isMember("enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["enchantment"];
+			}
+			else if (a_Function.m_Parameter.isMember("Enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["Enchantment"];
+			}
+
+			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
+
+			cItem HandItem;
+
+			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
+			{
+				HandItem = Player.GetEquippedItem();
+				return true;
+			});
+
+			int Level = HandItem.m_Enchantments.GetLevel(Enchantment);
+
+			AString Formula;
+			if (a_Function.m_Parameter.isMember("formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["formula"].asString());
+			}
+			else if (a_Function.m_Parameter.isMember("Formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["Formula"].asString());
+			}
+
+			Json::Value Parameters;
+
+			if (a_Function.m_Parameter.isMember("parameters"))
+			{
+				Parameters = a_Function.m_Parameter["parameters"];
+			}
+			else if (a_Function.m_Parameter.isMember("Parameters"))
+			{
+				Parameters = a_Function.m_Parameter["Parameters"];
+			}
 
 			if (Formula == "BinomialWithBonusCount")
 			{
 				// Binomial Probability Distribution with n=level + extra, p=probability
-				auto ExtraString = a_Function.m_Parameter.at("Extra");
-				int Extra = std::stoi(ExtraString);
-				auto ProbString = a_Function.m_Parameter.at("Probability");
-				float Probability = std::stof(ProbString);
+				int Extra;
+
+				if (Parameters.isMember("extra"))
+				{
+					Extra = Parameters["extra"].asInt();
+				}
+				else if (Parameters.isMember("Extra"))
+				{
+					Extra = Parameters["Extra"].asInt();
+				}
+
+				float Probability;
+
+				if (Parameters.isMember("probability"))
+				{
+					Probability = Parameters["probability"].asFloat();
+				}
+				else if (Parameters.isMember("Probability"))
+				{
+					Probability = Parameters["Probability"].asFloat();
+				}
 
 				std::default_random_engine Generator(a_Noise.GetSeed());
 				std::binomial_distribution<int> Dist(Level + Extra, Probability);
@@ -1615,13 +1825,20 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + Extra);
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
 			}
 			else if (Formula == "UniformBonusCount")
 			{
 				// prob = (0, level * BonusMultiplier)
-				auto BonusMultiplierString = a_Function.m_Parameter.at("BonusMultiplier");
-				int BonusMultiplier = std::stoi(BonusMultiplierString);
+				int BonusMultiplier;
+				if (Parameters.isMember("bonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["bonusMultiplier"].asInt();
+				}
+				else if (Parameters.isMember("BonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
+				}
 				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
@@ -1633,17 +1850,19 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::CopyNbt:  // Block Entity, Killed Entity
 		{
+			// TODO:
 			LOGWARNING("NBT for items is not yet supported, Dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::CopyState:  // Block break
 		{
-			// TODO: add when implemented
-			LOGWARNING("NBT for items is not yet supported, dropping function!");
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("States for items is not yet supported, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::ExplosionDecay:  // Block break
 		{
+			// TODO
 			break;
 		}
 		case LootTable::eFunctionType::FurnaceSmelt:  // Item, Block break
@@ -1656,51 +1875,162 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::FillPlayerHead:  // All
 		{
+			// TODO: 02.09.2020 - Add actual player head when implemented
+			if (a_Item.m_ItemType == E_ITEM_HEAD)
+			{
+				a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+				LOGWARNING("Setting players head as a item is not supported, setting to default player Design!");
+			}
+			else
+			{
+				LOGWARNING("Wrong Item provided to assign head type!");
+			}
 			break;
 		}
 		case LootTable::eFunctionType::LimitCount:  // All
 		{
+			Json::Value LimitObject;
+			if (a_Function.m_Parameter.isMember("limit"))
+			{
+				LimitObject = a_Function.m_Parameter["limit"];
+			}
+			else if (a_Function.m_Parameter.isMember("Limit"))
+			{
+				LimitObject = a_Function.m_Parameter["Limit"];
+			}
+			else
+			{
+				LOGWARNING("Missing limit, dropping function!");
+			}
+
+			int Limit = -1;
+			if (LimitObject.isInt())
+			{
+				Limit = LimitObject.isInt();
+			}
+			else if (LimitObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				if (LimitObject.isMember("min"))
+				{
+					Min = LimitObject["min"].asInt();
+				}
+				else if (LimitObject.isMember("Min"))
+				{
+					Min = LimitObject["Min"].asInt();
+				}
+
+				if (LimitObject.isMember("max"))
+				{
+					Max = LimitObject["max"].asInt();
+				}
+				else if (LimitObject.isMember("Max"))
+				{
+					Max = LimitObject["Max"].asInt();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+
+				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+			}
+			if (a_Item.m_ItemCount > Limit)
+			{
+				a_Item.m_ItemCount = Limit;
+			}
 			break;
 		}
 		case LootTable::eFunctionType::SetAttributes:  // All
 		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("Attributes for items are not implemented, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetContents:  // Block break
 		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("NBT for items is not yet supported, Dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetCount:  // All
 		{
-			auto Count = a_Function.m_Parameter.at("Count");
-			// Has no specified range
-			if (Count.empty())
+			Json::Value CountObject;
+			if (a_Function.m_Parameter.isMember("count"))
 			{
-				auto Type = a_Function.m_Parameter.at("Type");
-				if (Type == "Uniform")
+				CountObject = a_Function.m_Parameter["count"];
+			}
+			else if (a_Function.m_Parameter.isMember("Count"))
+			{
+				CountObject = a_Function.m_Parameter["Count"];
+			}
+
+			int Count = 0;
+			if (CountObject.isInt())
+			{
+				Count = CountObject.asInt();
+			}
+			else if (CountObject.isObject())
+			{
+				AString Type;
+				if (CountObject.isMember("type"))
 				{
-					auto MinString = a_Function.m_Parameter.at("Min");
-					auto MaxString = a_Function.m_Parameter.at("Max");
-					if (MinString.empty() || MaxString.empty())
+					Type = CountObject["type"].asString();
+				}
+				else if (CountObject.isMember("Type"))
+				{
+					Type = CountObject["Type"].asString();
+				}
+
+				if ((Type == "Uniform") || (Type == "uniform"))
+				{
+					int Min = 0, Max = 0;
+					if (CountObject.isMember("min"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						Min = CountObject["min"].asInt();
 					}
-					int Min = std::stoi(MinString);
-					int Max = std::stoi(MaxString);
+					else if (CountObject.isMember("Min"))
+					{
+						Min = CountObject["Min"].asInt();
+					}
+
+					if (CountObject.isMember("max"))
+					{
+						Max = CountObject["max"].asInt();
+					}
+					else if (CountObject.isMember("Max"))
+					{
+						Max = CountObject["Max"].asInt();
+					}
+
+					if (Min > Max)
+					{
+						Max = Min;
+					}
 					a_Item.m_ItemCount = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
 				}
-				else if (Type == "Binomial")
+				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
-					auto NString = a_Function.m_Parameter.at("N");
-					auto PString = a_Function.m_Parameter.at("P");
-					if (NString.empty() || PString.empty())
+					int N = 0;
+					float P = 0;
+					if (CountObject.isMember("n"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						N = CountObject["n"].asInt();
 					}
-					int N = std::stoi(NString);
-					float P = std::stof(PString);
+					else if (CountObject.isMember("N"))
+					{
+						N = CountObject["N"].asInt();
+					}
+
+					if (CountObject.isMember("p"))
+					{
+						P = CountObject["p"].asFloat();
+					}
+					else if (CountObject.isMember("P"))
+					{
+						P = CountObject["P"].asFloat();
+					}
 					std::default_random_engine Generator(a_Noise.GetSeed());
 					std::binomial_distribution<int> Dist(N, P);
 					std::vector<int> Values;
@@ -1708,20 +2038,59 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					{
 						Values[i] = Dist(Generator);
 					}
-					a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (N);
+					a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];
 				}
 			}
-			else
-			{
-				a_Item.m_ItemCount = std::stoi(Count);
-			}
-			break;
-		}
-		case LootTable::eFunctionType::SetLore:  // All
-		{
 			break;
 		}
 		case LootTable::eFunctionType::SetDamage:  // All
+		{
+			Json::Value DamageObject;
+
+			if (a_Function.m_Parameter.isMember("damage"))
+			{
+				DamageObject = a_Function.m_Parameter["damage"];
+			}
+			else if (a_Function.m_Parameter.isMember("Damage"))
+			{
+				DamageObject = a_Function.m_Parameter["Damage"];
+			}
+			float Damage = 0;
+			if (DamageObject.isNumeric())
+			{
+				Damage = DamageObject.asFloat();
+			}
+			else if (DamageObject.isObject())
+			{
+				float Min = 0.0f, Max = 0.0f;
+				if (DamageObject.isMember("min"))
+				{
+					Min = DamageObject["min"].asFloat();
+				}
+				else if (DamageObject.isMember("Min"))
+				{
+					Min = DamageObject["Min"].asFloat();
+				}
+
+				if (DamageObject.isMember("max"))
+				{
+					Max = DamageObject["max"].asFloat();
+				}
+				else if (DamageObject.isMember("Max"))
+				{
+					Max = DamageObject["Max"].asFloat();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+				Damage = std::fmod(a_Noise.IntNoise1D(a_Noise.GetSeed()), Max - Min) + Min;
+			}
+			a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
+			break;
+		}
+		case LootTable::eFunctionType::SetLore:  // All
 		{
 			break;
 		}
@@ -1729,9 +2098,19 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		{
 			break;
 		}
+		case LootTable::eFunctionType::SetNbt:  // All
+		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("NBT for items is not yet supported, dropping function!");
+			break;
+		}
+		case LootTable::eFunctionType::None:
+		{
+			break;
+		}
 		default:
 		{
-			LOGWARNING("Function type if not supported for this entity, dropping function!");
+			LOGWARNING("Function type is not supported for this entity, dropping function!");
 			break;
 		}
 	}
@@ -1741,59 +2120,267 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Block Entity
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const cUUID * a_Player)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const cUUID & a_Player)
 {
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Player))
+	{
+		return;
+	}
+
 	switch (a_Function.m_Type)
 	{
-		case LootTable::eFunctionType::SetAttributes:  // All
+		case LootTable::eFunctionType::ApplyBonus:  // Block Break, killed Entity
 		{
-			break;
-		}
-		case LootTable::eFunctionType::CopyName:  // Block Entity
-		{
-			// TODO: add when implemented
-			LOGWARNING("Custom Names for Block entities are not yet supported. Dropping function");
+			Json::Value EnchantmentObject;
+
+			if (a_Function.m_Parameter.isMember("enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["enchantment"];
+			}
+			else if (a_Function.m_Parameter.isMember("Enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["Enchantment"];
+			}
+
+			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
+
+			cItem HandItem;
+
+			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
+			{
+			  HandItem = Player.GetEquippedItem();
+			});
+
+			int Level = HandItem.m_Enchantments.GetLevel(Enchantment);
+
+			AString Formula;
+			if (a_Function.m_Parameter.isMember("formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["formula"].asString());
+			}
+			else if (a_Function.m_Parameter.isMember("Formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["Formula"].asString());
+			}
+
+			Json::Value Parameters;
+
+			if (a_Function.m_Parameter.isMember("parameters"))
+			{
+				Parameters = a_Function.m_Parameter["parameters"];
+			}
+			else if (a_Function.m_Parameter.isMember("Parameters"))
+			{
+				Parameters = a_Function.m_Parameter["Parameters"];
+			}
+
+			if (Formula == "BinomialWithBonusCount")
+			{
+				// Binomial Probability Distribution with n=level + extra, p=probability
+				int Extra;
+
+				if (Parameters.isMember("extra"))
+				{
+					Extra = Parameters["extra"].asInt();
+				}
+				else if (Parameters.isMember("Extra"))
+				{
+					Extra = Parameters["Extra"].asInt();
+				}
+
+				float Probability;
+
+				if (Parameters.isMember("probability"))
+				{
+					Probability = Parameters["probability"].asFloat();
+				}
+				else if (Parameters.isMember("Probability"))
+				{
+					Probability = Parameters["Probability"].asFloat();
+				}
+
+				std::default_random_engine Generator(a_Noise.GetSeed());
+				std::binomial_distribution<int> Dist(Level + Extra, Probability);
+				std::vector<int> Values;
+				for (int i = 0; i < Level + Extra; i++)
+				{
+					Values[i] = Dist(Generator);
+				}
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
+			}
+			else if (Formula == "UniformBonusCount")
+			{
+				// prob = (0, level * BonusMultiplier)
+				int BonusMultiplier;
+				if (Parameters.isMember("bonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["bonusMultiplier"].asInt();
+				}
+				else if (Parameters.isMember("BonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
+				}
+				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
+			}
+			else if (Formula == "OreDrops")
+			{
+				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
+				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + 2) - 1) + 1;
+			}
 			break;
 		}
 		case LootTable::eFunctionType::FillPlayerHead:  // All
 		{
+			// TODO: 02.09.2020 - Add actual player head when implemented
+			if (a_Item.m_ItemType == E_ITEM_HEAD)
+			{
+				a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+				LOGWARNING("Setting players head as a item is not supported, setting to default player Design!");
+			}
+			else
+			{
+				LOGWARNING("Wrong Item provided to assign head type!");
+			}
 			break;
 		}
 		case LootTable::eFunctionType::LimitCount:  // All
 		{
+			Json::Value LimitObject;
+			if (a_Function.m_Parameter.isMember("limit"))
+			{
+				LimitObject = a_Function.m_Parameter["limit"];
+			}
+			else if (a_Function.m_Parameter.isMember("Limit"))
+			{
+				LimitObject = a_Function.m_Parameter["Limit"];
+			}
+			else
+			{
+				LOGWARNING("Missing limit, dropping function!");
+			}
+
+			int Limit = -1;
+			if (LimitObject.isInt())
+			{
+				Limit = LimitObject.isInt();
+			}
+			else if (LimitObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				if (LimitObject.isMember("min"))
+				{
+					Min = LimitObject["min"].asInt();
+				}
+				else if (LimitObject.isMember("Min"))
+				{
+					Min = LimitObject["Min"].asInt();
+				}
+
+				if (LimitObject.isMember("max"))
+				{
+					Max = LimitObject["max"].asInt();
+				}
+				else if (LimitObject.isMember("Max"))
+				{
+					Max = LimitObject["Max"].asInt();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+
+				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+			}
+			if (a_Item.m_ItemCount > Limit)
+			{
+				a_Item.m_ItemCount = Limit;
+			}
+			break;
+		}
+		case LootTable::eFunctionType::SetAttributes:  // All
+		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("Attributes for items are not implemented, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetCount:  // All
 		{
-			auto Count = a_Function.m_Parameter.at("Count");
-			// Has no specified range
-			if (Count.empty())
+			Json::Value CountObject;
+			if (a_Function.m_Parameter.isMember("count"))
 			{
-				auto Type = a_Function.m_Parameter.at("Type");
-				if (Type == "Uniform")
+				CountObject = a_Function.m_Parameter["count"];
+			}
+			else if (a_Function.m_Parameter.isMember("Count"))
+			{
+				CountObject = a_Function.m_Parameter["Count"];
+			}
+
+			int Count = 0;
+			if (CountObject.isInt())
+			{
+				Count = CountObject.asInt();
+			}
+			else if (CountObject.isObject())
+			{
+				AString Type;
+				if (CountObject.isMember("type"))
 				{
-					auto MinString = a_Function.m_Parameter.at("Min");
-					auto MaxString = a_Function.m_Parameter.at("Max");
-					if (MinString.empty() || MaxString.empty())
+					Type = CountObject["type"].asString();
+				}
+				else if (CountObject.isMember("Type"))
+				{
+					Type = CountObject["Type"].asString();
+				}
+
+				if ((Type == "Uniform") || (Type == "uniform"))
+				{
+					int Min = 0, Max = 0;
+					if (CountObject.isMember("min"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						Min = CountObject["min"].asInt();
 					}
-					int Min = std::stoi(MinString);
-					int Max = std::stoi(MaxString);
+					else if (CountObject.isMember("Min"))
+					{
+						Min = CountObject["Min"].asInt();
+					}
+
+					if (CountObject.isMember("max"))
+					{
+						Max = CountObject["max"].asInt();
+					}
+					else if (CountObject.isMember("Max"))
+					{
+						Max = CountObject["Max"].asInt();
+					}
+
+					if (Min > Max)
+					{
+						Max = Min;
+					}
 					a_Item.m_ItemCount = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
 				}
-				else if (Type == "Binomial")
+				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
-					auto NString = a_Function.m_Parameter.at("N");
-					auto PString = a_Function.m_Parameter.at("P");
-					if (NString.empty() || PString.empty())
+					int N = 0;
+					float P = 0;
+					if (CountObject.isMember("n"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						N = CountObject["n"].asInt();
 					}
-					int N = std::stoi(NString);
-					float P = std::stof(PString);
+					else if (CountObject.isMember("N"))
+					{
+						N = CountObject["N"].asInt();
+					}
+
+					if (CountObject.isMember("p"))
+					{
+						P = CountObject["p"].asFloat();
+					}
+					else if (CountObject.isMember("P"))
+					{
+						P = CountObject["P"].asFloat();
+					}
 					std::default_random_engine Generator(a_Noise.GetSeed());
 					std::binomial_distribution<int> Dist(N, P);
 					std::vector<int> Values;
@@ -1801,17 +2388,56 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					{
 						Values[i] = Dist(Generator);
 					}
-					a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (N);
+					a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];
 				}
-			}
-			else
-			{
-				a_Item.m_ItemCount = std::stoi(Count);
 			}
 			break;
 		}
 		case LootTable::eFunctionType::SetDamage:  // All
 		{
+			Json::Value DamageObject;
+
+			if (a_Function.m_Parameter.isMember("damage"))
+			{
+				DamageObject = a_Function.m_Parameter["damage"];
+			}
+			else if (a_Function.m_Parameter.isMember("Damage"))
+			{
+				DamageObject = a_Function.m_Parameter["Damage"];
+			}
+			float Damage = 0;
+			if (DamageObject.isNumeric())
+			{
+				Damage = DamageObject.asFloat();
+			}
+			else if (DamageObject.isObject())
+			{
+				float Min = 0.0f, Max = 0.0f;
+				if (DamageObject.isMember("min"))
+				{
+					Min = DamageObject["min"].asFloat();
+				}
+				else if (DamageObject.isMember("Min"))
+				{
+					Min = DamageObject["Min"].asFloat();
+				}
+
+				if (DamageObject.isMember("max"))
+				{
+					Max = DamageObject["max"].asFloat();
+				}
+				else if (DamageObject.isMember("Max"))
+				{
+					Max = DamageObject["Max"].asFloat();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+				Damage = std::fmod(a_Noise.IntNoise1D(a_Noise.GetSeed()), Max - Min) + Min;
+			}
+			a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
 			break;
 		}
 		case LootTable::eFunctionType::SetLore:  // All
@@ -1822,9 +2448,19 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		{
 			break;
 		}
+		case LootTable::eFunctionType::SetNbt:  // All
+		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("NBT for items is not yet supported, dropping function!");
+			break;
+		}
+		case LootTable::eFunctionType::None:
+		{
+			break;
+		}
 		default:
 		{
-			LOGWARNING("Function type if not supported for this entity, dropping function!");
+			LOGWARNING("Function type is not supported for this entity, dropping function!");
 			break;
 		}
 	}
@@ -1833,25 +2469,84 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Killed entity
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, const cWorld * a_World, const cEntity * a_Entity, const cNoise & a_Noise, const cUUID * a_Player)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cEntity * a_Entity, const cNoise & a_Noise, const cUUID & a_Player)
 {
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Player))
+	{
+		return;
+	}
+
 	switch (a_Function.m_Type)
 	{
 		case LootTable::eFunctionType::ApplyBonus:  // Block Break, killed Entity
 		{
-			auto Enchantment = cEnchantments::StringToEnchantmentID(a_Function.m_Parameter.at("Enchantment"));
-			auto Formula = a_Function.m_Parameter.at("Formula");
+			Json::Value EnchantmentObject;
 
-			// Todo: get enchantment level of tool in player hand
-			int Level = 1;
+			if (a_Function.m_Parameter.isMember("enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["enchantment"];
+			}
+			else if (a_Function.m_Parameter.isMember("Enchantment"))
+			{
+				EnchantmentObject = a_Function.m_Parameter["Enchantment"];
+			}
+
+			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
+
+			cItem HandItem;
+
+			a_World->DoWithPlayerByUUID(a_Player, [&] (cPlayer & Player)
+			{
+			  HandItem = Player.GetEquippedItem();
+			});
+
+			int Level = HandItem.m_Enchantments.GetLevel(Enchantment);
+
+			AString Formula;
+			if (a_Function.m_Parameter.isMember("formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["formula"].asString());
+			}
+			else if (a_Function.m_Parameter.isMember("Formula"))
+			{
+				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["Formula"].asString());
+			}
+
+			Json::Value Parameters;
+
+			if (a_Function.m_Parameter.isMember("parameters"))
+			{
+				Parameters = a_Function.m_Parameter["parameters"];
+			}
+			else if (a_Function.m_Parameter.isMember("Parameters"))
+			{
+				Parameters = a_Function.m_Parameter["Parameters"];
+			}
 
 			if (Formula == "BinomialWithBonusCount")
 			{
 				// Binomial Probability Distribution with n=level + extra, p=probability
-				auto ExtraString = a_Function.m_Parameter.at("Extra");
-				int Extra = std::stoi(ExtraString);
-				auto ProbString = a_Function.m_Parameter.at("Probability");
-				float Probability = std::stof(ProbString);
+				int Extra;
+
+				if (Parameters.isMember("extra"))
+				{
+					Extra = Parameters["extra"].asInt();
+				}
+				else if (Parameters.isMember("Extra"))
+				{
+					Extra = Parameters["Extra"].asInt();
+				}
+
+				float Probability;
+
+				if (Parameters.isMember("probability"))
+				{
+					Probability = Parameters["probability"].asFloat();
+				}
+				else if (Parameters.isMember("Probability"))
+				{
+					Probability = Parameters["Probability"].asFloat();
+				}
 
 				std::default_random_engine Generator(a_Noise.GetSeed());
 				std::binomial_distribution<int> Dist(Level + Extra, Probability);
@@ -1860,13 +2555,20 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + Extra);
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
 			}
 			else if (Formula == "UniformBonusCount")
 			{
 				// prob = (0, level * BonusMultiplier)
-				auto BonusMultiplierString = a_Function.m_Parameter.at("BonusMultiplier");
-				int BonusMultiplier = std::stoi(BonusMultiplierString);
+				int BonusMultiplier;
+				if (Parameters.isMember("bonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["bonusMultiplier"].asInt();
+				}
+				else if (Parameters.isMember("BonusMultiplier"))
+				{
+					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
+				}
 				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
@@ -1883,6 +2585,16 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::FillPlayerHead:  // All
 		{
+			// TODO: 02.09.2020 - Add actual player head when implemented
+			if (a_Item.m_ItemType == E_ITEM_HEAD)
+			{
+				a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+				LOGWARNING("Setting players head as a item is not supported, setting to default player Design!");
+			}
+			else
+			{
+				LOGWARNING("Wrong Item provided to assign head type!");
+			}
 			break;
 		}
 		case LootTable::eFunctionType::FurnaceSmelt:  // Item, Block break, Entity Kill
@@ -1895,6 +2607,57 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::LimitCount:  // All
 		{
+			Json::Value LimitObject;
+			if (a_Function.m_Parameter.isMember("limit"))
+			{
+				LimitObject = a_Function.m_Parameter["limit"];
+			}
+			else if (a_Function.m_Parameter.isMember("Limit"))
+			{
+				LimitObject = a_Function.m_Parameter["Limit"];
+			}
+			else
+			{
+				LOGWARNING("Missing limit, dropping function!");
+			}
+
+			int Limit = -1;
+			if (LimitObject.isInt())
+			{
+				Limit = LimitObject.isInt();
+			}
+			else if (LimitObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				if (LimitObject.isMember("min"))
+				{
+					Min = LimitObject["min"].asInt();
+				}
+				else if (LimitObject.isMember("Min"))
+				{
+					Min = LimitObject["Min"].asInt();
+				}
+
+				if (LimitObject.isMember("max"))
+				{
+					Max = LimitObject["max"].asInt();
+				}
+				else if (LimitObject.isMember("Max"))
+				{
+					Max = LimitObject["Max"].asInt();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+
+				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+			}
+			if (a_Item.m_ItemCount > Limit)
+			{
+				a_Item.m_ItemCount = Limit;
+			}
 			break;
 		}
 		case LootTable::eFunctionType::LootingEnchant:  // Entity killed
@@ -1903,39 +2666,87 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::SetAttributes:  // All
 		{
+			// TODO: 02.09.2020 - Add when implemented - 12xx12
+			LOGWARNING("Attributes for items are not implemented, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetCount:  // All
 		{
-			auto Count = a_Function.m_Parameter.at("Count");
-			// Has no specified range
-			if (Count.empty())
+			Json::Value CountObject;
+			if (a_Function.m_Parameter.isMember("count"))
 			{
-				auto Type = a_Function.m_Parameter.at("Type");
-				if (Type == "Uniform")
+				CountObject = a_Function.m_Parameter["count"];
+			}
+			else if (a_Function.m_Parameter.isMember("Count"))
+			{
+				CountObject = a_Function.m_Parameter["Count"];
+			}
+
+			int Count = 0;
+			if (CountObject.isInt())
+			{
+				Count = CountObject.asInt();
+			}
+			else if (CountObject.isObject())
+			{
+				AString Type;
+				if (CountObject.isMember("type"))
 				{
-					auto MinString = a_Function.m_Parameter.at("Min");
-					auto MaxString = a_Function.m_Parameter.at("Max");
-					if (MinString.empty() || MaxString.empty())
+					Type = CountObject["type"].asString();
+				}
+				else if (CountObject.isMember("Type"))
+				{
+					Type = CountObject["Type"].asString();
+				}
+
+				if ((Type == "Uniform") || (Type == "uniform"))
+				{
+					int Min = 0, Max = 0;
+					if (CountObject.isMember("min"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						Min = CountObject["min"].asInt();
 					}
-					int Min = std::stoi(MinString);
-					int Max = std::stoi(MaxString);
+					else if (CountObject.isMember("Min"))
+					{
+						Min = CountObject["Min"].asInt();
+					}
+
+					if (CountObject.isMember("max"))
+					{
+						Max = CountObject["max"].asInt();
+					}
+					else if (CountObject.isMember("Max"))
+					{
+						Max = CountObject["Max"].asInt();
+					}
+
+					if (Min > Max)
+					{
+						Max = Min;
+					}
 					a_Item.m_ItemCount = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
 				}
-				else if (Type == "Binomial")
+				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
-					auto NString = a_Function.m_Parameter.at("N");
-					auto PString = a_Function.m_Parameter.at("P");
-					if (NString.empty() || PString.empty())
+					int N = 0;
+					float P = 0;
+					if (CountObject.isMember("n"))
 					{
-						LOGWARNING("Missing Range parameters on SetCount Function. dropping function!");
-						break;
+						N = CountObject["n"].asInt();
 					}
-					int N = std::stoi(NString);
-					float P = std::stof(PString);
+					else if (CountObject.isMember("N"))
+					{
+						N = CountObject["N"].asInt();
+					}
+
+					if (CountObject.isMember("p"))
+					{
+						P = CountObject["p"].asFloat();
+					}
+					else if (CountObject.isMember("P"))
+					{
+						P = CountObject["P"].asFloat();
+					}
 					std::default_random_engine Generator(a_Noise.GetSeed());
 					std::binomial_distribution<int> Dist(N, P);
 					std::vector<int> Values;
@@ -1943,17 +2754,56 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					{
 						Values[i] = Dist(Generator);
 					}
-					a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (N);
+					a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];
 				}
-			}
-			else
-			{
-				a_Item.m_ItemCount = std::stoi(Count);
 			}
 			break;
 		}
 		case LootTable::eFunctionType::SetDamage:  // All
 		{
+			Json::Value DamageObject;
+
+			if (a_Function.m_Parameter.isMember("damage"))
+			{
+				DamageObject = a_Function.m_Parameter["damage"];
+			}
+			else if (a_Function.m_Parameter.isMember("Damage"))
+			{
+				DamageObject = a_Function.m_Parameter["Damage"];
+			}
+			float Damage = 0;
+			if (DamageObject.isNumeric())
+			{
+				Damage = DamageObject.asFloat();
+			}
+			else if (DamageObject.isObject())
+			{
+				float Min = 0.0f, Max = 0.0f;
+				if (DamageObject.isMember("min"))
+				{
+					Min = DamageObject["min"].asFloat();
+				}
+				else if (DamageObject.isMember("Min"))
+				{
+					Min = DamageObject["Min"].asFloat();
+				}
+
+				if (DamageObject.isMember("max"))
+				{
+					Max = DamageObject["max"].asFloat();
+				}
+				else if (DamageObject.isMember("Max"))
+				{
+					Max = DamageObject["Max"].asFloat();
+				}
+
+				if (Min > Max)
+				{
+					Max = Min;
+				}
+				Damage = std::fmod(a_Noise.IntNoise1D(a_Noise.GetSeed()), Max - Min) + Min;
+			}
+			a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
 			break;
 		}
 		case LootTable::eFunctionType::SetLore:  // All
@@ -1964,9 +2814,13 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		{
 			break;
 		}
+		case LootTable::eFunctionType::None:
+		{
+			break;
+		}
 		default:
 		{
-			LOGWARNING("Function type if not supported for this entity, dropping function!");
+			LOGWARNING("Function type is not supported for this entity, dropping function!");
 			break;
 		}
 	}

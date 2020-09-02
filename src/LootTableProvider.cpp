@@ -14,7 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTableProvider
 
-cLootTableProvider::cLootTableProvider(AString & a_Path)
+cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
+	m_World(a_World)
 {
 	LOG("Loading loot tables...");
 	// Load default loot tables
@@ -65,20 +66,20 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 	}
 	else
 	{
-		switch (LootTable::eType(LootTable::NamespaceConverter(JsonObject["type"].as<AString>())))
+		switch (LootTable::eType(LootTable::NamespaceConverter(JsonObject["type"].asString())))
 		{
 			case LootTable::eType::Chest:
 			{
 				auto Name = a_Type;
 				LootTable::Replace(Name, "Chests%c", "");
 				const auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables[ChestType] = cLootTable(JsonObject);
+				m_ChestLootTables[ChestType] = cLootTable(JsonObject, m_World);
 
 				break;
 			}
 			default:
 			{
-				LOGWARNING("This loot table type is not supported: %s", JsonObject["type"].as<AString>());
+				LOGWARNING("This loot table type is not supported: %s", LootTable::NamespaceConverter(JsonObject["type"].asString()));
 				break;
 			}
 		}
