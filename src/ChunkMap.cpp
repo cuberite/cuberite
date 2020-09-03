@@ -909,21 +909,12 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 
 
 
-void cChunkMap::AddEntityIfNotPresent(OwnedEntity a_Entity)
+void cChunkMap::AddPlayer(std::unique_ptr<cPlayer> a_Player)
 {
 	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (Chunk == nullptr)
-	{
-		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
-		);
-		return;
-	}
-	if (!Chunk->HasEntity(a_Entity->GetUniqueID()))
-	{
-		Chunk->AddEntity(std::move(a_Entity));
-	}
+	auto & Chunk = ConstructChunk(a_Player->GetChunkX(), a_Player->GetChunkZ());  // Always construct the chunk for players
+	ASSERT(!Chunk.HasEntity(a_Player->GetUniqueID()));
+	Chunk.AddEntity(std::move(a_Player));
 }
 
 

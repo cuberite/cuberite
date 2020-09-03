@@ -201,9 +201,8 @@ public:
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(OwnedEntity a_Entity);
 
-	/** Adds the entity to its appropriate chunk, if the entity is not already added.
-	Takes ownership of the entity pointer */
-	void AddEntityIfNotPresent(OwnedEntity a_Entity);
+	/** Adds the player to its appropriate chunk, takes ownership of the player pointer */
+	void AddPlayer(std::unique_ptr<cPlayer> a_Player);
 
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(UInt32 a_EntityID) const;
