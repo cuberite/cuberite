@@ -31,15 +31,13 @@ public:  // tolua_export
 	void Explode(void);
 
 	/** Returns the fuse ticks until the tnt will explode */
-	unsigned GetFuseTicks(void) const { return m_FuseTicks.count(); }
+	unsigned GetFuseTicks(void) const { return m_FuseTicks; }
 
 	/** Set the fuse ticks until the tnt will explode */
-	void SetFuseTicks(unsigned a_FuseTicks) { m_FuseTicks = cTickTime(a_FuseTicks); }
+	void SetFuseTicks(unsigned a_FuseTicks) { m_FuseTicks = a_FuseTicks; }
 
 	// tolua_end
 
 protected:
-
-	// How many ticks left until the TNT explodes
-	cTickTime m_FuseTicks;
+	int m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
 };  // tolua_export

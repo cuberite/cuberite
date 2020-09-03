@@ -1395,9 +1395,9 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 {
 	cLock Lock(*this);
 
-	// TODO: cancausefire gets reset for some reason
-	// if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
+	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
+		// TODO: CanCauseFire gets reset to false for some reason
 		Explodinator::Kaboom(*this, Vector3f(a_BlockX, a_BlockY, a_BlockZ), a_ExplosionSize, a_CanCauseFire);
 		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 	}

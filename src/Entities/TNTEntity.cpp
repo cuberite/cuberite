@@ -35,9 +35,11 @@ void cTNTEntity::Explode(void)
 {
 	FLOGD("BOOM at {0}", GetPosition());
 
+	// Destroy first so the Explodinator doesn't find us (when iterating through entities):
+	Destroy();
+
 	// TODO centre everything else too
 	m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esPrimedTNT, this);
-	Destroy();
 }
 
 
@@ -55,8 +57,8 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BroadcastMovementUpdate();
 
-	m_FuseTicks -= std::chrono::duration_cast<cTickTime>(a_Dt);
-	if (m_FuseTicks.count() <= 0)
+	m_FuseTicks -= 1;
+	if (m_FuseTicks <= 0)
 	{
 		Explode();
 	}
