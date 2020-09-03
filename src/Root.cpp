@@ -21,6 +21,7 @@
 #include "Server.h"
 #include "World.h"
 #include "WebAdmin.h"
+#include "ChunkHTTPServer.h"
 #include "BrewingRecipes.h"
 #include "FurnaceRecipe.h"
 #include "CraftingRecipes.h"
@@ -62,6 +63,7 @@ cRoot::cRoot(void) :
 	m_FurnaceRecipe(nullptr),
 	m_BrewingRecipes(nullptr),
 	m_WebAdmin(nullptr),
+	m_ChunkServer(nullptr),
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
 {
@@ -150,6 +152,14 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
+	if (settingsRepo->GetValueSetB("ChunkServer", "Enable"))
+	{
+		LOGD("Start Chunk Server...");
+		m_ChunkServer = new ChunkHTTPServer();
+		m_ChunkServer->Init();
+		m_ChunkServer->Start();
+	}
+
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
@@ -199,6 +209,11 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		// Stop the server:
 		m_WebAdmin->Stop();
 
+		if (m_ChunkServer)
+		{
+			m_ChunkServer->Stop();
+		}
+
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 	}  // if (m_Server->Start()
@@ -217,6 +232,11 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Freeing MonsterConfig...");
 	delete m_MonsterConfig; m_MonsterConfig = nullptr;
 	delete m_WebAdmin; m_WebAdmin = nullptr;
+
+	if (m_ChunkServer)
+	{
+		delete m_ChunkServer; m_ChunkServer = nullptr;
+	}
 
 	LOGD("Unloading recipes...");
 	delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;

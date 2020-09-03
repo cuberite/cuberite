@@ -19,6 +19,7 @@
 
 // C++ Includes
 #include <fstream>
+#include <sstream>
 
 // C Includes
 #include <ctype.h>
@@ -186,6 +187,103 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 
 
 
+bool cIniFile::ReadString(const AString & a_Data)
+{
+	istringstream f(a_Data);
+	AString   line;
+	AString   keyname, valuename, value;
+	AString::size_type pLeft, pRight;
+
+	bool IsFirstLine = true;
+
+	while (getline(f, line))
+	{
+		// To be compatible with Win32, check for existence of '\r'.
+		// Win32 files have the '\r' and Unix files don't at the end of a line.
+		// Note that the '\r' will be written to INI files from
+		// Unix so that the created INI file can be read under Win32
+		// without change.
+
+		// Removes UTF-8 Byte Order Markers (BOM) if, present.
+		if (IsFirstLine)
+		{
+			RemoveBom(line);
+			IsFirstLine = false;
+		}
+
+		size_t lineLength = line.length();
+		if (lineLength == 0)
+		{
+			continue;
+		}
+		if (line[lineLength - 1] == '\r')
+		{
+			line = line.substr(0, lineLength - 1);
+		}
+
+		if (line.length() == 0)
+		{
+			continue;
+		}
+
+		// Check that the user hasn't opened a binary file by checking the first
+		// character of each line!
+		if (!isprint(line[0]))
+		{
+			printf("%s: Binary-check failed on char %d\n", __FUNCTION__, line[0]);
+			return false;
+		}
+		if ((pLeft = line.find_first_of(";#[=")) == AString::npos)
+		{
+			continue;
+		}
+
+		switch (line[pLeft])
+		{
+			case '[':
+			{
+				if (
+					((pRight = line.find_last_of("]")) != AString::npos) &&
+					(pRight > pLeft)
+					)
+				{
+					keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
+					AddKeyName(keyname);
+				}
+				break;
+			}
+
+			case '=':
+			{
+				valuename = line.substr(0, pLeft);
+				value = TrimString(line.substr(pLeft + 1));
+				AddValue(keyname, valuename, value);
+				break;
+			}
+
+			case ';':
+			case '#':
+			{
+				if (m_Names.empty())
+				{
+					AddHeaderComment(line.substr(pLeft + 1));
+				}
+				else
+				{
+					AddKeyComment(keyname, line.substr(pLeft + 1));
+				}
+				break;
+			}
+		}  // switch (line[pLeft])
+	}  // while (getline())
+
+	return !(m_Keys.empty() && m_Names.empty() && m_Comments.empty());
+}
+
+
+
+
+
 bool cIniFile::WriteFile(const AString & a_FileName) const
 {
 	// Normally you would use ofstream, but the SGI CC compiler has
@@ -229,6 +327,48 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	}
 	f.close();
 
+	return true;
+}
+
+
+
+
+
+bool cIniFile::WriteString(AString & a_Data) const
+{
+	ostringstream f;
+
+	// Write header comments.
+	size_t NumComments = m_Comments.size();
+	for (size_t commentID = 0; commentID < NumComments; ++commentID)
+	{
+		f << ';' << m_Comments[commentID] << iniEOL;
+	}
+	if (NumComments > 0)
+	{
+		f << iniEOL;
+	}
+
+	// Write keys and values.
+	for (size_t keyID = 0; keyID < m_Keys.size(); ++keyID)
+	{
+		f << '[' << m_Names[keyID] << ']' << iniEOL;
+
+		// Comments.
+		for (size_t commentID = 0; commentID < m_Keys[keyID].m_Comments.size(); ++commentID)
+		{
+			f << ';' << m_Keys[keyID].m_Comments[commentID] << iniEOL;
+		}
+
+		// Values.
+		for (size_t valueID = 0; valueID < m_Keys[keyID].m_Names.size(); ++valueID)
+		{
+			f << m_Keys[keyID].m_Names[valueID] << '=' << m_Keys[keyID].m_Values[valueID] << iniEOL;
+		}
+		f << iniEOL;
+	}
+
+	a_Data = f.str();
 	return true;
 }
 

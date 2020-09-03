@@ -61,6 +61,16 @@ private:
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
 
+public:
+
+	/** Reads the contents of the specified string
+	Returns true if successful, false otherwise. */
+	bool ReadString(const AString & a_Data);
+
+	/** Writes data stored in class to the specified string.
+	Returns true on success, false on failure. */
+	bool WriteString(AString & a_Data) const;
+
 	// tolua_begin
 
 public:

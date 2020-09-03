@@ -35,8 +35,9 @@ void cChunkGenerator::Initialize(cIniFile & a_IniFile)
 
 std::unique_ptr<cChunkGenerator> cChunkGenerator::CreateFromIniFile(cIniFile & a_IniFile)
 {
-	// Get the generator engine based on the INI file settings:
 	std::unique_ptr<cChunkGenerator> res;
+
+	// Get the generator engine based on the INI file settings:
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
 	{

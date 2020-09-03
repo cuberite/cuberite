@@ -18,6 +18,7 @@ target_sources(
 	Chunk.cpp
 	ChunkData.cpp
 	ChunkGeneratorThread.cpp
+	ChunkHTTPServer.cpp
 	ChunkMap.cpp
 	ChunkSender.cpp
 	ChunkStay.cpp
@@ -91,6 +92,7 @@ target_sources(
 	ChunkDataCallback.h
 	ChunkDef.h
 	ChunkGeneratorThread.h
+	ChunkHTTPServer.h
 	ChunkMap.h
 	ChunkSender.h
 	ChunkStay.h

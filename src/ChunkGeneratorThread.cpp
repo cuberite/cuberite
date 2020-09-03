@@ -43,7 +43,7 @@ bool cChunkGeneratorThread::Initialize(cPluginInterface & a_PluginInterface, cCh
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
 
-	m_Generator = cChunkGenerator::CreateFromIniFile(a_IniFile);
+	m_Generator = cChunkGenerator::CreateFromIniFile(a_IniFile, true);
 	if (m_Generator == nullptr)
 	{
 		LOGERROR("Generator could not start, aborting the server");

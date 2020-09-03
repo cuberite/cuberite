@@ -8,7 +8,9 @@
 
 // fwd:
 class cFastNBTWriter;
+class cParsedNBT;
 class cWorld;
+class cChunkDesc;
 
 
 
@@ -24,4 +26,10 @@ public:
 	/** Serializes the chunk into the specified writer.
 	Returns true on success, false on failure (chunk not present etc.) */
 	static bool serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter);
+
+
+	static bool serializeChunkDesc(cChunkDesc & aChunkDesc, cFastNBTWriter & aWriter);
+
+	static bool serializeBiomeMap(const cChunkDef::BiomeMap & aBiomeMap, cFastNBTWriter & aWriter);
+	static bool deserializeBiomeMap(cChunkDef::BiomeMap & aBiomeMap, cParsedNBT & a_NBT);
 };
