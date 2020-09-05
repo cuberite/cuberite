@@ -1233,26 +1233,6 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 
 
 
-eBlockFace cProtocol_1_9_0::FaceIntToBlockFace(Int32 a_BlockFace)
-{
-	// Normalize the blockface values returned from the protocol
-	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
-		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
-		case BLOCK_FACE_YM: return BLOCK_FACE_YM;
-		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
-		default: return BLOCK_FACE_NONE;
-	}
-}
-
-
-
-
-
 eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 {
 	// Convert hand parameter into eHand enum

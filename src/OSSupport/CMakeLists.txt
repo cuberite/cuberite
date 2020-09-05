@@ -28,12 +28,14 @@ target_sources(
 	HostnameLookup.h
 	IPLookup.h
 	IsThread.h
+	MiniDumpWriter.h
 	Network.h
 	NetworkLookup.h
 	NetworkSingleton.h
 	Queue.h
 	ServerHandleImpl.h
 	StackTrace.h
+	StartAsService.h
 	TCPLinkImpl.h
 	UDPEndpointImpl.h
 	WinStackWalker.h

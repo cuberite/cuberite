@@ -22,8 +22,6 @@
 // fwd:
 class cWorld;
 
-typedef cQueue<cChunkCoordsWithCallback> cChunkCoordsQueue;
-
 
 
 
@@ -61,13 +59,11 @@ public:
 	cWorldStorage();
 	virtual ~cWorldStorage() override;
 
-	/** Queues a chunk to be loaded, asynchronously.
-	The callback, if specified, will be called with the result of the load operation. */
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	/** Queues a chunk to be loaded, asynchronously. */
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);
 
-	/** Queues a chunk to be saved, asynchronously.
-	The callback, if specified, will be called with the result of the save operation. */
-	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	/** Queues a chunk to be saved, asynchronously. */
+	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Initializes the storage schemas, ready to be started. */
 	void Initialize(cWorld & a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor);
@@ -84,8 +80,8 @@ protected:
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
 
-	cChunkCoordsQueue  m_LoadQueue;
-	cChunkCoordsQueue m_SaveQueue;
+	cQueue<cChunkCoords> m_LoadQueue;
+	cQueue<cChunkCoords> m_SaveQueue;
 
 	/** All the storage schemas (all used for loading) */
 	cWSSchemaList m_Schemas;

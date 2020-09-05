@@ -614,12 +614,12 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 
 
 
-void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
+void cFastNBTWriter::AddString(const AString & a_Name, const std::string_view a_Value)
 {
 	TagCommon(a_Name, TAG_String);
-	UInt16 len = htons(static_cast<UInt16>(a_Value.size()));
-	m_Result.append(reinterpret_cast<const char *>(&len), 2);
-	m_Result.append(a_Value.c_str(), a_Value.size());
+	const UInt16 Length = htons(static_cast<UInt16>(a_Value.size()));
+	m_Result.append(reinterpret_cast<const char *>(&Length), sizeof(Length));
+	m_Result.append(a_Value);
 }
 
 

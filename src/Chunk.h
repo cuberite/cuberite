@@ -79,9 +79,6 @@ public:
 	Wakes up any calls to cChunkMap::GetHeight() when setting to cpPresent. */
 	void SetPresence(ePresence a_Presence);
 
-	/** Called to indicate whether the chunk should be queued in the generator if it fails to load. Set by cChunkMap::GetChunk(). */
-	void SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed);
-
 	/** Marks all clients attached to this chunk as wanting this chunk. Also sets presence to cpQueued. */
 	void MarkRegenerating(void);
 
@@ -106,8 +103,7 @@ public:
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 
-	/** Marks the chunk as failed to load.
-	If m_ShouldGenerateIfLoadFailed is set, queues the chunk for generating. */
+	/** Queues the chunk for generating. */
 	void MarkLoadFailed(void);
 
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
@@ -157,10 +153,10 @@ public:
 	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 	{
-		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta, a_SendToClients);
+		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
 
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
@@ -221,8 +217,6 @@ public:
 	/** Sets the biome in the specified relative coords area. All the coords are inclusive.
 	Sends the chunk to all relevant clients. */
 	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
-
-	void CollectPickupsByPlayer(cPlayer & a_Player);
 
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -376,27 +370,21 @@ public:
 
 	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_ChunkData.GetMeta(a_RelPos); }
 
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
-		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta, a_ShouldMarkDirty, a_ShouldInformClients);
+		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
 	}
 
 	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
 	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
 	such as leaf decay flags. */
-	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
 	{
 		bool hasChanged = m_ChunkData.SetMeta(a_RelPos, a_Meta);
 		if (hasChanged)
 		{
-			if (a_ShouldMarkDirty)
-			{
-				MarkDirty();
-			}
-			if (a_ShouldInformClients)
-			{
-				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
-			}
+			MarkDirty();
+			m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
 		}
 	}
 
@@ -582,8 +570,6 @@ private:
 	/** Holds the presence status of the chunk - if it is present, or in the loader / generator queue, or unloaded */
 	ePresence m_Presence;
 
-	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
-	bool m_ShouldGenerateIfLoadFailed;
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
@@ -595,10 +581,10 @@ private:
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	std::vector<OwnedEntity> m_Entities;
-	cBlockEntities               m_BlockEntities;
+	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
-	int m_StayCount;
+	unsigned m_StayCount;
 
 	int m_PosX, m_PosZ;
 	cWorld *    m_World;
@@ -628,8 +614,7 @@ private:
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
-	int m_AlwaysTicked;
-
+	unsigned m_AlwaysTicked;
 
 	// Pick up a random block of this chunk
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
@@ -637,12 +622,6 @@ private:
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
-
-	/** Add a block entity to the chunk without marking the chunk dirty */
-	void AddBlockEntityClean(OwnedBlockEntity a_BlockEntity);
-
-	/** Creates a block entity for each block that needs a block entity and doesn't have one already */
-	void CreateBlockEntities(void);
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
@@ -674,11 +653,3 @@ private:
 	/** Check m_Entities for cPlayer objects. */
 	bool HasPlayerEntities() const;
 };
-
-typedef cChunk * cChunkPtr;
-
-typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-

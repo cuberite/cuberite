@@ -767,9 +767,6 @@ protected:
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
-	void ResolvePermissions(void);
-	void ResolveGroups(void);
-
 	virtual void Destroyed(void) override;
 
 	/** Filters out damage for creative mode / friendly fire */
