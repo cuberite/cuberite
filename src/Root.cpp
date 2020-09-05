@@ -1011,10 +1011,6 @@ void cRoot::TransitionNextState(NextState a_NextState)
 	s_StopEvent.Set();
 
 #ifdef WIN32
-	if (g_RunAsService)
-	{
-		return;
-	}
 
 	DWORD Length;
 	INPUT_RECORD Record
@@ -1034,7 +1030,7 @@ void cRoot::TransitionNextState(NextState a_NextState)
 
 	// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)
 	// Apparently no way to unblock getline apart from CancelIoEx, but xoft wants Windows XP support
-	// Only thing I can think of for now.
-	VERIFY(WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length) == TRUE);
+	// Only thing I can think of for now. Also, ignore the retval since sometimes there's no cin.
+	WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length);
 #endif
 }
