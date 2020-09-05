@@ -51,14 +51,16 @@ static void NonCtrlHandler(int a_Signal)
 		{
 			PrintStackTrace();
 
-			LOGERROR("Failure report: \n\n"
-			         "  :(   | Cuberite has encountered an error and needs to close\n"
-			         "       | SIGSEGV: Segmentation fault\n"
-			         "       |\n"
+			LOGERROR(
+				"Failure report: \n\n"
+				"  :(   | Cuberite has encountered an error and needs to close\n"
+				"       | SIGSEGV: Segmentation fault\n"
+				"       |\n"
 #ifdef BUILD_ID
-			         "       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-			         "       | from commit " BUILD_COMMIT_ID "\n");
+				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
+				"       | from commit " BUILD_COMMIT_ID "\n"
 #endif
+			);
 
 			std::signal(SIGSEGV, SIG_DFL);
 			return;
@@ -70,14 +72,16 @@ static void NonCtrlHandler(int a_Signal)
 		{
 			PrintStackTrace();
 
-			LOGERROR("Failure report: \n\n"
-			         "  :(   | Cuberite has encountered an error and needs to close\n"
-			         "       | SIGABRT: Server self-terminated due to an internal fault\n"
-			         "       |\n"
+			LOGERROR(
+				"Failure report: \n\n"
+				"  :(   | Cuberite has encountered an error and needs to close\n"
+				"       | SIGABRT: Server self-terminated due to an internal fault\n"
+				"       |\n"
 #ifdef BUILD_ID
-			         "       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-			         "       | from commit " BUILD_COMMIT_ID "\n");
+				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
+				"       | from commit " BUILD_COMMIT_ID "\n"
 #endif
+			);
 
 			std::signal(SIGSEGV, SIG_DFL);
 			return;
