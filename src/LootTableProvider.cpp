@@ -46,13 +46,22 @@ cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
 			LoadLootTable(Data, FileName);
 		}
 	}
+	LOG("FINISHED");
 }
 
 
 
 
 
-const cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
+cLootTableProvider::~cLootTableProvider()
+{
+}
+
+
+
+
+
+cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
 
 
 
@@ -74,9 +83,10 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 			case LootTable::eType::Chest:
 			{
 				auto Name = a_Type;
-				LootTable::Replace(Name, "Chests%c", "");
+				LootTable::Replace(Name, AString ("Chests") + cFile::PathSeparator(), "");
+				LootTable::Replace(Name, ".json", "");
 				const auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables[ChestType] = cLootTable(JsonObject, m_World);
+				m_ChestLootTables.insert(std::make_pair(ChestType, cLootTable(JsonObject, m_World)));
 
 				break;
 			}
@@ -121,9 +131,13 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 
 
 
-const cLootTable * cLootTableProvider::GetLootTable(const enum LootTable::eChestType a_Type)
+cLootTable * cLootTableProvider::GetLootTable(enum LootTable::eChestType a_Type)
 {
-	return & (m_ChestLootTables.at(a_Type));
+	if (a_Type != LootTable::eChestType::None)
+	{
+		return & (m_ChestLootTables.at(a_Type));
+	}
+	return & m_EmptyLootTable;
 }
 
 

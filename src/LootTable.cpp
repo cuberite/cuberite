@@ -696,12 +696,18 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World):
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID & a_Player) const
+bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const cUUID & a_Player) const
 {
 	auto & ItemGrid = a_BlockEntity->GetContents();
 	auto Seed = a_BlockEntity->GetWorld()->GetGenerator().GetSeed();
 	auto Noise = cNoise(Seed);
+
 	auto Items = GetItems(Noise, a_BlockEntity->GetPos(), a_Player);
+
+	for (auto & Item : Items)
+	{
+		ItemGrid.AddItem(Item, true, Noise.IntNoise3DInt(a_BlockEntity->GetPos()) % ItemGrid.GetNumSlots());
+	}
 	return false;
 }
 
@@ -709,13 +715,19 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID & a_P
 
 
 
-std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID & a_Player, cEntity * a_Entity) const
+std::vector<cItem> cLootTable::GetItems(cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, cEntity * a_Entity) const
 {
 	auto Items = std::vector<cItem>();
+	int i = 0;
 	for (const auto & Pool : m_LootTablePools)
 	{
 		auto NewItems = GetItems(Pool, m_World, a_Noise, a_Pos, a_Player, a_Entity);
+		for (const auto & Item : NewItems)
+		{
+			LOG("Pool: %d: %s", i, ItemToFullString(Item));
+		}
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+		i++;
 	}
 	for (auto & Item : Items)
 	{
@@ -981,7 +993,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 	cLootTablePoolEntryVector Children;
 
 	bool Expand;
-	int Weight = 0;
+	int Weight = 1;
 	int Quality = 0;
 
 	// The type has to be known beforehand
@@ -1096,52 +1108,6 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 
 
 
-AStringMap cLootTable::ReadParameter(const Json::Value & a_Value)
-{
-	AStringMap Result;
-	if (a_Value.isObject())
-	{
-		for (const auto & Name : a_Value.getMemberNames())
-		{
-			if (a_Value.isNumeric())
-			{
-				Result[Name] = std::to_string(a_Value[Name].asInt());
-			}
-			else if (a_Value.isBool())
-			{
-				if (a_Value[Name].asBool())
-				{
-					Result[LootTable::NamespaceConverter(Name)] = "True";
-				}
-				else
-				{
-					Result[LootTable::NamespaceConverter(Name)] = "False";
-				}
-			}
-			else if (a_Value.isString())
-			{
-				Result[LootTable::NamespaceConverter(Name)] = LootTable::NamespaceConverter(a_Value[Name].asString());
-			}
-			else if (a_Value.isObject() ||a_Value.isArray())
-			{
-				Result.merge(ReadParameter(a_Value[Name]));
-			}
-		}
-	}
-	else if (a_Value.isArray())
-	{
-		for (unsigned int i = 0; i < a_Value.size(); i++)
-		{
-			Result.merge(ReadParameter(a_Value[i]));
-		}
-	}
-	return Result;
-}
-
-
-
-
-
 std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity)
 {
 	auto Items = std::vector<cItem>();
@@ -1150,29 +1116,33 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * 
 		return Items;
 	}
 
-	// Steady Roll
-	if (a_Pool.m_Rolls.m_RollsMax == a_Pool.m_Rolls.m_RollsMin)
+	int Luck = 0;
+	/*  TODO: Luck
+	auto Callback = [&] (cPlayer & a_Player)
 	{
-		for (int i = 0; i < a_Pool.m_Rolls.m_RollsMin; i++)
-		{
-			for (const auto & Entry : a_Pool.m_Entries)
-			{
-				auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_Player, a_Entity);
-				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
-			}
-		}
-	}
-	else  // Roll range
+		Luck = a_Player.GetLuck();
+	};
+	a_World->DoWithPlayerByUUID(a_Player, Callback);
+	*/
+
+	// Determines the total weight manipulated by the quality
+	int TotalWeight = a_Pool.m_TotalWeight + Luck * a_Pool.m_TotalQuality;
+	int TotalRolls = a_Pool.m_Rolls(a_Noise, a_Pos) + round(a_Pool.m_BonusRolls(a_Noise, a_Pos) * Luck);
+	int EntryNum;
+
+	for (int i = 0; i < TotalRolls; i++)
 	{
-		auto RollCount = a_Noise.IntNoise3DInt(a_Pos) % (a_Pool.m_Rolls.m_RollsMax - a_Pool.m_Rolls.m_RollsMin) + a_Pool.m_Rolls.m_RollsMin;
-		for (int i = 0; i < RollCount; i++)
+		auto Rnd = (a_Noise.IntNoise3DInt(a_Pos) + i * a_Noise.GetSeed())% TotalWeight;
+		EntryNum = 0;
+		while (Rnd > 0)
 		{
-			for (const auto & Entry : a_Pool.m_Entries)
-			{
-				auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_Player, a_Entity);
-				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
-			}
+			Rnd -= a_Pool.m_Entries[EntryNum].m_Weight + a_Pool.m_Entries[EntryNum].m_Quality * Luck;
+			EntryNum++;
+			EntryNum = EntryNum % a_Pool.m_Entries.size();
 		}
+		const auto & Entry = a_Pool.m_Entries[EntryNum];
+		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_Player, a_Entity);
+		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	return Items;
 }
@@ -1191,76 +1161,77 @@ std::vector<cItem> cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWo
 		return Items;
 	}
 
-		switch (a_Entry.m_Type)
+	switch (a_Entry.m_Type)
+	{
+		case LootTable::ePoolEntryType::Item:
 		{
-			case LootTable::ePoolEntryType::Item:
+			// Usually this only contains item - but just case
+			try
 			{
-				// Usually this only contains item - but just case
-				try
-				{
-					Items.push_back(std::get<cItem>(a_Entry.m_Content));
-				}
-				catch (const std::bad_variant_access &)
-				{
-					LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
-				}
-				break;
+				Items.push_back(cItem(std::get<cItem>(a_Entry.m_Content)));
 			}
-			case LootTable::ePoolEntryType::Tag:
+			catch (const std::bad_variant_access &)
 			{
-				// Todo: check what names are used
-				// Todo: add loot tables for that
-				// Todo: return item(s)
-				break;
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
 			}
-			case LootTable::ePoolEntryType::LootTable:
+			break;
+		}
+		case LootTable::ePoolEntryType::Tag:
+		{
+			// Todo: check what names are used
+			// Todo: add loot tables for that
+			// Todo: return item(s)
+			break;
+		}
+		case LootTable::ePoolEntryType::LootTable:
+		{
+			// Todo - add loot table lookup
+			break;
+		}
+		case LootTable::ePoolEntryType::Group:
+		{
+			try
 			{
-				// Todo - add loot table lookup
-				break;
-			}
-			case LootTable::ePoolEntryType::Group:
-			{
-				try
+				for (const auto & Child : std::get<cLootTablePoolEntryVector>(a_Entry.m_Content))
 				{
-					for (const auto & Child : std::get<cLootTablePoolEntryVector>(a_Entry.m_Content))
-					{
-						auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_Player, a_Entity);
-						Items.insert(Items.end(), NewItems.begin(), NewItems.end());
-					}
-				}
-				catch (const std::bad_variant_access &)
-				{
-					LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
-				}
-				break;
-			}
-			case LootTable::ePoolEntryType::Alternatives:
-			{
-				try
-				{
-					auto Children = std::get<cLootTablePoolEntryVector>(a_Entry.m_Content);
-					auto ChildPos = a_Noise.IntNoise3DInt(a_Pos) % Children.size();
-					auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Player, a_Entity);
+					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_Player, a_Entity);
 					Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				}
-				catch (const std::bad_variant_access &)
-				{
-					LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
-				}
-				break;
 			}
-			case LootTable::ePoolEntryType::Sequence:
-				break;
-				// TODO
-			case LootTable::ePoolEntryType::Dynamic:
-				break;
-				// TODO
-			case LootTable::ePoolEntryType::Empty:
+			catch (const std::bad_variant_access &)
 			{
-				Items.push_back(cItem(E_BLOCK_AIR));
-				break;
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
 			}
+			break;
 		}
+		case LootTable::ePoolEntryType::Alternatives:
+		{
+			try
+			{
+				auto Children = std::get<cLootTablePoolEntryVector>(a_Entry.m_Content);
+				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos) % Children.size();
+				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Player, a_Entity);
+				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+			}
+			break;
+		}
+		case LootTable::ePoolEntryType::Sequence:
+			break;
+			// TODO
+		case LootTable::ePoolEntryType::Dynamic:
+			break;
+			// TODO
+		case LootTable::ePoolEntryType::Empty:
+		{
+			Items.push_back(cItem(E_BLOCK_AIR));
+			break;
+		}
+	}
+
 	for (auto & Item : Items)
 	{
 		for (const auto & Function : a_Entry.m_Functions)
@@ -1429,7 +1400,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
+				a_Item.m_ItemCount += Values[(a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % Values.size()];;
 			}
 			else if (Formula == "UniformBonusCount")
 			{
@@ -1443,12 +1414,12 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				{
 					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
+				a_Item.m_ItemCount += (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
 			{
 				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
-				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + 2) - 1) + 1;
+				a_Item.m_ItemCount *= std::max(0, (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level + 2) - 1) + 1;
 			}
 			break;
 		}
@@ -1475,9 +1446,9 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			{
 				// All are possible
 				cWeightedEnchantments Enchantments;
-				cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % 7);
+				cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % 7);
 
-				cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, a_Noise.IntNoise1DInt(a_Noise.GetSeed()));
+				cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType));
 				a_Item.m_Enchantments.Add(Enchantment);
 				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
 				break;
@@ -1488,7 +1459,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 		}
 		case LootTable::eFunctionType::EnchantWithLevels:  // Item
 		{
-			bool Treasure;
+			bool Treasure = false;
 			// TODO: 02.09.2020 - Add treasure when implemented - 12xx12
 			if (a_Function.m_Parameter.isMember("treasure"))
 			{
@@ -1499,10 +1470,6 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			{
 				Treasure = a_Function.m_Parameter["Treasure"].asBool();
 				LOGWARNING("Treasure enchantments are not yet supported");
-			}
-			else
-			{
-				Treasure = false;
 			}
 			Json::Value LevelsObject;
 			if (a_Function.m_Parameter.isMember("levels"))
@@ -1549,7 +1516,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					Max = Min;
 				}
 
-				Levels = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+				Levels = (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Max - Min) + Min;
 			}
 			a_Item.EnchantByXPLevels(Levels);
 			break;
@@ -1615,7 +1582,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					Max = Min;
 				}
 
-				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+				Limit = (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Max - Min) + Min;
 			}
 			if (a_Item.m_ItemCount > Limit)
 			{
@@ -1644,18 +1611,19 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			int Count = 0;
 			if (CountObject.isInt())
 			{
-				Count = CountObject.asInt();
+				a_Item.m_ItemCount = CountObject.asInt();
 			}
 			else if (CountObject.isObject())
 			{
 				AString Type;
 				if (CountObject.isMember("type"))
 				{
-					Type = CountObject["type"].asString();
+					Type = LootTable::NamespaceConverter(CountObject["type"].asString());
+					Type = LootTable::NamespaceConverter(CountObject["type"].asString());
 				}
 				else if (CountObject.isMember("Type"))
 				{
-					Type = CountObject["Type"].asString();
+					Type = LootTable::NamespaceConverter(CountObject["Type"].asString());
 				}
 
 				if ((Type == "Uniform") || (Type == "uniform"))
@@ -1683,7 +1651,8 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					{
 						Max = Min;
 					}
-					a_Item.m_ItemCount = a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Max - Min) + Min;
+					a_Item.m_ItemCount = (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Max - Min) + Min;
+					LOG("%d", a_Item.m_ItemCount);
 				}
 				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
@@ -1713,7 +1682,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					{
 						Values[i] = Dist(Generator);
 					}
-					a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];
+					a_Item.m_ItemCount += Values[(a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % Values.size()];
 				}
 			}
 			break;
@@ -1995,7 +1964,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
+				a_Item.m_ItemCount += Values[(a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % Values.size()];;
 			}
 			else if (Formula == "UniformBonusCount")
 			{
@@ -2009,12 +1978,12 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
+				a_Item.m_ItemCount += (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
 			{
 				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
-				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + 2) - 1) + 1;
+				a_Item.m_ItemCount *= std::max(0, (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level + 2) - 1) + 1;
 			}
 			break;
 		}
@@ -2138,7 +2107,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % Values.size()];;
+				a_Item.m_ItemCount += Values[(a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % Values.size()];;
 			}
 			else if (Formula == "UniformBonusCount")
 			{
@@ -2152,12 +2121,12 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				{
 					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level * BonusMultiplier);
+				a_Item.m_ItemCount += (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
 			{
 				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
-				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed()) % (Level + 2) - 1) + 1;
+				a_Item.m_ItemCount *= std::max(0, (a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType) % (Level + 2) - 1) + 1;
 			}
 			break;
 		}

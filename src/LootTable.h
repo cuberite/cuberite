@@ -4,6 +4,7 @@
 #include "Item.h"
 #include <variant>
 #include "json/json.h"
+#include "Noise/Noise.h"
 
 // fwd:
 class cBlockEntityWithItems;
@@ -340,6 +341,19 @@ struct cLootTablePoolRolls
 		m_RollsMax(a_RollsMax)
 	{
 	}
+
+
+
+
+	/** Returns the rolls result */
+	int operator()(const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		if (m_RollsMax == m_RollsMin)
+		{
+			return m_RollsMin;
+		}
+		return a_Noise.IntNoise3DInt(a_Pos) % (m_RollsMax - m_RollsMin) + m_RollsMin;
+	}
 	// Note: The loot tables specify another value (type) this is usually "Uniform".
 	// I think this is the probability distribution for the random value.
 	// The wiki doesn't have any information in it. So this is left out for now
@@ -451,6 +465,11 @@ struct cLootTablePool
 		m_Entries(std::move(a_Entries)),
 		m_Conditions(std::move(a_Conditions))
 	{
+		for (const auto & Entry : m_Entries)
+		{
+			m_TotalWeight += Entry.m_Weight;
+			m_TotalQuality += Entry.m_Weight;
+		}
 	}
 
 
@@ -471,6 +490,7 @@ struct cLootTablePool
 		for (const auto & Entry : m_Entries)
 		{
 			m_TotalWeight += Entry.m_Weight;
+			m_TotalQuality += Entry.m_Weight;
 		}
 	}
 
@@ -478,7 +498,21 @@ struct cLootTablePool
 	cLootTablePoolRolls m_BonusRolls;
 	cLootTablePoolEntryVector m_Entries;
 	cLootTableConditionVector m_Conditions;
-	int m_TotalWeight;
+	int m_TotalWeight = 0;
+	int m_TotalQuality = 0;
+};
+
+
+
+
+
+struct EnumClassHash
+{
+	template <typename T>
+	std::size_t operator()(T t) const
+	{
+		return static_cast<std::size_t>(t);
+	}
 };
 
 
@@ -500,9 +534,9 @@ public:
 	cLootTable & operator = (cLootTable && a_Other) = default;
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, cUUID & a_Player) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const cUUID & a_Player) const;
 
-	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, cUUID & a_Player, cEntity * a_Entity = nullptr) const;
+	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, cEntity * a_Entity = nullptr) const;
 
 protected:
 	/** Type of loot table */
@@ -529,8 +563,6 @@ private:
 	/** Reads a loot table pool entry from Json */
 	static cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value);
 
-	static AStringMap ReadParameter(const Json::Value & a_Value);
-
 	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
 
 	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
@@ -556,7 +588,7 @@ private:
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;
-typedef std::unordered_map<enum LootTable::eChestType, cLootTable> cChestLootTableMap;
+typedef std::unordered_map<enum LootTable::eChestType, cLootTable, EnumClassHash> cChestLootTableMap;
 
 
 

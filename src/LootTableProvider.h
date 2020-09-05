@@ -31,10 +31,11 @@ Notes:
 class cLootTableProvider
 {
 public:
+  	cLootTableProvider() = default;
+
 	cLootTableProvider(AString & a_Path, cWorld * a_World);
 
-	/** Function to load a loot table from specified path */
-	void LoadLootTable(const AString & a_String, const AString & a_Type);
+	~cLootTableProvider();
 
 	/** Functions to load loot tables. Custom loot tables are also checked */
 	/*
@@ -45,7 +46,7 @@ public:
 	example:   Block|Stone
 	This is not case sensitive, and removes all spaces */
 	const cLootTable * GetLootTable(const AString & a_Name);
-	const cLootTable * GetLootTable(const enum LootTable::eChestType a_Type);
+	cLootTable * GetLootTable(enum LootTable::eChestType a_Type);
 
 private:
 
@@ -53,8 +54,11 @@ private:
 	cChestLootTableMap m_ChestLootTables;
 	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();
 
+	/** Function to load a loot table from specified path */
+	void LoadLootTable(const AString & a_String, const AString & a_Type);
+
 	/** Empty loot table in case there is an error */
-	static const cLootTable m_EmptyLootTable;
+	static cLootTable m_EmptyLootTable;
 
 	cWorld * m_World;
 };
