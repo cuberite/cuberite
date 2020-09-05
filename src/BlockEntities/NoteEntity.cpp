@@ -257,7 +257,7 @@ void cNoteEntity::MakeSound(void)
 
 
 
-char cNoteEntity::GetNote(void)
+unsigned char cNoteEntity::GetNote(void)
 {
 	return m_Note;
 }
@@ -266,7 +266,7 @@ char cNoteEntity::GetNote(void)
 
 
 
-void cNoteEntity::SetNote(char a_Note)
+void cNoteEntity::SetNote(unsigned char a_Note)
 {
 	m_Note = a_Note % 25;
 }
@@ -284,7 +284,7 @@ void cNoteEntity::IncrementNote(void)
 
 
 
-float cNoteEntity::PitchFromNote(char a_Pitch)
+float cNoteEntity::PitchFromNote(unsigned char a_Pitch)
 {
 	// This replaces the calculation of:
 	// float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Note - 12.0f) / 12.0f));
@@ -316,6 +316,7 @@ float cNoteEntity::PitchFromNote(char a_Pitch)
 		case 22: return 1.7817974362806785f;
 		case 23: return 1.887748625363387f;
 		case 24: return 2.0f;
-		default: LOGWARNING("Converted unknown pitch value"); return 1.0f;
 	}
+
+	UNREACHABLE("Converted unknown pitch value");
 }

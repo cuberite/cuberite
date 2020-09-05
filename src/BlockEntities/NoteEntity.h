@@ -40,12 +40,11 @@ public:  // tolua_export
 
 	/** Creates a new note entity. a_World may be nullptr */
 	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	virtual ~cNoteEntity() override {}
 
 	// tolua_begin
 
-	char GetNote(void);
-	void SetNote(char a_Note);
+	unsigned char GetNote(void);
+	void SetNote(unsigned char a_Note);
 	void IncrementNote(void);
 	void MakeSound(void);
 
@@ -58,12 +57,9 @@ public:  // tolua_export
 
 	/** Returns the relative pitch (used in the protocol)
 	from a note value between 0 and 24 (used in m_Note). */
-	static float PitchFromNote(char a_Note);
+	static float PitchFromNote(unsigned char a_Note);
 
 private:
-	char m_Note;
+
+	unsigned char m_Note;
 } ;  // tolua_export
-
-
-
-

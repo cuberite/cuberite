@@ -477,7 +477,7 @@ static int tolua_cNoteEntity_GetPitch(lua_State * tolua_S)
 	if (
 		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
 		!LuaState.CheckParamEnd(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -493,7 +493,7 @@ static int tolua_cNoteEntity_GetPitch(lua_State * tolua_S)
 		tolua_error(LuaState, "invalid 'self' in function 'GetPitch'", nullptr);
 	}
 	LuaState.Push(Self->GetNote());
-	LOGWARNING("Warning: 'cNoteEntity:GetPitch' function is deprecated. Please use 'cNoteEntity:a' instead.");
+	LOGWARNING("Warning: 'cNoteEntity:GetPitch' function is deprecated. Please use 'cNoteEntity:GetNote' instead.");
 	LuaState.LogStackTrace(0);
 	return 1;
 }
@@ -509,7 +509,7 @@ static int tolua_cNoteEntity_IncrementPitch(lua_State * tolua_S)
 	if (
 		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
 		!LuaState.CheckParamEnd(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -543,7 +543,7 @@ static int tolua_cNoteEntity_SetPitch(lua_State * tolua_S)
 		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
 		!LuaState.CheckParamNumber(2) ||
 		!LuaState.CheckParamEnd(3)
-		)
+	)
 	{
 		return 0;
 	}
