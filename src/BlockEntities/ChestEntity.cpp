@@ -105,6 +105,15 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
+	if (m_BlockType == E_BLOCK_CHEST)
+	{
+		a_Player->GetStatManager().AddValue(Statistic::OpenChest);
+	}
+	else  // E_BLOCK_TRAPPED_CHEST
+	{
+		a_Player->GetStatManager().AddValue(Statistic::TriggerTrappedChest);
+	}
+
 	// If the window is not created, open it anew:
 	cWindow * Window = PrimaryChest->GetWindow();
 	if (Window == nullptr)

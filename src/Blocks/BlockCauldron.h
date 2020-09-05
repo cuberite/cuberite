@@ -54,6 +54,7 @@ public:
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_WATER_BUCKET));
+						a_Player.GetStatManager().AddValue(Statistic::UseCauldron);
 					}
 				}
 				break;
@@ -68,6 +69,7 @@ public:
 					{
 						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 					}
+					a_Player.GetStatManager().AddValue(Statistic::FillCauldron);
 				}
 				break;
 			}

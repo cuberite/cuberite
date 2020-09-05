@@ -34,6 +34,8 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
+		a_Player.GetStatManager().AddValue(Statistic::InteractWithCraftingTable);
+
 		cWindow * Window = new cCraftingWindow();
 		a_Player.OpenWindow(*Window);
 		return true;

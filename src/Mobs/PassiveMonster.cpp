@@ -57,6 +57,7 @@ void cPassiveMonster::ResetLoveMode()
 	m_LoveTimer = 0;
 	m_MatingTimer = 0;
 	m_LoveCooldown = 20 * 60 * 5;  // 5 minutes
+	m_Feeder = cUUID();
 
 	// when an animal is in love mode, the client only stops sending the hearts if we let them know it's in cooldown, which is done with the "age" metadata
 	m_World->BroadcastEntityMetadata(*this);
@@ -125,6 +126,15 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
 
+			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
+			{
+				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				if (GetMobType() == eMonsterType::mtCow)
+				{
+					a_Player.AwardAchievement(Statistic::AchBreedCow);
+				}
+				return true;
+			});
 			m_LovePartner->ResetLoveMode();
 			ResetLoveMode();
 		}
@@ -241,6 +251,8 @@ void cPassiveMonster::OnRightClicked(cPlayer & a_Player)
 			}
 		}
 	}
+	// Stores feeder UUID for statistic tracking
+	m_Feeder = a_Player.GetUUID();
 }
 
 

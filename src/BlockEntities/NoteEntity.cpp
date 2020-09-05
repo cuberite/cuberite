@@ -4,6 +4,7 @@
 #include "NoteEntity.h"
 #include "../World.h"
 #include "json/value.h"
+#include "../Entities/Player.h"
 
 
 
@@ -33,7 +34,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 
 bool cNoteEntity::UsedBy(cPlayer * a_Player)
 {
-	UNUSED(a_Player);
+	a_Player->GetStatManager().AddValue(Statistic::TuneNoteblock);
 	IncrementNote();
 	MakeSound();
 	return true;
