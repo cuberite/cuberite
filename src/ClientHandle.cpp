@@ -2667,7 +2667,7 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 	// Light smoke particles:
 	SendParticleEffect("explode", a_Position.x, a_Position.y, a_Position.z, 0, 0, 0, Spread, static_cast<int>(ParticleCount));
 
-	// Macromedia Shockwave effect:
+	// Shockwave effect:
 	m_Protocol->SendExplosion(a_Position, a_Power);
 }
 

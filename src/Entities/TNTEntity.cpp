@@ -38,7 +38,8 @@ void cTNTEntity::Explode(void)
 	// Destroy first so the Explodinator doesn't find us (when iterating through entities):
 	Destroy();
 
-	// TODO centre everything else too
+	// TODO: provided centred coordinates to all calls to DoExplosionAt, from entities and blocks
+	// This is to ensure maximum efficiency of explosions
 	m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esPrimedTNT, this);
 }
 
