@@ -10,6 +10,7 @@
 #include "../Entities/Player.h"
 #include "LuaState.h"
 #include "../BlockInfo.h"
+#include "../BlockEntities/NoteEntity.h"
 
 
 
@@ -468,6 +469,105 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 
 
 
+/** function: cNoteEntity: GetNote */
+static int tolua_cNoteEntity_GetPitch(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	cNoteEntity * Self = nullptr;
+
+	if (!LuaState.GetStackValues(1, Self))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'GetPitch'", nullptr);
+	}
+	LuaState.Push(Self->GetNote());
+	LOGWARNING("Warning: 'cNoteEntity:GetPitch' function is deprecated. Please use 'cNoteEntity:GetNote' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+/** function: cNoteEntity: IncrementNote */
+static int tolua_cNoteEntity_IncrementPitch(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	cNoteEntity * Self = nullptr;
+
+	if (!LuaState.GetStackValues(1, Self))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetPitch'", nullptr);
+	}
+
+	Self->IncrementNote();
+	LOGWARNING("Warning: 'cNoteEntity:IncrementPitch' function is deprecated. Please use 'cNoteEntity:IncrementNote' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+/** function: cNoteEntity: SetNote */
+static int tolua_cNoteEntity_SetPitch(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamNumber(2) ||
+		!LuaState.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	cNoteEntity * Self = nullptr;
+	int Note = -1;
+
+	if (!LuaState.GetStackValues(1, Self, Note))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetPitch'", nullptr);
+	}
+
+	Self->SetNote(Note % 25);
+	LOGWARNING("Warning: 'cNoteEntity:SetPitch' function is deprecated. Please use 'cNoteEntity:SetNote' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
 
 /** function: cWorld:SetSignLines */
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
@@ -706,6 +806,12 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 
 	tolua_beginmodule(tolua_S, "cItem");
 		tolua_variable(tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "cNoteEntity");
+		tolua_function(tolua_S, "GetPitch", tolua_cNoteEntity_GetPitch);
+		tolua_function(tolua_S, "IncrementPitch", tolua_cNoteEntity_IncrementPitch);
+		tolua_function(tolua_S, "SetPitch", tolua_cNoteEntity_SetPitch);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cWorld");
