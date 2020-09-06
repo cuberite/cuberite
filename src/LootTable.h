@@ -245,8 +245,8 @@ namespace LootTable
 	};
 
 	// Declaration of methods in the cpp
-	enum eType eType(const AString & a_Type);
-	AString NamespaceConverter(AString a_String);
+	extern enum eType eType(const AString & a_Type);
+	extern AString NamespaceConverter(AString a_String);
 }
 
 
@@ -534,9 +534,10 @@ public:
 	cLootTable & operator = (cLootTable && a_Other) = default;
 
 	/** Fills the specified block entity at the position with loot and returns the success */
-	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const cUUID & a_Player) const;
+	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt32 & a_Player) const;
 
-	std::vector<cItem> GetItems(cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, cEntity * a_Entity = nullptr) const;
+	//Note: For any function killed describes the entity which triggered the event. And Killer the entity which killed the entity (if applicable)
+	cItems GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0) const;
 
 protected:
 	/** Type of loot table */
@@ -563,28 +564,28 @@ private:
 	/** Reads a loot table pool entry from Json */
 	static cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value);
 
-	static std::vector<cItem> GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
+	static cItems GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
-	static std::vector<cItem> GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
+	static cItems GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
-	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity = nullptr);
+	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
-	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player, const cEntity * a_Entity);
+	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
 	/** Applies give function to item for all types */
-	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player);
+	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
 	/** Applies given function to an item in a Container */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const cUUID & a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
 	/** Applies given function to an item dropped from a block */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const cUUID & a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
 	/** Applies given function to an item dropped from a block entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const cUUID & a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
 
 	/** Applies given function to an item dropped from a killed entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cEntity * a_Entity, const cNoise & a_Noise, const cUUID & a_Player);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Killed, const cNoise & a_Noise, const UInt32 & a_Killer = 0);
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;

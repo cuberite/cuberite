@@ -6,7 +6,8 @@
 #include "LootTable.h"
 
 /*
-This file contains all classes, types, ... used in the loot table functions.
+This file describes the LootTable provider. The Provider is initialized per world
+and loads default loot tables and custom ones.
 The default loot tables are from LootTables/ in the root folder
 The custom loot tables are read per world and must be contained in %worldname%/LootTables
 They follow the vanilla file structure so any possible entry should be respected
@@ -19,9 +20,7 @@ Notes:
 	01.09.2020:
 		Vanilla Minecraft uses a luck value per player that influences the outcome.
 		This is not added to cuberite at the moment.
-
-		When adding you need to:
-		- add the luck processing to GetItem. The value is already parsed and stored
+		I noted where you need to add some code (search for: "TODO: Luck" int the LootTable.cpp)
 */
 
 
@@ -31,11 +30,16 @@ Notes:
 class cLootTableProvider
 {
 public:
-  	cLootTableProvider() = default;
+	cLootTableProvider() = default;
 
 	cLootTableProvider(AString & a_Path, cWorld * a_World);
 
-	~cLootTableProvider();
+	cLootTableProvider(const cLootTableProvider & a_Other) = default;
+	cLootTableProvider(cLootTableProvider && a_Other) = default;
+	cLootTableProvider & operator = (const cLootTableProvider & a_Other) = default;
+	cLootTableProvider & operator = (cLootTableProvider && a_Other) = default;
+
+	~cLootTableProvider() = default;
 
 	/** Functions to load loot tables. Custom loot tables are also checked */
 	/*
@@ -50,7 +54,7 @@ public:
 
 private:
 
-	/** Maps containing custom loot tables */
+	/** Maps containing the loot tables */
 	cChestLootTableMap m_ChestLootTables;
 	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();
 

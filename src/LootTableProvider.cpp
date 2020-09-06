@@ -46,15 +46,6 @@ cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
 			LoadLootTable(Data, FileName);
 		}
 	}
-	LOG("FINISHED");
-}
-
-
-
-
-
-cLootTableProvider::~cLootTableProvider()
-{
 }
 
 
@@ -83,8 +74,8 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 			case LootTable::eType::Chest:
 			{
 				auto Name = a_Type;
-				LootTable::Replace(Name, AString ("Chests") + cFile::PathSeparator(), "");
-				LootTable::Replace(Name, ".json", "");
+				ReplaceString(Name, AString ("Chests") + cFile::PathSeparator(), "");
+				ReplaceString(Name, ".json", "");
 				const auto ChestType = LootTable::eChestType(Name);
 				m_ChestLootTables.insert(std::make_pair(ChestType, cLootTable(JsonObject, m_World)));
 
