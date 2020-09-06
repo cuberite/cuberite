@@ -6,6 +6,21 @@
 #include "json/json.h"
 #include "Noise/Noise.h"
 
+/*
+This is a representation of the loot tables as described in the wiki:
+https://minecraft.gamepedia.com/Loot_table
+The json files are parsed every time on startup. Mostly the interpretation is done on loading.
+The functions and conditions still contain some Json objects. It was the most effective way to store the parameters.
+Notes:
+	01.09.2020:
+		Vanilla Minecraft uses a luck value per player that influences the outcome.
+		This is not added to cuberite at the moment.
+		I noted where you need to add some code (search for: "TODO: Luck")
+	06.09.2020:
+		When updating the loot tables you have to check the Tag interpretation. There might be new items added.
+		There is a link to the list in the minecraft wiki in the LootTable class.
+*/
+
 // fwd:
 class cBlockEntityWithItems;
 class cWorld;
@@ -536,7 +551,7 @@ public:
 	/** Fills the specified block entity at the position with loot and returns the success */
 	bool FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt32 & a_Player) const;
 
-	//Note: For any function killed describes the entity which triggered the event. And Killer the entity which killed the entity (if applicable)
+	// Note: For any function killed describes the entity which triggered the event. And Killer the entity which killed the entity (if applicable)
 	cItems GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0) const;
 
 protected:

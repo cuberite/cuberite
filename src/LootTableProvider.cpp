@@ -77,7 +77,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 				ReplaceString(Name, AString ("Chests") + cFile::PathSeparator(), "");
 				ReplaceString(Name, ".json", "");
 				const auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables.insert(std::make_pair(ChestType, cLootTable(JsonObject, m_World)));
+				m_ChestLootTables[ChestType] = cLootTable(JsonObject, m_World);
 
 				break;
 			}

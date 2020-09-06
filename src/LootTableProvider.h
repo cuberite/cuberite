@@ -17,10 +17,6 @@ The file names follow the cuberite NamingStructure.
 Notes:
 	30.08.2020:
 		At the moment only loot tables for item container are supported.
-	01.09.2020:
-		Vanilla Minecraft uses a luck value per player that influences the outcome.
-		This is not added to cuberite at the moment.
-		I noted where you need to add some code (search for: "TODO: Luck" int the LootTable.cpp)
 */
 
 

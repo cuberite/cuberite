@@ -10,7 +10,7 @@
 #include "Root.h"
 #include "FurnaceRecipe.h"
 #include "Entities/Player.h"
-// #include "StringUtils.h"
+#include "Registries/ItemTags.h"
 
 namespace LootTable
 {
@@ -630,6 +630,7 @@ namespace LootTable
 		ReplaceString(a_String, "_", " ");
 		Capitalize(a_String);
 		ReplaceString(a_String, " ", "");
+		ReplaceString(a_String, "/", "|");
 		return a_String;
 	}
 }
@@ -693,7 +694,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt3
 		while (Item.m_ItemCount > 0)
 		{
 			Copy = Item.CopyOne();
-			ItemGrid.AddItem(Copy , true, abs((Noise.IntNoise3DInt(a_BlockEntity->GetPos()) * i) % ItemGrid.GetNumSlots()));
+			ItemGrid.AddItem(Copy, true, abs((Noise.IntNoise3DInt(a_BlockEntity->GetPos()) * Noise.IntNoise1DInt(i)) % ItemGrid.GetNumSlots()));
 			Item.m_ItemCount--;
 			i++;
 		}
@@ -984,7 +985,7 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 	AString Name;
 	cLootTablePoolEntryVector Children;
 
-	bool Expand;
+	bool Expand = true;
 	int Weight = 1;
 	int Quality = 0;
 
@@ -1124,7 +1125,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 
 	for (int i = 0; i < TotalRolls; i++)
 	{
-		auto Rnd = (a_Noise.IntNoise3DInt(a_Pos * 25) + i * a_Noise.GetSeed()) % TotalWeight;
+		auto Rnd = a_Noise.IntNoise3DInt(a_Pos * 25 * a_Noise.IntNoise1DInt(i)) % TotalWeight;
 		EntryNum = 0;
 		while (Rnd > 0)
 		{
@@ -1155,7 +1156,6 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 	{
 		case LootTable::ePoolEntryType::Item:
 		{
-			// Usually this only contains item - but just case
 			try
 			{
 				Items.push_back(cItem(std::get<cItem>(a_Entry.m_Content)));
@@ -1168,9 +1168,143 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 		}
 		case LootTable::ePoolEntryType::Tag:
 		{
-			// Todo: check what names are used
-			// Todo: add loot tables for that
-			// Todo: return item(s)
+			AString Tag;
+			try
+			{
+				Tag = std::get<AString>(a_Entry.m_Content);
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				break;
+			}
+
+			LOG(Tag);
+			std::vector<cItem> TagItems;
+
+			else if (Tag == "Fishes")
+			{
+			}
+			else if (Tag == "Flowers")
+			{
+			}
+			else if (Tag == "GoldOres")
+			{
+			}
+			else if (Tag == "JungleLogs")
+			{
+			}
+			else if (Tag == "Leaves")
+			{
+			}
+			else if (Tag == "LecternBooks")
+			{
+			}
+			else if (Tag == "Logs")
+			{
+			}
+			else if (Tag == "LogsThatBurn")
+			{
+			}
+			else if (Tag == "MusicDiscs")
+			{
+			}
+			else if (Tag == "NonFlammableWood")
+			{
+			}
+			else if (Tag == "OakLogs")
+			{
+			}
+			else if (Tag == "PiglinLoved")
+			{
+			}
+			else if (Tag == "PiglinRepellents")
+			{
+			}
+			else if (Tag == "Planks")
+			{
+			}
+			else if (Tag == "Rails")
+			{
+			}
+			else if (Tag == "Sand")
+			{
+			}
+			else if (Tag == "Saplings")
+			{
+			}
+			else if (Tag == "Signs")
+			{
+			}
+			else if (Tag == "Slabs")
+			{
+			}
+			else if (Tag == "SmallFlowers")
+			{
+			}
+			else if (Tag == "SoulFireBaseBlocks")
+			{
+			}
+			else if (Tag == "SpruceLogs")
+			{
+			}
+			else if (Tag == "Stairs")
+			{
+			}
+			else if (Tag == "StoneBricks")
+			{
+			}
+			else if (Tag == "StoneCraftingMaterials")
+			{
+			}
+			else if (Tag == "StoneToolMaterials")
+			{
+			}
+			else if (Tag == "TallFlowers")
+			{
+			}
+			else if (Tag == "Trapdoors")
+			{
+			}
+			else if (Tag == "Walls")
+			{
+			}
+			else if (Tag == "WarpedStems")
+			{
+			}
+			else if (Tag == "WoodenButtons")
+			{
+			}
+			else if (Tag == "WoodenDoors")
+			{
+			}
+			else if (Tag == "WoodenFences")
+			{
+			}
+			else if (Tag == "WoodenPressurePlates")
+			{
+			}
+			else if (Tag == "WoodenSlabs")
+			{
+			}
+			else if (Tag == "WoodenStairs")
+			{
+			}
+			else if (Tag == "WoodenTrapdoors")
+			{
+			}
+			else if (Tag == "Wool")
+			{
+			}
+
+			if (a_Entry.m_Expand)
+			{
+				Items.Add(TagItems[a_Noise.IntNoise3DInt(a_Pos * TagItems.size()) % TagItems.size()]);
+			}
+			else
+			{
+				Items.insert(Items.begin(), TagItems.begin(), TagItems.end());
+			}
 			break;
 		}
 		case LootTable::ePoolEntryType::LootTable:  // Grants items based on the specified loot table
@@ -1815,6 +1949,10 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 
 				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (Max - Min) + Min;
 			}
+			if (Limit < 0)
+			{
+				break;
+			}
 			if (a_Item.m_ItemCount > Limit)
 			{
 				a_Item.m_ItemCount = Limit;
@@ -2165,23 +2303,23 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					auto & Mob = static_cast<cMonster &>(a_Entity);
 					if (Mob.GetMobType() == mtCreeper)
 					{
-					  a_Item.m_ItemDamage = E_META_HEAD_CREEPER;
+						a_Item.m_ItemDamage = E_META_HEAD_CREEPER;
 					}
 					else if (Mob.GetMobType() == mtZombie)
 					{
-					  a_Item.m_ItemDamage = E_META_HEAD_ZOMBIE;
+						a_Item.m_ItemDamage = E_META_HEAD_ZOMBIE;
 					}
 					else if (Mob.GetMobType() == mtSkeleton)
 					{
-					  a_Item.m_ItemDamage = E_META_HEAD_SKELETON;
+						a_Item.m_ItemDamage = E_META_HEAD_SKELETON;
 					}
 					else if (Mob.GetMobType() == mtWitherSkeleton)
 					{
-					  a_Item.m_ItemDamage = E_META_HEAD_WITHER;
+						a_Item.m_ItemDamage = E_META_HEAD_WITHER;
 					}
 					else
 					{
-					  a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+						a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
 					}
 					return true;
 				};
