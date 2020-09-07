@@ -13,6 +13,14 @@
 
 
 
+#ifdef __FreeBSD__
+#include <netinet/in.h>
+#endif
+
+
+
+
+
 // fwd:
 class cTCPLink;
 typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
