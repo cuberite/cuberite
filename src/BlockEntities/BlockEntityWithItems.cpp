@@ -3,8 +3,8 @@
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
 
-#include "../Simulator/RedstoneSimulator.h"
 #include "../Entities/Player.h"
+#include "../Simulator/RedstoneSimulator.h"
 
 
 
