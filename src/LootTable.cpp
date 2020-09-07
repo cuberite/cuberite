@@ -1182,7 +1182,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			LOG(Tag);
 			std::vector<cItem> TagItems;
 
-			else if (Tag == "Fishes")
+			if (Tag == "Fishes")
 			{
 			}
 			else if (Tag == "Flowers")
@@ -1525,25 +1525,25 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				return true;
 			}
 
-			float LootingMutiplier = 0;
+			float LootingMultiplier = 0;
 			if (Parameter.isMember("looting_multiplier"))
 			{
-				LootingMutiplier = Parameter["looting_multiplier"].asFloat();
+				LootingMultiplier = Parameter["looting_multiplier"].asFloat();
 			}
 			else if (Parameter.isMember("LootingMultiplier"))
 			{
-				LootingMutiplier = Parameter["LootingMultiplier"].asFloat();
+				LootingMultiplier = Parameter["LootingMultiplier"].asFloat();
 			}
 
-			int Looting = 0;  // = a_Killer->GetOffHandEquipedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+			int Looting = 0;  // = a_Killer->GetOffHandEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 
 			if (Parameter.isMember("chance"))
 			{
-				return Parameter["chance"].asFloat() + Looting * LootingMutiplier > Rnd;
+				return Parameter["chance"].asFloat() + Looting * LootingMultiplier > Rnd;
 			}
 			else if (Parameter.isMember("Chance"))
 			{
-				return Parameter["Chance"].asFloat() + Looting * LootingMutiplier > Rnd;
+				return Parameter["Chance"].asFloat() + Looting * LootingMultiplier > Rnd;
 			}
 			LOGWARNING("An error occurred during random chance condition. Defaulting to true");
 			return true;
@@ -1765,7 +1765,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				{
 					Values[i] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size()];;
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size()];
 			}
 			else if (Formula == "UniformBonusCount")
 			{

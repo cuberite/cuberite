@@ -14,7 +14,7 @@
 #include "../UI/WindowOwner.h"
 #include "../World.h"
 
-
+class cLootTable;
 
 
 
@@ -64,6 +64,8 @@ public:  // tolua_export
 
 protected:
 	cItemGrid m_Contents;
+
+	AString m_LootTable;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
