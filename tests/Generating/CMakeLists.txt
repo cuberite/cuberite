@@ -52,12 +52,12 @@ set (GENERATING_SRCS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceStructuresGen.cpp
-	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabStructure.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Ravines.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/RoughRavines.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/StructGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/Trees.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/TwoHeights.cpp
@@ -120,7 +120,6 @@ set (GENERATING_HDRS
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PieceStructuresGen.h
-	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
 	${CMAKE_SOURCE_DIR}/src/Generating/PrefabStructure.h
@@ -128,6 +127,7 @@ set (GENERATING_HDRS
 	${CMAKE_SOURCE_DIR}/src/Generating/Ravines.h
 	${CMAKE_SOURCE_DIR}/src/Generating/RoughRavines.h
 	${CMAKE_SOURCE_DIR}/src/Generating/ShapeGen.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/SinglePieceStructuresGen.h
 	${CMAKE_SOURCE_DIR}/src/Generating/StructGen.h
 	${CMAKE_SOURCE_DIR}/src/Generating/Trees.h
 	${CMAKE_SOURCE_DIR}/src/Generating/TwoHeights.h
