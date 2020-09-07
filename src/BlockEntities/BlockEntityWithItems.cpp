@@ -57,3 +57,16 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	// Notify comparators:
 	m_World->WakeUpSimulators(m_Pos);
 }
+
+
+
+
+
+void cBlockEntityWithItems::SetLootTable(AString & a_LootTable)
+{
+	m_LootTable = a_LootTable;
+}
+
+
+
+

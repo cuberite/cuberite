@@ -3,18 +3,18 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "LootTable.h"
-#include "Mobs/MonsterTypes.h"
-#include "json/json.h"
-#include "BlockEntities/BlockEntityWithItems.h"
-#include "Noise/Noise.h"
-#include "Root.h"
-#include "FurnaceRecipe.h"
+
 #include "Entities/Player.h"
+#include "FurnaceRecipe.h"
+#include "ItemGrid.h"
+#include "json/json.h"
+#include "Mobs/MonsterTypes.h"
+#include "Noise/Noise.h"
 #include "Registries/ItemTags.h"
+#include "Root.h"
 
 namespace LootTable
 {
-	/** Gets the eType from String. Defaults to Generic */
 	enum eType eType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Empty") == 0)
@@ -788,7 +788,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 			}
 			else
 			{
-				int Min = -1, Max = -1;
+				int Min = 0, Max = -1;
 				for (auto & RollEntry: Rolls.getMemberNames())
 				{
 					if (NoCaseCompare(RollEntry, "min") == 0)
@@ -800,20 +800,10 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 						Max = Rolls[RollEntry].asInt();
 					}
 				}
-				// Todo: add info on which file is wrong
-				if (Min == -1)
-				{
-					LOGWARNING("Missing Minimum value in ... Dropping loot table pool.");
-					return;
-				}
 				if (Max == -1)
 				{
-					LOGWARNING("Missing maximum value in ... Dropping loot table pool.");
-					return;
-				}
-				if (Min > Max)
-				{
-					PoolRolls = cLootTablePoolRolls(Min, Min);
+					LOGWARNING("Missing maximum value in loot table pool - assuming steady roll");
+					Max = Min;
 				}
 				PoolRolls = cLootTablePoolRolls(Min, Max);
 			}
@@ -827,7 +817,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 			}
 			else
 			{
-				int Min = -1, Max = -1;
+				int Min = 0, Max = -1;
 				for (auto & RollEntry: Rolls.getMemberNames())
 				{
 					if (NoCaseCompare(RollEntry, "min") == 0)
@@ -838,18 +828,11 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 					{
 						Max = Rolls[RollEntry].asInt();
 					}
-					// Todo - add type
-				}
-				// Todo: add info on which file is wrong
-				if (Min == -1)
-				{
-					LOGWARNING("Missing Minimum value in ... Dropping loot table pool.");
-					return;
 				}
 				if (Max == -1)
 				{
-					LOGWARNING("Missing maximum value in ... Dropping loot table pool.");
-					return;
+					LOGWARNING("Missing maximum value in loot table pool - assuming steady roll");
+					Max = Min;
 				}
 				PoolBonusRolls = cLootTablePoolRolls(Min, Max);
 			}
@@ -920,11 +903,11 @@ cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Val
 	// Type has to be known beforehand
 	if (a_Value.isMember("condition"))
 	{
-		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["type"].asString()));
+		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["condition"].asString()));
 	}
 	else if (a_Value.isMember("Condition"))
 	{
-		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["Type"].asString()));
+		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["Condition"].asString()));
 	}
 	else
 	{
@@ -1144,7 +1127,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 	}
 
 	int Luck = 0;
-	/*  TODO: Luck
+	/*  TODO: 07.09.2020 - Luck
 	auto Callback = [&] (cPlayer & a_Player)
 	{
 		Luck = a_Player.GetLuck();
@@ -1488,7 +1471,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 						return true;
 					}
 					auto & Player = static_cast<cPlayer &>(a_Entity);
-					return ((Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage) == Durability);  // Todo: proofread
+					return ((Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage) == Durability);
 				};
 				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
 			}
@@ -1503,7 +1486,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					  return true;
 					}
 					auto & Player = static_cast<cPlayer &>(a_Entity);
-					int Durability = Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage;  // Todo: proofread
+					int Durability = Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage;
 					return ((Durability >= Min) && (Durability <= Min));
 				};
 				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
@@ -1745,11 +1728,57 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		}
 		case LootTable::eConditionType::TableBonus:
 		{
-			// TODO: 06.09.2020 - Add when implemented - 12xx12
-			// I don't understand what the wiki means with it's description. The vanilla loot tables don't contain any of those conditions.
-			// https://minecraft.gamepedia.com/Predicate
-			LOGWARNING("Loot table condition \"TableBonus\" is not yet supported, assuming true");
-			return true;
+			Json::Value Parameter;
+			try
+			{
+				Parameter = std::get<Json::Value>(a_Condition.m_Parameter);
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Unsupported Data type in loot table condition - dropping entry");
+				return true;
+			}
+
+			int Enchantment;
+			if (Parameter.isMember("enchantment"))
+			{
+				Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Parameter["enchantment"].asString()));
+			}
+			else if (Parameter.isMember("Enchantment"))
+			{
+				Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Parameter["Enchantment"].asString()));
+			}
+
+			Json::Value Chances;
+			if (Parameter.isMember("chances"))
+			{
+				Chances = Parameter["chances"];
+			}
+			else if (Parameter.isMember("Chances"))
+			{
+				Chances = Parameter["Chances"];
+			}
+			if (!Chances.isArray())
+			{
+				LOGWARNING("Loot table condition \"TableBonus\" is missing chances - assuming true");
+				return true;
+			}
+
+			auto Callback = [&] (cEntity & a_Entity)
+			{
+				if (a_Entity.GetEntityType() != cEntity::etPlayer)
+				{
+					return true;
+				}
+				auto & Player = static_cast<cPlayer &>(a_Entity);
+				unsigned int Level = Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment);
+
+				Level = std::min({Level, Chances.size()});
+
+				return GetRandomProvider().RandReal(0.0f, 1.0f) < Chances[Level].asFloat();
+			};
+
+			return a_World->DoWithEntityByID(a_Killer, Callback);
 		}
 		case LootTable::eConditionType::TimeCheck:
 		{

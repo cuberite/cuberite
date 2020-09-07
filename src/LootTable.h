@@ -260,6 +260,7 @@ namespace LootTable
 	};
 
 	// Declaration of methods in the cpp
+	/** Gets the eType from String. Defaults to Generic */
 	extern enum eType eType(const AString & a_Type);
 	extern AString NamespaceConverter(AString a_String);
 	/** Reads keys min and max and writes them into a_Min and a_Max

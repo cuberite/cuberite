@@ -412,6 +412,17 @@ return
 					Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords",
 				},
 			},
+			SetLootTable =
+			{
+				Params =
+				{
+					{
+						Name = "LootTable",
+						Type = "string",
+					},
+				},
+				Notes = "Sets the loot table of the entity. Follows the template 'Type|Subtype' for example: 'Chest|JungleTemple'",
+			},
 		},
 		Inherits = "cBlockEntity",
 	},
