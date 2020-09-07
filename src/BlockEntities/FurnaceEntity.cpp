@@ -139,7 +139,12 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
+
 	a_Player->GetStatManager().AddValue(Statistic::InteractWithFurnace);
+
+	// Loot table processing
+	Super::UsedBy(a_Player);
+
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

@@ -384,6 +384,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -412,6 +413,7 @@ public:
 			mWriter.EndList();
 			mWriter.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
 			mWriter.AddShort("Fuel", a_Brewingstand->GetRemainingFuel());
+			mWriter.AddString("LootTable", a_Brewingstand->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -426,6 +428,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -440,6 +443,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -454,6 +458,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -481,6 +486,7 @@ public:
 			mWriter.EndList();
 			mWriter.AddShort("BurnTime", static_cast<Int16>(a_Furnace->GetFuelBurnTimeLeft()));
 			mWriter.AddShort("CookTime", static_cast<Int16>(a_Furnace->GetTimeCooked()));
+			mWriter.AddString("LootTable", a_Furnace->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -495,6 +501,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 

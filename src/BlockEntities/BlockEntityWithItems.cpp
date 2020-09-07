@@ -70,3 +70,18 @@ void cBlockEntityWithItems::SetLootTable(AString & a_LootTable)
 
 
 
+
+bool cBlockEntityWithItems::UsedBy(cPlayer * a_Player)
+{
+	if (!m_LootTable.empty())
+	{
+		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(GetContents(), m_World, m_Pos, a_Player->GetUniqueID());
+		m_LootTable = "";
+		return true;
+	}
+	return false;
+}
+
+
+
+

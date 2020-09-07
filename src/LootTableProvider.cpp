@@ -20,8 +20,7 @@ cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
 	// Load default loot tables
 	for (const auto & FileName: LootTable::FileNames)
 	{
-		auto FilePathWithPrefix = AString("LootTables") + cFile::PathSeparator() + FileName;
-		auto Data = cFile::ReadWholeFile(FilePathWithPrefix);
+		auto Data = cFile::ReadWholeFile(FileName);
 		if (!Data.empty())
 		{
 			LoadLootTable(Data, FileName);
@@ -30,18 +29,30 @@ cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
 		{
 			// Todo: write better error message
 			LOGERROR("Could not find default loot table: %s! "
-			"Please make sure the file is readable or download them from cuberite.org", FilePathWithPrefix);
+			"Please make sure the file is readable or download them from cuberite.org", FileName);
 		}
 	}
+	// Check for global user tables
+	auto UserTables = cFile::GetFolderContents(LootTable::PathToUserLootTables);
+	for (const auto & UserTable : UserTables)
+	{
+		auto Data = cFile::ReadWholeFile(LootTable::PathToUserLootTables + cFile::PathSeparator() + UserTable);
+		if (!Data.empty())
+		{
+			LOGINFO("Found global user loot table: %s", LootTable::PathToUserLootTables + cFile::PathSeparator() + UserTable);
+			LoadLootTable(Data, UserTable);
+		}
+	}
+
 
 	// Check for custom tables
 	for (auto & FileName: LootTable::FileNames)
 	{
-		auto FilePathWithWorld = a_Path + cFile::PathSeparator() + AString("LootTables") + cFile::PathSeparator() + FileName;
+		auto FilePathWithWorld = a_Path + cFile::PathSeparator() + FileName;
 		auto Data = cFile::ReadWholeFile(FilePathWithWorld);
 		if (!Data.empty())
 		{
-			LOG("Found custom loot table: %s", FilePathWithWorld);
+			LOGINFO("Found custom loot table: %s", FilePathWithWorld);
 			LoadLootTable(Data, FileName);
 		}
 	}
@@ -73,11 +84,18 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 			case LootTable::eType::Chest:
 			{
 				auto Name = a_Type;
-				ReplaceString(Name, AString ("Chests") + cFile::PathSeparator(), "");
+				ReplaceString(Name, AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator(), "");
 				ReplaceString(Name, ".json", "");
 				const auto ChestType = LootTable::eChestType(Name);
 				m_ChestLootTables[ChestType] = cLootTable(JsonObject, m_World);
-
+				break;
+			}
+			case LootTable::eType::User:
+			{
+				auto Name = a_Type;
+				ReplaceString(Name, AString("LootTables") + cFile::PathSeparator() + "User", "");
+				ReplaceString(Name, ".json", "");
+				m_UserLootTables[Name] = cLootTable(JsonObject, m_World);
 				break;
 			}
 			default:
@@ -109,6 +127,7 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 	switch (Type)
 	{
 		case LootTable::eType::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
+		case LootTable::eType::User:  return GetUserLootTable(Data[1]);
 		default:
 		{
 			LOGWARNING("Trying to use unsupported or unknown loot table type: %s", Data[1]);
@@ -121,13 +140,30 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 
 
 
-cLootTable * cLootTableProvider::GetLootTable(enum LootTable::eChestType a_Type)
+const cLootTable * cLootTableProvider::GetLootTable(enum LootTable::eChestType a_Type)
 {
 	if (a_Type != LootTable::eChestType::None)
 	{
 		return & (m_ChestLootTables.at(a_Type));
 	}
 	return & m_EmptyLootTable;
+}
+
+
+
+
+
+const cLootTable * cLootTableProvider::GetUserLootTable(const AString & a_String)
+{
+	try
+	{
+		return & (m_UserLootTables.at(a_String));
+	}
+	catch (const std::out_of_range)
+	{
+		LOGWARNING("Got unknown string for user type loot table: %s. Returning empty", a_String);
+		return & m_EmptyLootTable;
+	}
 }
 
 

@@ -81,6 +81,9 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		return true;
 	}
 
+	// Loot table processing
+	Super::UsedBy(a_Player);
+
 	if (m_Neighbour == nullptr)
 	{
 		ScanNeighbours();

@@ -926,6 +926,13 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
 	}
 
+	// Loads the LootTable
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Beacon->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Beacon;
 }
 
@@ -1006,6 +1013,13 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 		Brewingstand->SetTimeBrewed(tb);
 	}
 
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Brewingstand->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	// Restart brewing:
 	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
@@ -1033,6 +1047,14 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	auto Chest = std::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Chest->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Chest;
 }
 
@@ -1094,6 +1116,14 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 	}
 	auto Dispenser = std::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Dispenser->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Dispenser;
 }
 
@@ -1117,6 +1147,14 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 	auto Dropper = std::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Dropper->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Dropper;
 }
 
@@ -1228,6 +1266,14 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
 		Furnace->SetCookTimes(200, ct);
 	}
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Furnace->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	Furnace->SetLoading(false);
@@ -1254,6 +1300,14 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	}
 	auto Hopper = std::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Hopper->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Hopper;
 }
 

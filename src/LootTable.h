@@ -37,44 +37,45 @@ namespace LootTable
 	The path to the folder is added later on. (global and per world). */
 	const AString FileNames[] =
 		{
-			AString("Chests") + cFile::PathSeparator() + "AbandonedMineshaft.json",
-			AString("Chests") + cFile::PathSeparator() + "BuriedTreasure.json",
-			AString("Chests") + cFile::PathSeparator() + "DesertPyramid.json",
-			AString("Chests") + cFile::PathSeparator() + "EndCityTreasure.json",
-			AString("Chests") + cFile::PathSeparator() + "IglooChest.json",
-			AString("Chests") + cFile::PathSeparator() + "JungleTemple.json",
-			AString("Chests") + cFile::PathSeparator() + "JungleTempleDispenser.json",
-			AString("Chests") + cFile::PathSeparator() + "NetherBridge.json",
-			AString("Chests") + cFile::PathSeparator() + "PillagerOutpost.json",
-			AString("Chests") + cFile::PathSeparator() + "ShipwreckMap.json",
-			AString("Chests") + cFile::PathSeparator() + "ShipwreckSupply.json",
-			AString("Chests") + cFile::PathSeparator() + "ShipwreckTreasure.json",
-			AString("Chests") + cFile::PathSeparator() + "SimpleDungeon.json",
-			AString("Chests") + cFile::PathSeparator() + "SpawnBonusChest.json",
-			AString("Chests") + cFile::PathSeparator() + "StrongholdCorridor.json",
-			AString("Chests") + cFile::PathSeparator() + "StrongholdCrossing.json",
-			AString("Chests") + cFile::PathSeparator() + "StrongholdLibrary.json",
-			AString("Chests") + cFile::PathSeparator() + "UnderwaterRuinBig.json",
-			AString("Chests") + cFile::PathSeparator() + "UnderwaterRuinSmall.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageArmorer.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageButcher.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageCartographer.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageDesertHouse.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageFisher.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageFletcher.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageMason.json",
-			AString("Chests") + cFile::PathSeparator() + "VillagePlainsHouse.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageSavannaHouse.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageShepherd.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageSnowyHouse.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageTaigaHouse.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageTannery.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageTemple.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageToolsmith.json",
-			AString("Chests") + cFile::PathSeparator() + "VillageWeaponsmith.json",
-			AString("Chests") + cFile::PathSeparator() + "WoodlandMansion.json"
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "AbandonedMineshaft.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "BuriedTreasure.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "DesertPyramid.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "EndCityTreasure.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "IglooChest.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "JungleTemple.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "JungleTempleDispenser.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "NetherBridge.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "PillagerOutpost.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckMap.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckSupply.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckTreasure.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "SimpleDungeon.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "SpawnBonusChest.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdCorridor.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdCrossing.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdLibrary.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "UnderwaterRuinBig.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "UnderwaterRuinSmall.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageArmorer.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageButcher.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageCartographer.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageDesertHouse.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageFisher.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageFletcher.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageMason.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillagePlainsHouse.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageSavannaHouse.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageShepherd.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageSnowyHouse.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTaigaHouse.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTannery.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTemple.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageToolsmith.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageWeaponsmith.json",
+			AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "WoodlandMansion.json"
 		};
 
+	const AString PathToUserLootTables = AString("LootTables") + cFile::PathSeparator() + "User";
 
 	/** Any available function type as of 1.16.2 */
 	enum class eFunctionType
@@ -120,7 +121,8 @@ namespace LootTable
 		Command,                       // Customizable loot tables for the loot command
 		Selector,                      // ?
 		AdvancementEntity,             // ?
-		Generic                        // ?
+		Generic,                       // ?
+		User                           // Non Vanilla type used for custom loot in generated structures
 	};
 
 
@@ -609,8 +611,8 @@ private:
 	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Killed, const cNoise & a_Noise, const UInt32 & a_Killer);
 };
 
-// typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;
 typedef std::unordered_map<enum LootTable::eChestType, cLootTable, EnumClassHash> cChestLootTableMap;
+typedef std::unordered_map<AString, cLootTable> cUserLootTableMap;
 
 
 

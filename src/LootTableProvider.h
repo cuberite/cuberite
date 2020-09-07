@@ -46,13 +46,14 @@ public:
 	example:   Block|Stone
 	This is not case sensitive, and removes all spaces */
 	const cLootTable * GetLootTable(const AString & a_Name);
-	cLootTable * GetLootTable(enum LootTable::eChestType a_Type);
+	const cLootTable * GetLootTable(enum LootTable::eChestType a_Type);
+	const cLootTable * GetUserLootTable(const AString & a_String);
 
 private:
 
 	/** Maps containing the loot tables */
 	cChestLootTableMap m_ChestLootTables;
-	// cMonsterLootTableMap m_CustomMonsterLootTables = cMonsterLootTableMap();
+	cUserLootTableMap m_UserLootTables;
 
 	/** Function to load a loot table from specified path */
 	void LoadLootTable(const AString & a_String, const AString & a_Type);

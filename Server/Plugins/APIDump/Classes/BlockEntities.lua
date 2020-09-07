@@ -423,6 +423,16 @@ return
 				},
 				Notes = "Sets the loot table of the entity. Follows the template 'Type|Subtype' for example: 'Chest|JungleTemple'",
 			},
+			GetLootTable =
+			{
+				Returns =
+				{
+					{
+						Type = "string",
+					},
+				},
+				Notes = "Returns the loot table stored in the entity",
+			},
 		},
 		Inherits = "cBlockEntity",
 	},

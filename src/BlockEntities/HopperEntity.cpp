@@ -106,7 +106,12 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
+
 	a_Player->GetStatManager().AddValue(Statistic::InspectHopper);
+
+	// Loot table processing
+	Super::UsedBy(a_Player);
+
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();

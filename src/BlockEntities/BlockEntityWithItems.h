@@ -55,6 +55,7 @@ public:  // tolua_export
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
 	void SetLootTable(AString & a_LootTable);
+	AString GetLootTable() { return m_LootTable; }
 
 	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }
@@ -63,6 +64,8 @@ public:  // tolua_export
 
 	/** Const version of the GetContents() function for C++ type-safety */
 	const cItemGrid & GetContents(void) const { return m_Contents; }
+
+	bool UsedBy(cPlayer * a_Player) override;
 
 protected:
 	cItemGrid m_Contents;

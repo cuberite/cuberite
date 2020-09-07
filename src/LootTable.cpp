@@ -7,9 +7,7 @@
 #include "Entities/Player.h"
 #include "FurnaceRecipe.h"
 #include "ItemGrid.h"
-#include "json/json.h"
 #include "Mobs/MonsterTypes.h"
-#include "Noise/Noise.h"
 #include "Registries/ItemTags.h"
 #include "Root.h"
 
@@ -60,6 +58,10 @@ namespace LootTable
 		else if (NoCaseCompare(a_Type, "AdvancementEntity") == 0)
 		{
 			return eType::AdvancementEntity;
+		}
+		else if (NoCaseCompare(a_Type, "User") == 0)
+		{
+			return eType::User;
 		}
 		else
 		{
