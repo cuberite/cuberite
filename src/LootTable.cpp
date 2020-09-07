@@ -1857,7 +1857,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				return true;
 			}
 
-			bool RainCheck, ThunderCheck;
+			bool RainCheck = false, ThunderCheck = false;
 			if (Parameter.isMember("raining"))
 			{
 				RainCheck = Parameter["raining"].asBool();
@@ -1954,7 +1954,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			if (Formula == "BinomialWithBonusCount")
 			{
 				// Binomial Probability Distribution with n=level + extra, p=probability
-				int Extra;
+				int Extra = 0;
 
 				if (Parameters.isMember("extra"))
 				{
@@ -1965,7 +1965,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					Extra = Parameters["Extra"].asInt();
 				}
 
-				float Probability;
+				float Probability = 0.0f;
 
 				if (Parameters.isMember("probability"))
 				{
@@ -1988,7 +1988,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			else if (Formula == "UniformBonusCount")
 			{
 				// prob = (0, level * BonusMultiplier)
-				int BonusMultiplier;
+				int BonusMultiplier = 0;
 				if (Parameters.isMember("bonusMultiplier"))
 				{
 					BonusMultiplier = Parameters["bonusMultiplier"].asInt();
@@ -1997,7 +1997,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				{
 					BonusMultiplier = Parameters["BonusMultiplier"].asInt();
 				}
-				a_Item.m_ItemCount += a_Noise.IntNoise1DInt(a_Noise.GetSeed()) * a_Item.m_ItemType % (Level * BonusMultiplier);
+				a_Item.m_ItemCount += a_Noise.IntNoise3DInt(a_Pos) * a_Item.m_ItemType % (Level * BonusMultiplier);
 			}
 			else if (Formula == "OreDrops")
 			{
@@ -2507,7 +2507,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 				CountObject = a_Function.m_Parameter["Count"];
 			}
 
-			int Count;
+			int Count = 1;
 			if (CountObject.isInt())
 			{
 				Count = CountObject.asInt();
