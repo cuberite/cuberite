@@ -532,7 +532,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Note, "Music");
-			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetPitch()));
+			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetNote()));
 		mWriter.EndCompound();
 	}
 

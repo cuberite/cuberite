@@ -2109,6 +2109,7 @@ void cClientHandle::Tick(float a_Dt)
 		LOGD("Client %s @ %s (%p) has been queued for destruction, destroying now.",
 			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 		);
+		GetPlayer()->GetStatManager().AddValue(Statistic::LeaveGame);
 		Destroy();
 		return;
 	}

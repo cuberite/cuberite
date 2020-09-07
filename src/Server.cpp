@@ -94,7 +94,7 @@ void cServer::cTickThread::Execute(void)
 	{
 		auto NowTime = std::chrono::steady_clock::now();
 		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
-		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(msec));
+		m_Server.Tick(static_cast<float>(msec));
 		auto TickTime = std::chrono::steady_clock::now() - NowTime;
 
 		if (TickTime < msPerTick)
@@ -118,7 +118,6 @@ cServer::cServer(void) :
 	m_PlayerCount(0),
 	m_ClientViewDistance(0),
 	m_bIsConnected(false),
-	m_bRestarting(false),
 	m_RCONServer(*this),
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
@@ -331,27 +330,16 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 
 
 
-bool cServer::Tick(float a_Dt)
+void cServer::Tick(float a_Dt)
 {
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
 
-	// Let the Root process all the queued commands:
-	cRoot::Get()->TickCommands();
+	// Process all the queued commands:
+	TickCommands();
 
 	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
-
-	if (!m_bRestarting)
-	{
-		return true;
-	}
-	else
-	{
-		m_bRestarting = false;
-		m_RestartEvent.Set();
-		return false;
-	}
 }
 
 
@@ -439,6 +427,17 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 		}
 	);
 	return Res;
+}
+
+
+
+
+
+void cServer::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
+{
+	// Put the command into a queue (Alleviates FS #363):
+	cCSLock Lock(m_CSPendingCommands);
+	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
 }
 
 
@@ -647,8 +646,7 @@ void cServer::Shutdown(void)
 	m_ServerHandles.clear();
 
 	// Notify the tick thread and wait for it to terminate:
-	m_bRestarting = true;
-	m_RestartEvent.Wait();
+	m_TickThread.Stop();
 
 	cRoot::Get()->SaveAllChunks();
 
@@ -706,3 +704,17 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUU
 
 
 
+void cServer::TickCommands(void)
+{
+	decltype(m_PendingCommands) PendingCommands;
+	{
+		cCSLock Lock(m_CSPendingCommands);
+		std::swap(PendingCommands, m_PendingCommands);
+	}
+
+	// Execute any pending commands:
+	for (const auto & Command : PendingCommands)
+	{
+		ExecuteConsoleCommand(Command.first, *Command.second);
+	}
+}

@@ -334,7 +334,12 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 
-	m_Stats.AddValue(Statistic::PlayOneMinute, 1);
+	m_Stats.AddValue(Statistic::PlayOneMinute);
+	m_Stats.AddValue(Statistic::TimeSinceDeath);
+	if (IsCrouched())
+	{
+		m_Stats.AddValue(Statistic::SneakTime);
+	}
 
 	// Handle the player detach, when the player is in spectator mode
 	if (
@@ -1235,6 +1240,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	}
 
 	m_Stats.AddValue(Statistic::Deaths);
+	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -2675,14 +2681,33 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		}
 		else if (IsInWater())
 		{
-			// TODO: implement differentiation between diving and swimming
-			m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+			if (m_IsHeadInWater)
+			{
+				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsOnGround())
 		{
-			m_Stats.AddValue(Statistic::WalkOneCm, Value);
-			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.0001) * static_cast<double>(Value));
+			if (IsCrouched())
+			{
+				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
+			if (IsSprinting())
+			{
+				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				AddFoodExhaustion(0.001 * static_cast<double>(Value));
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
 		}
 		else
 		{

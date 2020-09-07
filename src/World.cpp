@@ -3506,7 +3506,7 @@ void cWorld::AddQueuedPlayers(void)
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			auto PlayerPtr = Player.get();
-			m_ChunkMap->AddEntityIfNotPresent(std::move(Player));
+			m_ChunkMap->AddPlayer(std::move(Player));
 			PlayerPtr->OnAddToWorld(*this);
 			ASSERT(!PlayerPtr->IsTicking());
 			PlayerPtr->SetIsTicking(true);

@@ -53,19 +53,20 @@ public:
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
 
-	static bool m_TerminateEventRaised;
-	static bool m_RunAsService;
-
 	/** which ini file to load settings from, default is settings.ini */
 	AString m_SettingsFilename;
 
 	cRoot(void);
 	~cRoot();
 
-	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
+	/** Run the server. Returns true if we should restart, false to quit. */
+	bool Run(cSettingsRepositoryInterface & a_OverridesRepo);
 
-	/** Stops the server, as if "/stop" was typed in the console. */
-	void StopServer();
+	/** Interrupts the server and stops it, as if "/stop" typed in the console. */
+	static void Stop();
+
+	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
+	static void Restart();
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -127,17 +128,11 @@ public:
 	*/
 	void QueueExecuteConsoleCommand(const AString & a_Cmd);  // tolua_export
 
-	/** Executes a console command through the cServer class; does special handling for "stop" and "restart". */
-	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
-
 	/** Kicks the user, no matter in what world they are. Used from cAuthenticator */
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Called by cAuthenticator to auth the specified user */
 	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
-
-	/** Executes commands queued in the command queue */
-	void TickCommands(void);
 
 	/** Returns the number of chunks loaded */
 	size_t GetTotalChunkCount(void);  // tolua_export
@@ -195,31 +190,28 @@ public:
 	// tolua_end
 
 private:
-	class cCommand
-	{
-	public:
-		cCommand(const AString & a_Command, cCommandOutputCallback * a_Output) :
-			m_Command(a_Command),
-			m_Output(a_Output)
-		{
-		}
 
-		AString m_Command;
-		cCommandOutputCallback * m_Output;
-	} ;
+	/** States that the global cRoot can be in.
+	You can transition freely between Run and Restart, but the server unconditionally terminates in Stop. */
+	enum class NextState
+	{
+		Run,
+		Restart,
+		Stop
+	};
 
 	typedef std::map<AString, cWorld> WorldMap;
-	typedef std::vector<cCommand> cCommandQueue;
+
+	/** Blocking reads and processes console input. */
+	void HandleInput();
+
+	/** Performs run state transition, enforcing guarantees about state transitions. */
+	static void TransitionNextState(NextState a_NextState);
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 
-	cCriticalSection m_CSPendingCommands;
-	cCommandQueue    m_PendingCommands;
-
-	std::thread m_InputThread;
-	cEvent m_StopEvent;
-	std::atomic_flag m_InputThreadRunFlag;
+	static cEvent s_StopEvent;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -254,5 +246,6 @@ private:
 
 	static cRoot * s_Root;
 
-	static void InputThread(cRoot & a_Params);
+	/** Indicates the next action of cRoot, whether to run, stop or restart. */
+	static std::atomic<NextState> s_NextState;
 };  // tolua_export

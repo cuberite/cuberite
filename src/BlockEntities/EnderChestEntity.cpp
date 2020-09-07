@@ -61,6 +61,9 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 		// Obstruction, don't open
 		return false;
 	}
+
+	a_Player->GetStatManager().AddValue(Statistic::OpenEnderchest);
+
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

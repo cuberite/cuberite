@@ -128,6 +128,7 @@ bool cBlockBedHandler::OnUse(
 	SetBedPos(a_Player, a_BlockPos);
 	SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 	a_Player.SetIsInBed(true);
+	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
 
 	// Fast-forward the time if all players in the world are in their beds:
 	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
