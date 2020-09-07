@@ -14,7 +14,6 @@
 #include "../UI/WindowOwner.h"
 #include "../World.h"
 
-class cLootTable;
 
 
 
