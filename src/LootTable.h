@@ -585,28 +585,28 @@ private:
 	/** Reads a loot table pool entry from Json */
 	static cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value);
 
-	static cItems GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static cItems GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
-	static cItems GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static cItems GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
-	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static bool ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
-	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	/** Applies give function to item for all types */
-	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	/** Applies given function to an item in a Container */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	/** Applies given function to an item dropped from a block */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	/** Applies given function to an item dropped from a block entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer = 0);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	/** Applies given function to an item dropped from a killed entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Killed, const cNoise & a_Noise, const UInt32 & a_Killer = 0);
+	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Killed, const cNoise & a_Noise, const UInt32 & a_Killer);
 };
 
 // typedef std::map<const LootTable::ChestType::eChestType, cLootTable> cChestLootTableMap;

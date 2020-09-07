@@ -699,7 +699,7 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 		else if (NoCaseCompare(RootId, "pools") == 0)
 		{
 			Json::Value Pools = a_Description[RootId];
-			for (auto PoolId = 0; PoolId < Pools.size(); PoolId++)
+			for (unsigned int PoolId = 0; PoolId < Pools.size(); PoolId++)
 			{
 				ReadLootTablePool(Pools[PoolId]);
 			}
@@ -707,7 +707,7 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 		else if (NoCaseCompare(RootId, "functions") == 0)
 		{
 			auto FunctionsObject = a_Description[RootId];
-			for (auto FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
+			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
 				m_Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
 			}
@@ -1271,7 +1271,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			}
 			cItems NewItems;
 			int LockCont = 0;  // This is how many times the whole table is repeated to prevent infinite loops
-			int ChildPos = 0;
+			unsigned int ChildPos = 0;
 			do
 			{
 				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Killed, a_Killer);
@@ -1343,7 +1343,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			catch (const std::bad_variant_access &)
 			{
 				LOGWARNING("Unsupported Data type in loot table condition - dropping entry");
-				break;
+				return true;;
 			}
 			bool Success = false;
 			for (const auto & SubCondition: SubConditions)
@@ -1365,7 +1365,17 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			return true;
 		}
 		case LootTable::eConditionType::EntityProperties:
+		{
+			// TODO: 07.09.2020 - 12xx12
+			LOGWARNING("Loot table condition \"EntityProperties\" is not yet supported - assuming true");
+			return true;
+		}
 		case LootTable::eConditionType::EntityScores:
+		{
+			// TODO: 07.09.2020 - 12xx12
+			LOGWARNING("Loot table condition \"EntityScores\" is not yet supported - assuming true");
+			return true;
+		}
 		case LootTable::eConditionType::Inverted:
 		{
 			cLootTableConditionVector SubCondition;
@@ -1389,6 +1399,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			return a_World->DoWithEntityByID(a_Killer, Callback);
 		}
 		case LootTable::eConditionType::LocationCheck:
+		{
+			// TODO: 07.09.2020 - 12xx12
+			LOGWARNING("Loot table condition \"LocationCheck\" is not yet supported - assuming true");
+			return true;
+		}
 		case LootTable::eConditionType::MatchTool:
 		{
 			Json::Value Parameter;
@@ -1551,7 +1566,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 
 					if (LevelsObject.isInt())
 					{
-						int Levels = LevelsObject.asInt();
+						unsigned int Levels = LevelsObject.asInt();
 						auto Callback = [&] (cEntity & a_Entity)
 						{
 							if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -2025,8 +2040,8 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 		}
 		case LootTable::eFunctionType::EnchantWithLevels:
 		{
-			bool Treasure = false;
 			// TODO: 02.09.2020 - Add treasure when implemented - 12xx12
+			bool Treasure = false;
 			if (a_Function.m_Parameter.isMember("treasure"))
 			{
 				Treasure = a_Function.m_Parameter["treasure"].asBool();
@@ -2037,6 +2052,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				Treasure = a_Function.m_Parameter["Treasure"].asBool();
 				LOGWARNING("Treasure enchantments are not yet supported");
 			}
+			UNUSED_VAR(Treasure);
 			Json::Value LevelsObject;
 			if (a_Function.m_Parameter.isMember("levels"))
 			{
@@ -2134,7 +2150,6 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				CountObject = a_Function.m_Parameter["Count"];
 			}
 
-			int Count = 0;
 			if (CountObject.isInt())
 			{
 				a_Item.m_ItemCount = CountObject.asInt();
