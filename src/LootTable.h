@@ -262,6 +262,12 @@ namespace LootTable
 	// Declaration of methods in the cpp
 	extern enum eType eType(const AString & a_Type);
 	extern AString NamespaceConverter(AString a_String);
+	/** Reads keys min and max and writes them into a_Min and a_Max
+	if there are no appropriately named keys there is no change */
+	extern void MinMaxRange(const Json::Value & a_Value, int & a_Min, int & a_Max);
+	/** Reads keys min and max and returns a random integer value in between.
+	a_Noise is used as the random generator and a_Pos is used as the seed */
+	extern int MinMaxRand(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const int & a_Modifier);
 }
 
 

@@ -633,6 +633,46 @@ namespace LootTable
 		ReplaceString(a_String, "/", "|");
 		return a_String;
 	}
+
+
+
+
+
+	void MinMaxRange(const Json::Value & a_Value, int & a_Min, int & a_Max)
+	{
+		if (a_Value.isMember("min"))
+		{
+			a_Min = a_Value["min"].asInt();
+		}
+		else if (a_Value.isMember("Min"))
+		{
+			a_Min = a_Value["Min"].asInt();
+		}
+
+		if (a_Value.isMember("max"))
+		{
+			a_Max = a_Value["max"].asInt();
+		}
+		else if (a_Value.isMember("Max"))
+		{
+			a_Max = a_Value["Max"].asInt();
+		}
+		if (a_Min > a_Max)
+		{
+			a_Max = a_Min;
+		}
+	}
+
+
+
+
+
+	int MinMaxRand(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const int & a_Modifier)
+	{
+		int Min = 0, Max = 0;
+		MinMaxRange(a_Value, Min, Max);
+		return a_Noise.IntNoise3DInt(a_Pos * a_Modifier) % (Max - Min) + Min;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1182,120 +1222,8 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			LOG(Tag);
 			std::vector<cItem> TagItems;
 
-			if (Tag == "Fishes")
-			{
-			}
-			else if (Tag == "Flowers")
-			{
-			}
-			else if (Tag == "GoldOres")
-			{
-			}
-			else if (Tag == "JungleLogs")
-			{
-			}
-			else if (Tag == "Leaves")
-			{
-			}
-			else if (Tag == "LecternBooks")
-			{
-			}
-			else if (Tag == "Logs")
-			{
-			}
-			else if (Tag == "LogsThatBurn")
-			{
-			}
-			else if (Tag == "MusicDiscs")
-			{
-			}
-			else if (Tag == "NonFlammableWood")
-			{
-			}
-			else if (Tag == "OakLogs")
-			{
-			}
-			else if (Tag == "PiglinLoved")
-			{
-			}
-			else if (Tag == "PiglinRepellents")
-			{
-			}
-			else if (Tag == "Planks")
-			{
-			}
-			else if (Tag == "Rails")
-			{
-			}
-			else if (Tag == "Sand")
-			{
-			}
-			else if (Tag == "Saplings")
-			{
-			}
-			else if (Tag == "Signs")
-			{
-			}
-			else if (Tag == "Slabs")
-			{
-			}
-			else if (Tag == "SmallFlowers")
-			{
-			}
-			else if (Tag == "SoulFireBaseBlocks")
-			{
-			}
-			else if (Tag == "SpruceLogs")
-			{
-			}
-			else if (Tag == "Stairs")
-			{
-			}
-			else if (Tag == "StoneBricks")
-			{
-			}
-			else if (Tag == "StoneCraftingMaterials")
-			{
-			}
-			else if (Tag == "StoneToolMaterials")
-			{
-			}
-			else if (Tag == "TallFlowers")
-			{
-			}
-			else if (Tag == "Trapdoors")
-			{
-			}
-			else if (Tag == "Walls")
-			{
-			}
-			else if (Tag == "WarpedStems")
-			{
-			}
-			else if (Tag == "WoodenButtons")
-			{
-			}
-			else if (Tag == "WoodenDoors")
-			{
-			}
-			else if (Tag == "WoodenFences")
-			{
-			}
-			else if (Tag == "WoodenPressurePlates")
-			{
-			}
-			else if (Tag == "WoodenSlabs")
-			{
-			}
-			else if (Tag == "WoodenStairs")
-			{
-			}
-			else if (Tag == "WoodenTrapdoors")
-			{
-			}
-			else if (Tag == "Wool")
-			{
-			}
+			// TODO
+
 
 			if (a_Entry.m_Expand)
 			{
@@ -1482,7 +1410,246 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		case LootTable::eConditionType::LocationCheck:
 		case LootTable::eConditionType::MatchTool:
 		{
-			return true;
+			Json::Value Parameter;
+			try
+			{
+				Parameter = std::get<Json::Value>(a_Condition.m_Parameter);
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Unsupported Data type in loot table condition - dropping entry");
+				return true;
+			}
+
+			bool Res = true;
+			/*
+			count: Amount of the item.
+				max: The maximum value.
+				min: The minimum value.
+			*/
+			Json::Value CountObject;
+			if (Parameter.isMember("count"))
+			{
+				CountObject = Parameter["count"];
+			}
+			else if (Parameter.isMember("Count"))
+			{
+				CountObject = Parameter["Count"];
+			}
+
+			if (CountObject.isInt())
+			{
+				int Count = CountObject.asInt();
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+						return true;
+					}
+					auto & Player = static_cast<cPlayer &>(a_Entity);
+					return (Player.GetEquippedItem().m_ItemCount == Count);
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+			else if (CountObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				LootTable::MinMaxRange(CountObject, Min, Max);
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+					  return true;
+					}
+					auto & Player = static_cast<cPlayer &>(a_Entity);
+					return ((Player.GetEquippedItem().m_ItemCount >= Min) && (Player.GetEquippedItem().m_ItemCount <= Min));
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+			/*
+			durability: The durability of the item.
+				max: The maximum value.
+				min: The minimum value.
+			*/
+			Json::Value DurabilityObject;
+			if (Parameter.isMember("durability"))
+			{
+				CountObject = Parameter["durability"];
+			}
+			else if (Parameter.isMember("´Durability"))
+			{
+				CountObject = Parameter["Durability"];
+			}
+			if (DurabilityObject.isInt())
+			{
+				int Durability = DurabilityObject.asInt();
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+						return true;
+					}
+					auto & Player = static_cast<cPlayer &>(a_Entity);
+					return ((Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage) == Durability);  // Todo: proofread
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+			else if (DurabilityObject.isObject())
+			{
+				int Min = 0, Max = 0;
+				LootTable::MinMaxRange(DurabilityObject, Min, Max);
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+					  return true;
+					}
+					auto & Player = static_cast<cPlayer &>(a_Entity);
+					int Durability = Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage;  // Todo: proofread
+					return ((Durability >= Min) && (Durability <= Min));
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+			/*
+			enchantments: List of enchantments.
+				enchantment: An enchantment ID.
+				levels: The level of the enchantment.
+					max: The maximum value.
+					min: The minimum value.
+			*/
+			Json::Value EnchantmentsObject;
+			if (Parameter.isMember("enchantments"))
+			{
+				EnchantmentsObject = Parameter["enchantments"];
+			}
+			else if (Parameter.isMember("Enchantments"))
+			{
+				EnchantmentsObject = Parameter["Enchantments"];
+			}
+			/*
+			stored_enchantments: List of stored enchantments.
+				enchantment: An enchantment ID.
+				levels: The level of the enchantment.
+					max: The maximum value.
+					min: The minimum value.
+			*/
+			else if (Parameter.isMember("stored_enchantments"))
+			{
+				EnchantmentsObject = Parameter["stored_enchantments"];
+			}
+			else if (Parameter.isMember("StoredEnchantments"))
+			{
+				EnchantmentsObject = Parameter["StoredEnchantments"];
+			}
+
+			if (EnchantmentsObject.isArray())
+			{
+				Json::Value EnchantmentObject;
+				for (unsigned int i = 0; i < EnchantmentsObject.size(); i++)
+				{
+					EnchantmentObject = EnchantmentsObject[i];
+					int Enchantment;
+					if (EnchantmentObject.isMember("enchantment"))
+					{
+						Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject["enchantment"].asString()));
+					}
+					else if (EnchantmentObject.isMember("Enchantment"))
+					{
+						Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject["Enchantment"].asString()));
+					}
+
+					Json::Value LevelsObject;
+					if (EnchantmentObject.isMember("levels"))
+					{
+						LevelsObject = EnchantmentObject["levels"];
+					}
+					else if (EnchantmentObject.isMember("Levels"))
+					{
+						LevelsObject = EnchantmentObject["Levels"];
+					}
+
+					if (LevelsObject.isInt())
+					{
+						int Levels = LevelsObject.asInt();
+						auto Callback = [&] (cEntity & a_Entity)
+						{
+							if (a_Entity.GetEntityType() != cEntity::etPlayer)
+							{
+								return true;
+							}
+							auto & Player = static_cast<cPlayer &>(a_Entity);
+							return Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment) == Levels;
+						};
+						Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+					}
+					else if (LevelsObject.isObject())
+					{
+						int Min = 0, Max = 100;
+						LootTable::MinMaxRange(LevelsObject, Min, Max);
+
+						auto Callback = [&] (cEntity & a_Entity)
+						{
+							if (a_Entity.GetEntityType() != cEntity::etPlayer)
+							{
+								return true;
+							}
+							auto & Player = static_cast<cPlayer &>(a_Entity);
+							int Level = Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment);
+							return ((Level >= Min) && (Level <= Max));
+						};
+						Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+					}
+				}
+			}
+			// item: An item ID.
+			AString ItemString;
+			if (Parameter.isMember("item"))
+			{
+				ItemString = LootTable::NamespaceConverter(Parameter["item"].asString());
+			}
+			else if (Parameter.isMember("Item"))
+			{
+				ItemString = LootTable::NamespaceConverter(Parameter["Item"].asString());
+			}
+			if (!ItemString.empty())
+			{
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+						return true;
+					}
+					auto & Player = static_cast<cPlayer & >(a_Entity);
+					cItem Item;
+					StringToItem(ItemString, Item);
+					return Player.GetEquippedItem().IsSameType(Item);
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+
+			// nbt: An NBT string.
+			if (Parameter.isMember("nbt") || Parameter.isMember("Nbt"))
+			{
+				// TODO: 06.09.2020 - Add when implemented - 12xx12
+				LOGWARNING("Nbt for items is not yet supported - assuming true!");
+			}
+			// potion: A brewed potion ID.
+			if (Parameter.isMember("potion") || Parameter.isMember("Potion"))
+			{
+				// TODO: 06.09.2020 - Add when implemented - 12xx12
+				LOGWARNING("Nbt for items is not yet supported - assuming true!");
+			}
+			// tag: An item data pack tag.
+			// TODO
+			if (Parameter.isMember("tag"))
+			{
+				AString Tag = Parameter["tag"].asString();
+			}
+			else if (Parameter.isMember("Tag"))
+			{
+				AString Tag = Parameter["Tag"].asString();
+			}
+			return Res;
 		}
 		case LootTable::eConditionType::RandomChance:
 		{
@@ -1551,16 +1718,23 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		case LootTable::eConditionType::Reference:
 		{
 			// TODO: 06.09.2020 - 12xx12
+			// ??? I have no clue what this does... the wiki says "Test if another referred condition (predicate) passes."
+			LOGWARNING("Loot table condition \"Reference\" is not yet supported, assuming true");
 			return true;
 		}
 		case LootTable::eConditionType::SurvivesExplosion:
 		{
 			// TODO: 06.09.2020 - 12xx12
+			// You need to access the explosion radius
+			LOGWARNING("Loot table condition \"SurvivesExplosion\" is not yet supported, assuming true");
 			return true;
 		}
 		case LootTable::eConditionType::TableBonus:
 		{
-			// TODO: 06.09.2020 - 12xx12
+			// TODO: 06.09.2020 - Add when implemented - 12xx12
+			// I don't understand what the wiki means with it's description. The vanilla loot tables don't contain any of those conditions.
+			// https://minecraft.gamepedia.com/Predicate
+			LOGWARNING("Loot table condition \"TableBonus\" is not yet supported, assuming true");
 			return true;
 		}
 		case LootTable::eConditionType::TimeCheck:
@@ -1603,23 +1777,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			else if (Value.isObject())
 			{
 				int Min = 0, Max = 0;
-				if (Value.isMember("min"))
-				{
-					Min = Value["min"].asInt();
-				}
-				else if (Value.isMember("Min"))
-				{
-					Min = Value["Min"].asInt();
-				}
-
-				if (Value.isMember("max"))
-				{
-					Max = Value["max"].asInt();
-				}
-				else if (Value.isMember("Max"))
-				{
-					Max = Value["Max"].asInt();
-				}
+				LootTable::MinMaxRange(Value, Min, Max);
 				return ((a_World->GetTimeOfDay() % Period) > Min) && ((a_World->GetTimeOfDay() % Period) < Max);
 			}
 			LOGWARNING("An error occurred during time check, assuming true!");
@@ -1799,7 +1957,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
 				}
 			}
-			if (a_Function.m_Parameter.isMember("Enchantments"))
+			else if (a_Function.m_Parameter.isMember("Enchantments"))
 			{
 				auto Enchantments = a_Function.m_Parameter["Enchantments"];
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
@@ -1814,12 +1972,12 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + a_Noise.IntNoise3DInt(a_Pos * 20) % 7);
 
 				cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, a_Noise.IntNoise3DInt(a_Pos * 10) % Enchantments.size());
-				a_Item.m_Enchantments.Add(Enchantment);
 				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
+				a_Item.m_Enchantments.Add(Enchantment);
 				break;
 			}
-			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
 			a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
+			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
 			break;
 		}
 		case LootTable::eFunctionType::EnchantWithLevels:
@@ -1850,38 +2008,18 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				LOGWARNING("No levels provided for enchantments in Loot table, dropping function");
 				break;
 			}
-			int Levels;
+			int Levels = 0;
 			if (LevelsObject.isInt())
 			{
 				Levels = LevelsObject.asInt();
 			}
 			else if (LevelsObject.isObject())
 			{
-				int Min = 0, Max = 0;
-				if (LevelsObject.isMember("min"))
-				{
-					Min = LevelsObject["min"].asInt();
-				}
-				else if (LevelsObject.isMember("Min"))
-				{
-					Min = LevelsObject["Min"].asInt();
-				}
-
-				if (LevelsObject.isMember("max"))
-				{
-					Max = LevelsObject["max"].asInt();
-				}
-				else if (LevelsObject.isMember("Max"))
-				{
-					Max = LevelsObject["Max"].asInt();
-				}
-
-				if (Min > Max)
-				{
-					Max = Min;
-				}
-
-				Levels = a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (Max - Min) + Min;
+				Levels = LootTable::MinMaxRand(Levels, a_Noise, a_Pos, a_Item.m_ItemType);
+			}
+			if (!Levels)
+			{
+				break;
 			}
 			a_Item.EnchantByXPLevels(Levels);
 			break;
@@ -1923,31 +2061,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			}
 			else if (LimitObject.isObject())
 			{
-				int Min = 0, Max = 0;
-				if (LimitObject.isMember("min"))
-				{
-					Min = LimitObject["min"].asInt();
-				}
-				else if (LimitObject.isMember("Min"))
-				{
-					Min = LimitObject["Min"].asInt();
-				}
-
-				if (LimitObject.isMember("max"))
-				{
-					Max = LimitObject["max"].asInt();
-				}
-				else if (LimitObject.isMember("Max"))
-				{
-					Max = LimitObject["Max"].asInt();
-				}
-
-				if (Min > Max)
-				{
-					Max = Min;
-				}
-
-				Limit = a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (Max - Min) + Min;
+				Limit = LootTable::MinMaxRand(LimitObject, a_Noise, a_Pos, a_Item.m_ItemType);
 			}
 			if (Limit < 0)
 			{
@@ -1988,7 +2102,6 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				if (CountObject.isMember("type"))
 				{
 					Type = LootTable::NamespaceConverter(CountObject["type"].asString());
-					Type = LootTable::NamespaceConverter(CountObject["type"].asString());
 				}
 				else if (CountObject.isMember("Type"))
 				{
@@ -1997,30 +2110,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 
 				if ((Type == "Uniform") || (Type == "uniform"))
 				{
-					int Min = 0, Max = 0;
-					if (CountObject.isMember("min"))
-					{
-						Min = CountObject["min"].asInt();
-					}
-					else if (CountObject.isMember("Min"))
-					{
-						Min = CountObject["Min"].asInt();
-					}
-
-					if (CountObject.isMember("max"))
-					{
-						Max = CountObject["max"].asInt();
-					}
-					else if (CountObject.isMember("Max"))
-					{
-						Max = CountObject["Max"].asInt();
-					}
-
-					if (Min > Max)
-					{
-						Max = Min;
-					}
-					a_Item.m_ItemCount = a_Noise.IntNoise3DInt(a_Pos) % (Max - Min) + Min;
+					a_Item.m_ItemCount = LootTable::MinMaxRand(CountObject, a_Noise, a_Pos, 7);
 				}
 				else if ((Type == "Binomial") || (Type == "binomial"))
 				{
@@ -2198,7 +2288,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 	{
 		case LootTable::eFunctionType::CopyNbt:
 		{
-			// TODO:
+			// TODO: 06.09.2020 - Add when implemented - 12xx12
 			LOGWARNING("NBT for items is not yet supported, Dropping function!");
 			break;
 		}
@@ -2333,11 +2423,19 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		case LootTable::eFunctionType::LootingEnchant:
 		{
-			int Looting;
-			auto Callback = [&] (cPlayer & a_Player)
+			int Looting = 0;
+			auto Callback = [&] (cEntity & a_Entity)
 			{
-				Looting = a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+				if (a_Entity.GetEntityType() != cEntity::etPlayer)
+				{
+					return false;
+				}
+				auto & Player = static_cast<cPlayer &>(a_Entity);
+				Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+				return true;
 			};
+
+			a_World->DoWithEntityByID(a_Killer, Callback);
 
 			Json::Value CountObject;
 			if (a_Function.m_Parameter.isMember("count"))
@@ -2356,30 +2454,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 			}
 			else if (CountObject.isObject())
 			{
-				int Min = 0, Max = 0;
-				if (CountObject.isMember("min"))
-				{
-					Min = CountObject["min"].asInt();
-				}
-				else if (CountObject.isMember("Min"))
-				{
-					Min = CountObject["Min"].asInt();
-				}
-
-				if (CountObject.isMember("max"))
-				{
-					Max = CountObject["max"].asInt();
-				}
-				else if (CountObject.isMember("Max"))
-				{
-					Max = CountObject["Max"].asInt();
-				}
-
-				if (Min > Max)
-				{
-					Max = Min;
-				}
-				Count = a_Noise.IntNoise3DInt(a_Pos * 5) % (Max - Min) + Min;
+				Count = LootTable::MinMaxRand(CountObject, a_Noise, a_Pos, 5);
 			}
 			int Limit = 0;
 			if (a_Function.m_Parameter.isMember("limit"))
