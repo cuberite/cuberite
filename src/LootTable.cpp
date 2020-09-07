@@ -681,9 +681,9 @@ namespace LootTable
 // cLootTable
 
 
-cLootTable::cLootTable()
+cLootTable::cLootTable():
+	m_Type(LootTable::eType::Empty)
 {
-	m_Type = LootTable::eType::Empty;
 }
 
 
