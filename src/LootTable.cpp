@@ -1457,7 +1457,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				{
 					if (a_Entity.GetEntityType() != cEntity::etPlayer)
 					{
-					  return true;
+						return true;
 					}
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					return ((Player.GetEquippedItem().m_ItemCount >= Min) && (Player.GetEquippedItem().m_ItemCount <= Min));
@@ -1474,7 +1474,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			{
 				CountObject = Parameter["durability"];
 			}
-			else if (Parameter.isMember("´Durability"))
+			else if (Parameter.isMember("Durability"))
 			{
 				CountObject = Parameter["Durability"];
 			}
@@ -1500,7 +1500,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				{
 					if (a_Entity.GetEntityType() != cEntity::etPlayer)
 					{
-					  return true;
+						return true;
 					}
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					int Durability = Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage;
@@ -1512,8 +1512,8 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			enchantments: List of enchantments.
 				enchantment: An enchantment ID.
 				levels: The level of the enchantment.
-					max: The maximum value.
-					min: The minimum value.
+				max: The maximum value.
+				min: The minimum value.
 			*/
 			Json::Value EnchantmentsObject;
 			if (Parameter.isMember("enchantments"))
@@ -1528,8 +1528,8 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			stored_enchantments: List of stored enchantments.
 				enchantment: An enchantment ID.
 				levels: The level of the enchantment.
-					max: The maximum value.
-					min: The minimum value.
+				max: The maximum value.
+				min: The minimum value.
 			*/
 			else if (Parameter.isMember("stored_enchantments"))
 			{
