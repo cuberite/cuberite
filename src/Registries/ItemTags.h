@@ -1,8 +1,22 @@
 
+// ItemTags.h
+
 #pragma once
 
-// This list is up to date with 1.16.2 if there are new added please add here:
-// https://minecraft.gamepedia.com/Tag#Items
+/*
+This file describes the item tags (kind of categories).
+Those are used e.g. in the loot tables.
+You can export them from the minecraft sever with data generators
+
+There is a function provided to obtain a enum from a string in cuberite NamingConvention.
+There is also a function which provides cItems with the items described by the tag.
+
+There are many commented lines because any item that is in a tag in Vanilla 1.16.2 is there.
+
+This list is up to date with 1.16.2 if there are new added please add below:
+https://minecraft.gamepedia.com/Tag#Items
+*/
+
 namespace ItemTag
 {
 	enum class eItemTags
@@ -64,6 +78,7 @@ namespace ItemTag
 		None
 	};
 
+	/** Obtains the eItemTags type from string */
 	enum eItemTags eItemTags(AString & a_String)
 	{
 		if (NoCaseCompare(a_String, "AcaciaLogs") == 0)
@@ -293,6 +308,7 @@ namespace ItemTag
 	}
 
 // NOTE: Some of the Items are contained in multiple tags. Those are defined in the following macros
+
 // TODO: 07.09.2020 Add when implemented - 12xx12
 #define ACACIALOGS \
 	cItem(E_BLOCK_NEW_LOG, 1, E_META_NEW_LOG_ACACIA_WOOD),
@@ -987,6 +1003,7 @@ namespace ItemTag
 		cItem(E_BLOCK_WOOL, 1, E_META_WOOL_YELLOW),
 	};
 
+	/** Returns a cItemObject which contains all the items described by the tag */
 	cItems ItemTags(enum eItemTags a_Tag)
 	{
 		switch (a_Tag)
