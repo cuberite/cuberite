@@ -130,19 +130,6 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 
 
-void cProtocol_1_13::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPluginMessage);
-	Pkt.WriteString(a_Channel);
-	Pkt.WriteString(a_Message);
-}
-
-
-
-
-
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
 	// TODO
@@ -222,13 +209,13 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_COMMAND_BLOCK: Action = 2;  break;  // Update command block text
 		case E_BLOCK_BEACON:        Action = 3;  break;  // Update beacon entity
 		case E_BLOCK_HEAD:          Action = 4;  break;  // Update Mobhead entity
-		// case E_BLOCK_CONDUIT:       Action = 5;  break;  // Update Conduit entity
+		// case E_BLOCK_CONDUIT:    Action = 5;  break;  // Update Conduit entity
 		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_WALL_BANNER:   Action = 6;  break;  // Update banner entity
-		// case structure tile entity: Action = 7;  break;  // Update Structure tile entity
+		// case Structure Block:    Action = 7;  break;  // Update Structure tile entity
 		case E_BLOCK_END_GATEWAY:   Action = 8;  break;  // Update destination for a end gateway entity
 		case E_BLOCK_SIGN_POST:     Action = 9;  break;  // Update sign entity
-		// case E_BLOCK_SHULKER_BOX:   Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
+		// case E_BLOCK_SHULKER_BOX:Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
 		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
@@ -306,7 +293,7 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		m_Client->SetClientBrand(Brand);
 
 		// Send back our brand, including the length:
-		SendPluginMessage("minecraft:brand", "Cuberite");
+		SendPluginMessage("minecraft:brand", "\x08""Cuberite");
 		return;
 	}
 

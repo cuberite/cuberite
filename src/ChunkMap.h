@@ -42,7 +42,6 @@ class cBoundingBox;
 class cDeadlockDetect;
 
 typedef std::list<cClientHandle *> cClientHandleList;
-typedef cChunk *                   cChunkPtr;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
 using cBeaconCallback       = cFunctionRef<bool(cBeaconEntity       &)>;
 using cBedCallback          = cFunctionRef<bool(cBedEntity          &)>;
@@ -141,10 +140,8 @@ public:
 	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
@@ -320,9 +317,6 @@ public:
 	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
@@ -330,12 +324,8 @@ public:
 	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});  // Lua-accessible
 
 	/** Queues the chunk for generating.
-	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating.
-	The specified callback is called after the chunk has been loaded / generated.
-	It is legal to call without the callback.
-	Returns true if successful, false if not (possibly an out-of-memory error).
-	If the return value is true, the callback was / will be called. */
-	bool GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);  // Lua-accessible
+	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating. */
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // Lua-accessible
 
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -411,7 +401,7 @@ public:
 
 private:
 
-	// Chunks query their neighbors using GetChunk(), while being ticked
+	// Chunks query their neighbors using FindChunk(), while being ticked
 	friend class cChunk;
 
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
@@ -467,31 +457,11 @@ private:
 	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
-	Emplaces this chunk in the chunk map.
-	Developers SHOULD use the GetChunk variants instead of this function. */
-	cChunkPtr ConstructChunk(int a_ChunkX, int a_ChunkZ);
+	Emplaces this chunk in the chunk map. */
+	cChunk & ConstructChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
-	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
-
-	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
-
-	// Deprecated in favor of the vector version
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoGen({a_ChunkX, a_ChunkZ});
-	}
-
-	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(cChunkCoords a_Coords);
-
-	/** OBSOLETE, use the cChunkCoords-based overload instead.
-	Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoLoad({a_ChunkX, a_ChunkZ});
-	}
+	cChunk & GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -505,8 +475,3 @@ private:
 	void DelChunkStay(cChunkStay & a_ChunkStay);
 
 };
-
-
-
-
-

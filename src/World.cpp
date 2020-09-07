@@ -1023,13 +1023,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 	for (auto & Entity : EntitiesToAdd)
 	{
-		auto EntityPtr = Entity.get();
-		ASSERT(EntityPtr->GetWorld() == this);
 		m_ChunkMap->AddEntity(std::move(Entity));
-		EntityPtr->OnAddToWorld(*this);
-		ASSERT(!EntityPtr->IsTicking());
-		EntityPtr->SetIsTicking(true);
-		cPluginManager::Get()->CallHookSpawnedEntity(*this, *Entity);
 	}
 	EntitiesToAdd.clear();
 
@@ -1599,17 +1593,17 @@ bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 
 
 
-bool cWorld::GrowTree(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTree(const Vector3i a_BlockPos)
 {
-	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
+	if (GetBlock(a_BlockPos) == E_BLOCK_SAPLING)
 	{
 		// There is a sapling here, grow a tree according to its type:
-		return GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
+		return GrowTreeFromSapling(a_BlockPos);
 	}
 	else
 	{
 		// There is nothing here, grow a tree based on the current biome here:
-		return GrowTreeByBiome(a_X, a_Y, a_Z);
+		return GrowTreeByBiome(a_BlockPos);
 	}
 }
 
@@ -1617,36 +1611,37 @@ bool cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 
 
 
-bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
+bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
 	auto WorldAge = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
-	switch (a_SaplingMeta & 0x07)
+	auto SaplingMeta = GetBlockMeta(a_BlockPos);
+	switch (SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:    GetAppleTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_CONIFER:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta);
-			GetConiferTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other, IsLarge);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetConiferTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
-		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_BlockPos, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_JUNGLE:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta);
-			GetJungleTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other, IsLarge);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetJungleTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
 		case E_META_SAPLING_DARK_OAK:
 		{
-			if (!GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta))
+			if (!GetLargeTreeAdjustment(a_BlockPos, SaplingMeta))
 			{
 				return false;
 			}
 
-			GetDarkoakTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other);
+			GetDarkoakTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other);
 			break;
 		}
 	}
@@ -1659,7 +1654,7 @@ bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 
 
 
-bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta)
+bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 {
 	bool IsLarge = true;
 	a_Meta = a_Meta & 0x07;
@@ -1671,8 +1666,8 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1689,14 +1684,14 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_Z;
+		--a_BlockPos.z;
 		return true;
 	}
 
@@ -1708,15 +1703,15 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_Z;
-		--a_X;
+		--a_BlockPos.x;
+		--a_BlockPos.z;
 		return true;
 	}
 
@@ -1728,14 +1723,14 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_X;
+		--a_BlockPos.x;
 	}
 
 	return IsLarge;
@@ -1745,11 +1740,12 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 
 
 
-bool cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTreeByBiome(const Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
-	GetTreeImageByBiome({ a_X, a_Y, a_Z }, Noise, static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
+	auto seq = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
+	GetTreeImageByBiome(a_BlockPos, Noise, seq, GetBiomeAt(a_BlockPos.x, a_BlockPos.z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
 	return GrowTreeImage(Other);
@@ -1910,9 +1906,9 @@ void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_B
 
 
 
-void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
 }
 
 
@@ -2868,15 +2864,6 @@ void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 
 
 
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
-{
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
 void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter)
 {
 	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, std::move(a_CallAfter));
@@ -2978,7 +2965,6 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
-
 	m_Generator.QueueGenerateChunk({a_ChunkX, a_ChunkZ}, true);
 }
 

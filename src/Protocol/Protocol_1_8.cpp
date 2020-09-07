@@ -3172,7 +3172,7 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 
 
 
-eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(Int8 a_BlockFace)
+eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
 {
 	// Normalize the blockface values returned from the protocol
 	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE

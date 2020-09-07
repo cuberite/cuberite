@@ -40,9 +40,11 @@ namespace DoorHandler
 		Power = std::max(Power, Callback.Power);
 
 		cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
+		// Use redstone data rather than block state so players can override redstone control
+		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
+		const bool IsOpen = (Previous != 0);
 		const bool ShouldBeOpen = Power != 0;
 		const auto AbsolutePosition = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
-		const bool IsOpen = cBlockDoorHandler::IsOpen(ChunkInterface, AbsolutePosition);
 
 		if (ShouldBeOpen != IsOpen)
 		{

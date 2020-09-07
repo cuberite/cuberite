@@ -18,6 +18,7 @@
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -214,7 +215,7 @@ public:
 			case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity(static_cast<cCommandBlockEntity *>(a_Entity)); break;
 			case E_BLOCK_DISPENSER:     AddDispenserEntity   (static_cast<cDispenserEntity *>   (a_Entity)); break;
 			case E_BLOCK_DROPPER:       AddDropperEntity     (static_cast<cDropperEntity *>     (a_Entity)); break;
-			case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                               break;
+			case E_BLOCK_ENDER_CHEST:   AddEnderchestEntity  (static_cast<cEnderChestEntity *>  (a_Entity)); break;
 			case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   (static_cast<cFlowerPotEntity *>   (a_Entity)); break;
 			case E_BLOCK_FURNACE:       AddFurnaceEntity     (static_cast<cFurnaceEntity *>     (a_Entity)); break;
 			case E_BLOCK_HEAD:          AddMobHeadEntity     (static_cast<cMobHeadEntity *>     (a_Entity)); break;
@@ -453,6 +454,17 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+		mWriter.EndCompound();
+	}
+
+
+
+
+
+	void AddEnderchestEntity(cEnderChestEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EnderChest");
 		mWriter.EndCompound();
 	}
 
