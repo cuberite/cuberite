@@ -2,7 +2,10 @@
 
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
+
+#include <utility>
 #include "../Simulator/RedstoneSimulator.h"
+#include "../Entities/Player.h"
 
 
 
@@ -62,9 +65,9 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 
 
 
-void cBlockEntityWithItems::SetLootTable(AString & a_LootTable)
+void cBlockEntityWithItems::SetLootTable(AString a_LootTable)
 {
-	m_LootTable = a_LootTable;
+	m_LootTable = std::move(a_LootTable);
 }
 
 

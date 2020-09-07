@@ -54,7 +54,7 @@ public:  // tolua_export
 	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
-	void SetLootTable(AString & a_LootTable);
+	void SetLootTable(AString a_LootTable);
 	AString GetLootTable() { return m_LootTable; }
 
 	/** Returns the ItemGrid used for storing the contents */

@@ -296,7 +296,7 @@ namespace LootTable
 
 
 
-	/** Gets the eChestType from String as of 1.16.2 */
+
 	enum eChestType eChestType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "AbandonedMineshaft") == 0)
