@@ -330,9 +330,9 @@ namespace ItemTag
 
 // TODO: 07.09.2020 - Add when implemented - 12xx12
 #define DARKOAKLOGS \
-	cItem(E_BLOCK_NEW_LOG, 1, E_META_NEW_LOG_DARK_OAK_WOOD), \
-	cItem(E_BLOCK_NEW_LOG, 1, E_META_NEWLOG_DARK_OAK_BARK_ONLY),
+	cItem(E_BLOCK_NEW_LOG, 1, E_META_NEW_LOG_DARK_OAK_WOOD),
 	// cItem(E_BLOCK_DARK_OAK_WOOD),
+	// cItem(E_BLOCK_STRIPPED_DARK_OAK_LOG),
 	// cItem(E_BLOCK_STRIPPED_DARK_OAK_WOOD),
 
 #define GOLDORES \
@@ -342,8 +342,8 @@ namespace ItemTag
 // TODO: 07.09.2020 - Add when implemented - 12xx12
 #define JUNGLELOGS \
 	cItem(E_BLOCK_LOG, 1, E_META_LOG_JUNGLE),
-	// cItem(E_BLOCK_STRIPPED_JUNGLE_LOG), \
 	// cItem(E_BLOCK_JUNGLE_WOOD), \
+	// cItem(E_BLOCK_STRIPPED_JUNGLE_LOG), \
 	// cItem(E_BLOCK_STRIPPED_JUNGLE_WOOD), \
 
 #define LOGSTHATBURN \
@@ -354,9 +354,10 @@ namespace ItemTag
 	JUNGLELOGS \
 	SPRUCELOGS
 
+// TODO: 07.09.2020 - Add when implemented - 12xx12
 #define OAKLOGS \
-	cItem(E_BLOCK_LOG, 1, E_META_LOG_APPLE), \
-	cItem(E_BLOCK_LOG, 1, E_META_LOG_OAK_BARK_ONLY),
+	cItem(E_BLOCK_LOG, 1, E_META_LOG_APPLE),
+	// cItem(E_BLOCK_OAK_WOOD),
 	// cItem(E_BLOCK_STRIPPED_OAK_LOG),
 	// cItem(E_BLOCK_STRIPPED_OAK_WOOD)
 
@@ -377,8 +378,8 @@ namespace ItemTag
 	// cItem(E_BLOCK_WITHER_ROSE), \
 
 #define SPRUCELOGS \
-	cItem(E_BLOCK_LOG, 1, E_META_LOG_CONIFER), \
-	cItem(E_BLOCK_LOG, 1, E_META_LOG_SPRUCE_BARK_ONLY),
+	cItem(E_BLOCK_LOG, 1, E_META_LOG_CONIFER),
+	// cItem(E_BLOCK_SPRUCE_WOOD),
 	// cItem(E_BLOCK_STRIPPED_SPRUCE_LOG),
 	// cItem(E_BLOCK_STRIPPED_SPRUCE_WOOD),
 
@@ -538,7 +539,7 @@ namespace ItemTag
 	const std::initializer_list<cItem> Buttons =
 	{
 		WOODENBUTTONS
-		cItem(E_BLOCK_WOODEN_BUTTON)
+		cItem(E_BLOCK_STONE_BUTTON),
 	};
 
 	const std::initializer_list<cItem> Carpets =
@@ -986,7 +987,7 @@ namespace ItemTag
 		cItem(E_BLOCK_WOOL, 1, E_META_WOOL_YELLOW),
 	};
 
-	const cItems ItemTags(enum eItemTags a_Tag)
+	cItems ItemTags(enum eItemTags a_Tag)
 	{
 		switch (a_Tag)
 		{

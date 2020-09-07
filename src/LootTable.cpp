@@ -1219,11 +1219,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 				break;
 			}
 
-			LOG(Tag);
-			std::vector<cItem> TagItems;
-
-			// TODO
-
+			cItems TagItems = ItemTag::ItemTags(ItemTag::eItemTags(Tag));
 
 			if (a_Entry.m_Expand)
 			{
@@ -1293,7 +1289,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry!");
 				break;
 			}
 			cItems NewItems;
@@ -1308,8 +1304,11 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			break;
 		}
 		case LootTable::ePoolEntryType::Dynamic:  // Generates loot based on the block broken: chest content...
+		{
+			// TODO: 07.09.2020 - 12xx12
+			LOGWARNING("Loot table pool entry type \"Dynamic\" is not supported yet - dropping entry!");
 			break;
-			// TODO
+		}
 		case LootTable::ePoolEntryType::Empty:
 		{
 			break;
@@ -1613,6 +1612,8 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			}
 			if (!ItemString.empty())
 			{
+				cItem Item;
+				StringToItem(ItemString, Item);
 				auto Callback = [&] (cEntity & a_Entity)
 				{
 					if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -1620,8 +1621,6 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 						return true;
 					}
 					auto & Player = static_cast<cPlayer & >(a_Entity);
-					cItem Item;
-					StringToItem(ItemString, Item);
 					return Player.GetEquippedItem().IsSameType(Item);
 				};
 				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
@@ -1640,15 +1639,31 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				LOGWARNING("Nbt for items is not yet supported - assuming true!");
 			}
 			// tag: An item data pack tag.
-			// TODO
+			AString Tag;
 			if (Parameter.isMember("tag"))
 			{
-				AString Tag = Parameter["tag"].asString();
+				Tag = Parameter["tag"].asString();
 			}
 			else if (Parameter.isMember("Tag"))
 			{
-				AString Tag = Parameter["Tag"].asString();
+				Tag = Parameter["Tag"].asString();
 			}
+
+			if (!Tag.empty())
+			{
+				auto Callback = [&] (cEntity & a_Entity)
+				{
+					if (a_Entity.GetEntityType() != cEntity::etPlayer)
+					{
+						return true;
+					}
+
+					auto & Player = static_cast<cPlayer &>(a_Entity);
+					return ItemTag::ItemTags(ItemTag::eItemTags(Tag)).ContainsType(Player.GetEquippedItem());
+				};
+				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+			}
+
 			return Res;
 		}
 		case LootTable::eConditionType::RandomChance:
