@@ -688,8 +688,7 @@ cLootTable::cLootTable()
 
 
 
-cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World):
-	m_World(a_World)
+cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 {
 	for (const auto & RootId : a_Description.getMemberNames())
 	{
@@ -720,13 +719,14 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World):
 
 
 
-bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt32 & a_Player) const
+bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Player) const
 {
-	auto & ItemGrid = a_BlockEntity->GetContents();
-	auto Noise = cNoise(m_World->GetGenerator().GetSeed());
+	auto Noise = cNoise(a_World->GetGenerator().GetSeed());
 
-	auto Items = GetItems(Noise, a_BlockEntity->GetPos(), a_Player);
+	// The player is killed and killer here because he influences both in the functions or conditions
+	auto Items = GetItems(Noise, a_Pos, a_World, a_Player, a_Player);
 
+	// Places items in a_ItemGrid
 	int i = 0;  // This value is used for some more randomness
 	for (auto & Item : Items)
 	{
@@ -734,7 +734,7 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt3
 		while (Item.m_ItemCount > 0)
 		{
 			Copy = Item.CopyOne();
-			ItemGrid.AddItem(Copy, true, abs((Noise.IntNoise3DInt(a_BlockEntity->GetPos()) * Noise.IntNoise1DInt(i)) % ItemGrid.GetNumSlots()));
+			a_ItemGrid.AddItem(Copy, true, abs((Noise.IntNoise3DInt(a_Pos) * Noise.IntNoise1DInt(i)) % a_ItemGrid.GetNumSlots()));
 			Item.m_ItemCount--;
 			i++;
 		}
@@ -746,18 +746,13 @@ bool cLootTable::FillWithLoot(cBlockEntityWithItems * a_BlockEntity, const UInt3
 
 
 
-cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer) const
+cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld * a_World, const UInt32 & a_Killed, const UInt32 & a_Killer) const
 {
 	auto Items = cItems();
 	int i = 0;
 	for (const auto & Pool : m_LootTablePools)
 	{
-		auto NewItems = GetItems(Pool, m_World, a_Noise, a_Pos, a_Killed, a_Killer);
-		// TODO: remove debug output
-		for (const auto & Item : NewItems)
-		{
-			LOG("Pool: %d: %s", i, ItemToFullString(Item));
-		}
+		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 		i++;
 	}
@@ -765,7 +760,7 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cons
 	{
 		for (const auto & Function : m_Functions)
 		{
-			ApplyFunction(Function, Item, m_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
 		}
 	}
 	return Items;
@@ -804,7 +799,6 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 					{
 						Max = Rolls[RollEntry].asInt();
 					}
-					// Todo - add type
 				}
 				// Todo: add info on which file is wrong
 				if (Min == -1)
@@ -1245,7 +1239,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 				break;
 			}
 
-			auto NewItems = a_World->GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_Killed, a_Killer);
+			auto NewItems = a_World->GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_World, a_Killed, a_Killer);
 			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			break;
 		}
@@ -1280,7 +1274,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			}
 			break;
 		}
-		case LootTable::ePoolEntryType::Sequence:  // Selects entries from Children until one is not granted. This may lead to a infinite loop if the loot table is poorly written. TODO: block infinite loop
+		case LootTable::ePoolEntryType::Sequence:  // Selects entries from Children until one is not granted.
 		{
 			cLootTablePoolEntryVector Children;
 			try
@@ -1293,13 +1287,18 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 				break;
 			}
 			cItems NewItems;
+			int LockCont = 0;  // This is how many times the whole table is repeated to prevent infinite loops
 			int ChildPos = 0;
 			do
 			{
 				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Killed, a_Killer);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				ChildPos = (ChildPos + 1) % Children.size();
-			} while (NewItems.size() != 0);
+				if (ChildPos == Children.size() - 1)
+				{
+					LockCont++;
+				}
+			} while ((NewItems.size() != 0) && (LockCont < 10));
 
 			break;
 		}
