@@ -8204,7 +8204,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool BlockState(BlockState Block)
+		bool Short(BlockState Block)
 		{
 			switch (Block.ID)
 			{

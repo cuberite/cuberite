@@ -11723,7 +11723,7 @@ namespace Block
 		}
 		BlockState PistonHead();
 		eBlockFace Facing(BlockState Block);
-		bool BlockState(BlockState Block);
+		bool Short(BlockState Block);
 		enum Type Type(BlockState Block);
 	}
 	namespace PlayerHead

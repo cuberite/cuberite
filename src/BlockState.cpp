@@ -1,8 +1,10 @@
 #include "Globals.h"
 #include "BlockState.h"
 
-Block::Type BlockState::Type()
+Block::Type BlockState::Type() const
 {
+	using namespace Block;
+
 	switch (ID)
 	{
 		case 6442:case 6443:case 6444:case 6445:case 6446:case 6447:case 6448:case 6449:case 6450:case 6451:case 6452:case 6453:case 6454:case 6455:case 6456:case 6457:case 6458:case 6459:case 6460:case 6461:case 6462:case 6463:case 6464:case 6465: return Type::AcaciaButton;

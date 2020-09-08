@@ -42,17 +42,17 @@ namespace
 
 	auto Palette393(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 
 	auto Palette401(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 
 	auto Palette477(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 }
 
