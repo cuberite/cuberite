@@ -14,7 +14,7 @@
 
 
 #ifdef __FreeBSD__
-#include <netinet/in.h>
+	#include <netinet/in.h>
 #endif
 
 
@@ -362,7 +362,6 @@ public:
 	/** Returns all local IP addresses for network interfaces currently available. */
 	static AStringVector EnumLocalIPAddresses(void);
 };
-
 
 
 
