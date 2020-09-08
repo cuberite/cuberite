@@ -45,6 +45,7 @@ target_sources(
 	Logger.cpp
 	LootTable.cpp
 	LootTableProvider.cpp
+	LootTableParser.cpp
 	Map.cpp
 	MapManager.cpp
 	MemorySettingsRepository.cpp
@@ -127,6 +128,7 @@ target_sources(
 	LoggerSimple.h
 	LootTable.h
 	LootTableProvider.h
+	LootTableParser.h
 	Map.h
 	MapManager.h
 	Matrix4.h

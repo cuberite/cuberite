@@ -576,18 +576,6 @@ protected:
 	cLootTableFunctionVector m_Functions;
 
 private:
-	/** Reads Loot Table pool from Json */
-	void ReadLootTablePool(const Json::Value & a_Value);
-
-	/** Reads a loot table function from Json */
-	static cLootTableFunction ReadLootTableFunction(const Json::Value & a_Value);
-
-	/** Reads a loot table condition from Json */
-	static cLootTableCondition ReadLootTableCondition(const Json::Value & a_Value);
-
-	/** Reads a loot table pool entry from Json */
-	static cLootTablePoolEntry ReadLootTablePoolEntry(const Json::Value & a_Value);
-
 	static cItems GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);
 
 	static cItems GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer);

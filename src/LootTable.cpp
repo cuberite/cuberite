@@ -7,6 +7,7 @@
 #include "Entities/Player.h"
 #include "FurnaceRecipe.h"
 #include "ItemGrid.h"
+#include "LootTableParser.h"
 #include "Mobs/MonsterTypes.h"
 #include "Registries/ItemTags.h"
 #include "Root.h"
@@ -703,7 +704,7 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 			Json::Value Pools = a_Description[RootId];
 			for (unsigned int PoolId = 0; PoolId < Pools.size(); PoolId++)
 			{
-				ReadLootTablePool(Pools[PoolId]);
+				m_LootTablePools.push_back(LootTable::ParsePool(Pools[PoolId]));
 			}
 		}
 		else if (NoCaseCompare(RootId, "functions") == 0)
@@ -711,7 +712,7 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 			auto FunctionsObject = a_Description[RootId];
 			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
-				m_Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
+				m_Functions.push_back(LootTable::ParseFunction(FunctionsObject[FunctionIndex]));
 			}
 		}
 	}
@@ -764,356 +765,6 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 		}
 	}
 	return Items;
-}
-
-
-
-
-
-void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
-{
-	cLootTablePoolRolls PoolRolls;
-	cLootTablePoolRolls PoolBonusRolls;
-	cLootTablePoolEntryVector PoolEntries;
-	cLootTableFunctionVector Functions;
-	cLootTableConditionVector Conditions;
-	for (auto & PoolElement : a_Value.getMemberNames())
-	{
-		if (NoCaseCompare(PoolElement, "rolls") == 0)
-		{
-			auto Rolls = a_Value[PoolElement];
-			if (Rolls.isInt())
-			{
-				PoolRolls = cLootTablePoolRolls(Rolls.asInt(), Rolls.asInt());
-			}
-			else
-			{
-				int Min = 0, Max = -1;
-				for (auto & RollEntry: Rolls.getMemberNames())
-				{
-					if (NoCaseCompare(RollEntry, "min") == 0)
-					{
-						Min = Rolls[RollEntry].asInt();
-					}
-					else if (NoCaseCompare(RollEntry, "max") == 0)
-					{
-						Max = Rolls[RollEntry].asInt();
-					}
-				}
-				if (Max == -1)
-				{
-					LOGWARNING("Missing maximum value in loot table pool - assuming steady roll");
-					Max = Min;
-				}
-				PoolRolls = cLootTablePoolRolls(Min, Max);
-			}
-		}
-		else if (NoCaseCompare(PoolElement, "bonus_rolls") == 0)
-		{
-			auto Rolls = a_Value[PoolElement];
-			if (Rolls.isInt())
-			{
-				PoolRolls = cLootTablePoolRolls(Rolls.asInt(), Rolls.asInt());
-			}
-			else
-			{
-				int Min = 0, Max = -1;
-				for (auto & RollEntry: Rolls.getMemberNames())
-				{
-					if (NoCaseCompare(RollEntry, "min") == 0)
-					{
-						Min = Rolls[RollEntry].asInt();
-					}
-					else if (NoCaseCompare(RollEntry, "max") == 0)
-					{
-						Max = Rolls[RollEntry].asInt();
-					}
-				}
-				if (Max == -1)
-				{
-					LOGWARNING("Missing maximum value in loot table pool - assuming steady roll");
-					Max = Min;
-				}
-				PoolBonusRolls = cLootTablePoolRolls(Min, Max);
-			}
-		}
-		else if (NoCaseCompare(PoolElement, "entries") == 0)
-		{
-			auto Entries = a_Value[PoolElement];
-			for (unsigned int EntryIndex = 0; EntryIndex < Entries.size(); EntryIndex++)
-			{
-				PoolEntries.push_back(ReadLootTablePoolEntry(Entries[EntryIndex]));
-			}
-		}
-		else if (NoCaseCompare(PoolElement, "functions") == 0)
-		{
-			auto FunctionsObject = a_Value[PoolElement];
-			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
-			{
-				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
-			}
-		}
-		else if (NoCaseCompare(PoolElement, "conditions") == 0)
-		{
-			auto ConditionsObject = a_Value[PoolElement];
-			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
-			{
-				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
-			}
-		}
-	}
-	m_LootTablePools.push_back(cLootTablePool(PoolRolls, PoolEntries, Conditions));
-}
-
-
-
-
-
-cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value)
-{
-	enum LootTable::eFunctionType Type;
-	cLootTableConditionVector Conditions;
-	Json::Value Parameter = a_Value;
-	for (auto & FunctionInfo : a_Value.getMemberNames())
-	{
-		if (NoCaseCompare(FunctionInfo, "function") == 0)
-		{
-			Type = LootTable::eFunctionType(LootTable::NamespaceConverter(a_Value[FunctionInfo].asString()));
-		}
-		else if (NoCaseCompare(FunctionInfo, "conditions") == 0)
-		{
-			auto ConditionsObject = a_Value[FunctionInfo];
-			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
-			{
-				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
-			}
-			Parameter.removeMember(FunctionInfo);  // Removes the conditions so the json is a bit smaller
-		}
-	}
-	return cLootTableFunction(Type, Parameter, Conditions);
-}
-
-
-
-
-
-cLootTableCondition cLootTable::ReadLootTableCondition(const Json::Value & a_Value)
-{
-	enum LootTable::eConditionType Type;
-
-	// Type has to be known beforehand
-	if (a_Value.isMember("condition"))
-	{
-		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["condition"].asString()));
-	}
-	else if (a_Value.isMember("Condition"))
-	{
-		Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["Condition"].asString()));
-	}
-	else
-	{
-		LOGWARNING("Loot table is missing condition type. Dropping condition!");
-		return cLootTableCondition();
-	}
-
-	switch (Type)
-	{
-		case LootTable::eConditionType::Alternative:
-		{
-			Json::Value Terms;
-			cLootTableConditionVector SubConditions;
-			if (a_Value.isMember("terms"))
-			{
-				Terms = a_Value["terms"];
-			}
-			else if (a_Value.isMember("Terms"))
-			{
-				Terms = a_Value["Terms"];
-			}
-			else
-			{
-				LOGWARNING("Loot table condition \"Alternative\" is missing sub - conditions. Dropping condition!");
-				return cLootTableCondition();
-			}
-			for (unsigned int i = 0; i < Terms.size(); i++)
-			{
-				SubConditions.push_back(ReadLootTableCondition(Terms[i]));
-			}
-			return cLootTableCondition(Type, SubConditions);
-			break;
-		}
-		case LootTable::eConditionType::Inverted:
-		{
-			Json::Value Term;
-			cLootTableConditionVector SubConditions;
-			if (a_Value.isMember("term"))
-			{
-				Term = a_Value["term"];
-				SubConditions.push_back(ReadLootTableCondition(Term));
-				return cLootTableCondition(Type, SubConditions);
-			}
-			else if (a_Value.isMember("Term"))
-			{
-				Term = a_Value["Term"];
-				SubConditions.push_back(ReadLootTableCondition(Term));
-				return cLootTableCondition(Type, SubConditions);
-			}
-			else
-			{
-				LOGWARNING("Loot table condition \"Inverted\" is missing sub-condition. Dropping condition!");
-				return cLootTableCondition();
-			}
-		}
-		case LootTable::eConditionType::None:
-		{
-			return cLootTableCondition();
-		}
-		case LootTable::eConditionType::BlockStateProperty:
-		case LootTable::eConditionType::DamageSourceProperties:
-		case LootTable::eConditionType::EntityProperties:
-		case LootTable::eConditionType::EntityScores:
-		case LootTable::eConditionType::KilledByPlayer:
-		case LootTable::eConditionType::LocationCheck:
-		case LootTable::eConditionType::MatchTool:
-		case LootTable::eConditionType::RandomChance:
-		case LootTable::eConditionType::RandomChanceWithLooting:
-		case LootTable::eConditionType::Reference:
-		case LootTable::eConditionType::SurvivesExplosion:
-		case LootTable::eConditionType::TableBonus:
-		case LootTable::eConditionType::TimeCheck:
-		case LootTable::eConditionType::WeatherCheck:
-		{
-			return cLootTableCondition(Type, a_Value);
-		}
-		default: return cLootTableCondition();
-	}
-}
-
-
-
-
-
-cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Value)
-{
-	cLootTableConditionVector Conditions;
-	cLootTableFunctionVector Functions;
-	enum LootTable::ePoolEntryType Type;
-
-	cItem Item;
-	AString Name;
-	cLootTablePoolEntryVector Children;
-
-	bool Expand = true;
-	int Weight = 1;
-	int Quality = 0;
-
-	// The type has to be known beforehand
-	if (a_Value.isMember("type"))
-	{
-		Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["type"].asString()));
-	}
-	else if (a_Value.isMember("Type"))
-	{
-		Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["Type"].asString()));
-	}
-	else
-	{
-		LOGWARNING("No loot table poll entry type provided - dropping entry");
-		return cLootTablePoolEntry();
-	}
-
-	for (auto & EntryParameter : a_Value.getMemberNames())
-	{
-		if (NoCaseCompare(EntryParameter, "weight") == 0)
-		{
-			Weight = a_Value[EntryParameter].asInt();
-		}
-		else if (NoCaseCompare(EntryParameter, "name") == 0)
-		{
-			switch (Type)
-			{
-				case LootTable::ePoolEntryType::Item:
-				{
-					StringToItem(LootTable::NamespaceConverter(a_Value[EntryParameter].asString()), Item);
-					break;
-				}
-				case LootTable::ePoolEntryType::Tag:
-				case LootTable::ePoolEntryType::LootTable:
-				case LootTable::ePoolEntryType::Dynamic:
-				{
-					Name = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
-					break;
-				}
-				default: break;
-			}
-		}
-		else if (NoCaseCompare(EntryParameter, "functions") == 0)
-		{
-			auto FunctionsObject = a_Value[EntryParameter];
-			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
-			{
-				Functions.push_back(ReadLootTableFunction(FunctionsObject[FunctionIndex]));
-			}
-		}
-		else if (NoCaseCompare(EntryParameter, "conditions") == 0)
-		{
-			auto ConditionsObject = a_Value[EntryParameter];
-			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
-			{
-				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
-			}
-		}
-		else if (NoCaseCompare(EntryParameter, "children") == 0)
-		{
-			switch (Type)
-			{
-				case LootTable::ePoolEntryType::Group:
-				case LootTable::ePoolEntryType::Alternatives:
-				case LootTable::ePoolEntryType::Sequence:
-				{
-					auto ChildrenObject = a_Value[EntryParameter];
-					for (unsigned int ChildrenObjectId = 0; ChildrenObjectId < ChildrenObject.size(); ++ChildrenObjectId)
-					{
-						Children.push_back(ReadLootTablePoolEntry(ChildrenObject[ChildrenObjectId]));
-					}
-					break;
-				}
-				default: break;
-			}
-		}
-		else if (NoCaseCompare(EntryParameter, "expand") == 0)
-		{
-			Expand = a_Value[EntryParameter].asBool();
-		}
-		else if (NoCaseCompare(EntryParameter, "quality") == 0)
-		{
-			Quality = a_Value[EntryParameter].asInt();
-		}
-	}
-	switch (Type)
-	{
-		case LootTable::ePoolEntryType::Item:
-		{
-			return cLootTablePoolEntry(Conditions, Functions, Type, Item, Weight, Quality);
-		}
-
-		case LootTable::ePoolEntryType::Tag:
-		case LootTable::ePoolEntryType::LootTable:
-		case LootTable::ePoolEntryType::Dynamic:
-		{
-			return cLootTablePoolEntry(Conditions, Functions, Type, Name, Expand, Weight, Quality);
-		}
-
-		case LootTable::ePoolEntryType::Group:
-		case LootTable::ePoolEntryType::Alternatives:
-		case LootTable::ePoolEntryType::Sequence:
-		{
-			return cLootTablePoolEntry(Conditions, Functions, Type, Children, Weight, Quality);
-		}
-
-		case LootTable::ePoolEntryType::Empty: return cLootTablePoolEntry();
-		default:                               return cLootTablePoolEntry();
-	}
 }
 
 
@@ -2020,33 +1671,31 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 		}
 		case LootTable::eFunctionType::EnchantRandomly:
 		{
+			if (!cItem::IsEnchantable(a_Item.m_ItemType))
+			{
+				LOGWARNING("Item %s can not be enchanted in loot table", ItemToString(a_Item));
+			}
+
 			cWeightedEnchantments EnchantmentLimiter;
+			Json::Value Enchantments;
 			if (a_Function.m_Parameter.isMember("enchantments"))
 			{
-				auto Enchantments = a_Function.m_Parameter["enchantments"];
-				for (unsigned int i = 0; i < Enchantments.size(); i++)
-				{
-					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
-				}
+				Enchantments = a_Function.m_Parameter["enchantments"];
 			}
 			else if (a_Function.m_Parameter.isMember("Enchantments"))
 			{
-				auto Enchantments = a_Function.m_Parameter["Enchantments"];
+				Enchantments = a_Function.m_Parameter["Enchantments"];
+			}
+			if (Enchantments.isArray())
+			{
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
 					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
 				}
 			}
-			else
+			else  // All are possible
 			{
-				// All are possible
-				cWeightedEnchantments Enchantments;
-				cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + a_Noise.IntNoise3DInt(a_Pos * 20) % 7);
-
-				cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, a_Noise.IntNoise3DInt(a_Pos * 10) % Enchantments.size());
-				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
-				a_Item.m_Enchantments.Add(Enchantment);
-				break;
+				cEnchantments::AddItemEnchantmentWeights(EnchantmentLimiter, E_ITEM_BOOK, 24 + a_Noise.IntNoise3DInt(a_Pos * 20) % 7);
 			}
 			a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
 			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
