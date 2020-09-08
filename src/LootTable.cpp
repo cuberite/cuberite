@@ -625,7 +625,7 @@ namespace LootTable
 
 
 
-	/** Moves a_String from the "minecraft:" namespace to cuberite namespace */
+
 	AString NamespaceConverter(AString a_String)
 	{
 		ReplaceString(a_String, "minecraft:", "");
@@ -751,12 +751,10 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld * a_World, const Ve
 cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld * a_World, const UInt32 & a_Killed, const UInt32 & a_Killer) const
 {
 	auto Items = cItems();
-	int i = 0;
 	for (const auto & Pool : m_LootTablePools)
 	{
 		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
-		i++;
 	}
 	for (auto & Item : Items)
 	{
@@ -844,8 +842,7 @@ void cLootTable::ReadLootTablePool(const Json::Value & a_Value)
 			auto Entries = a_Value[PoolElement];
 			for (unsigned int EntryIndex = 0; EntryIndex < Entries.size(); EntryIndex++)
 			{
-				auto Entry = Entries[EntryIndex];
-				PoolEntries.push_back(ReadLootTablePoolEntry(Entry));
+				PoolEntries.push_back(ReadLootTablePoolEntry(Entries[EntryIndex]));
 			}
 		}
 		else if (NoCaseCompare(PoolElement, "functions") == 0)
@@ -876,6 +873,7 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 {
 	enum LootTable::eFunctionType Type;
 	cLootTableConditionVector Conditions;
+	Json::Value Parameter = a_Value;
 	for (auto & FunctionInfo : a_Value.getMemberNames())
 	{
 		if (NoCaseCompare(FunctionInfo, "function") == 0)
@@ -889,9 +887,10 @@ cLootTableFunction cLootTable::ReadLootTableFunction(const Json::Value & a_Value
 			{
 				Conditions.push_back(ReadLootTableCondition(ConditionsObject[ConditionId]));
 			}
+			Parameter.removeMember(FunctionInfo);  // Removes the conditions so the json is a bit smaller
 		}
 	}
-	return cLootTableFunction(Type, a_Value, Conditions);
+	return cLootTableFunction(Type, Parameter, Conditions);
 }
 
 
@@ -1019,7 +1018,8 @@ cLootTablePoolEntry cLootTable::ReadLootTablePoolEntry(const Json::Value & a_Val
 	}
 	else
 	{
-		Type = LootTable::ePoolEntryType::Empty;
+		LOGWARNING("No loot table poll entry type provided - dropping entry");
+		return cLootTablePoolEntry();
 	}
 
 	for (auto & EntryParameter : a_Value.getMemberNames())
@@ -1146,11 +1146,11 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 	{
 		auto Rnd = a_Noise.IntNoise3DInt(a_Pos * 25 * a_Noise.IntNoise1DInt(i)) % TotalWeight;
 		EntryNum = 0;
-		while (Rnd > 0)
+		do
 		{
 			Rnd -= a_Pool.m_Entries[EntryNum].m_Weight + a_Pool.m_Entries[EntryNum].m_Quality * Luck;
 			EntryNum = (EntryNum + 1) % a_Pool.m_Entries.size();
-		}
+		} while (Rnd > 0);
 		const auto & Entry = a_Pool.m_Entries[EntryNum];
 		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
@@ -1213,7 +1213,6 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 		case LootTable::ePoolEntryType::LootTable:  // Grants items based on the specified loot table
 		{
 			AString Loot;
-			// Usually this only contains item - but just case
 			try
 			{
 				Loot = std::get<AString>(a_Entry.m_Content);
@@ -1363,7 +1362,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		case LootTable::eConditionType::DamageSourceProperties:
 		{
 			// TODO: 06.09.2020 - 12xx12
-			LOGWARNING("Loot table condition \"AlternativeDamageSourceProperties\" is is not implemented. Assuming true!");
+			LOGWARNING("Loot table condition \"DamageSourceProperties\" is is not implemented. Assuming true!");
 			return true;
 		}
 		case LootTable::eConditionType::EntityProperties:
@@ -1460,7 +1459,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 						return true;
 					}
 					auto & Player = static_cast<cPlayer &>(a_Entity);
-					return ((Player.GetEquippedItem().m_ItemCount >= Min) && (Player.GetEquippedItem().m_ItemCount <= Min));
+					return ((Player.GetEquippedItem().m_ItemCount >= Min) && (Player.GetEquippedItem().m_ItemCount <= Max));
 				};
 				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
 			}
@@ -1472,11 +1471,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			Json::Value DurabilityObject;
 			if (Parameter.isMember("durability"))
 			{
-				CountObject = Parameter["durability"];
+				DurabilityObject = Parameter["durability"];
 			}
 			else if (Parameter.isMember("Durability"))
 			{
-				CountObject = Parameter["Durability"];
+				DurabilityObject = Parameter["Durability"];
 			}
 			if (DurabilityObject.isInt())
 			{
@@ -1494,7 +1493,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			}
 			else if (DurabilityObject.isObject())
 			{
-				int Min = 0, Max = 0;
+				int Min = 0, Max = 10000;  // Max is set so high in case minimum is only given
 				LootTable::MinMaxRange(DurabilityObject, Min, Max);
 				auto Callback = [&] (cEntity & a_Entity)
 				{
@@ -1716,7 +1715,20 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				LootingMultiplier = Parameter["LootingMultiplier"].asFloat();
 			}
 
-			int Looting = 0;  // = a_Killer->GetOffHandEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+			int Looting = 0;
+
+			auto Callback = [&] (cEntity & a_Entity)
+			{
+				if (a_Entity.GetEntityType() != cEntity::etPlayer)
+				{
+					return true;
+				}
+				auto & Player = static_cast<cPlayer &>(a_Entity);
+				Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+				return true;
+			};
+
+			a_World->DoWithEntityByID(a_Killer, Callback);
 
 			if (Parameter.isMember("chance"))
 			{
@@ -2113,6 +2125,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			else
 			{
 				LOGWARNING("Missing limit, dropping function!");
+				break;
 			}
 
 			int Limit = -1;
@@ -2132,6 +2145,63 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			{
 				a_Item.m_ItemCount = Limit;
 			}
+			break;
+		}
+		case LootTable::eFunctionType::LootingEnchant:
+		{
+			int Looting = 0;
+			auto Callback = [&] (cEntity & a_Entity)
+			{
+				if (a_Entity.GetEntityType() != cEntity::etPlayer)
+				{
+					return false;
+				}
+				auto & Player = static_cast<cPlayer &>(a_Entity);
+				Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+				return true;
+			};
+
+			a_World->DoWithEntityByID(a_Killer, Callback);
+
+			Json::Value CountObject;
+			if (a_Function.m_Parameter.isMember("count"))
+			{
+				CountObject = a_Function.m_Parameter["count"];
+			}
+			else if (a_Function.m_Parameter.isMember("Count"))
+			{
+				CountObject = a_Function.m_Parameter["Count"];
+			}
+
+			int Count = 1;
+			if (CountObject.isInt())
+			{
+				Count = CountObject.asInt();
+			}
+			else if (CountObject.isObject())
+			{
+				Count = LootTable::MinMaxRand(CountObject, a_Noise, a_Pos, 5);
+			}
+			int Limit = 0;
+			if (a_Function.m_Parameter.isMember("limit"))
+			{
+				Limit = a_Function.m_Parameter["limit"].asInt();
+			}
+			else if (a_Function.m_Parameter.isMember("Limit"))
+			{
+				Limit = a_Function.m_Parameter["Limit"].asInt();
+			}
+
+			a_Item.m_ItemCount += Looting * Count;
+
+			if (Limit > 0)
+			{
+				if (a_Item.m_ItemCount > Limit)
+				{
+					a_Item.m_ItemCount = Limit;
+				}
+			}
+
 			break;
 		}
 		case LootTable::eFunctionType::SetAttributes:
@@ -2261,16 +2331,12 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 		case LootTable::eFunctionType::SetLore:
 		{
 			// TODO: 06.09.2020 - Add the json string parsing - 12xx12
-			// Note: When adding this you need to move the function to the other ApplyFunction functions.
-			// This is different for each type because the @s tag which might be used reads the entity's name.
 			LOGWARNING("Lore for dropped items is not yet supported, dropping function!");
 			break;
 		}
 		case LootTable::eFunctionType::SetName:
 		{
 			// TODO: 06.09.2020 - Add the json string parsing - 12xx12
-			// Note: When adding this you need to move the function to the other ApplyFunction functions.
-			// This is different for each type because the @s tag which might be used reads the entity's name.
 			LOGWARNING("Naming for dropped items is not yet supported, dropping function!");
 			break;
 		}
@@ -2413,6 +2479,11 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		{
 			break;
 		}
+		case LootTable::eFunctionType::FillPlayerHead:
+		{
+			// TODO:
+			break;
+		}
 		default:
 		{
 			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
@@ -2479,63 +2550,6 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 			{
 				LOGWARNING("Wrong Item provided to assign head type!");
 			}
-			break;
-		}
-		case LootTable::eFunctionType::LootingEnchant:
-		{
-			int Looting = 0;
-			auto Callback = [&] (cEntity & a_Entity)
-			{
-				if (a_Entity.GetEntityType() != cEntity::etPlayer)
-				{
-					return false;
-				}
-				auto & Player = static_cast<cPlayer &>(a_Entity);
-				Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
-				return true;
-			};
-
-			a_World->DoWithEntityByID(a_Killer, Callback);
-
-			Json::Value CountObject;
-			if (a_Function.m_Parameter.isMember("count"))
-			{
-				CountObject = a_Function.m_Parameter["count"];
-			}
-			else if (a_Function.m_Parameter.isMember("Count"))
-			{
-				CountObject = a_Function.m_Parameter["Count"];
-			}
-
-			int Count = 1;
-			if (CountObject.isInt())
-			{
-				Count = CountObject.asInt();
-			}
-			else if (CountObject.isObject())
-			{
-				Count = LootTable::MinMaxRand(CountObject, a_Noise, a_Pos, 5);
-			}
-			int Limit = 0;
-			if (a_Function.m_Parameter.isMember("limit"))
-			{
-				Limit = a_Function.m_Parameter["limit"].asInt();
-			}
-			else if (a_Function.m_Parameter.isMember("Limit"))
-			{
-				Limit = a_Function.m_Parameter["Limit"].asInt();
-			}
-
-			a_Item.m_ItemCount += Looting * Count;
-
-			if (Limit > 0)
-			{
-				if (a_Item.m_ItemCount > Limit)
-				{
-					a_Item.m_ItemCount = Limit;
-				}
-			}
-
 			break;
 		}
 		case LootTable::eFunctionType::None:
