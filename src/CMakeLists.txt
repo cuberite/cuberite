@@ -6,10 +6,7 @@ target_sources(
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
-	BlockState.cpp
 	BlockType.cpp
-	BlockTypePalette.cpp
-	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
@@ -53,7 +50,6 @@ target_sources(
 	MonsterConfig.cpp
 	NetherPortalScanner.cpp
 	OverridesSettingsRepository.cpp
-	PalettedBlockArea.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -76,11 +72,8 @@ target_sources(
 	BlockArea.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
-	BlockState.h
 	BlockTracer.h
 	BlockType.h
-	BlockTypePalette.h
-	BlockTypeRegistry.h
 	BrewingRecipes.h
 	BoundingBox.h
 	BuildInfo.h.cmake
@@ -135,7 +128,6 @@ target_sources(
 	NetherPortalScanner.h
 	OpaqueWorld.h
 	OverridesSettingsRepository.h
-	PalettedBlockArea.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h

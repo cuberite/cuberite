@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "../TestHelpers.h"
-#include "BlockTypePalette.h"
+#include "Bindings/BlockTypePalette.h"
 #include "Stopwatch.h"
 
 

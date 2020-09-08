@@ -1,6 +1,6 @@
 
 #include "Globals.h"
-#include "BlockTypeRegistry.h"
+#include "Bindings/BlockTypeRegistry.h"
 #include "../TestHelpers.h"
 
 
