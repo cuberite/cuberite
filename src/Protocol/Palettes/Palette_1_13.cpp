@@ -1,7 +1,6 @@
 #include "Globals.h"
-
 #include "Palette_1_13.h"
-#include "../../Registries/Blocks.h"
+#include "Registries/BlockStates.h"
 
 namespace Palette_1_13
 {

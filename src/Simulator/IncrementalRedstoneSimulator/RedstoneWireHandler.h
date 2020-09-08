@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "../../Registries/Blocks.h"
+#include "Registries/BlockStates.h"
 
 
 

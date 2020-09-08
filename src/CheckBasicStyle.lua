@@ -44,7 +44,7 @@ local g_IgnoredFiles =
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
 	"Bindings/LuaState_Implementation.cpp",
-	"Registries/Blocks.h"
+	"Registries/BlockStates.h"
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles

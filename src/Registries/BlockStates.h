@@ -1,778 +1,11 @@
 #pragma once
 
 #include "Globals.h"
-#include "../Defines.h"
+#include "BlockState.h"
+#include "Defines.h"
 
 namespace Block
 {
-	enum class Type
-	{
-		AcaciaButton,
-		AcaciaDoor,
-		AcaciaFence,
-		AcaciaFenceGate,
-		AcaciaLeaves,
-		AcaciaLog,
-		AcaciaPlanks,
-		AcaciaPressurePlate,
-		AcaciaSapling,
-		AcaciaSign,
-		AcaciaSlab,
-		AcaciaStairs,
-		AcaciaTrapdoor,
-		AcaciaWallSign,
-		AcaciaWood,
-		ActivatorRail,
-		Air,
-		Allium,
-		AncientDebris,
-		Andesite,
-		AndesiteSlab,
-		AndesiteStairs,
-		AndesiteWall,
-		Anvil,
-		AttachedMelonStem,
-		AttachedPumpkinStem,
-		AzureBluet,
-		Bamboo,
-		BambooSapling,
-		Barrel,
-		Barrier,
-		Basalt,
-		Beacon,
-		Bedrock,
-		BeeNest,
-		Beehive,
-		Beetroots,
-		Bell,
-		BirchButton,
-		BirchDoor,
-		BirchFence,
-		BirchFenceGate,
-		BirchLeaves,
-		BirchLog,
-		BirchPlanks,
-		BirchPressurePlate,
-		BirchSapling,
-		BirchSign,
-		BirchSlab,
-		BirchStairs,
-		BirchTrapdoor,
-		BirchWallSign,
-		BirchWood,
-		BlackBanner,
-		BlackBed,
-		BlackCarpet,
-		BlackConcrete,
-		BlackConcretePowder,
-		BlackGlazedTerracotta,
-		BlackShulkerBox,
-		BlackStainedGlass,
-		BlackStainedGlassPane,
-		BlackTerracotta,
-		BlackWallBanner,
-		BlackWool,
-		Blackstone,
-		BlackstoneSlab,
-		BlackstoneStairs,
-		BlackstoneWall,
-		BlastFurnace,
-		BlueBanner,
-		BlueBed,
-		BlueCarpet,
-		BlueConcrete,
-		BlueConcretePowder,
-		BlueGlazedTerracotta,
-		BlueIce,
-		BlueOrchid,
-		BlueShulkerBox,
-		BlueStainedGlass,
-		BlueStainedGlassPane,
-		BlueTerracotta,
-		BlueWallBanner,
-		BlueWool,
-		BoneBlock,
-		Bookshelf,
-		BrainCoral,
-		BrainCoralBlock,
-		BrainCoralFan,
-		BrainCoralWallFan,
-		BrewingStand,
-		BrickSlab,
-		BrickStairs,
-		BrickWall,
-		Bricks,
-		BrownBanner,
-		BrownBed,
-		BrownCarpet,
-		BrownConcrete,
-		BrownConcretePowder,
-		BrownGlazedTerracotta,
-		BrownMushroom,
-		BrownMushroomBlock,
-		BrownShulkerBox,
-		BrownStainedGlass,
-		BrownStainedGlassPane,
-		BrownTerracotta,
-		BrownWallBanner,
-		BrownWool,
-		BubbleColumn,
-		BubbleCoral,
-		BubbleCoralBlock,
-		BubbleCoralFan,
-		BubbleCoralWallFan,
-		Cactus,
-		Cake,
-		Campfire,
-		Carrots,
-		CartographyTable,
-		CarvedPumpkin,
-		Cauldron,
-		CaveAir,
-		Chain,
-		ChainCommandBlock,
-		Chest,
-		ChippedAnvil,
-		ChiseledNetherBricks,
-		ChiseledPolishedBlackstone,
-		ChiseledQuartzBlock,
-		ChiseledRedSandstone,
-		ChiseledSandstone,
-		ChiseledStoneBricks,
-		ChorusFlower,
-		ChorusPlant,
-		Clay,
-		CoalBlock,
-		CoalOre,
-		CoarseDirt,
-		Cobblestone,
-		CobblestoneSlab,
-		CobblestoneStairs,
-		CobblestoneWall,
-		Cobweb,
-		Cocoa,
-		CommandBlock,
-		Comparator,
-		Composter,
-		Conduit,
-		Cornflower,
-		CrackedNetherBricks,
-		CrackedPolishedBlackstoneBricks,
-		CrackedStoneBricks,
-		CraftingTable,
-		CreeperHead,
-		CreeperWallHead,
-		CrimsonButton,
-		CrimsonDoor,
-		CrimsonFence,
-		CrimsonFenceGate,
-		CrimsonFungus,
-		CrimsonHyphae,
-		CrimsonNylium,
-		CrimsonPlanks,
-		CrimsonPressurePlate,
-		CrimsonRoots,
-		CrimsonSign,
-		CrimsonSlab,
-		CrimsonStairs,
-		CrimsonStem,
-		CrimsonTrapdoor,
-		CrimsonWallSign,
-		CryingObsidian,
-		CutRedSandstone,
-		CutRedSandstoneSlab,
-		CutSandstone,
-		CutSandstoneSlab,
-		CyanBanner,
-		CyanBed,
-		CyanCarpet,
-		CyanConcrete,
-		CyanConcretePowder,
-		CyanGlazedTerracotta,
-		CyanShulkerBox,
-		CyanStainedGlass,
-		CyanStainedGlassPane,
-		CyanTerracotta,
-		CyanWallBanner,
-		CyanWool,
-		DamagedAnvil,
-		Dandelion,
-		DarkOakButton,
-		DarkOakDoor,
-		DarkOakFence,
-		DarkOakFenceGate,
-		DarkOakLeaves,
-		DarkOakLog,
-		DarkOakPlanks,
-		DarkOakPressurePlate,
-		DarkOakSapling,
-		DarkOakSign,
-		DarkOakSlab,
-		DarkOakStairs,
-		DarkOakTrapdoor,
-		DarkOakWallSign,
-		DarkOakWood,
-		DarkPrismarine,
-		DarkPrismarineSlab,
-		DarkPrismarineStairs,
-		DaylightDetector,
-		DeadBrainCoral,
-		DeadBrainCoralBlock,
-		DeadBrainCoralFan,
-		DeadBrainCoralWallFan,
-		DeadBubbleCoral,
-		DeadBubbleCoralBlock,
-		DeadBubbleCoralFan,
-		DeadBubbleCoralWallFan,
-		DeadBush,
-		DeadFireCoral,
-		DeadFireCoralBlock,
-		DeadFireCoralFan,
-		DeadFireCoralWallFan,
-		DeadHornCoral,
-		DeadHornCoralBlock,
-		DeadHornCoralFan,
-		DeadHornCoralWallFan,
-		DeadTubeCoral,
-		DeadTubeCoralBlock,
-		DeadTubeCoralFan,
-		DeadTubeCoralWallFan,
-		DetectorRail,
-		DiamondBlock,
-		DiamondOre,
-		Diorite,
-		DioriteSlab,
-		DioriteStairs,
-		DioriteWall,
-		Dirt,
-		Dispenser,
-		DragonEgg,
-		DragonHead,
-		DragonWallHead,
-		DriedKelpBlock,
-		Dropper,
-		EmeraldBlock,
-		EmeraldOre,
-		EnchantingTable,
-		EndGateway,
-		EndPortal,
-		EndPortalFrame,
-		EndRod,
-		EndStone,
-		EndStoneBrickSlab,
-		EndStoneBrickStairs,
-		EndStoneBrickWall,
-		EndStoneBricks,
-		EnderChest,
-		Farmland,
-		Fern,
-		Fire,
-		FireCoral,
-		FireCoralBlock,
-		FireCoralFan,
-		FireCoralWallFan,
-		FletchingTable,
-		FlowerPot,
-		FrostedIce,
-		Furnace,
-		GildedBlackstone,
-		Glass,
-		GlassPane,
-		Glowstone,
-		GoldBlock,
-		GoldOre,
-		Granite,
-		GraniteSlab,
-		GraniteStairs,
-		GraniteWall,
-		Grass,
-		GrassBlock,
-		GrassPath,
-		Gravel,
-		GrayBanner,
-		GrayBed,
-		GrayCarpet,
-		GrayConcrete,
-		GrayConcretePowder,
-		GrayGlazedTerracotta,
-		GrayShulkerBox,
-		GrayStainedGlass,
-		GrayStainedGlassPane,
-		GrayTerracotta,
-		GrayWallBanner,
-		GrayWool,
-		GreenBanner,
-		GreenBed,
-		GreenCarpet,
-		GreenConcrete,
-		GreenConcretePowder,
-		GreenGlazedTerracotta,
-		GreenShulkerBox,
-		GreenStainedGlass,
-		GreenStainedGlassPane,
-		GreenTerracotta,
-		GreenWallBanner,
-		GreenWool,
-		Grindstone,
-		HayBale,
-		HeavyWeightedPressurePlate,
-		HoneyBlock,
-		HoneycombBlock,
-		Hopper,
-		HornCoral,
-		HornCoralBlock,
-		HornCoralFan,
-		HornCoralWallFan,
-		Ice,
-		InfestedChiseledStoneBricks,
-		InfestedCobblestone,
-		InfestedCrackedStoneBricks,
-		InfestedMossyStoneBricks,
-		InfestedStone,
-		InfestedStoneBricks,
-		IronBars,
-		IronBlock,
-		IronDoor,
-		IronOre,
-		IronTrapdoor,
-		JackOLantern,
-		Jigsaw,
-		Jukebox,
-		JungleButton,
-		JungleDoor,
-		JungleFence,
-		JungleFenceGate,
-		JungleLeaves,
-		JungleLog,
-		JunglePlanks,
-		JunglePressurePlate,
-		JungleSapling,
-		JungleSign,
-		JungleSlab,
-		JungleStairs,
-		JungleTrapdoor,
-		JungleWallSign,
-		JungleWood,
-		Kelp,
-		KelpPlant,
-		Ladder,
-		Lantern,
-		LapisBlock,
-		LapisOre,
-		LargeFern,
-		Lava,
-		Lectern,
-		Lever,
-		LightBlueBanner,
-		LightBlueBed,
-		LightBlueCarpet,
-		LightBlueConcrete,
-		LightBlueConcretePowder,
-		LightBlueGlazedTerracotta,
-		LightBlueShulkerBox,
-		LightBlueStainedGlass,
-		LightBlueStainedGlassPane,
-		LightBlueTerracotta,
-		LightBlueWallBanner,
-		LightBlueWool,
-		LightGrayBanner,
-		LightGrayBed,
-		LightGrayCarpet,
-		LightGrayConcrete,
-		LightGrayConcretePowder,
-		LightGrayGlazedTerracotta,
-		LightGrayShulkerBox,
-		LightGrayStainedGlass,
-		LightGrayStainedGlassPane,
-		LightGrayTerracotta,
-		LightGrayWallBanner,
-		LightGrayWool,
-		LightWeightedPressurePlate,
-		Lilac,
-		LilyOfTheValley,
-		LilyPad,
-		LimeBanner,
-		LimeBed,
-		LimeCarpet,
-		LimeConcrete,
-		LimeConcretePowder,
-		LimeGlazedTerracotta,
-		LimeShulkerBox,
-		LimeStainedGlass,
-		LimeStainedGlassPane,
-		LimeTerracotta,
-		LimeWallBanner,
-		LimeWool,
-		Lodestone,
-		Loom,
-		MagentaBanner,
-		MagentaBed,
-		MagentaCarpet,
-		MagentaConcrete,
-		MagentaConcretePowder,
-		MagentaGlazedTerracotta,
-		MagentaShulkerBox,
-		MagentaStainedGlass,
-		MagentaStainedGlassPane,
-		MagentaTerracotta,
-		MagentaWallBanner,
-		MagentaWool,
-		MagmaBlock,
-		Melon,
-		MelonStem,
-		MossyCobblestone,
-		MossyCobblestoneSlab,
-		MossyCobblestoneStairs,
-		MossyCobblestoneWall,
-		MossyStoneBrickSlab,
-		MossyStoneBrickStairs,
-		MossyStoneBrickWall,
-		MossyStoneBricks,
-		MovingPiston,
-		MushroomStem,
-		Mycelium,
-		NetherBrickFence,
-		NetherBrickSlab,
-		NetherBrickStairs,
-		NetherBrickWall,
-		NetherBricks,
-		NetherGoldOre,
-		NetherPortal,
-		NetherQuartzOre,
-		NetherSprouts,
-		NetherWart,
-		NetherWartBlock,
-		NetheriteBlock,
-		Netherrack,
-		NoteBlock,
-		OakButton,
-		OakDoor,
-		OakFence,
-		OakFenceGate,
-		OakLeaves,
-		OakLog,
-		OakPlanks,
-		OakPressurePlate,
-		OakSapling,
-		OakSign,
-		OakSlab,
-		OakStairs,
-		OakTrapdoor,
-		OakWallSign,
-		OakWood,
-		Observer,
-		Obsidian,
-		OrangeBanner,
-		OrangeBed,
-		OrangeCarpet,
-		OrangeConcrete,
-		OrangeConcretePowder,
-		OrangeGlazedTerracotta,
-		OrangeShulkerBox,
-		OrangeStainedGlass,
-		OrangeStainedGlassPane,
-		OrangeTerracotta,
-		OrangeTulip,
-		OrangeWallBanner,
-		OrangeWool,
-		OxeyeDaisy,
-		PackedIce,
-		Peony,
-		PetrifiedOakSlab,
-		PinkBanner,
-		PinkBed,
-		PinkCarpet,
-		PinkConcrete,
-		PinkConcretePowder,
-		PinkGlazedTerracotta,
-		PinkShulkerBox,
-		PinkStainedGlass,
-		PinkStainedGlassPane,
-		PinkTerracotta,
-		PinkTulip,
-		PinkWallBanner,
-		PinkWool,
-		Piston,
-		PistonHead,
-		PlayerHead,
-		PlayerWallHead,
-		Podzol,
-		PolishedAndesite,
-		PolishedAndesiteSlab,
-		PolishedAndesiteStairs,
-		PolishedBasalt,
-		PolishedBlackstone,
-		PolishedBlackstoneBrickSlab,
-		PolishedBlackstoneBrickStairs,
-		PolishedBlackstoneBrickWall,
-		PolishedBlackstoneBricks,
-		PolishedBlackstoneButton,
-		PolishedBlackstonePressurePlate,
-		PolishedBlackstoneSlab,
-		PolishedBlackstoneStairs,
-		PolishedBlackstoneWall,
-		PolishedDiorite,
-		PolishedDioriteSlab,
-		PolishedDioriteStairs,
-		PolishedGranite,
-		PolishedGraniteSlab,
-		PolishedGraniteStairs,
-		Poppy,
-		Potatoes,
-		PottedAcaciaSapling,
-		PottedAllium,
-		PottedAzureBluet,
-		PottedBamboo,
-		PottedBirchSapling,
-		PottedBlueOrchid,
-		PottedBrownMushroom,
-		PottedCactus,
-		PottedCornflower,
-		PottedCrimsonFungus,
-		PottedCrimsonRoots,
-		PottedDandelion,
-		PottedDarkOakSapling,
-		PottedDeadBush,
-		PottedFern,
-		PottedJungleSapling,
-		PottedLilyOfTheValley,
-		PottedOakSapling,
-		PottedOrangeTulip,
-		PottedOxeyeDaisy,
-		PottedPinkTulip,
-		PottedPoppy,
-		PottedRedMushroom,
-		PottedRedTulip,
-		PottedSpruceSapling,
-		PottedWarpedFungus,
-		PottedWarpedRoots,
-		PottedWhiteTulip,
-		PottedWitherRose,
-		PoweredRail,
-		Prismarine,
-		PrismarineBrickSlab,
-		PrismarineBrickStairs,
-		PrismarineBricks,
-		PrismarineSlab,
-		PrismarineStairs,
-		PrismarineWall,
-		Pumpkin,
-		PumpkinStem,
-		PurpleBanner,
-		PurpleBed,
-		PurpleCarpet,
-		PurpleConcrete,
-		PurpleConcretePowder,
-		PurpleGlazedTerracotta,
-		PurpleShulkerBox,
-		PurpleStainedGlass,
-		PurpleStainedGlassPane,
-		PurpleTerracotta,
-		PurpleWallBanner,
-		PurpleWool,
-		PurpurBlock,
-		PurpurPillar,
-		PurpurSlab,
-		PurpurStairs,
-		QuartzBlock,
-		QuartzBricks,
-		QuartzPillar,
-		QuartzSlab,
-		QuartzStairs,
-		Rail,
-		RedBanner,
-		RedBed,
-		RedCarpet,
-		RedConcrete,
-		RedConcretePowder,
-		RedGlazedTerracotta,
-		RedMushroom,
-		RedMushroomBlock,
-		RedNetherBrickSlab,
-		RedNetherBrickStairs,
-		RedNetherBrickWall,
-		RedNetherBricks,
-		RedSand,
-		RedSandstone,
-		RedSandstoneSlab,
-		RedSandstoneStairs,
-		RedSandstoneWall,
-		RedShulkerBox,
-		RedStainedGlass,
-		RedStainedGlassPane,
-		RedTerracotta,
-		RedTulip,
-		RedWallBanner,
-		RedWool,
-		RedstoneBlock,
-		RedstoneLamp,
-		RedstoneOre,
-		RedstoneTorch,
-		RedstoneWallTorch,
-		RedstoneWire,
-		Repeater,
-		RepeatingCommandBlock,
-		RespawnAnchor,
-		RoseBush,
-		Sand,
-		Sandstone,
-		SandstoneSlab,
-		SandstoneStairs,
-		SandstoneWall,
-		Scaffolding,
-		SeaLantern,
-		SeaPickle,
-		Seagrass,
-		Shroomlight,
-		ShulkerBox,
-		SkeletonSkull,
-		SkeletonWallSkull,
-		SlimeBlock,
-		SmithingTable,
-		Smoker,
-		SmoothQuartz,
-		SmoothQuartzSlab,
-		SmoothQuartzStairs,
-		SmoothRedSandstone,
-		SmoothRedSandstoneSlab,
-		SmoothRedSandstoneStairs,
-		SmoothSandstone,
-		SmoothSandstoneSlab,
-		SmoothSandstoneStairs,
-		SmoothStone,
-		SmoothStoneSlab,
-		Snow,
-		SnowBlock,
-		SoulCampfire,
-		SoulFire,
-		SoulLantern,
-		SoulSand,
-		SoulSoil,
-		SoulTorch,
-		SoulWallTorch,
-		Spawner,
-		Sponge,
-		SpruceButton,
-		SpruceDoor,
-		SpruceFence,
-		SpruceFenceGate,
-		SpruceLeaves,
-		SpruceLog,
-		SprucePlanks,
-		SprucePressurePlate,
-		SpruceSapling,
-		SpruceSign,
-		SpruceSlab,
-		SpruceStairs,
-		SpruceTrapdoor,
-		SpruceWallSign,
-		SpruceWood,
-		StickyPiston,
-		Stone,
-		StoneBrickSlab,
-		StoneBrickStairs,
-		StoneBrickWall,
-		StoneBricks,
-		StoneButton,
-		StonePressurePlate,
-		StoneSlab,
-		StoneStairs,
-		Stonecutter,
-		StrippedAcaciaLog,
-		StrippedAcaciaWood,
-		StrippedBirchLog,
-		StrippedBirchWood,
-		StrippedCrimsonHyphae,
-		StrippedCrimsonStem,
-		StrippedDarkOakLog,
-		StrippedDarkOakWood,
-		StrippedJungleLog,
-		StrippedJungleWood,
-		StrippedOakLog,
-		StrippedOakWood,
-		StrippedSpruceLog,
-		StrippedSpruceWood,
-		StrippedWarpedHyphae,
-		StrippedWarpedStem,
-		StructureBlock,
-		StructureVoid,
-		SugarCane,
-		Sunflower,
-		SweetBerryBush,
-		TNT,
-		TallGrass,
-		TallSeagrass,
-		Target,
-		Terracotta,
-		Torch,
-		TrappedChest,
-		Tripwire,
-		TripwireHook,
-		TubeCoral,
-		TubeCoralBlock,
-		TubeCoralFan,
-		TubeCoralWallFan,
-		TurtleEgg,
-		TwistingVines,
-		TwistingVinesPlant,
-		Vine,
-		VoidAir,
-		WallTorch,
-		WarpedButton,
-		WarpedDoor,
-		WarpedFence,
-		WarpedFenceGate,
-		WarpedFungus,
-		WarpedHyphae,
-		WarpedNylium,
-		WarpedPlanks,
-		WarpedPressurePlate,
-		WarpedRoots,
-		WarpedSign,
-		WarpedSlab,
-		WarpedStairs,
-		WarpedStem,
-		WarpedTrapdoor,
-		WarpedWallSign,
-		WarpedWartBlock,
-		Water,
-		WeepingVines,
-		WeepingVinesPlant,
-		WetSponge,
-		Wheat,
-		WhiteBanner,
-		WhiteBed,
-		WhiteCarpet,
-		WhiteConcrete,
-		WhiteConcretePowder,
-		WhiteGlazedTerracotta,
-		WhiteShulkerBox,
-		WhiteStainedGlass,
-		WhiteStainedGlassPane,
-		WhiteTerracotta,
-		WhiteTulip,
-		WhiteWallBanner,
-		WhiteWool,
-		WitherRose,
-		WitherSkeletonSkull,
-		WitherSkeletonWallSkull,
-		YellowBanner,
-		YellowBed,
-		YellowCarpet,
-		YellowConcrete,
-		YellowConcretePowder,
-		YellowGlazedTerracotta,
-		YellowShulkerBox,
-		YellowStainedGlass,
-		YellowStainedGlassPane,
-		YellowTerracotta,
-		YellowWallBanner,
-		YellowWool,
-		ZombieHead,
-		ZombieWallHead
-	};
-	enum Type Type(short ID);
-	bool Is(short ID, enum Type Type);
 	namespace AcaciaButton
 	{
 		enum class Face
@@ -781,7 +14,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short AcaciaButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState AcaciaButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6442;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6443;
@@ -808,10 +41,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6464;
 			return 6465;
 		}
-		short AcaciaButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState AcaciaButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaDoor
 	{
@@ -825,7 +58,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short AcaciaDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState AcaciaDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 8930;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 8931;
@@ -892,16 +125,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 8992;
 			return 8993;
 		}
-		short AcaciaDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState AcaciaDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaFence
 	{
-		constexpr short AcaciaFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState AcaciaFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 8676;
 			if (East && North && South && !West) return 8677;
@@ -920,15 +153,15 @@ namespace Block
 			if (!East && !North && !South && West) return 8704;
 			return 8705;
 		}
-		short AcaciaFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState AcaciaFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace AcaciaFenceGate
 	{
-		constexpr short AcaciaFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState AcaciaFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 8514;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 8515;
@@ -963,15 +196,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 8544;
 			return 8545;
 		}
-		short AcaciaFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState AcaciaFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaLeaves
 	{
-		constexpr short AcaciaLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState AcaciaLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 201;
 			if (Distance == 1 && !Persistent) return 202;
@@ -988,9 +221,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 213;
 			return 214;
 		}
-		short AcaciaLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState AcaciaLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace AcaciaLog
 	{
@@ -1000,45 +233,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short AcaciaLog(enum Axis Axis)
+		constexpr BlockState AcaciaLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 85;
 			if (Axis == Axis::Y) return 86;
 			return 87;
 		}
-		short AcaciaLog();
-		enum Axis Axis(short ID);
+		BlockState AcaciaLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace AcaciaPlanks
 	{
-		constexpr short AcaciaPlanks()
+		constexpr BlockState AcaciaPlanks()
 		{
 			return 19;
 		}
 	}
 	namespace AcaciaPressurePlate
 	{
-		constexpr short AcaciaPressurePlate(bool Powered)
+		constexpr BlockState AcaciaPressurePlate(bool Powered)
 		{
 			if (Powered) return 3881;
 			return 3882;
 		}
-		short AcaciaPressurePlate();
-		bool Powered(short ID);
+		BlockState AcaciaPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaSapling
 	{
-		constexpr short AcaciaSapling(unsigned char Stage)
+		constexpr BlockState AcaciaSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 29;
 			return 30;
 		}
-		short AcaciaSapling();
-		unsigned char Stage(short ID);
+		BlockState AcaciaSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace AcaciaSign
 	{
-		constexpr short AcaciaSign(unsigned char Rotation)
+		constexpr BlockState AcaciaSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3478;
 			if (Rotation == 1) return 3480;
@@ -1057,8 +290,8 @@ namespace Block
 			if (Rotation == 14) return 3506;
 			return 3508;
 		}
-		short AcaciaSign();
-		unsigned char Rotation(short ID);
+		BlockState AcaciaSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace AcaciaSlab
 	{
@@ -1068,14 +301,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short AcaciaSlab(enum Type Type)
+		constexpr BlockState AcaciaSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8325;
 			if (Type == Type::Bottom) return 8327;
 			return 8329;
 		}
-		short AcaciaSlab();
-		enum Type Type(short ID);
+		BlockState AcaciaSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace AcaciaStairs
 	{
@@ -1092,7 +325,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short AcaciaStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState AcaciaStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 7376;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 7378;
@@ -1135,10 +368,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 7452;
 			return 7454;
 		}
-		short AcaciaStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState AcaciaStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace AcaciaTrapdoor
 	{
@@ -1147,7 +380,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short AcaciaTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState AcaciaTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4368;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4370;
@@ -1182,23 +415,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4428;
 			return 4430;
 		}
-		short AcaciaTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState AcaciaTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaWallSign
 	{
-		constexpr short AcaciaWallSign(eBlockFace Facing)
+		constexpr BlockState AcaciaWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3760;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3762;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3764;
 			return 3766;
 		}
-		short AcaciaWallSign();
-		eBlockFace Facing(short ID);
+		BlockState AcaciaWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AcaciaWood
 	{
@@ -1208,14 +441,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short AcaciaWood(enum Axis Axis)
+		constexpr BlockState AcaciaWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 121;
 			if (Axis == Axis::Y) return 122;
 			return 123;
 		}
-		short AcaciaWood();
-		enum Axis Axis(short ID);
+		BlockState AcaciaWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace ActivatorRail
 	{
@@ -1228,7 +461,7 @@ namespace Block
 			AscendingNorth,
 			AscendingSouth
 		};
-		constexpr short ActivatorRail(bool Powered, enum Shape Shape)
+		constexpr BlockState ActivatorRail(bool Powered, enum Shape Shape)
 		{
 			if (Powered && Shape == Shape::NorthSouth) return 6823;
 			if (Powered && Shape == Shape::EastWest) return 6824;
@@ -1243,34 +476,34 @@ namespace Block
 			if (!Powered && Shape == Shape::AscendingNorth) return 6833;
 			return 6834;
 		}
-		short ActivatorRail();
-		bool Powered(short ID);
-		enum Shape Shape(short ID);
+		BlockState ActivatorRail();
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Air
 	{
-		constexpr short Air()
+		constexpr BlockState Air()
 		{
 			return -0;
 		}
 	}
 	namespace Allium
 	{
-		constexpr short Allium()
+		constexpr BlockState Allium()
 		{
 			return 1415;
 		}
 	}
 	namespace AncientDebris
 	{
-		constexpr short AncientDebris()
+		constexpr BlockState AncientDebris()
 		{
 			return 15827;
 		}
 	}
 	namespace Andesite
 	{
-		constexpr short Andesite()
+		constexpr BlockState Andesite()
 		{
 			return 6;
 		}
@@ -1283,14 +516,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short AndesiteSlab(enum Type Type)
+		constexpr BlockState AndesiteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10844;
 			if (Type == Type::Bottom) return 10846;
 			return 10848;
 		}
-		short AndesiteSlab();
-		enum Type Type(short ID);
+		BlockState AndesiteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace AndesiteStairs
 	{
@@ -1307,7 +540,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short AndesiteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState AndesiteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10470;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10472;
@@ -1350,10 +583,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10546;
 			return 10548;
 		}
-		short AndesiteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState AndesiteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace AndesiteWall
 	{
@@ -1381,7 +614,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short AndesiteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState AndesiteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 13138;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 13139;
@@ -1546,52 +779,52 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 13457;
 			return 13458;
 		}
-		short AndesiteWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState AndesiteWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Anvil
 	{
-		constexpr short Anvil(eBlockFace Facing)
+		constexpr BlockState Anvil(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6610;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6611;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6612;
 			return 6613;
 		}
-		short Anvil();
-		eBlockFace Facing(short ID);
+		BlockState Anvil();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AttachedMelonStem
 	{
-		constexpr short AttachedMelonStem(eBlockFace Facing)
+		constexpr BlockState AttachedMelonStem(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 4768;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 4769;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 4770;
 			return 4771;
 		}
-		short AttachedMelonStem();
-		eBlockFace Facing(short ID);
+		BlockState AttachedMelonStem();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AttachedPumpkinStem
 	{
-		constexpr short AttachedPumpkinStem(eBlockFace Facing)
+		constexpr BlockState AttachedPumpkinStem(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 4764;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 4765;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 4766;
 			return 4767;
 		}
-		short AttachedPumpkinStem();
-		eBlockFace Facing(short ID);
+		BlockState AttachedPumpkinStem();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AzureBluet
 	{
-		constexpr short AzureBluet()
+		constexpr BlockState AzureBluet()
 		{
 			return 1416;
 		}
@@ -1604,7 +837,7 @@ namespace Block
 			Small,
 			Large
 		};
-		constexpr short Bamboo(unsigned char Age, enum Leaves Leaves, unsigned char Stage)
+		constexpr BlockState Bamboo(unsigned char Age, enum Leaves Leaves, unsigned char Stage)
 		{
 			if (Age == 0 && Leaves == Leaves::None && Stage == 0) return 9652;
 			if (Age == 0 && Leaves == Leaves::None && Stage == 1) return 9653;
@@ -1619,21 +852,21 @@ namespace Block
 			if (Age == 1 && Leaves == Leaves::Large && Stage == 0) return 9662;
 			return 9663;
 		}
-		short Bamboo();
-		unsigned char Age(short ID);
-		enum Leaves Leaves(short ID);
-		unsigned char Stage(short ID);
+		BlockState Bamboo();
+		unsigned char Age(BlockState Block);
+		enum Leaves Leaves(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BambooSapling
 	{
-		constexpr short BambooSapling()
+		constexpr BlockState BambooSapling()
 		{
 			return 9651;
 		}
 	}
 	namespace Barrel
 	{
-		constexpr short Barrel(eBlockFace Facing, bool Open)
+		constexpr BlockState Barrel(eBlockFace Facing, bool Open)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Open) return 14791;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Open) return 14792;
@@ -1648,13 +881,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YM && Open) return 14801;
 			return 14802;
 		}
-		short Barrel();
-		eBlockFace Facing(short ID);
-		bool Open(short ID);
+		BlockState Barrel();
+		eBlockFace Facing(BlockState Block);
+		bool Open(BlockState Block);
 	}
 	namespace Barrier
 	{
-		constexpr short Barrier()
+		constexpr BlockState Barrier()
 		{
 			return 7536;
 		}
@@ -1667,32 +900,32 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short Basalt(enum Axis Axis)
+		constexpr BlockState Basalt(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 4002;
 			if (Axis == Axis::Y) return 4003;
 			return 4004;
 		}
-		short Basalt();
-		enum Axis Axis(short ID);
+		BlockState Basalt();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Beacon
 	{
-		constexpr short Beacon()
+		constexpr BlockState Beacon()
 		{
 			return 5656;
 		}
 	}
 	namespace Bedrock
 	{
-		constexpr short Bedrock()
+		constexpr BlockState Bedrock()
 		{
 			return 33;
 		}
 	}
 	namespace BeeNest
 	{
-		constexpr short BeeNest(eBlockFace Facing, unsigned char HoneyLevel)
+		constexpr BlockState BeeNest(eBlockFace Facing, unsigned char HoneyLevel)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HoneyLevel == 0) return 15776;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HoneyLevel == 1) return 15777;
@@ -1719,13 +952,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && HoneyLevel == 4) return 15798;
 			return 15799;
 		}
-		short BeeNest();
-		eBlockFace Facing(short ID);
-		unsigned char HoneyLevel(short ID);
+		BlockState BeeNest();
+		eBlockFace Facing(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beehive
 	{
-		constexpr short Beehive(eBlockFace Facing, unsigned char HoneyLevel)
+		constexpr BlockState Beehive(eBlockFace Facing, unsigned char HoneyLevel)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HoneyLevel == 0) return 15800;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HoneyLevel == 1) return 15801;
@@ -1752,21 +985,21 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && HoneyLevel == 4) return 15822;
 			return 15823;
 		}
-		short Beehive();
-		eBlockFace Facing(short ID);
-		unsigned char HoneyLevel(short ID);
+		BlockState Beehive();
+		eBlockFace Facing(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beetroots
 	{
-		constexpr short Beetroots(unsigned char Age)
+		constexpr BlockState Beetroots(unsigned char Age)
 		{
 			if (Age == 0) return 9219;
 			if (Age == 1) return 9220;
 			if (Age == 2) return 9221;
 			return 9222;
 		}
-		short Beetroots();
-		unsigned char Age(short ID);
+		BlockState Beetroots();
+		unsigned char Age(BlockState Block);
 	}
 	namespace Bell
 	{
@@ -1777,7 +1010,7 @@ namespace Block
 			SingleWall,
 			DoubleWall
 		};
-		constexpr short Bell(enum Attachment Attachment, eBlockFace Facing, bool Powered)
+		constexpr BlockState Bell(enum Attachment Attachment, eBlockFace Facing, bool Powered)
 		{
 			if (Attachment == Attachment::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 14854;
 			if (Attachment == Attachment::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 14855;
@@ -1812,10 +1045,10 @@ namespace Block
 			if (Attachment == Attachment::DoubleWall && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 14884;
 			return 14885;
 		}
-		short Bell();
-		enum Attachment Attachment(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState Bell();
+		enum Attachment Attachment(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchButton
 	{
@@ -1825,7 +1058,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short BirchButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState BirchButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6394;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6395;
@@ -1852,10 +1085,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6416;
 			return 6417;
 		}
-		short BirchButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState BirchButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchDoor
 	{
@@ -1869,7 +1102,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short BirchDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState BirchDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 8802;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 8803;
@@ -1936,16 +1169,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 8864;
 			return 8865;
 		}
-		short BirchDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState BirchDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchFence
 	{
-		constexpr short BirchFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState BirchFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 8612;
 			if (East && North && South && !West) return 8613;
@@ -1964,15 +1197,15 @@ namespace Block
 			if (!East && !North && !South && West) return 8640;
 			return 8641;
 		}
-		short BirchFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState BirchFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BirchFenceGate
 	{
-		constexpr short BirchFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState BirchFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 8450;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 8451;
@@ -2007,15 +1240,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 8480;
 			return 8481;
 		}
-		short BirchFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState BirchFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchLeaves
 	{
-		constexpr short BirchLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState BirchLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 173;
 			if (Distance == 1 && !Persistent) return 174;
@@ -2032,9 +1265,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 185;
 			return 186;
 		}
-		short BirchLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState BirchLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace BirchLog
 	{
@@ -2044,45 +1277,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short BirchLog(enum Axis Axis)
+		constexpr BlockState BirchLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 79;
 			if (Axis == Axis::Y) return 80;
 			return 81;
 		}
-		short BirchLog();
-		enum Axis Axis(short ID);
+		BlockState BirchLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace BirchPlanks
 	{
-		constexpr short BirchPlanks()
+		constexpr BlockState BirchPlanks()
 		{
 			return 17;
 		}
 	}
 	namespace BirchPressurePlate
 	{
-		constexpr short BirchPressurePlate(bool Powered)
+		constexpr BlockState BirchPressurePlate(bool Powered)
 		{
 			if (Powered) return 3877;
 			return 3878;
 		}
-		short BirchPressurePlate();
-		bool Powered(short ID);
+		BlockState BirchPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace BirchSapling
 	{
-		constexpr short BirchSapling(unsigned char Stage)
+		constexpr BlockState BirchSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 25;
 			return 26;
 		}
-		short BirchSapling();
-		unsigned char Stage(short ID);
+		BlockState BirchSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BirchSign
 	{
-		constexpr short BirchSign(unsigned char Rotation)
+		constexpr BlockState BirchSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3446;
 			if (Rotation == 1) return 3448;
@@ -2101,8 +1334,8 @@ namespace Block
 			if (Rotation == 14) return 3474;
 			return 3476;
 		}
-		short BirchSign();
-		unsigned char Rotation(short ID);
+		BlockState BirchSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BirchSlab
 	{
@@ -2112,14 +1345,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short BirchSlab(enum Type Type)
+		constexpr BlockState BirchSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8313;
 			if (Type == Type::Bottom) return 8315;
 			return 8317;
 		}
-		short BirchSlab();
-		enum Type Type(short ID);
+		BlockState BirchSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace BirchStairs
 	{
@@ -2136,7 +1369,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short BirchStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState BirchStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 5485;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 5487;
@@ -2179,10 +1412,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5561;
 			return 5563;
 		}
-		short BirchStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState BirchStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BirchTrapdoor
 	{
@@ -2191,7 +1424,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short BirchTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState BirchTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4240;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4242;
@@ -2226,23 +1459,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4300;
 			return 4302;
 		}
-		short BirchTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState BirchTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchWallSign
 	{
-		constexpr short BirchWallSign(eBlockFace Facing)
+		constexpr BlockState BirchWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3752;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3754;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3756;
 			return 3758;
 		}
-		short BirchWallSign();
-		eBlockFace Facing(short ID);
+		BlockState BirchWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BirchWood
 	{
@@ -2252,18 +1485,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short BirchWood(enum Axis Axis)
+		constexpr BlockState BirchWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 115;
 			if (Axis == Axis::Y) return 116;
 			return 117;
 		}
-		short BirchWood();
-		enum Axis Axis(short ID);
+		BlockState BirchWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace BlackBanner
 	{
-		constexpr short BlackBanner(unsigned char Rotation)
+		constexpr BlockState BlackBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8137;
 			if (Rotation == 1) return 8138;
@@ -2282,8 +1515,8 @@ namespace Block
 			if (Rotation == 14) return 8151;
 			return 8152;
 		}
-		short BlackBanner();
-		unsigned char Rotation(short ID);
+		BlockState BlackBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlackBed
 	{
@@ -2292,7 +1525,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short BlackBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState BlackBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1289;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1290;
@@ -2311,47 +1544,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1303;
 			return 1304;
 		}
-		short BlackBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState BlackBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BlackCarpet
 	{
-		constexpr short BlackCarpet()
+		constexpr BlockState BlackCarpet()
 		{
 			return 7881;
 		}
 	}
 	namespace BlackConcrete
 	{
-		constexpr short BlackConcrete()
+		constexpr BlockState BlackConcrete()
 		{
 			return 9453;
 		}
 	}
 	namespace BlackConcretePowder
 	{
-		constexpr short BlackConcretePowder()
+		constexpr BlockState BlackConcretePowder()
 		{
 			return 9469;
 		}
 	}
 	namespace BlackGlazedTerracotta
 	{
-		constexpr short BlackGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState BlackGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9434;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9435;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9436;
 			return 9437;
 		}
-		short BlackGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState BlackGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackShulkerBox
 	{
-		constexpr short BlackShulkerBox(eBlockFace Facing)
+		constexpr BlockState BlackShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9368;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9369;
@@ -2360,19 +1593,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9372;
 			return 9373;
 		}
-		short BlackShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState BlackShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackStainedGlass
 	{
-		constexpr short BlackStainedGlass()
+		constexpr BlockState BlackStainedGlass()
 		{
 			return 4110;
 		}
 	}
 	namespace BlackStainedGlassPane
 	{
-		constexpr short BlackStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState BlackStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7345;
 			if (East && North && South && !West) return 7346;
@@ -2391,41 +1624,41 @@ namespace Block
 			if (!East && !North && !South && West) return 7373;
 			return 7374;
 		}
-		short BlackStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState BlackStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BlackTerracotta
 	{
-		constexpr short BlackTerracotta()
+		constexpr BlockState BlackTerracotta()
 		{
 			return 6862;
 		}
 	}
 	namespace BlackWallBanner
 	{
-		constexpr short BlackWallBanner(eBlockFace Facing)
+		constexpr BlockState BlackWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8213;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8214;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8215;
 			return 8216;
 		}
-		short BlackWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState BlackWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackWool
 	{
-		constexpr short BlackWool()
+		constexpr BlockState BlackWool()
 		{
 			return 1399;
 		}
 	}
 	namespace Blackstone
 	{
-		constexpr short Blackstone()
+		constexpr BlockState Blackstone()
 		{
 			return 15839;
 		}
@@ -2438,14 +1671,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short BlackstoneSlab(enum Type Type)
+		constexpr BlockState BlackstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 16245;
 			if (Type == Type::Bottom) return 16247;
 			return 16249;
 		}
-		short BlackstoneSlab();
-		enum Type Type(short ID);
+		BlockState BlackstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace BlackstoneStairs
 	{
@@ -2462,7 +1695,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short BlackstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState BlackstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 15841;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 15843;
@@ -2505,10 +1738,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 15917;
 			return 15919;
 		}
-		short BlackstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState BlackstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BlackstoneWall
 	{
@@ -2536,7 +1769,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short BlackstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState BlackstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 15923;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 15924;
@@ -2701,16 +1934,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 16242;
 			return 16243;
 		}
-		short BlackstoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState BlackstoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace BlastFurnace
 	{
-		constexpr short BlastFurnace(eBlockFace Facing, bool Lit)
+		constexpr BlockState BlastFurnace(eBlockFace Facing, bool Lit)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit) return 14811;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Lit) return 14812;
@@ -2721,13 +1954,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Lit) return 14817;
 			return 14818;
 		}
-		short BlastFurnace();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
+		BlockState BlastFurnace();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace BlueBanner
 	{
-		constexpr short BlueBanner(unsigned char Rotation)
+		constexpr BlockState BlueBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8073;
 			if (Rotation == 1) return 8074;
@@ -2746,8 +1979,8 @@ namespace Block
 			if (Rotation == 14) return 8087;
 			return 8088;
 		}
-		short BlueBanner();
-		unsigned char Rotation(short ID);
+		BlockState BlueBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlueBed
 	{
@@ -2756,7 +1989,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short BlueBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState BlueBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1225;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1226;
@@ -2775,61 +2008,61 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1239;
 			return 1240;
 		}
-		short BlueBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState BlueBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BlueCarpet
 	{
-		constexpr short BlueCarpet()
+		constexpr BlockState BlueCarpet()
 		{
 			return 7877;
 		}
 	}
 	namespace BlueConcrete
 	{
-		constexpr short BlueConcrete()
+		constexpr BlockState BlueConcrete()
 		{
 			return 9449;
 		}
 	}
 	namespace BlueConcretePowder
 	{
-		constexpr short BlueConcretePowder()
+		constexpr BlockState BlueConcretePowder()
 		{
 			return 9465;
 		}
 	}
 	namespace BlueGlazedTerracotta
 	{
-		constexpr short BlueGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState BlueGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9418;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9419;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9420;
 			return 9421;
 		}
-		short BlueGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState BlueGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueIce
 	{
-		constexpr short BlueIce()
+		constexpr BlockState BlueIce()
 		{
 			return 9648;
 		}
 	}
 	namespace BlueOrchid
 	{
-		constexpr short BlueOrchid()
+		constexpr BlockState BlueOrchid()
 		{
 			return 1414;
 		}
 	}
 	namespace BlueShulkerBox
 	{
-		constexpr short BlueShulkerBox(eBlockFace Facing)
+		constexpr BlockState BlueShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9344;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9345;
@@ -2838,19 +2071,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9348;
 			return 9349;
 		}
-		short BlueShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState BlueShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueStainedGlass
 	{
-		constexpr short BlueStainedGlass()
+		constexpr BlockState BlueStainedGlass()
 		{
 			return 4106;
 		}
 	}
 	namespace BlueStainedGlassPane
 	{
-		constexpr short BlueStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState BlueStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7217;
 			if (East && North && South && !West) return 7218;
@@ -2869,34 +2102,34 @@ namespace Block
 			if (!East && !North && !South && West) return 7245;
 			return 7246;
 		}
-		short BlueStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState BlueStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BlueTerracotta
 	{
-		constexpr short BlueTerracotta()
+		constexpr BlockState BlueTerracotta()
 		{
 			return 6858;
 		}
 	}
 	namespace BlueWallBanner
 	{
-		constexpr short BlueWallBanner(eBlockFace Facing)
+		constexpr BlockState BlueWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8197;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8198;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8199;
 			return 8200;
 		}
-		short BlueWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState BlueWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueWool
 	{
-		constexpr short BlueWool()
+		constexpr BlockState BlueWool()
 		{
 			return 1395;
 		}
@@ -2909,58 +2142,58 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short BoneBlock(enum Axis Axis)
+		constexpr BlockState BoneBlock(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 9256;
 			if (Axis == Axis::Y) return 9257;
 			return 9258;
 		}
-		short BoneBlock();
-		enum Axis Axis(short ID);
+		BlockState BoneBlock();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Bookshelf
 	{
-		constexpr short Bookshelf()
+		constexpr BlockState Bookshelf()
 		{
 			return 1432;
 		}
 	}
 	namespace BrainCoral
 	{
-		constexpr short BrainCoral()
+		constexpr BlockState BrainCoral()
 		{
 			return 9533;
 		}
 	}
 	namespace BrainCoralBlock
 	{
-		constexpr short BrainCoralBlock()
+		constexpr BlockState BrainCoralBlock()
 		{
 			return 9516;
 		}
 	}
 	namespace BrainCoralFan
 	{
-		constexpr short BrainCoralFan()
+		constexpr BlockState BrainCoralFan()
 		{
 			return 9553;
 		}
 	}
 	namespace BrainCoralWallFan
 	{
-		constexpr short BrainCoralWallFan(eBlockFace Facing)
+		constexpr BlockState BrainCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9609;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9611;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9613;
 			return 9615;
 		}
-		short BrainCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState BrainCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrewingStand
 	{
-		constexpr short BrewingStand(bool HasBottle_0, bool HasBottle_1, bool HasBottle_2)
+		constexpr BlockState BrewingStand(bool HasBottle_0, bool HasBottle_1, bool HasBottle_2)
 		{
 			if (HasBottle_0 && HasBottle_1 && HasBottle_2) return 5133;
 			if (HasBottle_0 && HasBottle_1 && !HasBottle_2) return 5134;
@@ -2971,10 +2204,10 @@ namespace Block
 			if (!HasBottle_0 && !HasBottle_1 && HasBottle_2) return 5139;
 			return 5140;
 		}
-		short BrewingStand();
-		bool HasBottle_0(short ID);
-		bool HasBottle_1(short ID);
-		bool HasBottle_2(short ID);
+		BlockState BrewingStand();
+		bool HasBottle_0(BlockState Block);
+		bool HasBottle_1(BlockState Block);
+		bool HasBottle_2(BlockState Block);
 	}
 	namespace BrickSlab
 	{
@@ -2984,14 +2217,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short BrickSlab(enum Type Type)
+		constexpr BlockState BrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8373;
 			if (Type == Type::Bottom) return 8375;
 			return 8377;
 		}
-		short BrickSlab();
-		enum Type Type(short ID);
+		BlockState BrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace BrickStairs
 	{
@@ -3008,7 +2241,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short BrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState BrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 4853;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 4855;
@@ -3051,10 +2284,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 4929;
 			return 4931;
 		}
-		short BrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState BrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BrickWall
 	{
@@ -3082,7 +2315,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short BrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState BrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 10870;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 10871;
@@ -3247,23 +2480,23 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 11189;
 			return 11190;
 		}
-		short BrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState BrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Bricks
 	{
-		constexpr short Bricks()
+		constexpr BlockState Bricks()
 		{
 			return 1429;
 		}
 	}
 	namespace BrownBanner
 	{
-		constexpr short BrownBanner(unsigned char Rotation)
+		constexpr BlockState BrownBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8089;
 			if (Rotation == 1) return 8090;
@@ -3282,8 +2515,8 @@ namespace Block
 			if (Rotation == 14) return 8103;
 			return 8104;
 		}
-		short BrownBanner();
-		unsigned char Rotation(short ID);
+		BlockState BrownBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BrownBed
 	{
@@ -3292,7 +2525,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short BrownBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState BrownBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1241;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1242;
@@ -3311,54 +2544,54 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1255;
 			return 1256;
 		}
-		short BrownBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState BrownBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BrownCarpet
 	{
-		constexpr short BrownCarpet()
+		constexpr BlockState BrownCarpet()
 		{
 			return 7878;
 		}
 	}
 	namespace BrownConcrete
 	{
-		constexpr short BrownConcrete()
+		constexpr BlockState BrownConcrete()
 		{
 			return 9450;
 		}
 	}
 	namespace BrownConcretePowder
 	{
-		constexpr short BrownConcretePowder()
+		constexpr BlockState BrownConcretePowder()
 		{
 			return 9466;
 		}
 	}
 	namespace BrownGlazedTerracotta
 	{
-		constexpr short BrownGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState BrownGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9422;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9423;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9424;
 			return 9425;
 		}
-		short BrownGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState BrownGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownMushroom
 	{
-		constexpr short BrownMushroom()
+		constexpr BlockState BrownMushroom()
 		{
 			return 1425;
 		}
 	}
 	namespace BrownMushroomBlock
 	{
-		constexpr short BrownMushroomBlock(bool Down, bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState BrownMushroomBlock(bool Down, bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (Down && East && North && South && Up && West) return 4505;
 			if (Down && East && North && South && Up && !West) return 4506;
@@ -3425,17 +2658,17 @@ namespace Block
 			if (!Down && !East && !North && !South && !Up && West) return 4567;
 			return 4568;
 		}
-		short BrownMushroomBlock();
-		bool Down(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState BrownMushroomBlock();
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BrownShulkerBox
 	{
-		constexpr short BrownShulkerBox(eBlockFace Facing)
+		constexpr BlockState BrownShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9350;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9351;
@@ -3444,19 +2677,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9354;
 			return 9355;
 		}
-		short BrownShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState BrownShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownStainedGlass
 	{
-		constexpr short BrownStainedGlass()
+		constexpr BlockState BrownStainedGlass()
 		{
 			return 4107;
 		}
 	}
 	namespace BrownStainedGlassPane
 	{
-		constexpr short BrownStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState BrownStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7249;
 			if (East && North && South && !West) return 7250;
@@ -3475,84 +2708,84 @@ namespace Block
 			if (!East && !North && !South && West) return 7277;
 			return 7278;
 		}
-		short BrownStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState BrownStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BrownTerracotta
 	{
-		constexpr short BrownTerracotta()
+		constexpr BlockState BrownTerracotta()
 		{
 			return 6859;
 		}
 	}
 	namespace BrownWallBanner
 	{
-		constexpr short BrownWallBanner(eBlockFace Facing)
+		constexpr BlockState BrownWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8201;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8202;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8203;
 			return 8204;
 		}
-		short BrownWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState BrownWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownWool
 	{
-		constexpr short BrownWool()
+		constexpr BlockState BrownWool()
 		{
 			return 1396;
 		}
 	}
 	namespace BubbleColumn
 	{
-		constexpr short BubbleColumn(bool Drag)
+		constexpr BlockState BubbleColumn(bool Drag)
 		{
 			if (Drag) return 9667;
 			return 9668;
 		}
-		short BubbleColumn();
-		bool Drag(short ID);
+		BlockState BubbleColumn();
+		bool Drag(BlockState Block);
 	}
 	namespace BubbleCoral
 	{
-		constexpr short BubbleCoral()
+		constexpr BlockState BubbleCoral()
 		{
 			return 9535;
 		}
 	}
 	namespace BubbleCoralBlock
 	{
-		constexpr short BubbleCoralBlock()
+		constexpr BlockState BubbleCoralBlock()
 		{
 			return 9517;
 		}
 	}
 	namespace BubbleCoralFan
 	{
-		constexpr short BubbleCoralFan()
+		constexpr BlockState BubbleCoralFan()
 		{
 			return 9555;
 		}
 	}
 	namespace BubbleCoralWallFan
 	{
-		constexpr short BubbleCoralWallFan(eBlockFace Facing)
+		constexpr BlockState BubbleCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9617;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9619;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9621;
 			return 9623;
 		}
-		short BubbleCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState BubbleCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Cactus
 	{
-		constexpr short Cactus(unsigned char Age)
+		constexpr BlockState Cactus(unsigned char Age)
 		{
 			if (Age == 0) return 3931;
 			if (Age == 1) return 3932;
@@ -3571,12 +2804,12 @@ namespace Block
 			if (Age == 14) return 3945;
 			return 3946;
 		}
-		short Cactus();
-		unsigned char Age(short ID);
+		BlockState Cactus();
+		unsigned char Age(BlockState Block);
 	}
 	namespace Cake
 	{
-		constexpr short Cake(unsigned char Bites)
+		constexpr BlockState Cake(unsigned char Bites)
 		{
 			if (Bites == 0) return 4024;
 			if (Bites == 1) return 4025;
@@ -3586,12 +2819,12 @@ namespace Block
 			if (Bites == 5) return 4029;
 			return 4030;
 		}
-		short Cake();
-		unsigned char Bites(short ID);
+		BlockState Cake();
+		unsigned char Bites(BlockState Block);
 	}
 	namespace Campfire
 	{
-		constexpr short Campfire(eBlockFace Facing, bool Lit, bool SignalFire)
+		constexpr BlockState Campfire(eBlockFace Facing, bool Lit, bool SignalFire)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit && SignalFire) return 14891;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit && !SignalFire) return 14893;
@@ -3610,14 +2843,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Lit && SignalFire) return 14919;
 			return 14921;
 		}
-		short Campfire();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
-		bool SignalFire(short ID);
+		BlockState Campfire();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
+		bool SignalFire(BlockState Block);
 	}
 	namespace Carrots
 	{
-		constexpr short Carrots(unsigned char Age)
+		constexpr BlockState Carrots(unsigned char Age)
 		{
 			if (Age == 0) return 6330;
 			if (Age == 1) return 6331;
@@ -3628,57 +2861,57 @@ namespace Block
 			if (Age == 6) return 6336;
 			return 6337;
 		}
-		short Carrots();
-		unsigned char Age(short ID);
+		BlockState Carrots();
+		unsigned char Age(BlockState Block);
 	}
 	namespace CartographyTable
 	{
-		constexpr short CartographyTable()
+		constexpr BlockState CartographyTable()
 		{
 			return 14819;
 		}
 	}
 	namespace CarvedPumpkin
 	{
-		constexpr short CarvedPumpkin(eBlockFace Facing)
+		constexpr BlockState CarvedPumpkin(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 4016;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 4017;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 4018;
 			return 4019;
 		}
-		short CarvedPumpkin();
-		eBlockFace Facing(short ID);
+		BlockState CarvedPumpkin();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Cauldron
 	{
-		constexpr short Cauldron(unsigned char Level)
+		constexpr BlockState Cauldron(unsigned char Level)
 		{
 			if (Level == 0) return 5141;
 			if (Level == 1) return 5142;
 			if (Level == 2) return 5143;
 			return 5144;
 		}
-		short Cauldron();
-		unsigned char Level(short ID);
+		BlockState Cauldron();
+		unsigned char Level(BlockState Block);
 	}
 	namespace CaveAir
 	{
-		constexpr short CaveAir()
+		constexpr BlockState CaveAir()
 		{
 			return 9666;
 		}
 	}
 	namespace Chain
 	{
-		constexpr short Chain()
+		constexpr BlockState Chain()
 		{
 			return 4730;
 		}
 	}
 	namespace ChainCommandBlock
 	{
-		constexpr short ChainCommandBlock(bool Conditional, eBlockFace Facing)
+		constexpr BlockState ChainCommandBlock(bool Conditional, eBlockFace Facing)
 		{
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_ZM) return 9237;
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_XP) return 9238;
@@ -3693,9 +2926,9 @@ namespace Block
 			if (!Conditional && Facing == eBlockFace::BLOCK_FACE_YP) return 9247;
 			return 9248;
 		}
-		short ChainCommandBlock();
-		bool Conditional(short ID);
-		eBlockFace Facing(short ID);
+		BlockState ChainCommandBlock();
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Chest
 	{
@@ -3705,7 +2938,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short Chest(eBlockFace Facing, enum Type Type)
+		constexpr BlockState Chest(eBlockFace Facing, enum Type Type)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Single) return 2035;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Left) return 2037;
@@ -3720,67 +2953,67 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Type == Type::Left) return 2055;
 			return 2057;
 		}
-		short Chest();
-		eBlockFace Facing(short ID);
-		enum Type Type(short ID);
+		BlockState Chest();
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace ChippedAnvil
 	{
-		constexpr short ChippedAnvil(eBlockFace Facing)
+		constexpr BlockState ChippedAnvil(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6614;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6615;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6616;
 			return 6617;
 		}
-		short ChippedAnvil();
-		eBlockFace Facing(short ID);
+		BlockState ChippedAnvil();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace ChiseledNetherBricks
 	{
-		constexpr short ChiseledNetherBricks()
+		constexpr BlockState ChiseledNetherBricks()
 		{
 			return 17101;
 		}
 	}
 	namespace ChiseledPolishedBlackstone
 	{
-		constexpr short ChiseledPolishedBlackstone()
+		constexpr BlockState ChiseledPolishedBlackstone()
 		{
 			return 16253;
 		}
 	}
 	namespace ChiseledQuartzBlock
 	{
-		constexpr short ChiseledQuartzBlock()
+		constexpr BlockState ChiseledQuartzBlock()
 		{
 			return 6739;
 		}
 	}
 	namespace ChiseledRedSandstone
 	{
-		constexpr short ChiseledRedSandstone()
+		constexpr BlockState ChiseledRedSandstone()
 		{
 			return 8218;
 		}
 	}
 	namespace ChiseledSandstone
 	{
-		constexpr short ChiseledSandstone()
+		constexpr BlockState ChiseledSandstone()
 		{
 			return 247;
 		}
 	}
 	namespace ChiseledStoneBricks
 	{
-		constexpr short ChiseledStoneBricks()
+		constexpr BlockState ChiseledStoneBricks()
 		{
 			return 4498;
 		}
 	}
 	namespace ChorusFlower
 	{
-		constexpr short ChorusFlower(unsigned char Age)
+		constexpr BlockState ChorusFlower(unsigned char Age)
 		{
 			if (Age == 0) return 9128;
 			if (Age == 1) return 9129;
@@ -3789,12 +3022,12 @@ namespace Block
 			if (Age == 4) return 9132;
 			return 9133;
 		}
-		short ChorusFlower();
-		unsigned char Age(short ID);
+		BlockState ChorusFlower();
+		unsigned char Age(BlockState Block);
 	}
 	namespace ChorusPlant
 	{
-		constexpr short ChorusPlant(bool Down, bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState ChorusPlant(bool Down, bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (Down && East && North && South && Up && West) return 9064;
 			if (Down && East && North && South && Up && !West) return 9065;
@@ -3861,45 +3094,45 @@ namespace Block
 			if (!Down && !East && !North && !South && !Up && West) return 9126;
 			return 9127;
 		}
-		short ChorusPlant();
-		bool Down(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState ChorusPlant();
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Clay
 	{
-		constexpr short Clay()
+		constexpr BlockState Clay()
 		{
 			return 3947;
 		}
 	}
 	namespace CoalBlock
 	{
-		constexpr short CoalBlock()
+		constexpr BlockState CoalBlock()
 		{
 			return 7883;
 		}
 	}
 	namespace CoalOre
 	{
-		constexpr short CoalOre()
+		constexpr BlockState CoalOre()
 		{
 			return 71;
 		}
 	}
 	namespace CoarseDirt
 	{
-		constexpr short CoarseDirt()
+		constexpr BlockState CoarseDirt()
 		{
 			return 11;
 		}
 	}
 	namespace Cobblestone
 	{
-		constexpr short Cobblestone()
+		constexpr BlockState Cobblestone()
 		{
 			return 14;
 		}
@@ -3912,14 +3145,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short CobblestoneSlab(enum Type Type)
+		constexpr BlockState CobblestoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8367;
 			if (Type == Type::Bottom) return 8369;
 			return 8371;
 		}
-		short CobblestoneSlab();
-		enum Type Type(short ID);
+		BlockState CobblestoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace CobblestoneStairs
 	{
@@ -3936,7 +3169,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short CobblestoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState CobblestoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 3656;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 3658;
@@ -3979,10 +3212,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 3732;
 			return 3734;
 		}
-		short CobblestoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState CobblestoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace CobblestoneWall
 	{
@@ -4010,7 +3243,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short CobblestoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState CobblestoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 5660;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 5661;
@@ -4175,23 +3408,23 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 5979;
 			return 5980;
 		}
-		short CobblestoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState CobblestoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Cobweb
 	{
-		constexpr short Cobweb()
+		constexpr BlockState Cobweb()
 		{
 			return 1341;
 		}
 	}
 	namespace Cocoa
 	{
-		constexpr short Cocoa(unsigned char Age, eBlockFace Facing)
+		constexpr BlockState Cocoa(unsigned char Age, eBlockFace Facing)
 		{
 			if (Age == 0 && Facing == eBlockFace::BLOCK_FACE_ZM) return 5158;
 			if (Age == 0 && Facing == eBlockFace::BLOCK_FACE_ZP) return 5159;
@@ -4206,13 +3439,13 @@ namespace Block
 			if (Age == 2 && Facing == eBlockFace::BLOCK_FACE_XM) return 5168;
 			return 5169;
 		}
-		short Cocoa();
-		unsigned char Age(short ID);
-		eBlockFace Facing(short ID);
+		BlockState Cocoa();
+		unsigned char Age(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CommandBlock
 	{
-		constexpr short CommandBlock(bool Conditional, eBlockFace Facing)
+		constexpr BlockState CommandBlock(bool Conditional, eBlockFace Facing)
 		{
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_ZM) return 5644;
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_XP) return 5645;
@@ -4227,9 +3460,9 @@ namespace Block
 			if (!Conditional && Facing == eBlockFace::BLOCK_FACE_YP) return 5654;
 			return 5655;
 		}
-		short CommandBlock();
-		bool Conditional(short ID);
-		eBlockFace Facing(short ID);
+		BlockState CommandBlock();
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Comparator
 	{
@@ -4238,7 +3471,7 @@ namespace Block
 			Compare,
 			Subtract
 		};
-		constexpr short Comparator(eBlockFace Facing, enum Mode Mode, bool Powered)
+		constexpr BlockState Comparator(eBlockFace Facing, enum Mode Mode, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Mode == Mode::Compare && Powered) return 6678;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Mode == Mode::Compare && !Powered) return 6679;
@@ -4257,14 +3490,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Mode == Mode::Subtract && Powered) return 6692;
 			return 6693;
 		}
-		short Comparator();
-		eBlockFace Facing(short ID);
-		enum Mode Mode(short ID);
-		bool Powered(short ID);
+		BlockState Comparator();
+		eBlockFace Facing(BlockState Block);
+		enum Mode Mode(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Composter
 	{
-		constexpr short Composter(unsigned char Level)
+		constexpr BlockState Composter(unsigned char Level)
 		{
 			if (Level == 0) return 15751;
 			if (Level == 1) return 15752;
@@ -4276,54 +3509,54 @@ namespace Block
 			if (Level == 7) return 15758;
 			return 15759;
 		}
-		short Composter();
-		unsigned char Level(short ID);
+		BlockState Composter();
+		unsigned char Level(BlockState Block);
 	}
 	namespace Conduit
 	{
-		constexpr short Conduit()
+		constexpr BlockState Conduit()
 		{
 			return 9650;
 		}
 	}
 	namespace Cornflower
 	{
-		constexpr short Cornflower()
+		constexpr BlockState Cornflower()
 		{
 			return 1422;
 		}
 	}
 	namespace CrackedNetherBricks
 	{
-		constexpr short CrackedNetherBricks()
+		constexpr BlockState CrackedNetherBricks()
 		{
 			return 17102;
 		}
 	}
 	namespace CrackedPolishedBlackstoneBricks
 	{
-		constexpr short CrackedPolishedBlackstoneBricks()
+		constexpr BlockState CrackedPolishedBlackstoneBricks()
 		{
 			return 16252;
 		}
 	}
 	namespace CrackedStoneBricks
 	{
-		constexpr short CrackedStoneBricks()
+		constexpr BlockState CrackedStoneBricks()
 		{
 			return 4497;
 		}
 	}
 	namespace CraftingTable
 	{
-		constexpr short CraftingTable()
+		constexpr BlockState CraftingTable()
 		{
 			return 3356;
 		}
 	}
 	namespace CreeperHead
 	{
-		constexpr short CreeperHead(unsigned char Rotation)
+		constexpr BlockState CreeperHead(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6570;
 			if (Rotation == 1) return 6571;
@@ -4342,20 +3575,20 @@ namespace Block
 			if (Rotation == 14) return 6584;
 			return 6585;
 		}
-		short CreeperHead();
-		unsigned char Rotation(short ID);
+		BlockState CreeperHead();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CreeperWallHead
 	{
-		constexpr short CreeperWallHead(eBlockFace Facing)
+		constexpr BlockState CreeperWallHead(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6586;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6587;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6588;
 			return 6589;
 		}
-		short CreeperWallHead();
-		eBlockFace Facing(short ID);
+		BlockState CreeperWallHead();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CrimsonButton
 	{
@@ -4365,7 +3598,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short CrimsonButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState CrimsonButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 15479;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 15480;
@@ -4392,10 +3625,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 15501;
 			return 15502;
 		}
-		short CrimsonButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState CrimsonButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonDoor
 	{
@@ -4409,7 +3642,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short CrimsonDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState CrimsonDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 15527;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 15528;
@@ -4476,16 +3709,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 15589;
 			return 15590;
 		}
-		short CrimsonDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState CrimsonDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonFence
 	{
-		constexpr short CrimsonFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState CrimsonFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 15065;
 			if (East && North && South && !West) return 15066;
@@ -4504,15 +3737,15 @@ namespace Block
 			if (!East && !North && !South && West) return 15093;
 			return 15094;
 		}
-		short CrimsonFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState CrimsonFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace CrimsonFenceGate
 	{
-		constexpr short CrimsonFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState CrimsonFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 15255;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 15256;
@@ -4547,15 +3780,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 15285;
 			return 15286;
 		}
-		short CrimsonFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState CrimsonFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonFungus
 	{
-		constexpr short CrimsonFungus()
+		constexpr BlockState CrimsonFungus()
 		{
 			return 14988;
 		}
@@ -4568,49 +3801,49 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short CrimsonHyphae(enum Axis Axis)
+		constexpr BlockState CrimsonHyphae(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14981;
 			if (Axis == Axis::Y) return 14982;
 			return 14983;
 		}
-		short CrimsonHyphae();
-		enum Axis Axis(short ID);
+		BlockState CrimsonHyphae();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace CrimsonNylium
 	{
-		constexpr short CrimsonNylium()
+		constexpr BlockState CrimsonNylium()
 		{
 			return 14987;
 		}
 	}
 	namespace CrimsonPlanks
 	{
-		constexpr short CrimsonPlanks()
+		constexpr BlockState CrimsonPlanks()
 		{
 			return 15045;
 		}
 	}
 	namespace CrimsonPressurePlate
 	{
-		constexpr short CrimsonPressurePlate(bool Powered)
+		constexpr BlockState CrimsonPressurePlate(bool Powered)
 		{
 			if (Powered) return 15059;
 			return 15060;
 		}
-		short CrimsonPressurePlate();
-		bool Powered(short ID);
+		BlockState CrimsonPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonRoots
 	{
-		constexpr short CrimsonRoots()
+		constexpr BlockState CrimsonRoots()
 		{
 			return 15044;
 		}
 	}
 	namespace CrimsonSign
 	{
-		constexpr short CrimsonSign(unsigned char Rotation)
+		constexpr BlockState CrimsonSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 15656;
 			if (Rotation == 1) return 15658;
@@ -4629,8 +3862,8 @@ namespace Block
 			if (Rotation == 14) return 15684;
 			return 15686;
 		}
-		short CrimsonSign();
-		unsigned char Rotation(short ID);
+		BlockState CrimsonSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CrimsonSlab
 	{
@@ -4640,14 +3873,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short CrimsonSlab(enum Type Type)
+		constexpr BlockState CrimsonSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 15048;
 			if (Type == Type::Bottom) return 15050;
 			return 15052;
 		}
-		short CrimsonSlab();
-		enum Type Type(short ID);
+		BlockState CrimsonSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace CrimsonStairs
 	{
@@ -4664,7 +3897,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short CrimsonStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState CrimsonStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 15320;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 15322;
@@ -4707,10 +3940,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 15396;
 			return 15398;
 		}
-		short CrimsonStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState CrimsonStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace CrimsonStem
 	{
@@ -4720,14 +3953,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short CrimsonStem(enum Axis Axis)
+		constexpr BlockState CrimsonStem(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14975;
 			if (Axis == Axis::Y) return 14976;
 			return 14977;
 		}
-		short CrimsonStem();
-		enum Axis Axis(short ID);
+		BlockState CrimsonStem();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace CrimsonTrapdoor
 	{
@@ -4736,7 +3969,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short CrimsonTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState CrimsonTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 15128;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 15130;
@@ -4771,34 +4004,34 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 15188;
 			return 15190;
 		}
-		short CrimsonTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState CrimsonTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonWallSign
 	{
-		constexpr short CrimsonWallSign(eBlockFace Facing)
+		constexpr BlockState CrimsonWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 15720;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 15722;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 15724;
 			return 15726;
 		}
-		short CrimsonWallSign();
-		eBlockFace Facing(short ID);
+		BlockState CrimsonWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CryingObsidian
 	{
-		constexpr short CryingObsidian()
+		constexpr BlockState CryingObsidian()
 		{
 			return 15828;
 		}
 	}
 	namespace CutRedSandstone
 	{
-		constexpr short CutRedSandstone()
+		constexpr BlockState CutRedSandstone()
 		{
 			return 8219;
 		}
@@ -4811,18 +4044,18 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short CutRedSandstoneSlab(enum Type Type)
+		constexpr BlockState CutRedSandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8403;
 			if (Type == Type::Bottom) return 8405;
 			return 8407;
 		}
-		short CutRedSandstoneSlab();
-		enum Type Type(short ID);
+		BlockState CutRedSandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace CutSandstone
 	{
-		constexpr short CutSandstone()
+		constexpr BlockState CutSandstone()
 		{
 			return 248;
 		}
@@ -4835,18 +4068,18 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short CutSandstoneSlab(enum Type Type)
+		constexpr BlockState CutSandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8355;
 			if (Type == Type::Bottom) return 8357;
 			return 8359;
 		}
-		short CutSandstoneSlab();
-		enum Type Type(short ID);
+		BlockState CutSandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace CyanBanner
 	{
-		constexpr short CyanBanner(unsigned char Rotation)
+		constexpr BlockState CyanBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8041;
 			if (Rotation == 1) return 8042;
@@ -4865,8 +4098,8 @@ namespace Block
 			if (Rotation == 14) return 8055;
 			return 8056;
 		}
-		short CyanBanner();
-		unsigned char Rotation(short ID);
+		BlockState CyanBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CyanBed
 	{
@@ -4875,7 +4108,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short CyanBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState CyanBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1193;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1194;
@@ -4894,47 +4127,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1207;
 			return 1208;
 		}
-		short CyanBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState CyanBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace CyanCarpet
 	{
-		constexpr short CyanCarpet()
+		constexpr BlockState CyanCarpet()
 		{
 			return 7875;
 		}
 	}
 	namespace CyanConcrete
 	{
-		constexpr short CyanConcrete()
+		constexpr BlockState CyanConcrete()
 		{
 			return 9447;
 		}
 	}
 	namespace CyanConcretePowder
 	{
-		constexpr short CyanConcretePowder()
+		constexpr BlockState CyanConcretePowder()
 		{
 			return 9463;
 		}
 	}
 	namespace CyanGlazedTerracotta
 	{
-		constexpr short CyanGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState CyanGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9410;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9411;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9412;
 			return 9413;
 		}
-		short CyanGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState CyanGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanShulkerBox
 	{
-		constexpr short CyanShulkerBox(eBlockFace Facing)
+		constexpr BlockState CyanShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9332;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9333;
@@ -4943,19 +4176,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9336;
 			return 9337;
 		}
-		short CyanShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState CyanShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanStainedGlass
 	{
-		constexpr short CyanStainedGlass()
+		constexpr BlockState CyanStainedGlass()
 		{
 			return 4104;
 		}
 	}
 	namespace CyanStainedGlassPane
 	{
-		constexpr short CyanStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState CyanStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7153;
 			if (East && North && South && !West) return 7154;
@@ -4974,53 +4207,53 @@ namespace Block
 			if (!East && !North && !South && West) return 7181;
 			return 7182;
 		}
-		short CyanStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState CyanStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace CyanTerracotta
 	{
-		constexpr short CyanTerracotta()
+		constexpr BlockState CyanTerracotta()
 		{
 			return 6856;
 		}
 	}
 	namespace CyanWallBanner
 	{
-		constexpr short CyanWallBanner(eBlockFace Facing)
+		constexpr BlockState CyanWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8189;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8190;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8191;
 			return 8192;
 		}
-		short CyanWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState CyanWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanWool
 	{
-		constexpr short CyanWool()
+		constexpr BlockState CyanWool()
 		{
 			return 1393;
 		}
 	}
 	namespace DamagedAnvil
 	{
-		constexpr short DamagedAnvil(eBlockFace Facing)
+		constexpr BlockState DamagedAnvil(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6618;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6619;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6620;
 			return 6621;
 		}
-		short DamagedAnvil();
-		eBlockFace Facing(short ID);
+		BlockState DamagedAnvil();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Dandelion
 	{
-		constexpr short Dandelion()
+		constexpr BlockState Dandelion()
 		{
 			return 1412;
 		}
@@ -5033,7 +4266,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short DarkOakButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState DarkOakButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6466;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6467;
@@ -5060,10 +4293,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6488;
 			return 6489;
 		}
-		short DarkOakButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState DarkOakButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakDoor
 	{
@@ -5077,7 +4310,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short DarkOakDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState DarkOakDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 8994;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 8995;
@@ -5144,16 +4377,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 9056;
 			return 9057;
 		}
-		short DarkOakDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState DarkOakDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakFence
 	{
-		constexpr short DarkOakFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState DarkOakFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 8708;
 			if (East && North && South && !West) return 8709;
@@ -5172,15 +4405,15 @@ namespace Block
 			if (!East && !North && !South && West) return 8736;
 			return 8737;
 		}
-		short DarkOakFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState DarkOakFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace DarkOakFenceGate
 	{
-		constexpr short DarkOakFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState DarkOakFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 8546;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 8547;
@@ -5215,15 +4448,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 8576;
 			return 8577;
 		}
-		short DarkOakFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState DarkOakFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakLeaves
 	{
-		constexpr short DarkOakLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState DarkOakLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 215;
 			if (Distance == 1 && !Persistent) return 216;
@@ -5240,9 +4473,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 227;
 			return 228;
 		}
-		short DarkOakLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState DarkOakLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace DarkOakLog
 	{
@@ -5252,45 +4485,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short DarkOakLog(enum Axis Axis)
+		constexpr BlockState DarkOakLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 88;
 			if (Axis == Axis::Y) return 89;
 			return 90;
 		}
-		short DarkOakLog();
-		enum Axis Axis(short ID);
+		BlockState DarkOakLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace DarkOakPlanks
 	{
-		constexpr short DarkOakPlanks()
+		constexpr BlockState DarkOakPlanks()
 		{
 			return 20;
 		}
 	}
 	namespace DarkOakPressurePlate
 	{
-		constexpr short DarkOakPressurePlate(bool Powered)
+		constexpr BlockState DarkOakPressurePlate(bool Powered)
 		{
 			if (Powered) return 3883;
 			return 3884;
 		}
-		short DarkOakPressurePlate();
-		bool Powered(short ID);
+		BlockState DarkOakPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakSapling
 	{
-		constexpr short DarkOakSapling(unsigned char Stage)
+		constexpr BlockState DarkOakSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 31;
 			return 32;
 		}
-		short DarkOakSapling();
-		unsigned char Stage(short ID);
+		BlockState DarkOakSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace DarkOakSign
 	{
-		constexpr short DarkOakSign(unsigned char Rotation)
+		constexpr BlockState DarkOakSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3542;
 			if (Rotation == 1) return 3544;
@@ -5309,8 +4542,8 @@ namespace Block
 			if (Rotation == 14) return 3570;
 			return 3572;
 		}
-		short DarkOakSign();
-		unsigned char Rotation(short ID);
+		BlockState DarkOakSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace DarkOakSlab
 	{
@@ -5320,14 +4553,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short DarkOakSlab(enum Type Type)
+		constexpr BlockState DarkOakSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8331;
 			if (Type == Type::Bottom) return 8333;
 			return 8335;
 		}
-		short DarkOakSlab();
-		enum Type Type(short ID);
+		BlockState DarkOakSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace DarkOakStairs
 	{
@@ -5344,7 +4577,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short DarkOakStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState DarkOakStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 7456;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 7458;
@@ -5387,10 +4620,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 7532;
 			return 7534;
 		}
-		short DarkOakStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState DarkOakStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DarkOakTrapdoor
 	{
@@ -5399,7 +4632,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short DarkOakTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState DarkOakTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4432;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4434;
@@ -5434,23 +4667,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4492;
 			return 4494;
 		}
-		short DarkOakTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState DarkOakTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakWallSign
 	{
-		constexpr short DarkOakWallSign(eBlockFace Facing)
+		constexpr BlockState DarkOakWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3776;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3778;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3780;
 			return 3782;
 		}
-		short DarkOakWallSign();
-		eBlockFace Facing(short ID);
+		BlockState DarkOakWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DarkOakWood
 	{
@@ -5460,18 +4693,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short DarkOakWood(enum Axis Axis)
+		constexpr BlockState DarkOakWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 124;
 			if (Axis == Axis::Y) return 125;
 			return 126;
 		}
-		short DarkOakWood();
-		enum Axis Axis(short ID);
+		BlockState DarkOakWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace DarkPrismarine
 	{
-		constexpr short DarkPrismarine()
+		constexpr BlockState DarkPrismarine()
 		{
 			return 7603;
 		}
@@ -5484,14 +4717,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short DarkPrismarineSlab(enum Type Type)
+		constexpr BlockState DarkPrismarineSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 7857;
 			if (Type == Type::Bottom) return 7859;
 			return 7861;
 		}
-		short DarkPrismarineSlab();
-		enum Type Type(short ID);
+		BlockState DarkPrismarineSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace DarkPrismarineStairs
 	{
@@ -5508,7 +4741,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short DarkPrismarineStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState DarkPrismarineStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 7765;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 7767;
@@ -5551,14 +4784,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 7841;
 			return 7843;
 		}
-		short DarkPrismarineStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState DarkPrismarineStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DaylightDetector
 	{
-		constexpr short DaylightDetector(bool Inverted, unsigned char Power)
+		constexpr BlockState DaylightDetector(bool Inverted, unsigned char Power)
 		{
 			if (Inverted && Power == 0) return 6694;
 			if (Inverted && Power == 1) return 6695;
@@ -5593,181 +4826,181 @@ namespace Block
 			if (!Inverted && Power == 14) return 6724;
 			return 6725;
 		}
-		short DaylightDetector();
-		bool Inverted(short ID);
-		unsigned char Power(short ID);
+		BlockState DaylightDetector();
+		bool Inverted(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace DeadBrainCoral
 	{
-		constexpr short DeadBrainCoral()
+		constexpr BlockState DeadBrainCoral()
 		{
 			return 9523;
 		}
 	}
 	namespace DeadBrainCoralBlock
 	{
-		constexpr short DeadBrainCoralBlock()
+		constexpr BlockState DeadBrainCoralBlock()
 		{
 			return 9511;
 		}
 	}
 	namespace DeadBrainCoralFan
 	{
-		constexpr short DeadBrainCoralFan()
+		constexpr BlockState DeadBrainCoralFan()
 		{
 			return 9543;
 		}
 	}
 	namespace DeadBrainCoralWallFan
 	{
-		constexpr short DeadBrainCoralWallFan(eBlockFace Facing)
+		constexpr BlockState DeadBrainCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9569;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9571;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9573;
 			return 9575;
 		}
-		short DeadBrainCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState DeadBrainCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadBubbleCoral
 	{
-		constexpr short DeadBubbleCoral()
+		constexpr BlockState DeadBubbleCoral()
 		{
 			return 9525;
 		}
 	}
 	namespace DeadBubbleCoralBlock
 	{
-		constexpr short DeadBubbleCoralBlock()
+		constexpr BlockState DeadBubbleCoralBlock()
 		{
 			return 9512;
 		}
 	}
 	namespace DeadBubbleCoralFan
 	{
-		constexpr short DeadBubbleCoralFan()
+		constexpr BlockState DeadBubbleCoralFan()
 		{
 			return 9545;
 		}
 	}
 	namespace DeadBubbleCoralWallFan
 	{
-		constexpr short DeadBubbleCoralWallFan(eBlockFace Facing)
+		constexpr BlockState DeadBubbleCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9577;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9579;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9581;
 			return 9583;
 		}
-		short DeadBubbleCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState DeadBubbleCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadBush
 	{
-		constexpr short DeadBush()
+		constexpr BlockState DeadBush()
 		{
 			return 1344;
 		}
 	}
 	namespace DeadFireCoral
 	{
-		constexpr short DeadFireCoral()
+		constexpr BlockState DeadFireCoral()
 		{
 			return 9527;
 		}
 	}
 	namespace DeadFireCoralBlock
 	{
-		constexpr short DeadFireCoralBlock()
+		constexpr BlockState DeadFireCoralBlock()
 		{
 			return 9513;
 		}
 	}
 	namespace DeadFireCoralFan
 	{
-		constexpr short DeadFireCoralFan()
+		constexpr BlockState DeadFireCoralFan()
 		{
 			return 9547;
 		}
 	}
 	namespace DeadFireCoralWallFan
 	{
-		constexpr short DeadFireCoralWallFan(eBlockFace Facing)
+		constexpr BlockState DeadFireCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9585;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9587;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9589;
 			return 9591;
 		}
-		short DeadFireCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState DeadFireCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadHornCoral
 	{
-		constexpr short DeadHornCoral()
+		constexpr BlockState DeadHornCoral()
 		{
 			return 9529;
 		}
 	}
 	namespace DeadHornCoralBlock
 	{
-		constexpr short DeadHornCoralBlock()
+		constexpr BlockState DeadHornCoralBlock()
 		{
 			return 9514;
 		}
 	}
 	namespace DeadHornCoralFan
 	{
-		constexpr short DeadHornCoralFan()
+		constexpr BlockState DeadHornCoralFan()
 		{
 			return 9549;
 		}
 	}
 	namespace DeadHornCoralWallFan
 	{
-		constexpr short DeadHornCoralWallFan(eBlockFace Facing)
+		constexpr BlockState DeadHornCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9593;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9595;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9597;
 			return 9599;
 		}
-		short DeadHornCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState DeadHornCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadTubeCoral
 	{
-		constexpr short DeadTubeCoral()
+		constexpr BlockState DeadTubeCoral()
 		{
 			return 9521;
 		}
 	}
 	namespace DeadTubeCoralBlock
 	{
-		constexpr short DeadTubeCoralBlock()
+		constexpr BlockState DeadTubeCoralBlock()
 		{
 			return 9510;
 		}
 	}
 	namespace DeadTubeCoralFan
 	{
-		constexpr short DeadTubeCoralFan()
+		constexpr BlockState DeadTubeCoralFan()
 		{
 			return 9541;
 		}
 	}
 	namespace DeadTubeCoralWallFan
 	{
-		constexpr short DeadTubeCoralWallFan(eBlockFace Facing)
+		constexpr BlockState DeadTubeCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9561;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9563;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9565;
 			return 9567;
 		}
-		short DeadTubeCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState DeadTubeCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DetectorRail
 	{
@@ -5780,7 +5013,7 @@ namespace Block
 			AscendingNorth,
 			AscendingSouth
 		};
-		constexpr short DetectorRail(bool Powered, enum Shape Shape)
+		constexpr BlockState DetectorRail(bool Powered, enum Shape Shape)
 		{
 			if (Powered && Shape == Shape::NorthSouth) return 1317;
 			if (Powered && Shape == Shape::EastWest) return 1318;
@@ -5795,27 +5028,27 @@ namespace Block
 			if (!Powered && Shape == Shape::AscendingNorth) return 1327;
 			return 1328;
 		}
-		short DetectorRail();
-		bool Powered(short ID);
-		enum Shape Shape(short ID);
+		BlockState DetectorRail();
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DiamondBlock
 	{
-		constexpr short DiamondBlock()
+		constexpr BlockState DiamondBlock()
 		{
 			return 3355;
 		}
 	}
 	namespace DiamondOre
 	{
-		constexpr short DiamondOre()
+		constexpr BlockState DiamondOre()
 		{
 			return 3354;
 		}
 	}
 	namespace Diorite
 	{
-		constexpr short Diorite()
+		constexpr BlockState Diorite()
 		{
 			return 4;
 		}
@@ -5828,14 +5061,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short DioriteSlab(enum Type Type)
+		constexpr BlockState DioriteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10862;
 			if (Type == Type::Bottom) return 10864;
 			return 10866;
 		}
-		short DioriteSlab();
-		enum Type Type(short ID);
+		BlockState DioriteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace DioriteStairs
 	{
@@ -5852,7 +5085,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short DioriteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState DioriteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10710;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10712;
@@ -5895,10 +5128,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10786;
 			return 10788;
 		}
-		short DioriteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState DioriteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DioriteWall
 	{
@@ -5926,7 +5159,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short DioriteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState DioriteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 14434;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 14435;
@@ -6091,23 +5324,23 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 14753;
 			return 14754;
 		}
-		short DioriteWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState DioriteWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Dirt
 	{
-		constexpr short Dirt()
+		constexpr BlockState Dirt()
 		{
 			return 10;
 		}
 	}
 	namespace Dispenser
 	{
-		constexpr short Dispenser(eBlockFace Facing, bool Triggered)
+		constexpr BlockState Dispenser(eBlockFace Facing, bool Triggered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Triggered) return 234;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Triggered) return 235;
@@ -6122,20 +5355,20 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YM && Triggered) return 244;
 			return 245;
 		}
-		short Dispenser();
-		eBlockFace Facing(short ID);
-		bool Triggered(short ID);
+		BlockState Dispenser();
+		eBlockFace Facing(BlockState Block);
+		bool Triggered(BlockState Block);
 	}
 	namespace DragonEgg
 	{
-		constexpr short DragonEgg()
+		constexpr BlockState DragonEgg()
 		{
 			return 5155;
 		}
 	}
 	namespace DragonHead
 	{
-		constexpr short DragonHead(unsigned char Rotation)
+		constexpr BlockState DragonHead(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6590;
 			if (Rotation == 1) return 6591;
@@ -6154,31 +5387,31 @@ namespace Block
 			if (Rotation == 14) return 6604;
 			return 6605;
 		}
-		short DragonHead();
-		unsigned char Rotation(short ID);
+		BlockState DragonHead();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace DragonWallHead
 	{
-		constexpr short DragonWallHead(eBlockFace Facing)
+		constexpr BlockState DragonWallHead(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6606;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6607;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6608;
 			return 6609;
 		}
-		short DragonWallHead();
-		eBlockFace Facing(short ID);
+		BlockState DragonWallHead();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DriedKelpBlock
 	{
-		constexpr short DriedKelpBlock()
+		constexpr BlockState DriedKelpBlock()
 		{
 			return 9497;
 		}
 	}
 	namespace Dropper
 	{
-		constexpr short Dropper(eBlockFace Facing, bool Triggered)
+		constexpr BlockState Dropper(eBlockFace Facing, bool Triggered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Triggered) return 6835;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Triggered) return 6836;
@@ -6193,48 +5426,48 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YM && Triggered) return 6845;
 			return 6846;
 		}
-		short Dropper();
-		eBlockFace Facing(short ID);
-		bool Triggered(short ID);
+		BlockState Dropper();
+		eBlockFace Facing(BlockState Block);
+		bool Triggered(BlockState Block);
 	}
 	namespace EmeraldBlock
 	{
-		constexpr short EmeraldBlock()
+		constexpr BlockState EmeraldBlock()
 		{
 			return 5403;
 		}
 	}
 	namespace EmeraldOre
 	{
-		constexpr short EmeraldOre()
+		constexpr BlockState EmeraldOre()
 		{
 			return 5250;
 		}
 	}
 	namespace EnchantingTable
 	{
-		constexpr short EnchantingTable()
+		constexpr BlockState EnchantingTable()
 		{
 			return 5132;
 		}
 	}
 	namespace EndGateway
 	{
-		constexpr short EndGateway()
+		constexpr BlockState EndGateway()
 		{
 			return 9224;
 		}
 	}
 	namespace EndPortal
 	{
-		constexpr short EndPortal()
+		constexpr BlockState EndPortal()
 		{
 			return 5145;
 		}
 	}
 	namespace EndPortalFrame
 	{
-		constexpr short EndPortalFrame(bool Eye, eBlockFace Facing)
+		constexpr BlockState EndPortalFrame(bool Eye, eBlockFace Facing)
 		{
 			if (Eye && Facing == eBlockFace::BLOCK_FACE_ZM) return 5146;
 			if (Eye && Facing == eBlockFace::BLOCK_FACE_ZP) return 5147;
@@ -6245,13 +5478,13 @@ namespace Block
 			if (!Eye && Facing == eBlockFace::BLOCK_FACE_XM) return 5152;
 			return 5153;
 		}
-		short EndPortalFrame();
-		bool Eye(short ID);
-		eBlockFace Facing(short ID);
+		BlockState EndPortalFrame();
+		bool Eye(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace EndRod
 	{
-		constexpr short EndRod(eBlockFace Facing)
+		constexpr BlockState EndRod(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9058;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9059;
@@ -6260,12 +5493,12 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9062;
 			return 9063;
 		}
-		short EndRod();
-		eBlockFace Facing(short ID);
+		BlockState EndRod();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace EndStone
 	{
-		constexpr short EndStone()
+		constexpr BlockState EndStone()
 		{
 			return 5154;
 		}
@@ -6278,14 +5511,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short EndStoneBrickSlab(enum Type Type)
+		constexpr BlockState EndStoneBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10820;
 			if (Type == Type::Bottom) return 10822;
 			return 10824;
 		}
-		short EndStoneBrickSlab();
-		enum Type Type(short ID);
+		BlockState EndStoneBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace EndStoneBrickStairs
 	{
@@ -6302,7 +5535,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short EndStoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState EndStoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10070;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10072;
@@ -6345,10 +5578,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10146;
 			return 10148;
 		}
-		short EndStoneBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState EndStoneBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace EndStoneBrickWall
 	{
@@ -6376,7 +5609,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short EndStoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState EndStoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 14110;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 14111;
@@ -6541,35 +5774,35 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 14429;
 			return 14430;
 		}
-		short EndStoneBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState EndStoneBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace EndStoneBricks
 	{
-		constexpr short EndStoneBricks()
+		constexpr BlockState EndStoneBricks()
 		{
 			return 9218;
 		}
 	}
 	namespace EnderChest
 	{
-		constexpr short EnderChest(eBlockFace Facing)
+		constexpr BlockState EnderChest(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 5252;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 5254;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 5256;
 			return 5258;
 		}
-		short EnderChest();
-		eBlockFace Facing(short ID);
+		BlockState EnderChest();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Farmland
 	{
-		constexpr short Farmland(unsigned char Moisture)
+		constexpr BlockState Farmland(unsigned char Moisture)
 		{
 			if (Moisture == 0) return 3365;
 			if (Moisture == 1) return 3366;
@@ -6580,19 +5813,19 @@ namespace Block
 			if (Moisture == 6) return 3371;
 			return 3372;
 		}
-		short Farmland();
-		unsigned char Moisture(short ID);
+		BlockState Farmland();
+		unsigned char Moisture(BlockState Block);
 	}
 	namespace Fern
 	{
-		constexpr short Fern()
+		constexpr BlockState Fern()
 		{
 			return 1343;
 		}
 	}
 	namespace Fire
 	{
-		constexpr short Fire(unsigned char Age, bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState Fire(unsigned char Age, bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (Age == 0 && East && North && South && Up && West) return 1440;
 			if (Age == 0 && East && North && South && Up && !West) return 1441;
@@ -7107,76 +6340,76 @@ namespace Block
 			if (Age == 15 && !East && !North && !South && !Up && West) return 1950;
 			return 1951;
 		}
-		short Fire();
-		unsigned char Age(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState Fire();
+		unsigned char Age(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace FireCoral
 	{
-		constexpr short FireCoral()
+		constexpr BlockState FireCoral()
 		{
 			return 9537;
 		}
 	}
 	namespace FireCoralBlock
 	{
-		constexpr short FireCoralBlock()
+		constexpr BlockState FireCoralBlock()
 		{
 			return 9518;
 		}
 	}
 	namespace FireCoralFan
 	{
-		constexpr short FireCoralFan()
+		constexpr BlockState FireCoralFan()
 		{
 			return 9557;
 		}
 	}
 	namespace FireCoralWallFan
 	{
-		constexpr short FireCoralWallFan(eBlockFace Facing)
+		constexpr BlockState FireCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9625;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9627;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9629;
 			return 9631;
 		}
-		short FireCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState FireCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace FletchingTable
 	{
-		constexpr short FletchingTable()
+		constexpr BlockState FletchingTable()
 		{
 			return 14820;
 		}
 	}
 	namespace FlowerPot
 	{
-		constexpr short FlowerPot()
+		constexpr BlockState FlowerPot()
 		{
 			return 6305;
 		}
 	}
 	namespace FrostedIce
 	{
-		constexpr short FrostedIce(unsigned char Age)
+		constexpr BlockState FrostedIce(unsigned char Age)
 		{
 			if (Age == 0) return 9249;
 			if (Age == 1) return 9250;
 			if (Age == 2) return 9251;
 			return 9252;
 		}
-		short FrostedIce();
-		unsigned char Age(short ID);
+		BlockState FrostedIce();
+		unsigned char Age(BlockState Block);
 	}
 	namespace Furnace
 	{
-		constexpr short Furnace(eBlockFace Facing, bool Lit)
+		constexpr BlockState Furnace(eBlockFace Facing, bool Lit)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit) return 3373;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Lit) return 3374;
@@ -7187,27 +6420,27 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Lit) return 3379;
 			return 3380;
 		}
-		short Furnace();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
+		BlockState Furnace();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace GildedBlackstone
 	{
-		constexpr short GildedBlackstone()
+		constexpr BlockState GildedBlackstone()
 		{
 			return 16664;
 		}
 	}
 	namespace Glass
 	{
-		constexpr short Glass()
+		constexpr BlockState Glass()
 		{
 			return 231;
 		}
 	}
 	namespace GlassPane
 	{
-		constexpr short GlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState GlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 4733;
 			if (East && North && South && !West) return 4734;
@@ -7226,36 +6459,36 @@ namespace Block
 			if (!East && !North && !South && West) return 4761;
 			return 4762;
 		}
-		short GlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState GlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Glowstone
 	{
-		constexpr short Glowstone()
+		constexpr BlockState Glowstone()
 		{
 			return 4013;
 		}
 	}
 	namespace GoldBlock
 	{
-		constexpr short GoldBlock()
+		constexpr BlockState GoldBlock()
 		{
 			return 1427;
 		}
 	}
 	namespace GoldOre
 	{
-		constexpr short GoldOre()
+		constexpr BlockState GoldOre()
 		{
 			return 69;
 		}
 	}
 	namespace Granite
 	{
-		constexpr short Granite()
+		constexpr BlockState Granite()
 		{
 			return 2;
 		}
@@ -7268,14 +6501,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short GraniteSlab(enum Type Type)
+		constexpr BlockState GraniteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10838;
 			if (Type == Type::Bottom) return 10840;
 			return 10842;
 		}
-		short GraniteSlab();
-		enum Type Type(short ID);
+		BlockState GraniteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace GraniteStairs
 	{
@@ -7292,7 +6525,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short GraniteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState GraniteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10390;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10392;
@@ -7335,10 +6568,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10466;
 			return 10468;
 		}
-		short GraniteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState GraniteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace GraniteWall
 	{
@@ -7366,7 +6599,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short GraniteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState GraniteWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 12166;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 12167;
@@ -7531,47 +6764,47 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 12485;
 			return 12486;
 		}
-		short GraniteWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState GraniteWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Grass
 	{
-		constexpr short Grass()
+		constexpr BlockState Grass()
 		{
 			return 1342;
 		}
 	}
 	namespace GrassBlock
 	{
-		constexpr short GrassBlock(bool Snowy)
+		constexpr BlockState GrassBlock(bool Snowy)
 		{
 			if (Snowy) return 8;
 			return 9;
 		}
-		short GrassBlock();
-		bool Snowy(short ID);
+		BlockState GrassBlock();
+		bool Snowy(BlockState Block);
 	}
 	namespace GrassPath
 	{
-		constexpr short GrassPath()
+		constexpr BlockState GrassPath()
 		{
 			return 9223;
 		}
 	}
 	namespace Gravel
 	{
-		constexpr short Gravel()
+		constexpr BlockState Gravel()
 		{
 			return 68;
 		}
 	}
 	namespace GrayBanner
 	{
-		constexpr short GrayBanner(unsigned char Rotation)
+		constexpr BlockState GrayBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8009;
 			if (Rotation == 1) return 8010;
@@ -7590,8 +6823,8 @@ namespace Block
 			if (Rotation == 14) return 8023;
 			return 8024;
 		}
-		short GrayBanner();
-		unsigned char Rotation(short ID);
+		BlockState GrayBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GrayBed
 	{
@@ -7600,7 +6833,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short GrayBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState GrayBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1161;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1162;
@@ -7619,47 +6852,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1175;
 			return 1176;
 		}
-		short GrayBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState GrayBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace GrayCarpet
 	{
-		constexpr short GrayCarpet()
+		constexpr BlockState GrayCarpet()
 		{
 			return 7873;
 		}
 	}
 	namespace GrayConcrete
 	{
-		constexpr short GrayConcrete()
+		constexpr BlockState GrayConcrete()
 		{
 			return 9445;
 		}
 	}
 	namespace GrayConcretePowder
 	{
-		constexpr short GrayConcretePowder()
+		constexpr BlockState GrayConcretePowder()
 		{
 			return 9461;
 		}
 	}
 	namespace GrayGlazedTerracotta
 	{
-		constexpr short GrayGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState GrayGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9402;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9403;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9404;
 			return 9405;
 		}
-		short GrayGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState GrayGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayShulkerBox
 	{
-		constexpr short GrayShulkerBox(eBlockFace Facing)
+		constexpr BlockState GrayShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9320;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9321;
@@ -7668,19 +6901,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9324;
 			return 9325;
 		}
-		short GrayShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState GrayShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayStainedGlass
 	{
-		constexpr short GrayStainedGlass()
+		constexpr BlockState GrayStainedGlass()
 		{
 			return 4102;
 		}
 	}
 	namespace GrayStainedGlassPane
 	{
-		constexpr short GrayStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState GrayStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7089;
 			if (East && North && South && !West) return 7090;
@@ -7699,41 +6932,41 @@ namespace Block
 			if (!East && !North && !South && West) return 7117;
 			return 7118;
 		}
-		short GrayStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState GrayStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace GrayTerracotta
 	{
-		constexpr short GrayTerracotta()
+		constexpr BlockState GrayTerracotta()
 		{
 			return 6854;
 		}
 	}
 	namespace GrayWallBanner
 	{
-		constexpr short GrayWallBanner(eBlockFace Facing)
+		constexpr BlockState GrayWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8181;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8182;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8183;
 			return 8184;
 		}
-		short GrayWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState GrayWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayWool
 	{
-		constexpr short GrayWool()
+		constexpr BlockState GrayWool()
 		{
 			return 1391;
 		}
 	}
 	namespace GreenBanner
 	{
-		constexpr short GreenBanner(unsigned char Rotation)
+		constexpr BlockState GreenBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8105;
 			if (Rotation == 1) return 8106;
@@ -7752,8 +6985,8 @@ namespace Block
 			if (Rotation == 14) return 8119;
 			return 8120;
 		}
-		short GreenBanner();
-		unsigned char Rotation(short ID);
+		BlockState GreenBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GreenBed
 	{
@@ -7762,7 +6995,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short GreenBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState GreenBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1257;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1258;
@@ -7781,47 +7014,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1271;
 			return 1272;
 		}
-		short GreenBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState GreenBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace GreenCarpet
 	{
-		constexpr short GreenCarpet()
+		constexpr BlockState GreenCarpet()
 		{
 			return 7879;
 		}
 	}
 	namespace GreenConcrete
 	{
-		constexpr short GreenConcrete()
+		constexpr BlockState GreenConcrete()
 		{
 			return 9451;
 		}
 	}
 	namespace GreenConcretePowder
 	{
-		constexpr short GreenConcretePowder()
+		constexpr BlockState GreenConcretePowder()
 		{
 			return 9467;
 		}
 	}
 	namespace GreenGlazedTerracotta
 	{
-		constexpr short GreenGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState GreenGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9426;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9427;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9428;
 			return 9429;
 		}
-		short GreenGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState GreenGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenShulkerBox
 	{
-		constexpr short GreenShulkerBox(eBlockFace Facing)
+		constexpr BlockState GreenShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9356;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9357;
@@ -7830,19 +7063,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9360;
 			return 9361;
 		}
-		short GreenShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState GreenShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenStainedGlass
 	{
-		constexpr short GreenStainedGlass()
+		constexpr BlockState GreenStainedGlass()
 		{
 			return 4108;
 		}
 	}
 	namespace GreenStainedGlassPane
 	{
-		constexpr short GreenStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState GreenStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7281;
 			if (East && North && South && !West) return 7282;
@@ -7861,34 +7094,34 @@ namespace Block
 			if (!East && !North && !South && West) return 7309;
 			return 7310;
 		}
-		short GreenStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState GreenStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace GreenTerracotta
 	{
-		constexpr short GreenTerracotta()
+		constexpr BlockState GreenTerracotta()
 		{
 			return 6860;
 		}
 	}
 	namespace GreenWallBanner
 	{
-		constexpr short GreenWallBanner(eBlockFace Facing)
+		constexpr BlockState GreenWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8205;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8206;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8207;
 			return 8208;
 		}
-		short GreenWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState GreenWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenWool
 	{
-		constexpr short GreenWool()
+		constexpr BlockState GreenWool()
 		{
 			return 1397;
 		}
@@ -7901,7 +7134,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short Grindstone(enum Face Face, eBlockFace Facing)
+		constexpr BlockState Grindstone(enum Face Face, eBlockFace Facing)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM) return 14821;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZP) return 14822;
@@ -7916,9 +7149,9 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XM) return 14831;
 			return 14832;
 		}
-		short Grindstone();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
+		BlockState Grindstone();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace HayBale
 	{
@@ -7928,18 +7161,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short HayBale(enum Axis Axis)
+		constexpr BlockState HayBale(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 7863;
 			if (Axis == Axis::Y) return 7864;
 			return 7865;
 		}
-		short HayBale();
-		enum Axis Axis(short ID);
+		BlockState HayBale();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace HeavyWeightedPressurePlate
 	{
-		constexpr short HeavyWeightedPressurePlate(unsigned char Power)
+		constexpr BlockState HeavyWeightedPressurePlate(unsigned char Power)
 		{
 			if (Power == 0) return 6662;
 			if (Power == 1) return 6663;
@@ -7958,26 +7191,26 @@ namespace Block
 			if (Power == 14) return 6676;
 			return 6677;
 		}
-		short HeavyWeightedPressurePlate();
-		unsigned char Power(short ID);
+		BlockState HeavyWeightedPressurePlate();
+		unsigned char Power(BlockState Block);
 	}
 	namespace HoneyBlock
 	{
-		constexpr short HoneyBlock()
+		constexpr BlockState HoneyBlock()
 		{
 			return 15824;
 		}
 	}
 	namespace HoneycombBlock
 	{
-		constexpr short HoneycombBlock()
+		constexpr BlockState HoneycombBlock()
 		{
 			return 15825;
 		}
 	}
 	namespace Hopper
 	{
-		constexpr short Hopper(bool Enabled, eBlockFace Facing)
+		constexpr BlockState Hopper(bool Enabled, eBlockFace Facing)
 		{
 			if (Enabled && Facing == eBlockFace::BLOCK_FACE_YM) return 6728;
 			if (Enabled && Facing == eBlockFace::BLOCK_FACE_ZM) return 6729;
@@ -7990,95 +7223,95 @@ namespace Block
 			if (!Enabled && Facing == eBlockFace::BLOCK_FACE_XM) return 6736;
 			return 6737;
 		}
-		short Hopper();
-		bool Enabled(short ID);
-		eBlockFace Facing(short ID);
+		BlockState Hopper();
+		bool Enabled(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace HornCoral
 	{
-		constexpr short HornCoral()
+		constexpr BlockState HornCoral()
 		{
 			return 9539;
 		}
 	}
 	namespace HornCoralBlock
 	{
-		constexpr short HornCoralBlock()
+		constexpr BlockState HornCoralBlock()
 		{
 			return 9519;
 		}
 	}
 	namespace HornCoralFan
 	{
-		constexpr short HornCoralFan()
+		constexpr BlockState HornCoralFan()
 		{
 			return 9559;
 		}
 	}
 	namespace HornCoralWallFan
 	{
-		constexpr short HornCoralWallFan(eBlockFace Facing)
+		constexpr BlockState HornCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9633;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9635;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9637;
 			return 9639;
 		}
-		short HornCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState HornCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Ice
 	{
-		constexpr short Ice()
+		constexpr BlockState Ice()
 		{
 			return 3929;
 		}
 	}
 	namespace InfestedChiseledStoneBricks
 	{
-		constexpr short InfestedChiseledStoneBricks()
+		constexpr BlockState InfestedChiseledStoneBricks()
 		{
 			return 4504;
 		}
 	}
 	namespace InfestedCobblestone
 	{
-		constexpr short InfestedCobblestone()
+		constexpr BlockState InfestedCobblestone()
 		{
 			return 4500;
 		}
 	}
 	namespace InfestedCrackedStoneBricks
 	{
-		constexpr short InfestedCrackedStoneBricks()
+		constexpr BlockState InfestedCrackedStoneBricks()
 		{
 			return 4503;
 		}
 	}
 	namespace InfestedMossyStoneBricks
 	{
-		constexpr short InfestedMossyStoneBricks()
+		constexpr BlockState InfestedMossyStoneBricks()
 		{
 			return 4502;
 		}
 	}
 	namespace InfestedStone
 	{
-		constexpr short InfestedStone()
+		constexpr BlockState InfestedStone()
 		{
 			return 4499;
 		}
 	}
 	namespace InfestedStoneBricks
 	{
-		constexpr short InfestedStoneBricks()
+		constexpr BlockState InfestedStoneBricks()
 		{
 			return 4501;
 		}
 	}
 	namespace IronBars
 	{
-		constexpr short IronBars(bool East, bool North, bool South, bool West)
+		constexpr BlockState IronBars(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 4699;
 			if (East && North && South && !West) return 4700;
@@ -8097,15 +7330,15 @@ namespace Block
 			if (!East && !North && !South && West) return 4727;
 			return 4728;
 		}
-		short IronBars();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState IronBars();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace IronBlock
 	{
-		constexpr short IronBlock()
+		constexpr BlockState IronBlock()
 		{
 			return 1428;
 		}
@@ -8122,7 +7355,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short IronDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState IronDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 3809;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 3810;
@@ -8189,16 +7422,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 3871;
 			return 3872;
 		}
-		short IronDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState IronDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace IronOre
 	{
-		constexpr short IronOre()
+		constexpr BlockState IronOre()
 		{
 			return 70;
 		}
@@ -8210,7 +7443,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short IronTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState IronTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 7538;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 7540;
@@ -8245,23 +7478,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 7598;
 			return 7600;
 		}
-		short IronTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState IronTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JackOLantern
 	{
-		constexpr short JackOLantern(eBlockFace Facing)
+		constexpr BlockState JackOLantern(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 4020;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 4021;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 4022;
 			return 4023;
 		}
-		short JackOLantern();
-		eBlockFace Facing(short ID);
+		BlockState JackOLantern();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Jigsaw
 	{
@@ -8280,7 +7513,7 @@ namespace Block
 			NorthUp,
 			SouthUp
 		};
-		constexpr short Jigsaw(enum Orientation Orientation)
+		constexpr BlockState Jigsaw(enum Orientation Orientation)
 		{
 			if (Orientation == Orientation::DownEast) return 15739;
 			if (Orientation == Orientation::DownNorth) return 15740;
@@ -8295,18 +7528,18 @@ namespace Block
 			if (Orientation == Orientation::NorthUp) return 15749;
 			return 15750;
 		}
-		short Jigsaw();
-		enum Orientation Orientation(short ID);
+		BlockState Jigsaw();
+		enum Orientation Orientation(BlockState Block);
 	}
 	namespace Jukebox
 	{
-		constexpr short Jukebox(bool HasRecord)
+		constexpr BlockState Jukebox(bool HasRecord)
 		{
 			if (HasRecord) return 3964;
 			return 3965;
 		}
-		short Jukebox();
-		bool HasRecord(short ID);
+		BlockState Jukebox();
+		bool HasRecord(BlockState Block);
 	}
 	namespace JungleButton
 	{
@@ -8316,7 +7549,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short JungleButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState JungleButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6418;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6419;
@@ -8343,10 +7576,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6440;
 			return 6441;
 		}
-		short JungleButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState JungleButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleDoor
 	{
@@ -8360,7 +7593,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short JungleDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState JungleDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 8866;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 8867;
@@ -8427,16 +7660,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 8928;
 			return 8929;
 		}
-		short JungleDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState JungleDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleFence
 	{
-		constexpr short JungleFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState JungleFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 8644;
 			if (East && North && South && !West) return 8645;
@@ -8455,15 +7688,15 @@ namespace Block
 			if (!East && !North && !South && West) return 8672;
 			return 8673;
 		}
-		short JungleFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState JungleFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace JungleFenceGate
 	{
-		constexpr short JungleFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState JungleFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 8482;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 8483;
@@ -8498,15 +7731,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 8512;
 			return 8513;
 		}
-		short JungleFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState JungleFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleLeaves
 	{
-		constexpr short JungleLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState JungleLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 187;
 			if (Distance == 1 && !Persistent) return 188;
@@ -8523,9 +7756,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 199;
 			return 200;
 		}
-		short JungleLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState JungleLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace JungleLog
 	{
@@ -8535,45 +7768,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short JungleLog(enum Axis Axis)
+		constexpr BlockState JungleLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 82;
 			if (Axis == Axis::Y) return 83;
 			return 84;
 		}
-		short JungleLog();
-		enum Axis Axis(short ID);
+		BlockState JungleLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace JunglePlanks
 	{
-		constexpr short JunglePlanks()
+		constexpr BlockState JunglePlanks()
 		{
 			return 18;
 		}
 	}
 	namespace JunglePressurePlate
 	{
-		constexpr short JunglePressurePlate(bool Powered)
+		constexpr BlockState JunglePressurePlate(bool Powered)
 		{
 			if (Powered) return 3879;
 			return 3880;
 		}
-		short JunglePressurePlate();
-		bool Powered(short ID);
+		BlockState JunglePressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace JungleSapling
 	{
-		constexpr short JungleSapling(unsigned char Stage)
+		constexpr BlockState JungleSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 27;
 			return 28;
 		}
-		short JungleSapling();
-		unsigned char Stage(short ID);
+		BlockState JungleSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace JungleSign
 	{
-		constexpr short JungleSign(unsigned char Rotation)
+		constexpr BlockState JungleSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3510;
 			if (Rotation == 1) return 3512;
@@ -8592,8 +7825,8 @@ namespace Block
 			if (Rotation == 14) return 3538;
 			return 3540;
 		}
-		short JungleSign();
-		unsigned char Rotation(short ID);
+		BlockState JungleSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace JungleSlab
 	{
@@ -8603,14 +7836,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short JungleSlab(enum Type Type)
+		constexpr BlockState JungleSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8319;
 			if (Type == Type::Bottom) return 8321;
 			return 8323;
 		}
-		short JungleSlab();
-		enum Type Type(short ID);
+		BlockState JungleSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace JungleStairs
 	{
@@ -8627,7 +7860,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short JungleStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState JungleStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 5565;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 5567;
@@ -8670,10 +7903,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5641;
 			return 5643;
 		}
-		short JungleStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState JungleStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace JungleTrapdoor
 	{
@@ -8682,7 +7915,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short JungleTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState JungleTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4304;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4306;
@@ -8717,23 +7950,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4364;
 			return 4366;
 		}
-		short JungleTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState JungleTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleWallSign
 	{
-		constexpr short JungleWallSign(eBlockFace Facing)
+		constexpr BlockState JungleWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3768;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3770;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3772;
 			return 3774;
 		}
-		short JungleWallSign();
-		eBlockFace Facing(short ID);
+		BlockState JungleWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace JungleWood
 	{
@@ -8743,18 +7976,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short JungleWood(enum Axis Axis)
+		constexpr BlockState JungleWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 118;
 			if (Axis == Axis::Y) return 119;
 			return 120;
 		}
-		short JungleWood();
-		enum Axis Axis(short ID);
+		BlockState JungleWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Kelp
 	{
-		constexpr short Kelp(unsigned char Age)
+		constexpr BlockState Kelp(unsigned char Age)
 		{
 			if (Age == 0) return 9470;
 			if (Age == 1) return 9471;
@@ -8783,48 +8016,48 @@ namespace Block
 			if (Age == 24) return 9494;
 			return 9495;
 		}
-		short Kelp();
-		unsigned char Age(short ID);
+		BlockState Kelp();
+		unsigned char Age(BlockState Block);
 	}
 	namespace KelpPlant
 	{
-		constexpr short KelpPlant()
+		constexpr BlockState KelpPlant()
 		{
 			return 9496;
 		}
 	}
 	namespace Ladder
 	{
-		constexpr short Ladder(eBlockFace Facing)
+		constexpr BlockState Ladder(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3638;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3640;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3642;
 			return 3644;
 		}
-		short Ladder();
-		eBlockFace Facing(short ID);
+		BlockState Ladder();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Lantern
 	{
-		constexpr short Lantern(bool Hanging)
+		constexpr BlockState Lantern(bool Hanging)
 		{
 			if (Hanging) return 14886;
 			return 14887;
 		}
-		short Lantern();
-		bool Hanging(short ID);
+		BlockState Lantern();
+		bool Hanging(BlockState Block);
 	}
 	namespace LapisBlock
 	{
-		constexpr short LapisBlock()
+		constexpr BlockState LapisBlock()
 		{
 			return 233;
 		}
 	}
 	namespace LapisOre
 	{
-		constexpr short LapisOre()
+		constexpr BlockState LapisOre()
 		{
 			return 232;
 		}
@@ -8836,17 +8069,17 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short LargeFern(enum Half Half)
+		constexpr BlockState LargeFern(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7895;
 			return 7896;
 		}
-		short LargeFern();
-		enum Half Half(short ID);
+		BlockState LargeFern();
+		enum Half Half(BlockState Block);
 	}
 	namespace Lava
 	{
-		constexpr short Lava(unsigned char Level)
+		constexpr BlockState Lava(unsigned char Level)
 		{
 			if (Level == 0) return 50;
 			if (Level == 1) return 51;
@@ -8865,12 +8098,12 @@ namespace Block
 			if (Level == 14) return 64;
 			return 65;
 		}
-		short Lava();
-		unsigned char Level(short ID);
+		BlockState Lava();
+		unsigned char Level(BlockState Block);
 	}
 	namespace Lectern
 	{
-		constexpr short Lectern(eBlockFace Facing, bool HasBook, bool Powered)
+		constexpr BlockState Lectern(eBlockFace Facing, bool HasBook, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HasBook && Powered) return 14833;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && HasBook && !Powered) return 14834;
@@ -8889,10 +8122,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !HasBook && Powered) return 14847;
 			return 14848;
 		}
-		short Lectern();
-		eBlockFace Facing(short ID);
-		bool HasBook(short ID);
-		bool Powered(short ID);
+		BlockState Lectern();
+		eBlockFace Facing(BlockState Block);
+		bool HasBook(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Lever
 	{
@@ -8902,7 +8135,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short Lever(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState Lever(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 3783;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 3784;
@@ -8929,14 +8162,14 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 3805;
 			return 3806;
 		}
-		short Lever();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState Lever();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace LightBlueBanner
 	{
-		constexpr short LightBlueBanner(unsigned char Rotation)
+		constexpr BlockState LightBlueBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7945;
 			if (Rotation == 1) return 7946;
@@ -8955,8 +8188,8 @@ namespace Block
 			if (Rotation == 14) return 7959;
 			return 7960;
 		}
-		short LightBlueBanner();
-		unsigned char Rotation(short ID);
+		BlockState LightBlueBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightBlueBed
 	{
@@ -8965,7 +8198,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short LightBlueBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState LightBlueBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1097;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1098;
@@ -8984,47 +8217,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1111;
 			return 1112;
 		}
-		short LightBlueBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState LightBlueBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LightBlueCarpet
 	{
-		constexpr short LightBlueCarpet()
+		constexpr BlockState LightBlueCarpet()
 		{
 			return 7869;
 		}
 	}
 	namespace LightBlueConcrete
 	{
-		constexpr short LightBlueConcrete()
+		constexpr BlockState LightBlueConcrete()
 		{
 			return 9441;
 		}
 	}
 	namespace LightBlueConcretePowder
 	{
-		constexpr short LightBlueConcretePowder()
+		constexpr BlockState LightBlueConcretePowder()
 		{
 			return 9457;
 		}
 	}
 	namespace LightBlueGlazedTerracotta
 	{
-		constexpr short LightBlueGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState LightBlueGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9386;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9387;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9388;
 			return 9389;
 		}
-		short LightBlueGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState LightBlueGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueShulkerBox
 	{
-		constexpr short LightBlueShulkerBox(eBlockFace Facing)
+		constexpr BlockState LightBlueShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9296;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9297;
@@ -9033,19 +8266,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9300;
 			return 9301;
 		}
-		short LightBlueShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState LightBlueShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueStainedGlass
 	{
-		constexpr short LightBlueStainedGlass()
+		constexpr BlockState LightBlueStainedGlass()
 		{
 			return 4098;
 		}
 	}
 	namespace LightBlueStainedGlassPane
 	{
-		constexpr short LightBlueStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState LightBlueStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 6961;
 			if (East && North && South && !West) return 6962;
@@ -9064,41 +8297,41 @@ namespace Block
 			if (!East && !North && !South && West) return 6989;
 			return 6990;
 		}
-		short LightBlueStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState LightBlueStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LightBlueTerracotta
 	{
-		constexpr short LightBlueTerracotta()
+		constexpr BlockState LightBlueTerracotta()
 		{
 			return 6850;
 		}
 	}
 	namespace LightBlueWallBanner
 	{
-		constexpr short LightBlueWallBanner(eBlockFace Facing)
+		constexpr BlockState LightBlueWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8165;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8166;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8167;
 			return 8168;
 		}
-		short LightBlueWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState LightBlueWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueWool
 	{
-		constexpr short LightBlueWool()
+		constexpr BlockState LightBlueWool()
 		{
 			return 1387;
 		}
 	}
 	namespace LightGrayBanner
 	{
-		constexpr short LightGrayBanner(unsigned char Rotation)
+		constexpr BlockState LightGrayBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8025;
 			if (Rotation == 1) return 8026;
@@ -9117,8 +8350,8 @@ namespace Block
 			if (Rotation == 14) return 8039;
 			return 8040;
 		}
-		short LightGrayBanner();
-		unsigned char Rotation(short ID);
+		BlockState LightGrayBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightGrayBed
 	{
@@ -9127,7 +8360,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short LightGrayBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState LightGrayBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1177;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1178;
@@ -9146,47 +8379,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1191;
 			return 1192;
 		}
-		short LightGrayBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState LightGrayBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LightGrayCarpet
 	{
-		constexpr short LightGrayCarpet()
+		constexpr BlockState LightGrayCarpet()
 		{
 			return 7874;
 		}
 	}
 	namespace LightGrayConcrete
 	{
-		constexpr short LightGrayConcrete()
+		constexpr BlockState LightGrayConcrete()
 		{
 			return 9446;
 		}
 	}
 	namespace LightGrayConcretePowder
 	{
-		constexpr short LightGrayConcretePowder()
+		constexpr BlockState LightGrayConcretePowder()
 		{
 			return 9462;
 		}
 	}
 	namespace LightGrayGlazedTerracotta
 	{
-		constexpr short LightGrayGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState LightGrayGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9406;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9407;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9408;
 			return 9409;
 		}
-		short LightGrayGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState LightGrayGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayShulkerBox
 	{
-		constexpr short LightGrayShulkerBox(eBlockFace Facing)
+		constexpr BlockState LightGrayShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9326;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9327;
@@ -9195,19 +8428,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9330;
 			return 9331;
 		}
-		short LightGrayShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState LightGrayShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayStainedGlass
 	{
-		constexpr short LightGrayStainedGlass()
+		constexpr BlockState LightGrayStainedGlass()
 		{
 			return 4103;
 		}
 	}
 	namespace LightGrayStainedGlassPane
 	{
-		constexpr short LightGrayStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState LightGrayStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7121;
 			if (East && North && South && !West) return 7122;
@@ -9226,41 +8459,41 @@ namespace Block
 			if (!East && !North && !South && West) return 7149;
 			return 7150;
 		}
-		short LightGrayStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState LightGrayStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LightGrayTerracotta
 	{
-		constexpr short LightGrayTerracotta()
+		constexpr BlockState LightGrayTerracotta()
 		{
 			return 6855;
 		}
 	}
 	namespace LightGrayWallBanner
 	{
-		constexpr short LightGrayWallBanner(eBlockFace Facing)
+		constexpr BlockState LightGrayWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8185;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8186;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8187;
 			return 8188;
 		}
-		short LightGrayWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState LightGrayWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayWool
 	{
-		constexpr short LightGrayWool()
+		constexpr BlockState LightGrayWool()
 		{
 			return 1392;
 		}
 	}
 	namespace LightWeightedPressurePlate
 	{
-		constexpr short LightWeightedPressurePlate(unsigned char Power)
+		constexpr BlockState LightWeightedPressurePlate(unsigned char Power)
 		{
 			if (Power == 0) return 6646;
 			if (Power == 1) return 6647;
@@ -9279,8 +8512,8 @@ namespace Block
 			if (Power == 14) return 6660;
 			return 6661;
 		}
-		short LightWeightedPressurePlate();
-		unsigned char Power(short ID);
+		BlockState LightWeightedPressurePlate();
+		unsigned char Power(BlockState Block);
 	}
 	namespace Lilac
 	{
@@ -9289,31 +8522,31 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short Lilac(enum Half Half)
+		constexpr BlockState Lilac(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7887;
 			return 7888;
 		}
-		short Lilac();
-		enum Half Half(short ID);
+		BlockState Lilac();
+		enum Half Half(BlockState Block);
 	}
 	namespace LilyOfTheValley
 	{
-		constexpr short LilyOfTheValley()
+		constexpr BlockState LilyOfTheValley()
 		{
 			return 1424;
 		}
 	}
 	namespace LilyPad
 	{
-		constexpr short LilyPad()
+		constexpr BlockState LilyPad()
 		{
 			return 5014;
 		}
 	}
 	namespace LimeBanner
 	{
-		constexpr short LimeBanner(unsigned char Rotation)
+		constexpr BlockState LimeBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7977;
 			if (Rotation == 1) return 7978;
@@ -9332,8 +8565,8 @@ namespace Block
 			if (Rotation == 14) return 7991;
 			return 7992;
 		}
-		short LimeBanner();
-		unsigned char Rotation(short ID);
+		BlockState LimeBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LimeBed
 	{
@@ -9342,7 +8575,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short LimeBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState LimeBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1129;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1130;
@@ -9361,47 +8594,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1143;
 			return 1144;
 		}
-		short LimeBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState LimeBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LimeCarpet
 	{
-		constexpr short LimeCarpet()
+		constexpr BlockState LimeCarpet()
 		{
 			return 7871;
 		}
 	}
 	namespace LimeConcrete
 	{
-		constexpr short LimeConcrete()
+		constexpr BlockState LimeConcrete()
 		{
 			return 9443;
 		}
 	}
 	namespace LimeConcretePowder
 	{
-		constexpr short LimeConcretePowder()
+		constexpr BlockState LimeConcretePowder()
 		{
 			return 9459;
 		}
 	}
 	namespace LimeGlazedTerracotta
 	{
-		constexpr short LimeGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState LimeGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9394;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9395;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9396;
 			return 9397;
 		}
-		short LimeGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState LimeGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeShulkerBox
 	{
-		constexpr short LimeShulkerBox(eBlockFace Facing)
+		constexpr BlockState LimeShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9308;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9309;
@@ -9410,19 +8643,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9312;
 			return 9313;
 		}
-		short LimeShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState LimeShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeStainedGlass
 	{
-		constexpr short LimeStainedGlass()
+		constexpr BlockState LimeStainedGlass()
 		{
 			return 4100;
 		}
 	}
 	namespace LimeStainedGlassPane
 	{
-		constexpr short LimeStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState LimeStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7025;
 			if (East && North && South && !West) return 7026;
@@ -9441,60 +8674,60 @@ namespace Block
 			if (!East && !North && !South && West) return 7053;
 			return 7054;
 		}
-		short LimeStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState LimeStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LimeTerracotta
 	{
-		constexpr short LimeTerracotta()
+		constexpr BlockState LimeTerracotta()
 		{
 			return 6852;
 		}
 	}
 	namespace LimeWallBanner
 	{
-		constexpr short LimeWallBanner(eBlockFace Facing)
+		constexpr BlockState LimeWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8173;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8174;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8175;
 			return 8176;
 		}
-		short LimeWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState LimeWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeWool
 	{
-		constexpr short LimeWool()
+		constexpr BlockState LimeWool()
 		{
 			return 1389;
 		}
 	}
 	namespace Lodestone
 	{
-		constexpr short Lodestone()
+		constexpr BlockState Lodestone()
 		{
 			return 15838;
 		}
 	}
 	namespace Loom
 	{
-		constexpr short Loom(eBlockFace Facing)
+		constexpr BlockState Loom(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 14787;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 14788;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 14789;
 			return 14790;
 		}
-		short Loom();
-		eBlockFace Facing(short ID);
+		BlockState Loom();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaBanner
 	{
-		constexpr short MagentaBanner(unsigned char Rotation)
+		constexpr BlockState MagentaBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7929;
 			if (Rotation == 1) return 7930;
@@ -9513,8 +8746,8 @@ namespace Block
 			if (Rotation == 14) return 7943;
 			return 7944;
 		}
-		short MagentaBanner();
-		unsigned char Rotation(short ID);
+		BlockState MagentaBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace MagentaBed
 	{
@@ -9523,7 +8756,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short MagentaBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState MagentaBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1081;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1082;
@@ -9542,47 +8775,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1095;
 			return 1096;
 		}
-		short MagentaBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState MagentaBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace MagentaCarpet
 	{
-		constexpr short MagentaCarpet()
+		constexpr BlockState MagentaCarpet()
 		{
 			return 7868;
 		}
 	}
 	namespace MagentaConcrete
 	{
-		constexpr short MagentaConcrete()
+		constexpr BlockState MagentaConcrete()
 		{
 			return 9440;
 		}
 	}
 	namespace MagentaConcretePowder
 	{
-		constexpr short MagentaConcretePowder()
+		constexpr BlockState MagentaConcretePowder()
 		{
 			return 9456;
 		}
 	}
 	namespace MagentaGlazedTerracotta
 	{
-		constexpr short MagentaGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState MagentaGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9382;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9383;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9384;
 			return 9385;
 		}
-		short MagentaGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState MagentaGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaShulkerBox
 	{
-		constexpr short MagentaShulkerBox(eBlockFace Facing)
+		constexpr BlockState MagentaShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9290;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9291;
@@ -9591,19 +8824,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9294;
 			return 9295;
 		}
-		short MagentaShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState MagentaShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaStainedGlass
 	{
-		constexpr short MagentaStainedGlass()
+		constexpr BlockState MagentaStainedGlass()
 		{
 			return 4097;
 		}
 	}
 	namespace MagentaStainedGlassPane
 	{
-		constexpr short MagentaStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState MagentaStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 6929;
 			if (East && North && South && !West) return 6930;
@@ -9622,55 +8855,55 @@ namespace Block
 			if (!East && !North && !South && West) return 6957;
 			return 6958;
 		}
-		short MagentaStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState MagentaStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace MagentaTerracotta
 	{
-		constexpr short MagentaTerracotta()
+		constexpr BlockState MagentaTerracotta()
 		{
 			return 6849;
 		}
 	}
 	namespace MagentaWallBanner
 	{
-		constexpr short MagentaWallBanner(eBlockFace Facing)
+		constexpr BlockState MagentaWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8161;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8162;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8163;
 			return 8164;
 		}
-		short MagentaWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState MagentaWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaWool
 	{
-		constexpr short MagentaWool()
+		constexpr BlockState MagentaWool()
 		{
 			return 1386;
 		}
 	}
 	namespace MagmaBlock
 	{
-		constexpr short MagmaBlock()
+		constexpr BlockState MagmaBlock()
 		{
 			return 9253;
 		}
 	}
 	namespace Melon
 	{
-		constexpr short Melon()
+		constexpr BlockState Melon()
 		{
 			return 4763;
 		}
 	}
 	namespace MelonStem
 	{
-		constexpr short MelonStem(unsigned char Age)
+		constexpr BlockState MelonStem(unsigned char Age)
 		{
 			if (Age == 0) return 4780;
 			if (Age == 1) return 4781;
@@ -9681,12 +8914,12 @@ namespace Block
 			if (Age == 6) return 4786;
 			return 4787;
 		}
-		short MelonStem();
-		unsigned char Age(short ID);
+		BlockState MelonStem();
+		unsigned char Age(BlockState Block);
 	}
 	namespace MossyCobblestone
 	{
-		constexpr short MossyCobblestone()
+		constexpr BlockState MossyCobblestone()
 		{
 			return 1433;
 		}
@@ -9699,14 +8932,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short MossyCobblestoneSlab(enum Type Type)
+		constexpr BlockState MossyCobblestoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10814;
 			if (Type == Type::Bottom) return 10816;
 			return 10818;
 		}
-		short MossyCobblestoneSlab();
-		enum Type Type(short ID);
+		BlockState MossyCobblestoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace MossyCobblestoneStairs
 	{
@@ -9723,7 +8956,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short MossyCobblestoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState MossyCobblestoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9990;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9992;
@@ -9766,10 +8999,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10066;
 			return 10068;
 		}
-		short MossyCobblestoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState MossyCobblestoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace MossyCobblestoneWall
 	{
@@ -9797,7 +9030,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short MossyCobblestoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState MossyCobblestoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 5984;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 5985;
@@ -9962,12 +9195,12 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 6303;
 			return 6304;
 		}
-		short MossyCobblestoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState MossyCobblestoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace MossyStoneBrickSlab
 	{
@@ -9977,14 +9210,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short MossyStoneBrickSlab(enum Type Type)
+		constexpr BlockState MossyStoneBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10802;
 			if (Type == Type::Bottom) return 10804;
 			return 10806;
 		}
-		short MossyStoneBrickSlab();
-		enum Type Type(short ID);
+		BlockState MossyStoneBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace MossyStoneBrickStairs
 	{
@@ -10001,7 +9234,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short MossyStoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState MossyStoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9830;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9832;
@@ -10044,10 +9277,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 9906;
 			return 9908;
 		}
-		short MossyStoneBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState MossyStoneBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace MossyStoneBrickWall
 	{
@@ -10075,7 +9308,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short MossyStoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState MossyStoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 11842;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 11843;
@@ -10240,16 +9473,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 12161;
 			return 12162;
 		}
-		short MossyStoneBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState MossyStoneBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace MossyStoneBricks
 	{
-		constexpr short MossyStoneBricks()
+		constexpr BlockState MossyStoneBricks()
 		{
 			return 4496;
 		}
@@ -10261,7 +9494,7 @@ namespace Block
 			Normal,
 			Sticky
 		};
-		constexpr short MovingPiston(eBlockFace Facing, enum Type Type)
+		constexpr BlockState MovingPiston(eBlockFace Facing, enum Type Type)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Normal) return 1400;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Sticky) return 1401;
@@ -10276,13 +9509,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YM && Type == Type::Normal) return 1410;
 			return 1411;
 		}
-		short MovingPiston();
-		eBlockFace Facing(short ID);
-		enum Type Type(short ID);
+		BlockState MovingPiston();
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace MushroomStem
 	{
-		constexpr short MushroomStem(bool Down, bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState MushroomStem(bool Down, bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (Down && East && North && South && Up && West) return 4633;
 			if (Down && East && North && South && Up && !West) return 4634;
@@ -10349,27 +9582,27 @@ namespace Block
 			if (!Down && !East && !North && !South && !Up && West) return 4695;
 			return 4696;
 		}
-		short MushroomStem();
-		bool Down(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState MushroomStem();
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Mycelium
 	{
-		constexpr short Mycelium(bool Snowy)
+		constexpr BlockState Mycelium(bool Snowy)
 		{
 			if (Snowy) return 5012;
 			return 5013;
 		}
-		short Mycelium();
-		bool Snowy(short ID);
+		BlockState Mycelium();
+		bool Snowy(BlockState Block);
 	}
 	namespace NetherBrickFence
 	{
-		constexpr short NetherBrickFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState NetherBrickFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 5018;
 			if (East && North && South && !West) return 5019;
@@ -10388,11 +9621,11 @@ namespace Block
 			if (!East && !North && !South && West) return 5046;
 			return 5047;
 		}
-		short NetherBrickFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState NetherBrickFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace NetherBrickSlab
 	{
@@ -10402,14 +9635,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short NetherBrickSlab(enum Type Type)
+		constexpr BlockState NetherBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8385;
 			if (Type == Type::Bottom) return 8387;
 			return 8389;
 		}
-		short NetherBrickSlab();
-		enum Type Type(short ID);
+		BlockState NetherBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace NetherBrickStairs
 	{
@@ -10426,7 +9659,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short NetherBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState NetherBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 5049;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 5051;
@@ -10469,10 +9702,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5125;
 			return 5127;
 		}
-		short NetherBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState NetherBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace NetherBrickWall
 	{
@@ -10500,7 +9733,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short NetherBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState NetherBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 12814;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 12815;
@@ -10665,23 +9898,23 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 13133;
 			return 13134;
 		}
-		short NetherBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState NetherBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace NetherBricks
 	{
-		constexpr short NetherBricks()
+		constexpr BlockState NetherBricks()
 		{
 			return 5015;
 		}
 	}
 	namespace NetherGoldOre
 	{
-		constexpr short NetherGoldOre()
+		constexpr BlockState NetherGoldOre()
 		{
 			return 72;
 		}
@@ -10693,57 +9926,57 @@ namespace Block
 			X,
 			Z
 		};
-		constexpr short NetherPortal(enum Axis Axis)
+		constexpr BlockState NetherPortal(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 4014;
 			return 4015;
 		}
-		short NetherPortal();
-		enum Axis Axis(short ID);
+		BlockState NetherPortal();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace NetherQuartzOre
 	{
-		constexpr short NetherQuartzOre()
+		constexpr BlockState NetherQuartzOre()
 		{
 			return 6727;
 		}
 	}
 	namespace NetherSprouts
 	{
-		constexpr short NetherSprouts()
+		constexpr BlockState NetherSprouts()
 		{
 			return 14974;
 		}
 	}
 	namespace NetherWart
 	{
-		constexpr short NetherWart(unsigned char Age)
+		constexpr BlockState NetherWart(unsigned char Age)
 		{
 			if (Age == 0) return 5128;
 			if (Age == 1) return 5129;
 			if (Age == 2) return 5130;
 			return 5131;
 		}
-		short NetherWart();
-		unsigned char Age(short ID);
+		BlockState NetherWart();
+		unsigned char Age(BlockState Block);
 	}
 	namespace NetherWartBlock
 	{
-		constexpr short NetherWartBlock()
+		constexpr BlockState NetherWartBlock()
 		{
 			return 9254;
 		}
 	}
 	namespace NetheriteBlock
 	{
-		constexpr short NetheriteBlock()
+		constexpr BlockState NetheriteBlock()
 		{
 			return 15826;
 		}
 	}
 	namespace Netherrack
 	{
-		constexpr short Netherrack()
+		constexpr BlockState Netherrack()
 		{
 			return 3999;
 		}
@@ -10769,7 +10002,7 @@ namespace Block
 			Banjo,
 			Pling
 		};
-		constexpr short NoteBlock(enum Instrument Instrument, unsigned char Note, bool Powered)
+		constexpr BlockState NoteBlock(enum Instrument Instrument, unsigned char Note, bool Powered)
 		{
 			if (Instrument == Instrument::Harp && Note == 0 && Powered) return 249;
 			if (Instrument == Instrument::Harp && Note == 0 && !Powered) return 250;
@@ -11572,10 +10805,10 @@ namespace Block
 			if (Instrument == Instrument::Pling && Note == 24 && Powered) return 1047;
 			return 1048;
 		}
-		short NoteBlock();
-		enum Instrument Instrument(short ID);
-		unsigned char Note(short ID);
-		bool Powered(short ID);
+		BlockState NoteBlock();
+		enum Instrument Instrument(BlockState Block);
+		unsigned char Note(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakButton
 	{
@@ -11585,7 +10818,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short OakButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState OakButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6346;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6347;
@@ -11612,10 +10845,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6368;
 			return 6369;
 		}
-		short OakButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState OakButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakDoor
 	{
@@ -11629,7 +10862,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short OakDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState OakDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 3573;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 3574;
@@ -11696,16 +10929,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 3635;
 			return 3636;
 		}
-		short OakDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState OakDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakFence
 	{
-		constexpr short OakFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState OakFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 3968;
 			if (East && North && South && !West) return 3969;
@@ -11724,15 +10957,15 @@ namespace Block
 			if (!East && !North && !South && West) return 3996;
 			return 3997;
 		}
-		short OakFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState OakFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace OakFenceGate
 	{
-		constexpr short OakFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState OakFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 4820;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 4821;
@@ -11767,15 +11000,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 4850;
 			return 4851;
 		}
-		short OakFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState OakFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakLeaves
 	{
-		constexpr short OakLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState OakLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 145;
 			if (Distance == 1 && !Persistent) return 146;
@@ -11792,9 +11025,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 157;
 			return 158;
 		}
-		short OakLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState OakLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace OakLog
 	{
@@ -11804,45 +11037,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short OakLog(enum Axis Axis)
+		constexpr BlockState OakLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 73;
 			if (Axis == Axis::Y) return 74;
 			return 75;
 		}
-		short OakLog();
-		enum Axis Axis(short ID);
+		BlockState OakLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace OakPlanks
 	{
-		constexpr short OakPlanks()
+		constexpr BlockState OakPlanks()
 		{
 			return 15;
 		}
 	}
 	namespace OakPressurePlate
 	{
-		constexpr short OakPressurePlate(bool Powered)
+		constexpr BlockState OakPressurePlate(bool Powered)
 		{
 			if (Powered) return 3873;
 			return 3874;
 		}
-		short OakPressurePlate();
-		bool Powered(short ID);
+		BlockState OakPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace OakSapling
 	{
-		constexpr short OakSapling(unsigned char Stage)
+		constexpr BlockState OakSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 21;
 			return 22;
 		}
-		short OakSapling();
-		unsigned char Stage(short ID);
+		BlockState OakSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace OakSign
 	{
-		constexpr short OakSign(unsigned char Rotation)
+		constexpr BlockState OakSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3382;
 			if (Rotation == 1) return 3384;
@@ -11861,8 +11094,8 @@ namespace Block
 			if (Rotation == 14) return 3410;
 			return 3412;
 		}
-		short OakSign();
-		unsigned char Rotation(short ID);
+		BlockState OakSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace OakSlab
 	{
@@ -11872,14 +11105,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short OakSlab(enum Type Type)
+		constexpr BlockState OakSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8301;
 			if (Type == Type::Bottom) return 8303;
 			return 8305;
 		}
-		short OakSlab();
-		enum Type Type(short ID);
+		BlockState OakSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace OakStairs
 	{
@@ -11896,7 +11129,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short OakStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState OakStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 1955;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 1957;
@@ -11939,10 +11172,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 2031;
 			return 2033;
 		}
-		short OakStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState OakStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace OakTrapdoor
 	{
@@ -11951,7 +11184,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short OakTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState OakTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4112;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4114;
@@ -11986,23 +11219,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4172;
 			return 4174;
 		}
-		short OakTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState OakTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakWallSign
 	{
-		constexpr short OakWallSign(eBlockFace Facing)
+		constexpr BlockState OakWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3736;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3738;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3740;
 			return 3742;
 		}
-		short OakWallSign();
-		eBlockFace Facing(short ID);
+		BlockState OakWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OakWood
 	{
@@ -12012,18 +11245,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short OakWood(enum Axis Axis)
+		constexpr BlockState OakWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 109;
 			if (Axis == Axis::Y) return 110;
 			return 111;
 		}
-		short OakWood();
-		enum Axis Axis(short ID);
+		BlockState OakWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Observer
 	{
-		constexpr short Observer(eBlockFace Facing, bool Powered)
+		constexpr BlockState Observer(eBlockFace Facing, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 9260;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 9261;
@@ -12038,20 +11271,20 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YM && Powered) return 9270;
 			return 9271;
 		}
-		short Observer();
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState Observer();
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Obsidian
 	{
-		constexpr short Obsidian()
+		constexpr BlockState Obsidian()
 		{
 			return 1434;
 		}
 	}
 	namespace OrangeBanner
 	{
-		constexpr short OrangeBanner(unsigned char Rotation)
+		constexpr BlockState OrangeBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7913;
 			if (Rotation == 1) return 7914;
@@ -12070,8 +11303,8 @@ namespace Block
 			if (Rotation == 14) return 7927;
 			return 7928;
 		}
-		short OrangeBanner();
-		unsigned char Rotation(short ID);
+		BlockState OrangeBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace OrangeBed
 	{
@@ -12080,7 +11313,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short OrangeBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState OrangeBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1065;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1066;
@@ -12099,47 +11332,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1079;
 			return 1080;
 		}
-		short OrangeBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState OrangeBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace OrangeCarpet
 	{
-		constexpr short OrangeCarpet()
+		constexpr BlockState OrangeCarpet()
 		{
 			return 7867;
 		}
 	}
 	namespace OrangeConcrete
 	{
-		constexpr short OrangeConcrete()
+		constexpr BlockState OrangeConcrete()
 		{
 			return 9439;
 		}
 	}
 	namespace OrangeConcretePowder
 	{
-		constexpr short OrangeConcretePowder()
+		constexpr BlockState OrangeConcretePowder()
 		{
 			return 9455;
 		}
 	}
 	namespace OrangeGlazedTerracotta
 	{
-		constexpr short OrangeGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState OrangeGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9378;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9379;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9380;
 			return 9381;
 		}
-		short OrangeGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState OrangeGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeShulkerBox
 	{
-		constexpr short OrangeShulkerBox(eBlockFace Facing)
+		constexpr BlockState OrangeShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9284;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9285;
@@ -12148,19 +11381,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9288;
 			return 9289;
 		}
-		short OrangeShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState OrangeShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeStainedGlass
 	{
-		constexpr short OrangeStainedGlass()
+		constexpr BlockState OrangeStainedGlass()
 		{
 			return 4096;
 		}
 	}
 	namespace OrangeStainedGlassPane
 	{
-		constexpr short OrangeStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState OrangeStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 6897;
 			if (East && North && South && !West) return 6898;
@@ -12179,55 +11412,55 @@ namespace Block
 			if (!East && !North && !South && West) return 6925;
 			return 6926;
 		}
-		short OrangeStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState OrangeStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace OrangeTerracotta
 	{
-		constexpr short OrangeTerracotta()
+		constexpr BlockState OrangeTerracotta()
 		{
 			return 6848;
 		}
 	}
 	namespace OrangeTulip
 	{
-		constexpr short OrangeTulip()
+		constexpr BlockState OrangeTulip()
 		{
 			return 1418;
 		}
 	}
 	namespace OrangeWallBanner
 	{
-		constexpr short OrangeWallBanner(eBlockFace Facing)
+		constexpr BlockState OrangeWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8157;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8158;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8159;
 			return 8160;
 		}
-		short OrangeWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState OrangeWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeWool
 	{
-		constexpr short OrangeWool()
+		constexpr BlockState OrangeWool()
 		{
 			return 1385;
 		}
 	}
 	namespace OxeyeDaisy
 	{
-		constexpr short OxeyeDaisy()
+		constexpr BlockState OxeyeDaisy()
 		{
 			return 1421;
 		}
 	}
 	namespace PackedIce
 	{
-		constexpr short PackedIce()
+		constexpr BlockState PackedIce()
 		{
 			return 7884;
 		}
@@ -12239,13 +11472,13 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short Peony(enum Half Half)
+		constexpr BlockState Peony(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7891;
 			return 7892;
 		}
-		short Peony();
-		enum Half Half(short ID);
+		BlockState Peony();
+		enum Half Half(BlockState Block);
 	}
 	namespace PetrifiedOakSlab
 	{
@@ -12255,18 +11488,18 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PetrifiedOakSlab(enum Type Type)
+		constexpr BlockState PetrifiedOakSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8361;
 			if (Type == Type::Bottom) return 8363;
 			return 8365;
 		}
-		short PetrifiedOakSlab();
-		enum Type Type(short ID);
+		BlockState PetrifiedOakSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PinkBanner
 	{
-		constexpr short PinkBanner(unsigned char Rotation)
+		constexpr BlockState PinkBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7993;
 			if (Rotation == 1) return 7994;
@@ -12285,8 +11518,8 @@ namespace Block
 			if (Rotation == 14) return 8007;
 			return 8008;
 		}
-		short PinkBanner();
-		unsigned char Rotation(short ID);
+		BlockState PinkBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PinkBed
 	{
@@ -12295,7 +11528,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short PinkBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState PinkBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1145;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1146;
@@ -12314,47 +11547,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1159;
 			return 1160;
 		}
-		short PinkBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState PinkBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace PinkCarpet
 	{
-		constexpr short PinkCarpet()
+		constexpr BlockState PinkCarpet()
 		{
 			return 7872;
 		}
 	}
 	namespace PinkConcrete
 	{
-		constexpr short PinkConcrete()
+		constexpr BlockState PinkConcrete()
 		{
 			return 9444;
 		}
 	}
 	namespace PinkConcretePowder
 	{
-		constexpr short PinkConcretePowder()
+		constexpr BlockState PinkConcretePowder()
 		{
 			return 9460;
 		}
 	}
 	namespace PinkGlazedTerracotta
 	{
-		constexpr short PinkGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState PinkGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9398;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9399;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9400;
 			return 9401;
 		}
-		short PinkGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState PinkGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkShulkerBox
 	{
-		constexpr short PinkShulkerBox(eBlockFace Facing)
+		constexpr BlockState PinkShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9314;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9315;
@@ -12363,19 +11596,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9318;
 			return 9319;
 		}
-		short PinkShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState PinkShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkStainedGlass
 	{
-		constexpr short PinkStainedGlass()
+		constexpr BlockState PinkStainedGlass()
 		{
 			return 4101;
 		}
 	}
 	namespace PinkStainedGlassPane
 	{
-		constexpr short PinkStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState PinkStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7057;
 			if (East && North && South && !West) return 7058;
@@ -12394,48 +11627,48 @@ namespace Block
 			if (!East && !North && !South && West) return 7085;
 			return 7086;
 		}
-		short PinkStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState PinkStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace PinkTerracotta
 	{
-		constexpr short PinkTerracotta()
+		constexpr BlockState PinkTerracotta()
 		{
 			return 6853;
 		}
 	}
 	namespace PinkTulip
 	{
-		constexpr short PinkTulip()
+		constexpr BlockState PinkTulip()
 		{
 			return 1420;
 		}
 	}
 	namespace PinkWallBanner
 	{
-		constexpr short PinkWallBanner(eBlockFace Facing)
+		constexpr BlockState PinkWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8177;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8178;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8179;
 			return 8180;
 		}
-		short PinkWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState PinkWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkWool
 	{
-		constexpr short PinkWool()
+		constexpr BlockState PinkWool()
 		{
 			return 1390;
 		}
 	}
 	namespace Piston
 	{
-		constexpr short Piston(bool Extended, eBlockFace Facing)
+		constexpr BlockState Piston(bool Extended, eBlockFace Facing)
 		{
 			if (Extended && Facing == eBlockFace::BLOCK_FACE_ZM) return 1348;
 			if (Extended && Facing == eBlockFace::BLOCK_FACE_XP) return 1349;
@@ -12450,9 +11683,9 @@ namespace Block
 			if (!Extended && Facing == eBlockFace::BLOCK_FACE_YP) return 1358;
 			return 1359;
 		}
-		short Piston();
-		bool Extended(short ID);
-		eBlockFace Facing(short ID);
+		BlockState Piston();
+		bool Extended(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PistonHead
 	{
@@ -12461,41 +11694,41 @@ namespace Block
 			Normal,
 			Sticky
 		};
-		constexpr short PistonHead(eBlockFace Facing, bool Short, enum Type Type)
+		constexpr BlockState PistonHead(eBlockFace Facing, bool BlockState, enum Type Type)
 		{
-			if (Facing == eBlockFace::BLOCK_FACE_ZM && Short && Type == Type::Normal) return 1360;
-			if (Facing == eBlockFace::BLOCK_FACE_ZM && Short && Type == Type::Sticky) return 1361;
-			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Short && Type == Type::Normal) return 1362;
-			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Short && Type == Type::Sticky) return 1363;
-			if (Facing == eBlockFace::BLOCK_FACE_XP && Short && Type == Type::Normal) return 1364;
-			if (Facing == eBlockFace::BLOCK_FACE_XP && Short && Type == Type::Sticky) return 1365;
-			if (Facing == eBlockFace::BLOCK_FACE_XP && !Short && Type == Type::Normal) return 1366;
-			if (Facing == eBlockFace::BLOCK_FACE_XP && !Short && Type == Type::Sticky) return 1367;
-			if (Facing == eBlockFace::BLOCK_FACE_ZP && Short && Type == Type::Normal) return 1368;
-			if (Facing == eBlockFace::BLOCK_FACE_ZP && Short && Type == Type::Sticky) return 1369;
-			if (Facing == eBlockFace::BLOCK_FACE_ZP && !Short && Type == Type::Normal) return 1370;
-			if (Facing == eBlockFace::BLOCK_FACE_ZP && !Short && Type == Type::Sticky) return 1371;
-			if (Facing == eBlockFace::BLOCK_FACE_XM && Short && Type == Type::Normal) return 1372;
-			if (Facing == eBlockFace::BLOCK_FACE_XM && Short && Type == Type::Sticky) return 1373;
-			if (Facing == eBlockFace::BLOCK_FACE_XM && !Short && Type == Type::Normal) return 1374;
-			if (Facing == eBlockFace::BLOCK_FACE_XM && !Short && Type == Type::Sticky) return 1375;
-			if (Facing == eBlockFace::BLOCK_FACE_YP && Short && Type == Type::Normal) return 1376;
-			if (Facing == eBlockFace::BLOCK_FACE_YP && Short && Type == Type::Sticky) return 1377;
-			if (Facing == eBlockFace::BLOCK_FACE_YP && !Short && Type == Type::Normal) return 1378;
-			if (Facing == eBlockFace::BLOCK_FACE_YP && !Short && Type == Type::Sticky) return 1379;
-			if (Facing == eBlockFace::BLOCK_FACE_YM && Short && Type == Type::Normal) return 1380;
-			if (Facing == eBlockFace::BLOCK_FACE_YM && Short && Type == Type::Sticky) return 1381;
-			if (Facing == eBlockFace::BLOCK_FACE_YM && !Short && Type == Type::Normal) return 1382;
+			if (Facing == eBlockFace::BLOCK_FACE_ZM && BlockState && Type == Type::Normal) return 1360;
+			if (Facing == eBlockFace::BLOCK_FACE_ZM && BlockState && Type == Type::Sticky) return 1361;
+			if (Facing == eBlockFace::BLOCK_FACE_ZM && !BlockState && Type == Type::Normal) return 1362;
+			if (Facing == eBlockFace::BLOCK_FACE_ZM && !BlockState && Type == Type::Sticky) return 1363;
+			if (Facing == eBlockFace::BLOCK_FACE_XP && BlockState && Type == Type::Normal) return 1364;
+			if (Facing == eBlockFace::BLOCK_FACE_XP && BlockState && Type == Type::Sticky) return 1365;
+			if (Facing == eBlockFace::BLOCK_FACE_XP && !BlockState && Type == Type::Normal) return 1366;
+			if (Facing == eBlockFace::BLOCK_FACE_XP && !BlockState && Type == Type::Sticky) return 1367;
+			if (Facing == eBlockFace::BLOCK_FACE_ZP && BlockState && Type == Type::Normal) return 1368;
+			if (Facing == eBlockFace::BLOCK_FACE_ZP && BlockState && Type == Type::Sticky) return 1369;
+			if (Facing == eBlockFace::BLOCK_FACE_ZP && !BlockState && Type == Type::Normal) return 1370;
+			if (Facing == eBlockFace::BLOCK_FACE_ZP && !BlockState && Type == Type::Sticky) return 1371;
+			if (Facing == eBlockFace::BLOCK_FACE_XM && BlockState && Type == Type::Normal) return 1372;
+			if (Facing == eBlockFace::BLOCK_FACE_XM && BlockState && Type == Type::Sticky) return 1373;
+			if (Facing == eBlockFace::BLOCK_FACE_XM && !BlockState && Type == Type::Normal) return 1374;
+			if (Facing == eBlockFace::BLOCK_FACE_XM && !BlockState && Type == Type::Sticky) return 1375;
+			if (Facing == eBlockFace::BLOCK_FACE_YP && BlockState && Type == Type::Normal) return 1376;
+			if (Facing == eBlockFace::BLOCK_FACE_YP && BlockState && Type == Type::Sticky) return 1377;
+			if (Facing == eBlockFace::BLOCK_FACE_YP && !BlockState && Type == Type::Normal) return 1378;
+			if (Facing == eBlockFace::BLOCK_FACE_YP && !BlockState && Type == Type::Sticky) return 1379;
+			if (Facing == eBlockFace::BLOCK_FACE_YM && BlockState && Type == Type::Normal) return 1380;
+			if (Facing == eBlockFace::BLOCK_FACE_YM && BlockState && Type == Type::Sticky) return 1381;
+			if (Facing == eBlockFace::BLOCK_FACE_YM && !BlockState && Type == Type::Normal) return 1382;
 			return 1383;
 		}
-		short PistonHead();
-		eBlockFace Facing(short ID);
-		bool Short(short ID);
-		enum Type Type(short ID);
+		BlockState PistonHead();
+		eBlockFace Facing(BlockState Block);
+		bool BlockState(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace PlayerHead
 	{
-		constexpr short PlayerHead(unsigned char Rotation)
+		constexpr BlockState PlayerHead(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6550;
 			if (Rotation == 1) return 6551;
@@ -12514,34 +11747,34 @@ namespace Block
 			if (Rotation == 14) return 6564;
 			return 6565;
 		}
-		short PlayerHead();
-		unsigned char Rotation(short ID);
+		BlockState PlayerHead();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PlayerWallHead
 	{
-		constexpr short PlayerWallHead(eBlockFace Facing)
+		constexpr BlockState PlayerWallHead(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6566;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6567;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6568;
 			return 6569;
 		}
-		short PlayerWallHead();
-		eBlockFace Facing(short ID);
+		BlockState PlayerWallHead();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Podzol
 	{
-		constexpr short Podzol(bool Snowy)
+		constexpr BlockState Podzol(bool Snowy)
 		{
 			if (Snowy) return 12;
 			return 13;
 		}
-		short Podzol();
-		bool Snowy(short ID);
+		BlockState Podzol();
+		bool Snowy(BlockState Block);
 	}
 	namespace PolishedAndesite
 	{
-		constexpr short PolishedAndesite()
+		constexpr BlockState PolishedAndesite()
 		{
 			return 7;
 		}
@@ -12554,14 +11787,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PolishedAndesiteSlab(enum Type Type)
+		constexpr BlockState PolishedAndesiteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10856;
 			if (Type == Type::Bottom) return 10858;
 			return 10860;
 		}
-		short PolishedAndesiteSlab();
-		enum Type Type(short ID);
+		BlockState PolishedAndesiteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedAndesiteStairs
 	{
@@ -12578,7 +11811,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PolishedAndesiteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PolishedAndesiteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10630;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10632;
@@ -12621,10 +11854,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10706;
 			return 10708;
 		}
-		short PolishedAndesiteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PolishedAndesiteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBasalt
 	{
@@ -12634,18 +11867,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short PolishedBasalt(enum Axis Axis)
+		constexpr BlockState PolishedBasalt(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 4005;
 			if (Axis == Axis::Y) return 4006;
 			return 4007;
 		}
-		short PolishedBasalt();
-		enum Axis Axis(short ID);
+		BlockState PolishedBasalt();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace PolishedBlackstone
 	{
-		constexpr short PolishedBlackstone()
+		constexpr BlockState PolishedBlackstone()
 		{
 			return 16250;
 		}
@@ -12658,14 +11891,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PolishedBlackstoneBrickSlab(enum Type Type)
+		constexpr BlockState PolishedBlackstoneBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 16255;
 			if (Type == Type::Bottom) return 16257;
 			return 16259;
 		}
-		short PolishedBlackstoneBrickSlab();
-		enum Type Type(short ID);
+		BlockState PolishedBlackstoneBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedBlackstoneBrickStairs
 	{
@@ -12682,7 +11915,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PolishedBlackstoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PolishedBlackstoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 16261;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 16263;
@@ -12725,10 +11958,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 16337;
 			return 16339;
 		}
-		short PolishedBlackstoneBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PolishedBlackstoneBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBlackstoneBrickWall
 	{
@@ -12756,7 +11989,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short PolishedBlackstoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState PolishedBlackstoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 16343;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 16344;
@@ -12921,16 +12154,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 16662;
 			return 16663;
 		}
-		short PolishedBlackstoneBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState PolishedBlackstoneBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace PolishedBlackstoneBricks
 	{
-		constexpr short PolishedBlackstoneBricks()
+		constexpr BlockState PolishedBlackstoneBricks()
 		{
 			return 16251;
 		}
@@ -12943,7 +12176,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short PolishedBlackstoneButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState PolishedBlackstoneButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 16753;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 16754;
@@ -12970,20 +12203,20 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 16775;
 			return 16776;
 		}
-		short PolishedBlackstoneButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState PolishedBlackstoneButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace PolishedBlackstonePressurePlate
 	{
-		constexpr short PolishedBlackstonePressurePlate(bool Powered)
+		constexpr BlockState PolishedBlackstonePressurePlate(bool Powered)
 		{
 			if (Powered) return 16751;
 			return 16752;
 		}
-		short PolishedBlackstonePressurePlate();
-		bool Powered(short ID);
+		BlockState PolishedBlackstonePressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace PolishedBlackstoneSlab
 	{
@@ -12993,14 +12226,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PolishedBlackstoneSlab(enum Type Type)
+		constexpr BlockState PolishedBlackstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 16746;
 			if (Type == Type::Bottom) return 16748;
 			return 16750;
 		}
-		short PolishedBlackstoneSlab();
-		enum Type Type(short ID);
+		BlockState PolishedBlackstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedBlackstoneStairs
 	{
@@ -13017,7 +12250,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PolishedBlackstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PolishedBlackstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 16666;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 16668;
@@ -13060,10 +12293,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 16742;
 			return 16744;
 		}
-		short PolishedBlackstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PolishedBlackstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBlackstoneWall
 	{
@@ -13091,7 +12324,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short PolishedBlackstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState PolishedBlackstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 16780;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 16781;
@@ -13256,16 +12489,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 17099;
 			return 17100;
 		}
-		short PolishedBlackstoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState PolishedBlackstoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace PolishedDiorite
 	{
-		constexpr short PolishedDiorite()
+		constexpr BlockState PolishedDiorite()
 		{
 			return 5;
 		}
@@ -13278,14 +12511,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PolishedDioriteSlab(enum Type Type)
+		constexpr BlockState PolishedDioriteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10808;
 			if (Type == Type::Bottom) return 10810;
 			return 10812;
 		}
-		short PolishedDioriteSlab();
-		enum Type Type(short ID);
+		BlockState PolishedDioriteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedDioriteStairs
 	{
@@ -13302,7 +12535,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PolishedDioriteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PolishedDioriteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9910;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9912;
@@ -13345,14 +12578,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 9986;
 			return 9988;
 		}
-		short PolishedDioriteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PolishedDioriteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedGranite
 	{
-		constexpr short PolishedGranite()
+		constexpr BlockState PolishedGranite()
 		{
 			return 3;
 		}
@@ -13365,14 +12598,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PolishedGraniteSlab(enum Type Type)
+		constexpr BlockState PolishedGraniteSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10790;
 			if (Type == Type::Bottom) return 10792;
 			return 10794;
 		}
-		short PolishedGraniteSlab();
-		enum Type Type(short ID);
+		BlockState PolishedGraniteSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedGraniteStairs
 	{
@@ -13389,7 +12622,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PolishedGraniteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PolishedGraniteStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9670;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9672;
@@ -13432,21 +12665,21 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 9746;
 			return 9748;
 		}
-		short PolishedGraniteStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PolishedGraniteStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Poppy
 	{
-		constexpr short Poppy()
+		constexpr BlockState Poppy()
 		{
 			return 1413;
 		}
 	}
 	namespace Potatoes
 	{
-		constexpr short Potatoes(unsigned char Age)
+		constexpr BlockState Potatoes(unsigned char Age)
 		{
 			if (Age == 0) return 6338;
 			if (Age == 1) return 6339;
@@ -13457,208 +12690,208 @@ namespace Block
 			if (Age == 6) return 6344;
 			return 6345;
 		}
-		short Potatoes();
-		unsigned char Age(short ID);
+		BlockState Potatoes();
+		unsigned char Age(BlockState Block);
 	}
 	namespace PottedAcaciaSapling
 	{
-		constexpr short PottedAcaciaSapling()
+		constexpr BlockState PottedAcaciaSapling()
 		{
 			return 6310;
 		}
 	}
 	namespace PottedAllium
 	{
-		constexpr short PottedAllium()
+		constexpr BlockState PottedAllium()
 		{
 			return 6316;
 		}
 	}
 	namespace PottedAzureBluet
 	{
-		constexpr short PottedAzureBluet()
+		constexpr BlockState PottedAzureBluet()
 		{
 			return 6317;
 		}
 	}
 	namespace PottedBamboo
 	{
-		constexpr short PottedBamboo()
+		constexpr BlockState PottedBamboo()
 		{
 			return 9664;
 		}
 	}
 	namespace PottedBirchSapling
 	{
-		constexpr short PottedBirchSapling()
+		constexpr BlockState PottedBirchSapling()
 		{
 			return 6308;
 		}
 	}
 	namespace PottedBlueOrchid
 	{
-		constexpr short PottedBlueOrchid()
+		constexpr BlockState PottedBlueOrchid()
 		{
 			return 6315;
 		}
 	}
 	namespace PottedBrownMushroom
 	{
-		constexpr short PottedBrownMushroom()
+		constexpr BlockState PottedBrownMushroom()
 		{
 			return 6327;
 		}
 	}
 	namespace PottedCactus
 	{
-		constexpr short PottedCactus()
+		constexpr BlockState PottedCactus()
 		{
 			return 6329;
 		}
 	}
 	namespace PottedCornflower
 	{
-		constexpr short PottedCornflower()
+		constexpr BlockState PottedCornflower()
 		{
 			return 6323;
 		}
 	}
 	namespace PottedCrimsonFungus
 	{
-		constexpr short PottedCrimsonFungus()
+		constexpr BlockState PottedCrimsonFungus()
 		{
 			return 15834;
 		}
 	}
 	namespace PottedCrimsonRoots
 	{
-		constexpr short PottedCrimsonRoots()
+		constexpr BlockState PottedCrimsonRoots()
 		{
 			return 15836;
 		}
 	}
 	namespace PottedDandelion
 	{
-		constexpr short PottedDandelion()
+		constexpr BlockState PottedDandelion()
 		{
 			return 6313;
 		}
 	}
 	namespace PottedDarkOakSapling
 	{
-		constexpr short PottedDarkOakSapling()
+		constexpr BlockState PottedDarkOakSapling()
 		{
 			return 6311;
 		}
 	}
 	namespace PottedDeadBush
 	{
-		constexpr short PottedDeadBush()
+		constexpr BlockState PottedDeadBush()
 		{
 			return 6328;
 		}
 	}
 	namespace PottedFern
 	{
-		constexpr short PottedFern()
+		constexpr BlockState PottedFern()
 		{
 			return 6312;
 		}
 	}
 	namespace PottedJungleSapling
 	{
-		constexpr short PottedJungleSapling()
+		constexpr BlockState PottedJungleSapling()
 		{
 			return 6309;
 		}
 	}
 	namespace PottedLilyOfTheValley
 	{
-		constexpr short PottedLilyOfTheValley()
+		constexpr BlockState PottedLilyOfTheValley()
 		{
 			return 6324;
 		}
 	}
 	namespace PottedOakSapling
 	{
-		constexpr short PottedOakSapling()
+		constexpr BlockState PottedOakSapling()
 		{
 			return 6306;
 		}
 	}
 	namespace PottedOrangeTulip
 	{
-		constexpr short PottedOrangeTulip()
+		constexpr BlockState PottedOrangeTulip()
 		{
 			return 6319;
 		}
 	}
 	namespace PottedOxeyeDaisy
 	{
-		constexpr short PottedOxeyeDaisy()
+		constexpr BlockState PottedOxeyeDaisy()
 		{
 			return 6322;
 		}
 	}
 	namespace PottedPinkTulip
 	{
-		constexpr short PottedPinkTulip()
+		constexpr BlockState PottedPinkTulip()
 		{
 			return 6321;
 		}
 	}
 	namespace PottedPoppy
 	{
-		constexpr short PottedPoppy()
+		constexpr BlockState PottedPoppy()
 		{
 			return 6314;
 		}
 	}
 	namespace PottedRedMushroom
 	{
-		constexpr short PottedRedMushroom()
+		constexpr BlockState PottedRedMushroom()
 		{
 			return 6326;
 		}
 	}
 	namespace PottedRedTulip
 	{
-		constexpr short PottedRedTulip()
+		constexpr BlockState PottedRedTulip()
 		{
 			return 6318;
 		}
 	}
 	namespace PottedSpruceSapling
 	{
-		constexpr short PottedSpruceSapling()
+		constexpr BlockState PottedSpruceSapling()
 		{
 			return 6307;
 		}
 	}
 	namespace PottedWarpedFungus
 	{
-		constexpr short PottedWarpedFungus()
+		constexpr BlockState PottedWarpedFungus()
 		{
 			return 15835;
 		}
 	}
 	namespace PottedWarpedRoots
 	{
-		constexpr short PottedWarpedRoots()
+		constexpr BlockState PottedWarpedRoots()
 		{
 			return 15837;
 		}
 	}
 	namespace PottedWhiteTulip
 	{
-		constexpr short PottedWhiteTulip()
+		constexpr BlockState PottedWhiteTulip()
 		{
 			return 6320;
 		}
 	}
 	namespace PottedWitherRose
 	{
-		constexpr short PottedWitherRose()
+		constexpr BlockState PottedWitherRose()
 		{
 			return 6325;
 		}
@@ -13674,7 +12907,7 @@ namespace Block
 			AscendingNorth,
 			AscendingSouth
 		};
-		constexpr short PoweredRail(bool Powered, enum Shape Shape)
+		constexpr BlockState PoweredRail(bool Powered, enum Shape Shape)
 		{
 			if (Powered && Shape == Shape::NorthSouth) return 1305;
 			if (Powered && Shape == Shape::EastWest) return 1306;
@@ -13689,13 +12922,13 @@ namespace Block
 			if (!Powered && Shape == Shape::AscendingNorth) return 1315;
 			return 1316;
 		}
-		short PoweredRail();
-		bool Powered(short ID);
-		enum Shape Shape(short ID);
+		BlockState PoweredRail();
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Prismarine
 	{
-		constexpr short Prismarine()
+		constexpr BlockState Prismarine()
 		{
 			return 7601;
 		}
@@ -13708,14 +12941,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PrismarineBrickSlab(enum Type Type)
+		constexpr BlockState PrismarineBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 7851;
 			if (Type == Type::Bottom) return 7853;
 			return 7855;
 		}
-		short PrismarineBrickSlab();
-		enum Type Type(short ID);
+		BlockState PrismarineBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PrismarineBrickStairs
 	{
@@ -13732,7 +12965,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PrismarineBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PrismarineBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 7685;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 7687;
@@ -13775,14 +13008,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 7761;
 			return 7763;
 		}
-		short PrismarineBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PrismarineBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PrismarineBricks
 	{
-		constexpr short PrismarineBricks()
+		constexpr BlockState PrismarineBricks()
 		{
 			return 7602;
 		}
@@ -13795,14 +13028,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PrismarineSlab(enum Type Type)
+		constexpr BlockState PrismarineSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 7845;
 			if (Type == Type::Bottom) return 7847;
 			return 7849;
 		}
-		short PrismarineSlab();
-		enum Type Type(short ID);
+		BlockState PrismarineSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PrismarineStairs
 	{
@@ -13819,7 +13052,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PrismarineStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PrismarineStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 7605;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 7607;
@@ -13862,10 +13095,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 7681;
 			return 7683;
 		}
-		short PrismarineStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PrismarineStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PrismarineWall
 	{
@@ -13893,7 +13126,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short PrismarineWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState PrismarineWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 11194;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 11195;
@@ -14058,23 +13291,23 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 11513;
 			return 11514;
 		}
-		short PrismarineWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState PrismarineWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Pumpkin
 	{
-		constexpr short Pumpkin()
+		constexpr BlockState Pumpkin()
 		{
 			return 3998;
 		}
 	}
 	namespace PumpkinStem
 	{
-		constexpr short PumpkinStem(unsigned char Age)
+		constexpr BlockState PumpkinStem(unsigned char Age)
 		{
 			if (Age == 0) return 4772;
 			if (Age == 1) return 4773;
@@ -14085,12 +13318,12 @@ namespace Block
 			if (Age == 6) return 4778;
 			return 4779;
 		}
-		short PumpkinStem();
-		unsigned char Age(short ID);
+		BlockState PumpkinStem();
+		unsigned char Age(BlockState Block);
 	}
 	namespace PurpleBanner
 	{
-		constexpr short PurpleBanner(unsigned char Rotation)
+		constexpr BlockState PurpleBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8057;
 			if (Rotation == 1) return 8058;
@@ -14109,8 +13342,8 @@ namespace Block
 			if (Rotation == 14) return 8071;
 			return 8072;
 		}
-		short PurpleBanner();
-		unsigned char Rotation(short ID);
+		BlockState PurpleBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PurpleBed
 	{
@@ -14119,7 +13352,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short PurpleBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState PurpleBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1209;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1210;
@@ -14138,47 +13371,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1223;
 			return 1224;
 		}
-		short PurpleBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState PurpleBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace PurpleCarpet
 	{
-		constexpr short PurpleCarpet()
+		constexpr BlockState PurpleCarpet()
 		{
 			return 7876;
 		}
 	}
 	namespace PurpleConcrete
 	{
-		constexpr short PurpleConcrete()
+		constexpr BlockState PurpleConcrete()
 		{
 			return 9448;
 		}
 	}
 	namespace PurpleConcretePowder
 	{
-		constexpr short PurpleConcretePowder()
+		constexpr BlockState PurpleConcretePowder()
 		{
 			return 9464;
 		}
 	}
 	namespace PurpleGlazedTerracotta
 	{
-		constexpr short PurpleGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState PurpleGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9414;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9415;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9416;
 			return 9417;
 		}
-		short PurpleGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState PurpleGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleShulkerBox
 	{
-		constexpr short PurpleShulkerBox(eBlockFace Facing)
+		constexpr BlockState PurpleShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9338;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9339;
@@ -14187,19 +13420,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9342;
 			return 9343;
 		}
-		short PurpleShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState PurpleShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleStainedGlass
 	{
-		constexpr short PurpleStainedGlass()
+		constexpr BlockState PurpleStainedGlass()
 		{
 			return 4105;
 		}
 	}
 	namespace PurpleStainedGlassPane
 	{
-		constexpr short PurpleStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState PurpleStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7185;
 			if (East && North && South && !West) return 7186;
@@ -14218,41 +13451,41 @@ namespace Block
 			if (!East && !North && !South && West) return 7213;
 			return 7214;
 		}
-		short PurpleStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState PurpleStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace PurpleTerracotta
 	{
-		constexpr short PurpleTerracotta()
+		constexpr BlockState PurpleTerracotta()
 		{
 			return 6857;
 		}
 	}
 	namespace PurpleWallBanner
 	{
-		constexpr short PurpleWallBanner(eBlockFace Facing)
+		constexpr BlockState PurpleWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8193;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8194;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8195;
 			return 8196;
 		}
-		short PurpleWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState PurpleWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleWool
 	{
-		constexpr short PurpleWool()
+		constexpr BlockState PurpleWool()
 		{
 			return 1394;
 		}
 	}
 	namespace PurpurBlock
 	{
-		constexpr short PurpurBlock()
+		constexpr BlockState PurpurBlock()
 		{
 			return 9134;
 		}
@@ -14265,14 +13498,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short PurpurPillar(enum Axis Axis)
+		constexpr BlockState PurpurPillar(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 9135;
 			if (Axis == Axis::Y) return 9136;
 			return 9137;
 		}
-		short PurpurPillar();
-		enum Axis Axis(short ID);
+		BlockState PurpurPillar();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace PurpurSlab
 	{
@@ -14282,14 +13515,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short PurpurSlab(enum Type Type)
+		constexpr BlockState PurpurSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8409;
 			if (Type == Type::Bottom) return 8411;
 			return 8413;
 		}
-		short PurpurSlab();
-		enum Type Type(short ID);
+		BlockState PurpurSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace PurpurStairs
 	{
@@ -14306,7 +13539,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short PurpurStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState PurpurStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9139;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9141;
@@ -14349,21 +13582,21 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 9215;
 			return 9217;
 		}
-		short PurpurStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState PurpurStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace QuartzBlock
 	{
-		constexpr short QuartzBlock()
+		constexpr BlockState QuartzBlock()
 		{
 			return 6738;
 		}
 	}
 	namespace QuartzBricks
 	{
-		constexpr short QuartzBricks()
+		constexpr BlockState QuartzBricks()
 		{
 			return 17103;
 		}
@@ -14376,14 +13609,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short QuartzPillar(enum Axis Axis)
+		constexpr BlockState QuartzPillar(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 6740;
 			if (Axis == Axis::Y) return 6741;
 			return 6742;
 		}
-		short QuartzPillar();
-		enum Axis Axis(short ID);
+		BlockState QuartzPillar();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace QuartzSlab
 	{
@@ -14393,14 +13626,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short QuartzSlab(enum Type Type)
+		constexpr BlockState QuartzSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8391;
 			if (Type == Type::Bottom) return 8393;
 			return 8395;
 		}
-		short QuartzSlab();
-		enum Type Type(short ID);
+		BlockState QuartzSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace QuartzStairs
 	{
@@ -14417,7 +13650,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short QuartzStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState QuartzStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 6744;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 6746;
@@ -14460,10 +13693,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 6820;
 			return 6822;
 		}
-		short QuartzStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState QuartzStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Rail
 	{
@@ -14480,7 +13713,7 @@ namespace Block
 			NorthWest,
 			NorthEast
 		};
-		constexpr short Rail(enum Shape Shape)
+		constexpr BlockState Rail(enum Shape Shape)
 		{
 			if (Shape == Shape::NorthSouth) return 3645;
 			if (Shape == Shape::EastWest) return 3646;
@@ -14493,12 +13726,12 @@ namespace Block
 			if (Shape == Shape::NorthWest) return 3653;
 			return 3654;
 		}
-		short Rail();
-		enum Shape Shape(short ID);
+		BlockState Rail();
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedBanner
 	{
-		constexpr short RedBanner(unsigned char Rotation)
+		constexpr BlockState RedBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 8121;
 			if (Rotation == 1) return 8122;
@@ -14517,8 +13750,8 @@ namespace Block
 			if (Rotation == 14) return 8135;
 			return 8136;
 		}
-		short RedBanner();
-		unsigned char Rotation(short ID);
+		BlockState RedBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace RedBed
 	{
@@ -14527,7 +13760,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short RedBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState RedBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1273;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1274;
@@ -14546,54 +13779,54 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1287;
 			return 1288;
 		}
-		short RedBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState RedBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace RedCarpet
 	{
-		constexpr short RedCarpet()
+		constexpr BlockState RedCarpet()
 		{
 			return 7880;
 		}
 	}
 	namespace RedConcrete
 	{
-		constexpr short RedConcrete()
+		constexpr BlockState RedConcrete()
 		{
 			return 9452;
 		}
 	}
 	namespace RedConcretePowder
 	{
-		constexpr short RedConcretePowder()
+		constexpr BlockState RedConcretePowder()
 		{
 			return 9468;
 		}
 	}
 	namespace RedGlazedTerracotta
 	{
-		constexpr short RedGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState RedGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9430;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9431;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9432;
 			return 9433;
 		}
-		short RedGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState RedGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedMushroom
 	{
-		constexpr short RedMushroom()
+		constexpr BlockState RedMushroom()
 		{
 			return 1426;
 		}
 	}
 	namespace RedMushroomBlock
 	{
-		constexpr short RedMushroomBlock(bool Down, bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState RedMushroomBlock(bool Down, bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (Down && East && North && South && Up && West) return 4569;
 			if (Down && East && North && South && Up && !West) return 4570;
@@ -14660,13 +13893,13 @@ namespace Block
 			if (!Down && !East && !North && !South && !Up && West) return 4631;
 			return 4632;
 		}
-		short RedMushroomBlock();
-		bool Down(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState RedMushroomBlock();
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace RedNetherBrickSlab
 	{
@@ -14676,14 +13909,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short RedNetherBrickSlab(enum Type Type)
+		constexpr BlockState RedNetherBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10850;
 			if (Type == Type::Bottom) return 10852;
 			return 10854;
 		}
-		short RedNetherBrickSlab();
-		enum Type Type(short ID);
+		BlockState RedNetherBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace RedNetherBrickStairs
 	{
@@ -14700,7 +13933,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short RedNetherBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState RedNetherBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10550;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10552;
@@ -14743,10 +13976,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10626;
 			return 10628;
 		}
-		short RedNetherBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState RedNetherBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedNetherBrickWall
 	{
@@ -14774,7 +14007,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short RedNetherBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState RedNetherBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 13462;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 13463;
@@ -14939,30 +14172,30 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 13781;
 			return 13782;
 		}
-		short RedNetherBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState RedNetherBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace RedNetherBricks
 	{
-		constexpr short RedNetherBricks()
+		constexpr BlockState RedNetherBricks()
 		{
 			return 9255;
 		}
 	}
 	namespace RedSand
 	{
-		constexpr short RedSand()
+		constexpr BlockState RedSand()
 		{
 			return 67;
 		}
 	}
 	namespace RedSandstone
 	{
-		constexpr short RedSandstone()
+		constexpr BlockState RedSandstone()
 		{
 			return 8217;
 		}
@@ -14975,14 +14208,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short RedSandstoneSlab(enum Type Type)
+		constexpr BlockState RedSandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8397;
 			if (Type == Type::Bottom) return 8399;
 			return 8401;
 		}
-		short RedSandstoneSlab();
-		enum Type Type(short ID);
+		BlockState RedSandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace RedSandstoneStairs
 	{
@@ -14999,7 +14232,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short RedSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState RedSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 8221;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 8223;
@@ -15042,10 +14275,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 8297;
 			return 8299;
 		}
-		short RedSandstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState RedSandstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedSandstoneWall
 	{
@@ -15073,7 +14306,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short RedSandstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState RedSandstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 11518;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 11519;
@@ -15238,16 +14471,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 11837;
 			return 11838;
 		}
-		short RedSandstoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState RedSandstoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace RedShulkerBox
 	{
-		constexpr short RedShulkerBox(eBlockFace Facing)
+		constexpr BlockState RedShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9362;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9363;
@@ -15256,19 +14489,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9366;
 			return 9367;
 		}
-		short RedShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState RedShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedStainedGlass
 	{
-		constexpr short RedStainedGlass()
+		constexpr BlockState RedStainedGlass()
 		{
 			return 4109;
 		}
 	}
 	namespace RedStainedGlassPane
 	{
-		constexpr short RedStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState RedStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 7313;
 			if (East && North && South && !West) return 7314;
@@ -15287,85 +14520,85 @@ namespace Block
 			if (!East && !North && !South && West) return 7341;
 			return 7342;
 		}
-		short RedStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState RedStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace RedTerracotta
 	{
-		constexpr short RedTerracotta()
+		constexpr BlockState RedTerracotta()
 		{
 			return 6861;
 		}
 	}
 	namespace RedTulip
 	{
-		constexpr short RedTulip()
+		constexpr BlockState RedTulip()
 		{
 			return 1417;
 		}
 	}
 	namespace RedWallBanner
 	{
-		constexpr short RedWallBanner(eBlockFace Facing)
+		constexpr BlockState RedWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8209;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8210;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8211;
 			return 8212;
 		}
-		short RedWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState RedWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedWool
 	{
-		constexpr short RedWool()
+		constexpr BlockState RedWool()
 		{
 			return 1398;
 		}
 	}
 	namespace RedstoneBlock
 	{
-		constexpr short RedstoneBlock()
+		constexpr BlockState RedstoneBlock()
 		{
 			return 6726;
 		}
 	}
 	namespace RedstoneLamp
 	{
-		constexpr short RedstoneLamp(bool Lit)
+		constexpr BlockState RedstoneLamp(bool Lit)
 		{
 			if (Lit) return 5156;
 			return 5157;
 		}
-		short RedstoneLamp();
-		bool Lit(short ID);
+		BlockState RedstoneLamp();
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneOre
 	{
-		constexpr short RedstoneOre(bool Lit)
+		constexpr BlockState RedstoneOre(bool Lit)
 		{
 			if (Lit) return 3885;
 			return 3886;
 		}
-		short RedstoneOre();
-		bool Lit(short ID);
+		BlockState RedstoneOre();
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneTorch
 	{
-		constexpr short RedstoneTorch(bool Lit)
+		constexpr BlockState RedstoneTorch(bool Lit)
 		{
 			if (Lit) return 3887;
 			return 3888;
 		}
-		short RedstoneTorch();
-		bool Lit(short ID);
+		BlockState RedstoneTorch();
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneWallTorch
 	{
-		constexpr short RedstoneWallTorch(eBlockFace Facing, bool Lit)
+		constexpr BlockState RedstoneWallTorch(eBlockFace Facing, bool Lit)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit) return 3889;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Lit) return 3890;
@@ -15376,9 +14609,9 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Lit) return 3895;
 			return 3896;
 		}
-		short RedstoneWallTorch();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
+		BlockState RedstoneWallTorch();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneWire
 	{
@@ -15406,7 +14639,7 @@ namespace Block
 			Side,
 			None
 		};
-		constexpr short RedstoneWire(enum East East, enum North North, unsigned char Power, enum South South, enum West West)
+		constexpr BlockState RedstoneWire(enum East East, enum North North, unsigned char Power, enum South South, enum West West)
 		{
 			if (East == East::Up && North == North::Up && Power == 0 && South == South::Up && West == West::Up) return 2058;
 			if (East == East::Up && North == North::Up && Power == 0 && South == South::Up && West == West::Side) return 2059;
@@ -16705,16 +15938,16 @@ namespace Block
 			if (East == East::None && North == North::None && Power == 15 && South == South::None && West == West::Side) return 3352;
 			return 3353;
 		}
-		short RedstoneWire();
-		enum East East(short ID);
-		enum North North(short ID);
-		unsigned char Power(short ID);
-		enum South South(short ID);
-		enum West West(short ID);
+		BlockState RedstoneWire();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		unsigned char Power(BlockState Block);
+		enum South South(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Repeater
 	{
-		constexpr short Repeater(unsigned char Delay, eBlockFace Facing, bool Locked, bool Powered)
+		constexpr BlockState Repeater(unsigned char Delay, eBlockFace Facing, bool Locked, bool Powered)
 		{
 			if (Delay == 1 && Facing == eBlockFace::BLOCK_FACE_ZM && Locked && Powered) return 4031;
 			if (Delay == 1 && Facing == eBlockFace::BLOCK_FACE_ZM && Locked && !Powered) return 4032;
@@ -16781,15 +16014,15 @@ namespace Block
 			if (Delay == 4 && Facing == eBlockFace::BLOCK_FACE_XP && !Locked && Powered) return 4093;
 			return 4094;
 		}
-		short Repeater();
-		unsigned char Delay(short ID);
-		eBlockFace Facing(short ID);
-		bool Locked(short ID);
-		bool Powered(short ID);
+		BlockState Repeater();
+		unsigned char Delay(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Locked(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace RepeatingCommandBlock
 	{
-		constexpr short RepeatingCommandBlock(bool Conditional, eBlockFace Facing)
+		constexpr BlockState RepeatingCommandBlock(bool Conditional, eBlockFace Facing)
 		{
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_ZM) return 9225;
 			if (Conditional && Facing == eBlockFace::BLOCK_FACE_XP) return 9226;
@@ -16804,13 +16037,13 @@ namespace Block
 			if (!Conditional && Facing == eBlockFace::BLOCK_FACE_YP) return 9235;
 			return 9236;
 		}
-		short RepeatingCommandBlock();
-		bool Conditional(short ID);
-		eBlockFace Facing(short ID);
+		BlockState RepeatingCommandBlock();
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RespawnAnchor
 	{
-		constexpr short RespawnAnchor(unsigned char Charges)
+		constexpr BlockState RespawnAnchor(unsigned char Charges)
 		{
 			if (Charges == 0) return 15829;
 			if (Charges == 1) return 15830;
@@ -16818,8 +16051,8 @@ namespace Block
 			if (Charges == 3) return 15832;
 			return 15833;
 		}
-		short RespawnAnchor();
-		unsigned char Charges(short ID);
+		BlockState RespawnAnchor();
+		unsigned char Charges(BlockState Block);
 	}
 	namespace RoseBush
 	{
@@ -16828,24 +16061,24 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short RoseBush(enum Half Half)
+		constexpr BlockState RoseBush(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7889;
 			return 7890;
 		}
-		short RoseBush();
-		enum Half Half(short ID);
+		BlockState RoseBush();
+		enum Half Half(BlockState Block);
 	}
 	namespace Sand
 	{
-		constexpr short Sand()
+		constexpr BlockState Sand()
 		{
 			return 66;
 		}
 	}
 	namespace Sandstone
 	{
-		constexpr short Sandstone()
+		constexpr BlockState Sandstone()
 		{
 			return 246;
 		}
@@ -16858,14 +16091,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SandstoneSlab(enum Type Type)
+		constexpr BlockState SandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8349;
 			if (Type == Type::Bottom) return 8351;
 			return 8353;
 		}
-		short SandstoneSlab();
-		enum Type Type(short ID);
+		BlockState SandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace SandstoneStairs
 	{
@@ -16882,7 +16115,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short SandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState SandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 5171;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 5173;
@@ -16925,10 +16158,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5247;
 			return 5249;
 		}
-		short SandstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState SandstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SandstoneWall
 	{
@@ -16956,7 +16189,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short SandstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState SandstoneWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 13786;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 13787;
@@ -17121,16 +16354,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 14105;
 			return 14106;
 		}
-		short SandstoneWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState SandstoneWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Scaffolding
 	{
-		constexpr short Scaffolding(bool Bottom, unsigned char Distance)
+		constexpr BlockState Scaffolding(bool Bottom, unsigned char Distance)
 		{
 			if (Bottom && Distance == 0) return 14756;
 			if (Bottom && Distance == 1) return 14758;
@@ -17149,46 +16382,46 @@ namespace Block
 			if (!Bottom && Distance == 6) return 14784;
 			return 14786;
 		}
-		short Scaffolding();
-		bool Bottom(short ID);
-		unsigned char Distance(short ID);
+		BlockState Scaffolding();
+		bool Bottom(BlockState Block);
+		unsigned char Distance(BlockState Block);
 	}
 	namespace SeaLantern
 	{
-		constexpr short SeaLantern()
+		constexpr BlockState SeaLantern()
 		{
 			return 7862;
 		}
 	}
 	namespace SeaPickle
 	{
-		constexpr short SeaPickle(unsigned char Pickles)
+		constexpr BlockState SeaPickle(unsigned char Pickles)
 		{
 			if (Pickles == 1) return 9641;
 			if (Pickles == 2) return 9643;
 			if (Pickles == 3) return 9645;
 			return 9647;
 		}
-		short SeaPickle();
-		unsigned char Pickles(short ID);
+		BlockState SeaPickle();
+		unsigned char Pickles(BlockState Block);
 	}
 	namespace Seagrass
 	{
-		constexpr short Seagrass()
+		constexpr BlockState Seagrass()
 		{
 			return 1345;
 		}
 	}
 	namespace Shroomlight
 	{
-		constexpr short Shroomlight()
+		constexpr BlockState Shroomlight()
 		{
 			return 14989;
 		}
 	}
 	namespace ShulkerBox
 	{
-		constexpr short ShulkerBox(eBlockFace Facing)
+		constexpr BlockState ShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9272;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9273;
@@ -17197,12 +16430,12 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9276;
 			return 9277;
 		}
-		short ShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState ShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SkeletonSkull
 	{
-		constexpr short SkeletonSkull(unsigned char Rotation)
+		constexpr BlockState SkeletonSkull(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6490;
 			if (Rotation == 1) return 6491;
@@ -17221,38 +16454,38 @@ namespace Block
 			if (Rotation == 14) return 6504;
 			return 6505;
 		}
-		short SkeletonSkull();
-		unsigned char Rotation(short ID);
+		BlockState SkeletonSkull();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace SkeletonWallSkull
 	{
-		constexpr short SkeletonWallSkull(eBlockFace Facing)
+		constexpr BlockState SkeletonWallSkull(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6506;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6507;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6508;
 			return 6509;
 		}
-		short SkeletonWallSkull();
-		eBlockFace Facing(short ID);
+		BlockState SkeletonWallSkull();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SlimeBlock
 	{
-		constexpr short SlimeBlock()
+		constexpr BlockState SlimeBlock()
 		{
 			return 7535;
 		}
 	}
 	namespace SmithingTable
 	{
-		constexpr short SmithingTable()
+		constexpr BlockState SmithingTable()
 		{
 			return 14849;
 		}
 	}
 	namespace Smoker
 	{
-		constexpr short Smoker(eBlockFace Facing, bool Lit)
+		constexpr BlockState Smoker(eBlockFace Facing, bool Lit)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit) return 14803;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && !Lit) return 14804;
@@ -17263,13 +16496,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Lit) return 14809;
 			return 14810;
 		}
-		short Smoker();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
+		BlockState Smoker();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace SmoothQuartz
 	{
-		constexpr short SmoothQuartz()
+		constexpr BlockState SmoothQuartz()
 		{
 			return 8416;
 		}
@@ -17282,14 +16515,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SmoothQuartzSlab(enum Type Type)
+		constexpr BlockState SmoothQuartzSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10832;
 			if (Type == Type::Bottom) return 10834;
 			return 10836;
 		}
-		short SmoothQuartzSlab();
-		enum Type Type(short ID);
+		BlockState SmoothQuartzSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothQuartzStairs
 	{
@@ -17306,7 +16539,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short SmoothQuartzStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState SmoothQuartzStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10310;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10312;
@@ -17349,14 +16582,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10386;
 			return 10388;
 		}
-		short SmoothQuartzStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState SmoothQuartzStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothRedSandstone
 	{
-		constexpr short SmoothRedSandstone()
+		constexpr BlockState SmoothRedSandstone()
 		{
 			return 8417;
 		}
@@ -17369,14 +16602,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SmoothRedSandstoneSlab(enum Type Type)
+		constexpr BlockState SmoothRedSandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10796;
 			if (Type == Type::Bottom) return 10798;
 			return 10800;
 		}
-		short SmoothRedSandstoneSlab();
-		enum Type Type(short ID);
+		BlockState SmoothRedSandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothRedSandstoneStairs
 	{
@@ -17393,7 +16626,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short SmoothRedSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState SmoothRedSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 9750;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 9752;
@@ -17436,14 +16669,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 9826;
 			return 9828;
 		}
-		short SmoothRedSandstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState SmoothRedSandstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothSandstone
 	{
-		constexpr short SmoothSandstone()
+		constexpr BlockState SmoothSandstone()
 		{
 			return 8415;
 		}
@@ -17456,14 +16689,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SmoothSandstoneSlab(enum Type Type)
+		constexpr BlockState SmoothSandstoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 10826;
 			if (Type == Type::Bottom) return 10828;
 			return 10830;
 		}
-		short SmoothSandstoneSlab();
-		enum Type Type(short ID);
+		BlockState SmoothSandstoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothSandstoneStairs
 	{
@@ -17480,7 +16713,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short SmoothSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState SmoothSandstoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10230;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10232;
@@ -17523,14 +16756,14 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10306;
 			return 10308;
 		}
-		short SmoothSandstoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState SmoothSandstoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothStone
 	{
-		constexpr short SmoothStone()
+		constexpr BlockState SmoothStone()
 		{
 			return 8414;
 		}
@@ -17543,18 +16776,18 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SmoothStoneSlab(enum Type Type)
+		constexpr BlockState SmoothStoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8343;
 			if (Type == Type::Bottom) return 8345;
 			return 8347;
 		}
-		short SmoothStoneSlab();
-		enum Type Type(short ID);
+		BlockState SmoothStoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace Snow
 	{
-		constexpr short Snow(unsigned char Layers)
+		constexpr BlockState Snow(unsigned char Layers)
 		{
 			if (Layers == 1) return 3921;
 			if (Layers == 2) return 3922;
@@ -17565,19 +16798,19 @@ namespace Block
 			if (Layers == 7) return 3927;
 			return 3928;
 		}
-		short Snow();
-		unsigned char Layers(short ID);
+		BlockState Snow();
+		unsigned char Layers(BlockState Block);
 	}
 	namespace SnowBlock
 	{
-		constexpr short SnowBlock()
+		constexpr BlockState SnowBlock()
 		{
 			return 3930;
 		}
 	}
 	namespace SoulCampfire
 	{
-		constexpr short SoulCampfire(eBlockFace Facing, bool Lit, bool SignalFire)
+		constexpr BlockState SoulCampfire(eBlockFace Facing, bool Lit, bool SignalFire)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit && SignalFire) return 14923;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Lit && !SignalFire) return 14925;
@@ -17596,71 +16829,71 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Lit && SignalFire) return 14951;
 			return 14953;
 		}
-		short SoulCampfire();
-		eBlockFace Facing(short ID);
-		bool Lit(short ID);
-		bool SignalFire(short ID);
+		BlockState SoulCampfire();
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
+		bool SignalFire(BlockState Block);
 	}
 	namespace SoulFire
 	{
-		constexpr short SoulFire()
+		constexpr BlockState SoulFire()
 		{
 			return 1952;
 		}
 	}
 	namespace SoulLantern
 	{
-		constexpr short SoulLantern(bool Hanging)
+		constexpr BlockState SoulLantern(bool Hanging)
 		{
 			if (Hanging) return 14888;
 			return 14889;
 		}
-		short SoulLantern();
-		bool Hanging(short ID);
+		BlockState SoulLantern();
+		bool Hanging(BlockState Block);
 	}
 	namespace SoulSand
 	{
-		constexpr short SoulSand()
+		constexpr BlockState SoulSand()
 		{
 			return 4000;
 		}
 	}
 	namespace SoulSoil
 	{
-		constexpr short SoulSoil()
+		constexpr BlockState SoulSoil()
 		{
 			return 4001;
 		}
 	}
 	namespace SoulTorch
 	{
-		constexpr short SoulTorch()
+		constexpr BlockState SoulTorch()
 		{
 			return 4008;
 		}
 	}
 	namespace SoulWallTorch
 	{
-		constexpr short SoulWallTorch(eBlockFace Facing)
+		constexpr BlockState SoulWallTorch(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 4009;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 4010;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 4011;
 			return 4012;
 		}
-		short SoulWallTorch();
-		eBlockFace Facing(short ID);
+		BlockState SoulWallTorch();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Spawner
 	{
-		constexpr short Spawner()
+		constexpr BlockState Spawner()
 		{
 			return 1953;
 		}
 	}
 	namespace Sponge
 	{
-		constexpr short Sponge()
+		constexpr BlockState Sponge()
 		{
 			return 229;
 		}
@@ -17673,7 +16906,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short SpruceButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState SpruceButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 6370;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 6371;
@@ -17700,10 +16933,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 6392;
 			return 6393;
 		}
-		short SpruceButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState SpruceButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceDoor
 	{
@@ -17717,7 +16950,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short SpruceDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState SpruceDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 8738;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 8739;
@@ -17784,16 +17017,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 8800;
 			return 8801;
 		}
-		short SpruceDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState SpruceDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceFence
 	{
-		constexpr short SpruceFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState SpruceFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 8580;
 			if (East && North && South && !West) return 8581;
@@ -17812,15 +17045,15 @@ namespace Block
 			if (!East && !North && !South && West) return 8608;
 			return 8609;
 		}
-		short SpruceFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState SpruceFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace SpruceFenceGate
 	{
-		constexpr short SpruceFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState SpruceFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 8418;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 8419;
@@ -17855,15 +17088,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 8448;
 			return 8449;
 		}
-		short SpruceFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState SpruceFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceLeaves
 	{
-		constexpr short SpruceLeaves(unsigned char Distance, bool Persistent)
+		constexpr BlockState SpruceLeaves(unsigned char Distance, bool Persistent)
 		{
 			if (Distance == 1 && Persistent) return 159;
 			if (Distance == 1 && !Persistent) return 160;
@@ -17880,9 +17113,9 @@ namespace Block
 			if (Distance == 7 && Persistent) return 171;
 			return 172;
 		}
-		short SpruceLeaves();
-		unsigned char Distance(short ID);
-		bool Persistent(short ID);
+		BlockState SpruceLeaves();
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace SpruceLog
 	{
@@ -17892,45 +17125,45 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short SpruceLog(enum Axis Axis)
+		constexpr BlockState SpruceLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 76;
 			if (Axis == Axis::Y) return 77;
 			return 78;
 		}
-		short SpruceLog();
-		enum Axis Axis(short ID);
+		BlockState SpruceLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace SprucePlanks
 	{
-		constexpr short SprucePlanks()
+		constexpr BlockState SprucePlanks()
 		{
 			return 16;
 		}
 	}
 	namespace SprucePressurePlate
 	{
-		constexpr short SprucePressurePlate(bool Powered)
+		constexpr BlockState SprucePressurePlate(bool Powered)
 		{
 			if (Powered) return 3875;
 			return 3876;
 		}
-		short SprucePressurePlate();
-		bool Powered(short ID);
+		BlockState SprucePressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceSapling
 	{
-		constexpr short SpruceSapling(unsigned char Stage)
+		constexpr BlockState SpruceSapling(unsigned char Stage)
 		{
 			if (Stage == 0) return 23;
 			return 24;
 		}
-		short SpruceSapling();
-		unsigned char Stage(short ID);
+		BlockState SpruceSapling();
+		unsigned char Stage(BlockState Block);
 	}
 	namespace SpruceSign
 	{
-		constexpr short SpruceSign(unsigned char Rotation)
+		constexpr BlockState SpruceSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 3414;
 			if (Rotation == 1) return 3416;
@@ -17949,8 +17182,8 @@ namespace Block
 			if (Rotation == 14) return 3442;
 			return 3444;
 		}
-		short SpruceSign();
-		unsigned char Rotation(short ID);
+		BlockState SpruceSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace SpruceSlab
 	{
@@ -17960,14 +17193,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short SpruceSlab(enum Type Type)
+		constexpr BlockState SpruceSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8307;
 			if (Type == Type::Bottom) return 8309;
 			return 8311;
 		}
-		short SpruceSlab();
-		enum Type Type(short ID);
+		BlockState SpruceSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace SpruceStairs
 	{
@@ -17984,7 +17217,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short SpruceStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState SpruceStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 5405;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 5407;
@@ -18027,10 +17260,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5481;
 			return 5483;
 		}
-		short SpruceStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState SpruceStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SpruceTrapdoor
 	{
@@ -18039,7 +17272,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short SpruceTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState SpruceTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 4176;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 4178;
@@ -18074,23 +17307,23 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 4236;
 			return 4238;
 		}
-		short SpruceTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState SpruceTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceWallSign
 	{
-		constexpr short SpruceWallSign(eBlockFace Facing)
+		constexpr BlockState SpruceWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 3744;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 3746;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 3748;
 			return 3750;
 		}
-		short SpruceWallSign();
-		eBlockFace Facing(short ID);
+		BlockState SpruceWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SpruceWood
 	{
@@ -18100,18 +17333,18 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short SpruceWood(enum Axis Axis)
+		constexpr BlockState SpruceWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 112;
 			if (Axis == Axis::Y) return 113;
 			return 114;
 		}
-		short SpruceWood();
-		enum Axis Axis(short ID);
+		BlockState SpruceWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StickyPiston
 	{
-		constexpr short StickyPiston(bool Extended, eBlockFace Facing)
+		constexpr BlockState StickyPiston(bool Extended, eBlockFace Facing)
 		{
 			if (Extended && Facing == eBlockFace::BLOCK_FACE_ZM) return 1329;
 			if (Extended && Facing == eBlockFace::BLOCK_FACE_XP) return 1330;
@@ -18126,13 +17359,13 @@ namespace Block
 			if (!Extended && Facing == eBlockFace::BLOCK_FACE_YP) return 1339;
 			return 1340;
 		}
-		short StickyPiston();
-		bool Extended(short ID);
-		eBlockFace Facing(short ID);
+		BlockState StickyPiston();
+		bool Extended(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Stone
 	{
-		constexpr short Stone()
+		constexpr BlockState Stone()
 		{
 			return 1;
 		}
@@ -18145,14 +17378,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short StoneBrickSlab(enum Type Type)
+		constexpr BlockState StoneBrickSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8379;
 			if (Type == Type::Bottom) return 8381;
 			return 8383;
 		}
-		short StoneBrickSlab();
-		enum Type Type(short ID);
+		BlockState StoneBrickSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace StoneBrickStairs
 	{
@@ -18169,7 +17402,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short StoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState StoneBrickStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 4933;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 4935;
@@ -18212,10 +17445,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 5009;
 			return 5011;
 		}
-		short StoneBrickStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState StoneBrickStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace StoneBrickWall
 	{
@@ -18243,7 +17476,7 @@ namespace Block
 			Low,
 			Tall
 		};
-		constexpr short StoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
+		constexpr BlockState StoneBrickWall(enum East East, enum North North, enum South South, bool Up, enum West West)
 		{
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::None) return 12490;
 			if (East == East::None && North == North::None && South == South::None && Up && West == West::Low) return 12491;
@@ -18408,16 +17641,16 @@ namespace Block
 			if (East == East::Tall && North == North::Tall && South == South::Tall && !Up && West == West::Low) return 12809;
 			return 12810;
 		}
-		short StoneBrickWall();
-		enum East East(short ID);
-		enum North North(short ID);
-		enum South South(short ID);
-		bool Up(short ID);
-		enum West West(short ID);
+		BlockState StoneBrickWall();
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace StoneBricks
 	{
-		constexpr short StoneBricks()
+		constexpr BlockState StoneBricks()
 		{
 			return 4495;
 		}
@@ -18430,7 +17663,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short StoneButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState StoneButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 3897;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 3898;
@@ -18457,20 +17690,20 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 3919;
 			return 3920;
 		}
-		short StoneButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState StoneButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace StonePressurePlate
 	{
-		constexpr short StonePressurePlate(bool Powered)
+		constexpr BlockState StonePressurePlate(bool Powered)
 		{
 			if (Powered) return 3807;
 			return 3808;
 		}
-		short StonePressurePlate();
-		bool Powered(short ID);
+		BlockState StonePressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace StoneSlab
 	{
@@ -18480,14 +17713,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short StoneSlab(enum Type Type)
+		constexpr BlockState StoneSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 8337;
 			if (Type == Type::Bottom) return 8339;
 			return 8341;
 		}
-		short StoneSlab();
-		enum Type Type(short ID);
+		BlockState StoneSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace StoneStairs
 	{
@@ -18504,7 +17737,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short StoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState StoneStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 10150;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 10152;
@@ -18547,22 +17780,22 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 10226;
 			return 10228;
 		}
-		short StoneStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState StoneStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Stonecutter
 	{
-		constexpr short Stonecutter(eBlockFace Facing)
+		constexpr BlockState Stonecutter(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 14850;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 14851;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 14852;
 			return 14853;
 		}
-		short Stonecutter();
-		eBlockFace Facing(short ID);
+		BlockState Stonecutter();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace StrippedAcaciaLog
 	{
@@ -18572,14 +17805,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedAcaciaLog(enum Axis Axis)
+		constexpr BlockState StrippedAcaciaLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 100;
 			if (Axis == Axis::Y) return 101;
 			return 102;
 		}
-		short StrippedAcaciaLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedAcaciaLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedAcaciaWood
 	{
@@ -18589,14 +17822,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedAcaciaWood(enum Axis Axis)
+		constexpr BlockState StrippedAcaciaWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 139;
 			if (Axis == Axis::Y) return 140;
 			return 141;
 		}
-		short StrippedAcaciaWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedAcaciaWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedBirchLog
 	{
@@ -18606,14 +17839,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedBirchLog(enum Axis Axis)
+		constexpr BlockState StrippedBirchLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 94;
 			if (Axis == Axis::Y) return 95;
 			return 96;
 		}
-		short StrippedBirchLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedBirchLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedBirchWood
 	{
@@ -18623,14 +17856,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedBirchWood(enum Axis Axis)
+		constexpr BlockState StrippedBirchWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 133;
 			if (Axis == Axis::Y) return 134;
 			return 135;
 		}
-		short StrippedBirchWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedBirchWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedCrimsonHyphae
 	{
@@ -18640,14 +17873,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedCrimsonHyphae(enum Axis Axis)
+		constexpr BlockState StrippedCrimsonHyphae(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14984;
 			if (Axis == Axis::Y) return 14985;
 			return 14986;
 		}
-		short StrippedCrimsonHyphae();
-		enum Axis Axis(short ID);
+		BlockState StrippedCrimsonHyphae();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedCrimsonStem
 	{
@@ -18657,14 +17890,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedCrimsonStem(enum Axis Axis)
+		constexpr BlockState StrippedCrimsonStem(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14978;
 			if (Axis == Axis::Y) return 14979;
 			return 14980;
 		}
-		short StrippedCrimsonStem();
-		enum Axis Axis(short ID);
+		BlockState StrippedCrimsonStem();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedDarkOakLog
 	{
@@ -18674,14 +17907,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedDarkOakLog(enum Axis Axis)
+		constexpr BlockState StrippedDarkOakLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 103;
 			if (Axis == Axis::Y) return 104;
 			return 105;
 		}
-		short StrippedDarkOakLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedDarkOakLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedDarkOakWood
 	{
@@ -18691,14 +17924,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedDarkOakWood(enum Axis Axis)
+		constexpr BlockState StrippedDarkOakWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 142;
 			if (Axis == Axis::Y) return 143;
 			return 144;
 		}
-		short StrippedDarkOakWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedDarkOakWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedJungleLog
 	{
@@ -18708,14 +17941,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedJungleLog(enum Axis Axis)
+		constexpr BlockState StrippedJungleLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 97;
 			if (Axis == Axis::Y) return 98;
 			return 99;
 		}
-		short StrippedJungleLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedJungleLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedJungleWood
 	{
@@ -18725,14 +17958,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedJungleWood(enum Axis Axis)
+		constexpr BlockState StrippedJungleWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 136;
 			if (Axis == Axis::Y) return 137;
 			return 138;
 		}
-		short StrippedJungleWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedJungleWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedOakLog
 	{
@@ -18742,14 +17975,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedOakLog(enum Axis Axis)
+		constexpr BlockState StrippedOakLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 106;
 			if (Axis == Axis::Y) return 107;
 			return 108;
 		}
-		short StrippedOakLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedOakLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedOakWood
 	{
@@ -18759,14 +17992,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedOakWood(enum Axis Axis)
+		constexpr BlockState StrippedOakWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 127;
 			if (Axis == Axis::Y) return 128;
 			return 129;
 		}
-		short StrippedOakWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedOakWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedSpruceLog
 	{
@@ -18776,14 +18009,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedSpruceLog(enum Axis Axis)
+		constexpr BlockState StrippedSpruceLog(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 91;
 			if (Axis == Axis::Y) return 92;
 			return 93;
 		}
-		short StrippedSpruceLog();
-		enum Axis Axis(short ID);
+		BlockState StrippedSpruceLog();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedSpruceWood
 	{
@@ -18793,14 +18026,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedSpruceWood(enum Axis Axis)
+		constexpr BlockState StrippedSpruceWood(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 130;
 			if (Axis == Axis::Y) return 131;
 			return 132;
 		}
-		short StrippedSpruceWood();
-		enum Axis Axis(short ID);
+		BlockState StrippedSpruceWood();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedWarpedHyphae
 	{
@@ -18810,14 +18043,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedWarpedHyphae(enum Axis Axis)
+		constexpr BlockState StrippedWarpedHyphae(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14967;
 			if (Axis == Axis::Y) return 14968;
 			return 14969;
 		}
-		short StrippedWarpedHyphae();
-		enum Axis Axis(short ID);
+		BlockState StrippedWarpedHyphae();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedWarpedStem
 	{
@@ -18827,14 +18060,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short StrippedWarpedStem(enum Axis Axis)
+		constexpr BlockState StrippedWarpedStem(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14961;
 			if (Axis == Axis::Y) return 14962;
 			return 14963;
 		}
-		short StrippedWarpedStem();
-		enum Axis Axis(short ID);
+		BlockState StrippedWarpedStem();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StructureBlock
 	{
@@ -18845,26 +18078,26 @@ namespace Block
 			Corner,
 			Data
 		};
-		constexpr short StructureBlock(enum Mode Mode)
+		constexpr BlockState StructureBlock(enum Mode Mode)
 		{
 			if (Mode == Mode::Save) return 15735;
 			if (Mode == Mode::Load) return 15736;
 			if (Mode == Mode::Corner) return 15737;
 			return 15738;
 		}
-		short StructureBlock();
-		enum Mode Mode(short ID);
+		BlockState StructureBlock();
+		enum Mode Mode(BlockState Block);
 	}
 	namespace StructureVoid
 	{
-		constexpr short StructureVoid()
+		constexpr BlockState StructureVoid()
 		{
 			return 9259;
 		}
 	}
 	namespace SugarCane
 	{
-		constexpr short SugarCane(unsigned char Age)
+		constexpr BlockState SugarCane(unsigned char Age)
 		{
 			if (Age == 0) return 3948;
 			if (Age == 1) return 3949;
@@ -18883,8 +18116,8 @@ namespace Block
 			if (Age == 14) return 3962;
 			return 3963;
 		}
-		short SugarCane();
-		unsigned char Age(short ID);
+		BlockState SugarCane();
+		unsigned char Age(BlockState Block);
 	}
 	namespace Sunflower
 	{
@@ -18893,35 +18126,35 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short Sunflower(enum Half Half)
+		constexpr BlockState Sunflower(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7885;
 			return 7886;
 		}
-		short Sunflower();
-		enum Half Half(short ID);
+		BlockState Sunflower();
+		enum Half Half(BlockState Block);
 	}
 	namespace SweetBerryBush
 	{
-		constexpr short SweetBerryBush(unsigned char Age)
+		constexpr BlockState SweetBerryBush(unsigned char Age)
 		{
 			if (Age == 0) return 14954;
 			if (Age == 1) return 14955;
 			if (Age == 2) return 14956;
 			return 14957;
 		}
-		short SweetBerryBush();
-		unsigned char Age(short ID);
+		BlockState SweetBerryBush();
+		unsigned char Age(BlockState Block);
 	}
 	namespace TNT
 	{
-		constexpr short TNT(bool Unstable)
+		constexpr BlockState TNT(bool Unstable)
 		{
 			if (Unstable) return 1430;
 			return 1431;
 		}
-		short TNT();
-		bool Unstable(short ID);
+		BlockState TNT();
+		bool Unstable(BlockState Block);
 	}
 	namespace TallGrass
 	{
@@ -18930,13 +18163,13 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short TallGrass(enum Half Half)
+		constexpr BlockState TallGrass(enum Half Half)
 		{
 			if (Half == Half::Upper) return 7893;
 			return 7894;
 		}
-		short TallGrass();
-		enum Half Half(short ID);
+		BlockState TallGrass();
+		enum Half Half(BlockState Block);
 	}
 	namespace TallSeagrass
 	{
@@ -18945,17 +18178,17 @@ namespace Block
 			Upper,
 			Lower
 		};
-		constexpr short TallSeagrass(enum Half Half)
+		constexpr BlockState TallSeagrass(enum Half Half)
 		{
 			if (Half == Half::Upper) return 1346;
 			return 1347;
 		}
-		short TallSeagrass();
-		enum Half Half(short ID);
+		BlockState TallSeagrass();
+		enum Half Half(BlockState Block);
 	}
 	namespace Target
 	{
-		constexpr short Target(unsigned char Power)
+		constexpr BlockState Target(unsigned char Power)
 		{
 			if (Power == 0) return 15760;
 			if (Power == 1) return 15761;
@@ -18974,19 +18207,19 @@ namespace Block
 			if (Power == 14) return 15774;
 			return 15775;
 		}
-		short Target();
-		unsigned char Power(short ID);
+		BlockState Target();
+		unsigned char Power(BlockState Block);
 	}
 	namespace Terracotta
 	{
-		constexpr short Terracotta()
+		constexpr BlockState Terracotta()
 		{
 			return 7882;
 		}
 	}
 	namespace Torch
 	{
-		constexpr short Torch()
+		constexpr BlockState Torch()
 		{
 			return 1435;
 		}
@@ -18999,7 +18232,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short TrappedChest(eBlockFace Facing, enum Type Type)
+		constexpr BlockState TrappedChest(eBlockFace Facing, enum Type Type)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Single) return 6623;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Type == Type::Left) return 6625;
@@ -19014,13 +18247,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Type == Type::Left) return 6643;
 			return 6645;
 		}
-		short TrappedChest();
-		eBlockFace Facing(short ID);
-		enum Type Type(short ID);
+		BlockState TrappedChest();
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace Tripwire
 	{
-		constexpr short Tripwire(bool Attached, bool Disarmed, bool East, bool North, bool Powered, bool South, bool West)
+		constexpr BlockState Tripwire(bool Attached, bool Disarmed, bool East, bool North, bool Powered, bool South, bool West)
 		{
 			if (Attached && Disarmed && East && North && Powered && South && West) return 5275;
 			if (Attached && Disarmed && East && North && Powered && South && !West) return 5276;
@@ -19151,18 +18384,18 @@ namespace Block
 			if (!Attached && !Disarmed && !East && !North && !Powered && !South && West) return 5401;
 			return 5402;
 		}
-		short Tripwire();
-		bool Attached(short ID);
-		bool Disarmed(short ID);
-		bool East(short ID);
-		bool North(short ID);
-		bool Powered(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState Tripwire();
+		bool Attached(BlockState Block);
+		bool Disarmed(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool Powered(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace TripwireHook
 	{
-		constexpr short TripwireHook(bool Attached, eBlockFace Facing, bool Powered)
+		constexpr BlockState TripwireHook(bool Attached, eBlockFace Facing, bool Powered)
 		{
 			if (Attached && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 5259;
 			if (Attached && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 5260;
@@ -19181,47 +18414,47 @@ namespace Block
 			if (!Attached && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 5273;
 			return 5274;
 		}
-		short TripwireHook();
-		bool Attached(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState TripwireHook();
+		bool Attached(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace TubeCoral
 	{
-		constexpr short TubeCoral()
+		constexpr BlockState TubeCoral()
 		{
 			return 9531;
 		}
 	}
 	namespace TubeCoralBlock
 	{
-		constexpr short TubeCoralBlock()
+		constexpr BlockState TubeCoralBlock()
 		{
 			return 9515;
 		}
 	}
 	namespace TubeCoralFan
 	{
-		constexpr short TubeCoralFan()
+		constexpr BlockState TubeCoralFan()
 		{
 			return 9551;
 		}
 	}
 	namespace TubeCoralWallFan
 	{
-		constexpr short TubeCoralWallFan(eBlockFace Facing)
+		constexpr BlockState TubeCoralWallFan(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9601;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9603;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9605;
 			return 9607;
 		}
-		short TubeCoralWallFan();
-		eBlockFace Facing(short ID);
+		BlockState TubeCoralWallFan();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace TurtleEgg
 	{
-		constexpr short TurtleEgg(unsigned char Eggs, unsigned char Hatch)
+		constexpr BlockState TurtleEgg(unsigned char Eggs, unsigned char Hatch)
 		{
 			if (Eggs == 1 && Hatch == 0) return 9498;
 			if (Eggs == 1 && Hatch == 1) return 9499;
@@ -19236,13 +18469,13 @@ namespace Block
 			if (Eggs == 4 && Hatch == 1) return 9508;
 			return 9509;
 		}
-		short TurtleEgg();
-		unsigned char Eggs(short ID);
-		unsigned char Hatch(short ID);
+		BlockState TurtleEgg();
+		unsigned char Eggs(BlockState Block);
+		unsigned char Hatch(BlockState Block);
 	}
 	namespace TwistingVines
 	{
-		constexpr short TwistingVines(unsigned char Age)
+		constexpr BlockState TwistingVines(unsigned char Age)
 		{
 			if (Age == 0) return 15017;
 			if (Age == 1) return 15018;
@@ -19271,19 +18504,19 @@ namespace Block
 			if (Age == 24) return 15041;
 			return 15042;
 		}
-		short TwistingVines();
-		unsigned char Age(short ID);
+		BlockState TwistingVines();
+		unsigned char Age(BlockState Block);
 	}
 	namespace TwistingVinesPlant
 	{
-		constexpr short TwistingVinesPlant()
+		constexpr BlockState TwistingVinesPlant()
 		{
 			return 15043;
 		}
 	}
 	namespace Vine
 	{
-		constexpr short Vine(bool East, bool North, bool South, bool Up, bool West)
+		constexpr BlockState Vine(bool East, bool North, bool South, bool Up, bool West)
 		{
 			if (East && North && South && Up && West) return 4788;
 			if (East && North && South && Up && !West) return 4789;
@@ -19318,31 +18551,31 @@ namespace Block
 			if (!East && !North && !South && !Up && West) return 4818;
 			return 4819;
 		}
-		short Vine();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool Up(short ID);
-		bool West(short ID);
+		BlockState Vine();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace VoidAir
 	{
-		constexpr short VoidAir()
+		constexpr BlockState VoidAir()
 		{
 			return 9665;
 		}
 	}
 	namespace WallTorch
 	{
-		constexpr short WallTorch(eBlockFace Facing)
+		constexpr BlockState WallTorch(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 1436;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 1437;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 1438;
 			return 1439;
 		}
-		short WallTorch();
-		eBlockFace Facing(short ID);
+		BlockState WallTorch();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WarpedButton
 	{
@@ -19352,7 +18585,7 @@ namespace Block
 			Wall,
 			Ceiling
 		};
-		constexpr short WarpedButton(enum Face Face, eBlockFace Facing, bool Powered)
+		constexpr BlockState WarpedButton(enum Face Face, eBlockFace Facing, bool Powered)
 		{
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && Powered) return 15503;
 			if (Face == Face::Floor && Facing == eBlockFace::BLOCK_FACE_ZM && !Powered) return 15504;
@@ -19379,10 +18612,10 @@ namespace Block
 			if (Face == Face::Ceiling && Facing == eBlockFace::BLOCK_FACE_XP && Powered) return 15525;
 			return 15526;
 		}
-		short WarpedButton();
-		enum Face Face(short ID);
-		eBlockFace Facing(short ID);
-		bool Powered(short ID);
+		BlockState WarpedButton();
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedDoor
 	{
@@ -19396,7 +18629,7 @@ namespace Block
 			Left,
 			Right
 		};
-		constexpr short WarpedDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
+		constexpr BlockState WarpedDoor(eBlockFace Facing, enum Half Half, enum Hinge Hinge, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && Powered) return 15591;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Upper && Hinge == Hinge::Left && Open && !Powered) return 15592;
@@ -19463,16 +18696,16 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Lower && Hinge == Hinge::Right && !Open && Powered) return 15653;
 			return 15654;
 		}
-		short WarpedDoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Hinge Hinge(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState WarpedDoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedFence
 	{
-		constexpr short WarpedFence(bool East, bool North, bool South, bool West)
+		constexpr BlockState WarpedFence(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 15097;
 			if (East && North && South && !West) return 15098;
@@ -19491,15 +18724,15 @@ namespace Block
 			if (!East && !North && !South && West) return 15125;
 			return 15126;
 		}
-		short WarpedFence();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState WarpedFence();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace WarpedFenceGate
 	{
-		constexpr short WarpedFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
+		constexpr BlockState WarpedFenceGate(eBlockFace Facing, bool InWall, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && Powered) return 15287;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && InWall && Open && !Powered) return 15288;
@@ -19534,15 +18767,15 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !InWall && !Open && Powered) return 15317;
 			return 15318;
 		}
-		short WarpedFenceGate();
-		eBlockFace Facing(short ID);
-		bool InWall(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState WarpedFenceGate();
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedFungus
 	{
-		constexpr short WarpedFungus()
+		constexpr BlockState WarpedFungus()
 		{
 			return 14971;
 		}
@@ -19555,49 +18788,49 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short WarpedHyphae(enum Axis Axis)
+		constexpr BlockState WarpedHyphae(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14964;
 			if (Axis == Axis::Y) return 14965;
 			return 14966;
 		}
-		short WarpedHyphae();
-		enum Axis Axis(short ID);
+		BlockState WarpedHyphae();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace WarpedNylium
 	{
-		constexpr short WarpedNylium()
+		constexpr BlockState WarpedNylium()
 		{
 			return 14970;
 		}
 	}
 	namespace WarpedPlanks
 	{
-		constexpr short WarpedPlanks()
+		constexpr BlockState WarpedPlanks()
 		{
 			return 15046;
 		}
 	}
 	namespace WarpedPressurePlate
 	{
-		constexpr short WarpedPressurePlate(bool Powered)
+		constexpr BlockState WarpedPressurePlate(bool Powered)
 		{
 			if (Powered) return 15061;
 			return 15062;
 		}
-		short WarpedPressurePlate();
-		bool Powered(short ID);
+		BlockState WarpedPressurePlate();
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedRoots
 	{
-		constexpr short WarpedRoots()
+		constexpr BlockState WarpedRoots()
 		{
 			return 14973;
 		}
 	}
 	namespace WarpedSign
 	{
-		constexpr short WarpedSign(unsigned char Rotation)
+		constexpr BlockState WarpedSign(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 15688;
 			if (Rotation == 1) return 15690;
@@ -19616,8 +18849,8 @@ namespace Block
 			if (Rotation == 14) return 15716;
 			return 15718;
 		}
-		short WarpedSign();
-		unsigned char Rotation(short ID);
+		BlockState WarpedSign();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WarpedSlab
 	{
@@ -19627,14 +18860,14 @@ namespace Block
 			Bottom,
 			Double
 		};
-		constexpr short WarpedSlab(enum Type Type)
+		constexpr BlockState WarpedSlab(enum Type Type)
 		{
 			if (Type == Type::Top) return 15054;
 			if (Type == Type::Bottom) return 15056;
 			return 15058;
 		}
-		short WarpedSlab();
-		enum Type Type(short ID);
+		BlockState WarpedSlab();
+		enum Type Type(BlockState Block);
 	}
 	namespace WarpedStairs
 	{
@@ -19651,7 +18884,7 @@ namespace Block
 			OuterLeft,
 			OuterRight
 		};
-		constexpr short WarpedStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
+		constexpr BlockState WarpedStairs(eBlockFace Facing, enum Half Half, enum Shape Shape)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::Straight) return 15400;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Shape == Shape::InnerLeft) return 15402;
@@ -19694,10 +18927,10 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && Shape == Shape::OuterLeft) return 15476;
 			return 15478;
 		}
-		short WarpedStairs();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		enum Shape Shape(short ID);
+		BlockState WarpedStairs();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace WarpedStem
 	{
@@ -19707,14 +18940,14 @@ namespace Block
 			Y,
 			Z
 		};
-		constexpr short WarpedStem(enum Axis Axis)
+		constexpr BlockState WarpedStem(enum Axis Axis)
 		{
 			if (Axis == Axis::X) return 14958;
 			if (Axis == Axis::Y) return 14959;
 			return 14960;
 		}
-		short WarpedStem();
-		enum Axis Axis(short ID);
+		BlockState WarpedStem();
+		enum Axis Axis(BlockState Block);
 	}
 	namespace WarpedTrapdoor
 	{
@@ -19723,7 +18956,7 @@ namespace Block
 			Top,
 			Bottom
 		};
-		constexpr short WarpedTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
+		constexpr BlockState WarpedTrapdoor(eBlockFace Facing, enum Half Half, bool Open, bool Powered)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && Powered) return 15192;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Half == Half::Top && Open && !Powered) return 15194;
@@ -19758,34 +18991,34 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && Half == Half::Bottom && !Open && Powered) return 15252;
 			return 15254;
 		}
-		short WarpedTrapdoor();
-		eBlockFace Facing(short ID);
-		enum Half Half(short ID);
-		bool Open(short ID);
-		bool Powered(short ID);
+		BlockState WarpedTrapdoor();
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedWallSign
 	{
-		constexpr short WarpedWallSign(eBlockFace Facing)
+		constexpr BlockState WarpedWallSign(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 15728;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 15730;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 15732;
 			return 15734;
 		}
-		short WarpedWallSign();
-		eBlockFace Facing(short ID);
+		BlockState WarpedWallSign();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WarpedWartBlock
 	{
-		constexpr short WarpedWartBlock()
+		constexpr BlockState WarpedWartBlock()
 		{
 			return 14972;
 		}
 	}
 	namespace Water
 	{
-		constexpr short Water(unsigned char Level)
+		constexpr BlockState Water(unsigned char Level)
 		{
 			if (Level == 0) return 34;
 			if (Level == 1) return 35;
@@ -19804,12 +19037,12 @@ namespace Block
 			if (Level == 14) return 48;
 			return 49;
 		}
-		short Water();
-		unsigned char Level(short ID);
+		BlockState Water();
+		unsigned char Level(BlockState Block);
 	}
 	namespace WeepingVines
 	{
-		constexpr short WeepingVines(unsigned char Age)
+		constexpr BlockState WeepingVines(unsigned char Age)
 		{
 			if (Age == 0) return 14990;
 			if (Age == 1) return 14991;
@@ -19838,26 +19071,26 @@ namespace Block
 			if (Age == 24) return 15014;
 			return 15015;
 		}
-		short WeepingVines();
-		unsigned char Age(short ID);
+		BlockState WeepingVines();
+		unsigned char Age(BlockState Block);
 	}
 	namespace WeepingVinesPlant
 	{
-		constexpr short WeepingVinesPlant()
+		constexpr BlockState WeepingVinesPlant()
 		{
 			return 15016;
 		}
 	}
 	namespace WetSponge
 	{
-		constexpr short WetSponge()
+		constexpr BlockState WetSponge()
 		{
 			return 230;
 		}
 	}
 	namespace Wheat
 	{
-		constexpr short Wheat(unsigned char Age)
+		constexpr BlockState Wheat(unsigned char Age)
 		{
 			if (Age == 0) return 3357;
 			if (Age == 1) return 3358;
@@ -19868,12 +19101,12 @@ namespace Block
 			if (Age == 6) return 3363;
 			return 3364;
 		}
-		short Wheat();
-		unsigned char Age(short ID);
+		BlockState Wheat();
+		unsigned char Age(BlockState Block);
 	}
 	namespace WhiteBanner
 	{
-		constexpr short WhiteBanner(unsigned char Rotation)
+		constexpr BlockState WhiteBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7897;
 			if (Rotation == 1) return 7898;
@@ -19892,8 +19125,8 @@ namespace Block
 			if (Rotation == 14) return 7911;
 			return 7912;
 		}
-		short WhiteBanner();
-		unsigned char Rotation(short ID);
+		BlockState WhiteBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WhiteBed
 	{
@@ -19902,7 +19135,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short WhiteBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState WhiteBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1049;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1050;
@@ -19921,47 +19154,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1063;
 			return 1064;
 		}
-		short WhiteBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState WhiteBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace WhiteCarpet
 	{
-		constexpr short WhiteCarpet()
+		constexpr BlockState WhiteCarpet()
 		{
 			return 7866;
 		}
 	}
 	namespace WhiteConcrete
 	{
-		constexpr short WhiteConcrete()
+		constexpr BlockState WhiteConcrete()
 		{
 			return 9438;
 		}
 	}
 	namespace WhiteConcretePowder
 	{
-		constexpr short WhiteConcretePowder()
+		constexpr BlockState WhiteConcretePowder()
 		{
 			return 9454;
 		}
 	}
 	namespace WhiteGlazedTerracotta
 	{
-		constexpr short WhiteGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState WhiteGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9374;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9375;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9376;
 			return 9377;
 		}
-		short WhiteGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState WhiteGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteShulkerBox
 	{
-		constexpr short WhiteShulkerBox(eBlockFace Facing)
+		constexpr BlockState WhiteShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9278;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9279;
@@ -19970,19 +19203,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9282;
 			return 9283;
 		}
-		short WhiteShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState WhiteShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteStainedGlass
 	{
-		constexpr short WhiteStainedGlass()
+		constexpr BlockState WhiteStainedGlass()
 		{
 			return 4095;
 		}
 	}
 	namespace WhiteStainedGlassPane
 	{
-		constexpr short WhiteStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState WhiteStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 6865;
 			if (East && North && South && !West) return 6866;
@@ -20001,55 +19234,55 @@ namespace Block
 			if (!East && !North && !South && West) return 6893;
 			return 6894;
 		}
-		short WhiteStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState WhiteStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace WhiteTerracotta
 	{
-		constexpr short WhiteTerracotta()
+		constexpr BlockState WhiteTerracotta()
 		{
 			return 6847;
 		}
 	}
 	namespace WhiteTulip
 	{
-		constexpr short WhiteTulip()
+		constexpr BlockState WhiteTulip()
 		{
 			return 1419;
 		}
 	}
 	namespace WhiteWallBanner
 	{
-		constexpr short WhiteWallBanner(eBlockFace Facing)
+		constexpr BlockState WhiteWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8153;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8154;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8155;
 			return 8156;
 		}
-		short WhiteWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState WhiteWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteWool
 	{
-		constexpr short WhiteWool()
+		constexpr BlockState WhiteWool()
 		{
 			return 1384;
 		}
 	}
 	namespace WitherRose
 	{
-		constexpr short WitherRose()
+		constexpr BlockState WitherRose()
 		{
 			return 1423;
 		}
 	}
 	namespace WitherSkeletonSkull
 	{
-		constexpr short WitherSkeletonSkull(unsigned char Rotation)
+		constexpr BlockState WitherSkeletonSkull(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6510;
 			if (Rotation == 1) return 6511;
@@ -20068,24 +19301,24 @@ namespace Block
 			if (Rotation == 14) return 6524;
 			return 6525;
 		}
-		short WitherSkeletonSkull();
-		unsigned char Rotation(short ID);
+		BlockState WitherSkeletonSkull();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WitherSkeletonWallSkull
 	{
-		constexpr short WitherSkeletonWallSkull(eBlockFace Facing)
+		constexpr BlockState WitherSkeletonWallSkull(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6526;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6527;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6528;
 			return 6529;
 		}
-		short WitherSkeletonWallSkull();
-		eBlockFace Facing(short ID);
+		BlockState WitherSkeletonWallSkull();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowBanner
 	{
-		constexpr short YellowBanner(unsigned char Rotation)
+		constexpr BlockState YellowBanner(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 7961;
 			if (Rotation == 1) return 7962;
@@ -20104,8 +19337,8 @@ namespace Block
 			if (Rotation == 14) return 7975;
 			return 7976;
 		}
-		short YellowBanner();
-		unsigned char Rotation(short ID);
+		BlockState YellowBanner();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace YellowBed
 	{
@@ -20114,7 +19347,7 @@ namespace Block
 			Head,
 			Foot
 		};
-		constexpr short YellowBed(eBlockFace Facing, bool Occupied, enum Part Part)
+		constexpr BlockState YellowBed(eBlockFace Facing, bool Occupied, enum Part Part)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Head) return 1113;
 			if (Facing == eBlockFace::BLOCK_FACE_ZM && Occupied && Part == Part::Foot) return 1114;
@@ -20133,47 +19366,47 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_XP && !Occupied && Part == Part::Head) return 1127;
 			return 1128;
 		}
-		short YellowBed();
-		eBlockFace Facing(short ID);
-		bool Occupied(short ID);
-		enum Part Part(short ID);
+		BlockState YellowBed();
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace YellowCarpet
 	{
-		constexpr short YellowCarpet()
+		constexpr BlockState YellowCarpet()
 		{
 			return 7870;
 		}
 	}
 	namespace YellowConcrete
 	{
-		constexpr short YellowConcrete()
+		constexpr BlockState YellowConcrete()
 		{
 			return 9442;
 		}
 	}
 	namespace YellowConcretePowder
 	{
-		constexpr short YellowConcretePowder()
+		constexpr BlockState YellowConcretePowder()
 		{
 			return 9458;
 		}
 	}
 	namespace YellowGlazedTerracotta
 	{
-		constexpr short YellowGlazedTerracotta(eBlockFace Facing)
+		constexpr BlockState YellowGlazedTerracotta(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9390;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 9391;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 9392;
 			return 9393;
 		}
-		short YellowGlazedTerracotta();
-		eBlockFace Facing(short ID);
+		BlockState YellowGlazedTerracotta();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowShulkerBox
 	{
-		constexpr short YellowShulkerBox(eBlockFace Facing)
+		constexpr BlockState YellowShulkerBox(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 9302;
 			if (Facing == eBlockFace::BLOCK_FACE_XP) return 9303;
@@ -20182,19 +19415,19 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_YP) return 9306;
 			return 9307;
 		}
-		short YellowShulkerBox();
-		eBlockFace Facing(short ID);
+		BlockState YellowShulkerBox();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowStainedGlass
 	{
-		constexpr short YellowStainedGlass()
+		constexpr BlockState YellowStainedGlass()
 		{
 			return 4099;
 		}
 	}
 	namespace YellowStainedGlassPane
 	{
-		constexpr short YellowStainedGlassPane(bool East, bool North, bool South, bool West)
+		constexpr BlockState YellowStainedGlassPane(bool East, bool North, bool South, bool West)
 		{
 			if (East && North && South && West) return 6993;
 			if (East && North && South && !West) return 6994;
@@ -20213,41 +19446,41 @@ namespace Block
 			if (!East && !North && !South && West) return 7021;
 			return 7022;
 		}
-		short YellowStainedGlassPane();
-		bool East(short ID);
-		bool North(short ID);
-		bool South(short ID);
-		bool West(short ID);
+		BlockState YellowStainedGlassPane();
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace YellowTerracotta
 	{
-		constexpr short YellowTerracotta()
+		constexpr BlockState YellowTerracotta()
 		{
 			return 6851;
 		}
 	}
 	namespace YellowWallBanner
 	{
-		constexpr short YellowWallBanner(eBlockFace Facing)
+		constexpr BlockState YellowWallBanner(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8169;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8170;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 8171;
 			return 8172;
 		}
-		short YellowWallBanner();
-		eBlockFace Facing(short ID);
+		BlockState YellowWallBanner();
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowWool
 	{
-		constexpr short YellowWool()
+		constexpr BlockState YellowWool()
 		{
 			return 1388;
 		}
 	}
 	namespace ZombieHead
 	{
-		constexpr short ZombieHead(unsigned char Rotation)
+		constexpr BlockState ZombieHead(unsigned char Rotation)
 		{
 			if (Rotation == 0) return 6530;
 			if (Rotation == 1) return 6531;
@@ -20266,19 +19499,19 @@ namespace Block
 			if (Rotation == 14) return 6544;
 			return 6545;
 		}
-		short ZombieHead();
-		unsigned char Rotation(short ID);
+		BlockState ZombieHead();
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace ZombieWallHead
 	{
-		constexpr short ZombieWallHead(eBlockFace Facing)
+		constexpr BlockState ZombieWallHead(eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 6546;
 			if (Facing == eBlockFace::BLOCK_FACE_ZP) return 6547;
 			if (Facing == eBlockFace::BLOCK_FACE_XM) return 6548;
 			return 6549;
 		}
-		short ZombieWallHead();
-		eBlockFace Facing(short ID);
+		BlockState ZombieWallHead();
+		eBlockFace Facing(BlockState Block);
 	}
 }
