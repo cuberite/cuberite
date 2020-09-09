@@ -5,6 +5,7 @@
 
 #include "LootTableProvider.h"
 #include "JsonUtils.h"
+#include "World.h"
 
 
 
