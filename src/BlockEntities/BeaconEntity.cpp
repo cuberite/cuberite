@@ -306,7 +306,7 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	a_Player->GetStatManager().AddValue(Statistic::InteractWithBeacon);
 
 	// Loot table processing
-	Super::UsedBy(a_Player);
+	ApplyLootTable(a_Player);
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

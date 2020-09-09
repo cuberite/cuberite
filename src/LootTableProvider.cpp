@@ -12,7 +12,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTableProvider
 
-cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld * a_World):
+cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld & a_World):
 	m_World(a_World)
 {
 	LOG("Loading loot tables...");

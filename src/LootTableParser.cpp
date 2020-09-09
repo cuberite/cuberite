@@ -676,9 +676,9 @@ namespace LootTable
 	{
 		cLootTablePoolRolls PoolRolls;
 		cLootTablePoolRolls PoolBonusRolls;
-		cLootTablePoolEntryVector PoolEntries;
-		cLootTableFunctionVector Functions;
-		cLootTableConditionVector Conditions;
+		cLootTablePoolEntries PoolEntries;
+		cLootTableFunctions Functions;
+		cLootTableConditions Conditions;
 		for (auto & PoolElement : a_Value.getMemberNames())
 		{
 			if (NoCaseCompare(PoolElement, "rolls") == 0)
@@ -728,7 +728,7 @@ namespace LootTable
 	cLootTableFunction ParseFunction(const Json::Value & a_Value)
 	{
 		enum LootTable::eFunctionType Type;
-		cLootTableConditionVector Conditions;
+		cLootTableConditions Conditions;
 		Json::Value Parameter = a_Value;
 		for (auto & FunctionInfo : a_Value.getMemberNames())
 		{
@@ -777,7 +777,7 @@ namespace LootTable
 			case LootTable::eConditionType::Alternative:
 			{
 				Json::Value Terms;
-				cLootTableConditionVector SubConditions;
+				cLootTableConditions SubConditions;
 				if (a_Value.isMember("terms"))
 				{
 					Terms = a_Value["terms"];
@@ -801,7 +801,7 @@ namespace LootTable
 			case LootTable::eConditionType::Inverted:
 			{
 				Json::Value Term;
-				cLootTableConditionVector SubConditions;
+				cLootTableConditions SubConditions;
 				if (a_Value.isMember("term"))
 				{
 					Term = a_Value["term"];
@@ -851,13 +851,13 @@ namespace LootTable
 
 	cLootTablePoolEntry ParsePoolEntry(const Json::Value & a_Value)
 	{
-		cLootTableConditionVector Conditions;
-		cLootTableFunctionVector Functions;
+		cLootTableConditions Conditions;
+		cLootTableFunctions Functions;
 		enum LootTable::ePoolEntryType Type;
 
 		cItem Item;
 		AString Name;
-		cLootTablePoolEntryVector Children;
+		cLootTablePoolEntries Children;
 
 		bool Expand = true;
 		int Weight = 1;

@@ -142,7 +142,7 @@ bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 	a_Player->GetStatManager().AddValue(Statistic::InteractWithFurnace);
 
 	// Loot table processing
-	Super::UsedBy(a_Player);
+	ApplyLootTable(a_Player);
 
 
 	cWindow * Window = GetWindow();

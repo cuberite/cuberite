@@ -64,24 +64,22 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 
 
 
-void cBlockEntityWithItems::SetLootTable(AString a_LootTable)
+void cBlockEntityWithItems::SetLootTable(const AString & a_LootTable)
 {
-	m_LootTable = std::move(a_LootTable);
+	m_LootTable = a_LootTable;
 }
 
 
 
 
 
-bool cBlockEntityWithItems::UsedBy(cPlayer * a_Player)
+void cBlockEntityWithItems::ApplyLootTable(cPlayer * a_Player)
 {
 	if (!m_LootTable.empty())
 	{
-		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(GetContents(), m_World, m_Pos, a_Player->GetUniqueID());
+		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(GetContents(), * m_World, m_Pos, a_Player->GetUniqueID());
 		m_LootTable = "";
-		return true;
 	}
-	return false;
 }
 
 

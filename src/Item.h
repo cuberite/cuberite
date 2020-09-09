@@ -222,7 +222,7 @@ public:
 	/** Constructs a new instance containing the specified item. */
 	cItems(cItem && a_InitialItem);
 
-	/** Constructs a new Instance from a initializer list */
+	/** Constructs a new instance from a initializer list */
 	cItems(std::initializer_list<cItem> a_List):
 		std::vector<cItem>(a_List)
 	{

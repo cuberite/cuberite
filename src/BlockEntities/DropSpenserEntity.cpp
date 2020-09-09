@@ -163,7 +163,7 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 	}
 
 	// Loot table processing
-	Super::UsedBy(a_Player);
+	ApplyLootTable(a_Player);
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

@@ -27,7 +27,7 @@ cLootTable::cLootTable():
 
 
 
-cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
+cLootTable::cLootTable(const Json::Value & a_Description, cWorld & a_World)
 {
 	for (const auto & RootId : a_Description.getMemberNames())
 	{
@@ -58,12 +58,12 @@ cLootTable::cLootTable(const Json::Value & a_Description, cWorld * a_World)
 
 
 
-bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Player) const
+bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Vector3i a_Pos, const UInt32 a_PlayerID) const
 {
-	auto Noise = cNoise(a_World->GetGenerator().GetSeed());
+	auto Noise = cNoise(a_World.GetGenerator().GetSeed());
 
 	// The player is killed and killer here because he influences both in the functions or conditions
-	auto Items = GetItems(Noise, a_Pos, a_World, a_Player, a_Player);
+	auto Items = GetItems(Noise, a_Pos, a_World, a_PlayerID, a_PlayerID);
 
 	// Places items in a_ItemGrid
 	int i = 0;  // This value is used for some more randomness
@@ -85,19 +85,19 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld * a_World, const Ve
 
 
 
-cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld * a_World, const UInt32 & a_Killed, const UInt32 & a_Killer) const
+cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID) const
 {
 	auto Items = cItems();
 	for (const auto & Pool : m_LootTablePools)
 	{
-		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	for (auto & Item : Items)
 	{
 		for (const auto & Function : m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		}
 	}
 	return Items;
@@ -107,10 +107,10 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 
 
-cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
 	auto Items = cItems();
-	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return Items;
 	}
@@ -121,7 +121,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 	{
 		Luck = a_Player.GetLuck();
 	};
-	a_World->DoWithPlayerByUUID(a_Player, Callback);
+	a_World.DoWithPlayerByUUID(a_Player, Callback);
 	*/
 
 	// Determines the total weight manipulated by the quality
@@ -139,7 +139,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 			EntryNum = (EntryNum + 1) % a_Pool.m_Entries.size();
 		} while (Rnd > 0);
 		const auto & Entry = a_Pool.m_Entries[EntryNum];
-		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	return Items;
@@ -149,11 +149,11 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld * a_World, con
 
 
 
-cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
 	auto Items = cItems();
 
-	if (!ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return Items;
 	}
@@ -210,7 +210,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 				break;
 			}
 
-			auto NewItems = a_World->GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_World, a_Killed, a_Killer);
+			auto NewItems = a_World.GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_World, a_KilledID, a_KillerID);
 			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			break;
 		}
@@ -218,9 +218,9 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 		{
 			try
 			{
-				for (const auto & Child : std::get<cLootTablePoolEntryVector>(a_Entry.m_Content))
+				for (const auto & Child : std::get<cLootTablePoolEntries>(a_Entry.m_Content))
 				{
-					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 					Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				}
 			}
@@ -234,9 +234,9 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 		{
 			try
 			{
-				auto Children = std::get<cLootTablePoolEntryVector>(a_Entry.m_Content);
+				auto Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
 				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * Children.size()) % Children.size();
-				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			}
 			catch (const std::bad_variant_access &)
@@ -247,10 +247,10 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 		}
 		case LootTable::ePoolEntryType::Sequence:  // Selects entries from Children until one is not granted.
 		{
-			cLootTablePoolEntryVector Children;
+			cLootTablePoolEntries Children;
 			try
 			{
-				Children = std::get<cLootTablePoolEntryVector>(a_Entry.m_Content);
+				Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
 			}
 			catch (const std::bad_variant_access &)
 			{
@@ -262,7 +262,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 			unsigned int ChildPos = 0;
 			do
 			{
-				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				ChildPos = (ChildPos + 1) % Children.size();
 				if (ChildPos == Children.size() - 1)
@@ -289,7 +289,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 	{
 		for (const auto & Function : a_Entry.m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		}
 	}
 	return Items;
@@ -299,12 +299,12 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld * a_Worl
 
 
 
-bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer)
+bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, UInt32 a_KilledID, UInt32 a_KillerID)
 {
 	bool Success = true;
 	for (const auto & Condition : a_Conditions)
 	{
-		Success &= ConditionApplies(Condition, a_World, a_Noise, a_Killed, a_Killer);
+		Success &= ConditionApplies(Condition, a_World, a_Noise, a_KilledID, a_KillerID);
 	}
 	return Success;
 }
@@ -313,7 +313,7 @@ bool cLootTable::ConditionsApply(const cLootTableConditionVector & a_Conditions,
 
 
 
-bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld * a_World, const cNoise & a_Noise, const UInt32 & a_Killed, const UInt32 & a_Killer)
+bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, UInt32 a_KilledID, UInt32 a_KillerID)
 {
 	switch (a_Condition.m_Type)
 	{
@@ -323,10 +323,10 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		}
 		case LootTable::eConditionType::Alternative:
 		{
-			cLootTableConditionVector SubConditions;
+			cLootTableConditions SubConditions;
 			try
 			{
-				SubConditions = std::get<cLootTableConditionVector>(a_Condition.m_Parameter);
+				SubConditions = std::get<cLootTableConditions>(a_Condition.m_Parameter);
 			}
 			catch (const std::bad_variant_access &)
 			{
@@ -336,7 +336,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			bool Success = false;
 			for (const auto & SubCondition: SubConditions)
 			{
-				Success |= ConditionApplies(SubCondition, a_World, a_Noise, a_Killed, a_Killer);
+				Success |= ConditionApplies(SubCondition, a_World, a_Noise, a_KilledID, a_KillerID);
 			}
 			return Success;
 		}
@@ -366,17 +366,17 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		}
 		case LootTable::eConditionType::Inverted:
 		{
-			cLootTableConditionVector SubCondition;
+			cLootTableConditions SubCondition;
 			try
 			{
-				SubCondition = std::get<cLootTableConditionVector>(a_Condition.m_Parameter);
+				SubCondition = std::get<cLootTableConditions>(a_Condition.m_Parameter);
 			}
 			catch (const std::bad_variant_access &)
 			{
 				LOGWARNING("Unsupported Data type in loot table condition - dropping entry");
 				return true;
 			}
-			return !ConditionApplies(SubCondition[0], a_World, a_Noise, a_Killed, a_Killer);
+			return !ConditionApplies(SubCondition[0], a_World, a_Noise, a_KilledID, a_KillerID);
 		}
 		case LootTable::eConditionType::KilledByPlayer:
 		{
@@ -384,7 +384,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			{
 				return (a_Entity.GetEntityType() == cEntity::etPlayer);
 			};
-			return a_World->DoWithEntityByID(a_Killer, Callback);
+			return a_World.DoWithEntityByID(a_KillerID, Callback);
 		}
 		case LootTable::eConditionType::LocationCheck:
 		{
@@ -433,7 +433,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					return (Player.GetEquippedItem().m_ItemCount == Count);
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 			else if (CountObject.isObject())
 			{
@@ -448,7 +448,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					return ((Player.GetEquippedItem().m_ItemCount >= Min) && (Player.GetEquippedItem().m_ItemCount <= Max));
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 			/*
 			durability: The durability of the item.
@@ -476,7 +476,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					return ((Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage) == Durability);
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 			else if (DurabilityObject.isObject())
 			{
@@ -492,7 +492,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					int Durability = Player.GetEquippedItem().GetMaxDamage() - Player.GetEquippedItem().m_ItemDamage;
 					return ((Durability >= Min) && (Durability <= Min));
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 			/*
 			enchantments: List of enchantments.
@@ -564,7 +564,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 							auto & Player = static_cast<cPlayer &>(a_Entity);
 							return Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment) == Levels;
 						};
-						Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+						Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 					}
 					else if (LevelsObject.isObject())
 					{
@@ -581,7 +581,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 							int Level = Player.GetEquippedItem().m_Enchantments.GetLevel(Enchantment);
 							return ((Level >= Min) && (Level <= Max));
 						};
-						Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+						Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 					}
 				}
 			}
@@ -608,7 +608,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					auto & Player = static_cast<cPlayer & >(a_Entity);
 					return Player.GetEquippedItem().IsSameType(Item);
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 
 			// nbt: An NBT string.
@@ -646,14 +646,14 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					auto & Player = static_cast<cPlayer &>(a_Entity);
 					return ItemTag::ItemTags(ItemTag::eItemTags(Tag)).ContainsType(Player.GetEquippedItem());
 				};
-				Res &= a_World->DoWithEntityByID(a_Killer, Callback);
+				Res &= a_World.DoWithEntityByID(a_KillerID, Callback);
 			}
 
 			return Res;
 		}
 		case LootTable::eConditionType::RandomChance:
 		{
-			float Rnd = fmod(a_Noise.IntNoise1D(a_World->GetWorldAge()), 1.0f);
+			float Rnd = fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f);
 
 			Json::Value Parameter;
 			try
@@ -679,7 +679,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 		}
 		case LootTable::eConditionType::RandomChanceWithLooting:
 		{
-			float Rnd = fmod(a_Noise.IntNoise1D(a_World->GetWorldAge()), 1.0f);
+			float Rnd = fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f);
 
 			Json::Value Parameter;
 			try
@@ -715,7 +715,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				return true;
 			};
 
-			a_World->DoWithEntityByID(a_Killer, Callback);
+			a_World.DoWithEntityByID(a_KillerID, Callback);
 
 			if (Parameter.isMember("chance"))
 			{
@@ -794,7 +794,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 				return GetRandomProvider().RandReal(0.0f, 1.0f) < Chances[Level].asFloat();
 			};
 
-			return a_World->DoWithEntityByID(a_Killer, Callback);
+			return a_World.DoWithEntityByID(a_KillerID, Callback);
 		}
 		case LootTable::eConditionType::TimeCheck:
 		{
@@ -831,20 +831,20 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 
 			if (Value.isInt())
 			{
-				return (a_World->GetTimeOfDay() % Period) == Value.asInt();
+				return (a_World.GetTimeOfDay() % Period) == Value.asInt();
 			}
 			else if (Value.isObject())
 			{
 				int Min = 0, Max = 0;
 				LootTable::MinMaxRange(Value, Min, Max);
-				return ((a_World->GetTimeOfDay() % Period) > Min) && ((a_World->GetTimeOfDay() % Period) < Max);
+				return ((a_World.GetTimeOfDay() % Period) > Min) && ((a_World.GetTimeOfDay() % Period) < Max);
 			}
 			LOGWARNING("An error occurred during time check, assuming true!");
 			return true;
 		}
 		case LootTable::eConditionType::WeatherCheck:
 		{
-			auto Weather = a_World->GetWeather();
+			auto Weather = a_World.GetWeather();
 			Json::Value Parameter;
 			try
 			{
@@ -894,7 +894,7 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 
 
 
-void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
 	switch (a_Function.m_Type)
 	{
@@ -927,7 +927,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				return true;
 			};
 
-			a_World->DoWithEntityByID(a_Killed, Callback);
+			a_World.DoWithEntityByID(a_KilledID, Callback);
 
 			AString Formula;
 			if (a_Function.m_Parameter.isMember("formula"))
@@ -1146,7 +1146,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				return true;
 			};
 
-			a_World->DoWithEntityByID(a_Killer, Callback);
+			a_World.DoWithEntityByID(a_KillerID, Callback);
 
 			Json::Value CountObject;
 			if (a_Function.m_Parameter.isMember("count"))
@@ -1349,9 +1349,9 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 
 
 // Item in container
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
-	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return;
 	}
@@ -1378,7 +1378,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		default:
 		{
-			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 			break;
 		}
 	}
@@ -1388,9 +1388,9 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Block
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
-	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return;
 	}
@@ -1441,7 +1441,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		default:
 		{
-			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 			break;
 		}
 	}
@@ -1451,9 +1451,9 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Block Entity
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, const UInt32 & a_Killed, const UInt32 & a_Killer)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
 {
-	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return;
 	}
@@ -1471,7 +1471,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		default:
 		{
-			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 			break;
 		}
 	}
@@ -1480,9 +1480,9 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 
 
 // Killed entity
-void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld * a_World, const Vector3i & a_Pos, const UInt32 & a_Killed, const cNoise & a_Noise, const UInt32 & a_Killer)
+void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos, UInt32 a_KilledID, const cNoise & a_Noise, UInt32 a_KillerID)
 {
-	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Killed, a_Killer))
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_KilledID, a_KillerID))
 	{
 		return;
 	}
@@ -1529,7 +1529,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 					}
 					return true;
 				};
-				a_World->DoWithEntityByID(a_Killed, CallBack);
+				a_World.DoWithEntityByID(a_KilledID, CallBack);
 			}
 			else
 			{
@@ -1543,7 +1543,7 @@ void cLootTable::ApplyFunction(const cLootTableFunction & a_Function, cItem & a_
 		}
 		default:
 		{
-			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_Killed, a_Killer);
+			ApplyCommonFunction(a_Function, a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 			break;
 		}
 	}

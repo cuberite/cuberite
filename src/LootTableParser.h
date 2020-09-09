@@ -266,7 +266,7 @@ namespace LootTable
 
 
 struct cLootTableCondition;
-typedef std::vector<cLootTableCondition> cLootTableConditionVector;
+using cLootTableConditions = std::vector<cLootTableCondition>;
 /** Represents a condition for a pool item */
 struct cLootTableCondition
 {
@@ -281,7 +281,7 @@ struct cLootTableCondition
 
 	cLootTableCondition(
 		enum LootTable::eConditionType a_Type,
-		cLootTableConditionVector a_Parameter
+		cLootTableConditions a_Parameter
 	):
 		m_Type(a_Type),
 		m_Parameter(std::move(a_Parameter))
@@ -302,7 +302,7 @@ struct cLootTableCondition
 	}
 
 	enum LootTable::eConditionType m_Type;
-	std::variant<cLootTableConditionVector, Json::Value> m_Parameter;
+	std::variant<cLootTableConditions, Json::Value> m_Parameter;
 };
 
 
@@ -310,13 +310,13 @@ struct cLootTableCondition
 
 /** Represents a function for a pool item */
 struct cLootTableFunction;
-typedef std::vector<cLootTableFunction> cLootTableFunctionVector;
+using cLootTableFunctions = std::vector<cLootTableFunction>;
 struct cLootTableFunction
 {
 	cLootTableFunction(
 		enum LootTable::eFunctionType a_Type,
 		Json::Value a_Parameter,
-		cLootTableConditionVector a_Conditions
+		cLootTableConditions a_Conditions
 	):
 		m_Type(a_Type),
 		m_Parameter(std::move(a_Parameter)),
@@ -326,7 +326,7 @@ struct cLootTableFunction
 
 	enum LootTable::eFunctionType m_Type;
 	Json::Value m_Parameter;
-	cLootTableConditionVector m_Conditions;
+	cLootTableConditions m_Conditions;
 };
 
 
@@ -364,7 +364,7 @@ struct cLootTablePoolRolls
 		{
 			return m_RollsMin;
 		}
-		return a_Noise.IntNoise3DInt(a_Pos) % (m_RollsMax - m_RollsMin) + m_RollsMin;
+		return (a_Noise.IntNoise3DInt(a_Pos) / 7) % (m_RollsMax - m_RollsMin) + m_RollsMin;
 	}
 	// Note: The loot tables specify another value (type) this is usually "Uniform".
 	// I think this is the probability distribution for the random value.
@@ -378,7 +378,7 @@ struct cLootTablePoolRolls
 
 /** Represents a pool entry */
 struct cLootTablePoolEntry;
-typedef std::vector<cLootTablePoolEntry> cLootTablePoolEntryVector;
+using cLootTablePoolEntries = std::vector<cLootTablePoolEntry>;
 struct cLootTablePoolEntry
 {
 	cLootTablePoolEntry()
@@ -391,8 +391,8 @@ struct cLootTablePoolEntry
 
 
 	cLootTablePoolEntry(
-		cLootTableConditionVector a_Conditions,
-		cLootTableFunctionVector a_Functions,
+		cLootTableConditions a_Conditions,
+		cLootTableFunctions a_Functions,
 		enum LootTable::ePoolEntryType a_Type,
 		cItem a_Item,
 		int a_Weight,
@@ -412,8 +412,8 @@ struct cLootTablePoolEntry
 
 
 	cLootTablePoolEntry(
-		cLootTableConditionVector a_Conditions,
-		cLootTableFunctionVector a_Functions,
+		cLootTableConditions a_Conditions,
+		cLootTableFunctions a_Functions,
 		enum LootTable::ePoolEntryType a_Type,
 		AString a_Name,
 		bool a_Expand,
@@ -435,10 +435,10 @@ struct cLootTablePoolEntry
 
 
 	cLootTablePoolEntry(
-		cLootTableConditionVector a_Conditions,
-		cLootTableFunctionVector a_Functions,
+		cLootTableConditions a_Conditions,
+		cLootTableFunctions a_Functions,
 		enum LootTable::ePoolEntryType a_Type,
-		cLootTablePoolEntryVector a_Children,
+		cLootTablePoolEntries a_Children,
 		int a_Weight,
 		int a_Quality
 	):
@@ -451,10 +451,10 @@ struct cLootTablePoolEntry
 	{
 	}
 
-	cLootTableConditionVector m_Conditions;
-	cLootTableFunctionVector m_Functions;
+	cLootTableConditions m_Conditions;
+	cLootTableFunctions m_Functions;
 	enum LootTable::ePoolEntryType m_Type;
-	std::variant<cItem, AString, cLootTablePoolEntryVector> m_Content;
+	std::variant<cItem, AString, cLootTablePoolEntries> m_Content;
 	bool m_Expand;
 	int m_Weight;
 	int m_Quality;
@@ -465,13 +465,13 @@ struct cLootTablePoolEntry
 
 /** Represents a loot table pool */
 struct cLootTablePool;
-typedef std::vector<cLootTablePool> cLootTablePoolVector;
+using cLootTablePools = std::vector<cLootTablePool>;
 struct cLootTablePool
 {
 	cLootTablePool(
 		cLootTablePoolRolls a_Rolls,
-		cLootTablePoolEntryVector a_Entries,
-		cLootTableConditionVector a_Conditions
+		cLootTablePoolEntries a_Entries,
+		cLootTableConditions a_Conditions
 	):
 		m_Rolls(a_Rolls),
 		m_Entries(std::move(a_Entries)),
@@ -491,8 +491,8 @@ struct cLootTablePool
 	cLootTablePool(
 		cLootTablePoolRolls a_Rolls,
 		cLootTablePoolRolls a_BonusRolls,
-		cLootTablePoolEntryVector a_Entries,
-		cLootTableConditionVector a_Conditions
+		cLootTablePoolEntries a_Entries,
+		cLootTableConditions a_Conditions
 	):
 		m_Rolls(a_Rolls),
 		m_BonusRolls(a_BonusRolls),
@@ -508,8 +508,8 @@ struct cLootTablePool
 
 	cLootTablePoolRolls m_Rolls;
 	cLootTablePoolRolls m_BonusRolls;
-	cLootTablePoolEntryVector m_Entries;
-	cLootTableConditionVector m_Conditions;
+	cLootTablePoolEntries m_Entries;
+	cLootTableConditions m_Conditions;
 	int m_TotalWeight = 0;
 	int m_TotalQuality = 0;
 };

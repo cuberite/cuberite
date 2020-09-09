@@ -53,8 +53,8 @@ public:  // tolua_export
 	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
-	void SetLootTable(AString a_LootTable);
-	AString GetLootTable() { return m_LootTable; }
+	void SetLootTable(const AString & a_LootTable);
+	const AString & GetLootTable() { return m_LootTable; }
 
 	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }
@@ -64,12 +64,14 @@ public:  // tolua_export
 	/** Const version of the GetContents() function for C++ type-safety */
 	const cItemGrid & GetContents(void) const { return m_Contents; }
 
-	bool UsedBy(cPlayer * a_Player) override;
-
 protected:
 	cItemGrid m_Contents;
 
+	// TODO: add some doc here
 	AString m_LootTable;
+
+	/** If there's a loot table in this container, generates the loot according to it. */
+	void ApplyLootTable(cPlayer * a_Player);
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;

@@ -28,7 +28,7 @@ class cLootTableProvider
 public:
 	cLootTableProvider() = default;
 
-	cLootTableProvider(AString & a_Path, cWorld * a_World);
+	cLootTableProvider(AString & a_Path, cWorld & a_World);
 
 	cLootTableProvider(const cLootTableProvider & a_Other) = default;
 	cLootTableProvider(cLootTableProvider && a_Other) = default;
@@ -61,7 +61,7 @@ private:
 	/** Empty loot table in case there is an error */
 	static cLootTable m_EmptyLootTable;
 
-	cWorld * m_World;
+	cWorld & m_World;
 };
 
 
