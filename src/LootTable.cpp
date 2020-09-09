@@ -18,24 +18,11 @@ namespace LootTable
 // cLootTable
 
 
-cLootTable::cLootTable():
-	m_Type(LootTable::eType::Empty)
-{
-}
-
-
-
-
-
-cLootTable::cLootTable(const Json::Value & a_Description, cWorld & a_World)
+cLootTable::cLootTable(const Json::Value & a_Description)
 {
 	for (const auto & RootId : a_Description.getMemberNames())
 	{
-		if (NoCaseCompare(RootId, "type") == 0)
-		{
-			m_Type = LootTable::eType(LootTable::NamespaceConverter(a_Description[RootId].asString()));
-		}
-		else if (NoCaseCompare(RootId, "pools") == 0)
+		if (NoCaseCompare(RootId, "pools") == 0)
 		{
 			Json::Value Pools = a_Description[RootId];
 			for (unsigned int PoolId = 0; PoolId < Pools.size(); PoolId++)

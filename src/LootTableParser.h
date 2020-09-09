@@ -11,50 +11,48 @@
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 	{
-	/** Expected filenames of loot tables.
-	This list is used for reference when looking for custom loot tables.
-	The path to the folder is added later on. (global and per world). */
-	const AString FileNames[] =
+	/** A list of the names of the vanilla chest loot tables. */  // TODO: do we need this?
+	const AString VanillaChestLootTableNames[] =
 	{
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "AbandonedMineshaft.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "BuriedTreasure.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "DesertPyramid.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "EndCityTreasure.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "IglooChest.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "JungleTemple.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "JungleTempleDispenser.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "NetherBridge.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "PillagerOutpost.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckMap.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckSupply.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "ShipwreckTreasure.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "SimpleDungeon.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "SpawnBonusChest.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdCorridor.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdCrossing.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "StrongholdLibrary.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "UnderwaterRuinBig.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "UnderwaterRuinSmall.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageArmorer.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageButcher.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageCartographer.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageDesertHouse.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageFisher.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageFletcher.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageMason.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillagePlainsHouse.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageSavannaHouse.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageShepherd.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageSnowyHouse.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTaigaHouse.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTannery.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageTemple.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageToolsmith.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "VillageWeaponsmith.json",
-		AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator() + "WoodlandMansion.json"
+		"AbandonedMineshaft",
+		"BuriedTreasure",
+		"DesertPyramid",
+		"EndCityTreasure",
+		"IglooChest",
+		"JungleTemple",
+		"JungleTempleDispenser",
+		"NetherBridge",
+		"PillagerOutpost",
+		"ShipwreckMap",
+		"ShipwreckSupply",
+		"ShipwreckTreasure",
+		"SimpleDungeon",
+		"SpawnBonusChest",
+		"StrongholdCorridor",
+		"StrongholdCrossing",
+		"StrongholdLibrary",
+		"UnderwaterRuinBig",
+		"UnderwaterRuinSmall",
+		"VillageArmorer",
+		"VillageButcher",
+		"VillageCartographer",
+		"VillageDesertHouse",
+		"VillageFisher",
+		"VillageFletcher",
+		"VillageMason",
+		"VillagePlainsHouse",
+		"VillageSavannaHouse",
+		"VillageShepherd",
+		"VillageSnowyHouse",
+		"VillageTaigaHouse",
+		"VillageTannery",
+		"VillageTemple",
+		"VillageToolsmith",
+		"VillageWeaponsmith",
+		"WoodlandMansion"
 	};
 
-	const AString PathToUserLootTables = AString("LootTables") + cFile::PathSeparator() + "User";
+	const AString LootTablePath = "LootTables";
 
 	/** Any available function type as of 1.16.2 */
 	enum class eFunctionType
@@ -81,27 +79,6 @@ namespace LootTable
 		SetNbt,
 		SetStewEffect,
 		None
-	};
-
-
-
-
-	/** Any available type of loot table Type as of 1.16.2 */
-	enum class eType
-	{
-		Empty,                         // doesnt generate any Loot
-		Entity,                        // Loot from any entity
-		Block,                         // Loot from mined blocks
-		Chest,                         // Loot from chests
-		Fishing,                       // Loot from fishing
-		Gift,                          // Loot gifted to the player from NPCs
-		AdvancementReward,             // Rewards from advancements
-		Barter,                        // Loot from "trading" with Piglins
-		Command,                       // Customizable loot tables for the loot command
-		Selector,                      // ?
-		AdvancementEntity,             // ?
-		Generic,                       // ?
-		User                           // Non Vanilla type used for custom loot in generated structures
 	};
 
 
@@ -241,8 +218,6 @@ namespace LootTable
 	};
 
 	// Declaration of methods in the cpp
-	/** Gets the eType from String. Defaults to Generic */
-	enum eType eType(const AString & a_Type);
 	/** Gets the eChestType from String as of 1.16.2 */
 	enum eChestType eChestType(const AString & a_Type);
 	/** Gets the eFunctionType from String. Defaults to None */
@@ -514,18 +489,6 @@ struct cLootTablePool
 	int m_TotalQuality = 0;
 };
 
-
-
-
-
-struct EnumClassHash
-{
-	template <typename T>
-	std::size_t operator()(T t) const
-	{
-		return static_cast<std::size_t>(t);
-	}
-};
 
 
 

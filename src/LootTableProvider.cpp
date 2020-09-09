@@ -12,97 +12,55 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTableProvider
 
-cLootTableProvider::cLootTableProvider(AString & a_Path, cWorld & a_World):
-	m_World(a_World)
-{
-	LOG("Loading loot tables...");
-	// Load default loot tables
-	for (const auto & FileName: LootTable::FileNames)
-	{
-		auto Data = cFile::ReadWholeFile(FileName);
-		if (!Data.empty())
-		{
-			LoadLootTable(Data, FileName);
-		}
-		else
-		{
-			// Todo: write better error message
-			LOGERROR("Could not find default loot table: %s! "
-			"Please make sure the file is readable or download them from cuberite.org", FileName);
-		}
-	}
-	// Check for global user tables
-	auto UserTables = cFile::GetFolderContents(LootTable::PathToUserLootTables);
-	for (const auto & UserTable : UserTables)
-	{
-		auto Data = cFile::ReadWholeFile(LootTable::PathToUserLootTables + cFile::PathSeparator() + UserTable);
-		if (!Data.empty())
-		{
-			LOGINFO("Found global user loot table: %s", LootTable::PathToUserLootTables + cFile::PathSeparator() + UserTable);
-			LoadLootTable(Data, UserTable);
-		}
-	}
-
-
-	// Check for custom tables
-	for (auto & FileName: LootTable::FileNames)
-	{
-		auto FilePathWithWorld = a_Path + cFile::PathSeparator() + FileName;
-		auto Data = cFile::ReadWholeFile(FilePathWithWorld);
-		if (!Data.empty())
-		{
-			LOGINFO("Found custom loot table: %s", FilePathWithWorld);
-			LoadLootTable(Data, FileName);
-		}
-	}
-}
-
-
-
-
-
 cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
 
 
 
 
 
-void cLootTableProvider::LoadLootTable(const AString & a_String, const AString & a_Type)
+cLootTableProvider::cLootTableProvider(cWorld & a_World):
+	m_World(a_World)
 {
+	ReloadLootTables();
+}
+
+
+
+
+
+void cLootTableProvider::ReloadLootTables()
+{
+	LOG("Loading loot tables...");
+	// Load default loot tables
+	LoadLootTablesFromFolder(LootTable::LootTablePath);
+
+	// Check for custom tables
+	LoadLootTablesFromFolder(LootTable::LootTablePath + cFile::PathSeparator() + m_World.GetDataPath());
+}
+
+
+
+
+
+void cLootTableProvider::LoadLootTable(const AString & a_Path, const AString & a_Name)
+{
+	auto Data = cFile::ReadWholeFile(a_Path);
+	if (Data.empty())
+	{
+		LOGWARNING("There was an error on loading loot table %s", a_Path);
+	}
 	AString ErrorMessage;
 	Json::Value JsonObject;
-	JsonUtils::ParseString(a_String, JsonObject, & ErrorMessage);
+	JsonUtils::ParseString(Data, JsonObject, & ErrorMessage);
 	if (!ErrorMessage.empty() || !JsonObject.isObject())
 	{
-		LOGERROR(ErrorMessage);
+		LOGWARNING(ErrorMessage);
 	}
 	else
 	{
-		switch (LootTable::eType(LootTable::NamespaceConverter(JsonObject["type"].asString())))
-		{
-			case LootTable::eType::Chest:
-			{
-				auto Name = a_Type;
-				ReplaceString(Name, AString("LootTables") + cFile::PathSeparator() + "Chests" + cFile::PathSeparator(), "");
-				ReplaceString(Name, ".json", "");
-				const auto ChestType = LootTable::eChestType(Name);
-				m_ChestLootTables[ChestType] = cLootTable(JsonObject, m_World);
-				break;
-			}
-			case LootTable::eType::User:
-			{
-				auto Name = a_Type;
-				ReplaceString(Name, AString("LootTables") + cFile::PathSeparator() + "User", "");
-				ReplaceString(Name, ".json", "");
-				m_UserLootTables[Name] = cLootTable(JsonObject, m_World);
-				break;
-			}
-			default:
-			{
-				LOGWARNING("This loot table type is not supported: %s", LootTable::NamespaceConverter(JsonObject["type"].asString()));
-				break;
-			}
-		}
+		auto Name = a_Name;
+		ReplaceString(Name, ".json", "");
+		m_LootTables[a_Name] = cLootTable(JsonObject);
 	}
 }
 
@@ -112,25 +70,52 @@ void cLootTableProvider::LoadLootTable(const AString & a_String, const AString &
 
 const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 {
-	auto Data = StringSplitAndTrim(a_Name,"|");
-
-	if (Data.size() != 2)
+	try
 	{
-		LOGWARNING("Got ill formatted string: \"%s\" to look up a loot table.\n"
-			"Please use Type|Subtype. Returning empty loot table!", a_Name);
+		return & (m_LootTables.at(a_Name));
+	}
+	catch (const std::out_of_range)
+	{
+		if (
+			FindLootTable(LootTable::LootTablePath, a_Name) ||
+			FindLootTable(LootTable::LootTablePath + cFile::GetPathSeparator() + m_World.GetDataPath(), a_Name)
+			)
+		{
+			try
+			{
+				return & (m_LootTables.at(a_Name));
+			}
+			catch (const std::out_of_range)
+			{
+				LOGWARNING("Got unknown string for loot table: %s. Returning empty", a_Name);
+				return & m_EmptyLootTable;
+			}
+		}
+		LOGWARNING("Got unknown string for loot table: %s. Returning empty", a_Name);
 		return & m_EmptyLootTable;
 	}
+}
 
-	auto Type = LootTable::eType(Data[0]);
 
-	switch (Type)
+
+
+
+void cLootTableProvider::LoadLootTablesFromFolder(const AString & a_Path)
+{
+	if (!cFile::IsFolder(a_Path))
 	{
-		case LootTable::eType::Chest: return GetLootTable(LootTable::eChestType(Data[1]));
-		case LootTable::eType::User:  return GetUserLootTable(Data[1]);
-		default:
+		return;
+	}
+
+	for (const auto & FileName : cFile::GetFolderContents(a_Path))
+	{
+		if (cFile::IsFolder(a_Path + cFile::GetPathSeparator() + FileName))
 		{
-			LOGWARNING("Trying to use unsupported or unknown loot table type: %s", Data[1]);
-			return & m_EmptyLootTable;
+			LoadLootTablesFromFolder(a_Path + cFile::GetPathSeparator() + FileName);
+		}
+		else
+		{
+			LoadLootTable(a_Path + cFile::GetPathSeparator() + FileName, FileName);
 		}
 	}
 }
@@ -139,30 +124,30 @@ const cLootTable * cLootTableProvider::GetLootTable(const AString & a_Name)
 
 
 
-const cLootTable * cLootTableProvider::GetLootTable(enum LootTable::eChestType a_Type)
+bool cLootTableProvider::FindLootTable(const AString & a_Path, const AString & a_FileName)
 {
-	if (a_Type != LootTable::eChestType::None)
+	if (!cFile::IsFolder(a_Path))
 	{
-		return & (m_ChestLootTables.at(a_Type));
+		return false;
 	}
-	return & m_EmptyLootTable;
-}
 
-
-
-
-
-const cLootTable * cLootTableProvider::GetUserLootTable(const AString & a_String)
-{
-	try
+	for (const auto & FileName : cFile::GetFolderContents(a_Path))
 	{
-		return & (m_UserLootTables.at(a_String));
+		LOG(a_FileName + ".json");
+		if (cFile::IsFolder(a_Path + cFile::GetPathSeparator() + FileName))
+		{
+			LoadLootTablesFromFolder(a_Path + cFile::GetPathSeparator() + FileName);
+		}
+		else
+		{
+			if ((a_FileName + ".json") == FileName)
+			{
+				LoadLootTable(a_Path + cFile::GetPathSeparator() + FileName, FileName);
+				return true;
+			}
+		}
 	}
-	catch (const std::out_of_range)
-	{
-		LOGWARNING("Got unknown string for user type loot table: %s. Returning empty", a_String);
-		return & m_EmptyLootTable;
-	}
+	return false;
 }
 
 

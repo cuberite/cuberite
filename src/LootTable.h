@@ -31,11 +31,11 @@ class cBlockEntity;
 class cLootTable
 {
 public:
-	/** Creates a empty loot table with type empty */
-	cLootTable();
+	/** Creates a empty loot table */
+	cLootTable() = default;
 
-	/** Creates new loot table from string describing the loot table */
-	cLootTable(const Json::Value & a_Description, cWorld & a_World);
+	/** Creates new loot table from a Json object describing the loot table */
+	cLootTable(const Json::Value & a_Description);
 
 	cLootTable(const cLootTable & a_Other) = default;
 	cLootTable(cLootTable && a_Other) = default;
@@ -50,10 +50,7 @@ public:
 	cItems GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID) const;
 
 protected:
-	/** Type of loot table */
-	enum LootTable::eType m_Type;
-
-	/** Vector of loot pools */
+	/** contained loot pools */
 	cLootTablePools m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
@@ -83,9 +80,8 @@ private:
 	/** Applies given function to an item dropped from a killed entity */
 	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos, UInt32 a_KilledID, const cNoise & a_Noise, UInt32 a_KillerID);
 };
+typedef std::unordered_map<AString, cLootTable> cLootTables;
 
-typedef std::unordered_map<enum LootTable::eChestType, cLootTable, EnumClassHash> cChestLootTableMap;
-typedef std::unordered_map<AString, cLootTable> cUserLootTableMap;
 
 
 

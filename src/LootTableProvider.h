@@ -26,9 +26,7 @@ Notes:
 class cLootTableProvider
 {
 public:
-	cLootTableProvider() = default;
-
-	cLootTableProvider(AString & a_Path, cWorld & a_World);
+	cLootTableProvider(cWorld & a_World);
 
 	cLootTableProvider(const cLootTableProvider & a_Other) = default;
 	cLootTableProvider(cLootTableProvider && a_Other) = default;
@@ -37,26 +35,25 @@ public:
 
 	~cLootTableProvider() = default;
 
-	/** Functions to load loot tables. Custom loot tables are also checked */
-	/*
-	Further information on the string based function:
-	Format:    Type|FurtherInfo
-	example:   Chest|AbandonedMineshaft
-	example:   Monster|Skeleton
-	example:   Block|Stone
-	This is not case sensitive, and removes all spaces */
+	void ReloadLootTables();
+
+	/** Returns a pointer to the loot table with the filename a_Name.
+		Try's to load the file from disk if there is none present in memory */
 	const cLootTable * GetLootTable(const AString & a_Name);
-	const cLootTable * GetLootTable(enum LootTable::eChestType a_Type);
-	const cLootTable * GetUserLootTable(const AString & a_String);
 
 private:
 
-	/** Maps containing the loot tables */
-	cChestLootTableMap m_ChestLootTables;
-	cUserLootTableMap m_UserLootTables;
+	/** Function to load a loot table from specified path. */
+	void LoadLootTable(const AString & a_Path, const AString & a_Name);
 
-	/** Function to load a loot table from specified path */
-	void LoadLootTable(const AString & a_String, const AString & a_Type);
+	/** Finds all files in a_Path recursive and tries to load them as loot tables. */
+	void LoadLootTablesFromFolder(const AString & a_Path);
+
+	/** Tries to load a loot table with the name a_FileName from disk in folder a_Path recursive. */
+	bool FindLootTable(const AString & a_Path, const AString & a_FileName);
+
+	/** Maps containing the loot tables */
+	cLootTables m_LootTables;
 
 	/** Empty loot table in case there is an error */
 	static cLootTable m_EmptyLootTable;
