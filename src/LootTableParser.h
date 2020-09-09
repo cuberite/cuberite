@@ -172,54 +172,7 @@ namespace LootTable
 
 
 
-	/** Any available types of chest loots as of 1.16.2 */
-	enum class eChestType
-	{
-		AbandonedMineshaft,
-		BuriedTreasure,
-		DesertPyramid,
-		EndCityTreasure,
-		IglooChest,
-		JungleTemple,
-		JungleTempleDispenser,
-		NetherBridge,
-		PillagerOutpost,
-		ShipwreckMap,
-		ShipwreckSupply,
-		ShipwreckTreasure,
-		SimpleDungeon,
-		SpawnBonusChest,
-		StrongholdCorridor,
-		StrongholdCrossing,
-		StrongholdLibrary,
-		UnderwaterRuinBig,
-		UnderwaterRuinSmall,
-
-		/* Village chest types */
-		VillageArmorer,
-		VillageButcher,
-		VillageCartographer,
-		VillageDesertHouse,
-		VillageFisher,
-		VillageFletcher,
-		VillageMason,
-		VillagePlainsHouse,
-		VillageSavannaHouse,
-		VillageShepherd,
-		VillageSnowyHouse,
-		VillageTaigaHouse,
-		VillageTannery,
-		VillageTemple,
-		VillageToolsmith,
-		VillageWeaponsmith,
-
-		WoodlandMansion,
-		None
-	};
-
 	// Declaration of methods in the cpp
-	/** Gets the eChestType from String as of 1.16.2 */
-	enum eChestType eChestType(const AString & a_Type);
 	/** Gets the eFunctionType from String. Defaults to None */
 	enum eFunctionType eFunctionType(const AString & a_Type);
 	/** Gets the eConditionType from String. Defaults to None */

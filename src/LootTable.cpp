@@ -522,11 +522,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 					int Enchantment;
 					if (EnchantmentObject.isMember("enchantment"))
 					{
-						Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject["enchantment"].asString()));
+						Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject["enchantment"].asString()));
 					}
 					else if (EnchantmentObject.isMember("Enchantment"))
 					{
-						Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject["Enchantment"].asString()));
+						Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject["Enchantment"].asString()));
 					}
 
 					Json::Value LevelsObject;
@@ -576,11 +576,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			AString ItemString;
 			if (Parameter.isMember("item"))
 			{
-				ItemString = LootTable::NamespaceConverter(Parameter["item"].asString());
+				ItemString = NamespaceConverter(Parameter["item"].asString());
 			}
 			else if (Parameter.isMember("Item"))
 			{
-				ItemString = LootTable::NamespaceConverter(Parameter["Item"].asString());
+				ItemString = NamespaceConverter(Parameter["Item"].asString());
 			}
 			if (!ItemString.empty())
 			{
@@ -745,11 +745,11 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 			int Enchantment;
 			if (Parameter.isMember("enchantment"))
 			{
-				Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Parameter["enchantment"].asString()));
+				Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(Parameter["enchantment"].asString()));
 			}
 			else if (Parameter.isMember("Enchantment"))
 			{
-				Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(Parameter["Enchantment"].asString()));
+				Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(Parameter["Enchantment"].asString()));
 			}
 
 			Json::Value Chances;
@@ -898,7 +898,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				EnchantmentObject = a_Function.m_Parameter["Enchantment"];
 			}
 
-			auto Enchantment = cEnchantments::StringToEnchantmentID(LootTable::NamespaceConverter(EnchantmentObject.asString()));
+			auto Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject.asString()));
 			int Level;
 
 			auto Callback = [&] (cEntity & a_Entity)
@@ -919,11 +919,11 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			AString Formula;
 			if (a_Function.m_Parameter.isMember("formula"))
 			{
-				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["formula"].asString());
+				Formula = NamespaceConverter(a_Function.m_Parameter["formula"].asString());
 			}
 			else if (a_Function.m_Parameter.isMember("Formula"))
 			{
-				Formula = LootTable::NamespaceConverter(a_Function.m_Parameter["Formula"].asString());
+				Formula = NamespaceConverter(a_Function.m_Parameter["Formula"].asString());
 			}
 
 			Json::Value Parameters;
@@ -1013,7 +1013,7 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 			{
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
-					EnchantmentLimiter.push_back({1, cEnchantments(LootTable::NamespaceConverter(Enchantments[i].asString()))});
+					EnchantmentLimiter.push_back({1, cEnchantments(NamespaceConverter(Enchantments[i].asString()))});
 				}
 			}
 			else  // All are possible
@@ -1203,11 +1203,11 @@ void cLootTable::ApplyCommonFunction(const cLootTableFunction & a_Function, cIte
 				AString Type;
 				if (CountObject.isMember("type"))
 				{
-					Type = LootTable::NamespaceConverter(CountObject["type"].asString());
+					Type = NamespaceConverter(CountObject["type"].asString());
 				}
 				else if (CountObject.isMember("Type"))
 				{
-					Type = LootTable::NamespaceConverter(CountObject["Type"].asString());
+					Type = NamespaceConverter(CountObject["Type"].asString());
 				}
 
 				if ((Type == "Uniform") || (Type == "uniform"))

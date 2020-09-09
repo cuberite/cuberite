@@ -227,168 +227,6 @@ namespace LootTable
 
 
 
-	enum eChestType eChestType(const AString & a_Type)
-	{
-		if (NoCaseCompare(a_Type, "AbandonedMineshaft") == 0)
-		{
-			return eChestType::AbandonedMineshaft;
-		}
-		else if (NoCaseCompare(a_Type, "BuriedTreasure") == 0)
-		{
-			return eChestType::BuriedTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "DesertPyramid") == 0)
-		{
-			return eChestType::DesertPyramid;
-		}
-		else if (NoCaseCompare(a_Type, "EndCityTreasure") == 0)
-		{
-			return eChestType::EndCityTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "IglooChest") == 0)
-		{
-			return eChestType::IglooChest;
-		}
-		else if (NoCaseCompare(a_Type, "JungleTemple") == 0)
-		{
-			return eChestType::JungleTemple;
-		}
-		else if (NoCaseCompare(a_Type, "JungleTempleDispenser") == 0)
-		{
-			return eChestType::JungleTempleDispenser;
-		}
-		else if (NoCaseCompare(a_Type, "NetherBridge") == 0)
-		{
-			return eChestType::NetherBridge;
-		}
-		else if (NoCaseCompare(a_Type, "PillagerOutpost") == 0)
-		{
-			return eChestType::PillagerOutpost;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckMap") == 0)
-		{
-			return eChestType::ShipwreckMap;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckSupply") == 0)
-		{
-			return eChestType::ShipwreckSupply;
-		}
-		else if (NoCaseCompare(a_Type, "ShipwreckTreasure") == 0)
-		{
-			return eChestType::ShipwreckTreasure;
-		}
-		else if (NoCaseCompare(a_Type, "SimpleDungeon") == 0)
-		{
-			return eChestType::SimpleDungeon;
-		}
-		else if (NoCaseCompare(a_Type, "SpawnBonusChest") == 0)
-		{
-			return eChestType::SpawnBonusChest;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdCorridor") == 0)
-		{
-			return eChestType::StrongholdCorridor;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdCrossing") == 0)
-		{
-			return eChestType::StrongholdCrossing;
-		}
-		else if (NoCaseCompare(a_Type, "StrongholdLibrary") == 0)
-		{
-			return eChestType::StrongholdLibrary;
-		}
-		else if (NoCaseCompare(a_Type, "UnderwaterRuinBig") == 0)
-		{
-			return eChestType::UnderwaterRuinBig;
-		}
-		else if (NoCaseCompare(a_Type, "UnderwaterRuinSmall") == 0)
-		{
-			return eChestType::UnderwaterRuinSmall;
-		}
-
-			/* Village chest types */
-
-		else if (NoCaseCompare(a_Type, "VillageArmorer") == 0)
-		{
-			return eChestType::VillageArmorer;
-		}
-		else if (NoCaseCompare(a_Type, "VillageButcher") == 0)
-		{
-			return eChestType::VillageButcher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageCartographer") == 0)
-		{
-			return eChestType::VillageCartographer;
-		}
-		else if (NoCaseCompare(a_Type, "VillageDesertHouse") == 0)
-		{
-			return eChestType::VillageDesertHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageFisher") == 0)
-		{
-			return eChestType::VillageFisher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageFletcher") == 0)
-		{
-			return eChestType::VillageFletcher;
-		}
-		else if (NoCaseCompare(a_Type, "VillageMason") == 0)
-		{
-			return eChestType::VillageMason;
-		}
-		else if (NoCaseCompare(a_Type, "VillagePlainsHouse") == 0)
-		{
-			return eChestType::VillagePlainsHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageSavannaHouse") == 0)
-		{
-			return eChestType::VillageSavannaHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageShepherd") == 0)
-		{
-			return eChestType::VillageShepherd;
-		}
-		else if (NoCaseCompare(a_Type, "VillageSnowyHouse") == 0)
-		{
-			return eChestType::VillageSnowyHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTaigaHouse") == 0)
-		{
-			return eChestType::VillageTaigaHouse;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTannery") == 0)
-		{
-			return eChestType::VillageTannery;
-		}
-		else if (NoCaseCompare(a_Type, "VillageTemple") == 0)
-		{
-			return eChestType::VillageTemple;
-		}
-		else if (NoCaseCompare(a_Type, "VillageToolsmith") == 0)
-		{
-			return eChestType::VillageToolsmith;
-		}
-		else if (NoCaseCompare(a_Type, "VillageWeaponsmith") == 0)
-		{
-			return eChestType::VillageWeaponsmith;
-		}
-
-			/* Village chest types end */
-
-		else if (NoCaseCompare(a_Type, "WoodlandMansion") == 0)
-		{
-			return eChestType::WoodlandMansion;
-		}
-		else
-		{
-			return eChestType::None;
-		}
-	}
-
-
-
-
-
 	void MinMaxRange(const Json::Value & a_Value, int & a_Min, int & a_Max)
 	{
 		if (a_Value.isMember("min"))
@@ -491,7 +329,7 @@ namespace LootTable
 		{
 			if (NoCaseCompare(FunctionInfo, "function") == 0)
 			{
-				Type = LootTable::eFunctionType(LootTable::NamespaceConverter(a_Value[FunctionInfo].asString()));
+				Type = LootTable::eFunctionType(NamespaceConverter(a_Value[FunctionInfo].asString()));
 			}
 			else if (NoCaseCompare(FunctionInfo, "conditions") == 0)
 			{
@@ -517,11 +355,11 @@ namespace LootTable
 		// Type has to be known beforehand
 		if (a_Value.isMember("condition"))
 		{
-			Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["condition"].asString()));
+			Type = LootTable::eConditionType(NamespaceConverter(a_Value["condition"].asString()));
 		}
 		else if (a_Value.isMember("Condition"))
 		{
-			Type = LootTable::eConditionType(LootTable::NamespaceConverter(a_Value["Condition"].asString()));
+			Type = LootTable::eConditionType(NamespaceConverter(a_Value["Condition"].asString()));
 		}
 		else
 		{
@@ -623,11 +461,11 @@ namespace LootTable
 		// The type has to be known beforehand
 		if (a_Value.isMember("type"))
 		{
-			Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["type"].asString()));
+			Type = LootTable::ePoolEntryType(NamespaceConverter(a_Value["type"].asString()));
 		}
 		else if (a_Value.isMember("Type"))
 		{
-			Type = LootTable::ePoolEntryType(LootTable::NamespaceConverter(a_Value["Type"].asString()));
+			Type = LootTable::ePoolEntryType(NamespaceConverter(a_Value["Type"].asString()));
 		}
 		else
 		{
@@ -647,14 +485,14 @@ namespace LootTable
 				{
 					case LootTable::ePoolEntryType::Item:
 					{
-						StringToItem(LootTable::NamespaceConverter(a_Value[EntryParameter].asString()), Item);
+						StringToItem(NamespaceConverter(a_Value[EntryParameter].asString()), Item);
 						break;
 					}
 					case LootTable::ePoolEntryType::Tag:
 					case LootTable::ePoolEntryType::LootTable:
 					case LootTable::ePoolEntryType::Dynamic:
 					{
-						Name = LootTable::NamespaceConverter(a_Value[EntryParameter].asString());
+						Name = NamespaceConverter(a_Value[EntryParameter].asString());
 						break;
 					}
 					default: break;
