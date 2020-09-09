@@ -226,8 +226,6 @@ namespace LootTable
 	enum eConditionType eConditionType(const AString & a_Type);
 	/** Gets the ePoolEntryType from String. Defaults to Empty */
 	enum ePoolEntryType ePoolEntryType(const AString & a_Type);
-	/** Moves a_String from the "minecraft:" namespace to cuberite namespace */
-	AString NamespaceConverter(AString a_String);
 	/** Reads keys min and max and writes them into a_Min and a_Max
 	if there are no appropriately named keys there is no change */
 	void MinMaxRange(const Json::Value & a_Value, int & a_Min, int & a_Max);

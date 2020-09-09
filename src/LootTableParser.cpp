@@ -388,42 +388,6 @@ namespace LootTable
 
 
 
-	/** Capitalizes any letter following a space */
-	void Capitalize (AString & a_String)
-	{
-		bool Cap = true;
-
-		for (unsigned int i = 0; i <= a_String.length(); i++)
-		{
-			if (isalpha(a_String[i]) && Cap)
-			{
-				a_String[i] = toupper(a_String[i]);
-				Cap = false;
-			}
-			else if (isspace(a_String[i]))
-			{
-				Cap = true;
-			}
-		}
-	}
-
-
-
-
-
-	AString NamespaceConverter(AString a_String)
-	{
-		ReplaceString(a_String, "minecraft:", "");
-		ReplaceString(a_String, "_", " ");
-		Capitalize(a_String);
-		ReplaceString(a_String, " ", "");
-		ReplaceString(a_String, "/", "|");
-		return a_String;
-	}
-
-
-
-
 
 	void MinMaxRange(const Json::Value & a_Value, int & a_Min, int & a_Max)
 	{
