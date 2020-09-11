@@ -4,7 +4,7 @@
 
 struct BlockState
 {
-	constexpr BlockState(short ID) :
+	constexpr BlockState(unsigned short ID) :
 		ID(ID)
 	{
 	}
@@ -14,5 +14,5 @@ struct BlockState
 	bool operator == (BlockState Block) const;
 	bool operator != (BlockState Block) const;
 
-	short ID;
+	unsigned short ID;
 };
