@@ -99,7 +99,7 @@ protected:
 
 	/** Converts the hand parameter received by the protocol into eHand constants.
 	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
-	eHand HandIntToEnum(Int32 a_Hand);
+	static eHand HandIntToEnum(Int32 a_Hand);
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;

@@ -134,23 +134,6 @@ public:
 
 protected:
 
-	AString m_ServerAddress;
-
-	UInt16 m_ServerPort;
-
-	AString m_AuthServerID;
-
-	/** State of the protocol. 1 = status, 2 = login, 3 = game */
-	UInt32 m_State;
-
-	bool m_IsEncrypted;
-
-	cAesCfb128Decryptor m_Decryptor;
-	cAesCfb128Encryptor m_Encryptor;
-
-	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
-	cFile m_CommLogFile;
-
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	virtual void AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size);
 
@@ -226,7 +209,7 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
+	static eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
@@ -246,6 +229,9 @@ protected:
 	/** Writes the block entity data for the specified block entity into the packet. */
 	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 
+	/** State of the protocol. 1 = status, 2 = login, 3 = game */
+	UInt32 m_State;
+
 private:
 
 	/** Sends an entity teleport packet.
@@ -261,4 +247,18 @@ private:
 	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
 	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
 	static const char * GetProtocolStatisticName(Statistic a_Statistic);
+
+	AString m_ServerAddress;
+
+	UInt16 m_ServerPort;
+
+	AString m_AuthServerID;
+
+	bool m_IsEncrypted;
+
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Encryptor m_Encryptor;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
 } ;
