@@ -215,6 +215,42 @@ cProtocol::Version cProtocol_1_14::GetProtocolVersion()
 
 
 
+std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
+{
+	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
+{
+	return Palette_1_14::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
+{
+	return Palette_1_14::From(a_Statistic);
+}
+
+
+
+
+
 bool cProtocol_1_14::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	if (m_State != 3)
@@ -252,40 +288,4 @@ void cProtocol_1_14::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_14::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-}
-
-
-
-
-
-std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
-{
-	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
-{
-	return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
-{
-	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
-{
-	return Palette_1_14::From(a_Statistic);
 }

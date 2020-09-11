@@ -42,16 +42,15 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
 	virtual Version GetProtocolVersion() override;
+	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
+	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override;
+	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) override;
+	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer) override;
-
-	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override;
-	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) override;
-	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override {}
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override {}
