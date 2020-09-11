@@ -250,8 +250,6 @@ private:
 
 	AString m_ServerAddress;
 
-	UInt16 m_ServerPort;
-
 	AString m_AuthServerID;
 
 	bool m_IsEncrypted;
