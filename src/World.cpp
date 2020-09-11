@@ -2364,7 +2364,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 				ChunkSender.QueueSendChunkTo(
 					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
-					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
+					cChunkSender::Priority::Medium,
 					a_Chunk.GetAllClients()
 				);
 			}
@@ -2836,7 +2836,7 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
@@ -2845,7 +2845,7 @@ void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriorit
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);

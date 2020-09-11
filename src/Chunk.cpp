@@ -769,7 +769,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 		// Resend the full chunk
 		for (auto ClientHandle : m_LoadedByClient)
 		{
-			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, ClientHandle);
+			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
 		}
 	}
 	else
@@ -1442,7 +1442,7 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 	// Re-send the chunk to all clients:
 	for (auto ClientHandle : m_LoadedByClient)
 	{
-		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, ClientHandle);
+		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
 	}  // for itr - m_LoadedByClient[]
 }
 

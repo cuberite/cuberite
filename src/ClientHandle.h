@@ -571,7 +571,7 @@ private:
 	bool CheckBlockInteractionsRate(void);
 
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
 	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);

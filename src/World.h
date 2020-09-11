@@ -344,11 +344,11 @@ public:
 
 	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
 	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Sends the chunk to the client specified, even if the client already has the chunk.
 	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
