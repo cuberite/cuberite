@@ -419,6 +419,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	{
 		if (affectedArea.IsInside(itr->second->GetPos()))
 		{
+			itr->second->Destroy();
 			itr = m_BlockEntities.erase(itr);
 		}
 		else

@@ -47,6 +47,10 @@ public:
 
 	// tolua_end
 
+	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
+	See Physics\Explodinator.cpp for details of explosion block destruction. */
+	static float GetExplosionAbsorption(BLOCKTYPE Block);
+
 	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler.get();       }
 
 	/** Creates a default BlockInfo structure, initializes all values to their defaults */
