@@ -67,8 +67,7 @@ public:
 			return 0;
 		}
 
-		std::swap(Result->second, Power);
-		return Power;
+		return std::exchange(Result->second, Power);
 	}
 
 	/** Adjust From-relative coordinates into To-relative coordinates. */
