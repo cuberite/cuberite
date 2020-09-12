@@ -21,24 +21,17 @@ cBlockInfo::cBlockInfo()
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
+cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
-	delete a_Handler;
 }
 
 
 
 
 
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
+cBlockHandler * cBlockInfo::GetHandler(BLOCKTYPE a_Type)
 {
-	cBlockInfoArray & BlockInfos = *this;
-	// The piece-loading code uses the handlers for rotations, so we need valid handlers
-	// Insert dummy handlers:
-	for (size_t i = 0; i < BlockInfos.size(); i++)
-	{
-		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
-	}
+	return nullptr;
 }
 
 

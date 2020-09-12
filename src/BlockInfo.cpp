@@ -414,9 +414,17 @@ cBlockInfo::cBlockInfo():
 	m_FullyOccupiesVoxel(false),
 	m_CanBeTerraformed(false),
 	m_BlockHeight(1.0),
-	m_Hardness(0.0f),
-	m_Handler()
+	m_Hardness(0.0f)
 {
+}
+
+
+
+
+
+cBlockHandler * cBlockInfo::GetHandler(BLOCKTYPE a_Type)
+{
+	return &cBlockHandler::GetBlockHandler(a_Type);
 }
 
 
@@ -436,15 +444,6 @@ bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
-{
-	delete a_Handler;
-}
-
-
-
-
-
 cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 {
 	cBlockInfoArray & Info = *this;
@@ -452,7 +451,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
 		Info[i].m_BlockType = static_cast<BLOCKTYPE>(i);
-		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(Info[i].m_BlockType));
 	}
 
 	// Emissive blocks
