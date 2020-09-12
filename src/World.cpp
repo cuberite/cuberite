@@ -4,6 +4,7 @@
 #include "World.h"
 #include "BlockInfo.h"
 #include "ClientHandle.h"
+#include "Physics/Explodinator.h"
 #include "Server.h"
 #include "Root.h"
 #include "IniFile.h"
@@ -1393,47 +1394,13 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	cLock Lock(*this);
-	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
+
+	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
-		return;
+		// TODO: CanCauseFire gets reset to false for some reason
+		Explodinator::Kaboom(*this, Vector3f(a_BlockX, a_BlockY, a_BlockZ), a_ExplosionSize, a_CanCauseFire);
+		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 	}
-
-	// TODO: Implement block hardiness
-	cVector3iArray BlocksAffected;
-	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-
-	auto & Random = GetRandomProvider();
-	auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
-
-	Vector3d ExplosionPos(a_BlockX, a_BlockY, a_BlockZ);
-	for (auto Player : m_Players)
-	{
-		cClientHandle * ch = Player->GetClientHandle();
-		if (ch == nullptr)
-		{
-			continue;
-		}
-
-		bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
-		auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
-		ch->SendExplosion({a_BlockX, a_BlockY, a_BlockZ}, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
-	}
-
-	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
-	auto ParticleFormula = a_ExplosionSize * 0.33f;
-	auto Spread = ParticleFormula * 0.5f;
-	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
-
-	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
-
-	Spread = ParticleFormula * 0.35f;
-	ParticleCount = std::min((ParticleFormula * 550), 1800.0);
-
-	BroadcastParticleEffect("explode", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
-
-	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
 
 
@@ -2364,7 +2331,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 				ChunkSender.QueueSendChunkTo(
 					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
-					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
+					cChunkSender::Priority::Medium,
 					a_Chunk.GetAllClients()
 				);
 			}
@@ -2836,7 +2803,7 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
@@ -2845,7 +2812,7 @@ void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriorit
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
