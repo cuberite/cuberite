@@ -244,7 +244,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	UInt32 ProtocolVersion;
 	AString ServerAddress;
 	UInt16 ServerPort;
-	UInt32 NextState;
+	cProtocol::State NextState;
 
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
@@ -308,7 +308,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 				a_Client.GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 			);
 
-			if (NextState != 1)
+			if (NextState != cProtocol::State::Status)
 			{
 				throw sTriedToJoinWithUnsupportedProtocolException(
 					Printf("Unsupported protocol version %u.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)

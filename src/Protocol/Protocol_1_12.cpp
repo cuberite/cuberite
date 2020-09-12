@@ -1022,9 +1022,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -1033,9 +1032,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
@@ -1044,9 +1042,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
@@ -1093,10 +1090,10 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
 
 			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
+			m_State = State::Invalid;
 			return false;
 		}
-		case 255:
+		case State::Invalid:
 		{
 			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
 			// Do not output anything (the caller will do that for us), just return failure
@@ -1172,9 +1169,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -1183,9 +1179,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
@@ -1194,9 +1189,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
@@ -1243,10 +1237,10 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
 
 			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
+			m_State = State::Invalid;
 			return false;
 		}
-		case 255:
+		case State::Invalid:
 		{
 			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
 			// Do not output anything (the caller will do that for us), just return failure
