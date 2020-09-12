@@ -100,7 +100,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_8_0:
 
-cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, State a_State) :
 	Super(a_Client),
 	m_ServerAddress(a_ServerAddress),
 	// Note: a_ServerPort is unused
@@ -383,16 +383,14 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 {
 	switch (m_State)
 	{
-		case 2:
+		case State::Login:
 		{
-			// During login:
 			cPacketizer Pkt(*this, pktDisconnectDuringLogin);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
-		case 3:
+		case State::Game:
 		{
-			// In-game:
 			cPacketizer Pkt(*this, pktDisconnectDuringGame);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
@@ -796,7 +794,7 @@ void cProtocol_1_8_0::SendLoginSuccess(void)
 		Pkt.WriteVarInt32(CompressionThreshold);
 	}
 
-	m_State = 3;  // State = Game
+	m_State = State::Game;
 
 	{
 		cPacketizer Pkt(*this, pktLoginSuccess);
@@ -2217,9 +2215,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -2228,9 +2225,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
@@ -2239,9 +2235,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
@@ -2281,10 +2276,10 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
 
 			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
+			m_State = State::Invalid;
 			return false;
 		}
-		case 255:
+		case State::Invalid:
 		{
 			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
 			// Do not output anything (the caller will do that for us), just return failure
