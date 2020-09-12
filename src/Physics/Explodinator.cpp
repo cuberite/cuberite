@@ -99,13 +99,26 @@ namespace Explodinator
 		});
 	}
 
+	/** Sets the block at the given position, updating surroundings. */
+	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock)
+	{
+		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
+
+		// SetBlock wakes up all simulators for the area, so that water and lava flows and sand falls into the blasted holes
+		// It also is responsible for calling cBlockHandler::OnNeighborChanged to pop off blocks that fail CanBeAt
+		// An explicit call to cBlockHandler::OnBroken handles the destruction of multiblock structures
+		// References at (FS #391, GH #4418):
+		a_Chunk.SetBlock(a_RelativePosition, a_NewBlock, 0);
+
+		cChunkInterface Interface(a_World.GetChunkMap());
+		cBlockInfo::GetHandler(a_DestroyedBlock)->OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta);
+	}
+
 	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery)
 	{
-		BLOCKTYPE DestroyedBlock;
-		NIBBLETYPE DestroyedMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position, DestroyedBlock, DestroyedMeta);
+		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
 		if (DestroyedBlock == E_BLOCK_AIR)
 		{
 			// There's nothing left for us here, but a barren and empty land
@@ -126,6 +139,7 @@ namespace Explodinator
 		}
 		else if (Random.RandBool(1.f / a_Power))
 		{
+			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(
 				cBlockInfo::GetHandler(DestroyedBlock)->ConvertToPickups(DestroyedMeta, a_Chunk.GetBlockEntityRel(a_Position)),
 				Absolute
@@ -137,7 +151,7 @@ namespace Explodinator
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
-				a_Chunk.SetBlock(a_Position, E_BLOCK_FIRE, 0);
+				DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE);
 				return;
 			}
 		}
@@ -149,20 +163,14 @@ namespace Explodinator
 				((Shrapnel == slGravityAffectedOnly) && cSandSimulator::IsAllowedBlock(DestroyedBlock))
 			)
 			{
+				const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 				auto FallingBlock = std::make_unique<cFallingBlock>(Vector3d(0.5, 0, 0.5) + Absolute, DestroyedBlock, DestroyedMeta);
 				// TODO: correct velocity FallingBlock->SetSpeedY(40);
 				FallingBlock->Initialize(std::move(FallingBlock), World);
 			}
 		}
 
-		// SetBlock wakes up all simulators for the area, so that water and lava flows and sand falls into the blasted holes
-		// It also is responsible for calling cBlockHandler::OnNeighborChanged to pop off blocks that fail CanBeAt
-		// An explicit call to cBlockHandler::OnBroken handles the destruction of multiblock structures
-		// References at (FS #391, GH #):
-		a_Chunk.SetBlock(a_Position, E_BLOCK_AIR, 0);
-
-		cChunkInterface Interface(World.GetChunkMap());
-		cBlockInfo::GetHandler(DestroyedBlock)->OnBroken(Interface, World, Absolute, DestroyedBlock, 0);
+		DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR);
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
