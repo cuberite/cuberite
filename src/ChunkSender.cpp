@@ -33,7 +33,7 @@ class cNotifyChunkSender :
 			a_Coords.m_ChunkX, a_Coords.m_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
-				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MIDHIGH, a_Chunk.GetAllClients());
+				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::Priority::High, a_Chunk.GetAllClients());
 				return true;
 			}
 		);
@@ -89,7 +89,7 @@ void cChunkSender::Stop(void)
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != nullptr);
 	{
@@ -99,7 +99,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
@@ -121,7 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -130,7 +130,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
