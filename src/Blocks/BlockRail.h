@@ -104,12 +104,14 @@ public:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
 	{
-		auto meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-		auto newMeta = FindMeta(a_ChunkInterface, a_BlockPos);
-		if (IsUnstable(a_ChunkInterface, a_BlockPos) && (meta != newMeta))
+		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos);
+		if ((Meta != NewMeta) && IsUnstable(a_ChunkInterface, a_BlockPos))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? newMeta : newMeta | (meta & 0x08));
+			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
 		}
+
+		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
 	}
 
 
@@ -285,10 +287,12 @@ public:
 		return Meta;
 	}
 
+
 	inline bool CanThisRailCurve(void)
 	{
 		return m_BlockType == E_BLOCK_RAIL;
 	}
+
 
 	bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
 	{
@@ -422,6 +426,7 @@ public:
 		return false;
 	}
 
+
 	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
@@ -519,6 +524,7 @@ public:
 		return true;
 	}
 
+
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
@@ -556,7 +562,6 @@ public:
 	}
 
 
-
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
@@ -591,7 +596,6 @@ public:
 		// To avoid a compiler warning;
 		return a_Meta;
 	}
-
 
 
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
@@ -633,7 +637,6 @@ public:
 	}
 
 
-
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// MirrorYZ basically flips the XP and XM parts of the meta
@@ -673,14 +676,9 @@ public:
 	}
 
 
-
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
 	{
 		UNUSED(a_Meta);
 		return 0;
 	}
 } ;
-
-
-
-
