@@ -36,6 +36,9 @@ public:
 		effSaturation     = 23,
 	} ;
 
+	/** Returns the Type from string. Supports only CuberiteNamespace */
+	static eType eType(const AString & a_Type);
+
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
 	static int GetPotionColor(short a_ItemDamage);
 
