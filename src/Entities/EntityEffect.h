@@ -37,7 +37,7 @@ public:
 	} ;
 
 	/** Returns the Type from string. Supports only CuberiteNamespace */
-	static eType eType(const AString & a_Type);
+	static eType GetTypeFromString(const AString & a_Type);
 
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
 	static int GetPotionColor(short a_ItemDamage);
@@ -84,7 +84,7 @@ public:
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
-	static std::unique_ptr<cEntityEffect> CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
+	static std::unique_ptr<cEntityEffect> CreateEntityEffect(enum cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
 
 	/** Returns how many ticks this effect has been active for */
 	int GetTicks(void) const { return m_Ticks; }

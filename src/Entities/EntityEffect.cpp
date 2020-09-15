@@ -108,6 +108,7 @@ cEntityEffect::eType cEntityEffect::GetTypeFromString(const AString & m_Type)
 
 
 
+
 int cEntityEffect::GetPotionColor(short a_ItemDamage)
 {
 	// Lowest six bits
