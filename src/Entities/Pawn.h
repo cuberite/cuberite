@@ -66,7 +66,7 @@ public:
 	void TargetingMe(cMonster * a_Monster);
 
 	/** Returns all entity effects */
-	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects();
+	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects() const;
 
 	/** Returns the entity effect, if it is currently applied or nullptr if not. */
 	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType);
