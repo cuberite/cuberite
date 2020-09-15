@@ -61,7 +61,7 @@ void cLootTableProvider::LoadLootTable(const AString & a_Path, const AString & a
 	{
 		auto Name = a_Name;
 		ReplaceString(Name, ".json", "");
-		m_LootTables[a_Name] = cLootTable(JsonObject);
+		m_LootTables[Name] = cLootTable(JsonObject);
 	}
 }
 

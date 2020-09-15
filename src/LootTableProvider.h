@@ -30,6 +30,7 @@ public:
 
 	cLootTableProvider(const cLootTableProvider & a_Other) = default;
 	cLootTableProvider(cLootTableProvider && a_Other) = default;
+	// Todo: Explicitly defaulted move assignment operator is implicitly deleted
 	cLootTableProvider & operator = (const cLootTableProvider & a_Other) = default;
 	cLootTableProvider & operator = (cLootTableProvider && a_Other) = default;
 

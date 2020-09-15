@@ -51,34 +51,34 @@ public:
 
 protected:
 	/** contained loot pools */
-	cLootTablePools m_LootTablePools;
+	LootTable::cLootTablePools m_LootTablePools;
 
 	/** Vector of functions applied to all pools */
-	cLootTableFunctions m_Functions;
+	LootTable::cLootTableFunctions m_Functions;
 
 private:
-	static cItems GetItems(const cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static cItems GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
-	static cItems GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static cItems GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
-	static bool ConditionsApply(const cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, UInt32 a_KilledID, UInt32 a_KillerID);
+	static bool ConditionsApply(const LootTable::cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
-	static bool ConditionApplies(const cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, UInt32 a_KilledID, UInt32 a_KillerID);
+	static bool ConditionApplies(const LootTable::cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
 	/** Applies give function to item for all types */
-	static void ApplyCommonFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static void ApplyCommonFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
 	/** Applies given function to an item in a Container */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
 	/** Applies given function to an item dropped from a block */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
 	/** Applies given function to an item dropped from a block entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
+	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
 	/** Applies given function to an item dropped from a killed entity */
-	static void ApplyFunction(const cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos, UInt32 a_KilledID, const cNoise & a_Noise, UInt32 a_KillerID);
+	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos, UInt32 a_KilledID, const cNoise & a_Noise, UInt32 a_KillerID);
 };
 typedef std::unordered_map<AString, cLootTable> cLootTables;
 
