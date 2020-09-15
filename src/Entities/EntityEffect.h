@@ -84,7 +84,7 @@ public:
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
-	static std::unique_ptr<cEntityEffect> CreateEntityEffect(enum cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
+	static std::unique_ptr<cEntityEffect> CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
 
 	/** Returns how many ticks this effect has been active for */
 	int GetTicks(void) const { return m_Ticks; }
