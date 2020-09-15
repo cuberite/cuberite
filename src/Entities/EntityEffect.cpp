@@ -9,7 +9,7 @@
 
 
 
-cEntityEffect::eType cEntityEffect::eType(const AString & m_Type)
+cEntityEffect::eType cEntityEffect::GetTypeFromString(const AString & m_Type)
 {
 	if (NoCaseCompare(m_Type, "NoEffect") == 0)
 	{
@@ -98,6 +98,10 @@ cEntityEffect::eType cEntityEffect::eType(const AString & m_Type)
 	else if (NoCaseCompare(m_Type, "Saturation") == 0)
 	{
 		return effSaturation;
+	}
+	else
+	{
+		return effNoEffect;
 	}
 }
 
