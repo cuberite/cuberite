@@ -947,10 +947,12 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 
 
 	// Blocks that break when pushed by piston:
+	Info[E_BLOCK_ACACIA_DOOR                  ].m_PistonBreakable = true;
 	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_PistonBreakable = true;
 	Info[E_BLOCK_AIR                          ].m_PistonBreakable = true;
 	Info[E_BLOCK_BED                          ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_PistonBreakable = true;
+	Info[E_BLOCK_BIRCH_DOOR                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_PistonBreakable = true;
 	Info[E_BLOCK_BLUE_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_BROWN_MUSHROOM               ].m_PistonBreakable = true;
@@ -965,6 +967,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_CROPS                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_CYAN_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_DANDELION                    ].m_PistonBreakable = true;
+	Info[E_BLOCK_DARK_OAK_DOOR                ].m_PistonBreakable = true;
 	Info[E_BLOCK_DEAD_BUSH                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_DRAGON_EGG                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_FIRE                         ].m_PistonBreakable = true;
@@ -978,6 +981,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_IRON_DOOR                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_IRON_TRAPDOOR                ].m_PistonBreakable = true;
 	Info[E_BLOCK_JACK_O_LANTERN               ].m_PistonBreakable = true;
+	Info[E_BLOCK_JUNGLE_DOOR                  ].m_PistonBreakable = true;
 	Info[E_BLOCK_LIGHT_BLUE_SHULKER_BOX       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LIGHT_GRAY_SHULKER_BOX       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
@@ -1007,6 +1011,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_SAPLING                      ].m_PistonBreakable = true;
 	Info[E_BLOCK_SIGN_POST                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_SNOW                         ].m_PistonBreakable = true;
+	Info[E_BLOCK_SPRUCE_DOOR                  ].m_PistonBreakable = true;
 	Info[E_BLOCK_STATIONARY_LAVA              ].m_PistonBreakable = true;
 	Info[E_BLOCK_STATIONARY_WATER             ].m_PistonBreakable = true;
 	Info[E_BLOCK_STONE_BUTTON                 ].m_PistonBreakable = true;
