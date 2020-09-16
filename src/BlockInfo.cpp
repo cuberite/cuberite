@@ -8,7 +8,7 @@
 
 
 
-bool IsBlockWater(BLOCKTYPE a_BlockType)
+bool IsBlockWater(const BLOCKTYPE a_BlockType)
 {
 	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
 }
@@ -17,7 +17,7 @@ bool IsBlockWater(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockIce(BLOCKTYPE a_BlockType)
+bool IsBlockIce(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -38,7 +38,7 @@ bool IsBlockIce(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
+bool IsBlockWaterOrIce(const BLOCKTYPE a_BlockType)
 {
 	return (IsBlockWater(a_BlockType) || IsBlockIce(a_BlockType));
 }
@@ -47,7 +47,7 @@ bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockLava(BLOCKTYPE a_BlockType)
+bool IsBlockLava(const BLOCKTYPE a_BlockType)
 {
 	return ((a_BlockType == E_BLOCK_LAVA) || (a_BlockType == E_BLOCK_STATIONARY_LAVA));
 }
@@ -56,7 +56,7 @@ bool IsBlockLava(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockLiquid(BLOCKTYPE a_BlockType)
+bool IsBlockLiquid(const BLOCKTYPE a_BlockType)
 {
 	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
 }
@@ -65,7 +65,7 @@ bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockRail(BLOCKTYPE a_BlockType)
+bool IsBlockRail(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -76,7 +76,10 @@ bool IsBlockRail(BLOCKTYPE a_BlockType)
 		{
 			return true;
 		}
-		default: return false;
+		default:
+		{
+			return false;
+		}
 	}
 }
 
@@ -84,7 +87,7 @@ bool IsBlockRail(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
+bool IsBlockTypeOfDirt(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -95,15 +98,18 @@ bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 		{
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
 	}
-	return false;
 }
 
 
 
 
 
-bool IsBlockFence(BLOCKTYPE a_BlockType)
+bool IsBlockFence(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -135,7 +141,7 @@ bool IsBlockFence(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialWood(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -198,7 +204,7 @@ bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialPlants(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -233,7 +239,7 @@ bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialVine(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -255,7 +261,7 @@ bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialIron(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -291,7 +297,7 @@ bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialLeaves(const BLOCKTYPE a_BlockType)
 {
 	return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES);
 }
@@ -300,7 +306,7 @@ bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialGourd(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -321,7 +327,7 @@ bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
 
 
 
-bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
+bool IsBlockMaterialRock(const BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)
 	{
@@ -397,6 +403,40 @@ bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 
 
 
+bool IsBlockMaterialTerracotta(const BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
+		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
+		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
+		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
+		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
+		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
+		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
+		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
+		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
+		case E_BLOCK_RED_GLAZED_TERRACOTTA:
+		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
+		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockInfo:
 
@@ -423,39 +463,65 @@ cBlockInfo::cBlockInfo():
 
 
 
-bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
+bool cBlockInfo::IsSnowable(const BLOCKTYPE a_BlockType)
 {
-	return (
-		(a_BlockType == E_BLOCK_ICE) ||
-		(a_BlockType == E_BLOCK_LEAVES) ||
-		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
-	);
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ICE:
+		case E_BLOCK_LEAVES:
+		{
+			return true;
+		}
+		case E_BLOCK_PACKED_ICE:
+		{
+			return false;
+		}
+		default:
+		{
+			return !IsTransparent(a_BlockType);
+		}
+	}
 }
 
 
 
 
 
-float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
+float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE a_BlockType)
 {
-	switch (Block)
+	switch (a_BlockType)
 	{
 		case E_BLOCK_BEDROCK:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_END_GATEWAY:
 		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_END_PORTAL_FRAME: return 3600000;
+		case E_BLOCK_END_PORTAL_FRAME:
+		{
+			return 3600000;
+		}
 		case E_BLOCK_ANVIL:
 		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_OBSIDIAN: return 1200;
-		case E_BLOCK_ENDER_CHEST: return 600;
+		case E_BLOCK_OBSIDIAN:
+		{
+			return 1200;
+		}
+		case E_BLOCK_ENDER_CHEST:
+		{
+			return 600;
+		}
 		case E_BLOCK_LAVA:
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_WATER:
-		case E_BLOCK_STATIONARY_WATER: return 100;
+		case E_BLOCK_STATIONARY_WATER:
+		{
+			return 100;
+		}
 		case E_BLOCK_DRAGON_EGG:
 		case E_BLOCK_END_STONE:
-		case E_BLOCK_END_BRICKS: return 9;
+		case E_BLOCK_END_BRICKS:
+		{
+			return 9;
+		}
 		case E_BLOCK_STONE:
 		case E_BLOCK_BLOCK_OF_COAL:
 		case E_BLOCK_DIAMOND_BLOCK:
@@ -476,17 +542,35 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
 		case E_BLOCK_PRISMARINE_BLOCK:
 		case E_BLOCK_STONE_BRICKS:
 		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_COBBLESTONE_WALL: return 6;
+		case E_BLOCK_COBBLESTONE_WALL:
+		{
+			return 6;
+		}
 		case E_BLOCK_IRON_DOOR:
 		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_MOB_SPAWNER: return 5;
-		case E_BLOCK_HOPPER: return 4.8f;
-		case E_BLOCK_TERRACOTTA: return 4.2f;
-		case E_BLOCK_COBWEB: return 4;
+		case E_BLOCK_MOB_SPAWNER:
+		{
+			return 5;
+		}
+		case E_BLOCK_HOPPER:
+		{
+			return 4.8f;
+		}
+		case E_BLOCK_TERRACOTTA:
+		{
+			return 4.2f;
+		}
+		case E_BLOCK_COBWEB:
+		{
+			return 4;
+		}
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_FURNACE:
-		case E_BLOCK_OBSERVER: return 3.5f;
+		case E_BLOCK_OBSERVER:
+		{
+			return 3.5f;
+		}
 		case E_BLOCK_BEACON:
 		case E_BLOCK_COAL_ORE:
 		case E_BLOCK_COCOA_POD:
@@ -504,15 +588,30 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
 		case E_BLOCK_WOODEN_DOOR:
 		case E_BLOCK_WOODEN_SLAB:
 		case E_BLOCK_WOODEN_STAIRS:
-		case E_BLOCK_TRAPDOOR: return 3;
+		case E_BLOCK_TRAPDOOR:
+		{
+			return 3;
+		}
 		case E_BLOCK_CHEST:
 		case E_BLOCK_WORKBENCH:
-		case E_BLOCK_TRAPPED_CHEST: return 2.5f;
+		case E_BLOCK_TRAPPED_CHEST:
+		{
+			return 2.5f;
+		}
 		case E_BLOCK_BONE_BLOCK:
 		case E_BLOCK_CAULDRON:
-		case E_BLOCK_LOG: return 2;
-		case E_BLOCK_CONCRETE: return 1.8f;
-		case E_BLOCK_BOOKCASE: return 1.5f;
+		case E_BLOCK_LOG:
+		{
+			return 2;
+		}
+		case E_BLOCK_CONCRETE:
+		{
+			return 1.8f;
+		}
+		case E_BLOCK_BOOKCASE:
+		{
+			return 1.5f;
+		}
 		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_WALL_BANNER:
 		case E_BLOCK_JACK_O_LANTERN:
@@ -521,25 +620,40 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
 		case E_BLOCK_NETHER_WART_BLOCK:
 		case E_BLOCK_PUMPKIN:
 		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN: return 1;
+		case E_BLOCK_WALLSIGN:
+		{
+			return 1;
+		}
 		case E_BLOCK_QUARTZ_BLOCK:
 		case E_BLOCK_QUARTZ_STAIRS:
 		case E_BLOCK_RED_SANDSTONE:
 		case E_BLOCK_RED_SANDSTONE_STAIRS:
 		case E_BLOCK_SANDSTONE:
 		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_WOOL: return 0.8f;
-		case E_BLOCK_SILVERFISH_EGG: return 0.75f;
+		case E_BLOCK_WOOL:
+		{
+			return 0.8f;
+		}
+		case E_BLOCK_SILVERFISH_EGG:
+		{
+			return 0.75f;
+		}
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_DETECTOR_RAIL:
 		case E_BLOCK_POWERED_RAIL:
-		case E_BLOCK_RAIL: return 0.7f;
+		case E_BLOCK_RAIL:
+		{
+			return 0.7f;
+		}
 		case E_BLOCK_GRASS_PATH:
 		case E_BLOCK_CLAY:
 		case E_BLOCK_FARMLAND:
 		case E_BLOCK_GRASS:
 		case E_BLOCK_GRAVEL:
-		case E_BLOCK_SPONGE: return 0.6f;
+		case E_BLOCK_SPONGE:
+		{
+			return 0.6f;
+		}
 		case E_BLOCK_BREWING_STAND:
 		case E_BLOCK_STONE_BUTTON:
 		case E_BLOCK_WOODEN_BUTTON:
@@ -548,8 +662,14 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
 		case E_BLOCK_DIRT:
 		case E_BLOCK_FROSTED_ICE:
 		case E_BLOCK_HAY_BALE:
-		case E_BLOCK_ICE: return 0.5f;
-		default: return 0;
+		case E_BLOCK_ICE:
+		{
+			return 0.5f;
+		}
+		default:
+		{
+			return 0;
+		}
 	}
 }
 
