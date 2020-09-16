@@ -255,8 +255,8 @@ namespace LootTable
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cBlockStateProperty
+////////////////////////////////////////////////////////////////////////////////
+// cBlockStateProperty
 
 	cBlockStateProperty::cBlockStateProperty(const Json::Value & a_Value)
 	{
@@ -344,61 +344,61 @@ namespace LootTable
 
 		for (const auto & Key : Predicates.getMemberNames())
 		{
-			if ((NoCaseCompare(Key, "bypasses_armor") == 0) &&
+			if ((NoCaseCompare(Key, "bypasses_armor") == 0) ||
 				(NoCaseCompare(Key, "BypassesArmor") == 0))
 			{
 				m_BypassesArmor = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "bypasses_invulnerability") == 0) &&
+				(NoCaseCompare(Key, "bypasses_invulnerability") == 0) ||
 				(NoCaseCompare(Key, "BypassesInvulnerability") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "bypasses_magic") == 0) &&
+				(NoCaseCompare(Key, "bypasses_magic") == 0) ||
 				(NoCaseCompare(Key, "BypassesMagic") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "direct_entity") == 0) &&
+				(NoCaseCompare(Key, "direct_entity") == 0) ||
 				(NoCaseCompare(Key, "DirectEntity") == 0))
 			{
 				m_DirectEntity = cEntityProperties(Predicates[Key]);
 			}
 			else if (
-				(NoCaseCompare(Key, "is_explosion") == 0) &&
+				(NoCaseCompare(Key, "is_explosion") == 0) ||
 				(NoCaseCompare(Key, "IsExplosion") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "is_fire") == 0) &&
+				(NoCaseCompare(Key, "is_fire") == 0) ||
 				(NoCaseCompare(Key, "IsFire") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "is_magic") == 0) &&
+				(NoCaseCompare(Key, "is_magic") == 0) ||
 				(NoCaseCompare(Key, "IsMagic") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "is_projectile") == 0) &&
+				(NoCaseCompare(Key, "is_projectile") == 0) ||
 				(NoCaseCompare(Key, "IsProjectile") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "is_lightning") == 0) &&
+				(NoCaseCompare(Key, "is_lightning") == 0) ||
 				(NoCaseCompare(Key, "IsLightning") == 0))
 			{
 				m_BypassesInvulnerability = Predicates[Key].asBool();
 			}
 			else if (
-				(NoCaseCompare(Key, "source_entity") == 0) &&
+				(NoCaseCompare(Key, "source_entity") == 0) ||
 				(NoCaseCompare(Key, "SourceEntity") == 0))
 			{
 				m_SourceEntity = cEntityProperties(Predicates[Key]);
@@ -868,8 +868,8 @@ namespace LootTable
 		return Res;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cEntityScores
+////////////////////////////////////////////////////////////////////////////////
+// cEntityScores
 
 	cEntityScores::cEntityScores(const Json::Value & a_Value) {}
 
@@ -883,8 +883,8 @@ namespace LootTable
 		return true;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cInverted
+////////////////////////////////////////////////////////////////////////////////
+// cInverted
 
 	cInverted::cInverted(const Json::Value & a_Value)
 	{
@@ -904,8 +904,8 @@ namespace LootTable
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cKilledByPlayer
+////////////////////////////////////////////////////////////////////////////////
+// cKilledByPlayer
 
 	cKilledByPlayer::cKilledByPlayer(const Json::Value & a_Value)
 	{
@@ -1178,8 +1178,8 @@ namespace LootTable
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cMatchTool
+////////////////////////////////////////////////////////////////////////////////
+// cMatchTool
 
 	cMatchTool::cMatchTool(const Json::Value & a_Value)
 	{
@@ -1417,8 +1417,8 @@ namespace LootTable
 		return Res;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cRandomChance
+////////////////////////////////////////////////////////////////////////////////
+// cRandomChance
 
 	cRandomChance::cRandomChance(const Json::Value & a_Value)
 	{
@@ -1448,8 +1448,8 @@ namespace LootTable
 		return fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f) < m_Chance;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cRandomChanceWithLooting
+////////////////////////////////////////////////////////////////////////////////
+// cRandomChanceWithLooting
 
 	cRandomChanceWithLooting::cRandomChanceWithLooting(
 		const Json::Value & a_Value)
