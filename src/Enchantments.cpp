@@ -1194,6 +1194,30 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 
 
 
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments)
+{
+	int AllWeights = 0;
+	for (cWeightedEnchantments::const_iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	{
+		AllWeights += (*it).m_Weight;
+	}
+	int RandomNumber = GetRandomProvider().RandInt(AllWeights - 1);
+	for (cWeightedEnchantments::const_iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	{
+		RandomNumber -= (*it).m_Weight;
+		if (RandomNumber < 0)
+		{
+			return (*it).m_Enchantments;
+		}
+	}
+
+	return cEnchantments();
+}
+
+
+
+
+
 cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, int a_Seed)
 {
 	// Sum up all the enchantments' weights:

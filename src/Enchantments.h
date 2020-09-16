@@ -142,6 +142,9 @@ public:
 	/** Gets random enchantment from Vector and returns it */
 	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
 
+	/** Gets random enchantment from Vector and returns it */
+	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments);
+
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.
 	If a_Enchantments is empty, returns an empty enchantment. */
