@@ -179,9 +179,16 @@ bool cBlockPistonHandler::CanPushBlock(
 
 			// Terracotta and leaves can be pushed, but not pulled - so can't stick
 			const auto StickingBlockType = a_World.GetBlock(a_BlockPos + testDir);
+
 			if (IsBlockMaterialTerracotta(StickingBlockType) || IsBlockMaterialLeaves(StickingBlockType))
 			{
-				return false;
+				// Can only be pushed directly
+				const auto IsPushedDirectly = a_PushDir == testDir;
+				if (!IsPushedDirectly)
+				{
+					// Remove this block from the pushing queue
+					a_BlocksPushed.erase(a_BlocksPushed.begin());
+				}
 			}
 		}
 	}
