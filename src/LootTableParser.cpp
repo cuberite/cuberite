@@ -3,112 +3,12 @@
 
 #include "LootTableParser.h"
 #include "Entities/Player.h"
+#include "BlockEntities/BlockEntity.h"
 
 #include "World.h"
 
 namespace LootTable
 {
-	enum eFunctionType eFunctionType(const AString & a_Type)
-	{
-		if (NoCaseCompare(a_Type, "ApplyBonus") == 0)
-		{
-			return eFunctionType::ApplyBonus;
-		}
-		else if (NoCaseCompare(a_Type, "CopyName") == 0)
-		{
-			return eFunctionType::CopyName;
-		}
-		else if (NoCaseCompare(a_Type, "CopyNbt") == 0)
-		{
-			return eFunctionType::CopyNbt;
-		}
-		else if (NoCaseCompare(a_Type, "CopyState") == 0)
-		{
-			return eFunctionType::CopyState;
-		}
-		else if (NoCaseCompare(a_Type, "EnchantRandomly") == 0)
-		{
-			return eFunctionType::EnchantRandomly;
-		}
-		else if (NoCaseCompare(a_Type, "EnchantWithLevels") == 0)
-		{
-			return eFunctionType::EnchantWithLevels;
-		}
-		else if (NoCaseCompare(a_Type, "ExplorationMap") == 0)
-		{
-			return eFunctionType::ExplorationMap;
-		}
-		else if (NoCaseCompare(a_Type, "ExplosionDecay") == 0)
-		{
-			return eFunctionType::ExplosionDecay;
-		}
-		else if (NoCaseCompare(a_Type, "FurnaceSmelt") == 0)
-		{
-			return eFunctionType::FurnaceSmelt;
-		}
-		else if (NoCaseCompare(a_Type, "FillPlayerHead") == 0)
-		{
-			return eFunctionType::FillPlayerHead;
-		}
-		else if (NoCaseCompare(a_Type, "LimitCount") == 0)
-		{
-			return eFunctionType::LimitCount;
-		}
-		else if (NoCaseCompare(a_Type, "LootingEnchant") == 0)
-		{
-			return eFunctionType::LootingEnchant;
-		}
-		else if (NoCaseCompare(a_Type, "SetAttributes") == 0)
-		{
-			return eFunctionType::SetAttributes;
-		}
-		else if (NoCaseCompare(a_Type, "SetContents") == 0)
-		{
-			return eFunctionType::SetContents;
-		}
-		else if (NoCaseCompare(a_Type, "SetCount") == 0)
-		{
-			return eFunctionType::SetCount;
-		}
-		else if (NoCaseCompare(a_Type, "SetDamage") == 0)
-		{
-			return eFunctionType::SetDamage;
-		}
-		else if (NoCaseCompare(a_Type, "SetLootTable") == 0)
-		{
-			return eFunctionType::SetLootTable;
-		}
-		else if (NoCaseCompare(a_Type, "SetLore") == 0)
-		{
-			return eFunctionType::SetLore;
-		}
-		else if (NoCaseCompare(a_Type, "SetName") == 0)
-		{
-			return eFunctionType::SetName;
-		}
-		else if (NoCaseCompare(a_Type, "SetNbt") == 0)
-		{
-			return eFunctionType::SetNbt;
-		}
-		else if (NoCaseCompare(a_Type, "SetStewEffect") == 0)
-		{
-			return eFunctionType::SetStewEffect;
-		}
-		else if (NoCaseCompare(a_Type, "None") == 0)
-		{
-			return eFunctionType::None;
-		}
-		else
-		{
-			LOGWARNING("Unknown loot table function provided: %s. Using empty function", a_Type);
-			return eFunctionType::None;
-		}
-	}
-
-
-
-
-
 	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
 	{
 		if (NoCaseCompare(a_Type, "Item") == 0)
@@ -183,27 +83,6 @@ namespace LootTable
 		{
 			a_Max = std::max(a_Min, a_Max);
 		}
-	}
-
-
-
-
-
-	int MinMaxRand(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const int & a_Modifier)
-	{
-		int Min = 0, Max = 0;
-		MinMaxRange<int>(a_Value, Min, Max);
-		return a_Noise.IntNoise3DInt(a_Pos * a_Modifier) % (Max - Min) + Min;
-	}
-
-
-
-
-	float MinMaxRand(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const float & a_Modifier)
-	{
-		float Min = 0.0f, Max = 0.0f;
-		MinMaxRange<float>(a_Value, Min, Max);
-		return fmod(a_Noise.IntNoise3D(a_Pos * a_Modifier), Max - Min) + Min;
 	}
 
 
@@ -298,9 +177,7 @@ namespace LootTable
 		}
 	}
 
-	bool cBlockStateProperty::operator()(
-		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID) const
+	bool cBlockStateProperty::operator()(cWorld & a_World, const Vector3i & a_Pos) const
 	{
 		bool Res = true;
 		// Check if block is the same
@@ -675,7 +552,6 @@ namespace LootTable
 					if (NoCaseCompare(PlayerKey, "advancements") == 0)
 					{
 						// TODO: 14.09.2020 - Add when implemented - 12xx12
-						// Todo: error message
 					}
 					else if (NoCaseCompare(PlayerKey, "gamemode") == 0)
 					{
@@ -701,6 +577,16 @@ namespace LootTable
 					else if (NoCaseCompare(PlayerKey, "level") == 0)
 					{
 						MinMaxRange<int>(PlayerObject[PlayerKey], m_LevelMin, m_LevelMax);
+					}
+					else if (NoCaseCompare(PlayerKey, "recipes") == 0)
+					{
+						// TODO: 16.06.2020 - 12xx12
+						LOGWARNING("Recipes are not supported in the loot table condition \"EntityProperties\"");
+					}
+					else if (NoCaseCompare(PlayerKey, "stats") == 0)
+					{
+						// TODO: 16.06.2020 - 12xx12
+						LOGWARNING("Statistics are not supported in the loot table condition \"EntityProperties\"");
 					}
 				}
 			}
@@ -1117,7 +1003,7 @@ namespace LootTable
 		{
 			Res &= (a_World.GetBiomeAt(Pos.x, Pos.z) == m_Biome);
 		}
-		Res &= m_BlockState(a_World, a_Noise, Pos, a_KilledID, a_KillerID);
+		Res &= m_BlockState(a_World, Pos);
 
 		// TODO: Block Tag
 
@@ -1136,7 +1022,7 @@ namespace LootTable
 		{
 		}
 
-		Res &= m_FluidState(a_World, a_Noise, Pos, a_KilledID, a_KillerID);
+		Res &= m_FluidState(a_World, Pos);
 
 		// Todo: Fluid Tag
 		if (!m_FluidTag.empty())
@@ -1694,6 +1580,1075 @@ namespace LootTable
 	}
 	}  // Namespace Condition
 
+	namespace Function
+	{
+////////////////////////////////////////////////////////////////////////////////
+// cApplyBonus
+
+	cApplyBonus::cApplyBonus(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		Json::Value EnchantmentObject;
+
+		if (a_Value.isMember("enchantment"))
+		{
+			EnchantmentObject = a_Value["enchantment"];
+		}
+		else if (a_Value.isMember("Enchantment"))
+		{
+			EnchantmentObject = a_Value["Enchantment"];
+		}
+
+		m_Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject.asString()));
+
+		AString Formula;
+		if (a_Value.isMember("formula"))
+		{
+			Formula = NamespaceConverter(a_Value["formula"].asString());
+		}
+		else if (a_Value.isMember("Formula"))
+		{
+			Formula = NamespaceConverter(a_Value["Formula"].asString());
+		}
+
+		if (Formula == "BinomialWithBonusCount")
+		{
+			m_Formula = eFormula::BinomialWithBonusCount;
+		}
+		else if (Formula == "UniformBonusCount")
+		{
+			m_Formula = eFormula::UniformBonusCount;
+		}
+		else if (Formula == "OreDrops")
+		{
+			m_Formula = eFormula::OreDrops;
+		}
+		else
+		{
+			// Todo: error message
+			return;
+		}
+
+		Json::Value Parameters;
+
+		if (a_Value.isMember("parameters"))
+		{
+			Parameters = a_Value["parameters"];
+		}
+		else if (a_Value.isMember("Parameters"))
+		{
+			Parameters = a_Value["Parameters"];
+		}
+
+		if (Parameters.isMember("extra"))
+		{
+			m_Extra = Parameters["extra"].asInt();
+		}
+		else if (Parameters.isMember("Extra"))
+		{
+			m_Extra = Parameters["Extra"].asInt();
+		}
+
+		if (Parameters.isMember("probability"))
+		{
+			m_Probability = Parameters["probability"].asFloat();
+		}
+		else if (Parameters.isMember("Probability"))
+		{
+			m_Probability = Parameters["Probability"].asFloat();
+		}
+
+		if (Parameters.isMember("bonusMultiplier"))
+		{
+			m_BonusMultiplier = Parameters["bonusMultiplier"].asInt();
+		}
+		else if (Parameters.isMember("BonusMultiplier"))
+		{
+			m_BonusMultiplier = Parameters["BonusMultiplier"].asInt();
+		}
+	}
+
+
+
+
+
+	void cApplyBonus::operator() (
+		cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
+			UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		int Level;
+		auto Callback = [&] (cEntity & a_Entity)
+		{
+			if (a_Entity.GetEntityType() != cEntity::etPlayer)
+			{
+				return false;
+			}
+
+			auto & Player = static_cast<cPlayer &>(a_Entity);
+
+			Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
+			return true;
+		};
+
+		a_World.DoWithEntityByID(a_KilledID, Callback);
+
+		switch (m_Formula)
+		{
+			case eFormula::BinomialWithBonusCount:
+			{
+				// Binomial Probability Distribution with n=level + extra, p=probability
+				std::default_random_engine Generator(a_Noise.GetSeed());
+				std::binomial_distribution<int> Dist(Level + m_Extra, m_Probability);
+				std::vector<int> Values;
+				for (int i = 0; i < Level + m_Extra; i++)
+				{
+					Values[i] = Dist(Generator);
+				}
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size()];
+				break;
+			}
+			case eFormula::UniformBonusCount:
+			{
+				// prob = (0, level * BonusMultiplier)
+				a_Item.m_ItemCount += (a_Noise.IntNoise3DInt(a_Pos) / 3) % (int) round(Level * m_BonusMultiplier);
+				break;
+			}
+			case eFormula::OreDrops:
+			{
+				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
+				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (Level + 2) - 1) + 1;
+				break;
+			}
+			case eFormula::None:
+			{
+				break;
+			}
+		}
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cCopyName
+
+	cCopyName::cCopyName(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		if (a_Value.isMember("source"))
+		{
+			if ((a_Value["source"].asString() == "block entity") || (a_Value["source"].asString() == "BlockEntity"))
+			{
+				m_Active = true;
+			}
+		}
+		else if (a_Value.isMember("Source"))
+		{
+			if ((a_Value["Source"].asString() == "block entity") || (a_Value["Source"].asString() == "BlockEntity"))
+			{
+				m_Active = true;
+			}
+		}
+		else
+		{
+			// Todo: error message
+		}
+	}
+
+
+
+
+	void cCopyName::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+		// Todo
+		// a_Item.m_CustomName = a_BlockEntity.GetCustomName();
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cCopNBT
+
+	cCopyNbt::cCopyNbt(const Json::Value & a_Value)
+	{
+		// TODO: 06.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("NBT for items is not yet supported, Dropping function!");
+		return;
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		AString Source;
+		if (a_Value.isMember("source"))
+		{
+			Source = NamespaceConverter(a_Value["source"].asString());
+		}
+		else if (a_Value.isMember("Source"))
+		{
+			Source = NamespaceConverter(a_Value["Source"].asString());
+		}
+		else
+		{
+			// Todo: error message
+			return;
+		}
+
+		if (Source == "BlockEntity")
+		{
+			m_Source = eSource::BlockEntity;
+		}
+		else if (Source == "This")
+		{
+			m_Source = eSource::This;
+		}
+		else if (Source == "Killer")
+		{
+			m_Source = eSource::Killer;
+		}
+		else if (Source == "KillerPlayer")
+		{
+			m_Source = eSource::KillerPlayer;
+		}
+		else
+		{
+			// Todo: error message
+			return;
+		}
+
+		Json::Value Operations;
+		if (a_Value.isMember("ops"))
+		{
+			Operations = a_Value["ops"];
+		}
+		else if (a_Value.isMember("Ops"))
+		{
+			Operations = a_Value["Ops"];
+		}
+
+		if (!Operations.isArray())
+		{
+			// Todo: error Message
+		}
+		m_Active = true;
+
+		for (unsigned int i = 0; i < Operations.size(); i++)
+		{
+			Json::Value OperationObject = Operations[i];
+			if (!OperationObject.isObject())
+			{
+				continue;
+			}
+			for (const auto & OperationKey : OperationObject.getMemberNames())
+			{
+				AString SourcePath, TargetPath;
+				eOperation Operation;
+				if (NoCaseCompare(OperationKey, "source") == 0)
+				{
+					SourcePath = NamespaceConverter(OperationObject[OperationKey].asString());
+				}
+				else if (NoCaseCompare(OperationKey, "target") == 0)
+				{
+					TargetPath = NamespaceConverter(OperationObject[OperationKey].asString());
+				}
+				else if (NoCaseCompare(OperationKey, "op") == 0)
+				{
+					AString Op = NamespaceConverter(OperationObject[OperationKey].asString());
+					if (Op == "Replace")
+					{
+						Operation = eOperation::Replace;
+					}
+					else if (Op == "Append")
+					{
+						Operation = eOperation::Append;
+					}
+					else if (Op == "Merge")
+					{
+						Operation = eOperation::Merge;
+					}
+				}
+				m_Operations.emplace_back(sOperation{SourcePath, TargetPath, Operation});
+			}
+		}
+	}
+
+
+
+
+
+	void cCopyNbt::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+		// cNBT NBT;  // This contains the NBT of the Source - see eSource
+		for (const auto & Operation : m_Operations)
+		{
+			// Do operation. This depends on the actual implementation
+		}
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cCopyState
+
+	cCopyState::cCopyState(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("States for blocks is not yet supported, dropping function!");
+		return;
+
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		for (const auto & ParameterName : a_Value.getMemberNames())
+		{
+
+			if (NoCaseCompare(ParameterName, "block") == 0)
+			{
+				cItem Item;
+
+				if (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item))
+				{
+					m_Block = Item.m_ItemType;
+				}
+				else
+				{
+					LOGWARNING("Provided unknown Block");  // Todo: better error message
+				}
+			}
+			else if (NoCaseCompare(ParameterName, "properties") == 0)
+			{
+				Json::Value Properties = a_Value[ParameterName];
+				if (!Properties.isArray())
+				{
+					return;
+				}
+
+				for (unsigned int i = 0; i < Properties.size(); i++)
+				{
+					m_Properties.push_back(NamespaceConverter(Properties[i].asString()));
+				}
+			}
+		}
+	}
+
+	void cCopyState::operator()(cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos) const
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cCopyState
+
+
+
+	cEnchantRandomly::cEnchantRandomly(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		Json::Value Enchantments;
+		if (a_Value.isMember("enchantments"))
+		{
+			Enchantments = a_Value["enchantments"];
+		}
+		else if (a_Value.isMember("Enchantments"))
+		{
+			Enchantments = a_Value["Enchantments"];
+		}
+		if (Enchantments.isArray())
+		{
+			for (unsigned int i = 0; i < Enchantments.size(); i++)
+			{
+				m_EnchantmentLimiter.push_back({1, cEnchantments(NamespaceConverter(Enchantments[i].asString()))});
+			}
+		}
+		else
+		{
+			// Todo: error message
+		}
+	}
+
+
+
+
+	void cEnchantRandomly::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		if (!cItem::IsEnchantable(a_Item.m_ItemType))
+		{
+			LOGWARNING("Item %s can not be enchanted in loot table", ItemToString(a_Item));
+		}
+		if (!m_EnchantmentLimiter.empty())
+		{
+			if (a_Item.IsSameType(E_ITEM_BOOK))
+			{
+				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
+				a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(m_EnchantmentLimiter));
+			}
+		}
+		else  // All are possible
+		{
+			cWeightedEnchantments EnchantmentLimiter;
+			cEnchantments::AddItemEnchantmentWeights(EnchantmentLimiter, a_Item.m_ItemType, 24 + a_Noise.IntNoise3DInt(a_Pos * 20) % 7);
+			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cEnchantWithLevels
+
+
+	cEnchantWithLevels::cEnchantWithLevels(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		// TODO: 02.09.2020 - Add treasure when implemented - 12xx12
+		if (a_Value.isMember("treasure"))
+		{
+			m_Treasure = a_Value["treasure"].asBool();
+			LOGWARNING("Treasure enchantments are not yet supported");
+		}
+		else if (a_Value.isMember("Treasure"))
+		{
+			m_Treasure = a_Value["Treasure"].asBool();
+			LOGWARNING("Treasure enchantments are not yet supported");
+		}
+		Json::Value LevelsObject;
+		if (a_Value.isMember("levels"))
+		{
+			LevelsObject = a_Value["levels"];
+		}
+		else if (a_Value.isMember("Levels"))
+		{
+			LevelsObject = a_Value["Levels"];
+		}
+		else
+		{
+			LOGWARNING("No levels provided for enchantments in Loot table, dropping function");
+			return;
+		}
+		m_Active = true;
+		MinMaxRange<int>(LevelsObject, m_LevelsMin, m_LevelsMax);
+	}
+
+
+
+
+	void cEnchantWithLevels::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+		if (!cItem::IsEnchantable(a_Item.m_ItemType))
+		{
+			return;
+		}
+		int Levels = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LevelsMax - m_LevelsMin) + m_LevelsMin;
+		a_Item.EnchantByXPLevels(Levels);
+		if (a_Item.m_ItemType == E_ITEM_BOOK)
+		{
+			a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cExplorationMap
+
+
+	cExplorationMap::cExplorationMap(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("Exploration maps are not implemented, dropping function!");
+		return;
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		for (const auto & Key : a_Value.getMemberNames())
+		{
+			if (NoCaseCompare(Key, "Destination") == 0)
+			{
+				m_Destination = NamespaceConverter(a_Value[Key].asString());
+			}
+			else if (NoCaseCompare(Key, "Decoration") == 0)
+			{
+				m_Decoration = NamespaceConverter(a_Value[Key].asString());
+			}
+			else if (NoCaseCompare(Key, "Zoom") == 0)
+			{
+				m_Zoom = a_Value[Key].asInt();
+			}
+			else if ((NoCaseCompare(Key, "search_radius") == 0) || (NoCaseCompare(Key, "SearchRadius") == 0))
+			{
+				m_SearchRadius = a_Value[Key].asInt();
+			}
+			else if ((NoCaseCompare(Key, "skip_existing_chunks") == 0) || (NoCaseCompare(Key, "SkipExistingChunks") == 0))
+			{
+				m_SkipExistingChunks = a_Value[Key].asBool();
+			}
+		}
+	}
+
+
+
+
+
+	void cExplorationMap::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cExplosionDecay
+
+
+	void cExplosionDecay::operator() (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		// Todo
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cFurnaceSmelt
+
+	void cFurnaceSmelt::operator()(cItem & a_Item) const
+	{
+		auto Recipes = cRoot::Get()->GetFurnaceRecipe();
+		auto NewItem = Recipes->GetRecipeFrom(a_Item)->Out;
+		a_Item.m_ItemType = NewItem->m_ItemType;
+		a_Item.m_ItemDamage = NewItem->m_ItemDamage;
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cFillPlayerHead
+
+	cFillPlayerHead::cFillPlayerHead(const Json::Value & a_Value)
+	{
+	}
+
+
+
+
+
+	void cFillPlayerHead::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLimitCount
+
+	cLimitCount::cLimitCount(const Json::Value & a_Value)
+	{
+		Json::Value LimitObject;
+		if (a_Value.isMember("limit"))
+		{
+			LimitObject = a_Value["limit"];
+		}
+		else if (a_Value.isMember("Limit"))
+		{
+			LimitObject = a_Value["Limit"];
+		}
+		else
+		{
+			LOGWARNING("Missing limit, dropping function!");
+			return;
+		}
+
+		MinMaxRange<int>(LimitObject, m_LimitMin, m_LimitMax);
+		m_Active = true;
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cLimitCount
+
+	void cLimitCount::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+		int Limit = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LimitMin - m_LimitMax) + m_LimitMin;
+		if (a_Item.m_ItemCount > Limit)
+		{
+			a_Item.m_ItemCount = Limit;
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cLootingEnchant
+
+	cLootingEnchant::cLootingEnchant(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		Json::Value CountObject;
+		if (a_Value.isMember("count"))
+		{
+			CountObject = a_Value["count"];
+		}
+		else if (a_Value.isMember("Count"))
+		{
+			CountObject = a_Value["Count"];
+		}
+		MinMaxRange<int>(CountObject, m_CountMin, m_CountMax);
+
+		if (a_Value.isMember("limit"))
+		{
+			m_Limit = a_Value["limit"].asInt();
+		}
+		else if (a_Value.isMember("Limit"))
+		{
+			m_Limit = a_Value["Limit"].asInt();
+		}
+	}
+
+
+
+
+	void cLootingEnchant::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KillerID) const
+	{
+		int Looting = 0;
+		auto Callback = [&] (cEntity & a_Entity)
+		{
+			if (a_Entity.GetEntityType() != cEntity::etPlayer)
+			{
+				return false;
+			}
+			auto & Player = static_cast<cPlayer &>(a_Entity);
+			Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+			return true;
+		};
+
+		a_World.DoWithEntityByID(a_KillerID, Callback);
+
+		int Count = (a_Noise.IntNoise3DInt(a_Pos) / 11) % (m_CountMin - m_CountMax) + m_CountMin;
+
+		a_Item.m_ItemCount += Looting * Count;
+
+		if ((m_Limit > 0) && (a_Item.m_ItemCount > m_Limit))
+		{
+			a_Item.m_ItemCount = m_Limit;
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetAttributes
+
+
+	cSetAttributes::cSetAttributes(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("Attributes for items are not implemented, dropping function!");
+	}
+
+
+
+
+	void cSetAttributes::operator()(cItem & a_Item) const
+	{
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetContents
+
+
+	cSetContents::cSetContents(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("NBT for items is not yet supported, Dropping function!");
+	}
+
+
+
+
+	void cSetContents::operator()(cItem & a_Item) const
+	{
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetCount
+
+
+	cSetCount::cSetCount(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		Json::Value CountObject;
+		if (a_Value.isMember("count"))
+		{
+			CountObject = a_Value["count"];
+		}
+		else if (a_Value.isMember("Count"))
+		{
+			CountObject = a_Value["Count"];
+		}
+
+		if (CountObject.isInt())
+		{
+			m_Count = CountObject.asInt();
+		}
+		else if (CountObject.isObject())
+		{
+			AString Type;
+			if (CountObject.isMember("type"))
+			{
+				Type = NamespaceConverter(CountObject["type"].asString());
+			}
+			else if (CountObject.isMember("Type"))
+			{
+				Type = NamespaceConverter(CountObject["Type"].asString());
+			}
+
+			if (Type == "Uniform")
+			{
+				m_Type = eType::Uniform;
+				MinMaxRange<int>(CountObject, m_UniformMin, m_UniformMax);
+			}
+			else if (Type == "Binomial")
+			{
+				if (CountObject.isMember("n"))
+				{
+					m_N = CountObject["n"].asInt();
+				}
+				else if (CountObject.isMember("N"))
+				{
+					m_N = CountObject["N"].asInt();
+				}
+
+				if (CountObject.isMember("p"))
+				{
+					m_P = CountObject["p"].asFloat();
+				}
+				else if (CountObject.isMember("P"))
+				{
+					m_P = CountObject["P"].asFloat();
+				}
+			}
+		}
+	}
+
+
+
+
+
+	void cSetCount::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		if (m_Count)
+		{
+			a_Item.m_ItemCount = m_Count;
+		}
+
+		switch (m_Type)
+		{
+			case eType::Uniform:
+			{
+				a_Item.m_ItemCount = (a_Noise.IntNoise3DInt(a_Pos) / 9) % (m_UniformMin - m_UniformMax) + m_UniformMin;
+				break;
+			}
+			case eType::Binomial:
+			{
+				std::default_random_engine Generator(a_Noise.GetSeed());
+				std::binomial_distribution<int> Dist(m_N, m_P);
+				std::vector<int> Values;
+				for (int i = 0; i < m_N; i++)
+				{
+					Values[i] = Dist(Generator);
+				}
+				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * a_Item.m_ItemType) % Values.size()];
+				break;
+			}
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetDamage
+
+	cSetDamage::cSetDamage(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		Json::Value DamageObject;
+
+		if (a_Value.isMember("damage"))
+		{
+			DamageObject = a_Value["damage"];
+		}
+		else if (a_Value.isMember("Damage"))
+		{
+			DamageObject = a_Value["Damage"];
+		}
+		MinMaxRange<float>(DamageObject, m_Min, m_Max);
+	}
+
+
+
+
+	void cSetDamage::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
+	{
+		float Damage = std::fmod((a_Noise.IntNoise3D(a_Pos) / 7), m_Max - m_Min) + m_Min;
+		a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetLootTable
+
+	cSetLootTable::cSetLootTable(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("NBT for items is not yet supported, dropping \"SetLootTable\" function!");
+		return;
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		for (const auto & Key : a_Value.getMemberNames())
+		{
+			if (NoCaseCompare(Key, "name") == 0)
+			{
+				m_LootTable = NamespaceConverter(a_Value[Key].asString());
+			}
+			else if (NoCaseCompare(Key, "seed") == 0)
+			{
+				m_Seed = a_Value[Key].asInt();
+			}
+		}
+	}
+
+
+
+
+	void cSetLootTable::operator()(cItem & a_Item) const
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetLore
+
+	cSetLore::cSetLore(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		for (const auto & Key : a_Value.getMemberNames())
+		{
+			if (NoCaseCompare(Key, "lore") == 0)
+			{
+				Json::Value Lore = a_Value[Key];
+				if (!Lore.isArray())
+				{
+					// Todo: error message
+				}
+				for (unsigned int i = 0; i < Lore.size(); i++)
+				{
+					if (!Lore[i].isString())
+					{
+						// TODO: 16.09.2020 - Add when Json objects are used for Lore - 12xx12
+						LOGWARNING("Items only support plain text in loot tables. Please make sure you don't supply a Json object.");
+					}
+					else
+					{
+						m_Lore.push_back(Lore[i].asString());
+					}
+				}
+			}
+			else if (NoCaseCompare(Key, "entity") == 0)
+			{
+				AString Entity = NamespaceConverter(a_Value[Key].asString());
+				if (Entity == "This")
+				{
+					m_Type = eType::This;
+				}
+				else if (Entity == "Killer")
+				{
+					m_Type = eType::Killer;
+				}
+				else if (Entity == "KillerPlayer")
+				{
+					m_Type = eType::KillerPlayer;
+				}
+			}
+			else if (NoCaseCompare(Key, "replace") == 0)
+			{
+				m_Replace = a_Value[Key].asBool();
+			}
+		}
+	}
+
+
+
+
+	void cSetLore::operator()(cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		if (m_Replace)
+		{
+			a_Item.m_LoreTable = std::move(m_Lore);
+		}
+		else
+		{
+			a_Item.m_LoreTable.insert(a_Item.m_LoreTable.end(), m_Lore.begin(), m_Lore.end());
+		}
+	}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetName
+
+
+	cSetName::cSetName(const Json::Value & a_Value)
+	{
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+		for (const auto & Key : a_Value.getMemberNames())
+		{
+			if (NoCaseCompare(Key, "name") == 0)
+			{
+				if (!a_Value[Key].isString())
+				{
+					// TODO: 16.09.2020 - Add when Json objects are used for Names - 12xx12
+					LOGWARNING("Items only support plain text in loot tables. Please make sure you don't supply a Json object.");
+				}
+				else
+				{
+					m_Name = a_Value[Key].asString();
+				}
+			}
+			else if (NoCaseCompare(Key, "entity") == 0)
+			{
+				AString Entity = NamespaceConverter(a_Value[Key].asString());
+				if (Entity == "This")
+				{
+					m_Type = eType::This;
+				}
+				else if (Entity == "Killer")
+				{
+					m_Type = eType::Killer;
+				}
+				else if (Entity == "KillerPlayer")
+				{
+					m_Type = eType::KillerPlayer;
+				}
+			}
+		}
+
+	}
+
+
+
+
+	void cSetName::operator()(cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		a_Item.m_CustomName = m_Name;
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetName
+
+
+	cSetNbt::cSetNbt(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("NBT for items is not yet supported, dropping function!");
+		return;
+		if (!a_Value.isObject())
+		{
+			// Todo: error message
+			return;
+		}
+
+		if (a_Value.isMember("tag"))
+		{
+			m_Tag = a_Value["tag"].asString();
+		}
+		else if (a_Value.isMember("Tag"))
+		{
+			m_Tag = a_Value["Tag"].asString();
+		}
+		else
+		{
+			return;
+		}
+		m_Active = true;
+	}
+
+
+
+
+	void cSetNbt::operator()(cItem & a_Item) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+		// a_Item.SetNBT(m_Tag);
+	}
+
+////////////////////////////////////////////////////////////////////////////////
+// cSetStewEffect
+
+	cSetStewEffect::cSetStewEffect(const Json::Value & a_Value)
+	{
+		// TODO: 02.09.2020 - Add when implemented - 12xx12
+		LOGWARNING("Stews are not yet supported, dropping function!");
+	}
+
+
+
+
+
+	void cSetStewEffect::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	{
+		if (!m_Active)
+		{
+			return;
+		}
+	}
+
+
+}  // Namespace Function
+
 
 	cLootTablePool ParsePool(const Json::Value & a_Value)
 	{
@@ -1750,24 +2705,129 @@ namespace LootTable
 
 	cLootTableFunction ParseFunction(const Json::Value & a_Value)
 	{
-		enum eFunctionType Type;
 		cLootTableConditions Conditions;
-		for (auto & FunctionInfo : a_Value.getMemberNames())
+
+		Json::Value ConditionsObject;
+
+		if (a_Value.isMember("condition"))
 		{
-			if (NoCaseCompare(FunctionInfo, "function") == 0)
+			ConditionsObject = a_Value["condition"];
+		}
+		else if (a_Value.isMember("Condition"))
+		{
+			ConditionsObject = a_Value["Conditions"];
+		}
+
+		if (ConditionsObject.isObject())
+		{
+			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 			{
-				Type = eFunctionType(NamespaceConverter(a_Value[FunctionInfo].asString()));
-			}
-			else if (NoCaseCompare(FunctionInfo, "conditions") == 0)
-			{
-				auto ConditionsObject = a_Value[FunctionInfo];
-				for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
-				{
-					Conditions.push_back(ParseCondition(ConditionsObject[ConditionId]));
-				}
+				Conditions.emplace_back(ParseCondition(ConditionsObject[ConditionId]));
 			}
 		}
-		return cLootTableFunction(Type, a_Value, Conditions);
+
+		AString Function;
+
+		if (a_Value.isMember("function"))
+		{
+			Function = NamespaceConverter(a_Value["function"].asString());
+		}
+		else if (a_Value.isMember("Function"))
+		{
+			Function = NamespaceConverter(a_Value["Function"].asString());
+		}
+
+		if (NoCaseCompare(Function, "ApplyBonus") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cApplyBonus(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "CopyName") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cCopyName(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "CopyNbt") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cCopyNbt(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "CopyState") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cCopyState(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "EnchantRandomly") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cEnchantRandomly(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "EnchantWithLevels") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cEnchantWithLevels(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "ExplorationMap") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cExplorationMap(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "ExplosionDecay") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cExplosionDecay(), Conditions);
+		}
+		else if (NoCaseCompare(Function, "FurnaceSmelt") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cFurnaceSmelt(), Conditions);
+		}
+		else if (NoCaseCompare(Function, "FillPlayerHead") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cFillPlayerHead(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "LimitCount") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cLimitCount(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "LootingEnchant") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cLootingEnchant(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetAttributes") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetAttributes(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetContents") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetContents(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetCount") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetCount(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetDamage") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetDamage(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetLootTable") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetLootTable(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetLore") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetLore(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetName") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetName(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetNbt") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetNbt(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "SetStewEffect") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cSetStewEffect(a_Value), Conditions);
+		}
+		else if (NoCaseCompare(Function, "None") == 0)
+		{
+			return cLootTableFunction(LootTable::Function::cNone(), Conditions);
+		}
+
+
+		return cLootTableFunction(LootTable::Function::cNone(), Conditions);
 	}
 
 

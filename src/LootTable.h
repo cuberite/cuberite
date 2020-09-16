@@ -9,8 +9,8 @@
 /*
 This is a representation of the loot tables as described in the wiki:
 https://minecraft.gamepedia.com/Loot_table
-The json files are parsed every time on startup. Mostly the interpretation is done on loading.
-The functions and conditions still contain some Json objects. It was the most effective way to store the parameters.
+The json files are parsed every time on startup.
+
 Notes:
 	01.09.2020:
 		Vanilla Minecraft uses a luck value per player that influences the outcome.
@@ -19,6 +19,31 @@ Notes:
 	06.09.2020:
 		When updating the loot tables you have to check the Tag interpretation. There might be new items added.
 		There is a link to the list in the minecraft wiki in the LootTable class.
+	16.09.2020:
+		*--------------------------------------------------------------*
+		|                                                              |
+		| 				Maintaining instructions                       |
+		|                                                              |
+		* -------------------------------------------------------------*
+		The LootTable.cpp and LootTableProvider.cpp are just a nice interface. The heavy lifting is done in LootTableParser.cpp
+
+		So there are multiple things to maintain:
+		- A new entry type:
+		If you want to add or edit a entry type you need to add this to the enum in LootTableParser.
+		Additional you need to add the handling to the ParseLootTableEntry() and GetItems() in the LootTable.
+		- A new function, condition:
+		If you want to add or edit a function you need to add a new class to the matching namespace in LootTableParser.
+		Additional you need to add it to the respective VISIT macro.
+	16.09.2020:
+		*--------------------------------------------------------------*
+		|                                                              |
+		|   Things left to do resulting from missing implementation    |
+		|                                                              |
+		* -------------------------------------------------------------*
+		- Anything NBT related
+		- Treasure enchantments
+		- Json Text components for item name and item lore
+		- Luck in the rolls evaluation
 */
 
 // fwd:
@@ -65,20 +90,8 @@ private:
 
 	static bool ConditionApplies(const LootTable::cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
 
-	/** Applies give function to item for all types */
-	static void ApplyCommonFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
-
-	/** Applies given function to an item in a Container */
+	/** Applies given function to an item */
 	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
-
-	/** Applies given function to an item dropped from a block */
-	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockHandler & a_Block, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
-
-	/** Applies given function to an item dropped from a block entity */
-	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cBlockEntity & a_BlockEntity, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID);
-
-	/** Applies given function to an item dropped from a killed entity */
-	static void ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos, UInt32 a_KilledID, const cNoise & a_Noise, UInt32 a_KillerID);
 };
 typedef std::unordered_map<AString, cLootTable> cLootTables;
 

@@ -10,9 +10,9 @@ This file describes the LootTable provider. The Provider is initialized per worl
 and loads default loot tables and custom ones.
 The default loot tables are from LootTables/ in the root folder
 The custom loot tables are read per world and must be contained in %worldname%/LootTables
-They follow the vanilla file structure so any possible entry should be respected
 
 The file names follow the cuberite NamingStructure.
+The files are in the same format as minecraft loot tables but also support CuberiteNamespace Key, Values.
 
 Notes:
 	30.08.2020:

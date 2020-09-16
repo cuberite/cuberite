@@ -18,75 +18,7 @@ enum class Statistic;
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 {
-	/** A list of the names of the vanilla chest loot tables. */  // TODO: do we need this?
-	const AString VanillaChestLootTableNames[] =
-	{
-		"AbandonedMineshaft",
-		"BuriedTreasure",
-		"DesertPyramid",
-		"EndCityTreasure",
-		"IglooChest",
-		"JungleTemple",
-		"JungleTempleDispenser",
-		"NetherBridge",
-		"PillagerOutpost",
-		"ShipwreckMap",
-		"ShipwreckSupply",
-		"ShipwreckTreasure",
-		"SimpleDungeon",
-		"SpawnBonusChest",
-		"StrongholdCorridor",
-		"StrongholdCrossing",
-		"StrongholdLibrary",
-		"UnderwaterRuinBig",
-		"UnderwaterRuinSmall",
-		"VillageArmorer",
-		"VillageButcher",
-		"VillageCartographer",
-		"VillageDesertHouse",
-		"VillageFisher",
-		"VillageFletcher",
-		"VillageMason",
-		"VillagePlainsHouse",
-		"VillageSavannaHouse",
-		"VillageShepherd",
-		"VillageSnowyHouse",
-		"VillageTaigaHouse",
-		"VillageTannery",
-		"VillageTemple",
-		"VillageToolsmith",
-		"VillageWeaponsmith",
-		"WoodlandMansion"
-	};
-
 	const AString LootTablePath = "LootTables";
-
-	/** Any available function type as of 1.16.2 */
-	enum class eFunctionType
-	{
-		ApplyBonus,
-		CopyName,
-		CopyNbt,
-		CopyState,
-		EnchantRandomly,
-		EnchantWithLevels,
-		ExplorationMap,
-		ExplosionDecay,
-		FurnaceSmelt,
-		FillPlayerHead,
-		LimitCount,
-		LootingEnchant,
-		SetAttributes,
-		SetContents,
-		SetCount,
-		SetDamage,
-		SetLootTable,
-		SetLore,
-		SetName,
-		SetNbt,
-		SetStewEffect,
-		None
-	};
 
 
 
@@ -108,20 +40,12 @@ namespace LootTable
 
 
 	// Declaration of methods in the cpp
-	/** Gets the eFunctionType from String. Defaults to None */
-	enum eFunctionType eFunctionType(const AString & a_Type);
 	/** Gets the ePoolEntryType from String. Defaults to Empty */
 	enum ePoolEntryType ePoolEntryType(const AString & a_Type);
 	/** Reads keys min and max and writes them into a_Min and a_Max
 	if there are no appropriately named keys there is no change */
 	template <typename T>
 	void MinMaxRange(const Json::Value & a_Value, T & a_Min, T & a_Max);
-	/** Reads keys min and max and returns a random integer value in between.
-	a_Noise is used as the random generator and a_Pos is used as the seed */
-	int MinMaxRand(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const int & a_Modifier);
-	/** Reads keys min and max and returns a random float value in between.
-	a_Noise is used as the random generator and a_Pos is used as the seed */
-	float MinMaxRandFloat(const Json::Value & a_Value, const cNoise & a_Noise, const Vector3i & a_Pos, const float & a_Modifier);
 
 
 	/** Represents a condition for a pool item */
@@ -134,7 +58,6 @@ namespace LootTable
 
 	namespace Condition
 	{
-		struct cVisit;
 		class cCondition
 		{
 		public:
@@ -146,8 +69,8 @@ namespace LootTable
 		// Note: this following list is mostly alpha sorted - there are some types included in others so some come earlier
 		// The implementation will be in alphabetical order
 
+		/** Checks tool */
 		class cMatchTool : public cCondition
-		// Checks tool.
 		/* predicate: Predicate applied to item, uses same structure as advancements. */
 		{
 		public:
@@ -187,7 +110,7 @@ namespace LootTable
 		public:
 			cBlockStateProperty() { m_Active = false; }
 			cBlockStateProperty(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			bool operator () (cWorld & a_World, const Vector3i & a_Pos) const;
 		private:
 			BLOCKTYPE m_Block;
 			AStringMap m_Properties;
@@ -325,9 +248,9 @@ namespace LootTable
 			int m_LevelMin = 0;
 			int m_LevelMax = std::numeric_limits<int>::max();
 			// Recipes
-			// Todo: add
+			// TODO: 16.09.2020 - Add - 12xx12
 			// Stats
-			std::unordered_map<Statistic, bool> m_Statistics;
+			// TODO: 16.09.2020 - Add - 12xx12
 			// Team
 			AString m_Team;
 			// Type
@@ -507,7 +430,435 @@ namespace LootTable
 		};
 
 		class cNone : public cCondition {};
-	}
+	}  // Namespace Condition
+
+	namespace Function
+	{
+		/** The Base class for Loot Table functions */
+		class cFunction
+		{
+		protected:
+			void Activate() { m_Active = true; }
+			bool m_Active = false;
+		};
+
+
+
+
+
+		/** Applies a predefined bonus formula. */
+		class cApplyBonus : public cFunction
+		/*
+		enchantment: Enchantment ID used for level calculation.
+		formula: Can be binomial_with_bonus_count for a binomial distribution (with n=level + extra, p=probability), uniform_bonus_count for uniform distribution (from 0 to level * bonusMultiplier), or ore_drops for a special function used for ore drops in the vanilla game (Count * (max(0; random(0..Level + 2) - 1)+1)).
+		parameters: Values required for the formula.
+
+		extra: For formula 'binomial_with_bonus_count', the extra value.
+		probability : For formula 'binomial_with_bonus_count', the probability.
+		bonusMultiplier : For formula 'uniform_bonus_count', the bonus multiplier.
+		*/
+		{
+		public:
+			cApplyBonus(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			int m_Enchantment = -1;
+			enum class eFormula
+			{
+				BinomialWithBonusCount,
+				UniformBonusCount,
+				OreDrops,
+				None
+			};
+			eFormula m_Formula = eFormula::None;
+			int m_Extra = 0;
+			float m_Probability = 0.0f;
+			float m_BonusMultiplier = 1.0f;
+		};
+
+
+
+
+		/** Copies a block entity's CustomName tag into the item's CustomName. */
+		class cCopyName : public cFunction
+		/*
+		source: "block_entity" - Needs to be set to 'block_entity'.
+		*/
+		{
+		public:
+			cCopyName(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			bool m_Active = false;
+		};
+
+
+
+
+		/** Copies nbt to the item's tag tag. */
+		class cCopyNbt : public cFunction
+		/*
+		source: Specifies the source. Set to block_entity for the block entity of the destroyed block, this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+		ops: A list of copy operations
+			source: The nbt path to copy from.
+			target: The nbt path to copy to, starting from the item's tag tag.
+			op: Can be replace to replace any existing contents of the target, append to append to a list, or merge to merge into a compound tag. */
+		{
+		public:
+			cCopyNbt(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			enum class eSource
+			{
+				BlockEntity,
+				This,
+				Killer,
+				KillerPlayer
+			};<
+			eSource m_Source;
+			enum class eOperation
+			{
+				Replace,
+				Append,
+				Merge
+			};
+			struct sOperation
+			{
+				AString m_Source;
+				AString m_Target;
+				eOperation m_Operation;
+			};
+			std::vector<sOperation> m_Operations;
+		};
+
+
+
+
+
+		/** Copies state properties from dropped block to the item's BlockStateTag tag. */
+		class cCopyState : public cFunction
+		/*
+		block: A block ID. Function fails if the block doesn't match.
+		properties: A list of property names to copy.
+		A block state name to copy.
+		*/
+		{
+		public:
+			cCopyState(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos) const;
+		private:
+			short m_Block;
+			AStringList m_Properties;
+		};
+
+
+
+
+		/**  Enchants the item with one randomly-selected enchantment. The level of the enchantment, if applicable, is random. */
+		class cEnchantRandomly : public cFunction
+		/* enchantments: List of enchantment IDs to choose from. If omitted, all enchantments applicable to the item are possible. */
+		{
+		public:
+			cEnchantRandomly(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
+		private:
+			cWeightedEnchantments m_EnchantmentLimiter;
+		};
+
+
+
+
+		/** Enchants the item, with the specified enchantment level (roughly equivalent to using an enchantment table at that level). */
+		class cEnchantWithLevels : public cFunction
+		/* treasure: Determines whether treasure enchantments are allowed on this item.
+		levels: Specifies the exact enchantment level to use.
+		levels: Specifies a random enchantment level within a range.
+
+		min: Minimum level to use.
+		max: Maximum level to use. */
+		{
+		public:
+			cEnchantWithLevels(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
+		private:
+			bool m_Treasure = false;
+			int m_LevelsMin = 0;
+			int m_LevelsMax = std::numeric_limits<int>::max();
+		};
+
+
+
+
+		/** Converts an empty map into an explorer map leading to a nearby generated structure. */
+		class cExplorationMap : public cFunction
+		/* destination: The type of generated structure to locate. Accepts any of the StructureTypes used by the /locate command (case insensitive).
+		decoration: The icon used to mark the destination on the map. Accepts any of the map icon text IDs (case insensitive). If mansion or monument is used, the color of the lines on the item texture changes to match the corresponding explorer map.
+		zoom: The zoom level of the resulting map. Defaults to 2.
+		search_radius: The size, in chunks, of the area to search for structures. The area checked is square, not circular. Radius 0 causes only the current chunk to be searched, radius 1 causes the current chunk and eight adjacent chunks to be searched, and so on. Defaults to 50.
+		skip_existing_chunks: Don't search in chunks that have already been generated. Defaults to true. */
+		{
+		public:
+			cExplorationMap(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			AString m_Destination;
+			AString m_Decoration;
+			int m_Zoom = 2;
+			int m_SearchRadius = 50;
+			bool m_SkipExistingChunks = true;
+		};
+
+
+
+		/** For loot tables of type 'block', removes some items from a stack, if there was an explosion.
+		Each item has a chance of 1 divided by explosion radius to be lost. */
+		class cExplosionDecay : public cFunction
+		/*  */
+		{
+		public:
+			cExplosionDecay() { Activate(); }
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		};
+
+
+
+
+		/** Smelts the item as it would be in a furnace. */
+		class cFurnaceSmelt : public cFunction
+		/*  */
+		{
+		public:
+			cFurnaceSmelt() { m_Active = true; }
+			void operator () (cItem & a_Item) const;
+		};
+
+
+
+
+		/**  Adds required item tags of a player head  */
+		class cFillPlayerHead : public cFunction
+		/*  entity: Specifies an entity to be used for the player head. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player. */
+		{
+		public:
+			cFillPlayerHead(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		};
+
+
+
+
+		/** Limits the count of every item stack. */
+		class cLimitCount : public cFunction
+		/* limit: Specifies the exact limit to use.
+		limit: Specifies a random limit within a range.
+
+		min: Minimum limit to use.
+		max: Maximum limit to use. */
+		{
+		public:
+			cLimitCount(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
+		private:
+			bool m_Active = false;
+			int m_LimitMin = 0;
+			int m_LimitMax = std::numeric_limits<int>::max();
+		};
+
+
+
+
+		/** Adjusts the stack size based on the level of the Looting enchantment on the killer entity. */
+		class cLootingEnchant : public cFunction
+		/* count: Specifies an exact number of additional items per level of looting.
+		count: Specifies a random number (within a range) of additional items per level of looting. Note the random number generated may be fractional, rounded after multiplying by the looting level.
+
+		min: Minimum increase.
+		max: Maximum increase.
+
+		limit: Specifies the maximum amount of items in the stack after the looting calculation. If the value is 0, no limit is applied. */
+		{
+		public:
+			cLootingEnchant(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KillerID) const;
+		private:
+			int m_CountMin = 0;
+			int m_CountMax = std::numeric_limits<int>::max();
+			int m_Limit = 0;
+		};
+
+
+
+
+		/** Add attribute modifiers to the item. */
+		class cSetAttributes : public cFunction
+		{
+		public:
+			cSetAttributes(const Json::Value & a_Value);
+			void operator () (cItem & a_Item) const;
+		};
+
+		/** For loot tables of type 'block', sets the contents of a container block item to a list of entries. */
+		class cSetContents : public cFunction
+		/* entries: The entries to use as contents. */
+		{
+		public:
+			cSetContents(const Json::Value & a_Value);
+			void operator () (cItem & a_Item) const;
+		};
+
+
+
+
+		/** Sets the stack size. */
+		class cSetCount : public cFunction
+		/* count: Specifies the exact stack size to set.
+		count: Specifies a random stack size within a range.
+
+		type: The distribution type. Arguments lie in the count compound.
+		uniform: Uniform distribution. A random integer is chosen with probability of each number being equal.
+			min: Minimum stack size.
+			max: Maximum stack size.
+		binomial: Binomial distribution. Roll a number of times, each having a chance of adding 1 to the stack size.
+			n: Number of rolls.
+			p: Chance of each roll.
+		*/
+		{
+		public:
+			cSetCount(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
+		private:
+			int m_Count = 0;
+			enum class eType
+			{
+				Uniform,
+				Binomial
+			};
+			eType m_Type;
+			int m_UniformMin = 0;
+			int m_UniformMax = std::numeric_limits<int>::max();
+
+			int m_N = 1;
+			float m_P = 1.0f;
+		};
+
+
+
+		/** Sets the item's damage value (durability) for tools. */
+		class cSetDamage : public cFunction
+		/* damage: Specifies the damage fraction to set (1.0 is undamaged, 0.0 is zero durability left).
+		damage: Specifies a random damage fraction within a range.
+
+		min: Minimum value.
+		max: Maximum value. */
+		{
+		public:
+			cSetDamage(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
+		private:
+			float m_Min = 0.0f;
+			float m_Max = std::numeric_limits<float>::max();
+		};
+
+
+
+
+		/** Sets the loot table for a container (chest etc.). */
+		class cSetLootTable : public cFunction
+		/* name: Specifies the resource location of the loot table to be used.
+		seed: Optional. Specifies the loot table seed. If absent or set to 0, a random seed will be used. */
+		{
+		public:
+			cSetLootTable(const Json::Value & a_Value);
+			void operator () (cItem & a_Item) const;
+		private:
+			AString m_LootTable;
+			int m_Seed;
+		};
+
+
+
+
+		/**  Adds lore to the item  */
+		class cSetLore : public cFunction
+		/* lore: List of JSON text components. Each list entry represents one line of the lore.
+		entity: Specifies the entity to act as the source @s in the JSON text component. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player.
+		replace: If true, replaces all existing lines of lore, if false appends the list. */
+		{
+		public:
+			cSetLore(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			enum class eType
+			{
+				This,
+				Killer,
+				KillerPlayer
+			};
+			eType m_Type = eType::This;
+
+			AStringVector m_Lore;
+			bool m_Replace;
+		};
+
+
+
+
+		/** Adds display name of the item. */
+		class cSetName : public cFunction
+		/* name: A JSON text component name, allowing color, translations, etc.
+		entity: Specifies an entity to act as source @s in the JSON text component. Set to this to use the entity that died or the player that gained the advancement, opened the container or broke the block, killer for the killer, or killer_player for a killer that is a player. */
+		{
+		public:
+			cSetName(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			enum class eType
+			{
+				This,
+				Killer,
+				KillerPlayer
+			};
+			AString m_Name;
+			eType m_Type = eType::This;
+		};
+
+
+
+
+		/** Adds NBT data to the item. */
+		class cSetNbt : public cFunction
+		/* tag: Tag string to add, similar to those used by commands. Note that the first bracket is required and quotation marks need to be escaped using a backslash (\). */
+		{
+		public:
+			cSetNbt(const Json::Value & a_Value);
+			void operator () (cItem & a_Item) const;
+		private:
+			AString m_Tag;
+		};
+
+
+
+
+		/** Sets the status effects for suspicious stew. */
+		class cSetStewEffect : public cFunction
+		/* effects: The effects to apply.
+
+		An effect.
+			type: The effect ID.
+			duration: The duration of the effect.
+		*/
+		{
+		public:
+			cSetStewEffect(const Json::Value & a_Value);
+			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		};
+
+
+
+
+		/** No Function. just there for errors in parsing */
+		class cNone {};
+	}  // Namespace Function
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
@@ -515,7 +866,7 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 #define VISITCONDITION \
 	overloaded { \
 		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Condition::cBlockStateProperty & a_Cond)      { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Condition::cBlockStateProperty & a_Cond)      { return a_Cond(a_World, a_Pos); }, \
 		[&] (const LootTable::Condition::cDamageSourceProperties & a_Cond)  { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cEntityProperties & a_Cond)        { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cEntityScores & a_Cond)            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
@@ -533,8 +884,31 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 		[&] (const LootTable::Condition::cNone & a_Cond)                    { return true; } \
 	} \
 
-
-
+#define VISITFUNCTION \
+	overloaded { \
+		[&] (const LootTable::Function::cApplyBonus        & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyName          & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyNbt           & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyState         & a_Function) { a_Function(a_Item, a_World, a_Pos); }, \
+		[&] (const LootTable::Function::cEnchantRandomly   & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cEnchantWithLevels & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cExplorationMap    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cExplosionDecay    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cFurnaceSmelt      & a_Function) { a_Function(a_Item); }, \
+		[&] (const LootTable::Function::cFillPlayerHead    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cLimitCount        & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cLootingEnchant    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetAttributes     & a_Function) { a_Function(a_Item); }, \
+		[&] (const LootTable::Function::cSetContents       & a_Function) { a_Function(a_Item); }, \
+		[&] (const LootTable::Function::cSetCount          & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cSetDamage         & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cSetLootTable      & a_Function) { a_Function(a_Item); }, \
+		[&] (const LootTable::Function::cSetLore           & a_Function) { a_Function(a_Item, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetName           & a_Function) { a_Function(a_Item, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetNbt            & a_Function) { a_Function(a_Item); }, \
+		[&] (const LootTable::Function::cSetStewEffect     & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cNone              & a_Function) {} \
+	} \
 
 
 	struct cLootTableCondition
@@ -577,19 +951,40 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 	using cLootTableFunctions = std::vector<cLootTableFunction>;
 	struct cLootTableFunction
 	{
+		using Alternative = std::variant<
+			Function::cApplyBonus,
+			Function::cCopyName,
+			Function::cCopyNbt,
+			Function::cCopyState,
+			Function::cEnchantRandomly,
+			Function::cEnchantWithLevels,
+			Function::cExplorationMap,
+			Function::cExplosionDecay,
+			Function::cFurnaceSmelt,
+			Function::cFillPlayerHead,
+			Function::cLimitCount,
+			Function::cLootingEnchant,
+			Function::cSetAttributes,
+			Function::cSetContents,
+			Function::cSetCount,
+			Function::cSetDamage,
+			Function::cSetLootTable,
+			Function::cSetLore,
+			Function::cSetName,
+			Function::cSetNbt,
+			Function::cSetStewEffect,
+			Function::cNone>;
+
 		cLootTableFunction(
-			enum eFunctionType a_Type,
-			Json::Value a_Parameter,
+			Alternative a_Function,
 			cLootTableConditions a_Conditions
 		):
-			m_Type(a_Type),
-			m_Parameter(std::move(a_Parameter)),
+			m_Function(std::move(a_Function)),
 			m_Conditions(std::move(a_Conditions))
 		{
 		}
 
-		enum eFunctionType m_Type;
-		Json::Value m_Parameter;
+		Alternative m_Function;
 		cLootTableConditions m_Conditions;
 	};
 
