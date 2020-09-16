@@ -27,23 +27,23 @@ public:
 
 	// tolua_begin
 
-	inline static NIBBLETYPE GetLightValue        (const BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
-	inline static NIBBLETYPE GetSpreadLightFalloff(const BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;  }
-	inline static bool IsTransparent              (const BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
-	inline static bool IsOneHitDig                (const BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
-	inline static bool IsPistonBreakable          (const BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
-	inline static bool IsRainBlocker              (const BLOCKTYPE a_Type) { return Get(a_Type).m_IsRainBlocker;       }
-	inline static bool IsSkylightDispersant       (const BLOCKTYPE a_Type)
+	inline static NIBBLETYPE GetLightValue        (BLOCKTYPE a_Type) { return Get(a_Type).m_LightValue;          }
+	inline static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE a_Type) { return Get(a_Type).m_SpreadLightFalloff;  }
+	inline static bool IsTransparent              (BLOCKTYPE a_Type) { return Get(a_Type).m_Transparent;         }
+	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
+	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
+	inline static bool IsRainBlocker              (BLOCKTYPE a_Type) { return Get(a_Type).m_IsRainBlocker;       }
+	inline static bool IsSkylightDispersant       (BLOCKTYPE a_Type)
 	{
 		return ((Get(a_Type).m_IsSkylightDispersant) || (Get(a_Type).m_SpreadLightFalloff > 1));
 	}
 	static bool IsSnowable(BLOCKTYPE a_Type);
-	inline static bool IsSolid                    (const BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
-	inline static bool IsUseableBySpectator       (const BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
-	inline static bool FullyOccupiesVoxel         (const BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
-	inline static bool CanBeTerraformed           (const BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
-	inline static float GetBlockHeight            (const BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
-	inline static float GetHardness               (const BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
+	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
+	inline static bool IsUseableBySpectator       (BLOCKTYPE a_Type) { return Get(a_Type).m_UseableBySpectator;  }
+	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
+	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
+	inline static float GetBlockHeight            (BLOCKTYPE a_Type) { return Get(a_Type).m_BlockHeight;         }
+	inline static float GetHardness               (BLOCKTYPE a_Type) { return Get(a_Type).m_Hardness;            }
 
 	// tolua_end
 
