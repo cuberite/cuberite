@@ -3,6 +3,8 @@
 
 #include "LootTableParser.h"
 
+#include "World.h"
+
 namespace LootTable
 {
 	enum eFunctionType eFunctionType(const AString & a_Type)
@@ -832,7 +834,7 @@ namespace LootTable
 			{
 				bool CallbackRes = true;
 				// This is a bad workaround to prevent checking for any entity type and then casting to it.
-				auto & Player = static_cast<cPlayer &>(a_Entity);
+				const auto & Player = static_cast<const cPlayer &>(a_Entity);
 				const auto & Effects = Player.GetEntityEffects();
 				for (const auto Effect : m_Effects)
 				{
@@ -843,7 +845,7 @@ namespace LootTable
 					);
 					CallbackRes &=
 						((Effect.second.m_DurationMin <= EffectPrt->GetDuration()) &&
-						(Effect.second.m_DurationMax >= EffectPrt->GetDuration())#
+						(Effect.second.m_DurationMax >= EffectPrt->GetDuration())
 					);
 				}
 				return CallbackRes;
@@ -1330,7 +1332,7 @@ namespace LootTable
 			}
 			else
 			{
-				auto & Player = static_cast<cPlayer &>(a_Entity);
+				const auto & Player = static_cast<const cPlayer &>(a_Entity);
 				Item = Player.GetEquippedItem();
 			}
 			return true;
@@ -1493,7 +1495,7 @@ namespace LootTable
 			{
 				return true;
 			}
-			auto & Player = static_cast<cPlayer &>(a_Entity);
+			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 			int Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(
 				cEnchantments::enchLooting);
 			return m_Chance + Looting * m_LootingMultiplier > Rnd;
@@ -1588,7 +1590,7 @@ namespace LootTable
 			{
 				return true;
 			}
-			auto & Player = static_cast<cPlayer &>(a_Entity);
+			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 			unsigned long long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
 
 			Level = std::min({Level, m_Chances.size()});
@@ -1749,7 +1751,6 @@ namespace LootTable
 	{
 		enum eFunctionType Type;
 		cLootTableConditions Conditions;
-		Json::Value Parameter = a_Value;
 		for (auto & FunctionInfo : a_Value.getMemberNames())
 		{
 			if (NoCaseCompare(FunctionInfo, "function") == 0)
@@ -1763,10 +1764,9 @@ namespace LootTable
 				{
 					Conditions.push_back(ParseCondition(ConditionsObject[ConditionId]));
 				}
-				Parameter.removeMember(FunctionInfo);  // Removes the conditions so the json is a bit smaller
 			}
 		}
-		return cLootTableFunction(Type, Parameter, Conditions);
+		return cLootTableFunction(Type, a_Value, Conditions);
 	}
 
 
