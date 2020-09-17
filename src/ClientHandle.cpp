@@ -507,7 +507,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 				// Unloaded chunk found -> Send it to the client.
 				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
+				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::Priority::Critical : cChunkSender::Priority::Medium));
 				return false;
 			}
 		}
@@ -545,7 +545,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 			// Unloaded chunk found -> Send it to the client.
 			Lock.Unlock();
-			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
+			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::Priority::Low);
 			return false;
 		}
 	}
@@ -609,7 +609,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority)
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority)
 {
 	if (m_State >= csDestroying)
 	{
@@ -2637,7 +2637,7 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 
 
-void cClientHandle::SendExplosion(const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion)
+void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power)
 {
 	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
@@ -2648,7 +2648,27 @@ void cClientHandle::SendExplosion(const Vector3d a_Pos, float a_Radius, const cV
 	// Update the statistics:
 	m_NumExplosionsThisTick++;
 
-	m_Protocol->SendExplosion(a_Pos.x, a_Pos.y, a_Pos.z, a_Radius, a_BlocksAffected, a_PlayerMotion);
+	auto & Random = GetRandomProvider();
+	const auto SoundPitchMultiplier = 1.0f + (Random.RandReal() - Random.RandReal()) * 0.2f;
+
+	// Sound:
+	SendSoundEffect("entity.generic.explode", a_Position, 4.0f, SoundPitchMultiplier * 0.7f);
+
+	const auto ParticleFormula = a_Power * 0.33f;
+	auto Spread = ParticleFormula * 0.5f;
+	auto ParticleCount = std::min(static_cast<int>(ParticleFormula * 125), 600);
+
+	// Dark smoke particles:
+	SendParticleEffect("largesmoke", a_Position.x, a_Position.y, a_Position.z, 0, 0, 0, Spread, static_cast<int>(ParticleCount));
+
+	Spread = ParticleFormula * 0.35f;
+	ParticleCount = std::min(static_cast<int>(ParticleFormula * 550), 1800);
+
+	// Light smoke particles:
+	SendParticleEffect("explode", a_Position.x, a_Position.y, a_Position.z, 0, 0, 0, Spread, static_cast<int>(ParticleCount));
+
+	// Shockwave effect:
+	m_Protocol->SendExplosion(a_Position, a_Power);
 }
 
 

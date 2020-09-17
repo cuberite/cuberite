@@ -228,12 +228,12 @@ public:
 	Helper used in many ConvertToPickups() implementations. */
 	static bool ToolHasSilkTouch(const cItem * a_Tool);
 
+	// Gets the blockhandler for the given block type.
+	static cBlockHandler & GetBlockHandler(BLOCKTYPE a_BlockType);
 
 protected:
-	BLOCKTYPE m_BlockType;
 
-	// Creates a new blockhandler for the given block type. For internal use only, use ::GetBlockHandler() instead.
-	static cBlockHandler * CreateBlockHandler(BLOCKTYPE a_BlockType);
+	BLOCKTYPE m_BlockType;
 
 	friend class cBlockInfo;
 };

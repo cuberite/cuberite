@@ -222,9 +222,6 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback);  // Lua-accessible
 
-	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
-	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
-
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback) const;  // Lua-accessible

@@ -406,7 +406,9 @@ void cItem::Empty()
 
 
 
-cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
+cBlockHandler & cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 {
-	return new cBlockHandler(a_BlockType);
+	// Dummy handler.
+	static cBlockHandler Handler(E_BLOCK_AIR);
+	return Handler;
 }

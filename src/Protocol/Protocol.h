@@ -374,7 +374,7 @@ public:
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
+	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
