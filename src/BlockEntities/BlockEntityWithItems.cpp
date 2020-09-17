@@ -53,12 +53,7 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	}
 
 	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-	m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-	{
-		auto & Simulator = *m_World->GetRedstoneSimulator();
 
-		// Notify comparators:
-		m_World->WakeUpSimulators(m_Pos);
-		return true;
-	});
+	// Notify comparators:
+	m_World->WakeUpSimulators(m_Pos);
 }

@@ -62,7 +62,7 @@ public:
 			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelPos.x, a_RelPos.y, a_RelPos.z, Meta))
 			{
 				auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-				a_Chunk.GetWorld()->GrowTree(WorldPos.x, WorldPos.y, WorldPos.z);
+				a_Chunk.GetWorld()->GrowTree(WorldPos);
 			}
 			// Only move to the next growth stage if we haven't gone there yet
 			else if (((Meta & 0x08) == 0) && random.RandBool(0.45))
@@ -211,7 +211,7 @@ public:
 		}
 
 		// The sapling is grown, now it becomes a tree:
-		a_Chunk.GetWorld()->GrowTreeFromSapling(a_Chunk.RelativeToAbsolute(a_RelPos), blockMeta);
+		a_Chunk.GetWorld()->GrowTreeFromSapling(a_Chunk.RelativeToAbsolute(a_RelPos));
 		return res + 1;
 	}
 

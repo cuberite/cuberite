@@ -42,7 +42,6 @@ class cBoundingBox;
 class cDeadlockDetect;
 
 typedef std::list<cClientHandle *> cClientHandleList;
-typedef cChunk *                   cChunkPtr;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
 using cBeaconCallback       = cFunctionRef<bool(cBeaconEntity       &)>;
 using cBedCallback          = cFunctionRef<bool(cBedEntity          &)>;
@@ -141,10 +140,8 @@ public:
 	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta, bool a_ShouldMarkDirty, bool a_ShouldInformClients);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
@@ -204,19 +201,18 @@ public:
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(OwnedEntity a_Entity);
 
-	/** Adds the entity to its appropriate chunk, if the entity is not already added.
-	Takes ownership of the entity pointer */
-	void AddEntityIfNotPresent(OwnedEntity a_Entity);
+	/** Adds the player to its appropriate chunk, takes ownership of the player pointer */
+	void AddPlayer(std::unique_ptr<cPlayer> a_Player);
 
 	/** Returns true if the entity with specified ID is present in the chunks */
-	bool HasEntity(UInt32 a_EntityID);
+	bool HasEntity(UInt32 a_EntityID) const;
 
 	/** Removes the entity from its appropriate chunk
 	Returns an owning reference to the found entity. */
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
-	bool ForEachEntity(cEntityCallback a_Callback);  // Lua-accessible
+	bool ForEachEntity(cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback);  // Lua-accessible
@@ -226,12 +222,9 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback);  // Lua-accessible
 
-	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
-	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
-
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback);  // Lua-accessible
+	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback for each block entity in the specified chunk.
 	Returns true if all block entities processed, false if the callback aborted by returning true. */
@@ -320,9 +313,6 @@ public:
 	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
 	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
@@ -330,12 +320,8 @@ public:
 	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});  // Lua-accessible
 
 	/** Queues the chunk for generating.
-	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating.
-	The specified callback is called after the chunk has been loaded / generated.
-	It is legal to call without the callback.
-	Returns true if successful, false if not (possibly an out-of-memory error).
-	If the return value is true, the callback was / will be called. */
-	bool GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);  // Lua-accessible
+	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating. */
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // Lua-accessible
 
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -352,13 +338,13 @@ public:
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
-	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback);
+	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) const;
 
 	/** Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer cBlockArea::Write() instead. */
 	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Returns the number of valid chunks and the number of dirty chunks */
-	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
+	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const;
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -382,14 +368,14 @@ public:
 	void TickBlock(const Vector3i a_BlockPos);
 
 	void UnloadUnusedChunks(void);
-	void SaveAllChunks(void);
+	void SaveAllChunks(void) const;
 
-	cWorld * GetWorld(void) { return m_World; }
+	cWorld * GetWorld(void) const { return m_World; }
 
-	size_t GetNumChunks(void);
+	size_t GetNumChunks(void) const;
 
 	/** Returns the number of unused dirty chunks. Those are chunks that we can save and then unload */
-	size_t GetNumUnusedDirtyChunks(void);
+	size_t GetNumUnusedDirtyChunks(void) const;
 
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
@@ -411,7 +397,7 @@ public:
 
 private:
 
-	// Chunks query their neighbors using GetChunk(), while being ticked
+	// Chunks query their neighbors using FindChunk(), while being ticked
 	friend class cChunk;
 
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
@@ -453,9 +439,9 @@ private:
 
 	mutable cCriticalSection m_CSChunks;
 
-	/** A map of chunk coordinates to chunk pointers
-	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster */
-	std::map<ChunkCoordinate, std::unique_ptr<cChunk>, ChunkCoordinate::Comparer> m_Chunks;
+	/** A map of chunk coordinates to chunks.
+	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster. */
+	std::map<ChunkCoordinate, cChunk, ChunkCoordinate::Comparer> m_Chunks;
 
 	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
@@ -467,31 +453,11 @@ private:
 	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
-	Emplaces this chunk in the chunk map.
-	Developers SHOULD use the GetChunk variants instead of this function. */
-	cChunkPtr ConstructChunk(int a_ChunkX, int a_ChunkZ);
+	Emplaces this chunk in the chunk map. */
+	cChunk & ConstructChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
-	cChunkPtr GetChunk(int a_ChunkX, int a_ChunkZ);
-
-	/** Constructs a chunk and queues the chunk for loading if not valid, returning it; doesn't generate */
-	cChunkPtr GetChunkNoGen(cChunkCoords a_Chunk);
-
-	// Deprecated in favor of the vector version
-	cChunkPtr GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoGen({a_ChunkX, a_ChunkZ});
-	}
-
-	/** Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(cChunkCoords a_Coords);
-
-	/** OBSOLETE, use the cChunkCoords-based overload instead.
-	Constructs a chunk, returning it. Doesn't load, doesn't generate */
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ)
-	{
-		return GetChunkNoLoad({a_ChunkX, a_ChunkZ});
-	}
+	cChunk & GetChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -505,8 +471,3 @@ private:
 	void DelChunkStay(cChunkStay & a_ChunkStay);
 
 };
-
-
-
-
-

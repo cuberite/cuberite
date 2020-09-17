@@ -173,6 +173,7 @@ template class SizeChecker<UInt8,  1>;
 #include <chrono>
 #include <condition_variable>
 #include <deque>
+#include <fstream>
 #include <limits>
 #include <list>
 #include <map>
@@ -279,23 +280,23 @@ template class SizeChecker<UInt8,  1>;
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
-	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 
 #else  // TEST_GLOBALS
 
 	#ifdef _DEBUG
-		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
+		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 	#else
 		#define ASSERT(x)
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
-	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 
 #endif  // else TEST_GLOBALS
 
 /** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)
+#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
 
 
 

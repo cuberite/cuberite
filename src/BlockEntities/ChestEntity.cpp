@@ -105,6 +105,15 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
+	if (m_BlockType == E_BLOCK_CHEST)
+	{
+		a_Player->GetStatManager().AddValue(Statistic::OpenChest);
+	}
+	else  // E_BLOCK_TRAPPED_CHEST
+	{
+		a_Player->GetStatManager().AddValue(Statistic::TriggerTrappedChest);
+	}
+
 	// If the window is not created, open it anew:
 	cWindow * Window = PrimaryChest->GetWindow();
 	if (Window == nullptr)
@@ -243,12 +252,7 @@ void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	}
 
 	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-	m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-	{
-		auto & Simulator = *m_World->GetRedstoneSimulator();
 
-		// Notify comparators:
-		m_World->WakeUpSimulators(m_Pos);
-		return true;
-	});
+	// Notify comparators:
+	m_World->WakeUpSimulators(m_Pos);
 }

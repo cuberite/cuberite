@@ -334,7 +334,12 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 
-	m_Stats.AddValue(statMinutesPlayed, 1);
+	m_Stats.AddValue(Statistic::PlayOneMinute);
+	m_Stats.AddValue(Statistic::TimeSinceDeath);
+	if (IsCrouched())
+	{
+		m_Stats.AddValue(Statistic::SneakTime);
+	}
 
 	// Handle the player detach, when the player is in spectator mode
 	if (
@@ -742,7 +747,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
+	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(a_Items.Size()));
 
 	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
 	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
@@ -1110,7 +1115,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
-		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
@@ -1168,7 +1173,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(Pickups.Size()));
+	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -1234,7 +1239,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	m_Stats.AddValue(statDeaths);
+	m_Stats.AddValue(Statistic::Deaths);
+	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -1249,7 +1255,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 	if (a_Victim->IsPlayer())
 	{
-		m_Stats.AddValue(statPlayerKills);
+		m_Stats.AddValue(Statistic::PlayerKills);
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
@@ -1257,10 +1263,10 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
-			AwardAchievement(achKillMonster);
+			AwardAchievement(Statistic::AchKillEnemy);
 		}
 
-		m_Stats.AddValue(statMobKills);
+		m_Stats.AddValue(Statistic::MobKills);
 	}
 
 	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
@@ -1671,43 +1677,32 @@ void cPlayer::SetIP(const AString & a_IP)
 
 
 
-unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
+void cPlayer::AwardAchievement(const Statistic a_Ach)
 {
-	eStatistic Prerequisite = cStatInfo::GetPrerequisite(a_Ach);
-
-	// Check if the prerequisites are met
-	if (Prerequisite != statInvalid)
+	// Check if the prerequisites are met:
+	if (!m_Stats.SatisfiesPrerequisite(a_Ach))
 	{
-		if (m_Stats.GetValue(Prerequisite) == 0)
-		{
-			return 0;
-		}
+		return;
 	}
 
-	StatValue Old = m_Stats.GetValue(a_Ach);
-
-	if (Old > 0)
+	// Increment the statistic and check if we already have it:
+	if (m_Stats.AddValue(a_Ach) != 1)
 	{
-		return static_cast<unsigned int>(m_Stats.AddValue(a_Ach));
+		return;
 	}
-	else
+
+	if (m_World->ShouldBroadcastAchievementMessages())
 	{
-		if (m_World->ShouldBroadcastAchievementMessages())
-		{
-			cCompositeChat Msg;
-			Msg.SetMessageType(mtSuccess);
-			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-			m_World->BroadcastChat(Msg);
-		}
-
-		// Increment the statistic
-		StatValue New = m_Stats.AddValue(a_Ach);
-
-		// Achievement Get!
-		m_ClientHandle->SendStatistics(m_Stats);
-
-		return static_cast<unsigned int>(New);
+		cCompositeChat Msg;
+		Msg.SetMessageType(mtSuccess);
+		// TODO: cCompositeChat should not use protocol-specific strings
+		// Msg.AddShowAchievementPart(GetName(), nameNew);
+		Msg.AddTextPart("Achivement get!");
+		m_World->BroadcastChat(Msg);
 	}
+
+	// Achievement Get!
+	m_ClientHandle->SendStatistics(m_Stats);
 }
 
 
@@ -2334,10 +2329,16 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		m_SpawnWorld = cRoot::Get()->GetDefaultWorld();
 	}
 
-	// Load the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
-	StatSerializer.Load();
+	try
+	{
+		// Load the player stats.
+		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
+		StatSerializer::Load(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+	}
+	catch (...)
+	{
+		LOGWARNING("Failed loading player statistics");
+	}
 
 	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
 		GetName(), a_FileName, GetPosition(), a_World->GetName()
@@ -2476,10 +2477,13 @@ bool cPlayer::SaveToDisk()
 		return false;
 	}
 
-	// Save the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
-	if (!StatSerializer.Save())
+	try
+	{
+		// Save the player stats.
+		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
+		StatSerializer::Save(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+	}
+	catch (...)
 	{
 		LOGWARNING("Could not save stats for player %s", GetName().c_str());
 		return false;
@@ -2659,12 +2663,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		return;
 	}
 
-	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	const auto Value = FloorC<cStatManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
 		if (IsFlying())
 		{
-			m_Stats.AddValue(statDistFlown, Value);
+			m_Stats.AddValue(Statistic::FlyOneCm, Value);
 			// May be flying and doing any of the following:
 		}
 
@@ -2672,31 +2676,51 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.AddValue(Statistic::ClimbOneCm, FloorC<cStatManager::StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
 		else if (IsInWater())
 		{
-			m_Stats.AddValue(statDistSwum, Value);
+			if (m_IsHeadInWater)
+			{
+				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsOnGround())
 		{
-			m_Stats.AddValue(statDistWalked, Value);
-			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.0001) * static_cast<double>(Value));
+			if (IsCrouched())
+			{
+				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
+			if (IsSprinting())
+			{
+				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				AddFoodExhaustion(0.001 * static_cast<double>(Value));
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
 		}
 		else
 		{
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(statJumps, 1);
+				m_Stats.AddValue(Statistic::Jump, 1);
 				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(statDistFallen, static_cast<StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.AddValue(Statistic::FallOneCm, static_cast<cStatManager::StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
@@ -2705,15 +2729,15 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.AddValue(statDistMinecart, Value); break;
-			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
+			case cEntity::etMinecart: m_Stats.AddValue(Statistic::MinecartOneCm, Value); break;
+			case cEntity::etBoat:     m_Stats.AddValue(Statistic::BoatOneCm,     Value); break;
 			case cEntity::etMonster:
 			{
 				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
-					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
-					case mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					case mtPig:   m_Stats.AddValue(Statistic::PigOneCm,   Value); break;
+					case mtHorse: m_Stats.AddValue(Statistic::HorseOneCm, Value); break;
 					default: break;
 				}
 				break;

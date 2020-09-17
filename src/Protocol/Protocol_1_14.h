@@ -32,9 +32,6 @@ protected:
 
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	template <auto Palette> void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
@@ -52,7 +49,9 @@ protected:
 	virtual void HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer) override;
 
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
-	virtual UInt32 GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage) override;
+	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override;
+	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) override;
+	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override {}
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override {}

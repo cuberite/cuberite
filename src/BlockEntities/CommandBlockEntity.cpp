@@ -203,7 +203,7 @@ void cCommandBlockEntity::Execute()
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->ExecuteConsoleCommand(RealCommand, CmdBlockOutCb);
+		Server->QueueExecuteConsoleCommand(RealCommand, CmdBlockOutCb);
 	}
 	else
 	{

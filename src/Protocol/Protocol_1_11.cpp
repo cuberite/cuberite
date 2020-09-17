@@ -535,7 +535,7 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 
 cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
 {
-	return Version::Version_1_11_0;
+	return Version::v1_11_0;
 }
 
 
@@ -1183,5 +1183,5 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
 {
-	return Version::Version_1_11_1;
+	return Version::v1_11_1;
 }

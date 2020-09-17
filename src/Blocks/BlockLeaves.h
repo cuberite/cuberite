@@ -155,7 +155,7 @@ public:
 		// Set bit 0x08, so this block gets checked for decay:
 		if ((meta & 0x08) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, meta | 0x8, true, false);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, meta | 0x8);
 		}
 	}
 
@@ -201,7 +201,7 @@ public:
 		if (HasNearLog(Area, worldPos))
 		{
 			// Wood found, the leaves stay; unset the check bit
-			a_Chunk.SetMeta(a_RelPos, Meta ^ 0x08, true, false);
+			a_Chunk.SetMeta(a_RelPos, Meta ^ 0x08);
 			return;
 		}
 

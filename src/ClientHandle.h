@@ -175,7 +175,7 @@ public:  // tolua_export
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendExplosion                  (const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion);
+	void SendExplosion                  (Vector3f a_Position, float a_Power);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
 	void SendHeldItemChange             (int a_ItemIndex);
@@ -571,7 +571,7 @@ private:
 	bool CheckBlockInteractionsRate(void);
 
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
 	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);

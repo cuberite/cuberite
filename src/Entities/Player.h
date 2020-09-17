@@ -235,9 +235,8 @@ public:
 
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
-	If the achievement has been already awarded to the player, this method will just increment the stat counter.
-	Returns the _new_ stat value. (0 = Could not award achievement) */
-	unsigned int AwardAchievement(const eStatistic a_Ach);
+	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
+	void AwardAchievement(Statistic a_Ach);
 
 	void SetIP(const AString & a_IP);
 
@@ -767,9 +766,6 @@ protected:
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	void ResolvePermissions(void);
-	void ResolveGroups(void);
 
 	virtual void Destroyed(void) override;
 

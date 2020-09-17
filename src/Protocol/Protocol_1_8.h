@@ -15,6 +15,7 @@ Declares the 1.8 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../Registries/Statistics.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -63,7 +64,7 @@ public:
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
+	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
 	virtual void SendHeldItemChange             (int a_ItemIndex) override;
@@ -225,7 +226,7 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
+	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
@@ -254,5 +255,10 @@ private:
 
 	/** Converts an entity to a protocol-specific entity type.
 	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
-	UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+
+	/** Converts a statistic to a protocol-specific string.
+	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
+	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
+	static const char * GetProtocolStatisticName(Statistic a_Statistic);
 } ;

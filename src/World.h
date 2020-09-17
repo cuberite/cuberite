@@ -344,17 +344,14 @@ public:
 
 	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
 	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Sends the chunk to the client specified, even if the client already has the chunk.
 	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
-
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
@@ -377,10 +374,10 @@ public:
 	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
-	/** Regenerate the given chunk: */
+	/** Regenerate the given chunk. */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
-	/** Generates the given chunk */
+	/** Generates the given chunk. */
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
@@ -456,19 +453,15 @@ public:
 	}
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
 	{
-		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData);
 	}
 
 	/** Returns the sky light value at the specified block position.
@@ -829,30 +822,25 @@ public:
 	Returns true if the tree is imprinted successfully, false otherwise. */
 	bool GrowTreeImage(const sSetBlockVector & a_Blocks);
 
-	// tolua_begin
-
 	/** Grows a tree at the specified coords.
 	If the specified block is a sapling, the tree is grown from that sapling.
 	Otherwise a tree is grown based on the biome.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTree(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTree(Vector3i a_BlockPos);
 
-	/** Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(Vector3i a_BlockPos, NIBBLETYPE a_SaplingMeta)
-	{
-		// TODO: Change the implementation to use Vector3i, once cTree uses Vector3i-based functions
-		return GrowTreeFromSapling(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_SaplingMeta);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	/** Grows a tree from the sapling at the specified coords.
+	If the sapling is a part of a large-tree sapling (2x2), a large tree growth is attempted.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload and obsolete additional SaplingMeta param. */
+	bool GrowTreeFromSapling(Vector3i a_BlockPos);
 
 	/** Grows a tree at the specified coords, based on the biome in the place.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeByBiome(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTreeByBiome(Vector3i a_BlockPos);
+
+	// tolua_begin
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -1381,7 +1369,7 @@ private:
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
-	If so, adjusts the X and Z coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
+	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
 	Returns false if not a part of large-tree sapling. */
-	bool GetLargeTreeAdjustment(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_SaplingMeta);
 };  // tolua_export

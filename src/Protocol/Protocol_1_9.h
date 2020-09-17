@@ -97,10 +97,6 @@ protected:
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	virtual void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata) override;
 
-	/** Converts the BlockFace received by the protocol into eBlockFace constants.
-	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
-
 	/** Converts the hand parameter received by the protocol into eHand constants.
 	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
 	eHand HandIntToEnum(Int32 a_Hand);

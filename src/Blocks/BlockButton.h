@@ -47,7 +47,7 @@ public:
 
 		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta, false);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
@@ -185,7 +185,7 @@ public:
 			return;
 		}
 
-		a_World.SetBlockMeta(Pos, Meta | 0x08, false);
+		a_World.SetBlockMeta(Pos, Meta | 0x08);
 		a_World.WakeUpSimulators(Pos);
 
 		// sound name is ok to be wood, because only wood gets triggered by arrow
@@ -228,7 +228,7 @@ private:
 				// Block hasn't change in the meantime; release it
 				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
 
-				a_World.SetBlockMeta(a_Position, Meta & 0x07, false);
+				a_World.SetBlockMeta(a_Position, Meta & 0x07);
 				a_World.WakeUpSimulators(a_Position);
 				a_World.BroadcastSoundEffect(SoundToPlayOnRelease, a_Position, 0.5f, 0.5f);
 			}

@@ -6,7 +6,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "File.h"
-#include <fstream>
 #include <sys/stat.h>
 #ifdef _WIN32
 	#include <share.h>  // for _SH_DENYWRITE
@@ -710,3 +709,29 @@ void cFile::Flush(void)
 {
 	fflush(m_File);
 }
+
+
+
+
+
+template <class StreamType>
+FileStream<StreamType>::FileStream(const std::string & Path) :
+	StreamType()
+{
+	// Except on failbit, which is what open sets on failure:
+	FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+	// Open the file:
+	FileStream::open(Path);
+
+	// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+	FileStream::exceptions(FileStream::badbit);
+}
+
+
+
+
+
+// Instantiate the templated wrapper for input and output:
+template class FileStream<std::ifstream>;
+template class FileStream<std::ofstream>;

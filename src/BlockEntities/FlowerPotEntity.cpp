@@ -59,6 +59,8 @@ bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 		return false;
 	}
 
+	a_Player->GetStatManager().AddValue(Statistic::PotFlower);
+
 	cItem SelectedItem = a_Player->GetInventory().GetEquippedItem();
 	if (IsFlower(SelectedItem.m_ItemType, SelectedItem.m_ItemDamage))
 	{
