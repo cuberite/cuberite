@@ -949,6 +949,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_PistonBreakable = true;
 	Info[E_BLOCK_AIR                          ].m_PistonBreakable = true;
 	Info[E_BLOCK_BED                          ].m_PistonBreakable = true;
+	Info[E_BLOCK_BEETROOTS                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIRCH_DOOR                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_PistonBreakable = true;
