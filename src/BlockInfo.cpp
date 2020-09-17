@@ -987,8 +987,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_LIME_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_LADDER                       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LAVA                         ].m_PistonBreakable = true;
-	Info[E_BLOCK_LEVER                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_LEAVES                       ].m_PistonBreakable = true;
+	Info[E_BLOCK_LEVER                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MAGENTA_SHULKER_BOX          ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON_STEM                   ].m_PistonBreakable = true;
