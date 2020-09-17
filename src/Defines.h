@@ -273,6 +273,7 @@ enum eDamageType
 	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
 	dtExplosion,        // Damage applied by an explosion
+	dtEnvironment,      // Damage dealt to mobs from environment: enderman in rain, snow golem in desert
 
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
