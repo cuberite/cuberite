@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <stddef.h>
+#include "StringUtils.h"
 
 
 // tolua_begin
