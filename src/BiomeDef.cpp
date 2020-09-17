@@ -3,7 +3,7 @@
 
 // Implements biome helper functions
 
-#include "Globals.h"
+#include "BiomeDef.h"
 
 
 

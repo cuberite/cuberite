@@ -8,7 +8,7 @@
 #include "Protocol/Authenticator.h"
 #include "Protocol/MojangAPI.h"
 #include "RankManager.h"
-
+#include "ChunkDef.h"
 
 
 
