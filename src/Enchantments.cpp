@@ -1170,20 +1170,20 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments)
 {
 	int AllWeights = 0;
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (const auto & Enchantment: a_Enchantments)
 	{
-		AllWeights += (*it).m_Weight;
+		AllWeights += Enchantment.m_Weight;
 	}
 	int RandomNumber = GetRandomProvider().RandInt(AllWeights - 1);
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (const auto & Enchantment: a_Enchantments)
 	{
-		RandomNumber -= (*it).m_Weight;
+		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber < 0)
 		{
-			return (*it).m_Enchantments;
+			return Enchantment.m_Enchantments;
 		}
 	}
 
