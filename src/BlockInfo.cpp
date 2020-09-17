@@ -454,8 +454,7 @@ cBlockInfo::cBlockInfo():
 	m_FullyOccupiesVoxel(false),
 	m_CanBeTerraformed(false),
 	m_BlockHeight(1.0),
-	m_Hardness(0.0f),
-	m_Handler()
+	m_Hardness(0.0f)
 {
 }
 
@@ -481,6 +480,14 @@ bool cBlockInfo::IsSnowable(const BLOCKTYPE a_BlockType)
 			return !IsTransparent(a_BlockType);
 		}
 	}
+
+
+
+
+
+cBlockHandler * cBlockInfo::GetHandler(BLOCKTYPE a_Type)
+{
+	return &cBlockHandler::GetBlockHandler(a_Type);
 }
 
 
@@ -677,9 +684,13 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE a_BlockType)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
+bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
 {
-	delete a_Handler;
+	return (
+		(a_BlockType == E_BLOCK_ICE) ||
+		(a_BlockType == E_BLOCK_LEAVES) ||
+		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
+	);
 }
 
 
@@ -693,7 +704,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
 		Info[i].m_BlockType = static_cast<BLOCKTYPE>(i);
-		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(Info[i].m_BlockType));
 	}
 
 	// Emissive blocks
