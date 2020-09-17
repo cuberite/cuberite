@@ -949,6 +949,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_PistonBreakable = true;
 	Info[E_BLOCK_AIR                          ].m_PistonBreakable = true;
 	Info[E_BLOCK_BED                          ].m_PistonBreakable = true;
+	Info[E_BLOCK_BEETROOTS                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIRCH_DOOR                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_PistonBreakable = true;
@@ -987,11 +988,13 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_LIME_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_LADDER                       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LAVA                         ].m_PistonBreakable = true;
+	Info[E_BLOCK_LEAVES                       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LEVER                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MAGENTA_SHULKER_BOX          ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON_STEM                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_NETHER_WART                  ].m_PistonBreakable = true;
+	Info[E_BLOCK_OAK_DOOR                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_ORANGE_SHULKER_BOX           ].m_PistonBreakable = true;
 	Info[E_BLOCK_PINK_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_POTATOES                     ].m_PistonBreakable = true;
@@ -1022,9 +1025,9 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_VINES                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_WALLSIGN                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_WATER                        ].m_PistonBreakable = true;
+	Info[E_BLOCK_WHEAT                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_WHITE_SHULKER_BOX            ].m_PistonBreakable = true;
 	Info[E_BLOCK_WOODEN_BUTTON                ].m_PistonBreakable = true;
-	Info[E_BLOCK_OAK_DOOR                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_WOODEN_PRESSURE_PLATE        ].m_PistonBreakable = true;
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_PistonBreakable = true;
 
