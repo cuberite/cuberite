@@ -14330,6 +14330,166 @@ end
 				{
 					Notes = "Unknown click action"
 				},
+				dtAdmin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtArrow =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtArrowAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtBurning =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtCacti =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactus =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactusContact =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactuses =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtDrown =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtDrowning =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtEnderPearl =
+				{
+					Notes = "Damage received by throwing an ender pearl and being teleported by it"
+				},
+				dtEntityAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtEnvironment =
+				{
+					Notes = "Damage dealt to mobs from environment: enderman in rain, snow golem in desert"
+				},
+				dtExplosion =
+				{
+					Notes = "Damage applied by an explosion"
+				},
+				dtFall =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFalling =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFireContact =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtHunger =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtInFire =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtInVoid =
+				{
+					Notes = "Damage received by falling into the Void (Y < 0)"
+				},
+				dtLava =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLavaContact =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLightning =
+				{
+					Notes = "Damage from being hit by a lightning strike"
+				},
+				dtMob =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtMobAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtOnFire =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtPawnAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtPlugin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtPoison =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPoisoning =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPotionOfHarming =
+				{
+					Notes = "Damage applied by the potion of harming"
+				},
+				dtProjectile =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtRangedAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtStarvation =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtStarving =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtSuffocating =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtSuffocation =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtWither =
+				{
+					Notes = "Damage from the wither effect"
+				},
+				dtWithering =
+				{
+					Notes = "Damage from the wither effect"
+				},
 				E_BLOCK_ACACIA_DOOR =
 				{
 					Notes = "The blocktype for acacia door"
