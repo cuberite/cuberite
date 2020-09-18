@@ -131,8 +131,8 @@ public:
 		//  (Player clicked more distant half of a block)
 		if (a_CursorPos.y > 7)
 		{
-			// If player is placing the door on the same block is standing on top of,
-			//  move the trapdoor to the upper half of the block
+			// Only move the trapdoor to the upper half of the block,
+			//  if player is NOT placing the door on the same block is standing on top of
 			if (a_ClickedBlockFace != BLOCK_FACE_YM)
 			{
 				a_BlockMeta |= 0x8;
