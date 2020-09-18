@@ -85,12 +85,69 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
 
+		// Need this editable
+		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
+
+		// Handle horizontal placing
+		if (a_ClickedBlockFace == BLOCK_FACE_YP || a_ClickedBlockFace == BLOCK_FACE_YP)
+		{
+			// Estimate the orientation of relative to the player
+			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
+
+			printf("\n[%d:%d]", RotationUnitVector.x, RotationUnitVector.z );
+
+			// If facing along X
+			if (RotationUnitVector.x != 0)
+			{
+				// Towards positive X
+				if (RotationUnitVector.x > 0)
+				{
+					SafeClickedBlockFace = BLOCK_FACE_XP;
+				}
+				// Towards negative X
+				else
+				{
+					SafeClickedBlockFace = BLOCK_FACE_XM;
+				}
+			}
+			// If facing alon Z axis:
+			else
+			{
+				// Towards positive Z
+				if (RotationUnitVector.z > 0)
+				{
+					SafeClickedBlockFace = BLOCK_FACE_ZP;
+				}
+				// Towards negative Z
+				else
+				{
+					SafeClickedBlockFace = BLOCK_FACE_ZM;
+				}
+
+			// Lacks a check for Z = 0, because we still need 
+			//  some orientation for when looking straight down
+			}
+		}
+
+		a_BlockMeta = BlockFaceToMetaData(SafeClickedBlockFace);
+
+		// Check if doors occupies top-half or bottom-half of block
 		if (a_CursorPos.y > 7)
+		{
+			// Don't move up if placing on top of block
+			if (a_ClickedBlockFace != BLOCK_FACE_YM)
+			{
+				a_BlockMeta |= 0x8;
+			}
+		}
+
+		// Move trapdoor to upper half if facing up
+		if (a_ClickedBlockFace != BLOCK_FACE_YP)
 		{
 			a_BlockMeta |= 0x8;
 		}
+
 		return true;
 	}
 
@@ -106,9 +163,9 @@ public:
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_NONE:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
+			case BLOCK_FACE_NONE:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0;
