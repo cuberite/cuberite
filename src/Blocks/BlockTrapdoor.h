@@ -86,61 +86,60 @@ public:
 	{
 		a_BlockType = m_BlockType;
 
-		// Need this editable
+		// Need a_ClickedBlockFace editable
 		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
 
 		// Handle horizontal placing
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
-			// Estimate the orientation of relative to the player
+			// Get horizontal alignment of the trapdoor in relation to the player
 			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
 
-			// If facing along X
+			// If the trapdoor and the player are both on X axis, and
 			if (RotationUnitVector.x != 0)
 			{
-				// Towards positive X
+				// the trapdoor is further to the positive X (EAST)
 				if (RotationUnitVector.x > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_XP;
 				}
-				// Towards negative X
+				// the trapdoor is further to the negative X (WEST)
 				else
 				{
 					SafeClickedBlockFace = BLOCK_FACE_XM;
 				}
 			}
-			// If facing alon Z axis:
+			// If the trapdoor and the player are both on Z axis, and
 			else
 			{
-				// Towards positive Z
+				// the trapdoor is further to the positive Z (SOUTH)
 				if (RotationUnitVector.z > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_ZP;
 				}
-				// Towards negative Z
+				// the trapdoor is further to the negative Z (NORTH)
 				else
 				{
 					SafeClickedBlockFace = BLOCK_FACE_ZM;
 				}
-
-			// Lacks a check for Z = 0, because we still need
-			//  some orientation for when looking straight down
 			}
 		}
 
 		a_BlockMeta = BlockFaceToMetaData(SafeClickedBlockFace);
 
-		// Check if doors occupies top-half or bottom-half of block
+		// Check if the trapdoor should occupy top-half
+		//  (Player clicked more distant half of a block)
 		if (a_CursorPos.y > 7)
 		{
-			// Don't move up if placing on top of block
+			// If player is placing the door on the same block is standing on top of,
+			//  move the trapdoor to the upper half of the block
 			if (a_ClickedBlockFace != BLOCK_FACE_YM)
 			{
 				a_BlockMeta |= 0x8;
 			}
 		}
 
-		// Move trapdoor to upper half if facing up
+		// Move the  trapdoor to upper half of the block if player is facing up
 		if (a_ClickedBlockFace != BLOCK_FACE_YP)
 		{
 			a_BlockMeta |= 0x8;
