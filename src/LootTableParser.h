@@ -514,7 +514,7 @@ namespace LootTable
 				This,
 				Killer,
 				KillerPlayer
-			};<
+			};
 			eSource m_Source;
 			enum class eOperation
 			{
