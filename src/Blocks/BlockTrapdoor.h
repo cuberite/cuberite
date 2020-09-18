@@ -91,11 +91,11 @@ public:
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
-			const auto IsOnXAxis = std::abs(TrapdoorOffsetRelToPlayer.x) > std::abs(TrapdoorOffsetRelToPlayer.z);
+			const auto IsOnXAxis = std::abs(BlockOffsetRelToPlayer.x) > std::abs(BlockOffsetRelToPlayer.z);
 
 			if (IsOnXAxis)
 			{
-				if (TrapdoorOffsetRelToPlayer.x > 0)
+				if (BlockOffsetRelToPlayer.x > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_XM;
 				}
@@ -106,7 +106,7 @@ public:
 			}
 			else
 			{
-				if (TrapdoorOffsetRelToPlayer.z > 0)
+				if (BlockOffsetRelToPlayer.z > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_ZM;
 				}
