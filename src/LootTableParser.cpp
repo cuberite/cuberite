@@ -141,7 +141,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -159,12 +159,12 @@ namespace LootTable
 				}
 				else
 				{
-					LOGWARNING("Provided unknown Block");  // Todo: better error message
+					LOGWARNING("Loot table: Failed to parse Block in Loot table in condition \"BlockStateProperty\"");
 				}
 			}
 			else if (NoCaseCompare(ParameterName, "properties"))
 			{
-				LOGWARNING("Block states in Loot table conditions are not yet supported.");
+				LOGWARNING("Loot table: \"BlockStateProperty\" is not yet supported.");
 				// TODO: 06.09.2020 - Add when implemented - 12xx12
 				/*
 				Json::Value Properties = a_Value[ParameterName];
@@ -179,6 +179,10 @@ namespace LootTable
 
 	bool cBlockStateProperty::operator()(cWorld & a_World, const Vector3i & a_Pos) const
 	{
+		if (!m_Active)
+		{
+			return true;
+		}
 		bool Res = true;
 		// Check if block is the same
 		Res &= (a_World.GetBlock(a_Pos) == m_Block);
@@ -199,9 +203,13 @@ namespace LootTable
 	////////////////////////////////////////////////////////////////////////////////
 	// cDamageSourceProperties
 
-	cDamageSourceProperties::cDamageSourceProperties(
-		const Json::Value & a_Value)
+	cDamageSourceProperties::cDamageSourceProperties(const Json::Value & a_Value)
 	{
+		if (!a_Value.isObject())
+		{
+			LOGWARNING("Loot table: Condition \"DamageSourceProperties\" encountered a Json problem, dropping function!");
+			return;
+		}
 		// TODO: 10.09.2020 - Add - 12xx12
 		LOGWARNING("Loot table condition \"DamageSourceProperties\" is is not implemented. Assuming true!");
 		return;
@@ -216,9 +224,10 @@ namespace LootTable
 		}
 		else
 		{
+
 			return;
 		}
-
+		m_Active = true;
 		for (const auto & Key : Predicates.getMemberNames())
 		{
 			if ((NoCaseCompare(Key, "bypasses_armor") == 0) ||
@@ -287,6 +296,10 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		if (!m_Active)
+		{
+			return true;
+		}
 		// TODO: 10.09.2020 - Add - 12xx12
 		return true;
 		bool Res = true;
@@ -313,14 +326,14 @@ namespace LootTable
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////
-	// cEntityProperties
+////////////////////////////////////////////////////////////////////////////////
+// cEntityProperties
 
 	cEntityProperties::sEffectDesc::sEffectDesc(const Json::Value & a_Value)
 	{
 		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			// TODO: error message
+			LOGWARNING("Loot table: \"EffectDesc\" encountered a Json problem, dropping function!");
 			return;
 		}
 		for (const auto & Key : a_Value.getMemberNames())
@@ -344,7 +357,7 @@ namespace LootTable
 	{
 		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			// TODO: error message
+			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping function!");
 			return;
 		}
 		AString DestString;
@@ -402,7 +415,7 @@ namespace LootTable
 	{
 		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			// TODO: error message
+			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -581,12 +594,12 @@ namespace LootTable
 					else if (NoCaseCompare(PlayerKey, "recipes") == 0)
 					{
 						// TODO: 16.06.2020 - 12xx12
-						LOGWARNING("Recipes are not supported in the loot table condition \"EntityProperties\"");
+						LOGWARNING("Loot table: Recipes are not supported in the condition \"EntityProperties\"");
 					}
 					else if (NoCaseCompare(PlayerKey, "stats") == 0)
 					{
 						// TODO: 16.06.2020 - 12xx12
-						LOGWARNING("Statistics are not supported in the loot table condition \"EntityProperties\"");
+						LOGWARNING("Loot table: Statistics are not supported in the condition \"EntityProperties\"");
 					}
 				}
 			}
@@ -828,7 +841,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// TODO: error message
+			LOGWARNING("Loot table: Condition \"LocationCheck\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -856,7 +869,8 @@ namespace LootTable
 
 				if (!PredicateObject.isObject())
 				{
-					// TODO: error message;
+					LOGWARNING("Loot table: Condition \"LocationCheck\" is missing predicates, dropping condition");
+					m_Active = false;
 					return;
 				}
 
@@ -864,9 +878,8 @@ namespace LootTable
 				{
 					if (NoCaseCompare(PredicateKey, "biome") == 0)
 					{
-						m_Biome = StringToBiome(NamespaceConverter(
-							PredicateObject[PredicateKey].asString()));
-						// Todo: this might fail du e to changed biome names in 1.13
+						m_Biome = StringToBiome(NamespaceConverter(PredicateObject[PredicateKey].asString()));
+						// Todo: this might fail due to changed biome names in 1.13
 					}  // "biome"
 					else if (NoCaseCompare(PredicateKey, "block") == 0)
 					{
@@ -874,8 +887,8 @@ namespace LootTable
 
 						if (!BlockObject.isObject())
 						{
-							// TODO: error message;
-							return;
+							LOGWARNING("Loot table: Condition \"LocationCheck - Block\" is missing a Json object to describe it's parameters. Dropping part of the condition!");
+							continue;
 						}
 
 						for (const auto & BlockKey : BlockObject.getMemberNames())
@@ -897,8 +910,7 @@ namespace LootTable
 					else if (NoCaseCompare(PredicateKey, "dimension") == 0)
 					{
 						// Possible values: overworld, the_nether, the_end
-						AString Dimension =
-							PredicateObject[PredicateKey].asString();
+						AString Dimension = PredicateObject[PredicateKey].asString();
 						if (NoCaseCompare(Dimension, "overworld") == 0)
 						{
 							m_Dimension = eDimension::dimOverworld;
@@ -917,7 +929,7 @@ namespace LootTable
 						}
 						else
 						{
-							// Todo: error message with string output
+							LOGWARNING("Loot table: Got unknown dimension in condition \"LocationCheck\": %s", Dimension);
 						}
 					}  // "dimension"
 					else if (NoCaseCompare(PredicateKey, "feature") == 0)
@@ -930,8 +942,8 @@ namespace LootTable
 
 						if (!FluidObject.isObject())
 						{
-							// TODO: error message;
-							return;
+							LOGWARNING("Loot table: Condition \"LocationCheck - Fluid\" is missing a Json object to describe it's parameters. Dropping part of the condition!");
+							continue;
 						}
 
 						for (const auto & FluidKey : FluidObject.getMemberNames())
@@ -956,8 +968,8 @@ namespace LootTable
 
 						if (!PositionObject.isObject())
 						{
-							// TODO: error message;
-							return;
+							LOGWARNING("Loot table: Condition \"LocationCheck - Position\" is missing a Json object to describe it's parameters. Dropping part of the condition!");
+							continue;
 						}
 
 						for (const auto & PosKey : PositionObject.getMemberNames())
@@ -978,7 +990,7 @@ namespace LootTable
 					}  // "position"
 					else if (NoCaseCompare(PredicateKey, "smokey") == 0)
 					{
-						// TODO: add warning that there are no campfires
+						LOGWARNING("Loot table: Cuberite doesn't support campfires yet. Dropping part of the condition \"LocationCheck - Smokey\"");
 						m_Smokey = PredicateObject[PredicateKey].asBool();
 					}
 				}  // for PredicateKey : PredicateObject
@@ -1071,7 +1083,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"MatchTool\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -1087,8 +1099,7 @@ namespace LootTable
 		}
 		if (!Predicates.isObject())
 		{
-			LOGWARNING(
-				"Loot table condition \"cMatchTool\" is missing predicates");
+			LOGWARNING("Loot table: Condition \"MatchTool\" is missing predicates");
 			return;
 		}
 		for (const auto & Key : Predicates.getMemberNames())
@@ -1106,7 +1117,7 @@ namespace LootTable
 				Json::Value Enchantments = Predicates[Key];
 				if (!Enchantments.isArray())
 				{
-					LOGWARNING("Unknown entry provided for enchantments in in loot table condition \"MatchTool\"");
+					LOGWARNING("Loot table: Unknown entry provided for enchantments in in condition \"MatchTool\"");
 				}
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
@@ -1116,7 +1127,7 @@ namespace LootTable
 					int Min = 0, Max = 100;
 					if (!EnchantmentObject.isObject())
 					{
-						LOGWARNING("Unknown entry provided for enchantment in in loot table condition \"MatchTool\"");
+						LOGWARNING("Loot table: Unknown entry provided for enchantment in in condition \"MatchTool\"");
 						continue;
 					}
 					for (const auto & EnchantmentKey : EnchantmentObject.getMemberNames())
@@ -1144,7 +1155,7 @@ namespace LootTable
 				Json::Value Enchantments = Predicates[Key];
 				if (!Enchantments.isArray())
 				{
-					LOGWARNING("Unknown entry provided for enchantments in in loot table condition \"MatchTool\"");
+					LOGWARNING("Loot table: Unknown entry provided for enchantments in condition \"MatchTool\"");
 				}
 				for (unsigned int i = 0; i < Enchantments.size(); i++)
 				{
@@ -1154,7 +1165,7 @@ namespace LootTable
 					int Min = 0, Max = 100;
 					if (!EnchantmentObject.isObject())
 					{
-						LOGWARNING("Unknown entry provided for enchantment in in loot table condition \"MatchTool\"");
+						LOGWARNING("Loot table: Unknown entry provided for enchantment in condition \"MatchTool\"");
 						continue;
 					}
 					for (const auto & EnchantmentKey : EnchantmentObject.getMemberNames())
@@ -1179,20 +1190,20 @@ namespace LootTable
 			{
 				if (!StringToItem(NamespaceConverter(Predicates[Key].asString()), m_Item))
 				{
-					LOGWARNING("Unknown item provided in loot table condition \"MatchTool\"");
+					LOGWARNING("Loot table: Unknown item provided in condition \"MatchTool\"");
 				}
 			}
 			else if (NoCaseCompare(Key, "nbt") == 0)
 			{
 				// TODO: 10.09.2020 - Add when implemented - 12xx12
-				LOGWARNING("NBT for items is not yet supported!");
+				LOGWARNING("Loot table: NBT for items is not yet supported!");
 				continue;
 				m_NBT = Predicates[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "potion") == 0)
 			{
 				// TODO: 10.09.2020 - Add when implemented - 12xx12
-				LOGWARNING("NBT for items is not yet supported!");
+				LOGWARNING("Loot table: NBT for items is not yet supported!");
 			}
 			else if (NoCaseCompare(Key, "tag") == 0)
 			{
@@ -1342,7 +1353,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"RandomChanceWithLooting\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -1363,8 +1374,6 @@ namespace LootTable
 		{
 			m_Chance = a_Value["Chance"].asFloat();
 		}
-
-		LOGWARNING("An error occurred during random chance condition. Defaulting to true");
 	}
 
 
@@ -1427,7 +1436,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"TableBonus\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -1494,7 +1503,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"TimeCheck\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -1537,7 +1546,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"WeatherCheck\" encountered a Json problem, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -1589,7 +1598,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"ApplyBonus\" encountered a Json problem, dropping function!");
 			return;
 		}
 		Json::Value EnchantmentObject;
@@ -1738,7 +1747,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"CopyName\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -1782,11 +1791,11 @@ namespace LootTable
 	cCopyNbt::cCopyNbt(const Json::Value & a_Value)
 	{
 		// TODO: 06.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("NBT for items is not yet supported, Dropping function!");
+		LOGWARNING("Loot table: NBT for items is not yet supported. Dropping function!");
 		return;
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"CopyNbt\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -1907,12 +1916,12 @@ namespace LootTable
 	cCopyState::cCopyState(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("States for blocks is not yet supported, dropping function!");
+		LOGWARNING("Loot table: States for blocks is not yet supported, dropping function!");
 		return;
 
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"CopyState\" encountered a Json problem, dropping function!");
 			return;
 		}
 		for (const auto & ParameterName : a_Value.getMemberNames())
@@ -1928,7 +1937,7 @@ namespace LootTable
 				}
 				else
 				{
-					LOGWARNING("Provided unknown Block");  // Todo: better error message
+					LOGWARNING("Loot table: Provided unknown Block for condition \"CopyState\"");
 				}
 			}
 			else if (NoCaseCompare(ParameterName, "properties") == 0)
@@ -1961,7 +1970,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"EnchantRandomly\" encountered a Json problem, dropping function!");
 			return;
 		}
 		Json::Value Enchantments;
@@ -1993,7 +2002,7 @@ namespace LootTable
 	{
 		if (!cItem::IsEnchantable(a_Item.m_ItemType))
 		{
-			LOGWARNING("Item %s can not be enchanted in loot table", ItemToString(a_Item));
+			LOGWARNING("Loot table: Item %s can not be enchanted in loot table", ItemToString(a_Item));
 		}
 		if (!m_EnchantmentLimiter.empty())
 		{
@@ -2019,7 +2028,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"EnchantWithLevels\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -2027,12 +2036,12 @@ namespace LootTable
 		if (a_Value.isMember("treasure"))
 		{
 			m_Treasure = a_Value["treasure"].asBool();
-			LOGWARNING("Treasure enchantments are not yet supported");
+			LOGWARNING("Loot table: Treasure enchantments are not yet supported");
 		}
 		else if (a_Value.isMember("Treasure"))
 		{
 			m_Treasure = a_Value["Treasure"].asBool();
-			LOGWARNING("Treasure enchantments are not yet supported");
+			LOGWARNING("Loot table: Treasure enchantments are not yet supported");
 		}
 		Json::Value LevelsObject;
 		if (a_Value.isMember("levels"))
@@ -2045,7 +2054,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("No levels provided for enchantments in Loot table, dropping function");
+			LOGWARNING("Loot table: No levels provided for enchantments in function \"EnchantWithLevels\"");
 			return;
 		}
 		m_Active = true;
@@ -2080,11 +2089,11 @@ namespace LootTable
 	cExplorationMap::cExplorationMap(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("Exploration maps are not implemented, dropping function!");
+		LOGWARNING("Loot table: Exploration maps are not implemented, dropping function!");
 		return;
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"ExplorationMap\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -2174,7 +2183,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("Missing limit, dropping function!");
+			LOGWARNING("Loot table: Missing limit in function \"LimitCount\", dropping function!");
 			return;
 		}
 
@@ -2206,7 +2215,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"LootingEnchant\" encountered a Json problem, dropping function!");
 			return;
 		}
 		Json::Value CountObject;
@@ -2266,7 +2275,7 @@ namespace LootTable
 	cSetAttributes::cSetAttributes(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("Attributes for items are not implemented, dropping function!");
+		LOGWARNING("Loot table: Attributes for items are not implemented, dropping function!");
 	}
 
 
@@ -2283,7 +2292,7 @@ namespace LootTable
 	cSetContents::cSetContents(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("NBT for items is not yet supported, Dropping function!");
+		LOGWARNING("Loot table: NBT for items is not yet supported, Dropping function \"SetContents\"!");
 	}
 
 
@@ -2301,7 +2310,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetCount\" encountered a Json problem, dropping function!");
 			return;
 		}
 		Json::Value CountObject;
@@ -2398,7 +2407,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetDamage\" encountered a Json problem, dropping function!");
 			return;
 		}
 		Json::Value DamageObject;
@@ -2429,11 +2438,11 @@ namespace LootTable
 	cSetLootTable::cSetLootTable(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("NBT for items is not yet supported, dropping \"SetLootTable\" function!");
+		LOGWARNING("Loot table: NBT for items is not yet supported, dropping \"SetLootTable\" function!");
 		return;
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetLootTable\" encountered a Json problem, dropping function!");
 			return;
 		}
 		for (const auto & Key : a_Value.getMemberNames())
@@ -2465,7 +2474,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetLore\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -2483,7 +2492,7 @@ namespace LootTable
 					if (!Lore[i].isString())
 					{
 						// TODO: 16.09.2020 - Add when Json objects are used for Lore - 12xx12
-						LOGWARNING("Items only support plain text in loot tables. Please make sure you don't supply a Json object.");
+						LOGWARNING("Loot table: Items only support plain text in item lore. Please make sure you don't supply a Json object in function \"SetLore\".");
 					}
 					else
 					{
@@ -2538,7 +2547,7 @@ namespace LootTable
 	{
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetName\" encountered a Json problem, dropping function!");
 			return;
 		}
 		for (const auto & Key : a_Value.getMemberNames())
@@ -2548,7 +2557,7 @@ namespace LootTable
 				if (!a_Value[Key].isString())
 				{
 					// TODO: 16.09.2020 - Add when Json objects are used for Names - 12xx12
-					LOGWARNING("Items only support plain text in loot tables. Please make sure you don't supply a Json object.");
+					LOGWARNING("Loot table: Items only support plain text in item name. Please make sure you don't supply a Json object in function \"SetName\".");
 				}
 				else
 				{
@@ -2590,11 +2599,11 @@ namespace LootTable
 	cSetNbt::cSetNbt(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("NBT for items is not yet supported, dropping function!");
+		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetNBT\"!");
 		return;
 		if (!a_Value.isObject())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"SetNbt\" encountered a Json problem, dropping function!");
 			return;
 		}
 
@@ -2631,7 +2640,7 @@ namespace LootTable
 	cSetStewEffect::cSetStewEffect(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("Stews are not yet supported, dropping function!");
+		LOGWARNING("Loot table: Stews are not yet supported, dropping function \"SetStewEffect\"!");
 	}
 
 
@@ -2849,7 +2858,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("Loot table is missing condition type. Dropping condition!");
+			LOGWARNING("Loot table: Condition is missing type. Dropping condition!");
 			return cLootTableCondition(Condition::cNone());
 		}
 
@@ -2919,7 +2928,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("Unknown loot table condition provided: %s. Using no condition", Type);
+			LOGWARNING("Loot table: Unknown loot table condition provided: %s. Using no condition", Type);
 			return cLootTableCondition(Condition::cNone());
 		}
 	}
@@ -2953,7 +2962,7 @@ namespace LootTable
 		}
 		else
 		{
-			LOGWARNING("No loot table poll entry type provided - dropping entry");
+			LOGWARNING("Loot table: No entry type provided - dropping entry");
 			return cLootTablePoolEntry();
 		}
 
@@ -3077,7 +3086,7 @@ namespace LootTable
 			}
 			if (Max == -1)
 			{
-				LOGWARNING("Missing maximum value in loot table pool - assuming steady roll");
+				LOGWARNING("Loot table: Missing maximum value in pool rolls - assuming steady roll");
 				Max = Min;
 			}
 			return cLootTablePoolRolls(Min, Max);
