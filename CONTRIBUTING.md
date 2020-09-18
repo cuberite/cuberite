@@ -80,7 +80,7 @@ Note that the check script is not smart enough to catch everything, so not havin
 Pull Request Checks
 -------------------
 
-When a pull request is made, checks are made that the branch's main executable (Cuberite) AND all tools compile. These tools can be enabled by setting -DBUILD_TOOLS=Yes DSELF_TEST=Yes in cmake.
+When a pull request is made, checks are made that the branch's main executable (Cuberite) AND tools compile. These tools can be enabled by setting -DBUILD_TOOLS=Yes DSELF_TEST=Yes in cmake.
 
 Github-related conventions
 --------------------------
