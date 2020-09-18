@@ -4,6 +4,7 @@
 #include "LootTableParser.h"
 #include "Entities/Player.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Root.h"
 
 #include "World.h"
 
@@ -1487,7 +1488,7 @@ namespace LootTable
 				return true;
 			}
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
-			unsigned long long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
+			unsigned long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
 
 			Level = std::min(Level, m_Chances.size());
 
