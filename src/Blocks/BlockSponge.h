@@ -14,21 +14,20 @@ class cBlockSpongeHandler :
 
 public:
 
-	cBlockSpongeHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
+
+private:
 
 	virtual void OnPlaced(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
+	) const override
 	{
 		OnNeighborChanged(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NONE);
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
 		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { CheckSoaked(a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); return true; });
 	}
@@ -36,7 +35,7 @@ public:
 	/** Check blocks around the sponge to see if they are water.
 	If a dry sponge is touching water, soak up up to 65 blocks of water,
 	with a taxicab distance of 7, and turn the sponge into a wet sponge. */
-	void CheckSoaked(Vector3i a_Rel, cChunk & a_Chunk)
+	static void CheckSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		struct sSeed
 		{
@@ -117,7 +116,7 @@ public:
 		return(a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 18;

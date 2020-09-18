@@ -19,6 +19,12 @@ class cBlockLeavesHandler:
 {
 	using Super = cBlockHandler;
 
+public:
+
+	using Super::Super;
+
+private:
+
 	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of leaves blocks. */
 	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
 	{
@@ -87,19 +93,7 @@ class cBlockLeavesHandler:
 		return false;
 	}
 
-
-public:
-
-	cBlockLeavesHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If breaking with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
@@ -148,7 +142,7 @@ public:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
 		auto meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
@@ -169,7 +163,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		auto Meta = a_Chunk.GetMeta(a_RelPos);
 		if ((Meta & 0x04) != 0)
@@ -213,7 +207,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

@@ -1067,7 +1067,7 @@ void cBlockArea::RotateCCW(void)
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
-				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCCW(m_BlockMetas[OldIdx]);
+				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCCW(m_BlockMetas[OldIdx]);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -1127,7 +1127,7 @@ void cBlockArea::RotateCW(void)
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
-				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCW(m_BlockMetas[OldIdx]);
+				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCW(m_BlockMetas[OldIdx]);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -1185,8 +1185,8 @@ void cBlockArea::MirrorXY(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, y, MaxZ - z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXY(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXY(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorXY(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorXY(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -1242,8 +1242,8 @@ void cBlockArea::MirrorXZ(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, MaxY - y, z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXZ(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXZ(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorXZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorXZ(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -1299,8 +1299,8 @@ void cBlockArea::MirrorYZ(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorYZ(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorYZ(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorYZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorYZ(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -2198,21 +2198,6 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 		}
 	}
 	return true;
-}
-
-
-
-
-
-cItems cBlockArea::PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger, const cItem * a_Tool)
-{
-	auto relPos = a_AbsPos - m_Origin;
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetRelBlockTypeMeta(relPos.x, relPos.y, relPos.z, blockType, blockMeta);
-	auto blockEntity = GetBlockEntityRel(relPos);
-	auto handler = BlockHandler(blockType);
-	return handler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
 }
 
 

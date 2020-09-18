@@ -16,14 +16,9 @@ class cBlockEnchantmentTableHandler:
 
 public:
 
-	cBlockEnchantmentTableHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -32,7 +27,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		cWindow * Window = new cEnchantingWindow(a_BlockPos);
 		a_Player.OpenWindow(*Window);
@@ -43,7 +38,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -52,7 +47,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 29;

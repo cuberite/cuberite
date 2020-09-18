@@ -14,12 +14,11 @@ class cBlockIceHandler :
 
 public:
 
-	cBlockIceHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drop self when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
@@ -36,7 +35,7 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override
+	) const override
 	{
 		// If there's a solid block or a liquid underneath, convert to water, rather than air
 		if (a_BlockPos.y <= 0)
@@ -51,7 +50,7 @@ public:
 		}
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 5;

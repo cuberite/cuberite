@@ -12,9 +12,7 @@ class cBlockObserverHandler:
 
 public:
 
-	cBlockObserverHandler(BLOCKTYPE a_BlockType) : Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
 	inline static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
 	{

@@ -299,8 +299,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	// Wash away the block there, if possible:
 	if (CanWashAway(BlockType))
 	{
-		cBlockHandler * Handler = BlockHandler(BlockType);
-		if (Handler->DoesDropOnUnsuitable())
+		if (cBlockHandler::For(BlockType).DoesDropOnUnsuitable())
 		{
 			m_World.DropBlockAsPickups(absPos, nullptr, nullptr);
 		}

@@ -15,15 +15,11 @@ class cBlockTrapdoorHandler :
 
 public:
 
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -39,7 +35,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
@@ -65,7 +61,7 @@ public:
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
@@ -82,7 +78,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
@@ -141,7 +137,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

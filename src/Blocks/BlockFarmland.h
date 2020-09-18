@@ -23,16 +23,11 @@ class cBlockFarmlandHandler :
 
 public:
 
-	cBlockFarmlandHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_BLOCK_DIRT, 1, 0);
 	}
@@ -47,7 +42,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		auto BlockMeta = a_Chunk.GetMeta(a_RelPos);
 
@@ -91,7 +86,7 @@ public:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
 		// Don't care about any neighbor but the one above us (fix recursion loop in #2213):
 		if (a_WhichNeighbor != BLOCK_FACE_YP)
@@ -118,7 +113,7 @@ public:
 
 
 	/** Returns true if there's either a water source block close enough to hydrate the specified position, or it's raining there. */
-	bool IsWaterInNear(cChunk & a_Chunk, const Vector3i a_RelPos)
+	static bool IsWaterInNear(const cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
 		const auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		if (a_Chunk.GetWorld()->IsWeatherWetAtXYZ(WorldPos))
@@ -154,7 +149,7 @@ public:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
 	{
 		return (
 			(a_Plant == E_BLOCK_BEETROOTS) ||

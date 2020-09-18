@@ -41,7 +41,7 @@ public:
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool IsReplacingClickedBlock = BlockHandler(ClickedBlockType)->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
 
 		// If the regular placement doesn't work, do no further processing:
 		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))

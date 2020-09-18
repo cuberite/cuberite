@@ -19,14 +19,9 @@ class cBlockEntityHandler:
 
 public:
 
-	cBlockEntityHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -35,7 +30,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}
@@ -44,7 +39,7 @@ public:
 
 
 
-	virtual bool IsUseable() override
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
@@ -62,16 +57,14 @@ class cContainerEntityHandler:
 {
 public:
 
-	cContainerEntityHandler(BLOCKTYPE a_BlockType):
+	constexpr cContainerEntityHandler(BLOCKTYPE a_BlockType):
 		Base(a_BlockType)
 	{
 	}
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Reset meta to 0
 		cItems res(cItem(Base::m_BlockType, 1, 0));
