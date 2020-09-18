@@ -90,7 +90,7 @@ public:
 		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
 
 		// Handle horizontal placing
-		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YP))
+		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			// Get horizontal alignment of the trapdoor in relation to the player
 			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
