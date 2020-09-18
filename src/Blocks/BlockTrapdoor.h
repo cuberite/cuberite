@@ -140,7 +140,7 @@ public:
 		}
 
 		// Move the  trapdoor to upper half of the block if player is facing up
-		if (a_ClickedBlockFace != BLOCK_FACE_YP)
+		if (a_ClickedBlockFace == BLOCK_FACE_YP)
 		{
 			a_BlockMeta |= 0x8;
 		}
