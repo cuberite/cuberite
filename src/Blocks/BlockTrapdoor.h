@@ -95,32 +95,30 @@ public:
 			// Get horizontal alignment of the trapdoor in relation to the player
 			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
 
-			// If the trapdoor and the player are both on X axis, and
-			if (RotationUnitVector.x != 0)
+			const auto IsOnXAxis = std::abs(RotationUnitVector.x) > std::abs(RotationUnitVector.z);
+
+			// Select the correct rotation,
+			//  depending on door's position relative to the player
+			if (IsOnXAxis)
 			{
-				// the trapdoor is further to the positive X (EAST)
 				if (RotationUnitVector.x > 0)
-				{
-					SafeClickedBlockFace = BLOCK_FACE_XP;
-				}
-				// the trapdoor is further to the negative X (WEST)
-				else
 				{
 					SafeClickedBlockFace = BLOCK_FACE_XM;
 				}
-			}
-			// If the trapdoor and the player are both on Z axis, and
-			else
-			{
-				// the trapdoor is further to the positive Z (SOUTH)
-				if (RotationUnitVector.z > 0)
-				{
-					SafeClickedBlockFace = BLOCK_FACE_ZP;
-				}
-				// the trapdoor is further to the negative Z (NORTH)
 				else
 				{
+					SafeClickedBlockFace = BLOCK_FACE_XP;
+				}
+			}
+			else
+			{
+				if (RotationUnitVector.z > 0)
+				{
 					SafeClickedBlockFace = BLOCK_FACE_ZM;
+				}
+				else
+				{
+					SafeClickedBlockFace = BLOCK_FACE_ZP;
 				}
 			}
 		}
@@ -131,18 +129,18 @@ public:
 		//  (Player clicked more distant half of a block)
 		if (a_CursorPos.y > 7)
 		{
-			// Only move the trapdoor to the upper half of the block,
-			//  if player is NOT placing the door on the same block is standing on top of
-			if (a_ClickedBlockFace != BLOCK_FACE_YM)
-			{
-				a_BlockMeta |= 0x8;
-			}
+			a_BlockMeta |= 0x8;
 		}
 
-		// Move the  trapdoor to upper half of the block if player is facing up
+		// Clip the trapdoor to LOWER half of the block if player is facing DOWN
 		if (a_ClickedBlockFace == BLOCK_FACE_YP)
 		{
-			a_BlockMeta |= 0x8;
+			a_BlockMeta ^= 0x8;
+		}
+		// Clip the  trapdoor to UPPER half of the block if player is facing UP
+		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
+		{
+			a_BlockMeta ^= 0x8;
 		}
 
 		return true;
