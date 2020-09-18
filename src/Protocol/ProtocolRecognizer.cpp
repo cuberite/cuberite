@@ -25,9 +25,9 @@
 
 
 
-struct sUnsupportedButPingableProtocolException : public std::runtime_error
+struct UnsupportedButPingableProtocolException : public std::runtime_error
 {
-	explicit sUnsupportedButPingableProtocolException() :
+	explicit UnsupportedButPingableProtocolException() :
 		std::runtime_error("")
 	{
 	}
@@ -37,9 +37,9 @@ struct sUnsupportedButPingableProtocolException : public std::runtime_error
 
 
 
-struct sTriedToJoinWithUnsupportedProtocolException : public std::runtime_error
+struct TriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 {
-	explicit sTriedToJoinWithUnsupportedProtocolException(const std::string & a_Message) :
+	explicit TriedToJoinWithUnsupportedProtocolException(const std::string & a_Message) :
 		std::runtime_error(a_Message)
 	{
 	}
@@ -114,7 +114,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
 		};
 	}
-	catch (const sUnsupportedButPingableProtocolException &)
+	catch (const UnsupportedButPingableProtocolException &)
 	{
 		// Got a server list ping for an unrecognised version,
 		// switch into responding to unknown protocols mode:
@@ -253,7 +253,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 			a_Client.GetIPString().c_str(), PacketType
 		);
 
-		throw sTriedToJoinWithUnsupportedProtocolException(
+		throw TriedToJoinWithUnsupportedProtocolException(
 			Printf("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
 		);
 	}
@@ -267,7 +267,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	{
 		// TryRecognizeProtocol guarantees that we will have as much
 		// data to read as the client claims in the protocol length field:
-		throw sTriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
+		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
 
 	// TODO: this should be a protocol property, not ClientHandle:
@@ -310,12 +310,12 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 
 			if (NextState != cProtocol::State::Status)
 			{
-				throw sTriedToJoinWithUnsupportedProtocolException(
+				throw TriedToJoinWithUnsupportedProtocolException(
 					Printf("Unsupported protocol version %u.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
 				);
 			}
 
-			throw sUnsupportedButPingableProtocolException();
+			throw UnsupportedButPingableProtocolException();
 		}
 	}
 }
