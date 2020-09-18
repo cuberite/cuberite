@@ -169,8 +169,6 @@ typedef unsigned char Byte;
 #define VERIFY(x) (!!(x) || (LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
 
-#include "BiomeDef.h"
-
 
 
 

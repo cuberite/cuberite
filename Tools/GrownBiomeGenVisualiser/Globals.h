@@ -120,6 +120,7 @@ typedef unsigned char Byte;
 #include <cmath>
 #include <cstdarg>
 #include <ctime>
+#include <cstddef>
 
 
 
@@ -188,11 +189,4 @@ auto ToUnsigned(T a_Val)
 	ASSERT(a_Val >= 0);
 	return static_cast<std::make_unsigned_t<T>>(a_Val);
 }
-
-
-
-
-
-#include "BiomeDef.h"
-
 

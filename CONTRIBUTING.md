@@ -77,6 +77,11 @@ src/CheckBasicStyle.lua 1>&2 -g
 
 Note that the check script is not smart enough to catch everything, so not having any warnings does not necessarily imply that you followed the conventions fully. The other humans working on this will perform more checks before merging.
 
+Pull Request Checks
+-------------------
+
+When a pull request is made, checks are made that the branch's main executable (Cuberite) AND all tools compile. These tools can be enabled by setting -DBUILD_TOOLS=Yes DSELF_TEST=Yes in cmake.
+
 Github-related conventions
 --------------------------
 The following rules are not strictly enforced, but if you follow them, you will make it easier for us to review your changes.
