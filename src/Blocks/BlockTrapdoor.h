@@ -132,13 +132,8 @@ public:
 			a_BlockMeta |= 0x8;
 		}
 
-		// Clip the trapdoor to LOWER half of the block if player is facing DOWN
-		if (a_ClickedBlockFace == BLOCK_FACE_YP)
-		{
-			a_BlockMeta ^= 0x8;
-		}
-		// Clip the  trapdoor to UPPER half of the block if player is facing UP
-		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
+		// Clip the trapdoor to horizontal surface if needed
+		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			a_BlockMeta ^= 0x8;
 		}
