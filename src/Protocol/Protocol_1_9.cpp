@@ -79,8 +79,8 @@ static const UInt32 OFF_HAND = 1;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_0:
 
-cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State),
+cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
+	Super(a_Client, a_ServerAddress, a_State),
 	m_IsTeleportIdConfirmed(true),
 	m_OutstandingTeleportId(0)
 {
@@ -575,9 +575,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -586,9 +585,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
@@ -597,9 +595,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport              (a_ByteBuffer); return true;
@@ -643,10 +640,10 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
 
 			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
+			m_State = State::Invalid;
 			return false;
 		}
-		case 255:
+		case State::Invalid:
 		{
 			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
 			// Do not output anything (the caller will do that for us), just return failure
