@@ -79,8 +79,8 @@ static const UInt32 OFF_HAND = 1;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_0:
 
-cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, State a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State),
+cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
+	Super(a_Client, a_ServerAddress, a_State),
 	m_IsTeleportIdConfirmed(true),
 	m_OutstandingTeleportId(0)
 {
