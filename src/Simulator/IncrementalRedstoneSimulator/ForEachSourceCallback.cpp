@@ -23,25 +23,6 @@ ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3
 
 
 
-bool ForEachSourceCallback::ShouldQueryLinkedPosition(const Vector3i Location, const BLOCKTYPE Block)
-{
-	switch (Block)
-	{
-		// Normally we don't ask solid blocks for power because they don't have any (store, dirt, etc.)
-		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_TRAPPED_CHEST: return false;
-
-		// If a mechanism asks for power from a block, redirect the query to linked positions if:
-		default: return cBlockInfo::IsSolid(Block);
-	}
-}
-
-
-
-
-
 void ForEachSourceCallback::operator()(Vector3i Location)
 {
 	if (!cChunk::IsValidHeight(Location.y))
@@ -58,7 +39,7 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(Location);
 	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
-	if (ShouldQueryLinkedPosition(Location, PotentialSourceBlock))
+	if (ShouldQueryLinkedPosition(PotentialSourceBlock))
 	{
 		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location));
 	}
@@ -71,6 +52,53 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 				NeighbourRelativeQueryPosition, m_CurrentBlock, false
 			)
 		);
+	}
+}
+
+
+
+
+
+void ForEachSourceCallback::CheckIndirectPower()
+{
+	const Vector3i OffsetYP(0, 1, 0);
+	const auto Above = m_Position + OffsetYP;
+
+	if (Above.y == cChunkDef::Height)
+	{
+		return;
+	}
+
+	// Object representing restarted power calculation where the
+	// block above this piston, dropspenser is requesting a power level.
+	ForEachSourceCallback QuasiQueryCallback(m_Chunk, Above, m_Chunk.GetBlock(Above));
+
+	// Manually feed the callback object all positions that may deliver power to Above:
+	for (const auto QuasiPowerOffset : cSimulator::GetLinkedOffsets(OffsetYP))
+	{
+		QuasiQueryCallback(m_Position + QuasiPowerOffset);
+	}
+
+	// Get the results:
+	Power = std::max(Power, QuasiQueryCallback.Power);
+}
+
+
+
+
+
+bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
+{
+	switch (Block)
+	{
+		// Normally we don't ask solid blocks for power because they don't have any (store, dirt, etc.)
+		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_OBSERVER:
+		case E_BLOCK_TRAPPED_CHEST: return false;
+
+		// If a mechanism asks for power from a block, redirect the query to linked positions if:
+		default: return cBlockInfo::IsSolid(Block);
 	}
 }
 
