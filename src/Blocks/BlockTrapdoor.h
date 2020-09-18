@@ -90,12 +90,10 @@ public:
 		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
 
 		// Handle horizontal placing
-		if (a_ClickedBlockFace == BLOCK_FACE_YP || a_ClickedBlockFace == BLOCK_FACE_YP)
+		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
 			// Estimate the orientation of relative to the player
 			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
-
-			printf("\n[%d:%d]", RotationUnitVector.x, RotationUnitVector.z );
 
 			// If facing along X
 			if (RotationUnitVector.x != 0)
@@ -125,7 +123,7 @@ public:
 					SafeClickedBlockFace = BLOCK_FACE_ZM;
 				}
 
-			// Lacks a check for Z = 0, because we still need 
+			// Lacks a check for Z = 0, because we still need
 			//  some orientation for when looking straight down
 			}
 		}
