@@ -37,7 +37,7 @@ class cProtocol_1_9_0:
 
 public:
 
-	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, State a_State);
+	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;

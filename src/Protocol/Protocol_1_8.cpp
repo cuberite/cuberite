@@ -100,10 +100,9 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_8_0:
 
-cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, State a_State) :
+cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
 	Super(a_Client),
 	m_ServerAddress(a_ServerAddress),
-	// Note: a_ServerPort is unused
 	m_State(a_State),
 	m_IsEncrypted(false)
 {
