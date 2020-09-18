@@ -484,7 +484,7 @@ std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() const
 
 
 
-cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
+cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType) const
 {
 	auto itr = m_EntityEffects.find(a_EffectType);
 	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;

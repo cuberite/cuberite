@@ -620,25 +620,19 @@ void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_8_0::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Power)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktExplosion);
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockX));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockY));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockZ));
-	Pkt.WriteBEFloat(static_cast<float>(a_Radius));
-	Pkt.WriteBEUInt32(static_cast<UInt32>(a_BlocksAffected.size()));
-	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(), end = a_BlocksAffected.end(); itr != end; ++itr)
-	{
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->x));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->y));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->z));
-	}  // for itr - a_BlockAffected[]
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.x));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.y));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.z));
+	Pkt.WriteBEFloat(a_Position.x);
+	Pkt.WriteBEFloat(a_Position.y);
+	Pkt.WriteBEFloat(a_Position.z);
+	Pkt.WriteBEFloat(a_Power);
+	Pkt.WriteBEUInt32(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
 }
 
 

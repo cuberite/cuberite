@@ -13,6 +13,14 @@
 
 
 
+#ifdef __FreeBSD__
+	#include <netinet/in.h>
+#endif
+
+
+
+
+
 // fwd:
 class cTCPLink;
 typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
@@ -354,7 +362,6 @@ public:
 	/** Returns all local IP addresses for network interfaces currently available. */
 	static AStringVector EnumLocalIPAddresses(void);
 };
-
 
 
 

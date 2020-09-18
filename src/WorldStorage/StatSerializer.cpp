@@ -3,7 +3,6 @@
 
 
 #include "Globals.h"
-#include "StatSerializer.h"
 #include "../Statistics.h"
 #include "NamespaceSerializer.h"
 
