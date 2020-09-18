@@ -1480,7 +1480,7 @@ namespace LootTable
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 			unsigned long long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
 
-			Level = std::min({Level, m_Chances.size()});
+			Level = std::min(Level, m_Chances.size());
 
 			return GetRandomProvider().RandReal(0.0f, 1.0f) < m_Chances.at(Level);
 		};
