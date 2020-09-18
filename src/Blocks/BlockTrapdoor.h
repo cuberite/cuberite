@@ -86,22 +86,16 @@ public:
 	{
 		a_BlockType = m_BlockType;
 
-		// Need a_ClickedBlockFace editable
 		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
 
-		// Handle horizontal placing
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
-			// Get horizontal alignment of the trapdoor in relation to the player
-			const auto RotationUnitVector = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
+			const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
+			const auto IsOnXAxis = std::abs(TrapdoorOffsetRelToPlayer.x) > std::abs(TrapdoorOffsetRelToPlayer.z);
 
-			const auto IsOnXAxis = std::abs(RotationUnitVector.x) > std::abs(RotationUnitVector.z);
-
-			// Select the correct rotation,
-			//  depending on door's position relative to the player
 			if (IsOnXAxis)
 			{
-				if (RotationUnitVector.x > 0)
+				if (TrapdoorOffsetRelToPlayer.x > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_XM;
 				}
@@ -112,7 +106,7 @@ public:
 			}
 			else
 			{
-				if (RotationUnitVector.z > 0)
+				if (TrapdoorOffsetRelToPlayer.z > 0)
 				{
 					SafeClickedBlockFace = BLOCK_FACE_ZM;
 				}
@@ -125,14 +119,11 @@ public:
 
 		a_BlockMeta = BlockFaceToMetaData(SafeClickedBlockFace);
 
-		// Check if the trapdoor should occupy top-half
-		//  (Player clicked more distant half of a block)
 		if (a_CursorPos.y > 7)
 		{
 			a_BlockMeta |= 0x8;
 		}
 
-		// Clip the trapdoor to horizontal surface if needed
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			a_BlockMeta ^= 0x8;
