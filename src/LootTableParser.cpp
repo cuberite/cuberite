@@ -4,6 +4,7 @@
 #include "LootTableParser.h"
 #include "Entities/Player.h"
 #include "BlockEntities/BlockEntity.h"
+#include "FurnaceRecipe.h"
 #include "Root.h"
 
 #include "World.h"
