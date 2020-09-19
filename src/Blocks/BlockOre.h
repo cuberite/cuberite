@@ -8,71 +8,6 @@ class cBlockOreHandler:
 {
 	using Super = cBlockHandler;
 
-private:
-	/** Returns the correct drop multiplier for ores
-	EXCLUDING REDSTONE ORE which is handled differently
-	works for coal, diamond, emerald, nether gold, nether quartz and lapis
-	https://minecraft.gamepedia.com/Fortune#Ore */
-	inline unsigned int FortuneDropMult(unsigned int a_fortuneLevel)
-	{
-
-		auto & random = GetRandomProvider();
-		float RandUnif = random.RandReal();
-		switch (a_fortuneLevel)
-		{
-			case 0:
-				return 1;
-			case 1:
-				if (RandUnif<0.66)
-				{
-					return 1;
-				}
-				else
-				{
-					return 2;
-				}
-				break;
-			case 2:
-				if (RandUnif<0.5)
-				{
-					return 1;
-				}
-				else if (RandUnif<0.75)
-				{
-					return 2;
-				}
-				else
-				{
-					return 3;
-				}
-				break;
-			case 3:
-			{
-				if (RandUnif < 0.4)
-				{
-					return 1;
-				}
-				else if (RandUnif < 0.6)
-				{
-					return 2;
-				}
-				else if (RandUnif < 0.8)
-				{
-					return 3;
-				}
-				else
-				{
-					return 4;
-				}
-			}
-		}
-		return 1;
-	}
-
-
-
-
-
 public:
 	cBlockOreHandler(BLOCKTYPE a_BlockType):
 		Super(a_BlockType)
@@ -96,10 +31,10 @@ public:
 			}
 		}
 
-		const unsigned int FortuneLevel = ToolFortuneLevel(a_Tool);
-		const unsigned int DropMult = FortuneDropMult(FortuneLevel);
-
 		auto & random = GetRandomProvider();
+		const unsigned int FortuneLevel = ToolFortuneLevel(a_Tool);
+		const unsigned int DropMult = std::max(1, FloorC(random.RandReal(FortuneLevel + 2.0)));
+
 		switch (m_BlockType)
 		{
 			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * random.RandInt<char>(4, 8), 4);
