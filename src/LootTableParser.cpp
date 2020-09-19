@@ -5,6 +5,7 @@
 #include "Entities/Player.h"
 #include "BlockEntities/BlockEntity.h"
 #include "FurnaceRecipe.h"
+#include "Registries/ItemTags.h"
 #include "Root.h"
 
 #include "World.h"

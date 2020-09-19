@@ -4,10 +4,7 @@
 #include "LootTable.h"
 
 #include "Entities/Player.h"
-#include "FurnaceRecipe.h"
 #include "LootTableParser.h"
-#include "Registries/ItemTags.h"
-#include "Root.h"
 
 using namespace LootTable;
 
