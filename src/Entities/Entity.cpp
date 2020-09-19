@@ -635,6 +635,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtFalling:
 		case dtLightning:
 		case dtPlugin:
+		case dtEnvironment:
 		{
 			return false;
 		}
