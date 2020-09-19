@@ -17,7 +17,6 @@ private:
 			https://minecraft.gamepedia.com/Fortune#Ore */
 		auto & random = GetRandomProvider();
 		float rand = random.RandReal();
-		printf("rand = %f\n", rand);
 		switch (fortuneLevel)
 		{
 			case 0:
