@@ -100,7 +100,7 @@ public:
 				}
 				break;
 			}
-			// Resets any color to default
+			// Resets any color to default:
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:
@@ -109,14 +109,13 @@ public:
 				if ((Meta > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
-					LOG("%d", Meta);
 					auto NewItem = cItem(EquippedItem);
 					NewItem.m_ItemColor.Clear();
 					a_Player.ReplaceOneEquippedItemTossRest(NewItem);
 				}
 				break;
 			}
-			// Resets shulker box color
+			// Resets shulker box color:
 			case E_BLOCK_BLACK_SHULKER_BOX:
 			case E_BLOCK_BLUE_SHULKER_BOX:
 			case E_BLOCK_BROWN_SHULKER_BOX:
@@ -132,10 +131,10 @@ public:
 			case E_BLOCK_RED_SHULKER_BOX:
 			case E_BLOCK_YELLOW_SHULKER_BOX:
 			{
+				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
 				if (Meta > 0)
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
-					// Give new potion when the gamemode is not creative:
 					auto NewShulker = cItem(EquippedItem);
 					NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
 					a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
