@@ -414,8 +414,7 @@ cBlockInfo::cBlockInfo():
 	m_FullyOccupiesVoxel(false),
 	m_CanBeTerraformed(false),
 	m_BlockHeight(1.0),
-	m_Hardness(0.0f),
-	m_Handler()
+	m_Hardness(0.0f)
 {
 }
 
@@ -423,13 +422,9 @@ cBlockInfo::cBlockInfo():
 
 
 
-bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
+cBlockHandler * cBlockInfo::GetHandler(BLOCKTYPE a_Type)
 {
-	return (
-		(a_BlockType == E_BLOCK_ICE) ||
-		(a_BlockType == E_BLOCK_LEAVES) ||
-		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
-	);
+	return &cBlockHandler::GetBlockHandler(a_Type);
 }
 
 
@@ -557,9 +552,13 @@ float cBlockInfo::GetExplosionAbsorption(const BLOCKTYPE Block)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
+bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
 {
-	delete a_Handler;
+	return (
+		(a_BlockType == E_BLOCK_ICE) ||
+		(a_BlockType == E_BLOCK_LEAVES) ||
+		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
+	);
 }
 
 
@@ -573,7 +572,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
 		Info[i].m_BlockType = static_cast<BLOCKTYPE>(i);
-		Info[i].m_Handler.reset(cBlockHandler::CreateBlockHandler(Info[i].m_BlockType));
 	}
 
 	// Emissive blocks
@@ -951,6 +949,7 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_ACTIVE_COMPARATOR            ].m_PistonBreakable = true;
 	Info[E_BLOCK_AIR                          ].m_PistonBreakable = true;
 	Info[E_BLOCK_BED                          ].m_PistonBreakable = true;
+	Info[E_BLOCK_BEETROOTS                    ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIG_FLOWER                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BIRCH_DOOR                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_BLACK_SHULKER_BOX            ].m_PistonBreakable = true;
@@ -989,11 +988,13 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_LIME_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_LADDER                       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LAVA                         ].m_PistonBreakable = true;
+	Info[E_BLOCK_LEAVES                       ].m_PistonBreakable = true;
 	Info[E_BLOCK_LEVER                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MAGENTA_SHULKER_BOX          ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_MELON_STEM                   ].m_PistonBreakable = true;
 	Info[E_BLOCK_NETHER_WART                  ].m_PistonBreakable = true;
+	Info[E_BLOCK_OAK_DOOR                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_ORANGE_SHULKER_BOX           ].m_PistonBreakable = true;
 	Info[E_BLOCK_PINK_SHULKER_BOX             ].m_PistonBreakable = true;
 	Info[E_BLOCK_POTATOES                     ].m_PistonBreakable = true;
@@ -1024,9 +1025,9 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_VINES                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_WALLSIGN                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_WATER                        ].m_PistonBreakable = true;
+	Info[E_BLOCK_WHEAT                        ].m_PistonBreakable = true;
 	Info[E_BLOCK_WHITE_SHULKER_BOX            ].m_PistonBreakable = true;
 	Info[E_BLOCK_WOODEN_BUTTON                ].m_PistonBreakable = true;
-	Info[E_BLOCK_OAK_DOOR                     ].m_PistonBreakable = true;
 	Info[E_BLOCK_WOODEN_PRESSURE_PLATE        ].m_PistonBreakable = true;
 	Info[E_BLOCK_YELLOW_SHULKER_BOX           ].m_PistonBreakable = true;
 
