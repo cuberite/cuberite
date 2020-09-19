@@ -4,10 +4,10 @@
 // Implements the cLineBlockTracer class representing a cBlockTracer that traces along a straight line between two points
 
 #include "Globals.h"
+#include "LineBlockTracer.h"
 #include "BlockInfo.h"
 #include "World.h"
 #include "Chunk.h"
-#include "LineBlockTracer.h"
 #include "BoundingBox.h"
 
 
