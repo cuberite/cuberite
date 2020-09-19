@@ -345,6 +345,14 @@ public:
 		v1_14   = 477
 	};
 
+	enum State
+	{
+		Status = 1,
+		Login = 2,
+		Game = 3,
+		Invalid = 255
+	};
+
 	/** Called when client sends some data */
 	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
 

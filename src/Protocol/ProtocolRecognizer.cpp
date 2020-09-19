@@ -25,9 +25,9 @@
 
 
 
-struct sUnsupportedButPingableProtocolException : public std::runtime_error
+struct UnsupportedButPingableProtocolException : public std::runtime_error
 {
-	explicit sUnsupportedButPingableProtocolException() :
+	explicit UnsupportedButPingableProtocolException() :
 		std::runtime_error("")
 	{
 	}
@@ -37,9 +37,9 @@ struct sUnsupportedButPingableProtocolException : public std::runtime_error
 
 
 
-struct sTriedToJoinWithUnsupportedProtocolException : public std::runtime_error
+struct TriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 {
-	explicit sTriedToJoinWithUnsupportedProtocolException(const std::string & a_Message) :
+	explicit TriedToJoinWithUnsupportedProtocolException(const std::string & a_Message) :
 		std::runtime_error(a_Message)
 	{
 	}
@@ -114,7 +114,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
 		};
 	}
-	catch (const sUnsupportedButPingableProtocolException &)
+	catch (const UnsupportedButPingableProtocolException &)
 	{
 		// Got a server list ping for an unrecognised version,
 		// switch into responding to unknown protocols mode:
@@ -244,7 +244,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	UInt32 ProtocolVersion;
 	AString ServerAddress;
 	UInt16 ServerPort;
-	UInt32 NextState;
+	cProtocol::State NextState;
 
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
@@ -253,7 +253,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 			a_Client.GetIPString().c_str(), PacketType
 		);
 
-		throw sTriedToJoinWithUnsupportedProtocolException(
+		throw TriedToJoinWithUnsupportedProtocolException(
 			Printf("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
 		);
 	}
@@ -267,7 +267,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	{
 		// TryRecognizeProtocol guarantees that we will have as much
 		// data to read as the client claims in the protocol length field:
-		throw sTriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
+		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
 
 	// TODO: this should be a protocol property, not ClientHandle:
@@ -287,35 +287,35 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 
 	switch (static_cast<cProtocol::Version>(ProtocolVersion))
 	{
-		case cProtocol::Version::v1_8_0:  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_9_0:  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_9_1:  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_9_2:  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_9_4:  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_10_0: return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_11_0: return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_11_1: return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_12:   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_13:   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, ServerPort, NextState);
-		case cProtocol::Version::v1_14:   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, ServerPort, NextState);
+		case cProtocol::Version::v1_8_0:  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_9_0:  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_9_1:  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_9_2:  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_9_4:  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_10_0: return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_11_0: return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_11_1: return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_12:   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_13:   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
+		case cProtocol::Version::v1_14:   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
 				a_Client.GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 			);
 
-			if (NextState != 1)
+			if (NextState != cProtocol::State::Status)
 			{
-				throw sTriedToJoinWithUnsupportedProtocolException(
+				throw TriedToJoinWithUnsupportedProtocolException(
 					Printf("Unsupported protocol version %u.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
 				);
 			}
 
-			throw sUnsupportedButPingableProtocolException();
+			throw UnsupportedButPingableProtocolException();
 		}
 	}
 }
