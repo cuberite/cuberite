@@ -37,7 +37,7 @@ public:
 
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * random.RandInt<char>(4, 8), 4);
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * random.RandInt<char>(4, 9), 4);
 			case E_BLOCK_REDSTONE_ORE:         // handled by next case (glowing redstone), no dropMult
 			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5 + FortuneLevel), 0);
 			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
