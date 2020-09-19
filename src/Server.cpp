@@ -648,7 +648,8 @@ void cServer::Shutdown(void)
 	// Notify the tick thread and wait for it to terminate:
 	m_TickThread.Stop();
 
-	cRoot::Get()->SaveAllChunks();
+	// Save all chunks in all worlds, wait for chunks to be saved:
+	cRoot::Get()->SaveAllChunksNow();
 
 	// Remove all clients:
 	cCSLock Lock(m_CSClients);
