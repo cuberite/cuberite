@@ -31,11 +31,11 @@ public:
 		}
 		else
 		{
-			unsigned int dropNum = GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool));
+			unsigned int DropNum = GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool));
 			// cap the dropnum to the max amount of 5
-			dropNum = std::min<unsigned int>(dropNum, 5);
+			DropNum = std::min<unsigned int>(DropNum, 5);
 			// Reset meta to 0
-			return cItem(E_ITEM_PRISMARINE_CRYSTALS, dropNum, 0);
+			return cItem(E_ITEM_PRISMARINE_CRYSTALS, DropNum, 0);
 		}
 	}
 } ;

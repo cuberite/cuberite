@@ -28,10 +28,10 @@ public:
 		}
 		else
 		{
-			unsigned int dropNum = GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool));
+			unsigned int DropNum = GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool));
 			// cap the dropnum to the max amount of 4
-			dropNum = std::min<unsigned int>(dropNum, 4);
-			return cItem(E_ITEM_GLOWSTONE_DUST, dropNum, 0);
+			DropNum = std::min<unsigned int>(DropNum, 4);
+			return cItem(E_ITEM_GLOWSTONE_DUST, DropNum, 0);
 		}
 	}
 

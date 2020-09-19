@@ -9,20 +9,21 @@ class cBlockOreHandler:
 	using Super = cBlockHandler;
 
 private:
-	inline unsigned int fortuneDropMult(unsigned int fortuneLevel)
+	/** Returns the correct drop multiplier for ores
+	EXCLUDING REDSTONE ORE which is handled differently
+	works for coal, diamond, emerald, nether gold, nether quartz and lapis
+	https://minecraft.gamepedia.com/Fortune#Ore */
+	inline unsigned int FortuneDropMult(unsigned int a_fortuneLevel)
 	{
-		/** Returns the correct drop multiplier for ores
-			EXCLUDING REDSTONE ORE which is handled differently
-			works for coal, diamond, emerald, nether gold, nether quartz and lapis
-			https://minecraft.gamepedia.com/Fortune#Ore */
+
 		auto & random = GetRandomProvider();
-		float rand = random.RandReal();
-		switch (fortuneLevel)
+		float RandUnif = random.RandReal();
+		switch (a_fortuneLevel)
 		{
 			case 0:
 				return 1;
 			case 1:
-				if (rand<0.66)
+				if (RandUnif<0.66)
 				{
 					return 1;
 				}
@@ -32,11 +33,11 @@ private:
 				}
 				break;
 			case 2:
-				if (rand<0.5)
+				if (RandUnif<0.5)
 				{
 					return 1;
 				}
-				else if (rand<0.75)
+				else if (RandUnif<0.75)
 				{
 					return 2;
 				}
@@ -47,15 +48,15 @@ private:
 				break;
 			case 3:
 			{
-				if (rand < 0.4)
+				if (RandUnif < 0.4)
 				{
 					return 1;
 				}
-				else if (rand < 0.6)
+				else if (RandUnif < 0.6)
 				{
 					return 2;
 				}
-				else if (rand < 0.8)
+				else if (RandUnif < 0.8)
 				{
 					return 3;
 				}
@@ -95,19 +96,19 @@ public:
 			}
 		}
 
-		unsigned int fortuneLevel = ToolFortuneLevel(a_Tool);
-		unsigned int dropMult = fortuneDropMult(fortuneLevel);
+		const unsigned int FortuneLevel = ToolFortuneLevel(a_Tool);
+		const unsigned int DropMult = FortuneDropMult(FortuneLevel);
 
 		auto & random = GetRandomProvider();
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, dropMult * random.RandInt<char>(4, 8), 4);
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * random.RandInt<char>(4, 8), 4);
 			case E_BLOCK_REDSTONE_ORE:         // handled by next case (glowing redstone), no dropMult
-			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5 + fortuneLevel), 0);
-			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, dropMult);
-			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, dropMult);
-			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, dropMult);
-			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, dropMult);
+			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5 + FortuneLevel), 0);
+			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
+			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, DropMult);
+			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, DropMult);
+			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, DropMult);
 			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
 			default:
 			{
