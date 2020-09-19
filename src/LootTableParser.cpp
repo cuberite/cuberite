@@ -13,6 +13,7 @@ namespace LootTable
 {
 	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
 	{
+
 		if (NoCaseCompare(a_Type, "Item") == 0)
 		{
 			return ePoolEntryType::Item;
@@ -93,12 +94,18 @@ namespace LootTable
 
 	namespace Condition
 	{
+#define ACTIVECHECK if (!m_Active) { return true; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // cAlternative
 
 	cAlternative::cAlternative(const Json::Value & a_Value)
 	{
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping condition!");
+			return;
+		}
 		Json::Value Terms;
 		if (a_Value.isMember("terms"))
 		{
@@ -113,6 +120,12 @@ namespace LootTable
 			LOGWARNING("Loot table condition \"Alternative\" is missing sub - conditions. Dropping condition!");
 			return;
 		}
+		if (!Terms.isArray())
+		{
+			LOGWARNING("Loot table condition \"Alternative\" encountered a Json problem in it's sub - conditions. Dropping condition!");
+			return;
+		}
+		m_Active = true;
 		for (unsigned int i = 0; i < Terms.size(); i++)
 		{
 			m_SubConditions.emplace_back(ParseCondition(Terms[i]));
@@ -127,6 +140,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		bool Success = false;
 		for (const auto & SubCondition : m_SubConditions)
 		{
@@ -141,9 +155,9 @@ namespace LootTable
 
 	cBlockStateProperty::cBlockStateProperty(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -155,7 +169,7 @@ namespace LootTable
 			{
 				cItem Item;
 
-				if (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item))
+				if ((a_Value[ParameterName].isString()) && (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item)))
 				{
 					m_Block = Item.m_ItemType;
 				}
@@ -164,14 +178,18 @@ namespace LootTable
 					LOGWARNING("Loot table: Failed to parse Block in Loot table in condition \"BlockStateProperty\"");
 				}
 			}
-			else if (NoCaseCompare(ParameterName, "properties"))
+			else if (NoCaseCompare(ParameterName, "properties") == 0)
 			{
-				LOGWARNING("Loot table: \"BlockStateProperty\" is not yet supported.");
+				LOGWARNING("Loot table: \"BlockStateProperty\" is not yet supported!");
 				// TODO: 06.09.2020 - Add when implemented - 12xx12
 				/*
 				Json::Value Properties = a_Value[ParameterName];
 				for (const auto & Property : Properties.getMemberNames())
 				{
+					if (Properties[Property].isString())
+					{
+						LOGWARNING("Loot table: Encountered an Json error in condition \"BlockStateProperty - Properties\"");
+					}
 					m_Properties[Property] = Properties[Property].asString();
 				}
 				*/
@@ -181,10 +199,7 @@ namespace LootTable
 
 	bool cBlockStateProperty::operator()(cWorld & a_World, const Vector3i & a_Pos) const
 	{
-		if (!m_Active)
-		{
-			return true;
-		}
+		ACTIVECHECK
 		bool Res = true;
 		// Check if block is the same
 		Res &= (a_World.GetBlock(a_Pos) == m_Block);
@@ -207,7 +222,7 @@ namespace LootTable
 
 	cDamageSourceProperties::cDamageSourceProperties(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Condition \"DamageSourceProperties\" encountered a Json problem, dropping function!");
 			return;
@@ -298,10 +313,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		if (!m_Active)
-		{
-			return true;
-		}
+		ACTIVECHECK
 		// TODO: 10.09.2020 - Add - 12xx12
 		return true;
 		bool Res = true;
@@ -417,7 +429,7 @@ namespace LootTable
 	{
 		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -428,7 +440,7 @@ namespace LootTable
 				Json::Value Distance = a_Value[Key];
 				if (!Distance.isObject())
 				{
-					// Todo: proper error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - Distance\" encountered a Json problem, dropping condition!");
 					continue;
 				}
 				for (const auto & DistanceKey : Distance.getMemberNames())
@@ -460,7 +472,7 @@ namespace LootTable
 				const Json::Value EffectObject = a_Value[Key];
 				if (!EffectObject.isObject())
 				{
-					// Todo: proper error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - Effects\" encountered a Json problem, dropping condition!");
 					continue;
 				}
 				for (const auto & EffectKey : EffectObject.getMemberNames())
@@ -473,7 +485,7 @@ namespace LootTable
 				Json::Value Equipment = a_Value[Key];
 				if (!Equipment.isObject())
 				{
-					// Todo: proper error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - equipment\" encountered a Json problem, dropping condition!");
 					continue;
 				}
 				for (const auto & EquipmentKey : Equipment.getMemberNames())
@@ -509,7 +521,7 @@ namespace LootTable
 				Json::Value FlagsObject = a_Value[Key];
 				if (!FlagsObject.isObject())
 				{
-					// Todo: error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - flags\" encountered a Json problem, dropping condition!");
 					continue;
 				}
 				for (const auto & Flag : FlagsObject.getMemberNames())
@@ -558,7 +570,7 @@ namespace LootTable
 				Json::Value PlayerObject = a_Value[Key];
 				if (!PlayerObject.isObject())
 				{
-					// Todo: error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - Player\" encountered a Json problem, dropping condition!");
 					continue;
 				}
 				m_Player = true;  // Flag if the player should be checked - fails if entity is not player
@@ -615,9 +627,10 @@ namespace LootTable
 
 				if (Type.empty())
 				{
-					// Todo: add error message
+					LOGWARNING("Loot table: Condition \"EntityProperties - Type\" encountered a Json problem, dropping condition!");
 					continue;
 				}
+				// todo
 			}
 			else if (
 				(NoCaseCompare(Key, "target_entity") == 0) ||
@@ -637,6 +650,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		// If the Destination entity is KillerPlayer and the killer is not player return false
 		if (m_Dest == eDest::KillerPlayer)
 		{
@@ -696,8 +710,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt(
-					(KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
+				float Dist = abs(sqrt((KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 			if ((m_YMin != 0) || (m_YMax != std::numeric_limits<float>::max()))
@@ -705,8 +718,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt(
-					(KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
+				float Dist = abs(sqrt((KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 			if ((m_ZMin != 0) || (m_ZMax != std::numeric_limits<float>::max()))
@@ -714,8 +726,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt(
-					(KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
+				float Dist = abs(sqrt((KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 		}
@@ -762,6 +773,7 @@ namespace LootTable
 			auto Callback = [&](cEntity & a_Entity)
 			{
 				// MainHand = a_Entity.GetItemInMainHand();
+				// todo
 			};
 			m_MainHand(MainHand);
 		}
@@ -789,6 +801,7 @@ namespace LootTable
 
 	cInverted::cInverted(const Json::Value & a_Value)
 	{
+		// Todo: check if this is right
 		m_Conditions.emplace_back(ParseCondition(a_Value));
 	}
 
@@ -810,6 +823,12 @@ namespace LootTable
 
 	cKilledByPlayer::cKilledByPlayer(const Json::Value & a_Value)
 	{
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Condition \"KilledByPlayer\" encountered a Json problem, dropping function!");
+			return;
+		}
+		m_Active = true;
 		if (a_Value.isMember("inverse"))
 		{
 			m_Inverse = a_Value["inverse"].asBool();
@@ -828,6 +847,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		auto Callback = [&](cEntity & a_Entity)
 		{
 			return (a_Entity.GetEntityType() == cEntity::etPlayer);
@@ -841,7 +861,7 @@ namespace LootTable
 
 	cLocationCheck::cLocationCheck(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Condition \"LocationCheck\" encountered a Json problem, dropping function!");
 			return;
@@ -918,13 +938,13 @@ namespace LootTable
 							m_Dimension = eDimension::dimOverworld;
 						}
 						else if (
-							(NoCaseCompare(Dimension, "the_nether")) ||
+							(NoCaseCompare(Dimension, "the_nether") == 0) ||
 							NoCaseCompare(Dimension, "TheNether") == 0)
 						{
 							m_Dimension = eDimension::dimNether;
 						}
 						else if (
-							(NoCaseCompare(Dimension, "the_end")) ||
+							(NoCaseCompare(Dimension, "the_end") == 0) ||
 							NoCaseCompare(Dimension, "TheEnd") == 0)
 						{
 							m_Dimension = eDimension::dimEnd;
@@ -938,7 +958,7 @@ namespace LootTable
 					{
 						m_Feature = PredicateObject[PredicateKey].asString();
 					}
-					else if (NoCaseCompare(PredicateKey, "fluid"))
+					else if (NoCaseCompare(PredicateKey, "fluid") == 0)
 					{
 						Json::Value FluidObject;
 
@@ -1008,6 +1028,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		auto Pos = a_Pos;
 		Pos += {m_OffsetX, m_OffsetY, m_OffsetZ};
 
@@ -1083,9 +1104,9 @@ namespace LootTable
 
 	cMatchTool::cMatchTool(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"MatchTool\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"MatchTool\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -1152,7 +1173,7 @@ namespace LootTable
 			}
 			else if (
 				(NoCaseCompare(Key, "sorted_enchantments") == 0) ||
-				(NoCaseCompare(Key, "SortedEnchantments")))
+				(NoCaseCompare(Key, "SortedEnchantments") == 0))
 			{
 				Json::Value Enchantments = Predicates[Key];
 				if (!Enchantments.isArray())
@@ -1222,8 +1243,9 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		cItem Item;
+		ACTIVECHECK
 
+		cItem Item;
 		auto Callback = [&](cEntity & a_Entity)
 		{
 			if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -1250,6 +1272,7 @@ namespace LootTable
 
 	bool cMatchTool::operator()(cItem & a_Item) const
 	{
+		ACTIVECHECK
 		bool Res = true;
 
 		// Checks count
@@ -1266,7 +1289,7 @@ namespace LootTable
 			Res &= ((Durability >= m_DurabilityMin) && (Durability <= m_DurabilityMax));
 		}
 
-		// Checks enchantments on item
+		// Checks enchantments on item TODO: check if only books
 		if ((!m_EnchantmentsMin.IsEmpty() || !m_EnchantmentsMax.IsEmpty()) &&
 			(a_Item.m_ItemType != E_ITEM_ENCHANTED_BOOK))
 		{
@@ -1321,6 +1344,11 @@ namespace LootTable
 
 	cRandomChance::cRandomChance(const Json::Value & a_Value)
 	{
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Condition \"RandomChance\" encountered a Json problem, dropping condition!");
+			return;
+		}
 		if (a_Value.isMember("chance"))
 		{
 			m_Chance = a_Value["chance"].asFloat();
@@ -1331,7 +1359,7 @@ namespace LootTable
 		}
 		else
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"RandomChance\" is missing chance, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -1350,12 +1378,11 @@ namespace LootTable
 ////////////////////////////////////////////////////////////////////////////////
 // cRandomChanceWithLooting
 
-	cRandomChanceWithLooting::cRandomChanceWithLooting(
-		const Json::Value & a_Value)
+	cRandomChanceWithLooting::cRandomChanceWithLooting(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"RandomChanceWithLooting\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"RandomChanceWithLooting\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -1385,6 +1412,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		float Rnd = fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f);
 
 		auto Callback = [&](cEntity & a_Entity)
@@ -1394,8 +1422,7 @@ namespace LootTable
 				return true;
 			}
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
-			int Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(
-				cEnchantments::enchLooting);
+			int Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 			return m_Chance + Looting * m_LootingMultiplier > Rnd;
 		};
 
@@ -1407,6 +1434,11 @@ namespace LootTable
 // cReference
 	cReference::cReference(const Json::Value & a_Value)
 	{
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Condition \"Reference\" encountered a Json problem, dropping condition!");
+			return;
+		}
 		// TODO
 		m_Active = true;
 	}
@@ -1415,14 +1447,15 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		return true;
+		ACTIVECHECK
+		bool Res = true;
+		// Todo
+		return Res;
 	}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // cSurvivesExplosion
-
-	cSurvivesExplosion::cSurvivesExplosion() { m_Active = true; }
 
 	bool cSurvivesExplosion::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
@@ -1436,7 +1469,7 @@ namespace LootTable
 // cTableBonus
 	cTableBonus::cTableBonus(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Condition \"TableBonus\" encountered a Json problem, dropping function!");
 			return;
@@ -1462,7 +1495,8 @@ namespace LootTable
 		}
 		if (!Chances.isArray())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"TableBonus - Chances\" encountered a Json problem, dropping function!");
+			m_Active = false;
 			return;
 		}
 		else
@@ -1482,6 +1516,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		auto Callback = [&](cEntity & a_Entity)
 		{
 			if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -1504,9 +1539,9 @@ namespace LootTable
 // cTimeCheck
 	cTimeCheck::cTimeCheck(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"TimeCheck\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"TimeCheck\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -1538,6 +1573,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		return ((a_World.GetTimeOfDay() % m_Period) >= m_Min) &&
 			((a_World.GetTimeOfDay() % m_Period) <= m_Max);
 	}
@@ -1547,9 +1583,9 @@ namespace LootTable
 
 	cWeatherCheck::cWeatherCheck(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"WeatherCheck\" encountered a Json problem, dropping function!");
+			LOGWARNING("Loot table: Condition \"WeatherCheck\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -1578,6 +1614,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		auto Weather = a_World.GetWeather();
 		bool Res = true;
 		if (m_Raining)
@@ -1590,16 +1627,20 @@ namespace LootTable
 		}
 		return Res;
 	}
+
+#undef ACTIVECHECK
 	}  // Namespace Condition
 
 	namespace Function
 	{
 ////////////////////////////////////////////////////////////////////////////////
 // cApplyBonus
+#define ACTIVECHECK if (!m_Active) { return; }
+
 
 	cApplyBonus::cApplyBonus(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"ApplyBonus\" encountered a Json problem, dropping function!");
 			return;
@@ -1641,7 +1682,7 @@ namespace LootTable
 		}
 		else
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Condition \"ApplyBonus\" got a unknown Formula: %s", Formula);
 			return;
 		}
 
@@ -1692,6 +1733,7 @@ namespace LootTable
 		cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 			UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		ACTIVECHECK
 		int Level;
 		auto Callback = [&] (cEntity & a_Entity)
 		{
@@ -1748,7 +1790,7 @@ namespace LootTable
 
 	cCopyName::cCopyName(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"CopyName\" encountered a Json problem, dropping function!");
 			return;
@@ -1770,7 +1812,7 @@ namespace LootTable
 		}
 		else
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function wasn't provided a valid source, dropping function");
 		}
 	}
 
@@ -1796,7 +1838,7 @@ namespace LootTable
 		// TODO: 06.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported. Dropping function!");
 		return;
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"CopyNbt\" encountered a Json problem, dropping function!");
 			return;
@@ -1813,7 +1855,7 @@ namespace LootTable
 		}
 		else
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"CopyNBT\" wasn't provided a source, dropping function!");
 			return;
 		}
 
@@ -1835,7 +1877,7 @@ namespace LootTable
 		}
 		else
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"CopyNBT\" was provided a source unknown source: %s, dropping function!", Source);
 			return;
 		}
 
@@ -1851,7 +1893,8 @@ namespace LootTable
 
 		if (!Operations.isArray())
 		{
-			// Todo: error Message
+			LOGWARNING("Loot table: Function \"CopyNBT\" was provided an invalid object to get the operations from, dropping functions");
+			return;
 		}
 		m_Active = true;
 
@@ -1901,11 +1944,7 @@ namespace LootTable
 
 	void cCopyNbt::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		if (!m_Active)
-		{
-			return;
-		}
-		// cNBT NBT;  // This contains the NBT of the Source - see eSource
+		ACTIVECHECK
 		for (const auto & Operation : m_Operations)
 		{
 			// Do operation. This depends on the actual implementation
@@ -1922,7 +1961,7 @@ namespace LootTable
 		LOGWARNING("Loot table: States for blocks is not yet supported, dropping function!");
 		return;
 
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"CopyState\" encountered a Json problem, dropping function!");
 			return;
@@ -1948,6 +1987,7 @@ namespace LootTable
 				Json::Value Properties = a_Value[ParameterName];
 				if (!Properties.isArray())
 				{
+					LOGWARNING("Loot table: Function copy state wasn't provided with a valid object to get it's properties from, dropping frunction");
 					return;
 				}
 
@@ -1956,11 +1996,13 @@ namespace LootTable
 					m_Properties.push_back(NamespaceConverter(Properties[i].asString()));
 				}
 			}
+			m_Active = true;
 		}
 	}
 
 	void cCopyState::operator()(cItem & a_Item, cWorld & a_World, const Vector3i & a_Pos) const
 	{
+		ACTIVECHECK
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 	}
 
@@ -1971,7 +2013,7 @@ namespace LootTable
 
 	cEnchantRandomly::cEnchantRandomly(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"EnchantRandomly\" encountered a Json problem, dropping function!");
 			return;
@@ -1992,10 +2034,11 @@ namespace LootTable
 				m_EnchantmentLimiter.push_back({1, cEnchantments(NamespaceConverter(Enchantments[i].asString()))});
 			}
 		}
-		else
+		else if (!Enchantments.empty())
 		{
-			// Todo: error message
+			LOGWARNING("Loot table: Function \"EnchantRandomly\" got invalid object to get it's allowed functions from");
 		}
+		m_Active = true;
 	}
 
 
@@ -2003,17 +2046,19 @@ namespace LootTable
 
 	void cEnchantRandomly::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
+		ACTIVECHECK
 		if (!cItem::IsEnchantable(a_Item.m_ItemType))
 		{
 			LOGWARNING("Loot table: Item %s can not be enchanted in loot table", ItemToString(a_Item));
+			return;
 		}
 		if (!m_EnchantmentLimiter.empty())
 		{
 			if (a_Item.IsSameType(E_ITEM_BOOK))
 			{
 				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
-				a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(m_EnchantmentLimiter));
 			}
+			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(m_EnchantmentLimiter));
 		}
 		else  // All are possible
 		{
@@ -2029,7 +2074,7 @@ namespace LootTable
 
 	cEnchantWithLevels::cEnchantWithLevels(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"EnchantWithLevels\" encountered a Json problem, dropping function!");
 			return;
@@ -2069,12 +2114,10 @@ namespace LootTable
 
 	void cEnchantWithLevels::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
-		if (!m_Active)
-		{
-			return;
-		}
+		ACTIVECHECK
 		if (!cItem::IsEnchantable(a_Item.m_ItemType))
 		{
+			LOGWARNING("Loot table: Item %s can not be enchanted in loot table", ItemToString(a_Item));
 			return;
 		}
 		int Levels = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LevelsMax - m_LevelsMin) + m_LevelsMin;
@@ -2094,7 +2137,7 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: Exploration maps are not implemented, dropping function!");
 		return;
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"ExplorationMap\" encountered a Json problem, dropping function!");
 			return;
@@ -2159,6 +2202,7 @@ namespace LootTable
 
 	cFillPlayerHead::cFillPlayerHead(const Json::Value & a_Value)
 	{
+		// Todo:
 	}
 
 
@@ -2167,6 +2211,7 @@ namespace LootTable
 
 	void cFillPlayerHead::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		// TODO:
 	}
 
 
@@ -2195,15 +2240,12 @@ namespace LootTable
 	}
 
 
-////////////////////////////////////////////////////////////////////////////////
-// cLimitCount
+
+
 
 	void cLimitCount::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
-		if (!m_Active)
-		{
-			return;
-		}
+		ACTIVECHECK
 		int Limit = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LimitMin - m_LimitMax) + m_LimitMin;
 		if (a_Item.m_ItemCount > Limit)
 		{
@@ -2216,7 +2258,7 @@ namespace LootTable
 
 	cLootingEnchant::cLootingEnchant(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"LootingEnchant\" encountered a Json problem, dropping function!");
 			return;
@@ -2230,6 +2272,11 @@ namespace LootTable
 		{
 			CountObject = a_Value["Count"];
 		}
+		else
+		{
+			LOGWARNING("Loot table: Function \"LootingEnchant\" is missing it's count object, dropping function!");
+			return;
+		}
 		MinMaxRange<int>(CountObject, m_CountMin, m_CountMax);
 
 		if (a_Value.isMember("limit"))
@@ -2240,6 +2287,7 @@ namespace LootTable
 		{
 			m_Limit = a_Value["Limit"].asInt();
 		}
+		m_Active = true;
 	}
 
 
@@ -2259,7 +2307,10 @@ namespace LootTable
 			return true;
 		};
 
-		a_World.DoWithEntityByID(a_KillerID, Callback);
+		if (!a_World.DoWithEntityByID(a_KillerID, Callback))
+		{
+			return;
+		}
 
 		int Count = (a_Noise.IntNoise3DInt(a_Pos) / 11) % (m_CountMin - m_CountMax) + m_CountMin;
 
@@ -2286,6 +2337,7 @@ namespace LootTable
 
 	void cSetAttributes::operator()(cItem & a_Item) const
 	{
+		ACTIVECHECK
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2303,6 +2355,7 @@ namespace LootTable
 
 	void cSetContents::operator()(cItem & a_Item) const
 	{
+		ACTIVECHECK
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2311,7 +2364,7 @@ namespace LootTable
 
 	cSetCount::cSetCount(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetCount\" encountered a Json problem, dropping function!");
 			return;
@@ -2367,6 +2420,11 @@ namespace LootTable
 					m_P = CountObject["P"].asFloat();
 				}
 			}
+			else
+			{
+				LOGWARNING("Loot table: Function \"SetCount\" got provided a unknown type: %s, dropping function!", Type);
+				m_Active = false;
+			}
 		}
 	}
 
@@ -2376,11 +2434,7 @@ namespace LootTable
 
 	void cSetCount::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
-		if (m_Count)
-		{
-			a_Item.m_ItemCount = m_Count;
-		}
-
+		ACTIVECHECK
 		switch (m_Type)
 		{
 			case eType::Uniform:
@@ -2408,7 +2462,7 @@ namespace LootTable
 
 	cSetDamage::cSetDamage(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetDamage\" encountered a Json problem, dropping function!");
 			return;
@@ -2423,7 +2477,13 @@ namespace LootTable
 		{
 			DamageObject = a_Value["Damage"];
 		}
+		else
+		{
+			LOGWARNING("Loot table: Function \"SetDamage\" is missing it's damage object, dropping function!");
+			return;
+		}
 		MinMaxRange<float>(DamageObject, m_Min, m_Max);
+		m_Active = true;
 	}
 
 
@@ -2431,6 +2491,7 @@ namespace LootTable
 
 	void cSetDamage::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
+		ACTIVECHECK
 		float Damage = std::fmod((a_Noise.IntNoise3D(a_Pos) / 7), m_Max - m_Min) + m_Min;
 		a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
 	}
@@ -2443,11 +2504,12 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping \"SetLootTable\" function!");
 		return;
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetLootTable\" encountered a Json problem, dropping function!");
 			return;
 		}
+		m_Active = true;
 		for (const auto & Key : a_Value.getMemberNames())
 		{
 			if (NoCaseCompare(Key, "name") == 0)
@@ -2466,6 +2528,7 @@ namespace LootTable
 
 	void cSetLootTable::operator()(cItem & a_Item) const
 	{
+		ACTIVECHECK
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 	}
 
@@ -2475,7 +2538,7 @@ namespace LootTable
 
 	cSetLore::cSetLore(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetLore\" encountered a Json problem, dropping function!");
 			return;
@@ -2488,7 +2551,7 @@ namespace LootTable
 				Json::Value Lore = a_Value[Key];
 				if (!Lore.isArray())
 				{
-					// Todo: error message
+					LOGWARNING("Loot table: function \"SetLore\" got a unknown object for it's lore, dropping function!");
 				}
 				for (unsigned int i = 0; i < Lore.size(); i++)
 				{
@@ -2518,6 +2581,10 @@ namespace LootTable
 				{
 					m_Type = eType::KillerPlayer;
 				}
+				else
+				{
+					LOGWARNING("Loot table: Function \"SetLore\" got unknown destination: %s, dropping function!", Entity);
+				}
 			}
 			else if (NoCaseCompare(Key, "replace") == 0)
 			{
@@ -2531,6 +2598,7 @@ namespace LootTable
 
 	void cSetLore::operator()(cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		// TODO: 19.09.2020 - Add Json text component - 12xx12
 		if (m_Replace)
 		{
 			a_Item.m_LoreTable = std::move(m_Lore);
@@ -2548,7 +2616,7 @@ namespace LootTable
 
 	cSetName::cSetName(const Json::Value & a_Value)
 	{
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetName\" encountered a Json problem, dropping function!");
 			return;
@@ -2582,6 +2650,10 @@ namespace LootTable
 				{
 					m_Type = eType::KillerPlayer;
 				}
+				else
+				{
+					LOGWARNING("Loot table: Function \"SetName\" got unknown destination: %s, dropping function!", Entity);
+				}
 			}
 		}
 
@@ -2592,6 +2664,7 @@ namespace LootTable
 
 	void cSetName::operator()(cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
+		// Todo: 19.09.20 - Add Json text component - 12xx12
 		a_Item.m_CustomName = m_Name;
 	}
 
@@ -2604,7 +2677,7 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetNBT\"!");
 		return;
-		if (!a_Value.isObject())
+		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
 			LOGWARNING("Loot table: Function \"SetNbt\" encountered a Json problem, dropping function!");
 			return;
@@ -2620,6 +2693,7 @@ namespace LootTable
 		}
 		else
 		{
+			LOGWARNING("Loot table: Function \"SetNbt\" didn't get any tag, dropping function!");
 			return;
 		}
 		m_Active = true;
@@ -2630,10 +2704,7 @@ namespace LootTable
 
 	void cSetNbt::operator()(cItem & a_Item) const
 	{
-		if (!m_Active)
-		{
-			return;
-		}
+		ACTIVECHECK
 		// a_Item.SetNBT(m_Tag);
 	}
 
@@ -2652,10 +2723,7 @@ namespace LootTable
 
 	void cSetStewEffect::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		if (!m_Active)
-		{
-			return;
-		}
+		ACTIVECHECK
 	}
 
 
