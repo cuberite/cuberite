@@ -92,6 +92,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
 	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
+
+	# Enforce BlockHandler handling all blocks in switch statements
+	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/Blocks/BlockHandler.cpp" PROPERTIES COMPILE_OPTIONS -Werror=switch)
 endif()
 
 if(${BUILD_TOOLS})

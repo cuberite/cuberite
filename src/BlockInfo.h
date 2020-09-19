@@ -51,13 +51,14 @@ public:
 	See Physics\Explodinator.cpp for details of explosion block destruction. */
 	static float GetExplosionAbsorption(BLOCKTYPE Block);
 
-	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler.get();       }
-
 	/** Creates a default BlockInfo structure, initializes all values to their defaults */
 	cBlockInfo();
 
+	/** Gets the blockhandler for the given block type. */
+	static cBlockHandler * GetHandler(BLOCKTYPE a_Type);
 
 private:
+
 	/** Storage for all the BlockInfo structures. */
 	class cBlockInfoArray;
 
@@ -99,15 +100,6 @@ private:
 
 	/** Block's hardness. The greater the value the longer the player needs to break the block. */
 	float m_Hardness;
-
-	/** Custom deleter allows cBlockHandler to be an incomplete type. */
-	struct sHandlerDeleter
-	{
-		void operator () (cBlockHandler * a_Handler);
-	};
-
-	/** Associated block handler. */
-	std::unique_ptr<cBlockHandler, sHandlerDeleter> m_Handler;
 };  // tolua_export
 
 
