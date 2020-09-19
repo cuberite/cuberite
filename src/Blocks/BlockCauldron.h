@@ -133,30 +133,21 @@ public:
 			case E_BLOCK_YELLOW_SHULKER_BOX:
 			{
 				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
-				if (Meta > 0)
+				if (Meta == 0)
 				{
-					// This is a workaround for version < 1.13. They client thinks a player placed a shulker and display that to the player
-					// The shulker cleaning was added in 1.13.
-					if (a_Player.GetPosition().y != a_BlockPos.addedY(1).y)  // Player is not standing on top
-					{
-						auto NewPos = a_BlockPos;
-						switch (a_BlockFace)
-						{
-							case BLOCK_FACE_XM: NewPos = NewPos.addedX(-1); break;
-							case BLOCK_FACE_XP: NewPos = NewPos.addedX(1); break;
-							case BLOCK_FACE_YM: NewPos = NewPos.addedY(-1); break;
-							case BLOCK_FACE_YP: NewPos = NewPos.addedY(1); break;
-							case BLOCK_FACE_ZM: NewPos = NewPos.addedZ(-1); break;
-							case BLOCK_FACE_ZP: NewPos = NewPos.addedZ(1); break;
-							default: return true;
-						}
-						a_Player.GetClientHandle()->SendBlockChange(NewPos.x, NewPos.y, NewPos.z, a_ChunkInterface.GetBlock(NewPos), a_ChunkInterface.GetBlockMeta(NewPos));
-					}
-					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
-					auto NewShulker = cItem(EquippedItem);
-					NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
-					a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
+					break;
 				}
+				// This is a workaround for version < 1.13. They client thinks a player placed a shulker and display that to the player
+				// The shulker cleaning was added in 1.13.
+				auto NewPos = a_BlockPos;
+				NewPos = AddFaceDirection(NewPos, a_BlockFace);
+				a_Player.GetClientHandle()->SendBlockChange(NewPos.x, NewPos.y, NewPos.z, a_ChunkInterface.GetBlock(NewPos), a_ChunkInterface.GetBlockMeta(NewPos));
+
+				// Proceed with normal cleaning:
+				a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+				auto NewShulker = cItem(EquippedItem);
+				NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
+				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
 				break;
 			}
 		}
