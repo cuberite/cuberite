@@ -228,6 +228,10 @@ public:
 	Helper used in many ConvertToPickups() implementations. */
 	static bool ToolHasSilkTouch(const cItem * a_Tool);
 
+	/** Returns the fortune level of a tool, if it is a valid tool.
+	Can be used in ConvertToPickups() implementations. */
+	static unsigned int ToolFortuneLevel(const cItem * a_Tool);
+
 	// Gets the blockhandler for the given block type.
 	static cBlockHandler & GetBlockHandler(BLOCKTYPE a_BlockType);
 

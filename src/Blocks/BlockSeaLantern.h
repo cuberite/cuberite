@@ -6,7 +6,6 @@
 
 
 
-
 class cBlockSeaLanternHandler :
 	public cBlockHandler
 {
@@ -25,9 +24,19 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
 	{
-		// Reset meta to 0
-		// TODO: Handle the Fortune enchantment
-		return cItem(E_ITEM_PRISMARINE_CRYSTALS, GetRandomProvider().RandInt<char>(2, 3), 0);
+		// Drop self only when using silk-touch:
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(E_BLOCK_SEA_LANTERN, 1, 0);
+		}
+		else
+		{
+			unsigned int dropNum = GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool));
+			// cap the dropnum to the max amount of 5
+			dropNum = std::min<unsigned int>(dropNum, 5);
+			// Reset meta to 0
+			return cItem(E_ITEM_PRISMARINE_CRYSTALS, dropNum, 0);
+		}
 	}
 } ;
 

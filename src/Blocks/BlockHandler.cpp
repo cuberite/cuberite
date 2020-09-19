@@ -656,6 +656,15 @@ bool cBlockHandler::ToolHasSilkTouch(const cItem * a_Tool)
 
 
 
+unsigned int cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
+{
+	return (a_Tool != nullptr)*a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune);
+}
+
+
+
+
+
 cBlockHandler & cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 {
 	// Switch on the block type, as an enumeration
