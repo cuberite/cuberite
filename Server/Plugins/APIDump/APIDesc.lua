@@ -11653,10 +11653,6 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Saves all the chunks in all the worlds. Note that the saving is queued on each world's tick thread and this functions returns before the chunks are actually saved.",
 				},
-				SaveAllChunksNow =
-				{
-					Notes = "Saves all the chunks in all the worlds. Note that saving is performed synchronously, and this function will only return when all worlds are saved. For performance reasons, this is NOT RECOMMENDED to be used except where necessary, as this will cause lagspikes.",
-				},
 				SetSavingEnabled =
 				{
 					Params =
