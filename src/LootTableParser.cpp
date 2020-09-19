@@ -1491,7 +1491,8 @@ namespace LootTable
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 			unsigned long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
 
-			Level = std::min(Level, m_Chances.size());
+			Level = std::min(Level, (unsigned long) m_Chances.size());
+			// this is some funky business going on with MVSC. This sees the return value of .size() as unsigned long long. Clang does see unsigned long...
 
 			return GetRandomProvider().RandReal(0.0f, 1.0f) < m_Chances.at(Level);
 		};
