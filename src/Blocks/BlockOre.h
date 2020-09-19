@@ -33,6 +33,7 @@ public:
 
 		auto & random = GetRandomProvider();
 		const unsigned int FortuneLevel = ToolFortuneLevel(a_Tool);
+		// Clamp to 10 to prevent server crash if thing are mined with extremely high level fortune pick
 		const unsigned int DropMult = std::clamp<unsigned int>(FloorC(random.RandReal(FortuneLevel + 2.0)), 1, 10);
 
 		switch (m_BlockType)
