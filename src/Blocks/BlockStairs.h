@@ -14,14 +14,9 @@ class cBlockStairsHandler :
 
 public:
 
-	cBlockStairsHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -30,7 +25,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
 		UNUSED(a_PlacedBlockPos);
@@ -91,7 +86,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
 	{
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
@@ -101,7 +96,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

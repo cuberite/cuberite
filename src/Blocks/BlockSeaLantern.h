@@ -13,16 +13,11 @@ class cBlockSeaLanternHandler :
 
 public:
 
-	cBlockSeaLanternHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Drop self only when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
@@ -39,7 +34,3 @@ public:
 		}
 	}
 } ;
-
-
-
-

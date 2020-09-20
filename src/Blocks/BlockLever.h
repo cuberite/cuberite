@@ -13,14 +13,15 @@ class cBlockLeverHandler:
 
 public:
 
-	cBlockLeverHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
 	{
+		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 
-
-
-
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -29,7 +30,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		// Flip the ON bit on / off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x08);
@@ -44,7 +45,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Reset meta to zero:
 		return cItem(E_BLOCK_LEVER, 1, 0);
@@ -54,7 +55,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -70,7 +71,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = LeverDirectionToMetaData(a_ClickedBlockFace);
@@ -127,7 +128,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		// Find the type of block the lever is attached to:
 		auto Meta = a_Chunk.GetMeta(a_RelPos);
@@ -163,7 +164,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{
@@ -181,7 +182,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{
@@ -199,20 +200,10 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
-	}
-
-
-
-
-
-	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
-	{
-		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 } ;
 

@@ -27,7 +27,7 @@
 #include "BlockDirt.h"
 #include "BlockDoor.h"
 #include "BlockDropSpenser.h"
-#include "BlockEnchantmentTable.h"
+#include "BlockEnchantingTable.h"
 #include "BlockEnderchest.h"
 #include "BlockEndPortalFrame.h"
 #include "BlockEntity.h"
@@ -189,260 +189,262 @@ public:
 
 
 
+/** Static list of all block handlers.
+Ensures that a handler can never be nullptr (FS #243) on invalid during restarts or other transition periods. */
 namespace
 {
-	cBlockDoorHandler               BlockAcaciaDoorHandler            (E_BLOCK_ACACIA_DOOR);
-	cBlockFenceGateHandler         	BlockAcaciaFenceGateHandler       (E_BLOCK_ACACIA_FENCE_GATE);
-	cBlockFenceHandler             	BlockAcaciaFenceHandler           (E_BLOCK_ACACIA_FENCE);
-	cBlockStairsHandler            	BlockAcaciaWoodStairsHandler      (E_BLOCK_ACACIA_WOOD_STAIRS);
-	cBlockRailHandler              	BlockActivatorRailHandler         (E_BLOCK_ACTIVATOR_RAIL);
-	cBlockComparatorHandler        	BlockActiveComparatorHandler      (E_BLOCK_ACTIVE_COMPARATOR);
-	cBlockWithNoDrops<>            	BlockAirHandler                   (E_BLOCK_AIR);
-	cBlockAnvilHandler             	BlockAnvilHandler                 (E_BLOCK_ANVIL);
-	cBlockHandler                   BlockBarrierHandler               (E_BLOCK_BARRIER);
-	cBlockEntityHandler            	BlockBeaconHandler                (E_BLOCK_BEACON);
-	cBlockBedHandler               	BlockBedHandler                   (E_BLOCK_BED);
-	cBlockHandler                   BlockBedrockHandler               (E_BLOCK_BEDROCK);
-	cBlockCropsHandler<3>          	BlockBeetrootsHandler             (E_BLOCK_BEETROOTS);  // 4 stages of growth
-	cBlockBigFlowerHandler         	BlockBigFlowerHandler             (E_BLOCK_BIG_FLOWER);
-	cBlockDoorHandler              	BlockBirchDoorHandler             (E_BLOCK_BIRCH_DOOR);
-	cBlockFenceGateHandler         	BlockBirchFenceGateHandler        (E_BLOCK_BIRCH_FENCE_GATE);
-	cBlockFenceHandler             	BlockBirchFenceHandler            (E_BLOCK_BIRCH_FENCE);
-	cBlockStairsHandler            	BlockBirchWoodStairsHandler       (E_BLOCK_BIRCH_WOOD_STAIRS);
-	cBlockGlazedTerracottaHandler  	BlockBlackGlazedTerracottaHandler (E_BLOCK_BLACK_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockBlackShulkerBoxHandler       (E_BLOCK_BLACK_SHULKER_BOX);
-	cBlockHandler                   BlockBlockOfCoalHandler           (E_BLOCK_BLOCK_OF_COAL);
-	cBlockHandler                   BlockBlockOfRedstoneHandler       (E_BLOCK_BLOCK_OF_REDSTONE);
-	cBlockGlazedTerracottaHandler  	BlockBlueGlazedTerracottaHandler  (E_BLOCK_BLUE_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockBlueShulkerBoxHandler        (E_BLOCK_BLUE_SHULKER_BOX);
-	cBlockHandler                   BlockBoneBlockHandler             (E_BLOCK_BONE_BLOCK);
-	cBlockBookShelfHandler         	BlockBookcaseHandler              (E_BLOCK_BOOKCASE);
-	cBlockBrewingStandHandler      	BlockBrewingStandHandler          (E_BLOCK_BREWING_STAND);
-	cBlockHandler                   BlockBrickHandler                 (E_BLOCK_BRICK);
-	cBlockStairsHandler            	BlockBrickStairsHandler           (E_BLOCK_BRICK_STAIRS);
-	cBlockGlazedTerracottaHandler  	BlockBrownGlazedTerracottaHandler (E_BLOCK_BROWN_GLAZED_TERRACOTTA);
-	cBlockMushroomHandler          	BlockBrownMushroomHandler         (E_BLOCK_BROWN_MUSHROOM);
-	cBlockHandler                   BlockBrownShulkerBoxHandler       (E_BLOCK_BROWN_SHULKER_BOX);
-	cBlockCactusHandler            	BlockCactusHandler                (E_BLOCK_CACTUS);
-	cBlockCakeHandler              	BlockCakeHandler                  (E_BLOCK_CAKE);
-	cBlockCarpetHandler            	BlockCarpetHandler                (E_BLOCK_CARPET);
-	cBlockCropsHandler<7>          	BlockCarrotsHandler               (E_BLOCK_CARROTS);  // 8 stages of growth
-	cBlockCauldronHandler          	BlockCauldronHandler              (E_BLOCK_CAULDRON);
-	cBlockCommandBlockHandler      	BlockChainCommandBlockHandler     (E_BLOCK_CHAIN_COMMAND_BLOCK);
-	cBlockChestHandler             	BlockChestHandler                 (E_BLOCK_CHEST);
-	cBlockHandler                   BlockChorusFlowerHandler          (E_BLOCK_CHORUS_FLOWER);
-	cBlockHandler                   BlockChorusPlantHandler           (E_BLOCK_CHORUS_PLANT);
-	cBlockOreHandler               	BlockClayHandler                  (E_BLOCK_CLAY);
-	cBlockOreHandler               	BlockCoalOreHandler               (E_BLOCK_COAL_ORE);
-	cBlockStoneHandler             	BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
-	cBlockStairsHandler            	BlockCobblestoneStairsHandler     (E_BLOCK_COBBLESTONE_STAIRS);
-	cBlockHandler                   BlockCobblestoneWallHandler       (E_BLOCK_COBBLESTONE_WALL);
-	cBlockCobWebHandler            	BlockCobwebHandler                (E_BLOCK_COBWEB);
-	cBlockCocoaPodHandler          	BlockCocoaPodHandler              (E_BLOCK_COCOA_POD);
-	cBlockCommandBlockHandler      	BlockCommandBlockHandler          (E_BLOCK_COMMAND_BLOCK);
-	cBlockHandler                   BlockConcreteHandler              (E_BLOCK_CONCRETE);
-	cBlockConcretePowderHandler    	BlockConcretePowderHandler        (E_BLOCK_CONCRETE_POWDER);
-	cBlockCropsHandler<7>          	BlockCropsHandler                 (E_BLOCK_CROPS);  // 8 stages of growth
-	cBlockGlazedTerracottaHandler  	BlockCyanGlazedTerracottaHandler  (E_BLOCK_CYAN_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockCyanShulkerBoxHandler        (E_BLOCK_CYAN_SHULKER_BOX);
-	cBlockDoorHandler              	BlockDarkOakDoorHandler           (E_BLOCK_DARK_OAK_DOOR);
-	cBlockFenceGateHandler         	BlockDarkOakFenceGateHandler      (E_BLOCK_DARK_OAK_FENCE_GATE);
-	cBlockFenceHandler             	BlockDarkOakFenceHandler          (E_BLOCK_DARK_OAK_FENCE);
-	cBlockStairsHandler            	BlockDarkOakWoodStairsHandler     (E_BLOCK_DARK_OAK_WOOD_STAIRS);
-	cBlockHandler                   BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
-	cBlockDeadBushHandler          	BlockDeadBushHandler              (E_BLOCK_DEAD_BUSH);
-	cBlockRailHandler              	BlockDetectorRailHandler          (E_BLOCK_DETECTOR_RAIL);
-	cBlockHandler                   BlockDiamondBlockHandler          (E_BLOCK_DIAMOND_BLOCK);
-	cBlockOreHandler               	BlockDiamondOreHandler            (E_BLOCK_DIAMOND_ORE);
-	cBlockDirtHandler              	BlockDirtHandler                  (E_BLOCK_DIRT);
-	cBlockDropSpenserHandler       	BlockDispenserHandler             (E_BLOCK_DISPENSER);
-	cBlockDoubleSlabHandler        	BlockDoubleRedSandstoneSlabHandler(E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB);
-	cBlockDoubleSlabHandler        	BlockDoubleStoneSlabHandler       (E_BLOCK_DOUBLE_STONE_SLAB);
-	cBlockDoubleSlabHandler        	BlockDoubleWoodenSlabHandler      (E_BLOCK_DOUBLE_WOODEN_SLAB);
-	cBlockHandler                   BlockDragonEggHandler             (E_BLOCK_DRAGON_EGG);
-	cBlockDropSpenserHandler       	BlockDropperHandler               (E_BLOCK_DROPPER);
-	cBlockHandler                   BlockEmeraldBlockHandler          (E_BLOCK_EMERALD_BLOCK);
-	cBlockOreHandler               	BlockEmeraldOreHandler            (E_BLOCK_EMERALD_ORE);
-	cBlockEnchantmentTableHandler  	BlockEnchantmentTableHandler      (E_BLOCK_ENCHANTMENT_TABLE);
-	cBlockHandler                   BlockEndBricksHandler             (E_BLOCK_END_BRICKS);
-	cBlockHandler                   BlockEndGatewayHandler            (E_BLOCK_END_GATEWAY);
-	cBlockEndPortalFrameHandler    	BlockEndPortalFrameHandler        (E_BLOCK_END_PORTAL_FRAME);
-	cBlockHandler                   BlockEndPortalHandler             (E_BLOCK_END_PORTAL);
-	cBlockHandler                   BlockEndRodHandler                (E_BLOCK_END_ROD);
-	cBlockHandler                   BlockEndStoneHandler              (E_BLOCK_END_STONE);
-	cBlockEnderchestHandler        	BlockEnderChestHandler            (E_BLOCK_ENDER_CHEST);
-	cBlockFarmlandHandler          	BlockFarmlandHandler              (E_BLOCK_FARMLAND);
-	cBlockFenceHandler             	BlockFenceHandler                 (E_BLOCK_FENCE);
-	cBlockFireHandler              	BlockFireHandler                  (E_BLOCK_FIRE);
-	cBlockFlowerPotHandler         	BlockFlowerPotHandler             (E_BLOCK_FLOWER_POT);
-	cBlockIceHandler               	BlockFrostedIceHandler            (E_BLOCK_FROSTED_ICE);
-	cBlockFurnaceHandler           	BlockFurnaceHandler               (E_BLOCK_FURNACE);
-	cBlockGlassHandler             	BlockGlassHandler                 (E_BLOCK_GLASS);
-	cBlockGlassHandler             	BlockGlassPaneHandler             (E_BLOCK_GLASS_PANE);
-	cBlockGlowstoneHandler         	BlockGlowstoneHandler             (E_BLOCK_GLOWSTONE);
-	cBlockHandler                   BlockGoldBlockHandler             (E_BLOCK_GOLD_BLOCK);
-	cBlockOreHandler               	BlockGoldOreHandler               (E_BLOCK_GOLD_ORE);
-	cBlockGrassHandler             	BlockGrassHandler                 (E_BLOCK_GRASS);
-	cBlockHandler                   BlockGrassPathHandler             (E_BLOCK_GRASS_PATH);
-	cBlockGravelHandler            	BlockGravelHandler                (E_BLOCK_GRAVEL);
-	cBlockGlazedTerracottaHandler  	BlockGrayGlazedTerracottaHandler  (E_BLOCK_GRAY_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockGrayShulkerBoxHandler        (E_BLOCK_GRAY_SHULKER_BOX);
-	cBlockGlazedTerracottaHandler  	BlockGreenGlazedTerracottaHandler (E_BLOCK_GREEN_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockGreenShulkerBoxHandler       (E_BLOCK_GREEN_SHULKER_BOX);
-	cBlockHandler                   BlockHardenedClayHandler          (E_BLOCK_HARDENED_CLAY);
-	cBlockSidewaysHandler          	BlockHayBaleHandler               (E_BLOCK_HAY_BALE);
-	cBlockMobHeadHandler           	BlockHeadHandler                  (E_BLOCK_HEAD);
-	cBlockPressurePlateHandler     	BlockHeavyWeightedPressurePHandler(E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
-	cBlockHopperHandler            	BlockHopperHandler                (E_BLOCK_HOPPER);
-	cBlockHandler                   BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
-	cBlockHandler                   BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
-	cBlockIceHandler               	BlockIceHandler                   (E_BLOCK_ICE);
-	cBlockComparatorHandler        	BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
-	cBlockHandler                   BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
-	cBlockHandler                   BlockIronBarsHandler              (E_BLOCK_IRON_BARS);
-	cBlockHandler                   BlockIronBlockHandler             (E_BLOCK_IRON_BLOCK);
-	cBlockDoorHandler              	BlockIronDoorHandler              (E_BLOCK_IRON_DOOR);
-	cBlockOreHandler               	BlockIronOreHandler               (E_BLOCK_IRON_ORE);
-	cBlockTrapdoorHandler          	BlockIronTrapdoorHandler          (E_BLOCK_IRON_TRAPDOOR);
-	cBlockPumpkinHandler           	BlockJackOLanternHandler          (E_BLOCK_JACK_O_LANTERN);
-	cBlockJukeboxHandler           	BlockJukeboxHandler               (E_BLOCK_JUKEBOX);
-	cBlockDoorHandler              	BlockJungleDoorHandler            (E_BLOCK_JUNGLE_DOOR);
-	cBlockFenceGateHandler         	BlockJungleFenceGateHandler       (E_BLOCK_JUNGLE_FENCE_GATE);
-	cBlockFenceHandler             	BlockJungleFenceHandler           (E_BLOCK_JUNGLE_FENCE);
-	cBlockStairsHandler            	BlockJungleWoodStairsHandler      (E_BLOCK_JUNGLE_WOOD_STAIRS);
-	cBlockLadderHandler            	BlockLadderHandler                (E_BLOCK_LADDER);
-	cBlockHandler                   BlockLapisBlockHandler            (E_BLOCK_LAPIS_BLOCK);
-	cBlockOreHandler               	BlockLapisOreHandler              (E_BLOCK_LAPIS_ORE);
-	cBlockLavaHandler              	BlockLavaHandler                  (E_BLOCK_LAVA);
-	cBlockLeavesHandler            	BlockLeavesHandler                (E_BLOCK_LEAVES);
-	cBlockLeverHandler             	BlockLeverHandler                 (E_BLOCK_LEVER);
-	cBlockGlazedTerracottaHandler  	BlockLightBlueGlazedTerracoHandler(E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockLightBlueShulkerBoxHandler   (E_BLOCK_LIGHT_BLUE_SHULKER_BOX);
-	cBlockGlazedTerracottaHandler  	BlockLightGrayGlazedTerracoHandler(E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockLightGrayShulkerBoxHandler   (E_BLOCK_LIGHT_GRAY_SHULKER_BOX);
-	cBlockPressurePlateHandler     	BlockLightWeightedPressurePHandler(E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
-	cBlockLilypadHandler           	BlockLilyPadHandler               (E_BLOCK_LILY_PAD);
-	cBlockGlazedTerracottaHandler  	BlockLimeGlazedTerracottaHandler  (E_BLOCK_LIME_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockLimeShulkerBoxHandler        (E_BLOCK_LIME_SHULKER_BOX);
-	cBlockFurnaceHandler           	BlockLitFurnaceHandler            (E_BLOCK_LIT_FURNACE);
-	cBlockSidewaysHandler          	BlockLogHandler                   (E_BLOCK_LOG);
-	cBlockGlazedTerracottaHandler  	BlockMagentaGlazedTerracottHandler(E_BLOCK_MAGENTA_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockMagentaShulkerBoxHandler     (E_BLOCK_MAGENTA_SHULKER_BOX);
-	cBlockHandler                   BlockMagmaHandler                 (E_BLOCK_MAGMA);
-	cBlockMelonHandler             	BlockMelonHandler                 (E_BLOCK_MELON);
-	cBlockMelonStemHandler         	BlockMelonStemHandler             (E_BLOCK_MELON_STEM);
-	cBlockMobSpawnerHandler        	BlockMobSpawnerHandler            (E_BLOCK_MOB_SPAWNER);
-	cBlockHandler                   BlockMossyCobblestoneHandler      (E_BLOCK_MOSSY_COBBLESTONE);
-	cBlockMyceliumHandler          	BlockMyceliumHandler              (E_BLOCK_MYCELIUM);
-	cBlockFenceHandler             	BlockNetherBrickFenceHandler      (E_BLOCK_NETHER_BRICK_FENCE);
-	cBlockHandler                   BlockNetherBrickHandler           (E_BLOCK_NETHER_BRICK);
-	cBlockStairsHandler            	BlockNetherBrickStairsHandler     (E_BLOCK_NETHER_BRICK_STAIRS);
-	cBlockPortalHandler            	BlockNetherPortalHandler          (E_BLOCK_NETHER_PORTAL);
-	cBlockOreHandler               	BlockNetherQuartzOreHandler       (E_BLOCK_NETHER_QUARTZ_ORE);
-	cBlockHandler                   BlockNetherWartBlockHandler       (E_BLOCK_NETHER_WART_BLOCK);
-	cBlockNetherWartHandler        	BlockNetherWartHandler            (E_BLOCK_NETHER_WART);
-	cBlockNetherrack               	BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
-	cBlockLeavesHandler            	BlockNewLeavesHandler             (E_BLOCK_NEW_LEAVES);
-	cBlockSidewaysHandler          	BlockNewLogHandler                (E_BLOCK_NEW_LOG);
-	cBlockEntityHandler            	BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
-	cBlockDoorHandler              	BlockOakDoorHandler               (E_BLOCK_OAK_DOOR);
-	cBlockFenceGateHandler         	BlockOakFenceGateHandler          (E_BLOCK_OAK_FENCE_GATE);
-	cBlockStairsHandler            	BlockOakWoodStairsHandler         (E_BLOCK_OAK_WOOD_STAIRS);
-	cBlockObserverHandler          	BlockObserverHandler              (E_BLOCK_OBSERVER);
-	cBlockHandler                   BlockObsidianHandler              (E_BLOCK_OBSIDIAN);
-	cBlockGlazedTerracottaHandler  	BlockOrangeGlazedTerracottaHandler(E_BLOCK_ORANGE_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
-	cBlockIceHandler               	BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
-	cBlockGlazedTerracottaHandler  	BlockPinkGlazedTerracottaHandler  (E_BLOCK_PINK_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
-	cBlockPistonHandler            	BlockPistonHandler                (E_BLOCK_PISTON);
-	cBlockPistonHeadHandler         BlockPistonHeadHandler;
-	cBlockHandler                   BlockPistonMovedBlockHandler      (E_BLOCK_PISTON_MOVED_BLOCK);
-	cBlockPlanksHandler             BlockPlanksHandler                (E_BLOCK_PLANKS);
-	cBlockCropsHandler<7>          	BlockPotatoesHandler              (E_BLOCK_POTATOES);  // 8 stages of growth
-	cBlockRailHandler              	BlockPoweredRailHandler           (E_BLOCK_POWERED_RAIL);
-	cBlockHandler                   BlockPrismarineBlockHandler       (E_BLOCK_PRISMARINE_BLOCK);
-	cBlockPumpkinHandler           	BlockPumpkinHandler               (E_BLOCK_PUMPKIN);
-	cBlockPumpkinStemHandler       	BlockPumpkinStemHandler           (E_BLOCK_PUMPKIN_STEM);
-	cBlockGlazedTerracottaHandler  	BlockPurpleGlazedTerracottaHandler(E_BLOCK_PURPLE_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockPurpleShulkerBoxHandler      (E_BLOCK_PURPLE_SHULKER_BOX);
-	cBlockHandler                   BlockPurpurBlockHandler           (E_BLOCK_PURPUR_BLOCK);
-	cBlockDoubleSlabHandler        	BlockPurpurDoubleSlabHandler      (E_BLOCK_PURPUR_DOUBLE_SLAB);
-	cBlockHandler                   BlockPurpurPillarHandler          (E_BLOCK_PURPUR_PILLAR);
-	cBlockSlabHandler              	BlockPurpurSlabHandler            (E_BLOCK_PURPUR_SLAB);
-	cBlockStairsHandler            	BlockPurpurStairsHandler          (E_BLOCK_PURPUR_STAIRS);
-	cBlockQuartzHandler            	BlockQuartzBlockHandler           (E_BLOCK_QUARTZ_BLOCK);
-	cBlockStairsHandler            	BlockQuartzStairsHandler          (E_BLOCK_QUARTZ_STAIRS);
-	cBlockRailHandler              	BlockRailHandler                  (E_BLOCK_RAIL);
-	cBlockGlazedTerracottaHandler  	BlockRedGlazedTerracottaHandler   (E_BLOCK_RED_GLAZED_TERRACOTTA);
-	cBlockMushroomHandler          	BlockRedMushroomHandler           (E_BLOCK_RED_MUSHROOM);
-	cBlockHandler                   BlockRedNetherBrickHandler        (E_BLOCK_RED_NETHER_BRICK);
-	cBlockFlowerHandler            	BlockRedRoseHandler               (E_BLOCK_RED_ROSE);
-	cBlockHandler                   BlockRedSandstoneHandler          (E_BLOCK_RED_SANDSTONE);
-	cBlockSlabHandler              	BlockRedSandstoneSlabHandler      (E_BLOCK_RED_SANDSTONE_SLAB);
-	cBlockStairsHandler            	BlockRedSandstoneStairsHandler    (E_BLOCK_RED_SANDSTONE_STAIRS);
-	cBlockHandler                   BlockRedShulkerBoxHandler         (E_BLOCK_RED_SHULKER_BOX);
-	cBlockRedstoneLampHandler      	BlockRedstoneLampHandler          (E_BLOCK_REDSTONE_LAMP_ON);
-	cBlockGlowingRedstoneOreHandler BlockRedstoneOreGlowingHandler    (E_BLOCK_REDSTONE_ORE_GLOWING);
-	cBlockRedstoneOreHandler       	BlockRedstoneOreHandler           (E_BLOCK_REDSTONE_ORE);
-	cBlockRedstoneRepeaterHandler  	BlockRedstoneRepeaterOffHandler   (E_BLOCK_REDSTONE_REPEATER_OFF);
-	cBlockRedstoneRepeaterHandler  	BlockRedstoneRepeaterOnHandler    (E_BLOCK_REDSTONE_REPEATER_ON);
-	cBlockRedstoneTorchHandler     	BlockRedstoneTorchOffHandler      (E_BLOCK_REDSTONE_TORCH_OFF);
-	cBlockRedstoneTorchHandler     	BlockRedstoneTorchOnHandler       (E_BLOCK_REDSTONE_TORCH_ON);
-	cBlockRedstoneHandler          	BlockRedstoneWireHandler          (E_BLOCK_REDSTONE_WIRE);
-	cBlockCommandBlockHandler      	BlockRepeatingCommandBlockHandler (E_BLOCK_REPEATING_COMMAND_BLOCK);
-	cBlockSandHandler              	BlockSandHandler                  (E_BLOCK_SAND);
-	cBlockHandler                   BlockSandstoneHandler             (E_BLOCK_SANDSTONE);
-	cBlockStairsHandler            	BlockSandstoneStairsHandler       (E_BLOCK_SANDSTONE_STAIRS);
-	cBlockSaplingHandler           	BlockSaplingHandler               (E_BLOCK_SAPLING);
-	cBlockSeaLanternHandler        	BlockSeaLanternHandler            (E_BLOCK_SEA_LANTERN);
-	cBlockSignPostHandler          	BlockSignPostHandler              (E_BLOCK_SIGN_POST);
-	cBlockSlimeHandler             	BlockSlimeBlockHandler            (E_BLOCK_SLIME_BLOCK);
-	cBlockHandler                   BlockSnowBlockHandler             (E_BLOCK_SNOW_BLOCK);
-	cBlockSnowHandler              	BlockSnowHandler                  (E_BLOCK_SNOW);
-	cBlockHandler                   BlockSoulSandHandler              (E_BLOCK_SOULSAND);
-	cBlockSpongeHandler            	BlockSpongeHandler                (E_BLOCK_SPONGE);
-	cBlockDoorHandler              	BlockSpruceDoorHandler            (E_BLOCK_SPRUCE_DOOR);
-	cBlockFenceGateHandler         	BlockSpruceFenceGateHandler       (E_BLOCK_SPRUCE_FENCE_GATE);
-	cBlockFenceHandler             	BlockSpruceFenceHandler           (E_BLOCK_SPRUCE_FENCE);
-	cBlockStairsHandler            	BlockSpruceWoodStairsHandler      (E_BLOCK_SPRUCE_WOOD_STAIRS);
-	cBlockHandler                   BlockStainedClayHandler           (E_BLOCK_STAINED_CLAY);
-	cBlockGlassHandler             	BlockStainedGlassHandler          (E_BLOCK_STAINED_GLASS);
-	cBlockGlassHandler             	BlockStainedGlassPaneHandler      (E_BLOCK_STAINED_GLASS_PANE);
-	cBlockHandler                   BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);  // TODO: drops correct?
-	cBlockLavaHandler              	BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
-	cBlockFluidHandler             	BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
-	cBlockPistonHandler            	BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
-	cBlockStairsHandler            	BlockStoneBrickStairsHandler      (E_BLOCK_STONE_BRICK_STAIRS);
-	cBlockHandler                   BlockStoneBricksHandler           (E_BLOCK_STONE_BRICKS);
-	cBlockButtonHandler            	BlockStoneButtonHandler           (E_BLOCK_STONE_BUTTON);
-	cBlockStoneHandler             	BlockStoneHandler                 (E_BLOCK_STONE);
-	cBlockPressurePlateHandler     	BlockStonePressurePlateHandler    (E_BLOCK_STONE_PRESSURE_PLATE);
-	cBlockSlabHandler              	BlockStoneSlabHandler             (E_BLOCK_STONE_SLAB);
-	cBlockHandler                   BlockStructureBlockHandler        (E_BLOCK_STRUCTURE_BLOCK);
-	cBlockHandler                   BlockStructureVoidHandler         (E_BLOCK_STRUCTURE_VOID);
-	cBlockSugarcaneHandler         	BlockSugarcaneHandler             (E_BLOCK_SUGARCANE);
-	cBlockTallGrassHandler         	BlockTallGrassHandler             (E_BLOCK_TALL_GRASS);
-	cBlockTNTHandler               	BlockTntHandler                   (E_BLOCK_TNT);
-	cBlockTorchHandler             	BlockTorchHandler                 (E_BLOCK_TORCH);
-	cBlockTrapdoorHandler          	BlockTrapdoorHandler              (E_BLOCK_TRAPDOOR);
-	cBlockChestHandler             	BlockTrappedChestHandler          (E_BLOCK_TRAPPED_CHEST);
-	cBlockTripwireHandler          	BlockTripwireHandler              (E_BLOCK_TRIPWIRE);
-	cBlockTripwireHookHandler      	BlockTripwireHookHandler          (E_BLOCK_TRIPWIRE_HOOK);
-	cBlockVineHandler              	BlockVinesHandler                 (E_BLOCK_VINES);
-	cBlockHandler                   BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);  // TODO: drops correct?
-	cBlockWallSignHandler          	BlockWallsignHandler              (E_BLOCK_WALLSIGN);
-	cBlockFluidHandler             	BlockWaterHandler                 (E_BLOCK_WATER);
-	cBlockGlazedTerracottaHandler  	BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockWhiteShulkerBoxHandler       (E_BLOCK_WHITE_SHULKER_BOX);
-	cBlockButtonHandler            	BlockWoodenButtonHandler          (E_BLOCK_WOODEN_BUTTON);
-	cBlockPressurePlateHandler     	BlockWoodenPressurePlateHandler   (E_BLOCK_WOODEN_PRESSURE_PLATE);
-	cBlockSlabHandler              	BlockWoodenSlabHandler            (E_BLOCK_WOODEN_SLAB);
-	cBlockClothHandler             	BlockWoolHandler                  (E_BLOCK_WOOL);
-	cBlockWorkbenchHandler         	BlockWorkbenchHandler             (E_BLOCK_WORKBENCH);
-	cBlockFlowerHandler            	BlockYellowFlowerHandler          (E_BLOCK_YELLOW_FLOWER);
-	cBlockGlazedTerracottaHandler  	BlockYellowGlazedTerracottaHandler(E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
-	cBlockHandler                   BlockYellowShulkerBoxHandler      (E_BLOCK_YELLOW_SHULKER_BOX);
+	constexpr cBlockDoorHandler               BlockAcaciaDoorHandler            (E_BLOCK_ACACIA_DOOR);
+	constexpr cBlockFenceGateHandler          BlockAcaciaFenceGateHandler       (E_BLOCK_ACACIA_FENCE_GATE);
+	constexpr cBlockFenceHandler              BlockAcaciaFenceHandler           (E_BLOCK_ACACIA_FENCE);
+	constexpr cBlockStairsHandler             BlockAcaciaWoodStairsHandler      (E_BLOCK_ACACIA_WOOD_STAIRS);
+	constexpr cBlockRailHandler               BlockActivatorRailHandler         (E_BLOCK_ACTIVATOR_RAIL);
+	constexpr cBlockComparatorHandler         BlockActiveComparatorHandler      (E_BLOCK_ACTIVE_COMPARATOR);
+	constexpr cBlockWithNoDrops<>             BlockAirHandler                   (E_BLOCK_AIR);
+	constexpr cBlockAnvilHandler              BlockAnvilHandler                 (E_BLOCK_ANVIL);
+	constexpr cBlockHandler                   BlockBarrierHandler               (E_BLOCK_BARRIER);
+	constexpr cBlockEntityHandler             BlockBeaconHandler                (E_BLOCK_BEACON);
+	constexpr cBlockBedHandler                BlockBedHandler                   (E_BLOCK_BED);
+	constexpr cBlockHandler                   BlockBedrockHandler               (E_BLOCK_BEDROCK);
+	constexpr cBlockCropsHandler<3>           BlockBeetrootsHandler             (E_BLOCK_BEETROOTS);  // 4 stages of growth
+	constexpr cBlockBigFlowerHandler          BlockBigFlowerHandler             (E_BLOCK_BIG_FLOWER);
+	constexpr cBlockDoorHandler               BlockBirchDoorHandler             (E_BLOCK_BIRCH_DOOR);
+	constexpr cBlockFenceGateHandler          BlockBirchFenceGateHandler        (E_BLOCK_BIRCH_FENCE_GATE);
+	constexpr cBlockFenceHandler              BlockBirchFenceHandler            (E_BLOCK_BIRCH_FENCE);
+	constexpr cBlockStairsHandler             BlockBirchWoodStairsHandler       (E_BLOCK_BIRCH_WOOD_STAIRS);
+	constexpr cBlockGlazedTerracottaHandler   BlockBlackGlazedTerracottaHandler (E_BLOCK_BLACK_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockBlackShulkerBoxHandler       (E_BLOCK_BLACK_SHULKER_BOX);
+	constexpr cBlockHandler                   BlockBlockOfCoalHandler           (E_BLOCK_BLOCK_OF_COAL);
+	constexpr cBlockHandler                   BlockBlockOfRedstoneHandler       (E_BLOCK_BLOCK_OF_REDSTONE);
+	constexpr cBlockGlazedTerracottaHandler   BlockBlueGlazedTerracottaHandler  (E_BLOCK_BLUE_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockBlueShulkerBoxHandler        (E_BLOCK_BLUE_SHULKER_BOX);
+	constexpr cBlockHandler                   BlockBoneBlockHandler             (E_BLOCK_BONE_BLOCK);
+	constexpr cBlockBookShelfHandler          BlockBookcaseHandler              (E_BLOCK_BOOKCASE);
+	constexpr cBlockBrewingStandHandler       BlockBrewingStandHandler          (E_BLOCK_BREWING_STAND);
+	constexpr cBlockHandler                   BlockBrickHandler                 (E_BLOCK_BRICK);
+	constexpr cBlockStairsHandler             BlockBrickStairsHandler           (E_BLOCK_BRICK_STAIRS);
+	constexpr cBlockGlazedTerracottaHandler   BlockBrownGlazedTerracottaHandler (E_BLOCK_BROWN_GLAZED_TERRACOTTA);
+	constexpr cBlockMushroomHandler           BlockBrownMushroomHandler         (E_BLOCK_BROWN_MUSHROOM);
+	constexpr cBlockHandler                   BlockBrownShulkerBoxHandler       (E_BLOCK_BROWN_SHULKER_BOX);
+	constexpr cBlockCactusHandler             BlockCactusHandler                (E_BLOCK_CACTUS);
+	constexpr cBlockCakeHandler               BlockCakeHandler                  (E_BLOCK_CAKE);
+	constexpr cBlockCarpetHandler             BlockCarpetHandler                (E_BLOCK_CARPET);
+	constexpr cBlockCropsHandler<7>           BlockCarrotsHandler               (E_BLOCK_CARROTS);  // 8 stages of growth
+	constexpr cBlockCauldronHandler           BlockCauldronHandler              (E_BLOCK_CAULDRON);
+	constexpr cBlockCommandBlockHandler       BlockChainCommandBlockHandler     (E_BLOCK_CHAIN_COMMAND_BLOCK);
+	constexpr cBlockChestHandler              BlockChestHandler                 (E_BLOCK_CHEST);
+	constexpr cBlockHandler                   BlockChorusFlowerHandler          (E_BLOCK_CHORUS_FLOWER);
+	constexpr cBlockHandler                   BlockChorusPlantHandler           (E_BLOCK_CHORUS_PLANT);
+	constexpr cBlockOreHandler                BlockClayHandler                  (E_BLOCK_CLAY);
+	constexpr cBlockOreHandler                BlockCoalOreHandler               (E_BLOCK_COAL_ORE);
+	constexpr cBlockStoneHandler              BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
+	constexpr cBlockStairsHandler             BlockCobblestoneStairsHandler     (E_BLOCK_COBBLESTONE_STAIRS);
+	constexpr cBlockHandler                   BlockCobblestoneWallHandler       (E_BLOCK_COBBLESTONE_WALL);
+	constexpr cBlockCobWebHandler             BlockCobwebHandler                (E_BLOCK_COBWEB);
+	constexpr cBlockCocoaPodHandler           BlockCocoaPodHandler              (E_BLOCK_COCOA_POD);
+	constexpr cBlockCommandBlockHandler       BlockCommandBlockHandler          (E_BLOCK_COMMAND_BLOCK);
+	constexpr cBlockHandler                   BlockConcreteHandler              (E_BLOCK_CONCRETE);
+	constexpr cBlockConcretePowderHandler     BlockConcretePowderHandler        (E_BLOCK_CONCRETE_POWDER);
+	constexpr cBlockCropsHandler<7>           BlockCropsHandler                 (E_BLOCK_CROPS);  // 8 stages of growth
+	constexpr cBlockGlazedTerracottaHandler   BlockCyanGlazedTerracottaHandler  (E_BLOCK_CYAN_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockCyanShulkerBoxHandler        (E_BLOCK_CYAN_SHULKER_BOX);
+	constexpr cBlockDoorHandler               BlockDarkOakDoorHandler           (E_BLOCK_DARK_OAK_DOOR);
+	constexpr cBlockFenceGateHandler          BlockDarkOakFenceGateHandler      (E_BLOCK_DARK_OAK_FENCE_GATE);
+	constexpr cBlockFenceHandler              BlockDarkOakFenceHandler          (E_BLOCK_DARK_OAK_FENCE);
+	constexpr cBlockStairsHandler             BlockDarkOakWoodStairsHandler     (E_BLOCK_DARK_OAK_WOOD_STAIRS);
+	constexpr cBlockHandler                   BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
+	constexpr cBlockDeadBushHandler           BlockDeadBushHandler              (E_BLOCK_DEAD_BUSH);
+	constexpr cBlockRailHandler               BlockDetectorRailHandler          (E_BLOCK_DETECTOR_RAIL);
+	constexpr cBlockHandler                   BlockDiamondBlockHandler          (E_BLOCK_DIAMOND_BLOCK);
+	constexpr cBlockOreHandler                BlockDiamondOreHandler            (E_BLOCK_DIAMOND_ORE);
+	constexpr cBlockDirtHandler               BlockDirtHandler                  (E_BLOCK_DIRT);
+	constexpr cBlockDropSpenserHandler        BlockDispenserHandler             (E_BLOCK_DISPENSER);
+	constexpr cBlockDoubleSlabHandler         BlockDoubleRedSandstoneSlabHandler(E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB);
+	constexpr cBlockDoubleSlabHandler         BlockDoubleStoneSlabHandler       (E_BLOCK_DOUBLE_STONE_SLAB);
+	constexpr cBlockDoubleSlabHandler         BlockDoubleWoodenSlabHandler      (E_BLOCK_DOUBLE_WOODEN_SLAB);
+	constexpr cBlockHandler                   BlockDragonEggHandler             (E_BLOCK_DRAGON_EGG);
+	constexpr cBlockDropSpenserHandler        BlockDropperHandler               (E_BLOCK_DROPPER);
+	constexpr cBlockHandler                   BlockEmeraldBlockHandler          (E_BLOCK_EMERALD_BLOCK);
+	constexpr cBlockOreHandler                BlockEmeraldOreHandler            (E_BLOCK_EMERALD_ORE);
+	constexpr cBlockEnchantingTableHandler    BlockEnchantingTableHandler       (E_BLOCK_ENCHANTMENT_TABLE);
+	constexpr cBlockHandler                   BlockEndBricksHandler             (E_BLOCK_END_BRICKS);
+	constexpr cBlockHandler                   BlockEndGatewayHandler            (E_BLOCK_END_GATEWAY);
+	constexpr cBlockEndPortalFrameHandler     BlockEndPortalFrameHandler        (E_BLOCK_END_PORTAL_FRAME);
+	constexpr cBlockHandler                   BlockEndPortalHandler             (E_BLOCK_END_PORTAL);
+	constexpr cBlockHandler                   BlockEndRodHandler                (E_BLOCK_END_ROD);
+	constexpr cBlockHandler                   BlockEndStoneHandler              (E_BLOCK_END_STONE);
+	constexpr cBlockEnderchestHandler         BlockEnderChestHandler            (E_BLOCK_ENDER_CHEST);
+	constexpr cBlockFarmlandHandler           BlockFarmlandHandler              (E_BLOCK_FARMLAND);
+	constexpr cBlockFenceHandler              BlockFenceHandler                 (E_BLOCK_FENCE);
+	constexpr cBlockFireHandler               BlockFireHandler                  (E_BLOCK_FIRE);
+	constexpr cBlockFlowerPotHandler          BlockFlowerPotHandler             (E_BLOCK_FLOWER_POT);
+	constexpr cBlockIceHandler                BlockFrostedIceHandler            (E_BLOCK_FROSTED_ICE);
+	constexpr cBlockFurnaceHandler            BlockFurnaceHandler               (E_BLOCK_FURNACE);
+	constexpr cBlockGlassHandler              BlockGlassHandler                 (E_BLOCK_GLASS);
+	constexpr cBlockGlassHandler              BlockGlassPaneHandler             (E_BLOCK_GLASS_PANE);
+	constexpr cBlockGlowstoneHandler          BlockGlowstoneHandler             (E_BLOCK_GLOWSTONE);
+	constexpr cBlockHandler                   BlockGoldBlockHandler             (E_BLOCK_GOLD_BLOCK);
+	constexpr cBlockOreHandler                BlockGoldOreHandler               (E_BLOCK_GOLD_ORE);
+	constexpr cBlockGrassHandler              BlockGrassHandler                 (E_BLOCK_GRASS);
+	constexpr cBlockHandler                   BlockGrassPathHandler             (E_BLOCK_GRASS_PATH);
+	constexpr cBlockGravelHandler             BlockGravelHandler                (E_BLOCK_GRAVEL);
+	constexpr cBlockGlazedTerracottaHandler   BlockGrayGlazedTerracottaHandler  (E_BLOCK_GRAY_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockGrayShulkerBoxHandler        (E_BLOCK_GRAY_SHULKER_BOX);
+	constexpr cBlockGlazedTerracottaHandler   BlockGreenGlazedTerracottaHandler (E_BLOCK_GREEN_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockGreenShulkerBoxHandler       (E_BLOCK_GREEN_SHULKER_BOX);
+	constexpr cBlockHandler                   BlockHardenedClayHandler          (E_BLOCK_HARDENED_CLAY);
+	constexpr cBlockSidewaysHandler           BlockHayBaleHandler               (E_BLOCK_HAY_BALE);
+	constexpr cBlockMobHeadHandler            BlockHeadHandler                  (E_BLOCK_HEAD);
+	constexpr cBlockPressurePlateHandler      BlockHeavyWeightedPressurePHandler(E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
+	constexpr cBlockHopperHandler             BlockHopperHandler                (E_BLOCK_HOPPER);
+	constexpr cBlockHandler                   BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
+	constexpr cBlockHandler                   BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
+	constexpr cBlockIceHandler                BlockIceHandler                   (E_BLOCK_ICE);
+	constexpr cBlockComparatorHandler         BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
+	constexpr cBlockHandler                   BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
+	constexpr cBlockHandler                   BlockIronBarsHandler              (E_BLOCK_IRON_BARS);
+	constexpr cBlockHandler                   BlockIronBlockHandler             (E_BLOCK_IRON_BLOCK);
+	constexpr cBlockDoorHandler               BlockIronDoorHandler              (E_BLOCK_IRON_DOOR);
+	constexpr cBlockOreHandler                BlockIronOreHandler               (E_BLOCK_IRON_ORE);
+	constexpr cBlockTrapdoorHandler           BlockIronTrapdoorHandler          (E_BLOCK_IRON_TRAPDOOR);
+	constexpr cBlockPumpkinHandler            BlockJackOLanternHandler          (E_BLOCK_JACK_O_LANTERN);
+	constexpr cBlockJukeboxHandler            BlockJukeboxHandler               (E_BLOCK_JUKEBOX);
+	constexpr cBlockDoorHandler               BlockJungleDoorHandler            (E_BLOCK_JUNGLE_DOOR);
+	constexpr cBlockFenceGateHandler          BlockJungleFenceGateHandler       (E_BLOCK_JUNGLE_FENCE_GATE);
+	constexpr cBlockFenceHandler              BlockJungleFenceHandler           (E_BLOCK_JUNGLE_FENCE);
+	constexpr cBlockStairsHandler             BlockJungleWoodStairsHandler      (E_BLOCK_JUNGLE_WOOD_STAIRS);
+	constexpr cBlockLadderHandler             BlockLadderHandler                (E_BLOCK_LADDER);
+	constexpr cBlockHandler                   BlockLapisBlockHandler            (E_BLOCK_LAPIS_BLOCK);
+	constexpr cBlockOreHandler                BlockLapisOreHandler              (E_BLOCK_LAPIS_ORE);
+	constexpr cBlockLavaHandler               BlockLavaHandler                  (E_BLOCK_LAVA);
+	constexpr cBlockLeavesHandler             BlockLeavesHandler                (E_BLOCK_LEAVES);
+	constexpr cBlockLeverHandler              BlockLeverHandler                 (E_BLOCK_LEVER);
+	constexpr cBlockGlazedTerracottaHandler   BlockLightBlueGlazedTerracoHandler(E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockLightBlueShulkerBoxHandler   (E_BLOCK_LIGHT_BLUE_SHULKER_BOX);
+	constexpr cBlockGlazedTerracottaHandler   BlockLightGrayGlazedTerracoHandler(E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockLightGrayShulkerBoxHandler   (E_BLOCK_LIGHT_GRAY_SHULKER_BOX);
+	constexpr cBlockPressurePlateHandler      BlockLightWeightedPressurePHandler(E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
+	constexpr cBlockLilypadHandler            BlockLilyPadHandler               (E_BLOCK_LILY_PAD);
+	constexpr cBlockGlazedTerracottaHandler   BlockLimeGlazedTerracottaHandler  (E_BLOCK_LIME_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockLimeShulkerBoxHandler        (E_BLOCK_LIME_SHULKER_BOX);
+	constexpr cBlockFurnaceHandler            BlockLitFurnaceHandler            (E_BLOCK_LIT_FURNACE);
+	constexpr cBlockSidewaysHandler           BlockLogHandler                   (E_BLOCK_LOG);
+	constexpr cBlockGlazedTerracottaHandler   BlockMagentaGlazedTerracottHandler(E_BLOCK_MAGENTA_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockMagentaShulkerBoxHandler     (E_BLOCK_MAGENTA_SHULKER_BOX);
+	constexpr cBlockHandler                   BlockMagmaHandler                 (E_BLOCK_MAGMA);
+	constexpr cBlockMelonHandler              BlockMelonHandler                 (E_BLOCK_MELON);
+	constexpr cBlockMelonStemHandler          BlockMelonStemHandler             (E_BLOCK_MELON_STEM);
+	constexpr cBlockMobSpawnerHandler         BlockMobSpawnerHandler            (E_BLOCK_MOB_SPAWNER);
+	constexpr cBlockHandler                   BlockMossyCobblestoneHandler      (E_BLOCK_MOSSY_COBBLESTONE);
+	constexpr cBlockMyceliumHandler           BlockMyceliumHandler              (E_BLOCK_MYCELIUM);
+	constexpr cBlockFenceHandler              BlockNetherBrickFenceHandler      (E_BLOCK_NETHER_BRICK_FENCE);
+	constexpr cBlockHandler                   BlockNetherBrickHandler           (E_BLOCK_NETHER_BRICK);
+	constexpr cBlockStairsHandler             BlockNetherBrickStairsHandler     (E_BLOCK_NETHER_BRICK_STAIRS);
+	constexpr cBlockPortalHandler             BlockNetherPortalHandler          (E_BLOCK_NETHER_PORTAL);
+	constexpr cBlockOreHandler                BlockNetherQuartzOreHandler       (E_BLOCK_NETHER_QUARTZ_ORE);
+	constexpr cBlockHandler                   BlockNetherWartBlockHandler       (E_BLOCK_NETHER_WART_BLOCK);
+	constexpr cBlockNetherWartHandler         BlockNetherWartHandler            (E_BLOCK_NETHER_WART);
+	constexpr cBlockNetherrack                BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
+	constexpr cBlockLeavesHandler             BlockNewLeavesHandler             (E_BLOCK_NEW_LEAVES);
+	constexpr cBlockSidewaysHandler           BlockNewLogHandler                (E_BLOCK_NEW_LOG);
+	constexpr cBlockEntityHandler             BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
+	constexpr cBlockDoorHandler               BlockOakDoorHandler               (E_BLOCK_OAK_DOOR);
+	constexpr cBlockFenceGateHandler          BlockOakFenceGateHandler          (E_BLOCK_OAK_FENCE_GATE);
+	constexpr cBlockStairsHandler             BlockOakWoodStairsHandler         (E_BLOCK_OAK_WOOD_STAIRS);
+	constexpr cBlockObserverHandler           BlockObserverHandler              (E_BLOCK_OBSERVER);
+	constexpr cBlockHandler                   BlockObsidianHandler              (E_BLOCK_OBSIDIAN);
+	constexpr cBlockGlazedTerracottaHandler   BlockOrangeGlazedTerracottaHandler(E_BLOCK_ORANGE_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
+	constexpr cBlockIceHandler                BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
+	constexpr cBlockGlazedTerracottaHandler   BlockPinkGlazedTerracottaHandler  (E_BLOCK_PINK_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
+	constexpr cBlockPistonHandler             BlockPistonHandler                (E_BLOCK_PISTON);
+	constexpr cBlockPistonHeadHandler         BlockPistonHeadHandler;
+	constexpr cBlockHandler                   BlockPistonMovedBlockHandler      (E_BLOCK_PISTON_MOVED_BLOCK);
+	constexpr cBlockPlanksHandler             BlockPlanksHandler                (E_BLOCK_PLANKS);
+	constexpr cBlockCropsHandler<7>           BlockPotatoesHandler              (E_BLOCK_POTATOES);  // 8 stages of growth
+	constexpr cBlockRailHandler               BlockPoweredRailHandler           (E_BLOCK_POWERED_RAIL);
+	constexpr cBlockHandler                   BlockPrismarineBlockHandler       (E_BLOCK_PRISMARINE_BLOCK);
+	constexpr cBlockPumpkinHandler            BlockPumpkinHandler               (E_BLOCK_PUMPKIN);
+	constexpr cBlockPumpkinStemHandler        BlockPumpkinStemHandler           (E_BLOCK_PUMPKIN_STEM);
+	constexpr cBlockGlazedTerracottaHandler   BlockPurpleGlazedTerracottaHandler(E_BLOCK_PURPLE_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockPurpleShulkerBoxHandler      (E_BLOCK_PURPLE_SHULKER_BOX);
+	constexpr cBlockHandler                   BlockPurpurBlockHandler           (E_BLOCK_PURPUR_BLOCK);
+	constexpr cBlockDoubleSlabHandler         BlockPurpurDoubleSlabHandler      (E_BLOCK_PURPUR_DOUBLE_SLAB);
+	constexpr cBlockHandler                   BlockPurpurPillarHandler          (E_BLOCK_PURPUR_PILLAR);
+	constexpr cBlockSlabHandler               BlockPurpurSlabHandler            (E_BLOCK_PURPUR_SLAB);
+	constexpr cBlockStairsHandler             BlockPurpurStairsHandler          (E_BLOCK_PURPUR_STAIRS);
+	constexpr cBlockQuartzHandler             BlockQuartzBlockHandler           (E_BLOCK_QUARTZ_BLOCK);
+	constexpr cBlockStairsHandler             BlockQuartzStairsHandler          (E_BLOCK_QUARTZ_STAIRS);
+	constexpr cBlockRailHandler               BlockRailHandler                  (E_BLOCK_RAIL);
+	constexpr cBlockGlazedTerracottaHandler   BlockRedGlazedTerracottaHandler   (E_BLOCK_RED_GLAZED_TERRACOTTA);
+	constexpr cBlockMushroomHandler           BlockRedMushroomHandler           (E_BLOCK_RED_MUSHROOM);
+	constexpr cBlockHandler                   BlockRedNetherBrickHandler        (E_BLOCK_RED_NETHER_BRICK);
+	constexpr cBlockFlowerHandler             BlockRedRoseHandler               (E_BLOCK_RED_ROSE);
+	constexpr cBlockHandler                   BlockRedSandstoneHandler          (E_BLOCK_RED_SANDSTONE);
+	constexpr cBlockSlabHandler               BlockRedSandstoneSlabHandler      (E_BLOCK_RED_SANDSTONE_SLAB);
+	constexpr cBlockStairsHandler             BlockRedSandstoneStairsHandler    (E_BLOCK_RED_SANDSTONE_STAIRS);
+	constexpr cBlockHandler                   BlockRedShulkerBoxHandler         (E_BLOCK_RED_SHULKER_BOX);
+	constexpr cBlockRedstoneLampHandler       BlockRedstoneLampHandler          (E_BLOCK_REDSTONE_LAMP_ON);
+	constexpr cBlockGlowingRedstoneOreHandler BlockRedstoneOreGlowingHandler    (E_BLOCK_REDSTONE_ORE_GLOWING);
+	constexpr cBlockRedstoneOreHandler        BlockRedstoneOreHandler           (E_BLOCK_REDSTONE_ORE);
+	constexpr cBlockRedstoneRepeaterHandler   BlockRedstoneRepeaterOffHandler   (E_BLOCK_REDSTONE_REPEATER_OFF);
+	constexpr cBlockRedstoneRepeaterHandler   BlockRedstoneRepeaterOnHandler    (E_BLOCK_REDSTONE_REPEATER_ON);
+	constexpr cBlockRedstoneTorchHandler      BlockRedstoneTorchOffHandler      (E_BLOCK_REDSTONE_TORCH_OFF);
+	constexpr cBlockRedstoneTorchHandler      BlockRedstoneTorchOnHandler       (E_BLOCK_REDSTONE_TORCH_ON);
+	constexpr cBlockRedstoneHandler           BlockRedstoneWireHandler          (E_BLOCK_REDSTONE_WIRE);
+	constexpr cBlockCommandBlockHandler       BlockRepeatingCommandBlockHandler (E_BLOCK_REPEATING_COMMAND_BLOCK);
+	constexpr cBlockSandHandler               BlockSandHandler                  (E_BLOCK_SAND);
+	constexpr cBlockHandler                   BlockSandstoneHandler             (E_BLOCK_SANDSTONE);
+	constexpr cBlockStairsHandler             BlockSandstoneStairsHandler       (E_BLOCK_SANDSTONE_STAIRS);
+	constexpr cBlockSaplingHandler            BlockSaplingHandler               (E_BLOCK_SAPLING);
+	constexpr cBlockSeaLanternHandler         BlockSeaLanternHandler            (E_BLOCK_SEA_LANTERN);
+	constexpr cBlockSignPostHandler           BlockSignPostHandler              (E_BLOCK_SIGN_POST);
+	constexpr cBlockSlimeHandler              BlockSlimeBlockHandler            (E_BLOCK_SLIME_BLOCK);
+	constexpr cBlockHandler                   BlockSnowBlockHandler             (E_BLOCK_SNOW_BLOCK);
+	constexpr cBlockSnowHandler               BlockSnowHandler                  (E_BLOCK_SNOW);
+	constexpr cBlockHandler                   BlockSoulSandHandler              (E_BLOCK_SOULSAND);
+	constexpr cBlockSpongeHandler             BlockSpongeHandler                (E_BLOCK_SPONGE);
+	constexpr cBlockDoorHandler               BlockSpruceDoorHandler            (E_BLOCK_SPRUCE_DOOR);
+	constexpr cBlockFenceGateHandler          BlockSpruceFenceGateHandler       (E_BLOCK_SPRUCE_FENCE_GATE);
+	constexpr cBlockFenceHandler              BlockSpruceFenceHandler           (E_BLOCK_SPRUCE_FENCE);
+	constexpr cBlockStairsHandler             BlockSpruceWoodStairsHandler      (E_BLOCK_SPRUCE_WOOD_STAIRS);
+	constexpr cBlockHandler                   BlockStainedClayHandler           (E_BLOCK_STAINED_CLAY);
+	constexpr cBlockGlassHandler              BlockStainedGlassHandler          (E_BLOCK_STAINED_GLASS);
+	constexpr cBlockGlassHandler              BlockStainedGlassPaneHandler      (E_BLOCK_STAINED_GLASS_PANE);
+	constexpr cBlockHandler                   BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);  // TODO: drops correct?
+	constexpr cBlockLavaHandler               BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
+	constexpr cBlockFluidHandler              BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
+	constexpr cBlockPistonHandler             BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
+	constexpr cBlockStairsHandler             BlockStoneBrickStairsHandler      (E_BLOCK_STONE_BRICK_STAIRS);
+	constexpr cBlockHandler                   BlockStoneBricksHandler           (E_BLOCK_STONE_BRICKS);
+	constexpr cBlockButtonHandler             BlockStoneButtonHandler           (E_BLOCK_STONE_BUTTON);
+	constexpr cBlockStoneHandler              BlockStoneHandler                 (E_BLOCK_STONE);
+	constexpr cBlockPressurePlateHandler      BlockStonePressurePlateHandler    (E_BLOCK_STONE_PRESSURE_PLATE);
+	constexpr cBlockSlabHandler               BlockStoneSlabHandler             (E_BLOCK_STONE_SLAB);
+	constexpr cBlockHandler                   BlockStructureBlockHandler        (E_BLOCK_STRUCTURE_BLOCK);
+	constexpr cBlockHandler                   BlockStructureVoidHandler         (E_BLOCK_STRUCTURE_VOID);
+	constexpr cBlockSugarcaneHandler          BlockSugarcaneHandler             (E_BLOCK_SUGARCANE);
+	constexpr cBlockTallGrassHandler          BlockTallGrassHandler             (E_BLOCK_TALL_GRASS);
+	constexpr cBlockTNTHandler                BlockTntHandler                   (E_BLOCK_TNT);
+	constexpr cBlockTorchHandler              BlockTorchHandler                 (E_BLOCK_TORCH);
+	constexpr cBlockTrapdoorHandler           BlockTrapdoorHandler              (E_BLOCK_TRAPDOOR);
+	constexpr cBlockChestHandler              BlockTrappedChestHandler          (E_BLOCK_TRAPPED_CHEST);
+	constexpr cBlockTripwireHandler           BlockTripwireHandler              (E_BLOCK_TRIPWIRE);
+	constexpr cBlockTripwireHookHandler       BlockTripwireHookHandler          (E_BLOCK_TRIPWIRE_HOOK);
+	constexpr cBlockVineHandler               BlockVinesHandler                 (E_BLOCK_VINES);
+	constexpr cBlockHandler                   BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);  // TODO: drops correct?
+	constexpr cBlockWallSignHandler           BlockWallsignHandler              (E_BLOCK_WALLSIGN);
+	constexpr cBlockFluidHandler              BlockWaterHandler                 (E_BLOCK_WATER);
+	constexpr cBlockGlazedTerracottaHandler   BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockWhiteShulkerBoxHandler       (E_BLOCK_WHITE_SHULKER_BOX);
+	constexpr cBlockButtonHandler             BlockWoodenButtonHandler          (E_BLOCK_WOODEN_BUTTON);
+	constexpr cBlockPressurePlateHandler      BlockWoodenPressurePlateHandler   (E_BLOCK_WOODEN_PRESSURE_PLATE);
+	constexpr cBlockSlabHandler               BlockWoodenSlabHandler            (E_BLOCK_WOODEN_SLAB);
+	constexpr cBlockClothHandler              BlockWoolHandler                  (E_BLOCK_WOOL);
+	constexpr cBlockWorkbenchHandler          BlockWorkbenchHandler             (E_BLOCK_WORKBENCH);
+	constexpr cBlockFlowerHandler             BlockYellowFlowerHandler          (E_BLOCK_YELLOW_FLOWER);
+	constexpr cBlockGlazedTerracottaHandler   BlockYellowGlazedTerracottaHandler(E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
+	constexpr cBlockHandler                   BlockYellowShulkerBoxHandler      (E_BLOCK_YELLOW_SHULKER_BOX);
 }
 
 
@@ -452,22 +454,13 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockHandler:
 
-cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
-{
-	m_BlockType = a_BlockType;
-}
-
-
-
-
-
 bool cBlockHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
 	const Vector3i a_ClickedBlockPos,
 	eBlockFace a_ClickedBlockFace,
 	const Vector3i a_CursorPos,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-)
+) const
 {
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
 	a_BlockType = m_BlockType;
@@ -485,7 +478,7 @@ void cBlockHandler::OnUpdate(
 	cBlockPluginInterface & a_PluginInterface,
 	cChunk & a_Chunk,
 	const Vector3i a_RelPos
-)
+) const
 {
 }
 
@@ -493,7 +486,7 @@ void cBlockHandler::OnUpdate(
 
 
 
-void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
 	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); }))
 	{
@@ -521,7 +514,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 		return;
 	}
 
-	cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_NeighborPos))->OnNeighborChanged(a_ChunkInterface, a_NeighborPos, a_WhichNeighbor);
+	cBlockHandler::For(a_ChunkInterface.GetBlock(a_NeighborPos)).OnNeighborChanged(a_ChunkInterface, a_NeighborPos, a_WhichNeighbor);
 }
 
 
@@ -533,7 +526,7 @@ cItems cBlockHandler::ConvertToPickups(
 	cBlockEntity * a_BlockEntity,
 	const cEntity * a_Digger,
 	const cItem * a_Tool
-)
+) const
 {
 	UNUSED(a_BlockEntity);
 	UNUSED(a_Digger);
@@ -549,7 +542,7 @@ cItems cBlockHandler::ConvertToPickups(
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const
 {
 	return true;
 }
@@ -558,7 +551,7 @@ bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a
 
 
 
-bool cBlockHandler::IsUseable()
+bool cBlockHandler::IsUseable() const
 {
 	return false;
 }
@@ -567,7 +560,7 @@ bool cBlockHandler::IsUseable()
 
 
 
-bool cBlockHandler::IsClickedThrough(void)
+bool cBlockHandler::IsClickedThrough(void) const
 {
 	return false;
 }
@@ -576,7 +569,7 @@ bool cBlockHandler::IsClickedThrough(void)
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta)
+bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
 {
 	return (m_BlockType == E_BLOCK_AIR);
 }
@@ -585,7 +578,7 @@ bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface,
 
 
 
-bool cBlockHandler::DoesDropOnUnsuitable(void)
+bool cBlockHandler::DoesDropOnUnsuitable(void) const
 {
 	return true;
 }
@@ -594,7 +587,7 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const
 {
 	// Default functionality: Test the height, since we assume full voxels with varying height
 	return (a_RelPosition.y < cBlockInfo::GetBlockHeight(m_BlockType));
@@ -604,7 +597,7 @@ bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE
 
 
 
-cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
 {
 	if (!cBlockInfo::IsSolid(m_BlockType))
 	{
@@ -622,7 +615,7 @@ void cBlockHandler::Check(
 	cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
 	Vector3i a_RelPos,
 	cChunk & a_Chunk
-)
+) const
 {
 	const auto Position = cChunkDef::RelativeToAbsolute(a_RelPos, a_Chunk.GetPos());
 	NeighborChanged(a_ChunkInterface, Position.addedX(-1), BLOCK_FACE_XP);
@@ -637,7 +630,7 @@ void cBlockHandler::Check(
 
 
 
-ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
+ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
 {
 	// Zero for transparent
 	return 0;
@@ -672,7 +665,7 @@ unsigned int cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 
 
 
-cBlockHandler & cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
+const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 {
 	// Switch on the block type, as an enumeration
 	// Clang will fail if any type is unhandled:
@@ -751,7 +744,7 @@ cBlockHandler & cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DROPPER:                       return BlockDropperHandler;
 		case E_BLOCK_EMERALD_BLOCK:                 return BlockEmeraldBlockHandler;
 		case E_BLOCK_EMERALD_ORE:                   return BlockEmeraldOreHandler;
-		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantmentTableHandler;
+		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantingTableHandler;
 		case E_BLOCK_ENDER_CHEST:                   return BlockEnderChestHandler;
 		case E_BLOCK_END_BRICKS:                    return BlockEndBricksHandler;
 		case E_BLOCK_END_GATEWAY:                   return BlockEndGatewayHandler;

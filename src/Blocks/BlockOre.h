@@ -9,16 +9,12 @@ class cBlockOreHandler:
 	using Super = cBlockHandler;
 
 public:
-	cBlockOreHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
 
+	using Super::Super;
 
+private:
 
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If using silk-touch, drop self rather than the resource:
 		if (ToolHasSilkTouch(a_Tool))
@@ -61,7 +57,7 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		cPlayer & a_Player, Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override
+	) const override
 	{
 		if (!a_Player.IsGameModeSurvival())
 		{
