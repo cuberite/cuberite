@@ -95,7 +95,7 @@ public:
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
 			// Toggle 'Move up half-block' bit off
-			a_BlockMeta &= a_BlockMeta | 0x8;
+			a_BlockMeta &= ~0x8;
 		}
 		// Trapdoor is placed on a higher half of a vertical block or on the bottom of a block
 		else if ((a_CursorPos.y > 7) || (a_ClickedBlockFace == BLOCK_FACE_YM))
