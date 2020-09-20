@@ -218,8 +218,8 @@ cWorld::cWorld(
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_LootTableProvider(*this),
 	m_ChunkSender(*this),
+	m_LootTableProvider(*this),
 	m_Lighting(*this),
 	m_TickThread(*this)
 {

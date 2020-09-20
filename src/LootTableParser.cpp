@@ -424,6 +424,39 @@ namespace LootTable
 				}
 			}
 		}
+		if (m_IsMagic)
+		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtFireContact:
+				case dtInVoid:
+				case dtOnFire:
+				case dtLavaContact:
+				case dtLightning:
+				case dtRangedAttack:
+				case dtStarving:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res &= false;
+					break;
+				}
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				{
+					Res &= true;
+					break;
+				}
+			}
+		}
 		if (m_IsProjectile)
 		{
 			switch (a_DamageSource.DamageType)
@@ -566,7 +599,7 @@ namespace LootTable
 
 
 	// Todo: Function previously declared with an implicit exception specification redeclared with an explicit exception specification
-	cEntityProperties::~cEntityProperties() noexcept
+	cEntityProperties::~cEntityProperties()
 	{
 		if (m_Vehicle != nullptr)
 		{
@@ -840,7 +873,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt(
+				float Dist = std::abs(sqrt(
 					(KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x) +
 					(KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y) +
 					(KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
@@ -852,7 +885,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt(
+				float Dist = std::abs(sqrt(
 					(KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x) +
 					(KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_HorizontalMin <= Dist) && (m_HorizontalMax >= Dist);
@@ -862,7 +895,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt((KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
+				float Dist = std::abs(sqrt((KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 			if ((m_YMin != 0) || (m_YMax != std::numeric_limits<float>::max()))
@@ -870,7 +903,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt((KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
+				float Dist = std::abs(sqrt((KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 			if ((m_ZMin != 0) || (m_ZMax != std::numeric_limits<float>::max()))
@@ -878,7 +911,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = abs(sqrt((KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
+				float Dist = std::abs(sqrt((KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 		}
@@ -2110,6 +2143,7 @@ namespace LootTable
 		for (const auto & Operation : m_Operations)
 		{
 			// Do operation. This depends on the actual implementation
+			UNUSED(Operation);
 		}
 	}
 
