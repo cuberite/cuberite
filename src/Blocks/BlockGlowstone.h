@@ -6,7 +6,6 @@
 
 
 
-
 class cBlockGlowstoneHandler :
 	public cBlockHandler
 {
@@ -25,8 +24,10 @@ private:
 		}
 		else
 		{
-			// TODO: Handle the Fortune enchantment here
-			return cItem(E_ITEM_GLOWSTONE_DUST, GetRandomProvider().RandInt<char>(2, 4), 0);
+			unsigned int DropNum = GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool));
+			// cap the dropnum to the max amount of 4
+			DropNum = std::min<unsigned int>(DropNum, 4);
+			return cItem(E_ITEM_GLOWSTONE_DUST, DropNum, 0);
 		}
 	}
 

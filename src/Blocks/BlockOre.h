@@ -3,10 +3,6 @@
 
 #include "BlockHandler.h"
 
-
-
-
-
 class cBlockOreHandler:
 	public cBlockHandler
 {
@@ -31,17 +27,20 @@ private:
 			}
 		}
 
-		// TODO: Handle the Fortune enchantment here
 		auto & random = GetRandomProvider();
+		const unsigned int FortuneLevel = ToolFortuneLevel(a_Tool);
+		// Clamp to 10 to prevent server crash if thing are mined with extremely high level fortune pick
+		const unsigned int DropMult = std::clamp<unsigned int>(FloorC(random.RandReal(FortuneLevel + 2.0)), 1, 10);
+
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, random.RandInt<char>(4, 8), 4);
-			case E_BLOCK_REDSTONE_ORE:         return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND);
-			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD);
-			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL);
-			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ);
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * random.RandInt<char>(4, 9), 4);
+			case E_BLOCK_REDSTONE_ORE:         // handled by next case (glowing redstone), no dropMult
+			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5 + FortuneLevel), 0);
+			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
+			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, DropMult);
+			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, DropMult);
+			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, DropMult);
 			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
 			default:
 			{
