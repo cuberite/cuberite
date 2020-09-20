@@ -23,6 +23,7 @@
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
+#include "ItemEnchantingTable.h"
 #include "ItemEyeOfEnder.h"
 #include "ItemFishingRod.h"
 #include "ItemFood.h"
@@ -112,6 +113,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_ENCHANTMENT_TABLE:  return new cItemEnchantingTableHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
