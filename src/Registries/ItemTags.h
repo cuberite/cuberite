@@ -79,7 +79,7 @@ namespace ItemTag
 	};
 
 	/** Obtains the eItemTags type from string */
-	enum eItemTags eItemTags(AString & a_String)
+	enum eItemTags eItemTags(const AString & a_String)
 	{
 		if (NoCaseCompare(a_String, "AcaciaLogs") == 0)
 		{
@@ -1004,7 +1004,7 @@ namespace ItemTag
 	};
 
 	/** Returns a cItemObject which contains all the items described by the tag */
-	cItems ItemTags(enum eItemTags a_Tag)
+	cItems GetItems(enum eItemTags a_Tag)
 	{
 		switch (a_Tag)
 		{

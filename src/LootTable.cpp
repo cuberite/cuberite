@@ -4,6 +4,7 @@
 #include "LootTable.h"
 
 #include "Entities/Player.h"
+#include "Registries/ItemTags.h"
 #include "LootTableParser.h"
 
 using namespace LootTable;
@@ -44,7 +45,8 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Ve
 	auto Noise = cNoise(a_World.GetGenerator().GetSeed());
 
 	// The player is killed and killer here because he influences both in the functions or conditions
-	auto Items = GetItems(Noise, a_Pos, a_World, a_PlayerID, a_PlayerID);
+	auto DamageInfo = TakeDamageInfo();
+	auto Items = GetItems(Noise, a_Pos, a_World, a_PlayerID, a_PlayerID, DamageInfo);
 
 	// Places items in a_ItemGrid
 	int i = 0;  // This value is used for some more randomness
@@ -66,19 +68,19 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Ve
 
 
 
-cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID) const
+cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 {
 	auto Items = cItems();
 	for (const auto & Pool : m_LootTablePools)
 	{
-		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	for (auto & Item : Items)
 	{
 		for (const auto & Function : m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 		}
 	}
 	return Items;
@@ -88,10 +90,10 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 
 
-cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
+cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	auto Items = cItems();
-	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID))
+	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{
 		return Items;
 	}
@@ -120,7 +122,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, con
 			EntryNum = (EntryNum + 1) % a_Pool.m_Entries.size();
 		} while (Rnd > 0);
 		const auto & Entry = a_Pool.m_Entries[EntryNum];
-		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	return Items;
@@ -130,11 +132,11 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, con
 
 
 
-cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
+cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	auto Items = cItems();
 
-	if (!ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID))
+	if (!ConditionsApply(a_Entry.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{
 		return Items;
 	}
@@ -166,7 +168,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 				break;
 			}
 
-			cItems TagItems = ItemTag::ItemTags(ItemTag::eItemTags(Tag));
+			cItems TagItems = ItemTag::GetItems(ItemTag::eItemTags(Tag));
 
 			if (a_Entry.m_Expand)
 			{
@@ -191,7 +193,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 				break;
 			}
 
-			auto NewItems = a_World.GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_World, a_KilledID, a_KillerID);
+			auto NewItems = a_World.GetLootTableProvider()->GetLootTable(Loot)->GetItems(a_Noise, a_Pos, a_World, a_KilledID, a_KillerID, a_DamageSource);
 			Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			break;
 		}
@@ -201,7 +203,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 			{
 				for (const auto & Child : std::get<cLootTablePoolEntries>(a_Entry.m_Content))
 				{
-					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 					Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				}
 			}
@@ -217,7 +219,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 			{
 				auto Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
 				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * Children.size()) % Children.size();
-				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			}
 			catch (const std::bad_variant_access &)
@@ -243,7 +245,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 			unsigned int ChildPos = 0;
 			do
 			{
-				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				ChildPos = (ChildPos + 1) % Children.size();
 				if (ChildPos == Children.size() - 1)
@@ -270,7 +272,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 	{
 		for (const auto & Function : a_Entry.m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 		}
 	}
 	return Items;
@@ -280,12 +282,12 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 
 
 
-bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
+bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	bool Success = true;
 	for (const auto & Condition : a_Conditions)
 	{
-		Success &= ConditionApplies(Condition, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+		Success &= ConditionApplies(Condition, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 	}
 	return Success;
 }
@@ -294,7 +296,7 @@ bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWor
 
 
 
-bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
+bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	return std::visit(VISITCONDITION, a_Condition.m_Parameter);
 }
@@ -303,9 +305,9 @@ bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorl
 
 
 
-void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID)
+void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
-	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID))
+	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{
 		return;
 	}

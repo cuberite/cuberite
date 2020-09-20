@@ -3,6 +3,7 @@
 
 #include "LootTableParser.h"
 #include "Entities/Player.h"
+#include "Entities/Entity.h"
 #include "BlockEntities/BlockEntity.h"
 #include "FurnaceRecipe.h"
 #include "Registries/ItemTags.h"
@@ -139,7 +140,7 @@ namespace LootTable
 
 	bool cAlternative::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID) const
+		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 	{
 		ACTIVECHECK
 		bool Success = false;
@@ -228,9 +229,6 @@ namespace LootTable
 			LOGWARNING("Loot table: Condition \"DamageSourceProperties\" encountered a Json problem, dropping function!");
 			return;
 		}
-		// TODO: 10.09.2020 - Add - 12xx12
-		LOGWARNING("Loot table condition \"DamageSourceProperties\" is is not implemented. Assuming true!");
-		return;
 		Json::Value Predicates;
 		if (a_Value.isMember("predicate"))
 		{
@@ -242,7 +240,7 @@ namespace LootTable
 		}
 		else
 		{
-
+			LOGWARNING("Loot table: Condition \"DamageSourceProperties\" is missing it's predicates, dropping condition!");
 			return;
 		}
 		m_Active = true;
@@ -312,32 +310,185 @@ namespace LootTable
 
 	bool cDamageSourceProperties::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID) const
+		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 	{
 		ACTIVECHECK
-		// TODO: 10.09.2020 - Add - 12xx12
 		return true;
 		bool Res = true;
 		if (m_BypassesArmor)
 		{
+			a_World.DoWithEntityByID(a_KilledID, [&] (cEntity & a_Entity)
+			{
+				Res &= a_Entity.ArmorCoversAgainst(a_DamageSource.DamageType);
+				return true;
+			});
 		}
 		if (m_BypassesInvulnerability)
 		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtFireContact:
+				case dtInVoid:
+				case dtOnFire:
+				case dtLavaContact:
+				case dtLightning:
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				case dtRangedAttack:
+				case dtStarving:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res &= false;
+					break;
+				}
+
+
+				{
+					Res &= true;
+					break;
+				}
+			}
 		}
 		if (m_BypassesMagic)
 		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtFireContact:
+				case dtInVoid:
+				case dtOnFire:
+				case dtLavaContact:
+				case dtLightning:
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				case dtRangedAttack:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res = true;
+					break;
+				}
+				case dtStarving:
+				{
+					Res = true;
+					break;
+				}
+			}
 		}
 		if (m_IsFire)
 		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtInVoid:
+				case dtLavaContact:
+				case dtLightning:
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				case dtRangedAttack:
+				case dtStarving:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res &= false;
+					break;
+				}
+				case dtFireContact:
+				case dtOnFire:
+				{
+					Res &= true;
+					break;
+				}
+			}
 		}
 		if (m_IsProjectile)
 		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtFireContact:
+				case dtInVoid:
+				case dtOnFire:
+				case dtLavaContact:
+				case dtLightning:
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				case dtStarving:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res &= false;
+					break;
+				}
+				case dtRangedAttack: Res &= true; break;
+			}
 		}
 		if (m_IsLightning)
 		{
+			switch (a_DamageSource.DamageType)
+			{
+				case dtAdmin:
+				case dtAttack:
+				case dtCactusContact:
+				case dtDrowning:
+				case dtEnderPearl:
+				case dtEnvironment:
+				case dtExplosion:
+				case dtFalling:
+				case dtFireContact:
+				case dtInVoid:
+				case dtOnFire:
+				case dtLavaContact:
+				case dtPoisoning:
+				case dtPotionOfHarming:
+				case dtRangedAttack:
+				case dtStarving:
+				case dtSuffocating:
+				case dtWithering:
+				{
+					Res &= false;
+					break;
+				}
+				case dtLightning:
+				{
+					Res &= true;
+					break;
+				}
+			}
 		}
-		Res &= m_DirectEntity(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
-		Res &= m_SourceEntity(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+		// Todo
+		// Res &= m_DirectEntity(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
+		Res &= m_SourceEntity(a_World, a_Noise, a_Pos, a_DamageSource.Attacker->GetUniqueID(), a_DamageSource.Attacker->GetUniqueID());
 	}
 
 
@@ -414,7 +565,7 @@ namespace LootTable
 
 
 
-
+	// Todo: Function previously declared with an implicit exception specification redeclared with an explicit exception specification
 	cEntityProperties::~cEntityProperties() noexcept
 	{
 		if (m_Vehicle != nullptr)
@@ -812,10 +963,9 @@ namespace LootTable
 
 	bool cInverted::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID) const
+		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 	{
-		return !std::visit(VISITCONDITION,
-			m_Conditions[0].m_Parameter);
+		return !std::visit(VISITCONDITION, m_Conditions[0].m_Parameter);
 	}
 
 
@@ -1041,7 +1191,10 @@ namespace LootTable
 		}
 		Res &= m_BlockState(a_World, Pos);
 
-		// TODO: Block Tag
+		if (!m_BlockTag.empty())
+		{
+			Res &= ItemTag::GetItems(ItemTag::eItemTags(m_BlockTag)).Contains(cItem(a_World.GetBlock(a_Pos)));
+		}
 
 		// Block NBT
 		// Note: the following code is just an example this is TODO
@@ -1053,16 +1206,24 @@ namespace LootTable
 			Res &= (a_World.GetDimension() == m_Dimension);
 		}
 
-		// TODO: feature
+		// TODO: 13.09.2020 - Add when feature is implemented - 12xx12
 		if (!m_Feature.empty())
 		{
 		}
 
 		Res &= m_FluidState(a_World, Pos);
 
-		// Todo: Fluid Tag
 		if (!m_FluidTag.empty())
 		{
+			auto Block = a_World.GetBlock(a_Pos);
+			if (m_FluidTag == "Lava")
+			{
+				Res &= ((Block == E_BLOCK_LAVA) || (Block == E_BLOCK_STATIONARY_LAVA));
+			}
+			else if (m_FluidTag == "Water")
+			{
+				Res &= ((Block == E_BLOCK_WATER) || (Block == E_BLOCK_STATIONARY_WATER));
+			}
 		}
 
 		if ((m_LightMin != 0) || (m_LightMax != 100))
@@ -1290,7 +1451,7 @@ namespace LootTable
 			Res &= ((Durability >= m_DurabilityMin) && (Durability <= m_DurabilityMax));
 		}
 
-		// Checks enchantments on item TODO: check if only books
+		// Checks enchantments on book
 		if ((!m_EnchantmentsMin.IsEmpty() || !m_EnchantmentsMax.IsEmpty()) &&
 			(a_Item.m_ItemType != E_ITEM_ENCHANTED_BOOK))
 		{
@@ -1988,7 +2149,7 @@ namespace LootTable
 				Json::Value Properties = a_Value[ParameterName];
 				if (!Properties.isArray())
 				{
-					LOGWARNING("Loot table: Function copy state wasn't provided with a valid object to get it's properties from, dropping frunction");
+					LOGWARNING("Loot table: Function copy state wasn't provided with a valid object to get it's properties from, dropping function");
 					return;
 				}
 

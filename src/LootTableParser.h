@@ -268,7 +268,7 @@ namespace LootTable
 		public:
 			cAlternative() { m_Active = false; }
 			cAlternative(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const;
 		private:
 			cLootTableConditions m_SubConditions;
 		};
@@ -291,7 +291,7 @@ namespace LootTable
 		// TODO: 10.09.2020 - Add - 12xx12
 		public:
 			cDamageSourceProperties(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const;
 		private:
 			bool m_BypassesArmor;
 			bool m_BypassesInvulnerability;
@@ -327,7 +327,7 @@ namespace LootTable
 			// because the alternative in the condition struct needs the structs of the conditions but this condition needs the condition struct and so on..
 		public:
 			cInverted(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const;
 		private:
 			cLootTableConditions m_Conditions;
 		};
@@ -865,12 +865,12 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 #define VISITCONDITION \
 	overloaded { \
-		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
 		[&] (const LootTable::Condition::cBlockStateProperty & a_Cond)      { return a_Cond(a_World, a_Pos); }, \
-		[&] (const LootTable::Condition::cDamageSourceProperties & a_Cond)  { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Condition::cDamageSourceProperties & a_Cond)  { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
 		[&] (const LootTable::Condition::cEntityProperties & a_Cond)        { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cEntityScores & a_Cond)            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Condition::cInverted & a_Cond)                { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Condition::cInverted & a_Cond)                { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
 		[&] (const LootTable::Condition::cKilledByPlayer & a_Cond)          { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cLocationCheck & a_Cond)           { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cMatchTool & a_Cond)               { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
