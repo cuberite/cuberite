@@ -31,16 +31,14 @@ class cBlockWithNoDrops:
 {
 public:
 
-	cBlockWithNoDrops(BLOCKTYPE a_BlockType):
+	constexpr cBlockWithNoDrops(BLOCKTYPE a_BlockType):
 		Base(a_BlockType)
 	{
 	}
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Don't drop anything:
 		return {};
@@ -58,16 +56,14 @@ class cClearMetaOnDrop:
 {
 public:
 
-	cClearMetaOnDrop(BLOCKTYPE a_BlockType):
+	constexpr cClearMetaOnDrop(BLOCKTYPE a_BlockType):
 		Base(a_BlockType)
 	{
 	}
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Reset the meta to zero:
 		return cItem(this->m_BlockType);
@@ -87,15 +83,14 @@ class cMetaRotator:
 {
 public:
 
-	cMetaRotator(BLOCKTYPE a_BlockType):
+	constexpr cMetaRotator(BLOCKTYPE a_BlockType):
 		Base(a_BlockType)
-	{}
+	{
+	}
 
+protected:
 
-
-
-
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
@@ -116,7 +111,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
@@ -137,7 +132,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
 	{
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
@@ -153,7 +148,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
@@ -185,16 +180,12 @@ class cYawRotator:
 	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
 {
 	using Super = cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>;
+
 public:
 
-	cYawRotator(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -202,7 +193,7 @@ public:
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		NIBBLETYPE BaseMeta;
 		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockPos, a_BlockFace, a_CursorPos, a_BlockType, BaseMeta))
@@ -264,14 +255,9 @@ class cPitchYawRotator:
 
 public:
 
-	cPitchYawRotator(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+protected:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -280,7 +266,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		NIBBLETYPE BaseMeta;
 		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, BaseMeta))
@@ -296,7 +282,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
 	{
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
