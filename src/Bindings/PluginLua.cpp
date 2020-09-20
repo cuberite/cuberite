@@ -523,6 +523,15 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 
 
+bool cPluginLua::OnDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_DROPSPENSE, &a_World, &a_DropSpenser, a_SlotNum);
+}
+
+
+
+
+
 bool cPluginLua::OnKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
 {
 	cOperation op(*this);
