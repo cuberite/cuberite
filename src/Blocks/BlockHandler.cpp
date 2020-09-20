@@ -27,7 +27,7 @@
 #include "BlockDirt.h"
 #include "BlockDoor.h"
 #include "BlockDropSpenser.h"
-#include "BlockEnchantmentTable.h"
+#include "BlockEnchantingTable.h"
 #include "BlockEnderchest.h"
 #include "BlockEndPortalFrame.h"
 #include "BlockEntity.h"
@@ -265,7 +265,7 @@ namespace
 	constexpr cBlockDropSpenserHandler        BlockDropperHandler               (E_BLOCK_DROPPER);
 	constexpr cBlockHandler                   BlockEmeraldBlockHandler          (E_BLOCK_EMERALD_BLOCK);
 	constexpr cBlockOreHandler                BlockEmeraldOreHandler            (E_BLOCK_EMERALD_ORE);
-	constexpr cBlockEnchantmentTableHandler   BlockEnchantmentTableHandler      (E_BLOCK_ENCHANTMENT_TABLE);
+	constexpr cBlockEnchantingTableHandler    BlockEnchantingTableHandler       (E_BLOCK_ENCHANTMENT_TABLE);
 	constexpr cBlockHandler                   BlockEndBricksHandler             (E_BLOCK_END_BRICKS);
 	constexpr cBlockHandler                   BlockEndGatewayHandler            (E_BLOCK_END_GATEWAY);
 	constexpr cBlockEndPortalFrameHandler     BlockEndPortalFrameHandler        (E_BLOCK_END_PORTAL_FRAME);
@@ -728,7 +728,7 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DROPPER:                       return BlockDropperHandler;
 		case E_BLOCK_EMERALD_BLOCK:                 return BlockEmeraldBlockHandler;
 		case E_BLOCK_EMERALD_ORE:                   return BlockEmeraldOreHandler;
-		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantmentTableHandler;
+		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantingTableHandler;
 		case E_BLOCK_ENDER_CHEST:                   return BlockEnderChestHandler;
 		case E_BLOCK_END_BRICKS:                    return BlockEndBricksHandler;
 		case E_BLOCK_END_GATEWAY:                   return BlockEndGatewayHandler;

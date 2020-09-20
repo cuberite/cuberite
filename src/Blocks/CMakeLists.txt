@@ -29,7 +29,7 @@ target_sources(
 	BlockDirt.h
 	BlockDoor.h
 	BlockDropSpenser.h
-	BlockEnchantmentTable.h
+	BlockEnchantingTable.h
 	BlockEnderchest.h
 	BlockEndPortalFrame.h
 	BlockEntity.h
@@ -72,6 +72,7 @@ target_sources(
 	BlockRail.h
 	BlockRedstone.h
 	BlockRedstoneLamp.h
+	BlockRedstoneOre.h
 	BlockRedstoneRepeater.h
 	BlockRedstoneTorch.h
 	BlockSand.h

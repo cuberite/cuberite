@@ -23,7 +23,12 @@ private:
 		// If using silk-touch, drop self rather than the resource:
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(m_BlockType);
+			switch (m_BlockType)
+			{
+				// If it was a glowing redstone ore, drop a normal redstone ore
+				case E_BLOCK_REDSTONE_ORE_GLOWING:   return cItem(E_BLOCK_REDSTONE_ORE);
+				default:                             return cItem(m_BlockType);
+			}
 		}
 
 		// TODO: Handle the Fortune enchantment here
