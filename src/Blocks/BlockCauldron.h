@@ -151,8 +151,14 @@ public:
 			}
 		}
 
-		// This is a workaround for versions < 1.13, where rclking a cauldron places a block.
-		// Using cauldrons was added in 1.13 as part of shulker cleaning.
+		if (!ItemHandler(EquippedItem.m_ItemType)->IsPlaceable())
+		{
+			// Item not placeable in the first place, our work is done:
+			return true;
+		}
+
+		// This is a workaround for versions < 1.13, where rclking a cauldron with a block, places a block.
+		// Using cauldrons with blocks was added in 1.13 as part of shulker cleaning.
 		const auto ResendPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
 		a_Player.GetClientHandle()->SendBlockChange(
 			ResendPosition.x, ResendPosition.y, ResendPosition.z,
