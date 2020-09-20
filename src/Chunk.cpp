@@ -706,11 +706,9 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 void cChunk::TickBlock(const Vector3i a_RelPos)
 {
-	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelPos));
-	ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelPos);
+	cBlockHandler::For(GetBlock(a_RelPos)).OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelPos);
 }
 
 
@@ -802,8 +800,7 @@ void cChunk::CheckBlocks()
 		m_ToTickBlocks.pop();
 		Count--;
 
-		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
-		Handler->Check(ChunkInterface, PluginInterface, Pos, *this);
+		cBlockHandler::For(GetBlock(Pos)).Check(ChunkInterface, PluginInterface, Pos, *this);
 	}
 }
 
@@ -827,9 +824,7 @@ void cChunk::TickBlocks(void)
 			continue;  // It's all air up here
 		}
 
-		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
-		ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, Pos);
+		cBlockHandler::For(GetBlock(Pos)).OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, Pos);
 	}  // for i
 
 	// Set a new random coord for the next tick:
@@ -938,14 +933,13 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta;
 	GetBlockTypeMeta(a_RelPos, blockType, blockMeta);
-	auto blockHandler = cBlockInfo::GetHandler(blockType);
 	auto blockEntity = GetBlockEntityRel(a_RelPos);
 	cItems pickups (0);
 	auto toolHandler = a_Tool ? a_Tool->GetHandler() : cItemHandler::GetItemHandler(E_ITEM_EMPTY);
 	auto canHarvestBlock = toolHandler->CanHarvestBlock(blockType);
 	if (canHarvestBlock)
 	{
-		pickups = blockHandler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
+		pickups = cBlockHandler::For(blockType).ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
 	}
 	auto absPos = RelativeToAbsolute(a_RelPos);
 	cRoot::Get()->GetPluginManager()->CallHookBlockToPickups(*m_World, absPos, blockType, blockMeta, blockEntity, a_Digger, a_Tool, pickups);
@@ -958,8 +952,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 
 int cChunk::GrowPlantAt(Vector3i a_RelPos, int a_NumStages)
 {
-	auto blockHandler = BlockHandler(GetBlock(a_RelPos));
-	return blockHandler->Grow(*this, a_RelPos, a_NumStages);
+	return cBlockHandler::For(GetBlock(a_RelPos)).Grow(*this, a_RelPos, a_NumStages);
 }
 
 

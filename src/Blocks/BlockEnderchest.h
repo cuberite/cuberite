@@ -14,16 +14,11 @@ class cBlockEnderchestHandler :
 
 public:
 
-	cBlockEnderchestHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drop something when mined with a pickaxe:
 		if (

@@ -1103,7 +1103,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		if (
 			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough()
+			cBlockHandler::For(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ)).IsClickedThrough()
 		)
 		{
 			a_BlockX = BlockX;
@@ -1293,8 +1293,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
-	Handler->OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
+	cBlockHandler::For(a_OldBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
@@ -1371,7 +1370,6 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	m_Player->AddFoodExhaustion(0.025);
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	auto blockHandler = BlockHandler(a_OldBlock);
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
 	if (m_Player->IsGameModeSurvival())
 	{
@@ -1383,11 +1381,11 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	// Damage the tool:
-	auto dlAction = (cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
 	m_Player->UseEquippedItem(dlAction);
 
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	blockHandler->OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
+	cBlockHandler::For(a_OldBlock).OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
@@ -1466,10 +1464,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		World->GetBlockTypeMeta(ClickedBlockPos, BlockType, BlockMeta);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		const auto & BlockHandler = cBlockHandler::For(BlockType);
 
 		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		bool BlockUsable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
@@ -1477,7 +1475,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
-				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
+				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
 				{
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
@@ -1495,7 +1493,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
 				// A plugin doesn't agree with the action, replace the block on the client and quit:
-				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+				BlockHandler.OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 			}
 		}
 		else if (Placeable)

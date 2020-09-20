@@ -13,7 +13,11 @@
 class cBlockGrassHandler :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+public:
+
+	using cBlockHandler::cBlockHandler;
+
+private:
 
 	enum class Survivability
 	{
@@ -27,18 +31,7 @@ class cBlockGrassHandler :
 		DieInDarkness
 	};
 
-public:
-
-	cBlockGrassHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		if (!ToolHasSilkTouch(a_Tool))
 		{
@@ -57,7 +50,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		if (!a_Chunk.GetWorld()->IsChunkLighted(a_Chunk.GetPosX(), a_Chunk.GetPosZ()))
 		{
@@ -92,7 +85,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 1;
