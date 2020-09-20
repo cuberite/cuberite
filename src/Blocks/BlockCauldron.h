@@ -135,13 +135,17 @@ public:
 				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
 				if (Meta == 0)
 				{
+					// The cauldron is empty:
 					break;
 				}
+
 				// This is a workaround for version < 1.13. They client thinks a player placed a shulker and display that to the player
 				// The shulker cleaning was added in 1.13.
-				auto NewPos = a_BlockPos;
-				NewPos = AddFaceDirection(NewPos, a_BlockFace);
-				a_Player.GetClientHandle()->SendBlockChange(NewPos.x, NewPos.y, NewPos.z, a_ChunkInterface.GetBlock(NewPos), a_ChunkInterface.GetBlockMeta(NewPos));
+				const auto ResendPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
+				a_Player.GetClientHandle()->SendBlockChange(
+					ResendPosition.x, ResendPosition.y, ResendPosition.z,
+					a_ChunkInterface.GetBlock(ResendPosition), a_ChunkInterface.GetBlockMeta(ResendPosition)
+				);
 
 				// Proceed with normal cleaning:
 				a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
