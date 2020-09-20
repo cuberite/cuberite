@@ -24,8 +24,8 @@ private:
 		if (a_BlockMeta == 0x03)
 		{
 			// Fully grown, drop the entire produce:
-			auto & rand = GetRandomProvider();
-			return cItem(E_ITEM_NETHER_WART, 1 + (rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2, 0);
+			const char DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool));
+			return cItem(E_ITEM_NETHER_WART, DropNum, 0);
 		}
 		else
 		{

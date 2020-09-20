@@ -20,7 +20,8 @@ private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_MELON_SLICE, GetRandomProvider().RandInt<char>(3, 7), 0);
+		const char DropNum = FortuneDiscreteRandom(3, 7, ToolFortuneLevel(a_Tool), 9);
+		return cItem(E_ITEM_MELON_SLICE, DropNum, 0);
 	}
 
 

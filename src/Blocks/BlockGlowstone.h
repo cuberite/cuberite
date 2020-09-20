@@ -25,12 +25,8 @@ private:
 		}
 
 		// Number of dust to drop, capped at the max amount of 4.
-		const auto Drops = std::min(
-			static_cast<char>(4),
-			GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool))
-		);
-
-		return cItem(E_ITEM_GLOWSTONE_DUST, Drops);
+		const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool), 4);
+		return cItem(E_ITEM_GLOWSTONE_DUST, DropNum, 0);
 	}
 
 

@@ -234,6 +234,13 @@ public:
 	Can be used in ConvertToPickups() implementations. */
 	static unsigned char ToolFortuneLevel(const cItem * a_Tool);
 
+	/** Returns a random number of drops taking into account fortune.
+	Only applies to drops following clamped discrete random distribution.
+	a_DefaultMax is the maximum items from one block without fortune.
+	a_MaxDrop is the maximum items from one block with fortune,
+	if unspecified set to 25 to prevent lag or crash with high level tools. */
+	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned int a_FortuneLevel, char a_MaxDrop=25);
+
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);
 
