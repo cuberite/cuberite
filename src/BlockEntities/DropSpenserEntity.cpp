@@ -83,10 +83,10 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	int SpenseSlot = OccupiedSlots[RandomSlot];
 
 	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
-		{
-			// Plugin disagrees with the move
-			return;
-		}
+	{
+		// Plugin disagrees with the move
+		return;
+	}
 
 	// DropSpense the item, using the specialized behavior in the subclasses:
 	DropSpenseFromSlot(a_Chunk, SpenseSlot);
