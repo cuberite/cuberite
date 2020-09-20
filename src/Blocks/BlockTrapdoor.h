@@ -84,49 +84,22 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
+		const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - static_cast<Vector3i> (a_Player.GetPosition().Floor());
+
 		a_BlockType = m_BlockType;
+		a_BlockMeta = BlockFaceAndOffsetToMetaData(a_ClickedBlockFace, BlockOffsetRelToPlayer);
 
-		auto SafeClickedBlockFace = (eBlockFace) a_ClickedBlockFace;
-
-		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
+		// Trapdoor is placed on a horizontal surface
+		if ((a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
-			const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - (Vector3i) a_Player.GetPosition().Floor();
-			const auto IsOnXAxis = std::abs(BlockOffsetRelToPlayer.x) > std::abs(BlockOffsetRelToPlayer.z);
-
-			if (IsOnXAxis)
-			{
-				if (BlockOffsetRelToPlayer.x > 0)
-				{
-					SafeClickedBlockFace = BLOCK_FACE_XM;
-				}
-				else
-				{
-					SafeClickedBlockFace = BLOCK_FACE_XP;
-				}
-			}
-			else
-			{
-				if (BlockOffsetRelToPlayer.z > 0)
-				{
-					SafeClickedBlockFace = BLOCK_FACE_ZM;
-				}
-				else
-				{
-					SafeClickedBlockFace = BLOCK_FACE_ZP;
-				}
-			}
+			// Toggle 'Move up half-block' bit off
+			a_BlockMeta &= a_BlockMeta | 0x8;
 		}
-
-		a_BlockMeta = BlockFaceToMetaData(SafeClickedBlockFace);
-
-		if (a_CursorPos.y > 7)
+		// Trapdoor is placed on a vertical surface
+		else if ((a_CursorPos.y > 7) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
+			// Toggle 'Move up half-block' bit on
 			a_BlockMeta |= 0x8;
-		}
-
-		if ((a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
-		{
-			a_BlockMeta ^= 0x8;
 		}
 
 		return true;
@@ -136,17 +109,43 @@ public:
 
 
 
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
+	inline static NIBBLETYPE BlockFaceAndOffsetToMetaData(eBlockFace a_BlockFace, const Vector3i a_BlockOffset)
 	{
+		if ((a_BlockFace == BLOCK_FACE_YP) || (a_BlockFace == BLOCK_FACE_YM))
+		{
+			const auto IsOnXAxis = std::abs(a_BlockOffset.x) > std::abs(a_BlockOffset.z);
+
+			if (IsOnXAxis)
+			{
+				if (a_BlockOffset.x > 0)
+				{
+					a_BlockFace = BLOCK_FACE_XM;
+				}
+				else
+				{
+					a_BlockFace = BLOCK_FACE_XP;
+				}
+			}
+			else
+			{
+				if (a_BlockOffset.z > 0)
+				{
+					a_BlockFace = BLOCK_FACE_ZM;
+				}
+				else
+				{
+					a_BlockFace = BLOCK_FACE_ZP;
+				}
+			}
+		}
+
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_ZP: return 0x1;
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_NONE:
+			default:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0;
