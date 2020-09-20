@@ -86,16 +86,18 @@ public:
 	{
 		const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - static_cast<Vector3i> (a_Player.GetPosition().Floor());
 
+		// NOTE: The direction the player is facing is reversed to the BLOCK_FACE_* constant used
+
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceAndOffsetToMetaData(a_ClickedBlockFace, BlockOffsetRelToPlayer);
 
-		// Trapdoor is placed on the bottom of a block
+		// Trapdoor is placed on top of a block
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
 			// Toggle 'Move up half-block' bit off
 			a_BlockMeta &= a_BlockMeta | 0x8;
 		}
-		// Trapdoor is placed on a vertical surface or on top of a block
+		// Trapdoor is placed on a higher half of a vertical block or on the bottom of a block
 		else if ((a_CursorPos.y > 7) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			// Toggle 'Move up half-block' bit on
@@ -111,6 +113,8 @@ public:
 
 	inline static NIBBLETYPE BlockFaceAndOffsetToMetaData(eBlockFace a_BlockFace, const Vector3i a_BlockOffset)
 	{
+		// Handle placement on horizontal surface as if placed on the vertical one
+		//  oriented the same direction relative to the player
 		if ((a_BlockFace == BLOCK_FACE_YP) || (a_BlockFace == BLOCK_FACE_YM))
 		{
 			const auto IsOnXAxis = std::abs(a_BlockOffset.x) > std::abs(a_BlockOffset.z);
