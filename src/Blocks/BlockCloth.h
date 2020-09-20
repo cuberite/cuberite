@@ -11,12 +11,12 @@ class cBlockClothHandler :
 	public cBlockHandler
 {
 public:
-	cBlockClothHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	using cBlockHandler::cBlockHandler;
+
+private:
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{
@@ -44,7 +44,3 @@ public:
 		}
 	}
 } ;
-
-
-
-

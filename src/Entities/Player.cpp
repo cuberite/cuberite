@@ -2849,11 +2849,10 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 	bool HasInitializedBounds = false;
 	for (auto blk: a_Blocks)
 	{
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
 		int x = blk.GetX();
 		int y = blk.GetY();
 		int z = blk.GetZ();
-		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
 			m_World->GetBlock(x - 1, y, z),
 			m_World->GetBlock(x + 1, y, z),
 			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
@@ -2941,8 +2940,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
 
 		// Notify the blockhandlers:
-		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
-		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		cBlockHandler::For(blk.m_BlockType).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
 
 		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, blk);

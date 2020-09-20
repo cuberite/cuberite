@@ -52,7 +52,7 @@ public:
 		a_World.GetBlockTypeMeta(TopPos, TopType, TopMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
-		if (!BlockHandler(TopType)->DoesIgnoreBuildCollision(ChunkInterface, TopPos, a_Player, TopMeta))
+		if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(ChunkInterface, TopPos, a_Player, TopMeta))
 		{
 			return false;
 		}
