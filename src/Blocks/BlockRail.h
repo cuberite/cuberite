@@ -23,14 +23,9 @@ class cBlockRailHandler :
 
 public:
 
-	cBlockRailHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -39,7 +34,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = FindMeta(a_ChunkInterface, a_PlacedBlockPos);
@@ -60,7 +55,7 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
+	) const override
 	{
 		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
 
@@ -83,7 +78,7 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override
+	) const override
 	{
 		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
 
@@ -102,7 +97,7 @@ public:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
 		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos);
@@ -118,7 +113,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		if (a_RelPos.y <= 0)
 		{
@@ -163,7 +158,7 @@ public:
 
 
 
-	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos)
+	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos) const
 	{
 		NIBBLETYPE Meta = 0;
 		char RailsCnt = 0;
@@ -288,13 +283,13 @@ public:
 	}
 
 
-	inline bool CanThisRailCurve(void)
+	bool CanThisRailCurve(void) const
 	{
 		return m_BlockType == E_BLOCK_RAIL;
 	}
 
 
-	bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
+	static bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
 	{
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
@@ -427,7 +422,7 @@ public:
 	}
 
 
-	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
+	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
 		NIBBLETYPE Meta;
@@ -525,7 +520,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
 		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
@@ -562,7 +557,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
@@ -598,7 +593,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
 	{
 		// MirrorXY basically flips the ZP and ZM parts of the meta
 		if (m_BlockType == E_BLOCK_RAIL)
@@ -637,7 +632,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		// MirrorYZ basically flips the XP and XM parts of the meta
 		if (m_BlockType == E_BLOCK_RAIL)
@@ -676,7 +671,7 @@ public:
 	}
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;

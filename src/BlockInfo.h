@@ -5,12 +5,6 @@
 
 
 
-// fwd:
-class cBlockHandler;
-
-
-
-
 // tolua_begin
 class cBlockInfo
 {
@@ -53,9 +47,6 @@ public:
 
 	/** Creates a default BlockInfo structure, initializes all values to their defaults */
 	cBlockInfo();
-
-	/** Gets the blockhandler for the given block type. */
-	static cBlockHandler * GetHandler(BLOCKTYPE a_Type);
 
 private:
 
@@ -156,14 +147,4 @@ inline const cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 {
 	static const cBlockInfoArray ms_Info;
 	return ms_Info[a_Type];
-}
-
-
-
-
-
-// Shortcut to get the blockhandler for a specific block
-inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
-{
-	return cBlockInfo::GetHandler(a_BlockType);
 }

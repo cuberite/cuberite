@@ -15,16 +15,11 @@ class cBlockCauldronHandler :
 
 public:
 
-	cBlockCauldronHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_ITEM_CAULDRON, 1, 0);
 	}
@@ -40,7 +35,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 		auto EquippedItem = a_Player.GetEquippedItem();
@@ -172,7 +167,7 @@ public:
 
 
 
-	virtual bool IsUseable() override
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
@@ -187,7 +182,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		if (!a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
@@ -207,7 +202,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 21;

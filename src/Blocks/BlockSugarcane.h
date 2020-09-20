@@ -14,16 +14,11 @@ class cBlockSugarcaneHandler :
 
 public:
 
-	cBlockSugarcaneHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_ITEM_SUGARCANE, 1, 0);
 	}
@@ -32,7 +27,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		if (a_RelPos.y <= 0)
 		{
@@ -82,7 +77,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
@@ -92,7 +87,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		// Check the total height of the sugarcane blocks here:
 		int top = a_RelPos.y + 1;
@@ -129,13 +124,7 @@ public:
 		return toGrow;
 	}
 
-
-
-
-
-protected:
-
-	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) override
+	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
 		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))

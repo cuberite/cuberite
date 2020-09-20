@@ -11,16 +11,12 @@ class cBlockPortalHandler:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
+
 public:
 
-	cBlockPortalHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -29,7 +25,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		// We set meta to zero so Cuberite doesn't stop a Creative-mode player from building custom portal shapes
 		// CanBeAt doesn't do anything if meta is zero
@@ -44,7 +40,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -60,7 +56,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		// Spawn zombie pigmen with a 0.05% chance:
 		if (GetRandomProvider().RandBool(0.9995))
@@ -75,7 +71,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		if ((a_RelPos.y <= 0) || (a_RelPos.y >= cChunkDef::Height - 1))
 		{
@@ -138,7 +134,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 24;

@@ -2154,7 +2154,7 @@ void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, 
 	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockInfo::GetHandler(a_BlockType)->OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
+	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2182,7 +2182,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 	}
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockInfo::GetHandler(BlockType)->OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
+	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
 
 	return true;
 }
