@@ -89,13 +89,13 @@ public:
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceAndOffsetToMetaData(a_ClickedBlockFace, BlockOffsetRelToPlayer);
 
-		// Trapdoor is placed on a horizontal surface
+		// Trapdoor is placed on the bottom of a block
 		if ((a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
 			// Toggle 'Move up half-block' bit off
 			a_BlockMeta &= a_BlockMeta | 0x8;
 		}
-		// Trapdoor is placed on a vertical surface
+		// Trapdoor is placed on a vertical surface or on top of a block
 		else if ((a_CursorPos.y > 7) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			// Toggle 'Move up half-block' bit on
