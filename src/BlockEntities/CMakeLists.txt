@@ -11,6 +11,8 @@ target_sources(
 	DispenserEntity.cpp
 	DropSpenserEntity.cpp
 	DropperEntity.cpp
+	EnchantingTableEntity.cpp
+	EndPortalEntity.cpp
 	EnderChestEntity.cpp
 	FlowerPotEntity.cpp
 	FurnaceEntity.cpp
@@ -31,6 +33,8 @@ target_sources(
 	DispenserEntity.h
 	DropSpenserEntity.h
 	DropperEntity.h
+	EnchantingTableEntity.h
+	EndPortalEntity.h
 	EnderChestEntity.h
 	FlowerPotEntity.h
 	FurnaceEntity.h

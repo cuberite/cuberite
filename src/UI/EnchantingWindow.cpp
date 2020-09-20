@@ -11,8 +11,8 @@
 
 
 
-cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos) :
-	cWindow(wtEnchantment, "Enchant"),
+cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Title) :
+	cWindow(wtEnchantment, a_Title),
 	m_SlotArea(),
 	m_BlockPos(a_BlockPos)
 {

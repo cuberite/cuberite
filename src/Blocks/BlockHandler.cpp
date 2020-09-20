@@ -27,7 +27,7 @@
 #include "BlockDirt.h"
 #include "BlockDoor.h"
 #include "BlockDropSpenser.h"
-#include "BlockEnchantmentTable.h"
+#include "BlockEnchantingTable.h"
 #include "BlockEnderchest.h"
 #include "BlockEndPortalFrame.h"
 #include "BlockEntity.h"
@@ -263,7 +263,7 @@ namespace
 	cBlockDropSpenserHandler       	BlockDropperHandler               (E_BLOCK_DROPPER);
 	cBlockHandler                   BlockEmeraldBlockHandler          (E_BLOCK_EMERALD_BLOCK);
 	cBlockOreHandler               	BlockEmeraldOreHandler            (E_BLOCK_EMERALD_ORE);
-	cBlockEnchantmentTableHandler  	BlockEnchantmentTableHandler      (E_BLOCK_ENCHANTMENT_TABLE);
+	cBlockEnchantingTableHandler  	BlockEnchantingTableHandler       (E_BLOCK_ENCHANTMENT_TABLE);
 	cBlockHandler                   BlockEndBricksHandler             (E_BLOCK_END_BRICKS);
 	cBlockHandler                   BlockEndGatewayHandler            (E_BLOCK_END_GATEWAY);
 	cBlockEndPortalFrameHandler    	BlockEndPortalFrameHandler        (E_BLOCK_END_PORTAL_FRAME);
@@ -735,7 +735,7 @@ cBlockHandler & cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DROPPER:                       return BlockDropperHandler;
 		case E_BLOCK_EMERALD_BLOCK:                 return BlockEmeraldBlockHandler;
 		case E_BLOCK_EMERALD_ORE:                   return BlockEmeraldOreHandler;
-		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantmentTableHandler;
+		case E_BLOCK_ENCHANTMENT_TABLE:             return BlockEnchantingTableHandler;
 		case E_BLOCK_ENDER_CHEST:                   return BlockEnderChestHandler;
 		case E_BLOCK_END_BRICKS:                    return BlockEndBricksHandler;
 		case E_BLOCK_END_GATEWAY:                   return BlockEndGatewayHandler;

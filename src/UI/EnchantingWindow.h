@@ -22,7 +22,7 @@ class cEnchantingWindow:
 
 public:
 
-	cEnchantingWindow(Vector3i a_BlockPos);
+	cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Title);
 
 	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
 
