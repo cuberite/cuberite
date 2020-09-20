@@ -97,6 +97,11 @@ bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
 		case E_BLOCK_OBSERVER:
 		case E_BLOCK_TRAPPED_CHEST: return false;
 
+		// Pistons are solid but don't participate in link powering:
+		case E_BLOCK_PISTON:
+		case E_BLOCK_PISTON_EXTENSION:
+		case E_BLOCK_STICKY_PISTON: return false;
+
 		// If a mechanism asks for power from a block, redirect the query to linked positions if:
 		default: return cBlockInfo::IsSolid(Block);
 	}
