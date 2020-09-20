@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
+#include "../Bindings/PluginManager.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
