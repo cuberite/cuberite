@@ -2,7 +2,6 @@
 
 #include "BlockInfo.h"
 #include "BlockType.h"
-#include "Blocks/BlockHandler.h"
 
 
 
@@ -416,15 +415,6 @@ cBlockInfo::cBlockInfo():
 	m_BlockHeight(1.0),
 	m_Hardness(0.0f)
 {
-}
-
-
-
-
-
-cBlockHandler * cBlockInfo::GetHandler(BLOCKTYPE a_Type)
-{
-	return &cBlockHandler::GetBlockHandler(a_Type);
 }
 
 

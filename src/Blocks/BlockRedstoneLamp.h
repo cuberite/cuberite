@@ -11,16 +11,12 @@ class cBlockRedstoneLampHandler:
 	public cBlockHandler
 {
 public:
-	cBlockRedstoneLampHandler(BLOCKTYPE a_BlockType):
-		cBlockHandler(a_BlockType)
-	{
-	}
 
+	using cBlockHandler::cBlockHandler;
 
+private:
 
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Always drop the Off variant:
 		return(cItem(E_BLOCK_REDSTONE_LAMP_OFF, 1, 0));
@@ -30,7 +26,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 15;

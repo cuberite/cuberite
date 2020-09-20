@@ -15,16 +15,11 @@ class cBlockSaplingHandler :
 
 public:
 
-	cBlockSaplingHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
@@ -34,7 +29,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		return (a_RelPos.y > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelPos.addedY(-1)));
 	}
@@ -49,7 +44,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		auto Meta = a_Chunk.GetMeta(a_RelPos);
 		auto Light = std::max(a_Chunk.GetBlockLight(a_RelPos), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelPos)));
@@ -76,7 +71,7 @@ public:
 
 
 
-	bool CanGrowAt(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+	static bool CanGrowAt(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		a_Meta = a_Meta & 0x07;
 		int CheckHeight = 0;
@@ -190,7 +185,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto blockMeta = a_Chunk.GetMeta(a_RelPos);
 		auto typeMeta = blockMeta & 0x07;
@@ -219,19 +214,13 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
 	}
 
-
-
-
-
-private:
-
-	bool IsLargeTree(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+	static bool IsLargeTree(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		BLOCKTYPE type;
 		NIBBLETYPE meta;

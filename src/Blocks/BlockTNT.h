@@ -14,14 +14,9 @@ class cBlockTNTHandler :
 
 public:
 
-	cBlockTNTHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual void OnCancelRightClick(
 		cChunkInterface & a_ChunkInterface,
@@ -29,7 +24,7 @@ public:
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
-	) override
+	) const override
 	{
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
@@ -38,7 +33,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 4;

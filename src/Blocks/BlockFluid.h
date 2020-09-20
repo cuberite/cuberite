@@ -14,17 +14,11 @@ class cBlockFluidHandler:
 
 public:
 
-	cBlockFluidHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
+	using Super::Super;
 
-	}
+private:
 
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -34,7 +28,7 @@ public:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		return true;
 	}
@@ -43,7 +37,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		if (IsBlockWater(m_BlockType))
@@ -58,7 +52,7 @@ public:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
 	{
 		return (
 			(a_Plant == E_BLOCK_BEETROOTS) ||
@@ -82,14 +76,9 @@ class cBlockLavaHandler:
 
 public:
 
-	cBlockLavaHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual void OnUpdate(
 		cChunkInterface & a_ChunkInterface,
@@ -97,7 +86,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		if (a_Chunk.GetWorld()->ShouldLavaSpawnFire())
 		{
@@ -165,7 +154,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 4;
@@ -175,7 +164,7 @@ public:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) override
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
 	{
 		return false;
 	}
