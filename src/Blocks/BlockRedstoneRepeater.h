@@ -18,14 +18,49 @@ class cBlockRedstoneRepeaterHandler:
 
 public:
 
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
+		return -GetRearCoordinateOffset(a_Meta);
 	}
 
+	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		{
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
 
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return { 0, 0, 0 };
+			}
+		}
+	}
 
+	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		{
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return { 0, 0, 0 };
+			}
+		}
+	}
 
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -34,7 +69,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		// Increment the delay setting:
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, ((a_ChunkInterface.GetBlockMeta(a_BlockPos) + 0x04) & 0x0f));
@@ -51,7 +86,7 @@ public:
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
@@ -61,7 +96,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -70,7 +105,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		if (a_RelPos.y <= 0)
 		{
@@ -100,7 +135,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
 	}
@@ -109,61 +144,10 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 11;
-	}
-
-
-
-
-
-	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
-		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
-
-			default:
-			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return { 0, 0, 0 };
-			}
-		}
-	}
-
-
-
-
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		return -GetRearCoordinateOffset(a_Meta);
-	}
-
-
-
-
-
-	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
-		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
-			default:
-			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return { 0, 0, 0 };
-			}
-		}
 	}
 } ;
 

@@ -50,9 +50,8 @@ public:
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		auto blockHandler = BlockHandler(ClickedBlockType);
 		Vector3i PlacePos;
-		if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+		if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 		{
 			PlacePos = a_ClickedBlockPos;
 		}
@@ -69,8 +68,7 @@ public:
 			BLOCKTYPE PlaceBlock;
 			NIBBLETYPE PlaceMeta;
 			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
-			blockHandler = BlockHandler(PlaceBlock);
-			if (!blockHandler->DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
+			if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
 			{
 				return false;
 			}

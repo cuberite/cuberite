@@ -6,7 +6,6 @@
 #include "WorldInterface.h"
 #include "../ChunkMap.h"
 #include "../World.h"
-#include "../BlockInfo.h"
 
 
 
@@ -113,7 +112,7 @@ bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_Bl
 		return false;
 	}
 
-	cBlockInfo::GetHandler(BlockType)->OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta);
+	cBlockHandler::For(BlockType).OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta);
 	return true;
 }
 
