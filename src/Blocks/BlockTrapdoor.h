@@ -9,9 +9,9 @@
 
 
 class cBlockTrapdoorHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
 
 public:
 
@@ -80,24 +80,37 @@ private:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) const override
 	{
-		const auto BlockOffsetRelToPlayer = a_PlacedBlockPos - static_cast<Vector3i> (a_Player.GetPosition().Floor());
-
-		// NOTE: The direction the player is facing is reversed to the BLOCK_FACE_* constant used
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceAndOffsetToMetaData(a_ClickedBlockFace, BlockOffsetRelToPlayer);
-
-		// Trapdoor is placed on top of a block
-		if ((a_ClickedBlockFace == BLOCK_FACE_YP))
+		if (a_ClickedBlockFace == BLOCK_FACE_YP)
 		{
-			// Toggle 'Move up half-block' bit off
-			a_BlockMeta &= ~0x8;
+			// Trapdoor is placed on top of a block.
+			// Engage yaw rotation to determine hinge direction:
+			return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
 		}
-		// Trapdoor is placed on a higher half of a vertical block or on the bottom of a block
-		else if ((a_CursorPos.y > 7) || (a_ClickedBlockFace == BLOCK_FACE_YM))
+		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
 		{
-			// Toggle 'Move up half-block' bit on
+			// Trapdoor is placed on bottom of a block.
+			// Engage yaw rotation to determine hinge direction:
+			if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+			{
+				return false;
+			}
+
+			// Toggle 'Move up half-block' bit on:
 			a_BlockMeta |= 0x8;
+		}
+		else
+		{
+			// Placement on block sides; hinge direction is determined by which side was clicked.
+
+			a_BlockType = m_BlockType;
+			a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
+
+			if (a_CursorPos.y > 7)
+			{
+				// Trapdoor is placed on a higher half of a vertical block.
+				// Toggle 'Move up half-block' bit on:
+				a_BlockMeta |= 0x8;
+			}
 		}
 
 		return true;
@@ -107,38 +120,8 @@ private:
 
 
 
-	inline static NIBBLETYPE BlockFaceAndOffsetToMetaData(eBlockFace a_BlockFace, const Vector3i a_BlockOffset)
+	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
-		// Handle placement on horizontal surface as if placed on the vertical one
-		//  oriented the same direction relative to the player
-		if ((a_BlockFace == BLOCK_FACE_YP) || (a_BlockFace == BLOCK_FACE_YM))
-		{
-			const auto IsOnXAxis = std::abs(a_BlockOffset.x) > std::abs(a_BlockOffset.z);
-
-			if (IsOnXAxis)
-			{
-				if (a_BlockOffset.x > 0)
-				{
-					a_BlockFace = BLOCK_FACE_XM;
-				}
-				else
-				{
-					a_BlockFace = BLOCK_FACE_XP;
-				}
-			}
-			else
-			{
-				if (a_BlockOffset.z > 0)
-				{
-					a_BlockFace = BLOCK_FACE_ZM;
-				}
-				else
-				{
-					a_BlockFace = BLOCK_FACE_ZP;
-				}
-			}
-		}
-
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_ZP: return 0x1;
@@ -151,7 +134,6 @@ private:
 				return 0;
 			}
 		}
-		UNREACHABLE("Unsupported block face");
 	}
 
 
