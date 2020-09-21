@@ -8,15 +8,6 @@
 
 #pragma once
 
-#include <cstddef>
-
-#include <string>
-#include <list>
-#include <vector>
-#include <map>
-
-#include "fmt.h"
-
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;
