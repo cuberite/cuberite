@@ -790,7 +790,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when a hopper is pushing an item into the container it is aimed at.",
 			},
-            HOOK_DROPSPENSE =
+			HOOK_DROPSPENSE =
 			{
 				Notes = "Called when a {{cDropSpenserEntity|DropSpenser}} is dropspensing an {{cItem|item}}.",
 			},
