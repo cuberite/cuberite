@@ -792,7 +792,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
             HOOK_DROPSPENSE =
 			{
-				Notes = "Called when a {{cDropSpenser|DropSpenser}} is dropspensing an {{cItem|item}}.",
+				Notes = "Called when a {{cDropSpenserEntity|DropSpenser}} is dropspensing an {{cItem|item}}.",
 			},
 			HOOK_KILLED =
 			{
