@@ -140,6 +140,9 @@ public:
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
 
+	/** Saves all chunks in all worlds synchronously (waits until dirty chunks have been sent to the ChunkStorage queue before returning) */
+	void SaveAllChunksNow(void);
+
 	/** Sets whether saving chunks is enabled in all worlds (overrides however the worlds were already set) */
 	void SetSavingEnabled(bool a_SavingEnabled);  // tolua_export
 

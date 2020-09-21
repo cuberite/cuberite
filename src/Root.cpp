@@ -577,6 +577,18 @@ void cRoot::SaveAllChunks(void)
 
 
 
+void cRoot::SaveAllChunksNow(void)
+{
+	for (auto & Entry : m_WorldsByName)
+	{
+		Entry.second.SaveAllChunks();
+	}
+}
+
+
+
+
+
 void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 {
 	for (auto & Entry : m_WorldsByName)
