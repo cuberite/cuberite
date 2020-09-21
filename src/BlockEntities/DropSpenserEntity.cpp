@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
+#include "../Bindings/PluginManager.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
@@ -80,8 +81,16 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 
 	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
 
+	int SpenseSlot = OccupiedSlots[RandomSlot];
+
+	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
+	{
+		// Plugin disagrees with the move
+		return;
+	}
+
 	// DropSpense the item, using the specialized behavior in the subclasses:
-	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
+	DropSpenseFromSlot(a_Chunk, SpenseSlot);
 
 	// Broadcast a smoke and click effects:
 	NIBBLETYPE Meta = a_Chunk.GetMeta(GetRelPos());
