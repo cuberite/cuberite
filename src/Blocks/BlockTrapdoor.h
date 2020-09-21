@@ -97,20 +97,19 @@ private:
 
 			// Toggle 'Move up half-block' bit on:
 			a_BlockMeta |= 0x8;
+
+			return true;
 		}
-		else
+
+		// Placement on block sides; hinge direction is determined by which side was clicked:
+		a_BlockType = m_BlockType;
+		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
+
+		if (a_CursorPos.y > 7)
 		{
-			// Placement on block sides; hinge direction is determined by which side was clicked.
-
-			a_BlockType = m_BlockType;
-			a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-
-			if (a_CursorPos.y > 7)
-			{
-				// Trapdoor is placed on a higher half of a vertical block.
-				// Toggle 'Move up half-block' bit on:
-				a_BlockMeta |= 0x8;
-			}
+			// Trapdoor is placed on a higher half of a vertical block.
+			// Toggle 'Move up half-block' bit on:
+			a_BlockMeta |= 0x8;
 		}
 
 		return true;
