@@ -6,6 +6,7 @@
 
 
 
+
 class cBlockGlowstoneHandler :
 	public cBlockHandler
 {
@@ -22,13 +23,14 @@ private:
 		{
 			return cItem(E_BLOCK_GLOWSTONE, 1, 0);
 		}
-		else
-		{
-			unsigned int DropNum = GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool));
-			// cap the dropnum to the max amount of 4
-			DropNum = std::min<unsigned int>(DropNum, 4);
-			return cItem(E_ITEM_GLOWSTONE_DUST, DropNum, 0);
-		}
+
+		// Number of dust to drop, capped at the max amount of 4.
+		const auto Drops = std::min(
+			static_cast<char>(4),
+			GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool))
+		);
+
+		return cItem(E_ITEM_GLOWSTONE_DUST, Drops);
 	}
 
 
