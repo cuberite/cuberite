@@ -103,24 +103,9 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
-	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
-
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 
-	m_BlockEntities.clear();
-
-	// Remove and destroy all entities that are not players:
-	cEntityList Entities;
-	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
-	for (auto & Entity : Entities)
-	{
-		if (!Entity->IsPlayer())
-		{
-			// Scheduling a normal destruction is neither possible (Since this chunk will be gone till the schedule occurs) nor necessary.
-			Entity->DestroyNoScheduling(false);  // No point in broadcasting in an unloading chunk. Chunks unload when no one is nearby.
-		}
-	}
-
+	// Inform our neighbours that we're no longer valid:
 	if (m_NeighborXM != nullptr)
 	{
 		m_NeighborXM->m_NeighborXP = nullptr;
@@ -137,6 +122,7 @@ cChunk::~cChunk()
 	{
 		m_NeighborZP->m_NeighborZM = nullptr;
 	}
+
 	delete m_WaterSimulatorData;
 	m_WaterSimulatorData = nullptr;
 	delete m_LavaSimulatorData;
@@ -215,6 +201,25 @@ bool cChunk::CanUnloadAfterSaving(void) const
 		m_IsDirty &&                 // The chunk is dirty
 		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
 		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
+}
+
+
+
+
+
+void cChunk::OnUnload()
+{
+	// Note: this is only called during normal operation, not during shutdown
+
+	// Notify all entities of imminent unload:
+	for (auto & Entity : m_Entities)
+	{
+		// Chunks cannot be unloaded when they still contain players:
+		ASSERT(!Entity->IsPlayer());
+
+		// Notify the entity:
+		Entity->OnRemoveFromWorld(*Entity->GetWorld());
+	}
 }
 
 

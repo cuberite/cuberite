@@ -1717,10 +1717,17 @@ void cChunkMap::UnloadUnusedChunks(void)
 	for (auto itr = m_Chunks.begin(); itr != m_Chunks.end();)
 	{
 		if (
-			(itr->second.CanUnload()) &&  // Can unload
+			itr->second.CanUnload() &&  // Can unload
 			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.ChunkX, itr->first.ChunkZ)  // Plugins agree
 		)
 		{
+			// First notify plugins:
+			cPluginManager::Get()->CallHookChunkUnloaded(*m_World, itr->first.ChunkX, itr->first.ChunkZ);
+
+			// Notify entities within the chunk, while everything's still valid:
+			itr->second.OnUnload();
+
+			// Kill the chunk:
 			itr = m_Chunks.erase(itr);
 		}
 		else
