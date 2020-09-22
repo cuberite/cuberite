@@ -8,6 +8,7 @@
 #include "FurnaceRecipe.h"
 #include "Registries/ItemTags.h"
 #include "Root.h"
+#include "Mobs/Monster.h"
 
 #include "World.h"
 
@@ -519,7 +520,7 @@ namespace LootTable
 				}
 			}
 		}
-		// Todo
+		// TODO: 22.09.2020 - Add when implemented - 12xx12
 		// Res &= m_DirectEntity(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		Res &= m_SourceEntity(a_World, a_Noise, a_Pos, a_DamageSource.Attacker->GetUniqueID(), a_DamageSource.Attacker->GetUniqueID());
 	}
@@ -598,12 +599,16 @@ namespace LootTable
 
 
 
-	// Todo: Function previously declared with an implicit exception specification redeclared with an explicit exception specification
+
 	cEntityProperties::~cEntityProperties()
 	{
 		if (m_Vehicle != nullptr)
 		{
 			delete[] m_Vehicle;
+		}
+		if (m_TargetEntity != nullptr)
+		{
+			delete [] m_TargetEntity;
 		}
 	}
 
@@ -764,6 +769,7 @@ namespace LootTable
 					if (NoCaseCompare(PlayerKey, "advancements") == 0)
 					{
 						// TODO: 14.09.2020 - Add when implemented - 12xx12
+						LOGWARNING("Loot table: Advancements are not supported in the condition \"EntityProperties\"");
 					}
 					else if (NoCaseCompare(PlayerKey, "gamemode") == 0)
 					{
@@ -821,7 +827,7 @@ namespace LootTable
 				(NoCaseCompare(Key, "target_entity") == 0) ||
 				(NoCaseCompare(Key, "TargetEntity") == 0))
 			{
-				// Todo
+				m_TargetEntity = new cEntityProperties(a_Value[Key], eDest::This);
 			}
 			else if (NoCaseCompare(Key, "vehicle") == 0)
 			{
@@ -841,7 +847,7 @@ namespace LootTable
 		{
 			if (!a_World.DoWithEntityByID(a_KillerID, [&](cEntity & a_Entity)
 			{
-				return (a_Entity.GetEntityType() == cEntity::etPlayer);
+				return a_Entity.IsPlayer();
 			}))
 			{
 				return false;
@@ -954,15 +960,172 @@ namespace LootTable
 		// Equipment Check
 		if (m_MainHand.IsActive())
 		{
-			cItem MainHand;
 			auto Callback = [&](cEntity & a_Entity)
 			{
-				// MainHand = a_Entity.GetItemInMainHand();
-				// todo
+				if (!a_Entity.IsPlayer())
+				{
+					return true;
+				}
+				const auto & Player = static_cast<cPlayer & >(a_Entity);
+				return m_MainHand(Player.GetEquippedItem());
 			};
-			m_MainHand(MainHand);
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
 		}
-		// TODO: continue
+
+		if (m_OffHand.IsActive())
+		{
+			auto Callback = [&](cEntity & a_Entity)
+			{
+				return m_OffHand(a_Entity.GetOffHandEquipedItem());
+			};
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
+		}
+
+		if (m_Head.IsActive())
+		{
+			auto Callback = [&](cEntity & a_Entity)
+			{
+			  	return m_Head(a_Entity.GetEquippedHelmet());
+			};
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
+		}
+
+		if (m_Chest.IsActive())
+		{
+			auto Callback = [&](cEntity & a_Entity)
+			{
+				return m_Chest(a_Entity.GetEquippedChestplate());
+			};
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
+		}
+
+		if (m_Legs.IsActive())
+		{
+			auto Callback = [&](cEntity & a_Entity)
+			{
+				return m_Legs(a_Entity.GetEquippedLeggings());
+			};
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
+		}
+
+		if (m_Feet.IsActive())
+		{
+			auto Callback = [&](cEntity & a_Entity)
+			{
+				return m_Feet(a_Entity.GetEquippedBoots());
+			};
+			Res &= a_World.DoWithEntityByID(DestID, Callback);
+		}
+
+		auto FlagCallback = [&](cEntity & a_Entity)
+		{
+			if (m_IsOnFire)
+			{
+				Res &= a_Entity.IsOnFire();
+			}
+			if (m_IsSneaking)
+			{
+				Res &= a_Entity.IsCrouched();
+			}
+			if (m_IsSprinting)
+			{
+				Res &= a_Entity.IsSprinting();
+			}
+			if (m_IsSwimming)
+			{
+				Res &= a_Entity.IsInWater();
+			}
+			if (m_IsBaby)
+			{
+				if (a_Entity.IsMob())
+				{
+					const auto & Monster = static_cast<cMonster &>(a_Entity);
+					Res &= Monster.IsBaby();
+				}
+			}
+		};
+
+		a_World.DoWithEntityByID(DestID, FlagCallback);
+
+		Res &= m_Location(a_World, a_Noise, a_Pos, DestID, DestID);
+
+		if (!m_NBT.empty())
+		{
+			// Add NBT check here
+		}
+
+		if (m_Player)
+		{
+			if (m_Gamemode != eGameMode_NotSet)
+			{
+				Res &= a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
+				{
+				  if (!a_Entity.IsPlayer())
+				  {
+					  return false;
+				  }
+				  const auto & Player = static_cast<cPlayer &>(a_Entity);
+				  return (Player.GetGameMode() == m_Gamemode);
+				});
+			}
+			if ((m_LevelMin != 0) ||
+				(m_LevelMax != std::numeric_limits<int>::max()))
+			{
+				Res &= a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
+				{
+					if (!a_Entity.IsPlayer())
+					{
+						return false;
+					}
+					const auto & Player = static_cast<cPlayer &>(a_Entity);
+					return ((m_LevelMin <= Player.GetXpLevel()) && (Player.GetXpLevel() <= m_LevelMax));
+				});
+			}
+			// Add other player checks here!
+		}
+		if (!m_Team.empty())
+		{
+			Res &= a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
+			{
+				if (!a_Entity.IsPlayer())
+				{
+					return true;
+				}
+				const auto & Player = static_cast<cPlayer &>(a_Entity);
+				return (NoCaseCompare(Player.GetTeam()->GetName(), m_Team) == 0);
+			});
+		}
+
+		// Entity type
+
+		if (m_TargetEntity->IsActive())
+		{
+			UInt32 Target;
+			a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity){
+				if (a_Entity.IsMob())
+				{
+					Target = static_cast<cMonster &>(a_Entity).GetTarget()->GetUniqueID();
+				}
+				return true;
+			});
+
+			Res &= m_TargetEntity->operator()(a_World, a_Noise, a_Pos, Target, Target);
+		}
+
+		if (m_Vehicle->IsActive())
+		{
+			UInt32 Vehicle;
+			a_World.DoWithEntityByID(DestID, [&](cEntity & a_Entity)
+			{
+				if (a_Entity.IsPawn())
+				{
+					Vehicle = static_cast<cPawn &>(a_Entity).GetAttached()->GetUniqueID();
+				}
+				return true;
+			});
+
+			Res &= m_TargetEntity->operator()(a_World, a_Noise, a_Pos, Vehicle, Vehicle);
+		}
 		return Res;
 	}
 
@@ -986,8 +1149,26 @@ namespace LootTable
 
 	cInverted::cInverted(const Json::Value & a_Value)
 	{
-		// Todo: check if this is right
-		m_Conditions.emplace_back(ParseCondition(a_Value));
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Condition \"Inverted\" encountered a Json problem, dropping condition!");
+			return;
+		}
+		Json::Value Term;
+		if (a_Value.isMember("term"))
+		{
+			Term = a_Value["term"];
+		}
+		else if (a_Value.isMember("Term"))
+		{
+			Term = a_Value["Term"];
+		}
+		else
+		{
+			LOGWARNING("Loot table: Condition \"Inverted\" is missing it's sub condition, dropping condition!");
+		}
+		m_Conditions.emplace_back(ParseCondition(Term));
+		m_Active = true;
 	}
 
 
@@ -998,6 +1179,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 	{
+		ACTIVECHECK
 		return !std::visit(VISITCONDITION, m_Conditions[0].m_Parameter);
 	}
 
@@ -1465,7 +1647,7 @@ namespace LootTable
 
 
 
-	bool cMatchTool::operator()(cItem & a_Item) const
+	bool cMatchTool::operator()(const cItem & a_Item) const
 	{
 		ACTIVECHECK
 		bool Res = true;
@@ -1521,7 +1703,7 @@ namespace LootTable
 			Res &= m_Item.IsSameType(a_Item);
 		}
 
-		// TODO: 11.09.2020 - Todo: Add when implemented - Checks NBT Tag. - 12xx12
+		// TODO: 11.09.2020 - Add when implemented - Checks NBT Tag. - 12xx12
 		if (!m_NBT.empty())
 		{
 		}
@@ -1634,7 +1816,7 @@ namespace LootTable
 			LOGWARNING("Loot table: Condition \"Reference\" encountered a Json problem, dropping condition!");
 			return;
 		}
-		// TODO
+		// Todo
 		m_Active = true;
 	}
 
@@ -1656,7 +1838,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		// Todo:
+		// Todo
 		return true;
 	}
 
@@ -2398,7 +2580,44 @@ namespace LootTable
 
 	cFillPlayerHead::cFillPlayerHead(const Json::Value & a_Value)
 	{
-		// Todo:
+		if ((a_Value.empty()) || (!a_Value.isObject()))
+		{
+			LOGWARNING("Loot table: Function \"FillPlayerHead\" encountered a Json problem, dropping function!");
+			return;
+		}
+		AString Entity;
+		if (a_Value.isMember("entity"))
+		{
+			Entity = a_Value["entity"].asString();
+		}
+		else if (a_Value.isMember("Entity"))
+		{
+			Entity = a_Value["entity"].asString();
+		}
+		else
+		{
+			LOGWARNING("Loot table: Function \"FillPlayerHead\" is missing it's destination, dropping function!");
+			return;
+		}
+
+		if (NoCaseCompare(Entity, "this") == 0)
+		{
+			m_Dest = eDest::This;
+		}
+		else if (NoCaseCompare(Entity, "killer") == 0)
+		{
+			m_Dest = eDest::Killer;
+		}
+		else if ((NoCaseCompare(Entity, "killer_player")) || (NoCaseCompare(Entity, "KillerPlayer")))
+		{
+			m_Dest = eDest::KillerPlayer;
+		}
+		else
+		{
+			LOGWARNING("Loot table: Function \"FillPlayerHead\" got unknown destination %s, dropping function!", Entity);
+			return;
+		}
+		m_Active = true;
 	}
 
 
@@ -2407,7 +2626,78 @@ namespace LootTable
 
 	void cFillPlayerHead::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		// TODO:
+		ACTIVECHECK
+		switch (m_Dest)
+		{
+			case eDest::This:
+			{
+				a_World.DoWithEntityByID(a_KilledID, [&] (cEntity & a_Entity)
+				{
+					if (!a_Entity.IsMob())
+					{
+						return true;
+					}
+					const auto & Monster = static_cast<cMonster &>(a_Entity);
+					MobTypeToHead(Monster.GetMobType(), a_Item);
+				});
+				break;
+			}
+			case eDest::Killer: break;
+			case eDest::KillerPlayer:
+			{
+				a_World.DoWithEntityByID(a_KillerID, [&] (cEntity & a_Entity)
+				{
+					if (!a_Entity.IsPlayer())
+					{
+						return true;
+					}
+					a_Item.m_ItemType = E_ITEM_HEAD;
+					a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+				});
+				break;
+			}
+		}
+	}
+
+
+
+
+	cItem cFillPlayerHead::MobTypeToHead(eMonsterType a_Type, cItem & a_Item)
+	{
+		switch (a_Type)
+		{
+			case mtCreeper:
+			{
+				a_Item.m_ItemType = E_BLOCK_HEAD;
+				a_Item.m_ItemDamage = E_META_HEAD_CREEPER;
+				break;
+			}
+			case mtEnderDragon:
+			{
+				a_Item.m_ItemType = E_BLOCK_HEAD;
+				a_Item.m_ItemDamage = E_META_HEAD_DRAGON;
+				break;
+			}
+			case mtSkeleton:
+			{
+				a_Item.m_ItemType = E_BLOCK_HEAD;
+				a_Item.m_ItemDamage = E_META_HEAD_SKELETON;
+				break;
+			}
+			case mtWitherSkeleton:
+			{
+				a_Item.m_ItemType = E_BLOCK_HEAD;
+				a_Item.m_ItemDamage = E_META_HEAD_WITHER;
+				break;
+			}
+			case mtZombie:
+			{
+				a_Item.m_ItemType = E_BLOCK_HEAD;
+				a_Item.m_ItemDamage = E_META_HEAD_ZOMBIE;
+				break;
+			}
+			default: break;
+		}
 	}
 
 

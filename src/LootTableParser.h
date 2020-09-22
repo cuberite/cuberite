@@ -79,7 +79,7 @@ namespace LootTable
 			/** Default operation. Gets the killers item in hand and checks it */
 			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 			/** Simply checks the item given */
-			bool operator () (cItem & a_Item) const;
+			bool operator () (const cItem & a_Item) const;
 		private:
 			int m_CountMin = 0;
 			int m_CountMax = 65;  // Chose impossible value
@@ -255,9 +255,7 @@ namespace LootTable
 			AString m_Team;
 			// Type
 			cEntity::eEntityType m_EntityType;
-			// Target Entity - um yeah... I don't know
 			cEntityProperties * m_TargetEntity = nullptr;
-			// Vehicle - Needs to be allocated with new...
 			cEntityProperties * m_Vehicle = nullptr;
 		};
 
@@ -296,7 +294,7 @@ namespace LootTable
 			bool m_BypassesArmor;
 			bool m_BypassesInvulnerability;
 			bool m_BypassesMagic;
-			cEntityProperties m_DirectEntity;  // The entity that caused the damage
+			// cEntityProperties m_DirectEntity;  // The entity that caused the damage
 			bool m_IsFire;
 			bool m_IsMagic;
 			bool m_IsProjectile;
@@ -642,6 +640,10 @@ namespace LootTable
 		public:
 			cFillPlayerHead(const Json::Value & a_Value);
 			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+		private:
+			enum class eDest { This, Killer ,KillerPlayer };
+			enum eDest m_Dest = eDest::This;
+			static cItem MobTypeToHead(eMonsterType a_Type, cItem & a_Item);
 		};
 
 

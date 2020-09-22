@@ -103,10 +103,10 @@ public:
 	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
-	int GetXpLevel(void);
+	int GetXpLevel(void) const;
 
 	/** Gets the experience bar percentage - XpP */
-	float GetXpPercentage(void);
+	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
 	Ref: https://minecraft.gamepedia.com/XP
@@ -221,6 +221,9 @@ public:
 
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
+
+	/** Returns the associated team, nullptr if none */
+	const cTeam * GetTeam(void) const { return m_Team; }
 
 	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
