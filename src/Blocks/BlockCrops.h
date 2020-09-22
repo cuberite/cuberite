@@ -21,6 +21,24 @@ public:
 
 private:
 
+	char FortuneBinomialRandom(char a_Min, char a_Rolls) const
+	{
+		auto & random = GetRandomProvider();
+		char DropNum = a_Min;
+		for (unsigned char i=0; i<a_Rolls; i++)
+		{
+			if (random.RandBool(0.57))
+			{
+				DropNum++;
+			}
+		}
+		return DropNum;
+	}
+
+
+
+
+
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		auto & rand = GetRandomProvider();
@@ -45,30 +63,32 @@ private:
 		{
 			case E_BLOCK_BEETROOTS:
 			{
-				char SeedCount = 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2);  // [1 .. 3] with high preference of 2
+				const char SeedCount = FortuneBinomialRandom(0, 3 + ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount, 0);
-				char BeetrootCount = 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2);  // [1 .. 3] with high preference of 2
-				res.Add(E_ITEM_BEETROOT, BeetrootCount, 0);
+				res.Add(E_ITEM_BEETROOT, 1, 0);
 				break;
 			}
 			case E_BLOCK_CROPS:
 			{
 				res.Add(E_ITEM_WHEAT, 1, 0);
-				res.Add(E_ITEM_SEEDS, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
+				const char SeedCount = FortuneBinomialRandom(1, 3 + ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_SEEDS, SeedCount, 0);
 				break;
 			}
 			case E_BLOCK_CARROTS:
 			{
-				res.Add(E_ITEM_CARROT, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
+				const char CarrotCount = FortuneBinomialRandom(1, 4 + ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_CARROT, CarrotCount, 0);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
-				res.Add(E_ITEM_POTATO, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
-				if (rand.RandBool(0.05))
+				const char PotatoCount = FortuneBinomialRandom(2, 3 + ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_POTATO, PotatoCount, 0);
+				if (rand.RandBool(0.02))
 				{
-					// With a 5% chance, drop a poisonous potato as well
-					res.emplace_back(E_ITEM_POISONOUS_POTATO, 1, 0);
+					// With a 2% chance, drop a poisonous potato as well
+					res.Add(E_ITEM_POISONOUS_POTATO, 1, 0);
 				}
 				break;
 			}

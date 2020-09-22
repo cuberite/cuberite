@@ -37,12 +37,19 @@ private:
 			return cItem(m_BlockType, 1, a_BlockMeta);
 		}
 
-		// Drop seeds, sometimes:
-		if (GetRandomProvider().RandBool(0.125))
+		// Drop seeds, depending on bernoulli trial result:
+		auto & random = GetRandomProvider();
+		if (random.RandBool(0.875))
 		{
-			return cItem(E_ITEM_SEEDS);
+			// 87.5% chance of dropping nothing
+			return {};
 		}
-		return {};
+		else
+		{
+			// 12.5% chance of dropping some seeds
+			const char DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+			return cItem(E_ITEM_SEEDS, DropNum);
+		}
 	}
 
 

@@ -239,7 +239,7 @@ public:
 
 	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
 	{
-		push_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+		emplace_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
 	}
 
 	/** Adds a copy of all items in a_ItemGrid. */

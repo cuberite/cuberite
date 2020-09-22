@@ -237,9 +237,11 @@ public:
 	/** Returns a random number of drops taking into account fortune.
 	Only applies to drops following clamped discrete random distribution.
 	a_DefaultMax is the maximum items from one block without fortune.
+	a_BonusMax is the amount to increase the max of randInt by, usually the fortune level (but not always)
 	a_MaxDrop is the maximum items from one block with fortune,
-	if unspecified set to 25 to prevent lag or crash with high level tools. */
-	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned int a_FortuneLevel, char a_MaxDrop=25);
+	if unspecified set to 25 to prevent lag or crash with high level tools.
+	Similar to uniform_bonus_count at https://minecraft.gamepedia.com/Loot_table#Functions */
+	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned int a_BonusMax, char a_MaxDrop=25);
 
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);
