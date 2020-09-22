@@ -21,7 +21,7 @@ public:
 
 private:
 
-	char FortuneBinomialRandom(char a_Min, char a_Rolls) const
+	static char FortuneBinomialRandom(char a_Min, char a_Rolls)
 	{
 		auto & random = GetRandomProvider();
 		char DropNum = a_Min;

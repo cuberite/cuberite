@@ -241,7 +241,7 @@ public:
 	a_MaxDrop is the maximum items from one block with fortune,
 	if unspecified set to 25 to prevent lag or crash with high level tools.
 	Similar to uniform_bonus_count at https://minecraft.gamepedia.com/Loot_table#Functions */
-	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned int a_BonusMax, char a_MaxDrop=25);
+	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_MaxDrop=25);
 
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);

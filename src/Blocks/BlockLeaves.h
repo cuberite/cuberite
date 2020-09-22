@@ -25,6 +25,23 @@ public:
 
 private:
 
+	static double FortuneDropProbability(unsigned char a_DefaultDenominator, unsigned char a_FirstDenominatorReduction, unsigned char a_FortuneLevel)
+	{
+		// Fortune 3 behaves like fortune 4 for some reason
+		if (a_FortuneLevel == 3)
+		{
+			a_FortuneLevel++;
+		}
+		unsigned char Denominator = a_DefaultDenominator - a_FortuneLevel*a_FirstDenominatorReduction;
+		// if the denominator goes less than 10, cap it back to 10
+		Denominator = std::max<unsigned char>(Denominator, 10);
+		return 1 / static_cast<double>(Denominator);
+	}
+
+
+
+
+
 	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of leaves blocks. */
 	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
 	{
@@ -104,21 +121,23 @@ private:
 
 		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
 		// Note: It is possible (though very rare) for a single leaves block to drop both a sapling and an apple
-		// TODO: Take into account fortune for sapling drops.
-		double chance = 0.0;
+		double DropProbability;
+		const unsigned char FortuneLevel = ToolFortuneLevel(a_Tool);
 		auto & rand = GetRandomProvider();
 		cItems res;
+
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
 		{
-			// Jungle leaves have a 2.5% chance of dropping a sapling.
-			chance = 0.025;
+			// Jungle leaves have a 2.5% default chance of dropping a sapling.
+			DropProbability = FortuneDropProbability(40, 4, FortuneLevel);
 		}
 		else
 		{
-			// Other leaves have a 5% chance of dropping a sapling.
-			chance = 0.05;
+			// Other leaves have a 5% default chance of dropping a sapling.
+			DropProbability = FortuneDropProbability(20, 4, FortuneLevel);
 		}
-		if (rand.RandBool(chance))
+
+		if (rand.RandBool(DropProbability))
 		{
 			res.Add(
 				E_BLOCK_SAPLING,
@@ -127,14 +146,24 @@ private:
 			);
 		}
 
-		// 0.5 % chance of dropping an apple, if the leaves' type is Apple Leaves
+		// 0.5 % chance of dropping an apple, increased by fortune, if the leaves' type is Apple Leaves
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
-			if (rand.RandBool(0.005))
+			DropProbability = FortuneDropProbability(200, 20, FortuneLevel);
+			if (rand.RandBool(DropProbability))
 			{
 				res.Add(E_ITEM_RED_APPLE, 1, 0);
 			}
 		}
+
+		// 2% chance of dropping sticks (yuck) in 1.14
+		DropProbability = FortuneDropProbability(50, 5, FortuneLevel);
+		if (rand.RandBool(DropProbability))
+		{
+			// 1 or 2 sticks are dropped on success
+			res.Add(E_ITEM_STICK, rand.RandInt<char>(1, 2), 0);
+		}
+
 		return res;
 	}
 
