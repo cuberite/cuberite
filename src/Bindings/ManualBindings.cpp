@@ -4505,7 +4505,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPluginLua");
-			tolua_function(tolua_S, "AddWebTab", tolua_cPluginLua_AddWebTab);
+			tolua_function(tolua_S, "AddWebTab",        tolua_cPluginLua_AddWebTab);
+			tolua_function(tolua_S, "ExecuteOffThread", tolua_cPluginLua_ExecuteOffThread);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPluginManager");
