@@ -232,7 +232,7 @@ public:
 
 	/** Returns the fortune level of a tool, if it is a valid tool.
 	Can be used in ConvertToPickups() implementations. */
-	static unsigned int ToolFortuneLevel(const cItem * a_Tool);
+	static unsigned char ToolFortuneLevel(const cItem * a_Tool);
 
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);

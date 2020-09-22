@@ -649,16 +649,16 @@ bool cBlockHandler::ToolHasSilkTouch(const cItem * a_Tool)
 
 
 
-unsigned int cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
+unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 {
-	if (a_Tool != nullptr)
+	if ((a_Tool != nullptr) && ItemCategory::IsTool(a_Tool->m_ItemType))
 	{
-		return a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune);
+		// Return enchantment level, limited to avoid spawning excessive pickups (crashing the server) when modified items are used:
+		return std::min(8U, a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune));
 	}
-	else  // Not a tool
-	{
-		return 0;
-	}
+
+	// Not a tool:
+	return 0;
 }
 
 

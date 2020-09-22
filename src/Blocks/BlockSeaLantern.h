@@ -6,6 +6,7 @@
 
 
 
+
 class cBlockSeaLanternHandler :
 	public cBlockHandler
 {
@@ -24,13 +25,13 @@ private:
 		{
 			return cItem(E_BLOCK_SEA_LANTERN, 1, 0);
 		}
-		else
-		{
-			unsigned int DropNum = GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool));
-			// cap the dropnum to the max amount of 5
-			DropNum = std::min<unsigned int>(DropNum, 5);
-			// Reset meta to 0
-			return cItem(E_ITEM_PRISMARINE_CRYSTALS, DropNum, 0);
-		}
+
+		// Number of crystals to drop, capped at the max amount of 5.
+		const auto Drops = std::min(
+			static_cast<char>(5),
+			GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool))
+		);
+
+		return cItem(E_ITEM_PRISMARINE_CRYSTALS, Drops);
 	}
 } ;
