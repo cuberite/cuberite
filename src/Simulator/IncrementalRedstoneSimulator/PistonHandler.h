@@ -60,5 +60,8 @@ namespace PistonHandler
 				Callback(a_Position + Offset);
 			}
 		}
+
+		// Consider indirect power:
+		Callback.CheckIndirectPower();
 	}
 };
