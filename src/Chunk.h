@@ -90,6 +90,11 @@ public:
 	/** Returns true if the chunk could have been unloaded if it weren't dirty */
 	bool CanUnloadAfterSaving(void) const;
 
+	/** Called when the chunkmap unloads unused chunks.
+	Notifies contained entities that they are being unloaded and should for example, broadcast a destroy packet.
+	Not called during server shutdown; such cleanup during shutdown is unnecessary. */
+	void OnUnload();
+
 	bool IsLightValid(void) const {return m_IsLightValid; }
 
 	/*

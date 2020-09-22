@@ -341,9 +341,6 @@ public:
 	initialize clients with our position. */
 	Vector3d GetLastSentPosition(void) const { return m_LastSentPosition; }
 
-	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
-	void DestroyNoScheduling(bool a_ShouldBroadcast);
-
 	/** Makes this entity take damage specified in the a_TDI.
 	The TDI is sent through plugins first, then applied.
 	If it returns false, the entity hasn't receive any damage. */
