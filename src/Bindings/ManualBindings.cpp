@@ -1777,6 +1777,34 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 
 
 
+static int tolua_cPluginLua_ExecuteOffThread(lua_State * tolua_S)
+{
+	cLuaState own = cLuaState(tolua_S);
+	AString luaCode;
+	if (!own.GetStackValue(2, luaCode))
+	{
+		LOGWARNING("Expected string with Lua code.");
+		return 0;
+	}
+
+	auto callback = [luaCode]() {
+		cLuaState state = cLuaState("Testing");
+		state.Create();
+		state.RegisterAPILibs();
+		state.LoadStringW(luaCode, "");
+	};
+
+	std::thread thread = std::thread(callback);
+	thread.detach();
+	own.Push(true);
+
+	return 1;
+}
+
+
+
+
+
 static int tolua_cPlugin_GetDirectory(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
