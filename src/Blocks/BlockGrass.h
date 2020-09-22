@@ -52,7 +52,7 @@ private:
 		const Vector3i a_RelPos
 	) const override
 	{
-		if (!a_Chunk.GetWorld()->IsChunkLighted(a_Chunk.GetPosX(), a_Chunk.GetPosZ()))
+		if (!a_Chunk.IsLightValid())
 		{
 			a_Chunk.GetWorld()->QueueLightChunk(a_Chunk.GetPosX(), a_Chunk.GetPosZ());
 			return;
@@ -133,7 +133,7 @@ private:
 		}
 
 		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_RelPos);
-		if (Chunk == nullptr)
+		if ((Chunk == nullptr) || !Chunk->IsValid())
 		{
 			// Unloaded chunk
 			return;
