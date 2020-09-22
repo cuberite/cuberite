@@ -31,6 +31,44 @@ private:
 		}
 	}
 
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
+	{
+		if (a_WorldInterface.GetDimension() == dimNether)
+		{
+			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
+		}
+		// Artificial light on any of the surrounding block > 11 leads to melting ice
+		bool Smelt = false;
+		Vector3i Pos;
+		cChunk *Chunk;
+
+		Vector3i Coords[7] =
+			{{1, 0, 0}, {-1, 0, 0},
+			{0, 1, 0}, {0, -1, 0},
+			{0, 0, 1}, {0, 0, -1},
+			{0, 0, 0}};
+
+		auto StartAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+
+		for (int i = 0; i < ARRAYCOUNT(Coords); ++i)
+		{
+			Pos = StartAbsPos + Coords[i];
+			Chunk = a_Chunk.GetNeighborChunk(Pos.x, Pos.z);
+			Smelt |= Chunk->GetBlockLight(Chunk->AbsoluteToRelative(Pos)) > 11;
+		}
+
+		if (Smelt)
+		{
+			a_Chunk.SetBlock(a_RelPos, E_BLOCK_STATIONARY_WATER, 0);
+		}
+	}
+
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
