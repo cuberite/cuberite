@@ -29,6 +29,7 @@
 
 
 class cChunk;
+class cItems;
 class cPlayer;
 class cWorld;
 class cBlockEntity;
@@ -82,6 +83,10 @@ public:
 	/** Makes an exact copy of this block entity, except for its m_World (set to nullptr), and at a new position.
 	Uses CopyFrom() to copy the properties. */
 	OwnedBlockEntity Clone(Vector3i a_Pos);
+
+	/** Returns the contents of this block entity that it would drop if broken.
+	Note that the block itself is not included; that's handled by the block handler. */
+	virtual cItems ConvertToPickups() const;
 
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
 	Each non-abstract descendant should override to copy its specific properties, and call

@@ -25,6 +25,15 @@ cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
+cItems cMobHeadEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
+}
+
+
+
+
+
 void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);

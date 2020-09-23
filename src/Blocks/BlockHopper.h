@@ -8,9 +8,9 @@
 
 
 class cBlockHopperHandler :
-	public cPitchYawRotator<cContainerEntityHandler<cBlockEntityHandler>>
+	public cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>
 {
-	using Super = cPitchYawRotator<cContainerEntityHandler<cBlockEntityHandler>>;
+	using Super = cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>;
 
 public:
 

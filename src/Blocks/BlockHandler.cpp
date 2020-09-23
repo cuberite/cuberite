@@ -522,21 +522,13 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(
-	NIBBLETYPE a_BlockMeta,
-	cBlockEntity * a_BlockEntity,
-	const cEntity * a_Digger,
-	const cItem * a_Tool
-) const
+cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
-	UNUSED(a_BlockEntity);
 	UNUSED(a_Digger);
 	UNUSED(a_Tool);
 
 	// Add self:
-	cItems res;
-	res.push_back(cItem(m_BlockType, 1, a_BlockMeta));
-	return res;
+	return cItem(m_BlockType, 1, a_BlockMeta);
 }
 
 
