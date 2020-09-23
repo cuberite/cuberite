@@ -38,17 +38,14 @@ private:
 		}
 
 		// Drop seeds, depending on bernoulli trial result:
-		if (GetRandomProvider().RandBool(0.875))
+		if (GetRandomProvider().RandBool(0.875))  // 87.5% chance of dropping nothing
 		{
-			// 87.5% chance of dropping nothing
 			return {};
 		}
-		else
-		{
-			// 12.5% chance of dropping 0 or more seeds
-			const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
-			return cItem(E_ITEM_SEEDS, DropNum);
-		}
+
+		// 12.5% chance of dropping 0 or more seeds
+		const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+		return cItem(E_ITEM_SEEDS, DropNum);
 	}
 
 

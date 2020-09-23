@@ -25,12 +25,10 @@ private:
 		{
 			// Fully grown, drop the entire produce:
 			const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool));
-			return cItem(E_ITEM_NETHER_WART, DropNum, 0);
+			return cItem(E_ITEM_NETHER_WART, DropNum);
 		}
-		else
-		{
-			return cItem(E_ITEM_NETHER_WART);
-		}
+
+		return cItem(E_ITEM_NETHER_WART);
 	}
 
 
