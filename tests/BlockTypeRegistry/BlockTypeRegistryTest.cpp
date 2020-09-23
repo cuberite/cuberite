@@ -1,6 +1,5 @@
 
 #include "Globals.h"
-#include <thread>
 #include "BlockTypeRegistry.h"
 #include "../TestHelpers.h"
 
