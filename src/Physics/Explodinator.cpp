@@ -104,8 +104,27 @@ namespace Explodinator
 		});
 	}
 
+	/** Returns true if block should always drop when exploded.
+	Currently missing conduits from 1.13 */
+	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
+	{
+		// If it's a Shulker box
+		if ((a_Block >= E_BLOCK_WHITE_SHULKER_BOX) && (a_Block <= E_BLOCK_BLACK_SHULKER_BOX))
+		{
+			return true;
+		}
+		switch (a_Block)
+		{
+			case E_BLOCK_DRAGON_EGG:
+			case E_BLOCK_BEACON:
+			case E_BLOCK_HEAD: return true;
+		}
+
+		return false;
+	}
+
 	/** Sets the block at the given position, updating surroundings. */
-	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
+	static void SetBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
 
@@ -119,7 +138,8 @@ namespace Explodinator
 		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, a_ExplodingEntity);
 	}
 
-	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.
+	/** Work out what should happen when explosion destroys the given block
+	lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
@@ -134,7 +154,8 @@ namespace Explodinator
 		auto & World = *a_Chunk.GetWorld();
 		auto & Random = GetRandomProvider();
 		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
-		if (DestroyedBlock == E_BLOCK_TNT)
+
+		if (DestroyedBlock == E_BLOCK_TNT)  // If the block is TNT we should set it off
 		{
 			// Random fuse between 10 to 30 game ticks.
 			const int FuseTime = Random.RandInt(10, 30);
@@ -142,7 +163,9 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		else if (Random.RandBool(1.f / a_Power))
+		/** If the block was not TNT, and we are a TNT explosion,
+		or it is a block that always drops, or if RandBool, then drop pickups */
+		else if ((a_ExplodingEntity->GetEntityType() == cEntity::etTNT) || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
@@ -153,11 +176,11 @@ namespace Explodinator
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
-				DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
+				SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
 				return;
 			}
 		}
-		else if (const auto Shrapnel = World.GetTNTShrapnelLevel(); (Shrapnel > slNone) && Random.RandBool(0))  // 20% chance of flinging stuff around
+		else if (const auto Shrapnel = World.GetTNTShrapnelLevel(); (Shrapnel > slNone) && Random.RandBool(0))  // Currently 0% chance of flinging stuff around
 		{
 			// If the block is shrapnel-able, make a falling block entity out of it:
 			if (
@@ -172,7 +195,7 @@ namespace Explodinator
 			}
 		}
 
-		DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
+		SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
