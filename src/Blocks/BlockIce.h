@@ -25,10 +25,7 @@ private:
 		{
 			return cItem(m_BlockType);
 		}
-		else
-		{
-			return {};
-		}
+		return {};
 	}
 
 	virtual void OnUpdate(
@@ -39,33 +36,36 @@ private:
 		const Vector3i a_RelPos
 	) const override
 	{
+		// disappears instantly in nether
 		if (a_WorldInterface.GetDimension() == dimNether)
 		{
 			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
+			return;
 		}
-		// Artificial light on any of the surrounding block > 11 leads to melting ice
-		bool Smelt = false;
-		Vector3i Pos;
-		cChunk *Chunk;
+		// Artificial light on any of the surrounding block > 11 leads to melting the ice
+		const std::array<Vector3i, 7> Offsets =
+			{Vector3i(1, 0, 0), Vector3i(-1, 0, 0),
+			Vector3i(0, 1, 0), Vector3i(0, -1, 0),
+			Vector3i(0, 0, 1), Vector3i(0, 0, -1)};
 
-		Vector3i Coords[7] =
-			{{1, 0, 0}, {-1, 0, 0},
-			{0, 1, 0}, {0, -1, 0},
-			{0, 0, 1}, {0, 0, -1},
-			{0, 0, 0}};
-
-		auto StartAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-
-		for (int i = 0; i < ARRAYCOUNT(Coords); ++i)
+		for (const auto & Offset : Offsets)
 		{
-			Pos = StartAbsPos + Coords[i];
-			Chunk = a_Chunk.GetNeighborChunk(Pos.x, Pos.z);
-			Smelt |= Chunk->GetBlockLight(Chunk->AbsoluteToRelative(Pos)) > 11;
-		}
+			auto Position = a_RelPos + Offset;
+			const auto Chunk = a_Chunk.GetRelNeighborChunk(Position.x, Position.z);
+			if (!Chunk->IsLightValid())
+			{
+				Chunk->GetWorld()->QueueLightChunk(Chunk->GetPosX(), Chunk->GetPosZ());
+				return;
+			}
 
-		if (Smelt)
-		{
-			a_Chunk.SetBlock(a_RelPos, E_BLOCK_STATIONARY_WATER, 0);
+			Position.x = ((Position.x % cChunk::Width) + cChunk::Width) % cChunk::Width;
+			Position.z = ((Position.z % cChunk::Width) + cChunk::Width) % cChunk::Width;
+
+			if (Chunk->GetBlockLight(Position) > 11)
+			{
+				a_Chunk.SetBlock(a_RelPos, E_BLOCK_STATIONARY_WATER, 0);
+				return;
+			}
 		}
 	}
 
