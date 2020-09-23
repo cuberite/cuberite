@@ -122,9 +122,9 @@ private:
 		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
 		// Note: It is possible (though very rare) for a single leaves block to drop both a sapling and an apple
 		double DropProbability;
-		const unsigned char FortuneLevel = ToolFortuneLevel(a_Tool);
-		auto & rand = GetRandomProvider();
-		cItems res;
+		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
+		auto & Random = GetRandomProvider();
+		cItems Res;
 
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
 		{
@@ -137,9 +137,9 @@ private:
 			DropProbability = FortuneDropProbability(20, 4, FortuneLevel);
 		}
 
-		if (rand.RandBool(DropProbability))
+		if (Random.RandBool(DropProbability))
 		{
-			res.Add(
+			Res.Add(
 				E_BLOCK_SAPLING,
 				1,
 				(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : static_cast<short>(4 + (a_BlockMeta & 0x01))
@@ -150,21 +150,21 @@ private:
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
 			DropProbability = FortuneDropProbability(200, 20, FortuneLevel);
-			if (rand.RandBool(DropProbability))
+			if (Random.RandBool(DropProbability))
 			{
-				res.Add(E_ITEM_RED_APPLE, 1, 0);
+				Res.Add(E_ITEM_RED_APPLE, 1, 0);
 			}
 		}
 
 		// 2% chance of dropping sticks (yuck) in 1.14
 		DropProbability = FortuneDropProbability(50, 5, FortuneLevel);
-		if (rand.RandBool(DropProbability))
+		if (Random.RandBool(DropProbability))
 		{
 			// 1 or 2 sticks are dropped on success
-			res.Add(E_ITEM_STICK, rand.RandInt<char>(1, 2), 0);
+			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2), 0);
 		}
 
-		return res;
+		return Res;
 	}
 
 

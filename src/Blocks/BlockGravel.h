@@ -24,12 +24,10 @@ private:
 		}
 		else
 		{
-			// Denominator of probability from wiki
-			double Denominator = 10 - (3 * ToolFortuneLevel(a_Tool));
-			// if it went below 0, reset to 1 (only for Fortune > IV)
-			Denominator = std::max<double>(Denominator, 1);
-			auto & random = GetRandomProvider();
-			if (random.RandBool(1 / Denominator))
+			// Denominator of probability from wiki, don't let it go below 1
+			double Denominator = std::max(10 - (3 * ToolFortuneLevel(a_Tool)), 1);
+			auto & Random = GetRandomProvider();
+			if (Random.RandBool(1 / Denominator))
 			{
 				return cItem(E_ITEM_FLINT, 1, 0);
 			}

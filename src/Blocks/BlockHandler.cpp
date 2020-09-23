@@ -665,12 +665,12 @@ unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 
 
 
-char cBlockHandler::FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_MaxDrop)
+char cBlockHandler::FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_DropCap)
 {
 	// First sample the discrete random distribution
-	unsigned char DropNum = GetRandomProvider().RandInt<unsigned char>(a_MinDrop, a_DefaultMax + a_BonusMax);
+	char DropNum = GetRandomProvider().RandInt<char>(a_MinDrop, a_DefaultMax + a_BonusMax);
 	// Then clamp to within range (clamp instead of min incase of overflow)
-	return std::clamp<char>(DropNum, a_MinDrop, a_MaxDrop);
+	return std::clamp<char>(DropNum, a_MinDrop, a_DropCap);
 }
 
 
