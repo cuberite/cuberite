@@ -40,7 +40,16 @@ cJukeboxEntity::~cJukeboxEntity()
 void cJukeboxEntity::Destroy(void)
 {
 	ASSERT(m_World != nullptr);
-	EjectRecord();
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
+}
+
+
+
+
+
+cItems cJukeboxEntity::ConvertToPickups() const
+{
+	return IsPlayingRecord() ? cItem(static_cast<short>(m_Record)) : cItems();
 }
 
 

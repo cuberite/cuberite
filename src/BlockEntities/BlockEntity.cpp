@@ -128,6 +128,15 @@ OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 
 
 
+cItems cBlockEntity::ConvertToPickups() const
+{
+	return {};
+}
+
+
+
+
+
 void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	// Nothing to copy, but check that we're copying the right entity:

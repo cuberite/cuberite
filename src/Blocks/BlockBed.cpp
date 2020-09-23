@@ -168,14 +168,10 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
-	short color = E_META_WOOL_RED;
-	if (a_BlockEntity != nullptr)
-	{
-		color = reinterpret_cast<cBedEntity *>(a_BlockEntity)->GetColor();
-	}
-	return cItem(E_ITEM_BED, 1, color);
+	// Drops handled by the block entity:
+	return {};
 }
 
 

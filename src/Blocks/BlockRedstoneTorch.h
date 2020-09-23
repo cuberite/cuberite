@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Always drop the ON torch, meta 0
 		return cItem(E_BLOCK_REDSTONE_TORCH_ON, 1, 0);
