@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "BlockTypeRegistry.h"
 #include "Defines.h"
 #include "FunctionRef.h"
 #include "HTTP/HTTPServer.h"
@@ -96,7 +95,7 @@ public:
 	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
 
 	/** Returns the (read-write) storage for registered block types. */
-	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
+	// BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -233,7 +232,7 @@ private:
 	cHTTPServer m_HTTPServer;
 
 	/** The storage for all registered block types. */
-	BlockTypeRegistry m_BlockTypeRegistry;
+	// BlockTypeRegistry m_BlockTypeRegistry;
 
 
 	void LoadGlobalSettings();

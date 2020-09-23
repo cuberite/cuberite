@@ -1,5 +1,4 @@
 #include "Globals.h"
-#include <tuple>
 #include "PalettedBlockArea.h"
 #include "../TestHelpers.h"
 
