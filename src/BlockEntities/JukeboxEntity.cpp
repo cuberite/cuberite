@@ -65,17 +65,20 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 		EjectRecord();
 		return true;
 	}
-	else
-	{
-		const cItem & HeldItem = a_Player->GetEquippedItem();
-		if (PlayRecord(HeldItem.m_ItemType) && !a_Player->IsGameModeCreative())
-		{
-			a_Player->GetStatManager().AddValue(Statistic::PlayRecord);
 
+	const cItem & HeldItem = a_Player->GetEquippedItem();
+	if (PlayRecord(HeldItem.m_ItemType))
+	{
+		a_Player->GetStatManager().AddValue(Statistic::PlayRecord);
+		if (!a_Player->IsGameModeCreative())
+		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
-			return true;
 		}
+
+		return true;
 	}
+
+	// No state change, continue with block placement:
 	return false;
 }
 
@@ -90,11 +93,13 @@ bool cJukeboxEntity::PlayRecord(int a_Record)
 		// This isn't a Record Item
 		return false;
 	}
+
 	if (IsPlayingRecord())
 	{
 		// A Record is already in the Jukebox.
 		EjectRecord();
 	}
+
 	m_Record = a_Record;
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), m_Record);
 	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_ON);
@@ -113,12 +118,11 @@ bool cJukeboxEntity::EjectRecord(void)
 		return false;
 	}
 
-	cItems Drops;
-	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
-	m_Record = 0;
-	m_World->SpawnItemPickups(Drops, Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
+	m_World->SpawnItemPickups(cItem(static_cast<short>(m_Record)), Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
 	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_OFF);
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
+
+	m_Record = 0;
 	return true;
 }
 
@@ -126,9 +130,9 @@ bool cJukeboxEntity::EjectRecord(void)
 
 
 
-bool cJukeboxEntity::IsPlayingRecord(void)
+bool cJukeboxEntity::IsPlayingRecord(void) const
 {
-	return (m_Record != 0);
+	return m_Record != 0;
 }
 
 
