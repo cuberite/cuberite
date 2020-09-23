@@ -48,6 +48,7 @@ target_sources(
 	BlockHandler.h
 	BlockHopper.h
 	BlockIce.h
+	BlockJukebox.h
 	BlockLadder.h
 	BlockLeaves.h
 	BlockLever.h
