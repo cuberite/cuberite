@@ -804,9 +804,12 @@ bool cItems::ContainsType(const cItem & a_Item)
 
 void cItems::AddItemGrid(const cItemGrid & a_ItemGrid)
 {
-	auto numSlots = a_ItemGrid.GetNumSlots();
-	for (int i = 0; i < numSlots; ++i)
+	for (int i = 0; i < a_ItemGrid.GetNumSlots(); ++i)
 	{
-		Add(a_ItemGrid.GetSlot(i));
+		const auto & Slot = a_ItemGrid.GetSlot(i);
+		if (!Slot.IsEmpty())
+		{
+			Add(Slot);
+		}
 	}
 }
