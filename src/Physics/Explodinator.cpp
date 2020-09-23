@@ -83,7 +83,7 @@ namespace Explodinator
 			// Percentage of rays unobstructed.
 			const auto Exposure = CalculateEntityExposure(a_Chunk, Entity, a_Position, SquareRadius);
 			const auto Direction = Entity.GetPosition() - a_Position;
-			const auto Impact = (1 - (static_cast<float>(Direction.Length()) / Radius)) * Exposure;
+			auto Impact = (1 - (static_cast<float>(Direction.Length()) / Radius)) * Exposure;
 
 			// Don't apply damage to other TNT entities and falling blocks, they should be invincible:
 			if (!Entity.IsTNT() && !Entity.IsFallingBlock())
@@ -92,9 +92,12 @@ namespace Explodinator
 				Entity.TakeDamage(dtExplosion, nullptr, FloorC(Damage), 0);
 			}
 
-			// Impact reduced by armour:
-			const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();  // TODO: call is very expensive, should only apply to Pawns
-			Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
+			// Impact reduced by armour, expensive call so only apply to Pawns:
+			if (Entity.IsPawn())
+			{
+				Impact *= 1 - Entity.GetEnchantmentBlastKnockbackReduction();
+			}
+			Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
 
 			// Continue iteration:
 			return false;
