@@ -37,7 +37,7 @@ public:  // tolua_export
 	bool EjectRecord(void);
 
 	/** Is in the Jukebox a Record? */
-	bool IsPlayingRecord(void);
+	bool IsPlayingRecord(void) const;
 
 	static bool IsRecordItem(int a_Item)
 	{
@@ -48,6 +48,7 @@ public:  // tolua_export
 
 	// cBlockEntity overrides:
 	virtual void Destroy(void) override;
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
