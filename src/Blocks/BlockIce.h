@@ -51,15 +51,12 @@ private:
 		for (const auto & Offset : Offsets)
 		{
 			auto Position = a_RelPos + Offset;
-			const auto Chunk = a_Chunk.GetRelNeighborChunk(Position.x, Position.z);
+			const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Position);
 			if (!Chunk->IsLightValid())
 			{
 				Chunk->GetWorld()->QueueLightChunk(Chunk->GetPosX(), Chunk->GetPosZ());
 				return;
 			}
-
-			Position.x = ((Position.x % cChunk::Width) + cChunk::Width) % cChunk::Width;
-			Position.z = ((Position.z % cChunk::Width) + cChunk::Width) % cChunk::Width;
 
 			if (Chunk->GetBlockLight(Position) > 11)
 			{
