@@ -8,6 +8,7 @@
 #include "../MobSpawner.h"
 #include "../ClientHandle.h"
 #include "../Items/ItemSpawnEgg.h"
+#include "ChunkDataCallback.h"
 
 
 
@@ -144,23 +145,23 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					break;
 				}
 
-				Vector3i spawnRelPos(GetRelPos());
-				spawnRelPos += Vector3i(
+				Vector3i SpawnRelPos(GetRelPos());
+				SpawnRelPos += Vector3i(
 					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0),
 					Random.RandInt(-1, 1),
 					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0)
 				);
 
-				auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(spawnRelPos);
-				if ((chunk == nullptr) || !chunk->IsValid())
+				auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(SpawnRelPos);
+				if ((Chunk == nullptr) || !Chunk->IsValid())
 				{
 					continue;
 				}
-				EMCSBiome Biome = chunk->GetBiomeAt(spawnRelPos.x, spawnRelPos.z);
+				EMCSBiome Biome = Chunk->GetBiomeAt(SpawnRelPos.x, SpawnRelPos.z);
 
-				if (cMobSpawner::CanSpawnHere(chunk, spawnRelPos, MobType, Biome))
+				if (cMobSpawner::CanSpawnHere(Chunk, SpawnRelPos, MobType, Biome))
 				{
-					auto absPos = chunk->RelativeToAbsolute(spawnRelPos);
+					auto absPos = Chunk->RelativeToAbsolute(SpawnRelPos);
 					auto monster = cMonster::NewMonsterFromType(MobType);
 					if (monster == nullptr)
 					{
@@ -168,7 +169,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					}
 					monster->SetPosition(absPos);
 					monster->SetYaw(Random.RandReal(360.0f));
-					if (chunk->GetWorld()->SpawnMobFinalize(std::move(monster)) != cEntity::INVALID_ID)
+					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
 						m_World->BroadcastSoundParticleEffect(
