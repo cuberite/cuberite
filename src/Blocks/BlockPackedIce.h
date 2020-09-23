@@ -21,7 +21,8 @@ private:
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drop self when using silk-touch:
-		if (ToolHasSilkTouch(a_Tool)) {
+		if (ToolHasSilkTouch(a_Tool))
+		{
 			return cItem(m_BlockType);
 		}
 		return {};
