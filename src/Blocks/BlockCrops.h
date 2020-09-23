@@ -48,10 +48,10 @@ private:
 		{
 			switch (m_BlockType)
 			{
-				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS, 1, 0); break;
-				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS,          1, 0); break;
-				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT,         1, 0); break;
-				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO,         1, 0); break;
+				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS); break;
+				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS); break;
+				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT); break;
+				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO); break;
 			}
 			ASSERT(!"Unhandled block type");
 			return {};
@@ -64,31 +64,31 @@ private:
 			case E_BLOCK_BEETROOTS:
 			{
 				const auto SeedCount = FortuneBinomialRandom(0, 3 + ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount, 0);
-				res.Add(E_ITEM_BEETROOT, 1, 0);
+				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
+				res.Add(E_ITEM_BEETROOT);
 				break;
 			}
 			case E_BLOCK_CROPS:
 			{
-				res.Add(E_ITEM_WHEAT, 1, 0);
+				res.Add(E_ITEM_WHEAT);
 				const auto SeedCount = FortuneBinomialRandom(1, 3 + ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_SEEDS, SeedCount, 0);
+				res.Add(E_ITEM_SEEDS, SeedCount);
 				break;
 			}
 			case E_BLOCK_CARROTS:
 			{
 				const auto CarrotCount = FortuneBinomialRandom(1, 4 + ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_CARROT, CarrotCount, 0);
+				res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
 				const auto PotatoCount = FortuneBinomialRandom(2, 3 + ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_POTATO, PotatoCount, 0);
+				res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
 					// With a 2% chance, drop a poisonous potato as well
-					res.Add(E_ITEM_POISONOUS_POTATO, 1, 0);
+					res.Add(E_ITEM_POISONOUS_POTATO);
 				}
 				break;
 			}

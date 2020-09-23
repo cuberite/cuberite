@@ -20,7 +20,7 @@ private:
 	{
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(E_BLOCK_GRAVEL, 1, 0);
+			return cItem(E_BLOCK_GRAVEL);
 		}
 		else
 		{
@@ -29,11 +29,11 @@ private:
 			auto & Random = GetRandomProvider();
 			if (Random.RandBool(1 / Denominator))
 			{
-				return cItem(E_ITEM_FLINT, 1, 0);
+				return cItem(E_ITEM_FLINT);
 			}
 			else
 			{
-				return cItem(E_BLOCK_GRAVEL, 1, 0);
+				return cItem(E_BLOCK_GRAVEL);
 			}
 		}
 	}

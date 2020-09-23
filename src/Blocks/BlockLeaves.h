@@ -115,7 +115,7 @@ private:
 		// If breaking with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			return cItem(m_BlockType, a_BlockMeta & 0x03);
+			return cItem(m_BlockType, 1, a_BlockMeta & 0x03);
 		}
 
 
@@ -152,7 +152,7 @@ private:
 			DropProbability = FortuneDropProbability(200, 20, FortuneLevel);
 			if (Random.RandBool(DropProbability))
 			{
-				Res.Add(E_ITEM_RED_APPLE, 1, 0);
+				Res.Add(E_ITEM_RED_APPLE);
 			}
 		}
 
@@ -161,7 +161,7 @@ private:
 		if (Random.RandBool(DropProbability))
 		{
 			// 1 or 2 sticks are dropped on success
-			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2), 0);
+			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2));
 		}
 
 		return Res;

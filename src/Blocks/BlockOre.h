@@ -41,7 +41,7 @@ private:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{   // Redstone follows the discrete random distribution, unlike other ores
 				const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
-				return cItem(E_ITEM_REDSTONE_DUST, DropNum, 0);
+				return cItem(E_ITEM_REDSTONE_DUST, DropNum);
 			}
 			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * Random.RandInt<char>(4, 9), 4);
 			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
