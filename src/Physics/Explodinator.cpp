@@ -10,7 +10,9 @@
 #include "LineBlockTracer.h"
 #include "Simulator/SandSimulator.h"
 
-
+//KingCol13 debugging:
+#include <chrono>
+#include <iostream>
 
 
 
@@ -311,7 +313,12 @@ namespace Explodinator
 		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{
 			LagTheClient(a_Chunk, a_Position, a_Power);
+			std::cout << "Starting timer." << std::endl;
+			auto t1 = std::chrono::high_resolution_clock::now();
 			DamageEntities(a_Chunk, a_Position, a_Power);
+			auto t2 = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
+			std::cout << "Finished. Time taken: " << duration << std::endl;
 			DamageBlocks(a_Chunk, AbsoluteToRelative(a_Position, a_Chunk.GetPos()), a_Power, a_Fiery, a_ExplodingEntity);
 
 			return false;
