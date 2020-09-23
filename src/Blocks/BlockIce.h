@@ -52,10 +52,15 @@ private:
 		{
 			auto Position = a_RelPos + Offset;
 			const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Position);
+			if ((Chunk == nullptr) || !Chunk->IsValid())
+			{
+				continue;
+			}
+
 			if (!Chunk->IsLightValid())
 			{
 				Chunk->GetWorld()->QueueLightChunk(Chunk->GetPosX(), Chunk->GetPosZ());
-				return;
+				continue;
 			}
 
 			if (Chunk->GetBlockLight(Position) > 11)
