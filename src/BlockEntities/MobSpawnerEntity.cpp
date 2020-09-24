@@ -8,7 +8,6 @@
 #include "../MobSpawner.h"
 #include "../ClientHandle.h"
 #include "../Items/ItemSpawnEgg.h"
-#include "ChunkDataCallback.h"
 
 
 
@@ -125,14 +124,13 @@ void cMobSpawnerEntity::ResetTimer(void)
 
 void cMobSpawnerEntity::SpawnEntity(void)
 {
-	int NearbyEntities = GetNearbyMonsterNum(m_Entity);
+	auto NearbyEntities = GetNearbyMonsterNum(m_Entity);
 	if (NearbyEntities >= 6)
 	{
 		ResetTimer();
 		return;
 	}
 
-	auto MobType = m_Entity;
 	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [&](cChunk & a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
@@ -145,7 +143,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					break;
 				}
 
-				Vector3i SpawnRelPos(GetRelPos());
+				auto SpawnRelPos(GetRelPos());
 				SpawnRelPos += Vector3i(
 					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0),
 					Random.RandInt(-1, 1),
@@ -159,24 +157,20 @@ void cMobSpawnerEntity::SpawnEntity(void)
 				}
 				EMCSBiome Biome = Chunk->GetBiomeAt(SpawnRelPos.x, SpawnRelPos.z);
 
-				if (cMobSpawner::CanSpawnHere(Chunk, SpawnRelPos, MobType, Biome))
+				if (cMobSpawner::CanSpawnHere(Chunk, SpawnRelPos, m_Entity, Biome, true))
 				{
-					auto absPos = Chunk->RelativeToAbsolute(SpawnRelPos);
-					auto monster = cMonster::NewMonsterFromType(MobType);
-					if (monster == nullptr)
+					auto AbsPos = Chunk->RelativeToAbsolute(SpawnRelPos);
+					auto Monster = cMonster::NewMonsterFromType(m_Entity);
+					if (Monster == nullptr)
 					{
 						continue;
 					}
-					monster->SetPosition(absPos);
-					monster->SetYaw(Random.RandReal(360.0f));
-					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(monster)) != cEntity::INVALID_ID)
+					Monster->SetPosition(AbsPos);
+					Monster->SetYaw(Random.RandReal(360.0f));
+					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
-						m_World->BroadcastSoundParticleEffect(
-							EffectID::PARTICLE_MOBSPAWN,
-							absPos,
-							0
-						);
+						m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_MOBSPAWN, AbsPos, 0);
 						NearbyEntities++;
 					}
 				}
