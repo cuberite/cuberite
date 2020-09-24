@@ -59,6 +59,7 @@
 #include "BlockNetherWart.h"
 #include "BlockObserver.h"
 #include "BlockOre.h"
+#include "BlockPackedIce.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
 #include "BlockPortal.h"
@@ -354,7 +355,7 @@ namespace
 	constexpr cBlockHandler                   BlockObsidianHandler              (E_BLOCK_OBSIDIAN);
 	constexpr cBlockGlazedTerracottaHandler   BlockOrangeGlazedTerracottaHandler(E_BLOCK_ORANGE_GLAZED_TERRACOTTA);
 	constexpr cBlockHandler                   BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
-	constexpr cBlockIceHandler                BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
+	constexpr cBlockPackedIceHandler          BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
 	constexpr cBlockGlazedTerracottaHandler   BlockPinkGlazedTerracottaHandler  (E_BLOCK_PINK_GLAZED_TERRACOTTA);
 	constexpr cBlockHandler                   BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
 	constexpr cBlockPistonHandler             BlockPistonHandler                (E_BLOCK_PISTON);

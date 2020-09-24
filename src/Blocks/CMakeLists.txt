@@ -61,6 +61,7 @@ target_sources(
 	BlockNetherWart.h
 	BlockObserver.h
 	BlockOre.h
+	BlockPackedIce.h
 	BlockPiston.h
 	BlockPlanks.h
 	BlockPlant.h
