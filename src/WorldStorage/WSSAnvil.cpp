@@ -1343,7 +1343,6 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
 	{
 		short MonsterType = a_NBT.GetShort(Type);
-		LOG("%d", MonsterType);
 		if (MonsterType != eMonsterType::mtInvalidType)
 		{
 			MobSpawner->SetEntity(static_cast<eMonsterType>(MonsterType));
