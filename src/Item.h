@@ -101,6 +101,9 @@ public:
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
 	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
 
+	/** Get the number of items in the stack. */
+	char GetCount(void) { return m_ItemCount; }
+
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
 
