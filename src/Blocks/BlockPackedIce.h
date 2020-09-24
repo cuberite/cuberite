@@ -25,6 +25,7 @@ private:
 		{
 			return cItem(m_BlockType);
 		}
+
 		return {};
 	}
 

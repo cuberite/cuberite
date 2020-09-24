@@ -25,6 +25,7 @@ private:
 		{
 			return cItem(m_BlockType);
 		}
+
 		return {};
 	}
 
@@ -36,22 +37,25 @@ private:
 		const Vector3i a_RelPos
 	) const override
 	{
-		// disappears instantly in nether
+		// Disappears instantly in nether:
 		if (a_WorldInterface.GetDimension() == dimNether)
 		{
 			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 			return;
 		}
-		// Artificial light on any of the surrounding block > 11 leads to melting the ice
-		const std::array<Vector3i, 7> Offsets =
-			{Vector3i(1, 0, 0), Vector3i(-1, 0, 0),
-			Vector3i(0, 1, 0), Vector3i(0, -1, 0),
-			Vector3i(0, 0, 1), Vector3i(0, 0, -1)};
 
-		for (const auto & Offset : Offsets)
+		// Artificial light on any of the surrounding block > 11 leads to melting the ice.
+		const std::array<Vector3i, 7> Adjacents = {
+			{ 1, 0, 0 }, { -1, 0, 0 },
+			{ 0, 1, 0 }, { 0, -1, 0 },
+			{ 0, 0, 1 }, { 0, 0, -1 }
+		};
+
+		for (const auto Offset : Adjacents)
 		{
 			auto Position = a_RelPos + Offset;
 			const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Position);
+
 			if ((Chunk == nullptr) || !Chunk->IsValid())
 			{
 				continue;
