@@ -102,33 +102,36 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 	{
 		case mtBat:
 		{
-			return (
-					(a_RelPos.y <= 63) &&
-					(BlockLight <= 4) &&
-					(SkyLight <= 4) &&
-					(TargetBlock == E_BLOCK_AIR) &&
-					(!cBlockInfo::IsTransparent(BlockAbove))
+			return
+			(
+				(a_RelPos.y <= 63) &&
+				(BlockLight <= 4) &&
+				(SkyLight <= 4) &&
+				(TargetBlock == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(BlockAbove))
 			);
 		}
 
 		case mtBlaze:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-					(Random.RandBool())
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(Random.RandBool())
 			);
 		}
 
 		case mtCaveSpider:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-					(SkyLight <= 7) &&
-					(BlockLight <= 7) &&
-					(Random.RandBool())
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(SkyLight <= 7) &&
+				(BlockLight <= 7) &&
+				(Random.RandBool())
 			);
 		}
 
@@ -139,11 +142,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtRabbit:
 		case mtSheep:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					(BlockBelow == E_BLOCK_GRASS) &&
-					(SkyLight >= 9)
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				(BlockBelow == E_BLOCK_GRASS) &&
+				(SkyLight >= 9)
 			);
 		}
 
@@ -151,13 +155,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtSkeleton:
 		case mtZombie:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-					(SkyLight <= 7) &&
-					(BlockLight <= 7) &&
-					(Random.RandBool())
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(SkyLight <= 7) &&
+				(BlockLight <= 7) &&
+				(Random.RandBool())
 			);
 		}
 
@@ -169,13 +174,14 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 				if (blockTop == E_BLOCK_AIR)
 				{
 					blockTop = a_Chunk->GetBlock(a_RelPos.addedY(3));
-					return (
-							(TargetBlock == E_BLOCK_AIR) &&
-							(BlockAbove == E_BLOCK_AIR) &&
-							(blockTop == E_BLOCK_AIR) &&
-							((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-							(SkyLight <= 7) &&
-							(BlockLight <= 7)
+					return
+					(
+						(TargetBlock == E_BLOCK_AIR) &&
+						(BlockAbove == E_BLOCK_AIR) &&
+						(blockTop == E_BLOCK_AIR) &&
+						((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+						(SkyLight <= 7) &&
+						(BlockLight <= 7)
 					);
 				}
 			}
@@ -184,37 +190,41 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 		case mtGhast:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					(Random.RandBool(0.01))
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				(Random.RandBool(0.01))
 			);
 		}
 
 		case mtGuardian:
 		{
-			return (
-					IsBlockWater(TargetBlock) &&
-					IsBlockWater(BlockBelow) &&
-					(a_RelPos.y >= 45) &&
-					(a_RelPos.y <= 62)
+			return
+			(
+				IsBlockWater(TargetBlock) &&
+				IsBlockWater(BlockBelow) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
 			);
 		}
 
 		case mtMagmaCube:
 		case mtSlime:
 		{
-			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-					((a_RelPos.y <= 40) || (a_Biome == biSwampland))
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				((a_RelPos.y <= 40) || (a_Biome == biSwampland))
 			);
 		}
 
 		case mtMooshroom:
 		{
-			return (
+			return
+				(
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(BlockBelow == E_BLOCK_MYCELIUM) &&
@@ -253,10 +263,10 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 						return false;
 					}
 					HasFloor = (
-							HasFloor ||
-							(
-								a_Chunk->UnboundedRelGetBlockType(a_RelPos + Vector3i(x, -1, z), TargetBlock) &&
-								!cBlockInfo::IsTransparent(TargetBlock)
+						HasFloor ||
+						(
+							a_Chunk->UnboundedRelGetBlockType(a_RelPos + Vector3i(x, -1, z), TargetBlock) &&
+							!cBlockInfo::IsTransparent(TargetBlock)
 						)
 					);
 				}
@@ -267,39 +277,39 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtSquid:
 		{
 			return (
-					IsBlockWater(TargetBlock) &&
-					(a_RelPos.y >= 45) &&
-					(a_RelPos.y <= 62)
+				IsBlockWater(TargetBlock) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
 			);
 		}
 
 		case mtWitherSkeleton:
 		{
 			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-					(SkyLight <= 7) &&
-					(BlockLight <= 7) &&
-					(Random.RandBool(0.6))
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(SkyLight <= 7) &&
+				(BlockLight <= 7) &&
+				(Random.RandBool(0.6))
 			);
 		}
 
 		case mtWolf:
 		{
 			return (
-					(TargetBlock == E_BLOCK_GRASS) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					(
-					(a_Biome == biColdTaiga) ||
-					(a_Biome == biColdTaigaHills) ||
-					(a_Biome == biColdTaigaM) ||
-					(a_Biome == biForest) ||
-					(a_Biome == biTaiga) ||
-					(a_Biome == biTaigaHills) ||
-					(a_Biome == biTaigaM) ||
-					(a_Biome == biMegaTaiga) ||
-					(a_Biome == biMegaTaigaHills)
+				(TargetBlock == E_BLOCK_GRASS) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				(
+				(a_Biome == biColdTaiga) ||
+				(a_Biome == biColdTaigaHills) ||
+				(a_Biome == biColdTaigaM) ||
+				(a_Biome == biForest) ||
+				(a_Biome == biTaiga) ||
+				(a_Biome == biTaigaHills) ||
+				(a_Biome == biTaigaM) ||
+				(a_Biome == biMegaTaiga) ||
+				(a_Biome == biMegaTaigaHills)
 				)
 			);
 		}
@@ -307,9 +317,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtZombiePigman:
 		{
 			return (
-					(TargetBlock == E_BLOCK_AIR) &&
-					(BlockAbove == E_BLOCK_AIR) &&
-					((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck))
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck))
 			);
 		}
 
