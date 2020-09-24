@@ -46,11 +46,13 @@ private:
 
 		// Artificial light on any of the surrounding block > 11 leads to melting the ice.
 		static const std::array<Vector3i, 7> Adjacents
-		{{
-			{ 1, 0, 0 }, { -1, 0, 0 },
-			{ 0, 1, 0 }, { 0, -1, 0 },
-			{ 0, 0, 1 }, { 0, 0, -1 }
-		}};
+		{
+			{
+				{ 1, 0, 0 }, { -1, 0, 0 },
+				{ 0, 1, 0 }, { 0, -1, 0 },
+				{ 0, 0, 1 }, { 0, 0, -1 }
+			}
+		};
 
 		for (const auto Offset : Adjacents)
 		{
