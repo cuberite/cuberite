@@ -7026,6 +7026,16 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Randomly enchants the item using the specified number of XP levels. Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already).",
 				},
+				GetCount =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the number of items in the stack.",
+				},
 				GetEnchantability =
 				{
 					Returns =
