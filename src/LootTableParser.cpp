@@ -268,7 +268,7 @@ namespace LootTable
 				(NoCaseCompare(Key, "direct_entity") == 0) ||
 				(NoCaseCompare(Key, "DirectEntity") == 0))
 			{
-				m_DirectEntity = cEntityProperties(Predicates[Key]);
+				// m_DirectEntity = cEntityProperties(Predicates[Key]);
 			}
 			else if (
 				(NoCaseCompare(Key, "is_explosion") == 0) ||
@@ -985,7 +985,7 @@ namespace LootTable
 		{
 			auto Callback = [&](cEntity & a_Entity)
 			{
-			  	return m_Head(a_Entity.GetEquippedHelmet());
+				return m_Head(a_Entity.GetEquippedHelmet());
 			};
 			Res &= a_World.DoWithEntityByID(DestID, Callback);
 		}
@@ -1043,6 +1043,7 @@ namespace LootTable
 					Res &= Monster.IsBaby();
 				}
 			}
+			return true;
 		};
 
 		a_World.DoWithEntityByID(DestID, FlagCallback);
@@ -1060,12 +1061,12 @@ namespace LootTable
 			{
 				Res &= a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
 				{
-				  if (!a_Entity.IsPlayer())
-				  {
-					  return false;
-				  }
-				  const auto & Player = static_cast<cPlayer &>(a_Entity);
-				  return (Player.GetGameMode() == m_Gamemode);
+					if (!a_Entity.IsPlayer())
+					{
+						return false;
+					}
+					const auto & Player = static_cast<cPlayer &>(a_Entity);
+					return (Player.GetGameMode() == m_Gamemode);
 				});
 			}
 			if ((m_LevelMin != 0) ||
@@ -1101,7 +1102,8 @@ namespace LootTable
 		if (m_TargetEntity->IsActive())
 		{
 			UInt32 Target;
-			a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity){
+			a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
+			{
 				if (a_Entity.IsMob())
 				{
 					Target = static_cast<cMonster &>(a_Entity).GetTarget()->GetUniqueID();
@@ -2639,6 +2641,7 @@ namespace LootTable
 					}
 					const auto & Monster = static_cast<cMonster &>(a_Entity);
 					MobTypeToHead(Monster.GetMobType(), a_Item);
+					return true;
 				});
 				break;
 			}
@@ -2653,6 +2656,7 @@ namespace LootTable
 					}
 					a_Item.m_ItemType = E_ITEM_HEAD;
 					a_Item.m_ItemDamage = E_META_HEAD_PLAYER;
+					return true;
 				});
 				break;
 			}
@@ -2662,7 +2666,7 @@ namespace LootTable
 
 
 
-	cItem cFillPlayerHead::MobTypeToHead(eMonsterType a_Type, cItem & a_Item)
+	void cFillPlayerHead::MobTypeToHead(eMonsterType a_Type, cItem & a_Item)
 	{
 		switch (a_Type)
 		{

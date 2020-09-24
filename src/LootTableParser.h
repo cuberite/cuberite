@@ -10,6 +10,7 @@
 #include "Blocks/BlockHandler.h"
 #include "Entities/EntityEffect.h"
 #include "Entities/Entity.h"
+#include "Mobs/MonsterTypes.h"
 
 // fwd:
 class cWorld;
@@ -641,9 +642,9 @@ namespace LootTable
 			cFillPlayerHead(const Json::Value & a_Value);
 			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 		private:
-			enum class eDest { This, Killer ,KillerPlayer };
+			enum class eDest { This, Killer, KillerPlayer };
 			enum eDest m_Dest = eDest::This;
-			static cItem MobTypeToHead(eMonsterType a_Type, cItem & a_Item);
+			static void MobTypeToHead(eMonsterType a_Type, cItem & a_Item);
 		};
 
 
