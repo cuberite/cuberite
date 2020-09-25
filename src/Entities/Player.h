@@ -96,12 +96,6 @@ public:
 	*/
 	int DeltaExperience(int a_Xp_delta);
 
-	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
-	inline unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
-
-	/** Set the seed for enchanting related PRNGs, don't use this for other purposes. */
-	inline void SetEnchantmentSeed(unsigned int a_EnchantmentSeed) { m_EnchantmentSeed = a_EnchantmentSeed; }
-
 	/** Gets the experience total - XpTotal for score on death */
 	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
 
@@ -268,6 +262,12 @@ public:
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
 
 	// tolua_end
+
+	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
+	inline unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
+
+	/** Set the seed for enchanting related PRNGs, don't use this for other purposes. */
+	inline void SetEnchantmentSeed(unsigned int a_EnchantmentSeed) { m_EnchantmentSeed = a_EnchantmentSeed; }
 
 	/** Returns the SharedPtr to client handle associated with the player. */
 	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
