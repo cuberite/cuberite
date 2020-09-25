@@ -792,7 +792,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		const bool IsCreative = m_Player->IsGameModeCreative();
 		const auto XpRequired = m_Player->XpForLevel(BaseEnchantmentLevel);
 		cItem LapisStack = *Window->m_SlotArea->GetSlot(1, *m_Player);  // Make a copy of the lapis stack
-		const auto LapisRequired = a_Enchantment+1;
+		const auto LapisRequired = a_Enchantment + 1;
 
 		// Only allow enchantment if the player is creative or has sufficient levels and lapis to enchant
 		if (IsCreative || ((m_Player->GetCurrentXp() >= XpRequired) && LapisStack.GetCount() >= LapisRequired))
