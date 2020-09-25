@@ -96,6 +96,12 @@ public:
 	*/
 	int DeltaExperience(int a_Xp_delta);
 
+	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
+	inline unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
+
+	/** Set the seed for enchanting related PRNGs, don't use this for other purposes. */
+	inline void SetEnchantmentSeed(unsigned int a_EnchantmentSeed) { m_EnchantmentSeed = a_EnchantmentSeed; }
+
 	/** Gets the experience total - XpTotal for score on death */
 	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
 
@@ -718,6 +724,7 @@ protected:
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
+	unsigned int m_EnchantmentSeed;
 
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;

@@ -10,7 +10,7 @@
 
 #include "Defines.h"
 #include "WorldStorage/EnchantmentSerializer.h"
-
+#include "FastRandom.h"
 
 
 
@@ -92,6 +92,9 @@ public:
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;
 
+	/** Get the first enchantment ID, -1 if no enchantments */
+	int GetFirstEnchantmentID(void);
+
 	/** Returns the level for the specified enchantment; 0 if not stored */
 	unsigned int GetLevel(int a_EnchantmentID) const;
 
@@ -140,7 +143,7 @@ public:
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
 
 	/** Gets random enchantment from Vector and returns it */
-	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments);
+	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand * Random);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.

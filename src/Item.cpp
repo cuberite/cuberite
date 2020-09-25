@@ -429,7 +429,7 @@ int cItem::GetEnchantability()
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels)
+bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
 {
 	if (!cItem::IsEnchantable(m_ItemType))
 	{
@@ -442,9 +442,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		return false;
 	}
 
-	auto & Random = GetRandomProvider();
-	int ModifiedEnchantmentLevel = a_NumXPLevels + Random.RandInt(Enchantability / 4) + Random.RandInt(Enchantability / 4) + 1;
-	float RandomBonus = 1.0F + (Random.RandReal() + Random.RandReal() - 1.0F) * 0.15F;
+	if (!a_Random)  // If we weren't provided with a PRNG then use the thread's
+	{
+		a_Random = &GetRandomProvider();
+	}
+	int ModifiedEnchantmentLevel = a_NumXPLevels + a_Random->RandInt(Enchantability / 4) + a_Random->RandInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (a_Random->RandReal() + a_Random->RandReal() - 1.0F) * 0.15F;
 	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
@@ -455,7 +458,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		m_ItemType = E_ITEM_ENCHANTED_BOOK;
 	}
 
-	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment1.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment1);
 
@@ -465,12 +468,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Second)
 	float NewEnchantmentLevel = a_NumXPLevels / 2.0f;
 	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(SecondEnchantmentChance))
+	if (Enchantments.empty() || !a_Random->RandBool(SecondEnchantmentChance))
 	{
 		return true;
 	}
 
-	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment2.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment2);
 
@@ -480,12 +483,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Third)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(ThirdEnchantmentChance))
+	if (Enchantments.empty() || !a_Random->RandBool(ThirdEnchantmentChance))
 	{
 		return true;
 	}
 
-	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment3.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment3);
 
@@ -495,11 +498,11 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Fourth)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(FourthEnchantmentChance))
+	if (Enchantments.empty() || !a_Random->RandBool(FourthEnchantmentChance))
 	{
 		return true;
 	}
-	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment4.ToString());
 
 	return true;

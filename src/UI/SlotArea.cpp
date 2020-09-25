@@ -1477,6 +1477,7 @@ cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_Bl
 	cSlotAreaTemporary(2, a_ParentWindow),
 	m_BlockPos(a_BlockPos)
 {
+	m_EnchantedItemOptions.resize(3);
 }
 
 
@@ -1680,17 +1681,49 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 	if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
 	{
+		// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
 		int Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15);
 
-		auto & Random = GetRandomProvider();
-		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
-		int TopSlot = std::max(Base / 3, 1);
-		int MiddleSlot = (Base * 2) / 3 + 1;
-		int BottomSlot = std::max(Base, Bookshelves * 2);
+		// Initialise the PRNG using the player's enchantment seed
+		auto EnchantmentSeed = a_Player.GetEnchantmentSeed();
+		MTRand Random(EnchantmentSeed);
 
-		m_ParentWindow.SetProperty(0, static_cast<short>(TopSlot), a_Player);
-		m_ParentWindow.SetProperty(1, static_cast<short>(MiddleSlot), a_Player);
-		m_ParentWindow.SetProperty(2, static_cast<short>(BottomSlot), a_Player);
+		// Calculate the levels for the offered enchantment options:
+		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
+		int OptionLevels[3];
+		OptionLevels[0] = std::max(Base / 3, 1);
+		OptionLevels[1] = (Base * 2) / 3 + 1;
+		OptionLevels[2] = std::max(Base, Bookshelves * 2);
+
+		// Properties set according to: https://wiki.vg/Protocol#Window_Property
+		// Send bits of the seed to the client so it can write a bunch of BS in squiggly letters
+		m_ParentWindow.SetProperty(3, static_cast<short>(EnchantmentSeed & 0xFFFFFFF0), a_Player);
+
+		// Calculate cItems for the various levels and set the properties for each
+		for (short i=0; i<3; i++)
+		{
+			// Make a copy of the item, enchant based on the number of levels and store it as an option
+			cItem EnchantedItem = Item.CopyOne();
+			EnchantedItem.EnchantByXPLevels(OptionLevels[i]);
+			m_EnchantedItemOptions.Set(i, EnchantedItem);
+
+			LOG("Option level[%d] = %d", i, OptionLevels[i]);
+
+			// Send the level requirement for the enchantment option
+			m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]), a_Player);
+
+			// Get the first enchantment ID
+			short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.GetFirstEnchantmentID());
+			LOG("EnchantmentID[%d] = %d", i, EnchantmentID);
+
+			// Send the enchantment ID of the first enchantment on our item
+			m_ParentWindow.SetProperty(4 + i, EnchantmentID, a_Player);
+
+			short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
+			// Send the level for the first enchantment on our item
+			LOG("EnchantmentLevel[%d] = %d", i, EnchantmentLevel);
+			m_ParentWindow.SetProperty(7 + i, EnchantmentLevel, a_Player);
+		}
 	}
 	else
 	{

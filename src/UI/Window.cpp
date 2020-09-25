@@ -761,6 +761,7 @@ void cWindow::SetProperty(short a_Property, short a_Value)
 
 void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
+	printf("Setting property %d to %d\n", a_Property, a_Value);
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
 

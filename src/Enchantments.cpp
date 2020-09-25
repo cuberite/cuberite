@@ -126,6 +126,22 @@ unsigned int cEnchantments::GetLevel(int a_EnchantmentID) const
 
 
 
+int cEnchantments::GetFirstEnchantmentID(void)
+{
+	for (cEnchantments::cMap::const_iterator itr = m_Enchantments.begin(), end = m_Enchantments.end(); itr != end; ++itr)
+	{
+		if (itr->second>0)
+		{
+			return itr->first;
+		}
+	}
+	return -1;
+}
+
+
+
+
+
 void cEnchantments::SetLevel(int a_EnchantmentID, unsigned int a_Level)
 {
 	// Sets the level for the specified enchantment, adding it if not stored before or removing it if level <= 0
@@ -1170,14 +1186,18 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand * a_Random)
 {
+	if (!a_Random)
+	{
+		a_Random = &GetRandomProvider();
+	}
 	int AllWeights = 0;
 	for (const auto & Enchantment: a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
-	int RandomNumber = GetRandomProvider().RandInt(AllWeights - 1);
+	int RandomNumber = a_Random->RandInt(AllWeights - 1);
 	for (const auto & Enchantment: a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
