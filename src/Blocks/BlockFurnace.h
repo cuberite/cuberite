@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "../Blocks/BlockPiston.h"
-#include "../BlockEntities/FurnaceEntity.h"
 #include "Mixins.h"
 
 
@@ -19,15 +17,9 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		cItems res(cItem(E_BLOCK_FURNACE, 1));  // We can't drop a lit furnace
-		if (a_BlockEntity != nullptr)
-		{
-			auto be = static_cast<cFurnaceEntity *>(a_BlockEntity);
-			res.AddItemGrid(be->GetContents());
-		}
-		return res;
+		return cItem(E_BLOCK_FURNACE);  // We can't drop a lit furnace
 	}
 
 

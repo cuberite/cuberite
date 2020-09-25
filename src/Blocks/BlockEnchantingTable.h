@@ -62,17 +62,10 @@ private:
 	}
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		if ((a_BlockEntity == nullptr) || (a_BlockEntity->GetBlockType() != E_BLOCK_ENCHANTMENT_TABLE))
-		{
-			return {};
-		}
-
-		auto & EnchantingTable = static_cast<const cEnchantingTableEntity &>(*a_BlockEntity);
-		cItem Item = cItem(E_BLOCK_ENCHANTMENT_TABLE);
-		Item.m_CustomName = EnchantingTable.GetCustomName();
-		return Item;
+		// Drops handled by the block entity:
+		return {};
 	}
 
 

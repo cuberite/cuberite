@@ -140,10 +140,7 @@ namespace Explodinator
 		else if (Random.RandBool(1.f / a_Power))
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
-			a_Chunk.GetWorld()->SpawnItemPickups(
-				cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta, a_Chunk.GetBlockEntityRel(a_Position)),
-				Absolute
-			);
+			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
 		}
 		else if (a_Fiery && Random.RandBool(1.f / 3.f))  // 33% chance of starting fires if it can start fires
 		{

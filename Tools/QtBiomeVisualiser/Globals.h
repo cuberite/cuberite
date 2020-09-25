@@ -275,7 +275,5 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 // Common headers (part 2, with macros):
-#include "src/ChunkDef.h"
-#include "src/BiomeDef.h"
 #include "src/BlockID.h"
 #include "src/BlockInfo.h"

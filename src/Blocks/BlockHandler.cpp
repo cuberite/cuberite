@@ -59,6 +59,7 @@
 #include "BlockNetherWart.h"
 #include "BlockObserver.h"
 #include "BlockOre.h"
+#include "BlockPackedIce.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
 #include "BlockPortal.h"
@@ -354,7 +355,7 @@ namespace
 	constexpr cBlockHandler                   BlockObsidianHandler              (E_BLOCK_OBSIDIAN);
 	constexpr cBlockGlazedTerracottaHandler   BlockOrangeGlazedTerracottaHandler(E_BLOCK_ORANGE_GLAZED_TERRACOTTA);
 	constexpr cBlockHandler                   BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
-	constexpr cBlockIceHandler                BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
+	constexpr cBlockPackedIceHandler          BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
 	constexpr cBlockGlazedTerracottaHandler   BlockPinkGlazedTerracottaHandler  (E_BLOCK_PINK_GLAZED_TERRACOTTA);
 	constexpr cBlockHandler                   BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
 	constexpr cBlockPistonHandler             BlockPistonHandler                (E_BLOCK_PISTON);
@@ -521,21 +522,13 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(
-	NIBBLETYPE a_BlockMeta,
-	cBlockEntity * a_BlockEntity,
-	const cEntity * a_Digger,
-	const cItem * a_Tool
-) const
+cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
-	UNUSED(a_BlockEntity);
 	UNUSED(a_Digger);
 	UNUSED(a_Tool);
 
 	// Add self:
-	cItems res;
-	res.push_back(cItem(m_BlockType, 1, a_BlockMeta));
-	return res;
+	return cItem(m_BlockType, 1, a_BlockMeta);
 }
 
 

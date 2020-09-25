@@ -19,6 +19,17 @@ cEnchantingTableEntity::cEnchantingTableEntity(BLOCKTYPE a_BlockType, NIBBLETYPE
 
 
 
+cItems cEnchantingTableEntity::ConvertToPickups() const
+{
+	cItem Item(E_BLOCK_ENCHANTMENT_TABLE);
+	Item.m_CustomName = m_CustomName;
+	return Item;
+}
+
+
+
+
+
 void cEnchantingTableEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);

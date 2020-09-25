@@ -48,6 +48,7 @@ target_sources(
 	BlockHandler.h
 	BlockHopper.h
 	BlockIce.h
+	BlockJukebox.h
 	BlockLadder.h
 	BlockLeaves.h
 	BlockLever.h
@@ -61,6 +62,7 @@ target_sources(
 	BlockNetherWart.h
 	BlockObserver.h
 	BlockOre.h
+	BlockPackedIce.h
 	BlockPiston.h
 	BlockPlanks.h
 	BlockPlant.h

@@ -146,16 +146,10 @@ public:
 
 	/** Returns the pickups that would result if the block was mined by a_Digger using a_Tool.
 	Doesn't do any actual block change / mining, only calculates the pickups.
-	a_BlockEntity is the block entity present at the block, if any, nullptr if none.
 	a_Digger is the entity that caused the conversion, usually the player digging.
 	a_Tool is the tool used for the digging.
 	The default implementation drops a single item created from m_BlockType and the current meta. */
-	virtual cItems ConvertToPickups(
-		NIBBLETYPE a_BlockMeta,
-		cBlockEntity * a_BlockEntity,
-		const cEntity * a_Digger = nullptr,
-		const cItem * a_Tool = nullptr
-	) const;
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr) const;
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
 	virtual bool CanBeAt(
