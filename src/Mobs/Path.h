@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ChunkDef.h"
+
 /*
 // Needed Fwds: cPath
 enum class ePathFinderStatus;

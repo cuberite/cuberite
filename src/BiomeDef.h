@@ -9,10 +9,6 @@
 
 #pragma once
 
-
-
-
-
 // tolua_begin
 /** Biome IDs
 The first batch corresponds to the clientside biomes, used by MineCraft.

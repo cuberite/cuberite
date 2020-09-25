@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include "AllocationPool.h"
-
+#include "ChunkDef.h"
 
 
 class cChunkData

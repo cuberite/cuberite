@@ -28,7 +28,7 @@ For reading entire files into memory, just use the static cFile::ReadWholeFile()
 
 #pragma once
 
-
+#include "StringUtils.h"
 
 
 
