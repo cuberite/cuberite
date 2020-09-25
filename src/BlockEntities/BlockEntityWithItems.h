@@ -44,6 +44,7 @@ public:  // tolua_export
 	);
 
 	// cBlockEntity overrides:
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 
 	// tolua_begin

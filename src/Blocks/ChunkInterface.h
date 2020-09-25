@@ -3,7 +3,7 @@
 
 #include "../ForEachChunkProvider.h"
 #include "../FunctionRef.h"
-
+#include "ChunkDef.h"
 
 
 

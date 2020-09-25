@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 
 
 
@@ -19,14 +18,10 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		if ((a_BlockEntity == nullptr) || (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD))
-		{
-			return {};
-		}
-		auto mobHeadEntity = static_cast<cMobHeadEntity *>(a_BlockEntity);
-		return cItem(E_ITEM_HEAD, 1, static_cast<short>(mobHeadEntity->GetType()));
+		// Drops handled by the block entity:
+		return {};
 	}
 
 

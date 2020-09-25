@@ -26,6 +26,17 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 
 
 
+cItems cBlockEntityWithItems::ConvertToPickups() const
+{
+	cItems Pickups;
+	Pickups.AddItemGrid(m_Contents);
+	return Pickups;
+}
+
+
+
+
+
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);

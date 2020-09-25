@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "../BlockEntities/ChestEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "Mixins.h"
@@ -11,9 +10,9 @@
 
 
 class cBlockChestHandler :
-	public cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
+	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
-	using Super = cYawRotator<cContainerEntityHandler<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
+	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
 public:
 
