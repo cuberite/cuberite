@@ -2749,6 +2749,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Get the count of enchantments contained within the class",
 				},
+				GetFirstEnchantmentID =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Get the first enchantment ID, -1 if no enchantments found.",
+				},
 				GetLevel =
 				{
 					Params =

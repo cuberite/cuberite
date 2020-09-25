@@ -92,7 +92,7 @@ public:
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;
 
-	/** Get the first enchantment ID, -1 if no enchantments */
+	/** Get the first enchantment ID, -1 if no enchantments found. */
 	int GetFirstEnchantmentID(void);
 
 	/** Returns the level for the specified enchantment; 0 if not stored */
