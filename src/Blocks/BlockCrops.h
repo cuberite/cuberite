@@ -21,11 +21,13 @@ public:
 
 private:
 
-	static char FortuneBinomialRandom(char a_Min, char a_Rolls)
+	/** Calculate the number of seeds to drop when the crop is broken. */
+	static char CalculateSeedCount(char a_Min, char a_BaseRolls, char a_FortuneLevel)
 	{
 		auto & Random = GetRandomProvider();
 		char DropNum = a_Min;
-		for (unsigned char i=0; i<a_Rolls; i++)
+		const auto Rolls = a_BaseRolls + a_FortuneLevel;
+		for (unsigned char i=0; i<Rolls; i++)
 		{
 			if (Random.RandBool(0.57))
 			{
@@ -63,7 +65,7 @@ private:
 		{
 			case E_BLOCK_BEETROOTS:
 			{
-				const auto SeedCount = FortuneBinomialRandom(0, 3 + ToolFortuneLevel(a_Tool));
+				const auto SeedCount = CalculateSeedCount(0, 3, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
 				res.Add(E_ITEM_BEETROOT);
 				break;
@@ -71,19 +73,19 @@ private:
 			case E_BLOCK_CROPS:
 			{
 				res.Add(E_ITEM_WHEAT);
-				const auto SeedCount = FortuneBinomialRandom(1, 3 + ToolFortuneLevel(a_Tool));
+				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_SEEDS, SeedCount);
 				break;
 			}
 			case E_BLOCK_CARROTS:
 			{
-				const auto CarrotCount = FortuneBinomialRandom(1, 4 + ToolFortuneLevel(a_Tool));
+				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
-				const auto PotatoCount = FortuneBinomialRandom(2, 3 + ToolFortuneLevel(a_Tool));
+				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
 				res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
