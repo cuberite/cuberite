@@ -1699,7 +1699,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		// Send bits of the seed to the client so it can write a bunch of BS in squiggly letters
 		m_ParentWindow.SetProperty(3, static_cast<short>(EnchantmentSeed & 0xFFFFFFF0), a_Player);
 
-		// Calculate cItems for the various levels and set the properties for each
+		// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window
 		for (short i=0; i<3; i++)
 		{
 			// Make a copy of the item, enchant based on the number of levels
@@ -1726,9 +1726,11 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 	}
 	else
 	{
-		m_ParentWindow.SetProperty(0, 0, a_Player);
-		m_ParentWindow.SetProperty(1, 0, a_Player);
-		m_ParentWindow.SetProperty(2, 0, a_Player);
+		// Reset window properties
+		for (short i=0; i<10; i++)
+		{
+			m_ParentWindow.SetProperty(i, 0, a_Player);
+		}
 	}
 }
 

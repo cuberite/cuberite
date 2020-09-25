@@ -142,8 +142,9 @@ public:
 	/** Check enchantment conflicts from enchantments from the vector */
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
 
-	/** Gets random enchantment from Vector and returns it */
-	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand * Random);
+	/** Gets random enchantment from Vector and returns it
+	Passing an MTRand PRNG pointer is optional. */
+	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand * Random = nullptr);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.
