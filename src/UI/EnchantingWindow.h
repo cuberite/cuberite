@@ -11,8 +11,8 @@
 
 #include "Window.h"
 
-
-
+//fwd
+class cSlotAreaEnchanting;
 
 
 class cEnchantingWindow:
