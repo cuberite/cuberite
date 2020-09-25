@@ -1702,26 +1702,25 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		// Calculate cItems for the various levels and set the properties for each
 		for (short i=0; i<3; i++)
 		{
-			// Make a copy of the item, enchant based on the number of levels and store it as an option
+			// Make a copy of the item, enchant based on the number of levels
 			cItem EnchantedItem = Item.CopyOne();
-			EnchantedItem.EnchantByXPLevels(OptionLevels[i]);
+			EnchantedItem.EnchantByXPLevels(OptionLevels[i], &Random);
+			// Store the item we've enchanted as an option to be retrieved later
 			m_EnchantedItemOptions.Set(i, EnchantedItem);
 
-			LOG("Option level[%d] = %d", i, OptionLevels[i]);
+			LOG("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
 
 			// Send the level requirement for the enchantment option
 			m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]), a_Player);
 
 			// Get the first enchantment ID
-			short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.GetFirstEnchantmentID());
-			LOG("EnchantmentID[%d] = %d", i, EnchantmentID);
+			const short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.GetFirstEnchantmentID());
 
 			// Send the enchantment ID of the first enchantment on our item
 			m_ParentWindow.SetProperty(4 + i, EnchantmentID, a_Player);
 
-			short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
+			const short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
 			// Send the level for the first enchantment on our item
-			LOG("EnchantmentLevel[%d] = %d", i, EnchantmentLevel);
 			m_ParentWindow.SetProperty(7 + i, EnchantmentLevel, a_Player);
 		}
 	}

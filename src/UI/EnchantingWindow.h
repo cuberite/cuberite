@@ -36,7 +36,7 @@ public:
 	cSlotArea * m_SlotArea;
 
 protected:
-	short m_PropertyValue[3];
+	short m_PropertyValue[10];
 	Vector3i m_BlockPos;
 };
 
