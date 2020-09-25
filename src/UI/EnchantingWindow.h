@@ -33,7 +33,7 @@ public:
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
-	cSlotArea * m_SlotArea;
+	cSlotAreaEnchanting * m_SlotArea;
 
 protected:
 	short m_PropertyValue[10];

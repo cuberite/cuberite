@@ -779,29 +779,26 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
+		LOGD("cClientHandle received a non valid enchanting window.");
 		return;
 	}
 
 	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
-	auto Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // A copy of the item to be enchanted.
 	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
+	cItem EnchantedItem = Window->m_SlotArea->GetEnchantedOption(a_Enchantment);
 
-	if (!Item.EnchantByXPLevels(BaseEnchantmentLevel))
-	{
-		// Item wasn't enchantable:
-		return;
-	}
-
-	const auto SetEnchantAndBroadcast = [this, &Item, Window]
+	const auto SetEnchantAndBroadcast = [this, &EnchantedItem, Window]
 	{
 		// Set the item slot to our new enchanted item:
-		Window->m_SlotArea->SetSlot(0, *m_Player, Item);
-		Window->BroadcastWholeWindow();
+		Window->m_SlotArea->SetSlot(0, *m_Player, EnchantedItem);
 
-		// Remove enchantment choices:
-		Window->SetProperty(0, 0, *m_Player);
-		Window->SetProperty(1, 0, *m_Player);
-		Window->SetProperty(2, 0, *m_Player);
+		// Reset window properties
+		for (short i=0; i<10; i++)
+		{
+			Window->SetProperty(i, 0, *m_Player);
+		}
+		Window->BroadcastWholeWindow();
 	};
 
 	// Creative players can always enchant:

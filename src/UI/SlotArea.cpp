@@ -1736,6 +1736,16 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 
 
+cItem cSlotAreaEnchanting::GetEnchantedOption( unsigned char a_EnchantOption)
+{
+	ASSERT((a_EnchantOption < m_EnchantedItemOptions.size()));
+	return m_EnchantedItemOptions[a_EnchantOption];
+}
+
+
+
+
+
 int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
 	int Bookshelves = 0;
