@@ -1387,9 +1387,17 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// Check if the mob type if valid for this version. If not bail out:
+	if (MobType == -1)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
@@ -1885,8 +1893,10 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtChicken:               return 93;
 		case mtCow:                   return 92;
 		case mtCreeper:               return 50;
+		case mtDonkey:                return 100;
 		case mtEnderDragon:           return 63;
 		case mtEnderman:              return 58;
+		case mtEndermite:             return 67;
 		case mtGhast:                 return 56;
 		case mtGiant:                 return 53;
 		case mtGuardian:              return 68;
@@ -1894,6 +1904,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtIronGolem:             return 99;
 		case mtMagmaCube:             return 62;
 		case mtMooshroom:             return 96;
+		case mtMule:                  return 100;
 		case mtOcelot:                return 98;
 		case mtPig:                   return 90;
 		case mtRabbit:                return 101;
@@ -1910,10 +1921,12 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtWitherSkeleton:        return 51;
 		case mtWolf:                  return 95;
 		case mtZombie:                return 54;
+		case mtZombieHorse:           return 100;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+
+		default:                      return -1;
 	}
-	UNREACHABLE("Unsupported mob type");
 }
 
 
@@ -3693,6 +3706,11 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtEnderman
 
+		case mtEndermite:
+		{
+			// TODO
+		}  // case mtEndermite
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -3701,7 +3719,10 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtGhast
 
+		case mtDonkey:
 		case mtHorse:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
 		{
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
 			int Flags = 0;
