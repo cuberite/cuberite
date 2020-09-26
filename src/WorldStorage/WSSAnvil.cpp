@@ -1674,8 +1674,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
 	};
 
-	LOG("Loading %s", AString(a_IDTag, a_IDTagLength));
-
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
 	if (it != EntityTypeToFunction.end())
 	{

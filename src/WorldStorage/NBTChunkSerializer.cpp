@@ -749,7 +749,6 @@ public:
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
 		const char * EntityClass = NamespaceSerializer::From(a_Monster->GetMobType());
-		LOG("saving %s", EntityClass);
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_Monster, EntityClass);
 			mWriter.BeginList("DropChances", TAG_Float);
