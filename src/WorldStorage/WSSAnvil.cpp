@@ -3023,6 +3023,7 @@ void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 
 
+
 void cWSSAnvil::LoadSkeletonHorseFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
 {
 	// TODO
