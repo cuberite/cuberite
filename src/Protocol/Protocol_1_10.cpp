@@ -334,6 +334,19 @@ cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
 
 
 
+UInt32 cProtocol_1_10_0::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtPolarBear:   return 102;
+		case mtStray:       return Super::GetProtocolMobType(mtSkeleton);
+		case mtHusk:        return Super::GetProtocolMobType(mtZombie);
+		default:            return Super::GetProtocolMobType(a_MobType);
+	}
+}
+
+
+
 
 
 void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
@@ -741,6 +754,12 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtEnderman
 
+		case mtEndermite:
+		{
+			// TODO
+			break;
+		}  // case mtEndermite
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -803,6 +822,12 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtHorse
 
+		case mtHusk:
+		{
+			// TODO
+			break;
+		}  // case mtHusk
+
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -837,6 +862,12 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtPig
 
+		case mtPolarBear:
+		{
+			// TODO
+			break;
+		}  // case mtPolarBear
+
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -869,6 +900,19 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
+
+
+		case mtStray:
+		{
+			// TODO
+			break;
+		}  // case mtStray
+
+		case mtShulker:
+		{
+			// TODO
+			break;
+		}
 
 		case mtSlime:
 		{
@@ -958,6 +1002,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtWolf
 
+		case mtHusk:
 		case mtZombie:
 		{
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
