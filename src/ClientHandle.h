@@ -401,6 +401,10 @@ public:  // tolua_export
 
 	void InvalidateCachedSentChunk();
 
+	/** Calculates if the block should be instantly mined given block and player circumstances
+	https://minecraft.gamepedia.com/Breaking#Calculation */
+	bool IsInstaMined(BLOCKTYPE a_OldBlock);
+
 	bool IsPlayerChunkSent();
 
 private:

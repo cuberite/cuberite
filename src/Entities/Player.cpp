@@ -3133,61 +3133,105 @@ bool cPlayer::IsInsideWater()
 
 float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 {
-	float f = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
-	if (f > 1.0f)
+	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
+
+	// Get the base speed multiplier of the equipped tool for the mined block
+	float MiningSpeed = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
+	if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 	{
-		unsigned int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
-		if (efficiencyModifier > 0)
+		unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+		if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
 		{
-			f += (efficiencyModifier * efficiencyModifier) + 1;
+			MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
 		}
 	}
 
+	// If we can't harvest the block, set it back to 1
+	if (!GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
+	{
+		MiningSpeed = 1;
+	}
+
+	// Hase increases speed by 20% per level
 	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
 	if (Haste != nullptr)
 	{
 		int intensity = Haste->GetIntensity() + 1;
-		f *= 1.0f + (intensity * 0.2f);
+		MiningSpeed *= 1.0f + (intensity * 0.2f);
 	}
 
+	// Mining fatigue decreases speed a lot
 	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
 	if (MiningFatigue != nullptr)
 	{
 		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
-			case 0:  f *= 0.3f;     break;
-			case 1:  f *= 0.09f;    break;
-			case 2:  f *= 0.0027f;  break;
-			default: f *= 0.00081f; break;
+			case 0:  MiningSpeed *= 0.3f;     break;
+			case 1:  MiningSpeed *= 0.09f;    break;
+			case 2:  MiningSpeed *= 0.0027f;  break;
+			default: MiningSpeed *= 0.00081f; break;
 
 		}
 	}
 
+	// 5x speed loss for being in water
 	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
+	// 5x speed loss for not touching ground
 	if (!IsOnGround())
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
-	return f;
+	return MiningSpeed;
 }
 
 
 
 
 
-float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
+float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 {
-	float blockHardness = cBlockInfo::GetHardness(a_Block);
-	float digSpeed = GetDigSpeed(a_Block);
-	float canHarvestBlockDivisor = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
-	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
-	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
+	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
+	// If we know it's instantly breakable then quit here
+	if (cBlockInfo::IsOneHitDig(a_Block))
+	{
+		return 0;
+	}
+	float BlockHardness = cBlockInfo::GetHardness(a_Block);
+	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less
+	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
+	{
+		BlockHardness*=1.5;
+	}
+	else
+	{
+		BlockHardness*=5;
+	}
+	float DigSpeed = GetDigSpeed(a_Block);
+	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
+	// Therefore take inverse to get fraction mined per tick:
+	return DigSpeed / (20 * BlockHardness);
+}
+
+
+
+
+
+bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
+{
+	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
+	// Check it has non-zero hardness
+	if (cBlockInfo::IsOneHitDig(a_Block))
+	{
+		return true;
+	}
+	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine
+	return GetDigSpeed(a_Block) > 30 * cBlockInfo::GetHardness(a_Block);
 }
 
 
