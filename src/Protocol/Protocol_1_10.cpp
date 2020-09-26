@@ -897,13 +897,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-
-		case mtStray:
-		{
-			// TODO
-			break;
-		}  // case mtStray
-
 		case mtShulker:
 		{
 			// TODO
@@ -918,6 +911,12 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
+
+		case mtStray:
+		{
+			// TODO
+			break;
+		}  // case mtStray
 
 		case mtVillager:
 		{
