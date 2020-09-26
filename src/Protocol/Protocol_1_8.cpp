@@ -1389,7 +1389,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
-	// Check if the mob type if valid for this version. If not bail out:
+	// If the type is not valid in this protocol bail out:
 	if (MobType == -1)
 	{
 		return;
