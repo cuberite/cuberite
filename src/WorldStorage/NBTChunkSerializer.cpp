@@ -945,7 +945,6 @@ public:
 				case mtCat:
 				case mtCod:
 				case mtDolphin:
-				case mtDonkey:
 				case mtDrowned:
 				case mtElderGuardian:
 				case mtEndermite:
@@ -976,10 +975,9 @@ public:
 				case mtVindicator:
 				case mtWanderingTrader:
 				case mtZoglin:
-				case mtZombieHorse:
 				{
 					// All the entities not added
-					LOGD("Saving unimplemented entity type: %d", a_Monster->GetMobType());
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer:: NamespaceSerializer::From(a_Monster->GetMobType()));
 					break;
 				}
 				case mtInvalidType:
