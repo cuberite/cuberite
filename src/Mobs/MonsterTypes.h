@@ -26,7 +26,7 @@ enum eMonsterType
 	mtEnderDragon,
 	mtEnderman,
 	mtEndermite,                    // Added in 1.8
-	mtEvoker,                       // Added in 1.11      // Todo : check if we need this
+	mtEvoker,                       // Added in 1.11
 	mtFox,                          // Added in 1.14
 	mtGhast,
 	mtGiant,
@@ -76,7 +76,7 @@ enum eMonsterType
 	mtWolf,
 	mtZoglin,                       // Added in 1.16
 	mtZombie,
-	mtZombieHorse,                  // Todo: check if we need this
+	mtZombieHorse,                  // Added in 1.6
 	mtZombiePigman,
 	mtZombieVillager,
 
