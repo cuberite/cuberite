@@ -977,7 +977,7 @@ public:
 				case mtZoglin:
 				{
 					// All the entities not added
-					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer:: NamespaceSerializer::From(a_Monster->GetMobType()));
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
 					break;
 				}
 				case mtInvalidType:
