@@ -1696,8 +1696,9 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		OptionLevels[2] = std::max(Base, Bookshelves * 2);
 
 		// Properties set according to: https://wiki.vg/Protocol#Window_Property
+		// I made the bitmask 0xFFF0 instead of 0xFFFFFFF0 (as on wiki) since we are casting to short anyway
 		// Send bits of the seed to the client so it can write a bunch of BS in squiggly letters
-		m_ParentWindow.SetProperty(3, static_cast<short>(EnchantmentSeed & 0xFFFFFFF0), a_Player);
+		m_ParentWindow.SetProperty(3, static_cast<short>(EnchantmentSeed) & 0xFFF0, a_Player);
 
 		// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window
 		for (short i=0; i<3; i++)
