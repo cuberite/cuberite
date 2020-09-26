@@ -377,12 +377,20 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == -1)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
+	Pkt.WriteVarInt32(MobType);
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -554,26 +562,38 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtChicken:               return 93;
 		case mtCow:                   return 92;
 		case mtCreeper:               return 50;
+		case mtDonkey:                return 31;
 		case mtEnderDragon:           return 63;
 		case mtEnderman:              return 58;
+		case mtEndermite:             return 67;
+		case mtEvoker:                return 34;
 		case mtGhast:                 return 56;
 		case mtGiant:                 return 53;
 		case mtGuardian:              return 68;
 		case mtHorse:                 return 100;
+		case mtHusk:                  return 23;
 		case mtIronGolem:             return 99;
+		case mtLlama:                 return 103;
 		case mtMagmaCube:             return 62;
 		case mtMooshroom:             return 96;
+		case mtMule:                  return 32;
 		case mtOcelot:                return 98;
 		case mtPig:                   return 90;
+		case mtPolarBear:             return 102;
 		case mtRabbit:                return 101;
 		case mtSheep:                 return 91;
+		case mtShulker:               return 69;
 		case mtSilverfish:            return 60;
 		case mtSkeleton:              return 51;
 		case mtSlime:                 return 55;
 		case mtSnowGolem:             return 97;
 		case mtSpider:                return 52;
+		case mtStray:                 return 6;
+		case mtTraderLlama:           return 103;  // TODO: check again
 		case mtSquid:                 return 94;
+		case mtVex:                   return 35;
 		case mtVillager:              return 120;
+		case mtVindicator:            return 36;
 		case mtWitch:                 return 66;
 		case mtWither:                return 64;
 		case mtWitherSkeleton:        return 5;
@@ -581,6 +601,8 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+
+		default:                      return -1;
 	}
 	UNREACHABLE("Unsupported mob type");
 }
@@ -820,7 +842,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 {
 	using namespace Metadata_1_11;
 
-	// Living Enitiy Metadata
+	// Living Entitiy Metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -900,6 +922,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
 		}  // case mtEnderman
+
+		case mtEndermite:
+		{
+			// TODO
+			break;
+		}  // case mtEndermite
 
 		case mtGhast:
 		{
@@ -1021,6 +1049,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtPig
 
+		case mtPolarBear:
+		{
+			// TODO
+			break;
+		}  // case mtPolarBear
+
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -1054,6 +1088,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
+		case mtShulker:
+		{
+			// TODO
+			break;
+		}
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1062,6 +1102,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
+
+		case mtStray:
+		{
+			// TODO
+			break;
+		}  // case mtStray
 
 		case mtVillager:
 		{
