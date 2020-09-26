@@ -1337,8 +1337,8 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	if (!m_Player->IsGameModeCreative() && !m_Player->CanInstantlyMine(a_OldBlock))
 	{
-		// Hack for very fast tools.
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(a_OldBlock);
+		// Check for very fast tools. Maybe instead of FASTBREAK_PERCENTAGE we should check we are within x multiplied by the progress per tick
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
@@ -2090,7 +2090,6 @@ void cClientHandle::Tick(float a_Dt)
 	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
-		LOGD("m_BreakProgress = %f", m_BreakProgress);
 	}
 
 	ProcessProtocolInOut();

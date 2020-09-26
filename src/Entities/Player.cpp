@@ -3213,7 +3213,9 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 		BlockHardness*=5;
 	}
 	float DigSpeed = GetDigSpeed(a_Block);
+	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
 	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
+
 	// Therefore take inverse to get fraction mined per tick:
 	return DigSpeed / (20 * BlockHardness);
 }

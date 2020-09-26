@@ -593,11 +593,13 @@ public:
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Returns 0 if it can be instantly mined.
+	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
 	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
+	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
 	bool CanInstantlyMine(BLOCKTYPE a_Block);
 
