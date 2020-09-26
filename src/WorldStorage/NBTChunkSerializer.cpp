@@ -810,7 +810,10 @@ public:
 					mWriter.AddShort("carriedData", static_cast<Int16>(Enderman->GetCarriedMeta()));
 					break;
 				}
+				case mtDonkey:
 				case mtHorse:
+				case mtSkeletonHorse:
+				case mtZombieHorse:
 				{
 					const cHorse *Horse = static_cast<const cHorse *>(a_Monster);
 					mWriter.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);

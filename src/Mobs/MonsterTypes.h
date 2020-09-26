@@ -57,6 +57,7 @@ enum eMonsterType
 	mtShulker,                      // Added in 1.9
 	mtSilverfish,
 	mtSkeleton,
+	mtSkeletonHorse,
 	mtSlime,
 	mtSnowGolem,
 	mtSpider,

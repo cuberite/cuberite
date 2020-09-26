@@ -185,6 +185,7 @@ namespace NamespaceSerializer
 			case mtShulker:        return "minecraft:shulker";
 			case mtSilverfish:     return "minecraft:silverfish";
 			case mtSkeleton:       return "minecraft:skeleton";
+			case mtSkeletonHorse:  return "minecraft:skeleton_horse";
 			case mtSlime:          return "minecraft:slime";
 			case mtSnowGolem:      return "minecraft:snow_golem";
 			case mtSpider:         return "minecraft:spider";
@@ -411,6 +412,7 @@ namespace NamespaceSerializer
 		{"minecraft:shulker",          mtShulker},
 		{"minecraft:silverfish",       mtSilverfish},
 		{"minecraft:skeleton",         mtSkeleton},
+		{"minecraft:skeleton_horse",   mtSkeletonHorse},
 		{"minecraft:slime",            mtSlime},
 		{"minecraft:snow_golem",       mtSnowGolem},
 		{"minecraft:spider",           mtSpider},

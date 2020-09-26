@@ -249,6 +249,7 @@ protected:
 	void LoadShulkerFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSilverfishFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSkeletonFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSkeletonHorseFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSlimeFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSnowGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSpiderFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
