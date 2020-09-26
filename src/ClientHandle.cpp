@@ -2090,6 +2090,7 @@ void cClientHandle::Tick(float a_Dt)
 	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
+		LOGD("m_BreakProgress = %f", m_BreakProgress);
 	}
 
 	ProcessProtocolInOut();
