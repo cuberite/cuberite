@@ -3137,17 +3137,20 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 
 	// Get the base speed multiplier of the equipped tool for the mined block
 	float MiningSpeed = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
-	if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
+
+	// If we can harvest the block then we can apply material and enchantment bonuses
+	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
 	{
-		unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
-		if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
+		if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 		{
-			MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
+			unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+			if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
+			{
+				MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
+			}
 		}
 	}
-
-	// If we can't harvest the block, set it back to 1
-	if (!GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
+	else  // If we can't harvest the block then no bonuses
 	{
 		MiningSpeed = 1;
 	}
