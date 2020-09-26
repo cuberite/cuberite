@@ -824,12 +824,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtHorse
 
-		case mtHusk:
-		{
-			// TODO
-			break;
-		}  // case mtHusk
-
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
