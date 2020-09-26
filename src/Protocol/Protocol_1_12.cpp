@@ -614,6 +614,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtEnderman
 
+		case mtEndermite:
+		{
+			// TODO
+			break;
+		}  // case mtEndermite
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -734,6 +740,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtPig
 
+		case mtPolarBear:
+		{
+			// TODO
+			break;
+		}  // case mtPolarBear
+
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -767,6 +779,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
+		case mtShulker:
+		{
+			// TODO
+			break;
+		}
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -775,6 +793,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
+
+		case mtStray:
+		{
+			// TODO
+			break;
+		}  // case mtStray
 
 		case mtVillager:
 		{
@@ -1012,6 +1036,19 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
 	return Version::v1_12;
+}
+
+
+
+
+UInt32 cProtocol_1_12::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtIllusioner:  return 37;
+		case mtParrot:      return 105;
+		default:            return Super::GetProtocolMobType(a_MobType);
+	}
 }
 
 
