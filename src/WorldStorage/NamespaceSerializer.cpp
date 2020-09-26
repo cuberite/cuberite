@@ -9,9 +9,9 @@ namespace NamespaceSerializer
 		return 2566;
 	}
 
-	const char * From(const Statistic ID)
+	const char * From(const Statistic a_ID)
 	{
-		switch (ID)
+		switch (a_ID)
 		{
 			case Statistic::AnimalsBred:                  return "animals_bred";
 			case Statistic::AviateOneCm:                  return "aviate_one_cm";
@@ -130,6 +130,90 @@ namespace NamespaceSerializer
 
 		UNREACHABLE("Tried to save unhandled statistic");
 	}
+
+
+
+
+	const char * From(eMonsterType a_ID)
+	{
+		switch (a_ID)
+		{
+			case mtInvalidType:    return "";
+			case mtBat:            return "minecraft:bat";
+			case mtBlaze:          return "minecraft:blaze";
+			case mtCat:            return "minecraft:cat";
+			case mtCaveSpider:     return "minecraft:cave_spider";
+			case mtChicken:        return "minecraft:chicken";
+			case mtCod:            return "minecraft:cod";
+			case mtCow:            return "minecraft:cow";
+			case mtCreeper:        return "minecraft:creeper";
+			case mtDolphin:        return "minecraft:dolphin";
+			case mtDonkey:         return "minecraft:donkey";
+			case mtDrowned:        return "minecraft:drowned";
+			case mtElderGuardian:  return "minecraft:elder:guardian";
+			case mtEnderDragon:    return "minecraft:ender_dragon";
+			case mtEnderman:       return "minecraft:enderman";
+			case mtEndermite:      return "minecraft:endermite";
+			case mtEvoker:         return "minecraft:evoker";
+			case mtFox:            return "minecraft:fox";
+			case mtGhast:          return "minecraft:ghast";
+			case mtGiant:          return "minecraft:giant";
+			case mtGuardian:       return "minecraft:guardian";
+			case mtHorse:          return "minecraft:horse";
+			case mtHoglin:         return "minecraft:hoglin";
+			case mtHusk:           return "minecraft:husk";
+			case mtIllusioner:     return "minecraft:illusioner";
+			case mtIronGolem:      return "minecraft:iron_golem";
+			case mtLlama:          return "minecraft:llama";
+			case mtMagmaCube:      return "minecraft:magma_cube";
+			case mtMooshroom:      return "minecraft:mooshroom";
+			case mtMule:           return "minecraft:mule";
+			case mtOcelot:         return "minecraft:ocelot";
+			case mtPanda:          return "minecraft:panda";
+			case mtParrot:         return "minecraft:parrot";
+			case mtPhantom:        return "minecraft:phantom";
+			case mtPig:            return "minecraft:pig";
+			case mtPiglin:         return "minecraft:piglin";
+			case mtPiglinBrute:    return "minecraft:piglin_brute";
+			case mtPillager:       return "minecraft:pillager";
+			case mtPolarBear:      return "minecraft:polar_bear";
+			case mtPufferfish:     return "minecraft:pufferfish";
+			case mtRabbit:         return "minecraft:rabbit";
+			case mtRavager:        return "minecraft:ravager";
+			case mtSalmon:         return "minecraft:salmon";
+			case mtSheep:          return "minecraft:sheep";
+			case mtShulker:        return "minecraft:shulker";
+			case mtSilverfish:     return "minecraft:silverfish";
+			case mtSkeleton:       return "minecraft:skeleton";
+			case mtSlime:          return "minecraft:slime";
+			case mtSnowGolem:      return "minecraft:snow_golem";
+			case mtSpider:         return "minecraft:spider";
+			case mtSquid:          return "minecraft:squid";
+			case mtStray:          return "minecraft:stray";
+			case mtStrider:        return "minecraft:strider";
+			case mtTraderLlama:    return "minecraft:trader_llama";
+			case mtTropicalFish:   return "minecraft:tropical_fish";
+			case mtTurtle:         return "minecraft:turtle";
+			case mtVex:            return "minecraft:vex";
+			case mtVillager:       return "minecraft:villager";
+			case mtVindicator:     return "minecraft:vindicator";
+			case mtWanderingTrader:return "minecraft:wandering_trader";
+			case mtWitch:          return "minecraft:witch";
+			case mtWither:         return "minecraft:wither";
+			case mtWitherSkeleton: return "minecraft:wither_skeleton";
+			case mtWolf:           return "minecraft:wolf";
+			case mtZoglin:         return "minecraft:zoglin";
+			case mtZombie:         return "minecraft:zombie";
+			case mtZombieHorse:    return "minecraft:zombie_horse";
+			case mtZombiePigman:   return "minecraft:zombie_pigman";
+			case mtZombieVillager: return "minecraft:zombie_villager";
+		}
+		UNREACHABLE("Tried to save unknown monster type");
+	}
+
+
+
+
 
 	static const std::unordered_map<std::string_view, Statistic> CustomStatistics
 	{
@@ -277,5 +361,127 @@ namespace NamespaceSerializer
 		}
 
 		return { Namespace::Unknown, ID };
+	}
+
+	static const std::unordered_map<std::string_view, eMonsterType> MonsterTypes
+	{
+		{"minecraft:bat",              mtBat},
+		{"minecraft:blaze",            mtBlaze},
+		{"minecraft:cat",              mtCat},
+		{"minecraft:cave_spider",      mtCaveSpider},
+		{"minecraft:chicken",          mtChicken},
+		{"minecraft:cod",              mtCod},
+		{"minecraft:cow",              mtCow},
+		{"minecraft:creeper",          mtCreeper},
+		{"minecraft:dolphin",          mtDolphin},
+		{"minecraft:donkey",           mtDonkey},
+		{"minecraft:drowned",          mtDrowned},
+		{"minecraft:elder_guardian",   mtElderGuardian},
+		{"minecraft:ender_dragon",     mtEnderDragon},
+		{"minecraft:enderman",         mtEnderman},
+		{"minecraft:endermite",        mtEndermite},
+		{"minecraft:evoker",           mtEvoker},
+		{"minecraft:fox",              mtFox},
+		{"minecraft:ghast",            mtGhast},
+		{"minecraft:giant",            mtGiant},
+		{"minecraft:guardian",         mtGuardian},
+		{"minecraft:horse",            mtHorse},
+		{"minecraft:hoglin",           mtHoglin},
+		{"minecraft:husk",             mtHusk},
+		{"minecraft:illusioner",       mtIllusioner},
+		{"minecraft:iron_golem",       mtIronGolem},
+		{"minecraft:llama",            mtLlama},
+		{"minecraft:magma_cube",       mtMagmaCube},
+		{"minecraft:mooshroom",        mtMooshroom},
+		{"minecraft:mule",             mtMule},
+		{"minecraft:ocelot",           mtOcelot},
+		{"minecraft:panda",            mtPanda},
+		{"minecraft:parrot",           mtParrot},
+		{"minecraft:phantom",          mtPhantom},
+		{"minecraft:pig",              mtPig},
+		{"minecraft:piglin",           mtPiglin},
+		{"minecraft:piglin_brute",     mtPiglinBrute},
+		{"minecraft:pillager",         mtPillager},
+		{"minecraft:polar_bear",       mtPolarBear},
+		{"minecraft:pufferfish",       mtPufferfish},
+		{"minecraft:rabbit",           mtRabbit},
+		{"minecraft:ravager",          mtRavager},
+		{"minecraft:salmon",           mtSalmon},
+		{"minecraft:sheep",            mtSheep},
+		{"minecraft:shulker",          mtShulker},
+		{"minecraft:silverfish",       mtSilverfish},
+		{"minecraft:skeleton",         mtSkeleton},
+		{"minecraft:slime",            mtSlime},
+		{"minecraft:snow_golem",       mtSnowGolem},
+		{"minecraft:spider",           mtSpider},
+		{"minecraft:squid",            mtSquid},
+		{"minecraft:stray",            mtStray},
+		{"minecraft:strider",          mtStrider},
+		{"minecraft:trader_llama",     mtTraderLlama},
+		{"minecraft:tropical_fish",    mtTropicalFish},
+		{"minecraft:turtle",           mtTurtle},
+		{"minecraft:vex",              mtVex},
+		{"minecraft:villager",         mtVillager},
+		{"minecraft:vindicator",       mtVindicator},
+		{"minecraft:wandering_trader", mtWanderingTrader},
+		{"minecraft:witch",            mtWitch},
+		{"minecraft:wither",           mtWither},
+		{"minecraft:wither_skeleton",  mtWitherSkeleton},
+		{"minecraft:wolf",             mtWolf},
+		{"minecraft:zoglin",           mtZoglin},
+		{"minecraft:zombie",           mtZombie},
+		{"minecraft:zombie_horse",     mtZombieHorse},
+		{"minecraft:zombie_pigman",    mtZombiePigman},
+		{"minecraft:zombie_villager",  mtZombieVillager},
+
+		{"minecraft:villager_golem",   mtIronGolem},
+		{"minecraft:snowman",          mtSnowGolem},
+
+		// Old names:
+		{"Bat",            mtBat},
+		{"Blaze",          mtBlaze},
+		{"CaveSpider",     mtCaveSpider},
+		{"Chicken",        mtChicken},
+		{"Cow",            mtCow},
+		{"Creeper",        mtCreeper},
+		{"EnderDragon",    mtEnderDragon},
+		{"Enderman",       mtEnderman},
+		{"Ghast",          mtGhast},
+		{"Giant",          mtGiant},
+		{"Guardian",       mtGuardian},
+		{"Horse",          mtHorse},
+		{"VillagerGolem",  mtIronGolem},
+		{"LavaSlime",      mtMagmaCube},
+		{"MushroomCow",    mtMooshroom},
+		{"Ozelot",         mtOcelot},
+		{"Pig",            mtPig},
+		{"Rabbit",         mtRabbit},
+		{"Sheep",          mtSheep},
+		{"Silverfish",     mtSilverfish},
+		{"Skeleton",       mtSkeleton},
+		{"Slime",          mtSlime},
+		{"SnowMan",        mtSnowGolem},
+		{"Spider",         mtSpider},
+		{"Squid",          mtSquid},
+		{"Villager",       mtVillager},
+		{"Witch",          mtWitch},
+		{"WitherBoss",     mtWither},
+		{"WitherSkeleton", mtWitherSkeleton},
+		{"Wolf",           mtWolf},
+		{"Zombie",         mtZombie},
+		{"PigZombie",      mtZombiePigman},
+		{"ZombieVillager", mtZombieVillager}
+	};
+
+	eMonsterType ToMonsterType(std::string_view a_ID)
+	{
+		try
+		{
+			return MonsterTypes.at(a_ID);
+		}
+		catch (std::out_of_range)
+		{
+			return mtInvalidType;
+		}
 	}
 }

@@ -1563,73 +1563,118 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:small_fireball",      &cWSSAnvil::LoadFireChargeFromNBT },
 		{ "ThrownEnderpearl",              &cWSSAnvil::LoadThrownEnderpearlFromNBT },
 		{ "minecraft:ender_pearl",         &cWSSAnvil::LoadThrownEnderpearlFromNBT },
+
+		// Old mob type ids:
 		{ "Bat",                           &cWSSAnvil::LoadBatFromNBT },
-		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
 		{ "Blaze",                         &cWSSAnvil::LoadBlazeFromNBT },
-		{ "minecraft:blaze",               &cWSSAnvil::LoadBlazeFromNBT },
 		{ "CaveSpider",                    &cWSSAnvil::LoadCaveSpiderFromNBT },
-		{ "minecraft:cave_spider",         &cWSSAnvil::LoadCaveSpiderFromNBT },
 		{ "Chicken",                       &cWSSAnvil::LoadChickenFromNBT },
-		{ "minecraft:chicken",             &cWSSAnvil::LoadChickenFromNBT },
 		{ "Cow",                           &cWSSAnvil::LoadCowFromNBT },
-		{ "minecraft:cow",                 &cWSSAnvil::LoadCowFromNBT },
 		{ "Creeper",                       &cWSSAnvil::LoadCreeperFromNBT },
-		{ "minecraft:creeper",             &cWSSAnvil::LoadCreeperFromNBT },
 		{ "EnderDragon",                   &cWSSAnvil::LoadEnderDragonFromNBT },
-		{ "minecraft:ender_dragon",        &cWSSAnvil::LoadEnderDragonFromNBT },
 		{ "Enderman",                      &cWSSAnvil::LoadEndermanFromNBT },
-		{ "minecraft:enderman",            &cWSSAnvil::LoadEndermanFromNBT },
 		{ "Ghast",                         &cWSSAnvil::LoadGhastFromNBT },
-		{ "minecraft:ghast",               &cWSSAnvil::LoadGhastFromNBT },
 		{ "Giant",                         &cWSSAnvil::LoadGiantFromNBT },
-		{ "minecraft:giant",               &cWSSAnvil::LoadGiantFromNBT },
 		{ "Guardian",                      &cWSSAnvil::LoadGuardianFromNBT },
-		{ "minecraft:guardian",            &cWSSAnvil::LoadGuardianFromNBT },
 		{ "Horse",                         &cWSSAnvil::LoadHorseFromNBT },
-		{ "minecraft:horse",               &cWSSAnvil::LoadHorseFromNBT },
 		{ "Villager",                      &cWSSAnvil::LoadVillagerFromNBT },
-		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
 		{ "VillagerGolem",                 &cWSSAnvil::LoadIronGolemFromNBT },
-		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
 		{ "LavaSlime",                     &cWSSAnvil::LoadMagmaCubeFromNBT },
-		{ "minecraft:magma_cube",          &cWSSAnvil::LoadMagmaCubeFromNBT },
 		{ "MushroomCow",                   &cWSSAnvil::LoadMooshroomFromNBT },
-		{ "minecraft:mooshroom",           &cWSSAnvil::LoadMooshroomFromNBT },
 		{ "Ozelot",                        &cWSSAnvil::LoadOcelotFromNBT },
-		{ "minecraft:ocelot",              &cWSSAnvil::LoadOcelotFromNBT },
 		{ "Pig",                           &cWSSAnvil::LoadPigFromNBT },
-		{ "minecraft:pig",                 &cWSSAnvil::LoadPigFromNBT },
 		{ "Rabbit",                        &cWSSAnvil::LoadRabbitFromNBT },
-		{ "minecraft:rabbit",              &cWSSAnvil::LoadRabbitFromNBT },
 		{ "Sheep",                         &cWSSAnvil::LoadSheepFromNBT },
-		{ "minecraft:sheep",               &cWSSAnvil::LoadSheepFromNBT },
 		{ "Silverfish",                    &cWSSAnvil::LoadSilverfishFromNBT },
-		{ "minecraft:silverfish",          &cWSSAnvil::LoadSilverfishFromNBT },
 		{ "Skeleton",                      &cWSSAnvil::LoadSkeletonFromNBT },
-		{ "minecraft:skeleton",            &cWSSAnvil::LoadSkeletonFromNBT },
 		{ "Slime",                         &cWSSAnvil::LoadSlimeFromNBT },
-		{ "minecraft:slime",               &cWSSAnvil::LoadSlimeFromNBT },
 		{ "SnowMan",                       &cWSSAnvil::LoadSnowGolemFromNBT },
-		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
 		{ "Spider",                        &cWSSAnvil::LoadSpiderFromNBT },
-		{ "minecraft:spider",              &cWSSAnvil::LoadSpiderFromNBT },
 		{ "Squid",                         &cWSSAnvil::LoadSquidFromNBT },
-		{ "minecraft:squid",               &cWSSAnvil::LoadSquidFromNBT },
 		{ "Witch",                         &cWSSAnvil::LoadWitchFromNBT },
-		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
 		{ "WitherBoss",                    &cWSSAnvil::LoadWitherFromNBT },
-		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
 		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherSkeletonFromNBT },
-		{ "minecraft:wither_skeleton",     &cWSSAnvil::LoadWitherSkeletonFromNBT },
 		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
-		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },
 		{ "Zombie",                        &cWSSAnvil::LoadZombieFromNBT },
-		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
 		{ "PigZombie",                     &cWSSAnvil::LoadPigZombieFromNBT },
-		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
 		{ "ZombieVillager",                &cWSSAnvil::LoadZombieVillagerFromNBT },
+
+		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
+		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
+
+		// New namespaced mob type ids:
+		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
+		{ "minecraft:blaze",               &cWSSAnvil::LoadBlazeFromNBT },
+		{ "minecraft:cat",                 &cWSSAnvil::LoadCatFromNBT },
+		{ "minecraft:cave_spider",         &cWSSAnvil::LoadCaveSpiderFromNBT },
+		{ "minecraft:chicken",             &cWSSAnvil::LoadChickenFromNBT },
+		{ "minecraft:cod",                 &cWSSAnvil::LoadCodFromNBT},
+		{ "minecraft:cow",                 &cWSSAnvil::LoadCowFromNBT },
+		{ "minecraft:creeper",             &cWSSAnvil::LoadCreeperFromNBT },
+		{ "minecraft:dolphin",             &cWSSAnvil::LoadDolphinFromNBT },
+		{ "minecraft:donkey",              &cWSSAnvil::LoadDonkeyFromNBT },
+		{ "minecraft:drowned",             &cWSSAnvil::LoadDrownedFromNBT },
+		{ "minecraft:elder_guardian",      &cWSSAnvil::LoadElderGuardianFromNBT },
+		{ "minecraft:ender_dragon",        &cWSSAnvil::LoadEnderDragonFromNBT },
+		{ "minecraft:enderman",            &cWSSAnvil::LoadEndermanFromNBT },
+		{ "minecraft:endermite",           &cWSSAnvil::LoadEndermiteFromNBT },
+		{ "minecraft:evoker",              &cWSSAnvil::LoadEvokerFromNBT },
+		{ "minecraft:fox",                 &cWSSAnvil::LoadFoxFromNBT },
+		{ "minecraft:ghast",               &cWSSAnvil::LoadGhastFromNBT },
+		{ "minecraft:giant",               &cWSSAnvil::LoadGiantFromNBT },
+		{ "minecraft:guardian",            &cWSSAnvil::LoadGuardianFromNBT },
+		{ "minecraft:horse",               &cWSSAnvil::LoadHorseFromNBT },
+		{ "minecraft:hoglin",              &cWSSAnvil::LoadHoglinFromNBT },
+		{ "minecraft:husk",                &cWSSAnvil::LoadHuskFromNBT },
+		{ "minecraft:illusioner",          &cWSSAnvil::LoadIllusionerFromNBT },
+		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
+		{ "minecraft:iron_golem",          &cWSSAnvil::LoadIronGolemFromNBT },
+		{ "minecraft:llama",               &cWSSAnvil::LoadLlamaFromNBT },
+		{ "minecraft:magma_cube",          &cWSSAnvil::LoadMagmaCubeFromNBT },
+		{ "minecraft:mooshroom",           &cWSSAnvil::LoadMooshroomFromNBT },
+		{ "minecraft:mule",                &cWSSAnvil::LoadMuleFromNBT },
+		{ "minecraft:ocelot",              &cWSSAnvil::LoadOcelotFromNBT },
+		{ "minecraft:panda",               &cWSSAnvil::LoadPandaFromNBT },
+		{ "minecraft:parrot",              &cWSSAnvil::LoadParrotFromNBT },
+		{ "minecraft:phantom",             &cWSSAnvil::LoadPhantomFromNBT },
+		{ "minecraft:pig",                 &cWSSAnvil::LoadPigFromNBT },
+		{ "minecraft:piglin",              &cWSSAnvil::LoadPiglinFromNBT },
+		{ "minecraft:piglin_brute",        &cWSSAnvil::LoadPiglinBruteFromNBT },
+		{ "minecraft:pillager",            &cWSSAnvil::LoadPillagerFromNBT },
+		{ "minecraft:polar_bear",          &cWSSAnvil::LoadPolarBearFromNBT },
+		{ "minecraft:pufferfish",          &cWSSAnvil::LoadPufferfishFromNBT },
+		{ "minecraft:rabbit",              &cWSSAnvil::LoadRabbitFromNBT },
+		{ "minecraft:ravager",             &cWSSAnvil::LoadRavagerFromNBT },
+		{ "minecraft:salmon",              &cWSSAnvil::LoadSalmonFromNBT },
+		{ "minecraft:sheep",               &cWSSAnvil::LoadSheepFromNBT },
+		{ "minecraft:shulker",             &cWSSAnvil::LoadShulkerFromNBT },
+		{ "minecraft:silverfish",          &cWSSAnvil::LoadSilverfishFromNBT },
+		{ "minecraft:skeleton",            &cWSSAnvil::LoadSkeletonFromNBT },
+		{ "minecraft:slime",               &cWSSAnvil::LoadSlimeFromNBT },
+		{ "minecraft:snow_golem",          &cWSSAnvil::LoadSnowGolemFromNBT },
+		{ "minecraft:spider",              &cWSSAnvil::LoadSpiderFromNBT },
+		{ "minecraft:squid",               &cWSSAnvil::LoadSquidFromNBT },
+		{ "minecraft:stray",               &cWSSAnvil::LoadStrayFromNBT },
+		{ "minecraft:strider",             &cWSSAnvil::LoadStriderFromNBT },
+		{ "minecraft:trader_llama",        &cWSSAnvil::LoadTraderLlamaFromNBT },
+		{ "minecraft:tropical_fish",       &cWSSAnvil::LoadTropicalFishFromNBT },
+		{ "minecraft:turtle",              &cWSSAnvil::LoadTurtleFromNBT },
+		{ "minecraft:vex",                 &cWSSAnvil::LoadVexFromNBT },
+		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
+		{ "minecraft:vindicator",          &cWSSAnvil::LoadVindicatorFromNBT },
+		{ "minecraft:wandering_trader",    &cWSSAnvil::LoadWanderingTraderFromNBT },
+		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
+		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
+		{ "minecraft:wither_skeleton",     &cWSSAnvil::LoadWitherSkeletonFromNBT },
+		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },
+		{ "minecraft:zoglin",              &cWSSAnvil::LoadZoglinFromNBT },
+		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
+		{ "minecraft:zombie_horse",        &cWSSAnvil::LoadZombieHorseFromNBT },
+		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
 		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
 	};
+
+	LOG("Loading %s", AString(a_IDTag, a_IDTagLength));
 
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
 	if (it != EntityTypeToFunction.end())
@@ -2229,6 +2274,15 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 
 
+void cWSSAnvil::LoadCatFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cCaveSpider> Monster = std::make_unique<cCaveSpider>();
@@ -2263,6 +2317,15 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadCodFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2309,6 +2372,42 @@ void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 
 
 
+void cWSSAnvil::LoadDolphinFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadDonkeyFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadDrownedFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadElderGuardianFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cEnderDragon> Monster = std::make_unique<cEnderDragon>();
@@ -2343,6 +2442,33 @@ void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT &
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadEndermiteFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadEvokerFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadFoxFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2455,6 +2581,33 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 
 
+void cWSSAnvil::LoadHoglinFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadHuskFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadIllusionerFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cIronGolem> Monster = std::make_unique<cIronGolem>();
@@ -2469,6 +2622,15 @@ void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadLlamaFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2518,6 +2680,15 @@ void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadMuleFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2578,6 +2749,33 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 
 
+void cWSSAnvil::LoadPandaFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadParrotFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadPhantomFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cPig> Monster = std::make_unique<cPig>();
@@ -2605,6 +2803,51 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadPiglinFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadPiglinBruteFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadPillagerFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadPolarBearFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadPufferfishFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2655,6 +2898,24 @@ void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 
 
+void cWSSAnvil::LoadRavagerFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadSalmonFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
@@ -2695,6 +2956,15 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadShulkerFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -2843,6 +3113,60 @@ void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 
 
+void cWSSAnvil::LoadStrayFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadStriderFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadTraderLlamaFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadTropicalFishFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadTurtleFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadVexFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
@@ -2879,6 +3203,24 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadVindicatorFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
+void cWSSAnvil::LoadWanderingTraderFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 
@@ -3027,6 +3369,15 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 
 
+void cWSSAnvil::LoadZoglinFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
+}
+
+
+
+
+
 void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cZombie> Monster = std::make_unique<cZombie>();
@@ -3054,6 +3405,15 @@ void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	}
 
 	a_Entities.emplace_back(std::move(Monster));
+}
+
+
+
+
+
+void cWSSAnvil::LoadZombieHorseFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT, int a_TagIdx)
+{
+	// TODO
 }
 
 

@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
+#include "NamespaceSerializer.h"
 #include "../ChunkDataCallback.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
@@ -747,49 +748,8 @@ public:
 
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
-		const char * EntityClass = nullptr;
-		switch (a_Monster->GetMobType())
-		{
-			case mtBat:            EntityClass = "Bat";            break;
-			case mtBlaze:          EntityClass = "Blaze";          break;
-			case mtCaveSpider:     EntityClass = "CaveSpider";     break;
-			case mtChicken:        EntityClass = "Chicken";        break;
-			case mtCow:            EntityClass = "Cow";            break;
-			case mtCreeper:        EntityClass = "Creeper";        break;
-			case mtEnderDragon:    EntityClass = "EnderDragon";    break;
-			case mtEnderman:       EntityClass = "Enderman";       break;
-			case mtGhast:          EntityClass = "Ghast";          break;
-			case mtGiant:          EntityClass = "Giant";          break;
-			case mtGuardian:       EntityClass = "Guardian";       break;
-			case mtHorse:          EntityClass = "Horse";          break;
-			case mtIronGolem:      EntityClass = "VillagerGolem";  break;
-			case mtMagmaCube:      EntityClass = "LavaSlime";      break;
-			case mtMooshroom:      EntityClass = "MushroomCow";    break;
-			case mtOcelot:         EntityClass = "Ozelot";         break;
-			case mtPig:            EntityClass = "Pig";            break;
-			case mtRabbit:         EntityClass = "Rabbit";         break;
-			case mtSheep:          EntityClass = "Sheep";          break;
-			case mtSilverfish:     EntityClass = "Silverfish";     break;
-			case mtSkeleton:       EntityClass = "Skeleton";       break;
-			case mtSlime:          EntityClass = "Slime";          break;
-			case mtSnowGolem:      EntityClass = "SnowMan";        break;
-			case mtSpider:         EntityClass = "Spider";         break;
-			case mtSquid:          EntityClass = "Squid";          break;
-			case mtVillager:       EntityClass = "Villager";       break;
-			case mtWitch:          EntityClass = "Witch";          break;
-			case mtWither:         EntityClass = "WitherBoss";     break;
-			case mtWitherSkeleton: EntityClass = "WitherSkeleton"; break;
-			case mtWolf:           EntityClass = "Wolf";           break;
-			case mtZombie:         EntityClass = "Zombie";         break;
-			case mtZombiePigman:   EntityClass = "PigZombie";      break;
-			case mtZombieVillager: EntityClass = "ZombieVillager"; break;
-			default:
-			{
-				ASSERT(!"Unhandled monster type");
-				return;
-			}
-		}  // switch (payload)
-
+		const char * EntityClass = NamespaceSerializer::From(a_Monster->GetMobType());
+		LOG("saving %s", EntityClass);
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_Monster, EntityClass);
 			mWriter.BeginList("DropChances", TAG_Float);
@@ -956,6 +916,7 @@ public:
 					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
 					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
+					break;
 				}
 				case mtBlaze:
 				case mtCaveSpider:
@@ -976,6 +937,46 @@ public:
 				case mtWitherSkeleton:
 				{
 					// Other mobs have no special tags.
+					break;
+				}
+				case mtCat:
+				case mtCod:
+				case mtDolphin:
+				case mtDonkey:
+				case mtDrowned:
+				case mtElderGuardian:
+				case mtEndermite:
+				case mtEvoker:
+				case mtFox:
+				case mtHoglin:
+				case mtHusk:
+				case mtIllusioner:
+				case mtLlama:
+				case mtMule:
+				case mtPanda:
+				case mtParrot:
+				case mtPhantom:
+				case mtPiglin:
+				case mtPiglinBrute:
+				case mtPillager:
+				case mtPolarBear:
+				case mtPufferfish:
+				case mtRavager:
+				case mtSalmon:
+				case mtShulker:
+				case mtStray:
+				case mtStrider:
+				case mtTraderLlama:
+				case mtTropicalFish:
+				case mtTurtle:
+				case mtVex:
+				case mtVindicator:
+				case mtWanderingTrader:
+				case mtZoglin:
+				case mtZombieHorse:
+				{
+					// All the entities not added
+					LOGD("Saving unimplemented entity type: %d", a_Monster->GetMobType());
 					break;
 				}
 				case mtInvalidType:
