@@ -3709,6 +3709,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtEndermite:
 		{
 			// TODO
+			break;
 		}  // case mtEndermite
 
 		case mtGhast:

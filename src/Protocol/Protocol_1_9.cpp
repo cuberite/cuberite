@@ -1858,6 +1858,12 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtEnderman
 
+		case mtEndermite:
+		{
+			// TODO
+			break;
+		}  // case mtEndermite
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -1986,6 +1992,12 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
+
+		case mtShulker:
+		{
+			// TODO
+			break;
+		}
 
 		case mtSlime:
 		{
