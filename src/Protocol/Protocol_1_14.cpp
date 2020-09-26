@@ -214,6 +214,24 @@ cProtocol::Version cProtocol_1_14::GetProtocolVersion()
 
 
 
+UInt32 cProtocol_1_14::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtCat:              return 6;
+		case mtFox:              return 27;
+		case mtPanda:            return 52;
+		case mtPillager:         return 87;
+		case mtRavager:          return 98;
+		case mtTraderLlama:      return 75;
+		case mtWanderingTrader:  return 88;
+		default:                 return Super::GetProtocolMobType(a_MobType);
+	}
+}
+
+
+
+
 
 std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
 {

@@ -42,6 +42,7 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
 	virtual Version GetProtocolVersion() override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) override;
