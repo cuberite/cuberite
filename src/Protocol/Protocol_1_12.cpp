@@ -940,6 +940,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtVindicator:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("Sending unimplemented mob in protocol 1.12");
 			break;
 		}
 

@@ -1293,6 +1293,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("Sending unimplemented mob in protocol 1.13");
 			break;
 		}
 

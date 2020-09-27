@@ -3948,6 +3948,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtZombieHorse:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("Sending unimplemented mob in protocol 1.8");
 			break;
 		}
 
