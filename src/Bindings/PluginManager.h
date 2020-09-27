@@ -76,13 +76,14 @@ public:
 		psNotFound,
 	};
 
-	/** Defines the deferred actions needed for a plugin **/
-	enum ePluginActions {
+	/** Defines the deferred actions needed for a plugin */
+	enum ePluginActions
+	{
 
-		/** The plugin needs to be reloaded **/
+		/** The plugin needs to be reloaded */
 		paReload,
 
-		/** The plugin needs to be unloaded **/
+		/** The plugin needs to be unloaded */
 		paUnload
 	};
 
@@ -422,7 +423,7 @@ private:
 	typedef std::map<AString, cCommandReg> CommandMap;
 
 
-	/** FolderNames of plugins that need an action (unload, reload, …).
+	/** FolderNames of plugins that need an action (unload, reload, ...).
 	The plugins will be acted upon within the next call to Tick(), to avoid multithreading issues.
 	Protected against multithreaded access by m_CSPluginsNeedAction. */
 	std::vector<std::pair<ePluginActions, AString>> m_PluginsNeedAction;

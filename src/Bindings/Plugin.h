@@ -39,7 +39,7 @@ public:
 	The default implementation removes the plugin's associations with cPluginManager, descendants should call it as well. */
 	virtual void Unload(void);
 
-	/** Reloads the plugin. Sets m_Status to psLoaded or psError accordingly. 
+	/** Reloads the plugin. Sets m_Status to psLoaded or psError accordingly.
 	The default implementation simply calls Unload then Load. */
 	virtual void Reload(void);
 

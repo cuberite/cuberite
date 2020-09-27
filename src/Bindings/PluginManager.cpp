@@ -166,8 +166,7 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 void cPluginManager::Tick(float a_Dt)
 {
 	// Unload plugins that have been scheduled for unloading:
-	decltype(m_PluginsNeedAction) PluginsNeedAction; 
-
+	decltype(m_PluginsNeedAction) PluginsNeedAction;
 	{
 		cCSLock Lock(m_CSPluginsNeedAction);
 		std::swap(m_PluginsNeedAction, PluginsNeedAction);
@@ -176,8 +175,8 @@ void cPluginManager::Tick(float a_Dt)
 
 	for (auto & currentPlugin: PluginsNeedAction)
 	{
-		auto& action = currentPlugin.first;
-		auto& folder = currentPlugin.second;
+		auto & action = currentPlugin.first;
+		auto & folder = currentPlugin.second;
 
 		bool WasLoaded = false;
 		bool WasFound = false;
@@ -188,13 +187,15 @@ void cPluginManager::Tick(float a_Dt)
 				WasFound = true;
 				if (plugin->IsLoaded())
 				{
-					switch(action) {
-						case ePluginActions::paReload : {
+					switch (action)
+					{
+						case ePluginActions::paReload :
+						{
 							plugin->Reload();
 							break;
 						}
-
-						case ePluginActions::paUnload : {
+						case ePluginActions::paUnload :
+						{
 							plugin->Unload();
 							break;
 						}
@@ -1331,16 +1332,20 @@ void cPluginManager::UnloadPluginsNow()
 
 
 
-
 void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
 	cCSLock Lock(m_CSPluginsNeedAction);
 	m_PluginsNeedAction.push_back(std::make_pair(ePluginActions::paUnload, a_PluginFolder));
 }
 
-void cPluginManager::reloadPlugin(AString const& a_PluginFolder) {
-	cCSLock Lock(m_CSPluginsToUnload);
-	m_pluginsToUnload.push_back(std::make_pair(ePluginActions::paReload, a_PluginFolder));
+
+
+
+
+void cPluginManager::ReloadPlugin(const AString & a_PluginFolder)
+{
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.push_back(std::make_pair(ePluginActions::paReload, a_PluginFolder));
 }
 
 
