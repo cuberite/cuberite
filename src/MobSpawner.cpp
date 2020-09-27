@@ -301,15 +301,15 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 				(TargetBlock == E_BLOCK_GRASS) &&
 				(BlockAbove == E_BLOCK_AIR) &&
 				(
-				(a_Biome == biColdTaiga) ||
-				(a_Biome == biColdTaigaHills) ||
-				(a_Biome == biColdTaigaM) ||
-				(a_Biome == biForest) ||
-				(a_Biome == biTaiga) ||
-				(a_Biome == biTaigaHills) ||
-				(a_Biome == biTaigaM) ||
-				(a_Biome == biMegaTaiga) ||
-				(a_Biome == biMegaTaigaHills)
+					(a_Biome == biColdTaiga) ||
+					(a_Biome == biColdTaigaHills) ||
+					(a_Biome == biColdTaigaM) ||
+					(a_Biome == biForest) ||
+					(a_Biome == biTaiga) ||
+					(a_Biome == biTaigaHills) ||
+					(a_Biome == biTaigaM) ||
+					(a_Biome == biMegaTaiga) ||
+					(a_Biome == biMegaTaigaHills)
 				)
 			);
 		}
@@ -466,11 +466,16 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 	// If too close to any player, don't spawn anything
 	auto AbsPos = a_Chunk->RelativeToAbsolute(a_RelPos);
 	static const double RangeLimit = 24;
-	if (a_Chunk->GetWorld()->DoWithNearestPlayer(AbsPos, RangeLimit, [](cPlayer & a_Player) -> bool
-	{
-		return true;
-	})
-			)
+	if (
+		a_Chunk->GetWorld()->DoWithNearestPlayer(
+			AbsPos,
+			RangeLimit,
+			[](cPlayer & a_Player)
+			{
+				return true;
+			}
+		)
+	)
 	{
 		return nullptr;
 	}
