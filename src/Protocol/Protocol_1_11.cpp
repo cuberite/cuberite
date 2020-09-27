@@ -589,7 +589,7 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtSnowGolem:             return 97;
 		case mtSpider:                return 52;
 		case mtStray:                 return 6;
-		case mtTraderLlama:           return 103;  // TODO: check again
+		case mtTraderLlama:           return 103;
 		case mtSquid:                 return 94;
 		case mtVex:                   return 35;
 		case mtVillager:              return 120;
@@ -604,7 +604,6 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 
 		default:                      return 0;
 	}
-	UNREACHABLE("Unsupported mob type");
 }
 
 
