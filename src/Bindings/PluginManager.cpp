@@ -210,7 +210,7 @@ void cPluginManager::Tick(float a_Dt)
 		}
 		else if (!WasLoaded)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
