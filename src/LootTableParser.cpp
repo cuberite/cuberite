@@ -106,7 +106,7 @@ namespace LootTable
 	{
 		if ((a_Value.empty()) || (!a_Value.isObject()))
 		{
-			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping condition!");
+			LOGWARNING("Loot table: Condition \"Alternative\" encountered a Json problem, dropping condition!");
 			return;
 		}
 		Json::Value Terms;
@@ -158,7 +158,7 @@ namespace LootTable
 
 	cBlockStateProperty::cBlockStateProperty(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"BlockStateProperty\" encountered a Json problem, dropping condition!");
 			return;
@@ -172,7 +172,7 @@ namespace LootTable
 			{
 				cItem Item;
 
-				if ((a_Value[ParameterName].isString()) && (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item)))
+				if ((a_Value[ParameterName].isString()) && (StringToItem(a_Value[ParameterName].asString(), Item)))
 				{
 					m_Block = Item.m_ItemType;
 				}
@@ -225,7 +225,7 @@ namespace LootTable
 
 	cDamageSourceProperties::cDamageSourceProperties(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"DamageSourceProperties\" encountered a Json problem, dropping function!");
 			return;
@@ -262,7 +262,7 @@ namespace LootTable
 				(NoCaseCompare(Key, "bypasses_magic") == 0) ||
 				(NoCaseCompare(Key, "BypassesMagic") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_BypassesMagic = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "direct_entity") == 0) ||
@@ -274,31 +274,31 @@ namespace LootTable
 				(NoCaseCompare(Key, "is_explosion") == 0) ||
 				(NoCaseCompare(Key, "IsExplosion") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_IsExplosion = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "is_fire") == 0) ||
 				(NoCaseCompare(Key, "IsFire") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_IsFire = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "is_magic") == 0) ||
 				(NoCaseCompare(Key, "IsMagic") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_IsMagic = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "is_projectile") == 0) ||
 				(NoCaseCompare(Key, "IsProjectile") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_IsProjectile = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "is_lightning") == 0) ||
 				(NoCaseCompare(Key, "IsLightning") == 0))
 			{
-				m_BypassesInvulnerability = Predicates[Key].asBool();
+				m_IsLightning = Predicates[Key].asBool();
 			}
 			else if (
 				(NoCaseCompare(Key, "source_entity") == 0) ||
@@ -531,7 +531,7 @@ namespace LootTable
 
 	cEntityProperties::sEffectDesc::sEffectDesc(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: \"EffectDesc\" encountered a Json problem, dropping function!");
 			return;
@@ -555,7 +555,7 @@ namespace LootTable
 
 	cEntityProperties::cEntityProperties(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping function!");
 			return;
@@ -617,18 +617,32 @@ namespace LootTable
 
 	void cEntityProperties::FromJson(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"EntityProperties\" encountered a Json problem, dropping condition!");
 			return;
 		}
+		Json::Value Predicate;
+		if (a_Value.isMember("predicate"))
+		{
+			Predicate = a_Value["predicate"];
+		}
+		else if (a_Value.isMember("Predicate"))
+		{
+			Predicate = a_Value["Predicate"];
+		}
+		else
+		{
+			LOGWARNING("Loot table: Condition \"EntityProperties\" is missing it's predicates, dropping condition!");
+			return;
+		}
 		m_Active = true;
-		for (const auto & Key : a_Value.getMemberNames())
+		for (const auto & Key : Predicate.getMemberNames())
 		{
 			if (NoCaseCompare(Key, "distance") == 0)
 			{
-				Json::Value Distance = a_Value[Key];
-				if (!Distance.isObject())
+				Json::Value Distance = Predicate[Key];
+				if (Distance.isArray())
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Distance\" encountered a Json problem, dropping condition!");
 					continue;
@@ -659,8 +673,8 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "effects") == 0)
 			{
-				const Json::Value EffectObject = a_Value[Key];
-				if (!EffectObject.isObject())
+				const Json::Value EffectObject = Predicate[Key];
+				if (EffectObject.isArray())
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Effects\" encountered a Json problem, dropping condition!");
 					continue;
@@ -672,7 +686,7 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "equipment") == 0)
 			{
-				Json::Value Equipment = a_Value[Key];
+				Json::Value Equipment = Predicate[Key];
 				if (!Equipment.isObject())
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - equipment\" encountered a Json problem, dropping condition!");
@@ -708,8 +722,8 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "flags") == 0)
 			{
-				Json::Value FlagsObject = a_Value[Key];
-				if (!FlagsObject.isObject())
+				Json::Value FlagsObject = Predicate[Key];
+				if (FlagsObject.isArray())
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - flags\" encountered a Json problem, dropping condition!");
 					continue;
@@ -717,31 +731,31 @@ namespace LootTable
 				for (const auto & Flag : FlagsObject.getMemberNames())
 				{
 					if ((NoCaseCompare(Flag, "is_on_fire") == 0) ||
-						(NoCaseCompare(Key, "IsOnFire") == 0))
+						(NoCaseCompare(Flag, "IsOnFire") == 0))
 					{
 						m_IsOnFire = FlagsObject[Flag].asBool();
 					}
 					else if (
 						(NoCaseCompare(Flag, "is_sneaking") == 0) ||
-						(NoCaseCompare(Key, "IsSneaking") == 0))
+						(NoCaseCompare(Flag, "IsSneaking") == 0))
 					{
 						m_IsSneaking = FlagsObject[Flag].asBool();
 					}
 					else if (
 						(NoCaseCompare(Flag, "is_sprinting") == 0) ||
-						(NoCaseCompare(Key, "IsSprinting") == 0))
+						(NoCaseCompare(Flag, "IsSprinting") == 0))
 					{
 						m_IsSprinting = FlagsObject[Flag].asBool();
 					}
 					else if (
 						(NoCaseCompare(Flag, "is_swimming") == 0) ||
-						(NoCaseCompare(Key, "IsSwimming") == 0))
+						(NoCaseCompare(Flag, "IsSwimming") == 0))
 					{
 						m_IsSwimming = FlagsObject[Flag].asBool();
 					}
 					else if (
 						(NoCaseCompare(Flag, "is_baby") == 0) ||
-						(NoCaseCompare(Key, "IsBaby") == 0))
+						(NoCaseCompare(Flag, "IsBaby") == 0))
 					{
 						m_IsBaby = FlagsObject[Flag].asBool();
 					}
@@ -749,16 +763,16 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "location") == 0)
 			{
-				m_Location = cLocationCheck(a_Value[Key]);
+				m_Location = cLocationCheck(Predicate[Key]);
 			}
 			else if (NoCaseCompare(Key, "nbt") == 0)
 			{
-				m_NBT = a_Value[Key].asString();
+				m_NBT = Predicate[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "player") == 0)
 			{
-				Json::Value PlayerObject = a_Value[Key];
-				if (!PlayerObject.isObject())
+				Json::Value PlayerObject = Predicate[Key];
+				if (PlayerObject.isArray())
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Player\" encountered a Json problem, dropping condition!");
 					continue;
@@ -774,7 +788,7 @@ namespace LootTable
 					else if (NoCaseCompare(PlayerKey, "gamemode") == 0)
 					{
 						// Allowed values: survival, adventure, creative or spectator
-						AString Gamemode = PlayerObject[PlayerKey].asString();
+						AString Gamemode = NamespaceConverter(PlayerObject[PlayerKey].asString());
 						if (NoCaseCompare(Gamemode, "survival") == 0)
 						{
 							m_Gamemode = eGameMode_Survival;
@@ -810,11 +824,11 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "team") == 0)
 			{
-				m_Team = a_Value[Key].asString();
+				m_Team = Predicate[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "type") == 0)
 			{
-				auto Type = a_Value[Key].asString();
+				auto Type = Predicate[Key].asString();
 
 				if (Type.empty())
 				{
@@ -827,14 +841,14 @@ namespace LootTable
 				(NoCaseCompare(Key, "target_entity") == 0) ||
 				(NoCaseCompare(Key, "TargetEntity") == 0))
 			{
-				m_TargetEntity = new cEntityProperties(a_Value[Key], eDest::This);
+				m_TargetEntity = new cEntityProperties(Predicate[Key], eDest::This);
 			}
 			else if (NoCaseCompare(Key, "vehicle") == 0)
 			{
 				// Note: this might create looooooooooooooooooooooooooong (even infinite) loops... BUT the user must write any loop depth into the json. So this is limited by the users disk space and can also be abused in vanilla. I thought about limiting the depth but if the user want's  to break the server he shall.
-				m_Vehicle = new cEntityProperties(a_Value[Key], eDest::This);
+				m_Vehicle = new cEntityProperties(Predicate[Key], eDest::This);
 			}
-		}
+		}  // Predicates
 	}
 
 	bool cEntityProperties::operator()(
@@ -1151,7 +1165,7 @@ namespace LootTable
 
 	cInverted::cInverted(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"Inverted\" encountered a Json problem, dropping condition!");
 			return;
@@ -1191,7 +1205,7 @@ namespace LootTable
 
 	cKilledByPlayer::cKilledByPlayer(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"KilledByPlayer\" encountered a Json problem, dropping function!");
 			return;
@@ -1229,7 +1243,7 @@ namespace LootTable
 
 	cLocationCheck::cLocationCheck(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"LocationCheck\" encountered a Json problem, dropping function!");
 			return;
@@ -1483,7 +1497,7 @@ namespace LootTable
 
 	cMatchTool::cMatchTool(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"MatchTool\" encountered a Json problem, dropping condition!");
 			return;
@@ -1723,7 +1737,7 @@ namespace LootTable
 
 	cRandomChance::cRandomChance(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"RandomChance\" encountered a Json problem, dropping condition!");
 			return;
@@ -1759,7 +1773,7 @@ namespace LootTable
 
 	cRandomChanceWithLooting::cRandomChanceWithLooting(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"RandomChanceWithLooting\" encountered a Json problem, dropping condition!");
 			return;
@@ -1813,7 +1827,7 @@ namespace LootTable
 // cReference
 	cReference::cReference(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"Reference\" encountered a Json problem, dropping condition!");
 			return;
@@ -1848,7 +1862,7 @@ namespace LootTable
 // cTableBonus
 	cTableBonus::cTableBonus(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"TableBonus\" encountered a Json problem, dropping function!");
 			return;
@@ -1918,7 +1932,7 @@ namespace LootTable
 // cTimeCheck
 	cTimeCheck::cTimeCheck(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"TimeCheck\" encountered a Json problem, dropping condition!");
 			return;
@@ -1962,7 +1976,7 @@ namespace LootTable
 
 	cWeatherCheck::cWeatherCheck(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"WeatherCheck\" encountered a Json problem, dropping condition!");
 			return;
@@ -2019,7 +2033,7 @@ namespace LootTable
 
 	cApplyBonus::cApplyBonus(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"ApplyBonus\" encountered a Json problem, dropping function!");
 			return;
@@ -2169,7 +2183,7 @@ namespace LootTable
 
 	cCopyName::cCopyName(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"CopyName\" encountered a Json problem, dropping function!");
 			return;
@@ -2217,7 +2231,7 @@ namespace LootTable
 		// TODO: 06.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported. Dropping function!");
 		return;
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"CopyNbt\" encountered a Json problem, dropping function!");
 			return;
@@ -2341,7 +2355,7 @@ namespace LootTable
 		LOGWARNING("Loot table: States for blocks is not yet supported, dropping function!");
 		return;
 
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"CopyState\" encountered a Json problem, dropping function!");
 			return;
@@ -2393,7 +2407,7 @@ namespace LootTable
 
 	cEnchantRandomly::cEnchantRandomly(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"EnchantRandomly\" encountered a Json problem, dropping function!");
 			return;
@@ -2454,7 +2468,7 @@ namespace LootTable
 
 	cEnchantWithLevels::cEnchantWithLevels(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"EnchantWithLevels\" encountered a Json problem, dropping function!");
 			return;
@@ -2517,7 +2531,7 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: Exploration maps are not implemented, dropping function!");
 		return;
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"ExplorationMap\" encountered a Json problem, dropping function!");
 			return;
@@ -2582,7 +2596,7 @@ namespace LootTable
 
 	cFillPlayerHead::cFillPlayerHead(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"FillPlayerHead\" encountered a Json problem, dropping function!");
 			return;
@@ -2748,7 +2762,7 @@ namespace LootTable
 
 	cLootingEnchant::cLootingEnchant(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"LootingEnchant\" encountered a Json problem, dropping function!");
 			return;
@@ -2854,7 +2868,7 @@ namespace LootTable
 
 	cSetCount::cSetCount(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetCount\" encountered a Json problem, dropping function!");
 			return;
@@ -2952,7 +2966,7 @@ namespace LootTable
 
 	cSetDamage::cSetDamage(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetDamage\" encountered a Json problem, dropping function!");
 			return;
@@ -2994,7 +3008,7 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping \"SetLootTable\" function!");
 		return;
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetLootTable\" encountered a Json problem, dropping function!");
 			return;
@@ -3028,7 +3042,7 @@ namespace LootTable
 
 	cSetLore::cSetLore(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetLore\" encountered a Json problem, dropping function!");
 			return;
@@ -3106,7 +3120,7 @@ namespace LootTable
 
 	cSetName::cSetName(const Json::Value & a_Value)
 	{
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetName\" encountered a Json problem, dropping function!");
 			return;
@@ -3167,7 +3181,7 @@ namespace LootTable
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetNBT\"!");
 		return;
-		if ((a_Value.empty()) || (!a_Value.isObject()))
+		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetNbt\" encountered a Json problem, dropping function!");
 			return;

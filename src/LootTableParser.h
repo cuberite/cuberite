@@ -297,6 +297,7 @@ namespace LootTable
 			bool m_BypassesMagic;
 			// cEntityProperties m_DirectEntity;  // The entity that caused the damage
 			bool m_IsFire;
+			bool m_IsExplosion;
 			bool m_IsMagic;
 			bool m_IsProjectile;
 			bool m_IsLightning;

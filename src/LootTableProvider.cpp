@@ -36,7 +36,7 @@ void cLootTableProvider::ReloadLootTables()
 	LoadLootTablesFromFolder(LootTable::LootTablePath);
 
 	// Check for custom tables
-	LoadLootTablesFromFolder(LootTable::LootTablePath + cFile::PathSeparator() + m_World.GetDataPath());
+	LoadLootTablesFromFolder(m_World.GetDataPath() + cFile::PathSeparator() + LootTable::LootTablePath);
 }
 
 
