@@ -582,7 +582,7 @@ cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
-	 {
+	{
 		case mtShulker:   return 69;
 		default: return Super::GetProtocolMobType(a_MobType);
 	}
