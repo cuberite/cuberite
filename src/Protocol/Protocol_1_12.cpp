@@ -624,7 +624,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		{
 			// TODO
 			break;
-		} // case mtEvoker
+		}  // case mtEvoker
 
 		case mtGhast:
 		{
@@ -1080,6 +1080,7 @@ cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
 	return Version::v1_12;
 }
+
 
 
 
