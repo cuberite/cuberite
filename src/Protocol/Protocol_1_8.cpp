@@ -1893,7 +1893,6 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtChicken:               return 93;
 		case mtCow:                   return 92;
 		case mtCreeper:               return 50;
-		case mtDonkey:                return 100;
 		case mtEnderDragon:           return 63;
 		case mtEnderman:              return 58;
 		case mtEndermite:             return 67;
@@ -1904,14 +1903,12 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtIronGolem:             return 99;
 		case mtMagmaCube:             return 62;
 		case mtMooshroom:             return 96;
-		case mtMule:                  return 100;
 		case mtOcelot:                return 98;
 		case mtPig:                   return 90;
 		case mtRabbit:                return 101;
 		case mtSheep:                 return 91;
 		case mtSilverfish:            return 60;
 		case mtSkeleton:              return 51;
-		case mtSkeletonHorse:         return 100;
 		case mtSlime:                 return 55;
 		case mtSnowGolem:             return 97;
 		case mtSpider:                return 52;
@@ -1922,12 +1919,16 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtWitherSkeleton:        return 51;
 		case mtWolf:                  return 95;
 		case mtZombie:                return 54;
-		case mtZombieHorse:           return 100;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
 		// Mobs that get replaced with another because they were added later
+		case mtCat:                   return GetProtocolMobType(mtOcelot);
+		case mtDonkey:                return GetProtocolMobType(mtHorse);
+		case mtMule:                  return GetProtocolMobType(mtHorse);
+		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
+		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
 		case mtStray:                 return GetProtocolMobType(mtSkeleton);
-		case mtHusk:                  return GetProtocolMobType(mtHusk);
+		case mtHusk:                  return GetProtocolMobType(mtZombie);
 
 		default:                      return 0;
 	}
@@ -3774,7 +3775,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -3941,6 +3941,8 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
+
+		case mtCat:
 
 		case mtEndermite:
 		{

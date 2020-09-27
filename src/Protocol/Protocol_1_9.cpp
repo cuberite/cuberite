@@ -1868,11 +1868,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtGhast
 
-		case mtDonkey:
 		case mtHorse:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
 		{
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
 			Int8 Flags = 0;
@@ -1934,7 +1930,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -2139,9 +2134,18 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}
 
+		case mtCat:
+
+		case mtDonkey:
+
 		case mtEndermite:
 
+		case mtMule:
+
 		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
 
 		case mtShulker:
 		{
