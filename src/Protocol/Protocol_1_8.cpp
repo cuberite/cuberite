@@ -3719,11 +3719,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtGhast
 
-		case mtDonkey:
 		case mtHorse:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
 		{
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
 			int Flags = 0;
@@ -3945,6 +3941,11 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtCat:
 
 		case mtEndermite:
+
+		case mtDonkey:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
 			break;
