@@ -76,17 +76,6 @@ public:
 		psNotFound,
 	};
 
-	/** Defines the deferred actions needed for a plugin */
-	enum ePluginActions
-	{
-
-		/** The plugin needs to be reloaded */
-		paReload,
-
-		/** The plugin needs to be unloaded */
-		paUnload
-	};
-
 
 	enum PluginHook
 	{
@@ -171,6 +160,14 @@ public:
 		HOOK_NUM_HOOKS,
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
 	} ;  // tolua_export
+
+
+	/** Defines the deferred actions needed for a plugin */
+	enum class PluginAction
+	{
+		Reload,
+		Unload
+	};
 
 
 	/** Used as a callback for enumerating bound commands */
@@ -426,7 +423,7 @@ private:
 	/** FolderNames of plugins that need an action (unload, reload, ...).
 	The plugins will be acted upon within the next call to Tick(), to avoid multithreading issues.
 	Protected against multithreaded access by m_CSPluginsNeedAction. */
-	std::vector<std::pair<ePluginActions, AString>> m_PluginsNeedAction;
+	std::vector<std::pair<PluginAction, AString>> m_PluginsNeedAction;
 
 	/** Protects m_PluginsToUnload against multithreaded access. */
 	mutable cCriticalSection m_CSPluginsNeedAction;

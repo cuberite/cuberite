@@ -1013,14 +1013,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "The plugin is enabled in settings.ini, but it has been unloaded (by a command).",
 			},
-			paReload =
-			{
-				Notes = "The plugin is waiting for reload at next tick.",
-			},
-			paUnload =
-			{
-				Notes = "The plugin is waiting for unload at next tick.",
-			}
 		},
 		ConstantGroups =
 		{
@@ -1053,15 +1045,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 					These constants are used to report status of individual plugins. Use {{cPlugin}}:GetStatus() to query the
 					status of a plugin; use cPluginManager::ForEachPlugin() to iterate over plugins.]],
 			},
-			ePluginActions =
-			{
-				Include =
-				{
-					"pa.*",
-				},
-				TextBefore = [[
-					These constants are used to report the actions needed on the plugins.]],
-			}
 		},
 	},
 }
