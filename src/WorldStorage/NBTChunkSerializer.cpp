@@ -808,10 +808,7 @@ public:
 					mWriter.AddShort("carriedData", static_cast<Int16>(Enderman->GetCarriedMeta()));
 					break;
 				}
-				case mtDonkey:
 				case mtHorse:
-				case mtSkeletonHorse:
-				case mtZombieHorse:
 				{
 					const cHorse *Horse = static_cast<const cHorse *>(a_Monster);
 					mWriter.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);
@@ -943,6 +940,7 @@ public:
 				case mtCat:
 				case mtCod:
 				case mtDolphin:
+				case mtDonkey:
 				case mtDrowned:
 				case mtElderGuardian:
 				case mtEndermite:
@@ -964,6 +962,7 @@ public:
 				case mtRavager:
 				case mtSalmon:
 				case mtShulker:
+				case mtSkeletonHorse:
 				case mtStray:
 				case mtStrider:
 				case mtTraderLlama:
@@ -973,6 +972,7 @@ public:
 				case mtVindicator:
 				case mtWanderingTrader:
 				case mtZoglin:
+				case mtZombieHorse:
 				{
 					// All the entities not added
 					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
