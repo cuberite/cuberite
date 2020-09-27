@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChunkDef.h"
 
 // tolua_begin
 

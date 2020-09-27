@@ -613,6 +613,19 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
+bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return GenericCallHook(HOOK_DROPSPENSE, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnDropSpense(a_World, a_DropSpenser, a_SlotNum);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
 {
 	return GenericCallHook(HOOK_KILLED, [&](cPlugin * a_Plugin)

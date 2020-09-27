@@ -16,18 +16,21 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Drop self only when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
 		{
 			return cItem(E_BLOCK_GLOWSTONE, 1, 0);
 		}
-		else
-		{
-			// TODO: Handle the Fortune enchantment here
-			return cItem(E_ITEM_GLOWSTONE_DUST, GetRandomProvider().RandInt<char>(2, 4), 0);
-		}
+
+		// Number of dust to drop, capped at the max amount of 4.
+		const auto Drops = std::min(
+			static_cast<char>(4),
+			GetRandomProvider().RandInt<char>(2, 4 + ToolFortuneLevel(a_Tool))
+		);
+
+		return cItem(E_ITEM_GLOWSTONE_DUST, Drops);
 	}
 
 

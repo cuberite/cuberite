@@ -24,6 +24,15 @@ cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 
 
 
+cItems cBedEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_BED, 1, m_Color);
+}
+
+
+
+
+
 void cBedEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);

@@ -1203,6 +1203,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 					case dtAdmin:           return "was administrator'd";
 					case dtExplosion:       return "blew up";
 					case dtAttack:          return "was attacked by thin air";
+					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
 				}
 				UNREACHABLE("Unsupported damage type");
 			}();

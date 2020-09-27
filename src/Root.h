@@ -1,14 +1,13 @@
 
 #pragma once
 
-#include "BlockTypeRegistry.h"
 #include "Defines.h"
 #include "FunctionRef.h"
 #include "HTTP/HTTPServer.h"
 #include "Protocol/Authenticator.h"
 #include "Protocol/MojangAPI.h"
 #include "RankManager.h"
-
+#include "ChunkDef.h"
 
 
 
@@ -96,7 +95,7 @@ public:
 	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
 
 	/** Returns the (read-write) storage for registered block types. */
-	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
+	// BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -139,6 +138,9 @@ public:
 
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
+
+	/** Saves all chunks in all worlds synchronously (waits until dirty chunks have been sent to the ChunkStorage queue before returning) */
+	void SaveAllChunksNow(void);
 
 	/** Sets whether saving chunks is enabled in all worlds (overrides however the worlds were already set) */
 	void SetSavingEnabled(bool a_SavingEnabled);  // tolua_export
@@ -230,7 +232,7 @@ private:
 	cHTTPServer m_HTTPServer;
 
 	/** The storage for all registered block types. */
-	BlockTypeRegistry m_BlockTypeRegistry;
+	// BlockTypeRegistry m_BlockTypeRegistry;
 
 
 	void LoadGlobalSettings();

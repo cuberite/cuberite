@@ -4,7 +4,6 @@
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
 #include "../Item.h"
-#include "../BlockEntities/BlockEntityWithItems.h"
 
 
 
@@ -42,39 +41,5 @@ private:
 	virtual bool IsUseable() const override
 	{
 		return true;
-	}
-};
-
-
-
-
-
-/** Wrapper for blocks that have a cBlockEntityWithItems descendant attached to them.
-When converting to pickups, drops self with meta reset to zero, and adds the container contents. */
-template <typename Base = cBlockEntityHandler>
-class cContainerEntityHandler:
-	public Base
-{
-public:
-
-	constexpr cContainerEntityHandler(BLOCKTYPE a_BlockType):
-		Base(a_BlockType)
-	{
-	}
-
-private:
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
-	{
-		// Reset meta to 0
-		cItems res(cItem(Base::m_BlockType, 1, 0));
-
-		// Drop the contents:
-		if (a_BlockEntity != nullptr)
-		{
-			auto container = static_cast<cBlockEntityWithItems *>(a_BlockEntity);
-			res.AddItemGrid(container->GetContents());
-		}
-		return res;
 	}
 };

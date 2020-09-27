@@ -31,6 +31,7 @@ by using templates.
 
 #include <tuple>
 #include "../Noise/Noise.h"
+#include "BiomeDef.h"
 
 
 

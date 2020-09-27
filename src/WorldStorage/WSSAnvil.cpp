@@ -1392,27 +1392,14 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 
 	auto MobSpawner = std::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
-	// Load entity (Cuberite worlds):
-	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
-	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
+	// Load entity type
+	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
+	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
 	{
-		short MonsterType = a_NBT.GetShort(Type);
-		if ((MonsterType >= 50) && (MonsterType <= 120))
+		eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
+		if (MonsterType != eMonsterType::mtInvalidType)
 		{
-			MobSpawner->SetEntity(static_cast<eMonsterType>(MonsterType));
-		}
-	}
-	else
-	{
-		// Load entity (vanilla worlds):
-		Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
-		if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
-		{
-			eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
-			if (MonsterType != eMonsterType::mtInvalidType)
-			{
-				MobSpawner->SetEntity(MonsterType);
-			}
+			MobSpawner->SetEntity(MonsterType);
 		}
 	}
 

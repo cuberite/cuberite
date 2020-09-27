@@ -339,7 +339,7 @@ void cBlockPistonHeadHandler::OnBroken(
 
 
 
-cItems cBlockPistonHeadHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockPistonHeadHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
 	// Give a normal\sticky piston base, not piston extension
 	// With 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...

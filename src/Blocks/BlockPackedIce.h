@@ -1,16 +1,16 @@
 
 #pragma once
 
-#include "BlockEntity.h"
+#include "BlockHandler.h"
 
 
 
 
 
-class cBlockCommandBlockHandler :
-	public cBlockEntityHandler
+class cBlockPackedIceHandler :
+	public cBlockHandler
 {
-	using Super = cBlockEntityHandler;
+	using Super = cBlockHandler;
 
 public:
 
@@ -20,21 +20,18 @@ private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		// Don't allow as a pickup:
+		// Only drop self when using silk-touch:
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(m_BlockType);
+		}
+
 		return {};
 	}
-
-
-
-
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
-		return 10;
+		return 5;
 	}
 } ;
-
-
-
-

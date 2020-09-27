@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "../BlockEntities/BrewingstandEntity.h"
 #include "Mixins.h"
 
 
@@ -19,15 +18,9 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		cItems res(cItem(E_ITEM_BREWING_STAND, 1));  // We have to drop the item form of a brewing stand
-		if (a_BlockEntity != nullptr)
-		{
-			auto be = static_cast<cBrewingstandEntity *>(a_BlockEntity);
-			res.AddItemGrid(be->GetContents());
-		}
-		return res;
+		return cItem(E_ITEM_BREWING_STAND);  // We have to drop the item form of a brewing stand
 	}
 
 

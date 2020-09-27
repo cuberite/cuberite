@@ -70,6 +70,7 @@ public:  // tolua_export
 	cUUID GetOwnerUUID(void) const { return m_OwnerUUID; }  // Exported in ManualBindings.cpp
 
 	// cBlockEntity overrides:
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;

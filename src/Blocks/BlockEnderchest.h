@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "BlockEntity.h"
 #include "Mixins.h"
 
 
@@ -18,7 +17,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drop something when mined with a pickaxe:
 		if (
@@ -29,13 +28,12 @@ private:
 			// Only drop self when mined with a silk-touch pickaxe:
 			if (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0)
 			{
-				return cItem(E_BLOCK_ENDER_CHEST, 1, 0);
+				return cItem(E_BLOCK_ENDER_CHEST);
 			}
-			else
-			{
-				return cItem(E_BLOCK_OBSIDIAN, 8, 0);
-			}
+
+			return cItem(E_BLOCK_OBSIDIAN, 8);
 		}
+
 		return {};
 	}
 

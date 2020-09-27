@@ -129,7 +129,6 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			m_Player->DestroyNoScheduling(true);
 		}
 		// Send the Offline PlayerList packet:
 		cRoot::Get()->BroadcastPlayerListsRemovePlayer(*m_Player);

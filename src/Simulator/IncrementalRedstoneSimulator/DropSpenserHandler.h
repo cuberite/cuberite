@@ -65,6 +65,11 @@ namespace DropSpenserHandler
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
+
+		// Consider indirect power:
+		Callback.CheckIndirectPower();
+
+		// Consider normal adjacents:
 		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };

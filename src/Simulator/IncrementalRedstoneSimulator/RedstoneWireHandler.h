@@ -88,11 +88,14 @@ namespace RedstoneWireHandler
 				return a_Offset.z != 0;
 			}
 			case E_BLOCK_ACTIVE_COMPARATOR:
-			case E_BLOCK_INACTIVE_COMPARATOR:
 			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_INACTIVE_COMPARATOR:
+			case E_BLOCK_LEVER:
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
-			case E_BLOCK_REDSTONE_WIRE: return true;
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON: return true;
 			default: return false;
 		}
 	}

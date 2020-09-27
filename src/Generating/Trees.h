@@ -18,7 +18,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #pragma once
 
 #include "../Noise/Noise.h"
-
+#include "../ChunkDef.h"  // For sSetBlockVector
 
 
 

@@ -40,7 +40,6 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
-#include "BlockTypePalette.h"
 
 
 
@@ -66,7 +65,6 @@ cRoot::cRoot(void) :
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr)
 {
-	Temporary::RegisterAllBlockHandlers(m_BlockTypeRegistry);
 	s_Root = this;
 	TransitionNextState(NextState::Run);
 }
@@ -570,6 +568,18 @@ void cRoot::SaveAllChunks(void)
 	for (auto & Entry : m_WorldsByName)
 	{
 		Entry.second.QueueSaveAllChunks();
+	}
+}
+
+
+
+
+
+void cRoot::SaveAllChunksNow(void)
+{
+	for (auto & Entry : m_WorldsByName)
+	{
+		Entry.second.SaveAllChunks();
 	}
 }
 

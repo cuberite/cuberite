@@ -227,6 +227,7 @@ cWorld::cWorld(
 
 	cFile::CreateFolderRecursive(m_DataPath);
 
+	// TODO: unique ptr unnecessary
 	m_ChunkMap = std::make_unique<cChunkMap>(this);
 	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
@@ -965,11 +966,6 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 
 		m_MapManager.SaveMapData();
 	}
-
-	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
-	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
-	// TODO: destructors should only be used for releasing resources, not doing extra work
-	m_ChunkMap.reset();
 }
 
 

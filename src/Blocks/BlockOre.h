@@ -18,30 +18,32 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If using silk-touch, drop self rather than the resource:
 		if (ToolHasSilkTouch(a_Tool))
 		{
 			switch (m_BlockType)
 			{
-				// If it was a glowing redstone ore, drop a normal redstone ore
+				// If it was a glowing redstone ore, drop a normal redstone ore:
 				case E_BLOCK_REDSTONE_ORE_GLOWING:   return cItem(E_BLOCK_REDSTONE_ORE);
 				default:                             return cItem(m_BlockType);
 			}
 		}
 
-		// TODO: Handle the Fortune enchantment here
-		auto & random = GetRandomProvider();
+		auto & Random = GetRandomProvider();
+		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
+		const auto Drops = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
+
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, random.RandInt<char>(4, 8), 4);
-			case E_BLOCK_REDSTONE_ORE:         return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND);
-			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD);
-			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL);
-			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ);
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, Drops * Random.RandInt<char>(4, 9), 4);
+			case E_BLOCK_REDSTONE_ORE:         // Handled by next case (glowing redstone)
+			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, Random.RandInt<char>(4, 5 + FortuneLevel));
+			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, Drops);
+			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, Drops);
+			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, Drops);
+			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, Drops);
 			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
 			default:
 			{

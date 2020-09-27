@@ -250,21 +250,6 @@ void cEntity::Destroy()
 
 
 
-void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
-{
-	SetIsTicking(false);
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
-	}
-
-	Destroyed();
-}
-
-
-
-
-
 void cEntity::TakeDamage(cEntity & a_Attacker)
 {
 	int RawDamage = a_Attacker.GetRawDamageAgainst(*this);

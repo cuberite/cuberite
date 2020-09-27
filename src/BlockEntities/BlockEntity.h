@@ -1,7 +1,7 @@
 
 #pragma once
 
-
+#include "ChunkDef.h"
 
 
 
@@ -29,6 +29,7 @@
 
 
 class cChunk;
+class cItems;
 class cPlayer;
 class cWorld;
 class cBlockEntity;
@@ -83,6 +84,10 @@ public:
 	Uses CopyFrom() to copy the properties. */
 	OwnedBlockEntity Clone(Vector3i a_Pos);
 
+	/** Returns the contents of this block entity that it would drop if broken.
+	Note that the block handler will usually handle pickups for the block itself, in addition to any items returned here. */
+	virtual cItems ConvertToPickups() const;
+
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
 	Each non-abstract descendant should override to copy its specific properties, and call
 	Super::CopyFrom(a_Src) to copy the common ones. */
@@ -117,7 +122,7 @@ public:
 	cWorld * GetWorld() const { return m_World; }
 
 	int GetChunkX() const { return FAST_FLOOR_DIV(m_Pos.x, cChunkDef::Width); }
-	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.y, cChunkDef::Width); }
+	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.z, cChunkDef::Width); }
 
 	int GetRelX() const { return m_RelX; }
 	int GetRelZ() const { return m_RelZ; }

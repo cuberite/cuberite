@@ -275,6 +275,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtCactusContact:   return "dtCactusContact";
 		case dtDrowning:        return "dtDrowning";
 		case dtEnderPearl:      return "dtEnderPearl";
+		case dtEnvironment:     return "dtEnvironment";
 		case dtFalling:         return "dtFalling";
 		case dtFireContact:     return "dtFireContact";
 		case dtInVoid:          return "dtInVoid";
@@ -331,6 +332,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtPotionOfHarming, "dtPotionOfHarming"},
 		{ dtAdmin,           "dtAdmin"},
 		{ dtExplosion,       "dtExplosion"},
+		{ dtEnvironment,     "dtEnvironment"},
 
 		// Common synonyms:
 		{ dtAttack,        "dtPawnAttack"},
