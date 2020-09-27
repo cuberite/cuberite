@@ -1058,6 +1058,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		{
 			break;
 		}
-		default: UNREACHABLE("Tried to transmit unknown mob in Prpotocol 1.10");
+		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.10");
 	}  // switch (a_Mob.GetType())
 }
