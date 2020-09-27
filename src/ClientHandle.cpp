@@ -772,6 +772,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		return;
 	}
 
+	// Bail out if something's wrong with the window
 	if (
 		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
@@ -782,21 +783,60 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	}
 
 	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
+	auto Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // A copy of the item to be enchanted.
 	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
-	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	if (!Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{
-		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
-		{
-			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
-			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
-			Window->BroadcastWholeWindow();
+		// Item wasn't enchantable:
+		return;
+	}
 
-			Window->SetProperty(0, 0, *m_Player);
-			Window->SetProperty(1, 0, *m_Player);
-			Window->SetProperty(2, 0, *m_Player);
-		}
+	// Creative players can always enchant:
+	if (m_Player->IsGameModeCreative())
+	{
+		Broadcast:
+
+		// Set the item slot to our new enchanted item:
+		Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+		Window->BroadcastWholeWindow();
+
+		// Remove enchantment choices:
+		Window->SetProperty(0, 0, *m_Player);
+		Window->SetProperty(1, 0, *m_Player);
+		Window->SetProperty(2, 0, *m_Player);
+		return;
+	}
+
+	const auto XpRequired = m_Player->XpForLevel(BaseEnchantmentLevel);
+	auto LapisStack = *Window->m_SlotArea->GetSlot(1, *m_Player);  // A copy of the lapis stack.
+	const auto LapisRequired = a_Enchantment + 1;
+
+	// Only allow enchantment if the player has sufficient levels and lapis to enchant:
+	if ((m_Player->GetCurrentXp() >= XpRequired) && (LapisStack.m_ItemCount >= LapisRequired))
+	{
+		/*
+		We need to reduce the player's level by the number of lapis required.
+		However we need to keep the resulting percentage filled the same.
+		*/
+
+		const auto TargetLevel = m_Player->GetXpLevel() - LapisRequired;
+		const auto CurrentFillPercent = m_Player->GetXpPercentage();
+
+		// The experience to remove in order to reach the start (0% fill) of the target level.
+		const auto DeltaForLevel = -m_Player->GetCurrentXp() + m_Player->XpForLevel(TargetLevel);
+
+		// The experience to add to get the same fill percent.
+		const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
+
+		// Apply the experience delta:
+		m_Player->DeltaExperience(DeltaForLevel + DeltaForPercent);
+
+		// Now reduce the lapis in our stack and send it back:
+		LapisStack.AddCount(-LapisRequired);
+		Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
+
+		goto Broadcast;
 	}
 }
 
