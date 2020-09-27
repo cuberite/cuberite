@@ -897,13 +897,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSlime
 
-		case mtStray:
-		case mtSkeleton:
-		{
-			// TODO
-			break;
-		}  // case mtStray
-
 		case mtVillager:
 		{
 			auto & Villager = static_cast<const cVillager &>(a_Mob);
@@ -1051,7 +1044,9 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtSnowGolem:
+		case mtStray:
 		case mtSpider:
 		case mtSquid:
 		{

@@ -848,7 +848,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		}  // case mtWolf
 
 		case mtZombie:
-		case mtHusk:
 		{
 			// XXX Zombies were also split into new subclasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -919,6 +918,8 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtEndermite:
 
 		case mtEvoker:
+
+		case mtHusk:
 
 		case mtIllusioner:
 
