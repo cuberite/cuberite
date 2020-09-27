@@ -1659,6 +1659,9 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:zombie_horse",        &cWSSAnvil::LoadZombieHorseFromNBT },
 		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
 		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
+
+		// Renames from versions not yet added
+		{ "minecraft:zombified_piglin",   &cWSSAnvil::LoadPigZombieFromNBT },
 	};
 
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
