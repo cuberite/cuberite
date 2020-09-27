@@ -533,7 +533,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 {
 	using namespace Metadata_1_12;
 
-	// Living Enitiy Metadata
+	// Living Entity Metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -614,18 +614,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtEnderman
 
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
-
-		case mtEvoker:
-		{
-			// TODO
-			break;
-		}  // case mtEvoker
-
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -635,13 +623,9 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtGhast
 
-		case mtDonkey:
 		case mtHorse:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
 		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
+			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
 			// Abstract horse
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
@@ -697,18 +681,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtHorse
 
-		case mtIllusioner:
-		{
-			// TODO
-			break;
-		}  // case mtIllusioner
-
-		case mtLlama:
-		{
-			// TODO
-			break;
-		}  // case mtLlama
-
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -718,7 +690,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -763,18 +734,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtPig
 
-		case mtParrot:
-		{
-			// TODO
-			break;
-		}  // case mtParrot
-
-		case mtPolarBear:
-		{
-			// TODO
-			break;
-		}  // case mtPolarBear
-
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -808,12 +767,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
-		case mtShulker:
-		{
-			// TODO
-			break;
-		}
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -822,18 +775,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
-
-		case mtStray:
-		{
-			// TODO
-			break;
-		}  // case mtStray
-
-		case mtVex:
-		{
-			// TODO
-			break;
-		}  // case mtVex
 
 		case mtVillager:
 		{
@@ -847,12 +788,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
-
-		case mtVindicator:
-		{
-			// TODO
-			break;
-		}  // case mtVindicator
 
 		case mtWitch:
 		{
@@ -915,7 +850,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtZombie:
 		case mtHusk:
 		{
-			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
+			// XXX Zombies were also split into new subclasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -973,6 +908,38 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtMooshroom:
 		{
 			// Not mentioned on http://wiki.vg/Entities
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+		case mtMule:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtIllusioner:
+
+		case mtLlama:
+
+		case mtParrot:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtStray:
+
+		case mtVex:
+
+		case mtVindicator:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
 			break;
 		}
 

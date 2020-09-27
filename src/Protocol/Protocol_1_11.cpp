@@ -841,7 +841,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 {
 	using namespace Metadata_1_11;
 
-	// Living Entitiy Metadata
+	// Living entity Metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -868,12 +868,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
 			break;
 		}  // case mtBat
-
-		case mtBlaze:
-		{
-			// TODO
-			break;
-		}
 
 		case mtChicken:
 		{
@@ -912,12 +906,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtCreeper
 
-		case mtElderGuardian:
-		{
-			// TODO
-			return;
-		}  // case mtElderGuardian
-
 		case mtEnderman:
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
@@ -934,18 +922,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtEnderman
 
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
-
-		case mtEvoker:
-		{
-			// TODO
-			break;
-		}
-
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -955,17 +931,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtGhast
 
-		case mtGuardian:
-		{
-			// TODO
-			break;
-		}  // case mtGuardian
-
-		case mtDonkey:
 		case mtHorse:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
 		{
 			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
@@ -1023,12 +989,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtHorse
 
-		case mtLlama:
-		{
-			// TODO
-			break;
-		}
-
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -1038,9 +998,9 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
+			// Todo: move unnecessary to cat
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
 
 			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
@@ -1083,12 +1043,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtPig
 
-		case mtPolarBear:
-		{
-			// TODO
-			break;
-		}  // case mtPolarBear
-
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -1122,19 +1076,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSnowGolem:
-		{
-			// TODO
-			// has no pumpkin head
-			break;
-		}
-
-		case mtShulker:
-		{
-			// TODO
-			break;
-		}
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1143,21 +1084,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
-
-		case mtSkeleton:
-		case mtStray:
-		case mtWitherSkeleton:
-		{
-			// TODO
-			// There is a flag that tells the game the arms are swinging
-			break;
-		}
-
-		case mtVex:
-		{
-			// TODO
-			break;
-		}
 
 		case mtVillager:
 		{
@@ -1180,12 +1106,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(Witch.IsAngry());
 			break;
 		}  // case mtWitch
-
-		case mtVindicator:
-		{
-			// TODO
-			break;
-		}
 
 		case mtWither:
 		{
@@ -1272,14 +1192,52 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		case mtSnowGolem:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+		case mtMule:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtLlama:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtVex:
+
+		case mtVindicator:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			break;
+		}
+
 		case mtCaveSpider:
 		case mtEnderDragon:
 		case mtGiant:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
+		case mtSkeleton:
+		case mtStray:
 		case mtSpider:
 		case mtSquid:
+		case mtWitherSkeleton:
 		{
 			// Mobs without additional metadata
 			break;

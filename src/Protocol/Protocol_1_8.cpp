@@ -1925,6 +1925,9 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombieHorse:           return 100;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+		// Mobs that get replaced with another because they were added later
+		case mtStray:                 return GetProtocolMobType(mtSkeleton);
+		case mtHusk:                  return GetProtocolMobType(mtHusk);
 
 		default:                      return 0;
 	}
@@ -3669,13 +3672,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtBat
 
-		case mtBlaze:
-		{
-			auto & Blaze = static_cast<const cBlaze &>(a_Mob);
-			// TODO
-			break;
-		}
-
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -3714,12 +3710,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtEnderman
 
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
-
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -3727,13 +3717,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEUInt8(Ghast.IsCharging());
 			break;
 		}  // case mtGhast
-
-		case mtGuardian:
-		case mtElderGuardian:
-		{
-			// TODO
-			break;
-		}
 
 		case mtDonkey:
 		case mtHorse:
@@ -3950,6 +3933,20 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEUInt8((ZombieVillager.ConversionTime() == -1) ? 0 : 1);
 			break;
 		}  // case mtZombieVillager
+
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtEndermite:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			break;
+		}
 
 		case mtCaveSpider:
 		case mtEnderDragon:

@@ -582,7 +582,7 @@ cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)
-	{
+	 {
 		case mtShulker:   return 69;
 		default: return Super::GetProtocolMobType(a_MobType);
 	}
@@ -1778,7 +1778,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -1805,12 +1805,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
 			break;
 		}  // case mtBat
-
-		case mtBlaze:
-		{
-			// TODO
-			break;
-		}
 
 		case mtChicken:
 		{
@@ -1864,12 +1858,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
 		}  // case mtEnderman
-
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
 
 		case mtGhast:
 		{
@@ -2004,12 +1992,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
-
-		case mtShulker:
-		{
-			// TODO
-			break;
-		}
 
 		case mtSkeleton:
 		case mtStray:
@@ -2150,11 +2132,25 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		case mtCaveSpider:
+		case mtBlaze:
 		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtEndermite:
+
+		case mtShulker:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			break;
+		}
+
+		case mtCaveSpider:
 		case mtEnderDragon:
 		case mtGiant:
-		case mtGuardian:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:

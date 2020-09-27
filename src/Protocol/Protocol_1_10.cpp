@@ -341,8 +341,6 @@ UInt32 cProtocol_1_10_0::GetProtocolMobType(eMonsterType a_MobType)
 	switch (a_MobType)
 	{
 		case mtPolarBear:   return 102;
-		case mtStray:       return Super::GetProtocolMobType(mtSkeleton);
-		case mtHusk:        return Super::GetProtocolMobType(mtZombie);
 		default:            return Super::GetProtocolMobType(a_MobType);
 	}
 }
@@ -703,12 +701,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtBat
 
-		case mtBlaze:
-		{
-			// TODO
-			break;
-		}
-
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -761,12 +753,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
 		}  // case mtEnderman
-
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
 
 		case mtGhast:
 		{
@@ -869,12 +855,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtPig
 
-		case mtPolarBear:
-		{
-			// TODO
-			break;
-		}  // case mtPolarBear
-
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -907,12 +887,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
-
-		case mtShulker:
-		{
-			// TODO
-			break;
-		}
 
 		case mtSlime:
 		{
@@ -1053,11 +1027,27 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
-		case mtCaveSpider:
+		case mtBlaze:
 		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtEndermite:
+
+		case mtPolarBear:
+
+		case mtShulker:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			break;
+		}
+
+		case mtCaveSpider:
 		case mtEnderDragon:
 		case mtGiant:
-		case mtGuardian:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
