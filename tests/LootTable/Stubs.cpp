@@ -17,7 +17,9 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem &) con
 
 int cPlayer::GetXpLevel() const { return 0; }
 
-const cItem & cInventory::GetEquippedItem() const { return cItem(); }
+const cItem Item;
+
+const cItem & cInventory::GetEquippedItem() const { return Item; }
 
 EMCSBiome cWorld::GetBiomeAt(int a_BlockX, int a_BlockZ) { return biInvalidBiome; }
 unsigned char cWorld::GetBlockBlockLight(Vector3i a_BlockPos) { return 0; }

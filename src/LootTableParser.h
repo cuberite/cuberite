@@ -4,7 +4,6 @@
 #pragma once
 
 #include <variant>
-#include "json/json.h"
 #include "Noise/Noise.h"
 #include "Item.h"
 #include "Blocks/BlockHandler.h"
@@ -15,6 +14,12 @@
 // fwd:
 class cWorld;
 enum class Statistic;
+
+// fwd:
+namespace Json
+{
+	class Value;
+}
 
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable

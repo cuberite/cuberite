@@ -4,6 +4,7 @@
 #include "Globals.h"
 
 #include "../TestHelpers.h"
+#include "json/json.h"
 #include "JsonUtils.h"
 
 #define private public  // Yes - bad but does the job

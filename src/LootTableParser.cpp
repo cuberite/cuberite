@@ -9,6 +9,7 @@
 #include "Registries/ItemTags.h"
 #include "Root.h"
 #include "Mobs/Monster.h"
+#include "json/json.h"
 
 #include "World.h"
 
