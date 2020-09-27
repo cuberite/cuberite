@@ -825,7 +825,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -1023,6 +1022,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
+		case mtCat:
 
 		case mtEndermite:
 
