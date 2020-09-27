@@ -533,7 +533,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 {
 	using namespace Metadata_1_12;
 
-	// Living Entity Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -896,7 +896,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtGuardian:
 		case mtIronGolem:
 		case mtSnowGolem:
-		case mtSkeleton:
 		case mtSpider:
 		case mtWitherSkeleton:
 		{
@@ -946,6 +945,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtSquid:
 		{
 			// Mobs with no extra fields
