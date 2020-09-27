@@ -1621,7 +1621,7 @@ return
 						Type = "number",
 					},
 				},
-				Notes = "Sets the block meta at the specified absolute coords",
+				Notes = "Sets the block meta at the specified absolute coords. Any call to SetBlockMeta will not generate a simulator update, consider using SetBlock instead.",
 			},
 			SetBlockSkyLight =
 			{

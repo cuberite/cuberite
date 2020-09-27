@@ -1119,7 +1119,7 @@ return
 							Type = "EMCSBiome",
 						},
 					},
-					Notes = "Sets the biome at the specified relative coords",
+					Notes = "Sets the biome at the specified relative coords.",
 				},
 				SetBlockMeta =
 				{
@@ -1142,7 +1142,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords",
+					Notes = "Sets the block meta at the specified relative coords. Any call to SetBlockMeta will not generate a simulator update, consider using SetBlock instead.",
 				},
 				SetBlockType =
 				{
