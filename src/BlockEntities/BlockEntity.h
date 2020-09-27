@@ -122,7 +122,7 @@ public:
 	cWorld * GetWorld() const { return m_World; }
 
 	int GetChunkX() const { return FAST_FLOOR_DIV(m_Pos.x, cChunkDef::Width); }
-	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.y, cChunkDef::Width); }
+	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.z, cChunkDef::Width); }
 
 	int GetRelX() const { return m_RelX; }
 	int GetRelZ() const { return m_RelZ; }
