@@ -171,32 +171,30 @@ void cPluginManager::Tick(float a_Dt)
 		cCSLock Lock(m_CSPluginsNeedAction);
 		std::swap(m_PluginsNeedAction, PluginsNeedAction);
 	}
-
-
-	for (auto & currentPlugin: PluginsNeedAction)
+	for (auto & CurrentPlugin: PluginsNeedAction)
 	{
-		auto & action = currentPlugin.first;
-		auto & folder = currentPlugin.second;
+		auto & Action = CurrentPlugin.first;
+		auto & Folder = CurrentPlugin.second;
 
 		bool WasLoaded = false;
 		bool WasFound = false;
-		for (auto & plugin: m_Plugins)
+		for (auto & Plugin: m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (Plugin->GetFolderName() == Folder)
 			{
 				WasFound = true;
-				if (plugin->IsLoaded())
+				if (Plugin->IsLoaded())
 				{
-					switch (action)
+					switch (Action)
 					{
 						case ePluginActions::paReload :
 						{
-							plugin->Reload();
+							Plugin->Reload();
 							break;
 						}
 						case ePluginActions::paUnload :
 						{
-							plugin->Unload();
+							Plugin->Unload();
 							break;
 						}
 					}
@@ -206,11 +204,11 @@ void cPluginManager::Tick(float a_Dt)
 		}
 		if (!WasFound)
 		{
-			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", Folder.c_str());
 		}
 		else if (!WasLoaded)
 		{
-			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", Folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
