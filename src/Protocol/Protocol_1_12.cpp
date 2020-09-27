@@ -620,6 +620,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtEndermite
 
+		case mtEvoker:
+		{
+			// TODO
+			break;
+		} // case mtEvoker
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -629,7 +635,11 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtGhast
 
+		case mtDonkey:
 		case mtHorse:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
 		{
 			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
 
@@ -687,6 +697,18 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtHorse
 
+		case mtIllusioner:
+		{
+			// TODO
+			break;
+		}  // case mtIllusioner
+
+		case mtLlama:
+		{
+			// TODO
+			break;
+		}  // case mtLlama
+
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -696,6 +718,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtMagmaCube
 
+		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -739,6 +762,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// PIG_TOTAL_CARROT_ON_A_STICK_BOOST in 1.11.1 only
 			break;
 		}  // case mtPig
+
+		case mtParrot:
+		{
+			// TODO
+			break;
+		}  // case mtParrot
 
 		case mtPolarBear:
 		{
@@ -800,6 +829,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtStray
 
+		case mtVex:
+		{
+			// TODO
+			break;
+		}  // case mtVex
+
 		case mtVillager:
 		{
 			auto & Villager = static_cast<const cVillager &>(a_Mob);
@@ -812,6 +847,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
+
+		case mtVindicator:
+		{
+			// TODO
+			break;
+		}  // case mtVindicator
 
 		case mtWitch:
 		{
@@ -872,6 +913,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		}  // case mtWolf
 
 		case mtZombie:
+		case mtHusk:
 		{
 			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -914,18 +956,21 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		}  // case mtZombieVillager
 
 		case mtBlaze:
+		case mtCaveSpider:
+		case mtElderGuardian:
 		case mtEnderDragon:
 		case mtGuardian:
 		case mtIronGolem:
 		case mtSnowGolem:
+		case mtSkeleton:
 		case mtSpider:
+		case mtWitherSkeleton:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
 
 		case mtMooshroom:
-		case mtCaveSpider:
 		{
 			// Not mentioned on http://wiki.vg/Entities
 			break;
@@ -933,9 +978,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtSquid:
-		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
@@ -943,9 +986,9 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtInvalidType:
 		{
-			ASSERT(!"cProtocol_1_12::WriteMobMetadata: Recieved mob of invalid type");
 			break;
 		}
+		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.12");
 	}  // switch (a_Mob.GetType())
 }
 

@@ -870,6 +870,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtBat
 
+		case mtBlaze:
+		{
+			// TODO
+			break;
+		}
+
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -907,6 +913,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtCreeper
 
+		case mtElderGuardian:
+		{
+			// TODO
+			return;
+		}  // case mtElderGuardian
+
 		case mtEnderman:
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
@@ -929,6 +941,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtEndermite
 
+		case mtEvoker:
+		{
+			// TODO
+			break;
+		}
+
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -938,9 +956,19 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtGhast
 
-		case mtHorse:
+		case mtGuardian:
 		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
+			// TODO
+			break;
+		}  // case mtGuardian
+
+		case mtDonkey:
+		case mtHorse:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+		{
+			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
 			// Abstract horse
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
@@ -996,6 +1024,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtHorse
 
+		case mtLlama:
+		{
+			// TODO
+			break;
+		}
+
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -1005,6 +1039,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtMagmaCube
 
+		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -1088,6 +1123,13 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
+		case mtSnowGolem:
+		{
+			// TODO
+			// has no pumpkin head
+			break;
+		}
+
 		case mtShulker:
 		{
 			// TODO
@@ -1103,11 +1145,20 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSlime
 
+		case mtSkeleton:
 		case mtStray:
+		case mtWitherSkeleton:
+		{
+			// TODO
+			// There is a flag that tells the game the arms are swinging
+			break;
+		}
+
+		case mtVex:
 		{
 			// TODO
 			break;
-		}  // case mtStray
+		}
 
 		case mtVillager:
 		{
@@ -1130,6 +1181,12 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(Witch.IsAngry());
 			break;
 		}  // case mtWitch
+
+		case mtVindicator:
+		{
+			// TODO
+			break;
+		}
 
 		case mtWither:
 		{
@@ -1216,7 +1273,23 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Mobs without additional metadata
+			break;
+		}
+		case mtInvalidType:
+		{
+			break;
+		}
+		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.11");
 	}  // switch (a_Mob.GetType())
 }
 

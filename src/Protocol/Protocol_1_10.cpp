@@ -703,6 +703,12 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtBat
 
+		case mtBlaze:
+		{
+			// TODO
+			break;
+		}
+
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -771,7 +777,11 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtGhast
 
+		case mtDonkey:
 		case mtHorse:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
 		{
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
 			Int8 Flags = 0;
@@ -833,6 +843,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtMagmaCube
 
+		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -913,6 +924,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		}  // case mtSlime
 
 		case mtStray:
+		case mtSkeleton:
 		{
 			// TODO
 			break;
@@ -1041,6 +1053,24 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtCaveSpider:
+		case mtElderGuardian:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtGuardian:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+		}
+		case mtInvalidType:
+		{
+			break;
+		}
+		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.10");
 	}  // switch (a_Mob.GetType())
 }

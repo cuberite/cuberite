@@ -1390,7 +1390,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
-	if (MobType == -1)
+	if (MobType == 0)
 	{
 		return;
 	}
@@ -1911,6 +1911,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtSheep:                 return 91;
 		case mtSilverfish:            return 60;
 		case mtSkeleton:              return 51;
+		case mtSkeletonHorse:         return 100;
 		case mtSlime:                 return 55;
 		case mtSnowGolem:             return 97;
 		case mtSpider:                return 52;
@@ -1925,7 +1926,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
 
-		default:                      return -1;
+		default:                      return 0;
 	}
 }
 
@@ -3668,6 +3669,13 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtBat
 
+		case mtBlaze:
+		{
+			auto & Blaze = static_cast<const cBlaze &>(a_Mob);
+			// TODO
+			break;
+		}
+
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -3722,6 +3730,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtDonkey:
 		case mtHorse:
+		case mtMule:
 		case mtSkeletonHorse:
 		case mtZombieHorse:
 		{
@@ -3775,6 +3784,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtMagmaCube
 
+		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -3827,6 +3837,14 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
+
+		case mtSkeleton:
+		case mtStray:
+		{
+			a_Pkt.WriteBEUInt8(0x0d);
+			a_Pkt.WriteBEUInt8(0);  // Is normal skeleton
+			break;
+		}
 
 		case mtVillager:
 		{
@@ -3893,6 +3911,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtWolf
 
+		case mtHusk:
 		case mtZombie:
 		{
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -3925,7 +3944,25 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtGuardian:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Allowed mobs without additional metadata
+			break;
+		}
+		case mtInvalidType:
+		{
+			break;
+		}
+		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.8");
 	}  // switch (a_Mob.GetType())
 }
 
