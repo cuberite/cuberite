@@ -2150,7 +2150,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtShulker:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("Sending unimplemented mob in protocol 1.9");
+			UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -2171,7 +2171,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		{
 
 		}
-		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.9");
+		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 

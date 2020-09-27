@@ -940,7 +940,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtVindicator:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("Sending unimplemented mob in protocol 1.12");
+			UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -957,7 +957,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		{
 			break;
 		}
-		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.12");
+		default: UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 

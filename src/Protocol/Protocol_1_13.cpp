@@ -1293,7 +1293,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("Sending unimplemented mob in protocol 1.13");
+			UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -1303,6 +1303,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// Not mentioned on http://wiki.vg/Entities
 			break;
 		}
+
 		case mtGiant:
 		case mtSilverfish:
 		case mtSkeleton:
@@ -1312,11 +1313,12 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// Mobs with no extra fields
 			break;
 		}
+
 		case mtInvalidType:
 		{
 			break;
 		}
-		default: UNREACHABLE("Tried to transmit unknown mob in Protocol 1.13");
+		default: UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
