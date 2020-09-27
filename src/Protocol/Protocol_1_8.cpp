@@ -3728,6 +3728,13 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtGhast
 
+		case mtGuardian:
+		case mtElderGuardian:
+		{
+			// TODO
+			break;
+		}
+
 		case mtDonkey:
 		case mtHorse:
 		case mtMule:
@@ -3947,7 +3954,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtCaveSpider:
 		case mtEnderDragon:
 		case mtGiant:
-		case mtGuardian:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:

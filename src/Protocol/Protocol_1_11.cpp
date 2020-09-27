@@ -380,7 +380,7 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
-	if (MobType == -1)
+	if (MobType == 0)
 	{
 		return;
 	}
@@ -602,7 +602,7 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
 
-		default:                      return -1;
+		default:                      return 0;
 	}
 	UNREACHABLE("Unsupported mob type");
 }

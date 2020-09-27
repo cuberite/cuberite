@@ -420,7 +420,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
-	if (MobType == -1)
+	if (MobType == 0)
 	{
 		return;
 	}
