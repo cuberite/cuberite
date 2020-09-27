@@ -951,12 +951,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtBat
 
-		case mtCod:
-		{
-			// TODO
-			break;
-		}  // case mtCod
-
 		case mtChicken:
 		{
 			auto & Chicken = static_cast<const cChicken &>(a_Mob);
@@ -990,25 +984,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtCreeper
 
-		case mtDolphin:
-		{
-			// TODO
-			break;
-		}  // mtDolphin
-
-		case mtDrowned:
-		{
-			// TODO
-			break;
-		}  // mtDrowned
-
-		case mtElderGuardian:
-		case mtGuardian:
-		{
-			// TODO
-			break;
-		}
-
 		case mtEnderman:
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
@@ -1023,18 +998,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtEnderman
 
-		case mtEndermite:
-		{
-			// TODO
-			break;
-		}  // case mtEndermite
-
-		case mtEvoker:
-		{
-			// TODO
-			break;
-		}
-
 		case mtGhast:
 		{
 			auto & Ghast = static_cast<const cGhast &>(a_Mob);
@@ -1044,11 +1007,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtGhast
 
-		case mtDonkey:
 		case mtHorse:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
 		{
 			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
 
@@ -1098,18 +1057,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtHorse
 
-		case mtIllusioner:
-		{
-			// TODO
-			break;
-		}  // mtIllusioner
-
-		case mtLlama:
-		{
-			// TODO
-			break;
-		}  // case mtLlama
-
 		case mtMagmaCube:
 		{
 			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
@@ -1119,7 +1066,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtMagmaCube
 
-		case mtCat:
 		case mtOcelot:
 		{
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
@@ -1159,30 +1105,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtPig
 
-		case mtParrot:
-		{
-			// TODO
-			break;
-		}  // case mtParrot
-
-		case mtPhantom:
-		{
-			// TODO
-			break;
-		}  // case mtPhantom
-
-		case mtPolarBear:
-		{
-			// TODO
-			break;
-		}  // case mtPolarBear
-
-		case mtPufferfish:
-		{
-			// TODO
-			break;
-		}  // case mtPufferfish
-
 		case mtRabbit:
 		{
 			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
@@ -1194,12 +1116,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
 			break;
 		}  // case mtRabbit
-
-		case mtSalmon:
-		{
-			// TODO
-			break;
-		}  // case mtSalmon
 
 		case mtSheep:
 		{
@@ -1219,12 +1135,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
-		case mtShulker:
-		{
-			// TODO
-			break;
-		}  // case mtShulker
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1233,30 +1143,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
-
-		case mtStray:
-		{
-			// TODO
-			break;
-		}  // case mtStray
-
-		case mtTropicalFish:
-		{
-			// TODO
-			break;
-		}  // case mtTropicalFish
-
-		case mtTurtle:
-		{
-			// TODO
-			break;
-		}  // case mtTurtle
-
-		case mtVex:
-		{
-			// TODO
-			break;
-		}  // case mtVex
 
 		case mtVillager:
 		{
@@ -1269,12 +1155,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
-
-		case mtVindicator:
-		{
-			// TODO
-			break;
-		}  // case mtVindicator
 
 		case mtWitch:
 		{
@@ -1330,7 +1210,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtWolf
 
-		case mtHusk:
 		case mtZombie:
 		{
 			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
@@ -1359,6 +1238,61 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtZombieVillager:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtCod:
+
+		case mtDolphin:
+
+		case mtDonkey:
+
+		case mtDrowned:
+
+		case mtElderGuardian:
+		case mtGuardian:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtIllusioner:
+
+		case mtLlama:
+
+		case mtMule:
+
+		case mtParrot:
+
+		case mtPhantom:
+
+		case mtPolarBear:
+
+		case mtPufferfish:
+
+		case mtSalmon:
+
+		case mtShulker:
+
+		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtTropicalFish:
+
+		case mtTurtle:
+
+		case mtVex:
+
+		case mtVindicator:
+
+		case mtHusk:
+
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
 			break;
 		}
 
