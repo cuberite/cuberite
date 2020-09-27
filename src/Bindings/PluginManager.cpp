@@ -166,32 +166,48 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 void cPluginManager::Tick(float a_Dt)
 {
 	// Unload plugins that have been scheduled for unloading:
-	AStringVector PluginsToUnload;
+	decltype(m_PluginsNeedAction) PluginsNeedAction; 
+
 	{
-		cCSLock Lock(m_CSPluginsToUnload);
-		std::swap(m_PluginsToUnload, PluginsToUnload);
+		cCSLock Lock(m_CSPluginsNeedAction);
+		std::swap(m_PluginsNeedAction, PluginsNeedAction);
 	}
-	for (auto & folder: PluginsToUnload)
+
+
+	for (auto & currentPlugin: PluginsNeedAction)
 	{
-		bool HasUnloaded = false;
-		bool HasFound = false;
+		auto& action = currentPlugin.first;
+		auto& folder = currentPlugin.second;
+
+		bool WasLoaded = false;
+		bool WasFound = false;
 		for (auto & plugin: m_Plugins)
 		{
 			if (plugin->GetFolderName() == folder)
 			{
-				HasFound = true;
+				WasFound = true;
 				if (plugin->IsLoaded())
 				{
-					plugin->Unload();
-					HasUnloaded = true;
+					switch(action) {
+						case ePluginActions::paReload : {
+							plugin->Reload();
+							break;
+						}
+
+						case ePluginActions::paUnload : {
+							plugin->Unload();
+							break;
+						}
+					}
+					WasLoaded = true;
 				}
 			}
 		}
-		if (!HasFound)
+		if (!WasFound)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
 		}
-		else if (!HasUnloaded)
+		else if (!WasLoaded)
 		{
 			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
 		}
@@ -1315,10 +1331,16 @@ void cPluginManager::UnloadPluginsNow()
 
 
 
+
 void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.push_back(std::make_pair(ePluginActions::paUnload, a_PluginFolder));
+}
+
+void cPluginManager::reloadPlugin(AString const& a_PluginFolder) {
 	cCSLock Lock(m_CSPluginsToUnload);
-	m_PluginsToUnload.push_back(a_PluginFolder);
+	m_pluginsToUnload.push_back(std::make_pair(ePluginActions::paReload, a_PluginFolder));
 }
 
 

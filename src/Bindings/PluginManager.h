@@ -76,6 +76,16 @@ public:
 		psNotFound,
 	};
 
+	/** Defines the deferred actions needed for a plugin **/
+	enum ePluginActions {
+
+		/** The plugin needs to be reloaded **/
+		paReload,
+
+		/** The plugin needs to be unloaded **/
+		paUnload
+	};
+
 
 	enum PluginHook
 	{
@@ -303,6 +313,10 @@ public:
 	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
 	void UnloadPlugin(const AString & a_PluginFolder);  // tolua_export
 
+	/** Queues the specified plugin to be reloaded in the next call to Tick().
+	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
+	void ReloadPlugin(const AString & a_PluginFolder);  // tolua_export
+
 	/** Loads the plugin from the specified plugin folder.
 	Returns true if the plugin was loaded successfully or was already loaded before, false otherwise. */
 	bool LoadPlugin(const AString & a_PluginFolder);  // tolua_export
@@ -408,13 +422,13 @@ private:
 	typedef std::map<AString, cCommandReg> CommandMap;
 
 
-	/** FolderNames of plugins that should be unloaded.
-	The plugins will be unloaded within the next call to Tick(), to avoid multithreading issues.
-	Protected against multithreaded access by m_CSPluginsToUnload. */
-	AStringVector m_PluginsToUnload;
+	/** FolderNames of plugins that need an action (unload, reload, …).
+	The plugins will be acted upon within the next call to Tick(), to avoid multithreading issues.
+	Protected against multithreaded access by m_CSPluginsNeedAction. */
+	std::vector<std::pair<ePluginActions, AString>> m_PluginsNeedAction;
 
 	/** Protects m_PluginsToUnload against multithreaded access. */
-	mutable cCriticalSection m_CSPluginsToUnload;
+	mutable cCriticalSection m_CSPluginsNeedAction;
 
 	/** All plugins that have been found in the Plugins folder. */
 	cPluginPtrs m_Plugins;

@@ -40,6 +40,12 @@ void cPlugin::Unload(void)
 }
 
 
+void cPlugin::Reload(void) 
+{
+	Unload();
+	Load();
+}
+
 
 
 

@@ -465,9 +465,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->UnloadPlugin(split[1]);
+			cPluginManager::Get()->ReloadPlugin(split[1]);
 			a_Output.Out("Plugin unloaded scheduled");
-			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
