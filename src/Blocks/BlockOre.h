@@ -31,7 +31,6 @@ private:
 			}
 		}
 
-		auto & Random = GetRandomProvider();
 		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
 
 		if ((m_BlockType == E_BLOCK_REDSTONE_ORE) || (m_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING))
@@ -40,6 +39,7 @@ private:
 			return cItem(E_ITEM_REDSTONE_DUST, DropNum);
 		}
 
+		auto & Random = GetRandomProvider();
 		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 		switch (m_BlockType)
 		{

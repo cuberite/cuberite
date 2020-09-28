@@ -24,7 +24,7 @@ private:
 		}
 
 		// Denominator of probability from wiki, don't let it go below 1.
-		const auto Denominator = std::max(10U - 3U * ToolFortuneLevel(a_Tool), 1U);
+		const auto Denominator = std::max(10 - 3 * ToolFortuneLevel(a_Tool), 1);
 		if (GetRandomProvider().RandBool(1.0 / Denominator))
 		{
 			return cItem(E_ITEM_FLINT);
