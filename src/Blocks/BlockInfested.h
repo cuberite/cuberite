@@ -65,7 +65,7 @@ private:
 	{
 		// TODO: only display animation if the difficulty allows mob spawns
 		// Spawn Silverfish
-		a_WorldInterface.SpawnMob(a_BlockPos.x - 0.5f , a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f, mtSilverfish, false);
+		a_WorldInterface.SpawnMob(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f, mtSilverfish, false);
 		// Play particle
 		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", a_BlockPos, {0.5f, 0.5f, 0.5f}, 0.1, 50);
 	}
