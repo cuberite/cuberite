@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
+#include "../Items/ItemSpawnEgg.h"
 
 
 
@@ -18,7 +19,11 @@ cWolf::cWolf(void) :
 	m_IsAngry(false),
 	m_OwnerName(""),
 	m_CollarColor(E_META_DYE_ORANGE),
-	m_NotificationCooldown(0)
+	m_NotificationCooldown(0),
+	m_LovePartner(nullptr),
+	m_LoveTimer(0),
+	m_LoveCooldown(0),
+	m_MatingTimer(0)
 {
 	m_RelativeWalkSpeed = 2;
 }
@@ -208,6 +213,10 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			case E_ITEM_RAW_CHICKEN:
 			case E_ITEM_COOKED_CHICKEN:
 			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_MUTTON:
+			case E_ITEM_RAW_RABBIT:
+			case E_ITEM_COOKED_RABBIT:
+			case E_ITEM_COOKED_MUTTON:
 			{
 				if (m_Health < m_MaxHealth)
 				{
@@ -215,6 +224,23 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				else if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
+				{
+					// Go into love mode
+					if ((m_LoveCooldown == 0) && !IsInLove() && !IsBaby())
+					{
+						if (!a_Player.IsGameModeCreative())
+						{
+							a_Player.GetInventory().RemoveOneEquippedItem();
+						}
+						m_LoveTimer = 20 * 30;  // half a minute
+						m_World->BroadcastEntityStatus(*this, esMobInLove);
+					}
+					else if (IsBaby())
+					{
+						m_Age = m_Age * 0.9;
 					}
 				}
 				break;
@@ -230,6 +256,21 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 					}
 				}
 				break;
+			}
+			// If a player holding my spawn egg right-clicked me, spawn a new baby
+			case E_ITEM_SPAWN_EGG:
+			{
+				eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+				if (
+					(MonsterType == m_MobType) &&
+					(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+				{
+					if (!a_Player.IsGameModeCreative())
+					{
+						// The mob was spawned, "use" the item:
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
 			}
 			default:
 			{
@@ -337,6 +378,96 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		StopMovingToPosition();
 	}
+
+	// if we have a partner, mate
+	if (m_LovePartner != nullptr)
+	{
+
+		if (m_MatingTimer > 0)
+		{
+			// If we should still mate, keep bumping into them until baby is made
+			Vector3d Pos = m_LovePartner->GetPosition();
+			MoveToPosition(Pos);
+		}
+		else
+		{
+			// Mating finished. Spawn baby
+			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
+			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
+
+			cWolf * Baby = nullptr;
+
+			m_World->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
+			{
+				Baby = static_cast<cWolf *>(&a_Entity);
+				return true;
+			});
+
+			if (Baby != nullptr)
+			{
+				Baby->InheritFromParents(*this, *m_LovePartner);
+			}
+
+			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
+
+			m_World->DoWithPlayerByUUID(m_OwnerUUID, [&] (cPlayer & a_Player)
+			{
+				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				return true;
+			});
+			m_LovePartner->ResetLoveMode();
+			ResetLoveMode();
+		}
+	}
+
+	// If we are in love mode but we have no partner, search for a partner nearby
+	if (m_LoveTimer > 0)
+	{
+		if (m_LovePartner == nullptr)
+		{
+			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
+				{
+					// If the entity is not a monster, don't breed with it
+					// Also, do not self-breed
+					if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+					{
+						return false;
+					}
+
+					auto & Me = *this;
+					auto & PotentialPartner = static_cast<cWolf &>(a_Entity);
+
+					// If the potential partner is not of the same species, don't breed with it
+					if (PotentialPartner.GetMobType() != Me.GetMobType())
+					{
+						return false;
+					}
+
+					// If the potential partner is not in love
+					// Or they already have a mate, do not breed with them
+					if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
+					{
+						return false;
+					}
+
+					// All conditions met, let's breed!
+					PotentialPartner.EngageLoveMode(& Me);
+					Me.EngageLoveMode(& PotentialPartner);
+					return true;
+				}
+			);
+		}
+
+		m_LoveTimer--;
+	}
+	if (m_MatingTimer > 0)
+	{
+		m_MatingTimer--;
+	}
+	if (m_LoveCooldown > 0)
+	{
+		m_LoveCooldown--;
+	}
 }
 
 
@@ -400,3 +531,52 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 }
 
 
+
+
+
+void cWolf::InheritFromParents(cWolf & a_Parent1, cWolf & a_Parent2)
+{
+	if (a_Parent1.GetOwnerUUID() == a_Parent2.GetOwnerUUID())
+	{
+		SetOwner(a_Parent1.GetOwnerName(), a_Parent2.GetOwnerUUID());
+	}
+	else
+	{
+		auto Parent1Age = a_Parent1.GetAge();
+		auto Parent2Age = a_Parent2.GetAge();
+
+		if (Parent1Age > Parent2Age)
+		{
+			SetOwner(a_Parent2.GetOwnerName(), a_Parent2.GetOwnerUUID());
+		}
+		else
+		{
+			SetOwner(a_Parent1.GetOwnerName(), a_Parent1.GetOwnerUUID());
+		}
+	}
+}
+
+
+
+
+
+void cWolf::EngageLoveMode(cWolf *a_Partner)
+{
+	m_LovePartner = a_Partner;
+	m_MatingTimer = 50;  // about 3 seconds of mating
+}
+
+
+
+
+
+void cWolf::ResetLoveMode()
+{
+	m_LovePartner = nullptr;
+	m_LoveTimer = 0;
+	m_MatingTimer = 0;
+	m_LoveCooldown = 20 * 60 * 5;  // 5 minutes
+
+	// when an animal is in love mode, the client only stops sending the hearts if we let them know it's in cooldown, which is done with the "age" metadata
+	m_World->BroadcastEntityMetadata(*this);
+}
