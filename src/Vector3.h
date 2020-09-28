@@ -426,7 +426,6 @@ public:
 
 	template <typename FormatContext>
 	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
-			-> typename FormatContext::iterator
 	{
 		Write(a_Ctx, "{");
 		Write(a_Ctx, a_Vec.x);
@@ -493,9 +492,3 @@ typedef Vector3<int>    Vector3i;
 
 
 typedef std::vector<Vector3i> cVector3iArray;
-
-
-
-
-
-
