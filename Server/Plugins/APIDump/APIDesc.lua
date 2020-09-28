@@ -1142,7 +1142,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
+					Notes = "Sets the block meta at the specified relative coords.",
 				},
 				SetBlockType =
 				{
