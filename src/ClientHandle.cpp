@@ -792,11 +792,8 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		return;
 	}
 
-	// Creative players can always enchant:
-	if (m_Player->IsGameModeCreative())
+	const auto SetEnchantAndBroadcast = [this, &Item, Window]
 	{
-		Broadcast:
-
 		// Set the item slot to our new enchanted item:
 		Window->m_SlotArea->SetSlot(0, *m_Player, Item);
 		Window->BroadcastWholeWindow();
@@ -805,6 +802,12 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		Window->SetProperty(0, 0, *m_Player);
 		Window->SetProperty(1, 0, *m_Player);
 		Window->SetProperty(2, 0, *m_Player);
+	};
+
+	// Creative players can always enchant:
+	if (m_Player->IsGameModeCreative())
+	{
+		SetEnchantAndBroadcast();
 		return;
 	}
 
@@ -836,7 +839,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		LapisStack.AddCount(-LapisRequired);
 		Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
 
-		goto Broadcast;
+		SetEnchantAndBroadcast();
 	}
 }
 
