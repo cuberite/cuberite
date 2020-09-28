@@ -33,16 +33,16 @@ private:
 
 		auto & Random = GetRandomProvider();
 		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
-		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 
+		if ((m_BlockType == E_BLOCK_REDSTONE_ORE) || (m_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING))
+		{   // Redstone follows the discrete random distribution, unlike other ores
+			const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
+			return cItem(E_ITEM_REDSTONE_DUST, DropNum);
+		}
+
+		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 		switch (m_BlockType)
 		{
-			case E_BLOCK_REDSTONE_ORE:         // handled by next case (glowing redstone), no dropMult
-			case E_BLOCK_REDSTONE_ORE_GLOWING:
-			{   // Redstone follows the discrete random distribution, unlike other ores
-				const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
-				return cItem(E_ITEM_REDSTONE_DUST, DropNum);
-			}
 			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * Random.RandInt<char>(4, 9), 4);
 			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
 			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, DropMult);

@@ -43,7 +43,7 @@ private:
 			return {};
 		}
 
-		// 12.5% chance of dropping 0 or more seeds
+		// 12.5% chance of dropping 0 or more seeds.
 		const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
 		return cItem(E_ITEM_SEEDS, DropNum);
 	}

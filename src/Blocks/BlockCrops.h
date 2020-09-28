@@ -24,17 +24,8 @@ private:
 	/** Calculate the number of seeds to drop when the crop is broken. */
 	static char CalculateSeedCount(char a_Min, char a_BaseRolls, char a_FortuneLevel)
 	{
-		auto & Random = GetRandomProvider();
-		char DropNum = a_Min;
-		const auto Rolls = a_BaseRolls + a_FortuneLevel;
-		for (unsigned char i=0; i<Rolls; i++)
-		{
-			if (Random.RandBool(0.57))
-			{
-				DropNum++;
-			}
-		}
-		return DropNum;
+		std::binomial_distribution Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
+		return a_Min + Binomial(GetRandomProvider().Engine());
 	}
 
 
@@ -50,11 +41,12 @@ private:
 		{
 			switch (m_BlockType)
 			{
-				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS); break;
-				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS); break;
-				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT); break;
-				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO); break;
+				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS);
+				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS);
+				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT);
+				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO);
 			}
+
 			ASSERT(!"Unhandled block type");
 			return {};
 		}

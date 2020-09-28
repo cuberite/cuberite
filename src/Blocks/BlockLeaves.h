@@ -32,10 +32,10 @@ private:
 		{
 			a_FortuneLevel++;
 		}
-		unsigned char Denominator = a_DefaultDenominator - a_FortuneLevel*a_FirstDenominatorReduction;
-		// if the denominator goes less than 10, cap it back to 10
-		Denominator = std::max<unsigned char>(Denominator, 10);
-		return 1 / static_cast<double>(Denominator);
+
+		// Denominator, capped at minimum of 10.
+		const auto Denominator = std::max<unsigned char>(10, a_DefaultDenominator - a_FortuneLevel * a_FirstDenominatorReduction);
+		return 1.0 / Denominator;
 	}
 
 
@@ -160,7 +160,7 @@ private:
 		DropProbability = FortuneDropProbability(50, 5, FortuneLevel);
 		if (Random.RandBool(DropProbability))
 		{
-			// 1 or 2 sticks are dropped on success
+			// 1 or 2 sticks are dropped on success:
 			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2));
 		}
 

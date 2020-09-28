@@ -23,10 +23,9 @@ private:
 			return cItem(E_BLOCK_GRAVEL);
 		}
 
-		// Denominator of probability from wiki, don't let it go below 1
-		double Denominator = std::max(10 - (3 * ToolFortuneLevel(a_Tool)), 1);
-		auto & Random = GetRandomProvider();
-		if (Random.RandBool(1 / Denominator))
+		// Denominator of probability from wiki, don't let it go below 1.
+		const auto Denominator = std::max(10U - 3U * ToolFortuneLevel(a_Tool), 1U);
+		if (GetRandomProvider().RandBool(1.0 / Denominator))
 		{
 			return cItem(E_ITEM_FLINT);
 		}
