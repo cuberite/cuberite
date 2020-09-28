@@ -20,7 +20,7 @@ private:
 		{
 			case E_META_SILVERFISH_EGG_STONE:
 			{
-				if (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch))
+				if (ToolHasSilkTouch(a_Tool))
 				{
 					return cItem(E_BLOCK_STONE);
 				}
@@ -49,7 +49,10 @@ private:
 			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) const override
 	{
-		SpawnSilverfish(a_ChunkInterface, a_WorldInterface, a_BlockPos);
+		if (!a_Player.IsGameModeCreative())
+		{
+			SpawnSilverfish(a_ChunkInterface, a_WorldInterface, a_BlockPos);
+		}
 	}
 
 
