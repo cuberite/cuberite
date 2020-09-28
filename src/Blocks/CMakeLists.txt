@@ -56,6 +56,7 @@ target_sources(
 	BlockMelon.h
 	BlockMobHead.h
 	BlockMobSpawner.h
+	BlockInfested.h
 	BlockMushroom.h
 	BlockMycelium.h
 	BlockNetherrack.h

@@ -53,6 +53,7 @@
 #include "BlockLever.h"
 #include "BlockMelon.h"
 #include "BlockMobSpawner.h"
+#include "BlockInfested.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherrack.h"
@@ -301,7 +302,7 @@ namespace
 	constexpr cBlockHandler                   BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
 	constexpr cBlockIceHandler                BlockIceHandler                   (E_BLOCK_ICE);
 	constexpr cBlockComparatorHandler         BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
-	constexpr cBlockHandler                   BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
+	constexpr cBlockInfestedHandler           BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
 	constexpr cBlockHandler                   BlockIronBarsHandler              (E_BLOCK_IRON_BARS);
 	constexpr cBlockHandler                   BlockIronBlockHandler             (E_BLOCK_IRON_BLOCK);
 	constexpr cBlockDoorHandler               BlockIronDoorHandler              (E_BLOCK_IRON_DOOR);
