@@ -2802,7 +2802,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update, consider using SetBlock instead.",
+					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
 				},
 				{
 					Params =
@@ -2816,7 +2816,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update, consider using SetBlock instead.",
+					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
 				},
 			},
 			SetChunkAlwaysTicked =
