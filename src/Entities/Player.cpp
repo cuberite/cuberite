@@ -3155,7 +3155,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 		MiningSpeed = 1;
 	}
 
-	// Hase increases speed by 20% per level
+	// Haste increases speed by 20% per level
 	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
 	if (Haste != nullptr)
 	{
@@ -3203,7 +3203,7 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 	// If we know it's instantly breakable then quit here
 	if (cBlockInfo::IsOneHitDig(a_Block))
 	{
-		return 0;
+		return 1;
 	}
 	float BlockHardness = cBlockInfo::GetHardness(a_Block);
 	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less
@@ -3218,7 +3218,6 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 	float DigSpeed = GetDigSpeed(a_Block);
 	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
 	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
-
 	// Therefore take inverse to get fraction mined per tick:
 	return DigSpeed / (20 * BlockHardness);
 }
