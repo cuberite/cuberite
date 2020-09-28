@@ -23,15 +23,11 @@ private:
 		// Drop self only when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(E_BLOCK_SEA_LANTERN, 1, 0);
+			return cItem(E_BLOCK_SEA_LANTERN);
 		}
 
 		// Number of crystals to drop, capped at the max amount of 5.
-		const auto Drops = std::min(
-			static_cast<char>(5),
-			GetRandomProvider().RandInt<char>(2, 3 + ToolFortuneLevel(a_Tool))
-		);
-
-		return cItem(E_ITEM_PRISMARINE_CRYSTALS, Drops);
+		const auto DropNum = FortuneDiscreteRandom(2, 3, ToolFortuneLevel(a_Tool), 5);
+		return cItem(E_ITEM_PRISMARINE_CRYSTALS, DropNum);
 	}
 } ;

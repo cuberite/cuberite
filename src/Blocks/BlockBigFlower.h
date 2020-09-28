@@ -65,15 +65,23 @@ private:
 		auto flowerType = a_BlockMeta & 0x07;
 		if (flowerType == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			if (GetRandomProvider().RandBool(1.0 / 24.0))
+
+			// Drop seeds, depending on bernoulli trial result:
+			if (GetRandomProvider().RandBool(0.875))
 			{
-				return cItem(E_ITEM_SEEDS);
+				// 87.5% chance of dropping nothing:
+				return {};
 			}
+
+			// 12.5% chance of dropping some seeds.
+			const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+			return cItem(E_ITEM_SEEDS, DropNum);
 		}
 		else if (flowerType != E_META_BIG_FLOWER_LARGE_FERN)
 		{
 			return cItem(m_BlockType, 1, static_cast<short>(flowerType));
 		}
+
 		return {};
 	}
 
