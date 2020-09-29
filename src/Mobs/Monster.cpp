@@ -1,5 +1,4 @@
 
-#include <Items/ItemSpawnEgg.h>
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
@@ -14,6 +13,8 @@
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
 #include "../BoundingBox.h"
+
+#include "Items/ItemSpawnEgg.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
