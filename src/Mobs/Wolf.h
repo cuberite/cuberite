@@ -59,23 +59,22 @@ public:
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	/** Called after the baby is born, allows the baby to inherit the parents' properties (color, etc.) */
-	virtual void InheritFromParents(cWolf & a_Parent1, cWolf & a_Parent2);
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override;
+	virtual void GetBreedingItems(cItems & a_Items) override
+	{
+		a_Items.Add(E_ITEM_RAW_BEEF);
+		a_Items.Add(E_ITEM_STEAK);
+		a_Items.Add(E_ITEM_RAW_PORKCHOP);
+		a_Items.Add(E_ITEM_COOKED_PORKCHOP);
+		a_Items.Add(E_ITEM_RAW_CHICKEN);
+		a_Items.Add(E_ITEM_COOKED_CHICKEN);
+		a_Items.Add(E_ITEM_RAW_MUTTON);
+		a_Items.Add(E_ITEM_COOKED_MUTTON);
+		a_Items.Add(E_ITEM_RAW_RABBIT);
+		a_Items.Add(E_ITEM_COOKED_RABBIT);
+		a_Items.Add(E_ITEM_ROTTEN_FLESH);
+	}
 
-	/** Returns the partner which the monster is currently mating with. */
-	cWolf * GetPartner(void) const { return m_LovePartner; }
-
-	/** Start the mating process. Causes the monster to keep bumping into the partner until m_MatingTimer reaches zero. */
-	void EngageLoveMode(cWolf * a_Partner);
-
-	/** Finish the mating process. Called after a baby is born. Resets all breeding related timers and sets m_LoveCooldown to 20 minutes. */
-	void ResetLoveMode();
-
-	/** Returns whether the monster has just been fed and is ready to mate. If this is "true" and GetPartner isn't "nullptr", then the monster is mating. */
-	bool IsInLove() const { return (m_LoveTimer > 0); }
-
-	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
-	bool IsInLoveCooldown() const { return (m_LoveCooldown > 0); }
 
 protected:
 
@@ -87,18 +86,6 @@ protected:
 	cUUID   m_OwnerUUID;
 	int     m_CollarColor;
 	int     m_NotificationCooldown;
-
-	/** The monster's breeding partner. */
-	cWolf * m_LovePartner;
-
-	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
-	int m_LoveTimer;
-
-	/** If above 0, the monster is in cooldown mode and will refuse to breed. Decrements by 1 per tick till reaching zero. */
-	int m_LoveCooldown;
-
-	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till reaching zero, then a baby is made and ResetLoveMode() is called. */
-	int m_MatingTimer;
 } ;
 
 
