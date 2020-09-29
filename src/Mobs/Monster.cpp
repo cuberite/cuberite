@@ -1401,6 +1401,7 @@ void cMonster::LoveTick(void)
 
 
 
+
 void cMonster::RightClickFeed(cPlayer & a_Player)
 {
 
@@ -1426,9 +1427,9 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 	{
 		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
 		if (
-				(MonsterType == m_MobType) &&
-				(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
-				)
+			(MonsterType == m_MobType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
+			)
 		{
 			if (!a_Player.IsGameModeCreative())
 			{

@@ -244,7 +244,7 @@ public:
 	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
 	bool IsInLoveCooldown() const { return (m_LoveCooldown > 0); }
 
-	/** Does the whole love/breeding processing */
+	/** Does the whole love and breeding processing */
 	void LoveTick(void);
 
 	/** Right click call to process feeding */
