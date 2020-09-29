@@ -28,7 +28,7 @@ cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Titl
 
 void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
+	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= m_PropertyValue.size()))
 	{
 		ASSERT(!"a_Property is invalid");
 		return;
@@ -44,7 +44,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a
 
 void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 {
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
+	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= m_PropertyValue.size()))
 	{
 		ASSERT(!"a_Property is invalid");
 		return;
@@ -60,7 +60,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 
 short cEnchantingWindow::GetPropertyValue(short a_Property)
 {
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
+	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= m_PropertyValue.size()))
 	{
 		ASSERT(!"a_Property is invalid");
 		return 0;

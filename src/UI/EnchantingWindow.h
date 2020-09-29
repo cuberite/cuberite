@@ -36,7 +36,7 @@ public:
 	cSlotAreaEnchanting * m_SlotArea;
 
 protected:
-	short m_PropertyValue[10];
+	std::array<short, 10> m_PropertyValue;
 	Vector3i m_BlockPos;
 };
 

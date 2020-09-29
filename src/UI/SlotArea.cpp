@@ -1477,7 +1477,6 @@ cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_Bl
 	cSlotAreaTemporary(2, a_ParentWindow),
 	m_BlockPos(a_BlockPos)
 {
-	m_EnchantedItemOptions.resize(3);
 }
 
 
@@ -1690,7 +1689,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 		// Calculate the levels for the offered enchantment options:
 		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
-		int OptionLevels[3];
+		std::array<unsigned int, 3> OptionLevels;
 		OptionLevels[0] = std::max(Base / 3, 1);
 		OptionLevels[1] = (Base * 2) / 3 + 1;
 		OptionLevels[2] = std::max(Base, Bookshelves * 2);
@@ -1707,7 +1706,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 			cItem EnchantedItem = Item.CopyOne();
 			EnchantedItem.EnchantByXPLevels(OptionLevels[i], &Random);
 			// Store the item we've enchanted as an option to be retrieved later
-			m_EnchantedItemOptions.Set(i, EnchantedItem);
+			m_EnchantedItemOptions[i] = EnchantedItem;
 
 			LOG("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
 
@@ -1739,7 +1738,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 
 
-cItem cSlotAreaEnchanting::GetEnchantedOption( unsigned char a_EnchantOption)
+cItem cSlotAreaEnchanting::GetEnchantedOption( size_t a_EnchantOption)
 {
 	ASSERT((a_EnchantOption < m_EnchantedItemOptions.size()));
 	return m_EnchantedItemOptions[a_EnchantOption];

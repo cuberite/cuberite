@@ -401,14 +401,14 @@ public:
 	int GetBookshelvesCount(cWorld & a_World);
 
 	/* Return the enchanted item matching the chosen option (0, 1, 2) */
-	cItem GetEnchantedOption( unsigned char a_EnchantOption);
+	cItem GetEnchantedOption( size_t a_EnchantOption);
 
 protected:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
 	Vector3i m_BlockPos;
-	cItems m_EnchantedItemOptions;
+	std::array<cItem, 3> m_EnchantedItemOptions;
 };
 
 
