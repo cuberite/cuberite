@@ -26,18 +26,6 @@ jobs:
         - export PATH=/snap/bin/:${PATH}
       env: *Debug
 
-    - name: "Clang 7.0 - Debug"
-      compiler: clang
-      arch: ppc64le
-      before_install: *use-cmake
-      env: *Debug
-
-    - name: "Clang 7.0 - Debug"
-      compiler: clang
-      arch: s390x
-      before_install: *use-cmake
-      env: *Debug
-
     - name: "AppleClang - Debug"
       os: osx
       osx_image: xcode11.3
