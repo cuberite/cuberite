@@ -792,6 +792,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	{
 		// Set the item slot to our new enchanted item:
 		Window->m_SlotArea->SetSlot(0, *m_Player, EnchantedItem);
+		m_Player->PermuteEnchantmentSeed();
 
 		// Reset window properties
 		for (short i=0; i<10; i++)

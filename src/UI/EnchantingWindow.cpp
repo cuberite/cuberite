@@ -30,7 +30,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a
 {
 	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
 	{
-		LOGD("a_Property is invalid");
+		ASSERT(!"a_Property is invalid");
 		return;
 	}
 
@@ -46,7 +46,7 @@ void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 {
 	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
 	{
-		LOGD("a_Property is invalid");
+		ASSERT("a_Property is invalid");
 		return;
 	}
 
@@ -62,7 +62,7 @@ short cEnchantingWindow::GetPropertyValue(short a_Property)
 {
 	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
 	{
-		LOGD("a_Property is invalid");
+		ASSERT("a_Property is invalid");
 		return 0;
 	}
 

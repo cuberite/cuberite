@@ -266,8 +266,8 @@ public:
 	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
 	inline unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
 
-	/** Set the seed for enchanting related PRNGs, don't use this for other purposes. */
-	inline void SetEnchantmentSeed(unsigned int a_EnchantmentSeed) { m_EnchantmentSeed = a_EnchantmentSeed; }
+	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
+	void PermuteEnchantmentSeed();
 
 	/** Returns the SharedPtr to client handle associated with the player. */
 	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
