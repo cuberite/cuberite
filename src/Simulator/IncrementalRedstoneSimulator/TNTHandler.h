@@ -24,7 +24,7 @@ namespace TNTHandler
 		if (Power != 0)
 		{
 			a_Chunk.SetBlock(a_Position, E_BLOCK_AIR, 0);
-			a_Chunk.GetWorld()->SpawnPrimedTNT(Vector3d(0.5, 0.5, 0.5) + cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()));  // 80 ticks to boom
+			a_Chunk.GetWorld()->SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()));  // 80 ticks to boom
 		}
 	}
 
