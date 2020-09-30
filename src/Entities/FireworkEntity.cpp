@@ -21,6 +21,17 @@ cFireworkEntity::cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cIte
 
 
 
+void cFireworkEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & Firework = static_cast<const cFireworkEntity &>(a_Src);
+	m_TicksToExplosion = Firework.m_TicksToExplosion;
+}
+
+
+
+
+
 void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;

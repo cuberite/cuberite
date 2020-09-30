@@ -20,6 +20,18 @@ cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 
 
 
+void cItemFrame::CopyFrom(const cEntity &a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & ItemFrame = static_cast<const cItemFrame &>(a_Src);
+	m_Item = ItemFrame.m_Item;
+	m_ItemRotation = ItemFrame.m_ItemRotation;
+}
+
+
+
+
+
 void cItemFrame::OnRightClicked(cPlayer & a_Player)
 {
 	Super::OnRightClicked(a_Player);

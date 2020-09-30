@@ -1326,6 +1326,66 @@ void cMinecart::Destroyed()
 
 
 
+std::unique_ptr<cEntity> cMinecart::MakeClone(Vector3d a_Pos)
+{
+	switch (m_Payload)
+	{
+		case mpNone:
+		{
+			auto & Rideable = static_cast<cRideableMinecart &>(*this);
+			auto Clone = std::make_unique<cRideableMinecart>(a_Pos, Rideable.GetContent(), (int) Rideable.GetHeight());
+			Clone->CopyFrom(Rideable);
+			return Clone;
+		}
+		case mpChest:
+		{
+			auto & Chest = static_cast<cRideableMinecart &>(*this);
+			auto Clone = std::make_unique<cMinecartWithChest>(a_Pos);
+			Clone->CopyFrom(Chest);
+			return Clone;
+		}
+		case mpFurnace:
+		{
+			auto & Furnace = static_cast<cMinecartWithFurnace &>(*this);
+			auto Clone = std::make_unique<cMinecartWithFurnace>(a_Pos);
+			Clone->CopyFrom(Furnace);
+			return Clone;
+		}
+		case mpTNT:
+		{
+			auto Clone = std::make_unique<cMinecartWithTNT>(a_Pos);
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case mpHopper:
+		{
+			auto & Hopper = static_cast<cMinecartWithHopper &>(*this);
+			auto Clone = std::make_unique<cMinecartWithHopper>(a_Pos);
+			Clone->CopyFrom(Hopper);
+			return Clone;
+		}
+	}
+	UNREACHABLE("Tried to clone unknown Minecart type!");
+	return nullptr;
+}
+
+
+
+
+
+void cMinecart::CopyFrom(const cEntity & a_Src)
+{
+	auto & Minecart = static_cast<const cMinecart &>(a_Src);
+	Super::CopyFrom(a_Src);
+	m_LastDamage = Minecart.m_LastDamage;
+	m_DetectorRailPosition = Minecart.m_DetectorRailPosition;
+	m_bIsOnDetectorRail = Minecart.m_bIsOnDetectorRail;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
@@ -1365,6 +1425,15 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 
 	// Attach the player to this minecart
 	a_Player.AttachTo(this);
+}
+
+
+
+
+
+void cRideableMinecart::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
 }
 
 
@@ -1445,6 +1514,17 @@ void cMinecartWithChest::Destroyed()
 
 
 
+void cMinecartWithChest::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Chest = static_cast<const cMinecartWithChest &>(a_Src);
+	m_Contents.CopyFrom(Chest.m_Contents);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithFurnace:
 
@@ -1512,6 +1592,18 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 
 
 
+void cMinecartWithFurnace::CopyFrom(const cEntity &a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Furnace = static_cast<const cMinecartWithFurnace &>(a_Src);
+	m_FueledTimeLeft = Furnace.m_FueledTimeLeft;
+	m_IsFueled = Furnace.m_IsFueled;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithTNT:
 
@@ -1521,6 +1613,13 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 }
 
 // TODO: Make it activate when passing over activator rail
+
+
+
+void cMinecartWithTNT::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+}
 
 
 
@@ -1536,3 +1635,9 @@ cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
 
 // TODO: Make it suck up blocks and travel further than any other cart and physics and put and take blocks
 // AND AVARYTHING!!
+
+
+void cMinecartWithHopper::CopyFrom(const cEntity &a_Src)
+{
+	Super::CopyFrom(a_Src);
+}

@@ -208,6 +208,21 @@ void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
 
 
 
+void cBoat::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Boat = static_cast<const cBoat &>(a_Src);
+	m_LastDamage = Boat.m_LastDamage;
+	m_ForwardDirection = Boat.m_ForwardDirection;
+	m_DamageTaken = Boat.m_DamageTaken;
+	m_RightPaddleUsed = Boat.m_RightPaddleUsed;
+	m_LeftPaddleUsed = Boat.m_LeftPaddleUsed;
+}
+
+
+
+
+
 cBoat::eMaterial cBoat::ItemToMaterial(const cItem & a_Item)
 {
 	switch (a_Item.m_ItemType)

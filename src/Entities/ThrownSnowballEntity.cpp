@@ -18,6 +18,17 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, Vector3d a_Pos
 
 
 
+void cThrownSnowballEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & SnowBall = static_cast<const cThrownSnowballEntity &>(a_Src);
+	m_DestroyTimer = SnowBall.m_DestroyTimer;
+}
+
+
+
+
+
 void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	m_DestroyTimer = 2;

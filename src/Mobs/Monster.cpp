@@ -1512,3 +1512,62 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup)
 {
 	Unleash(a_ShouldDropLeashPickup, true);
 }
+
+
+
+
+
+std::unique_ptr<cEntity> cMonster::MakeClone(Vector3d a_Pos)
+{
+	auto Clone = NewMonsterFromType(m_MobType);
+	Clone->CopyFrom(*this);
+	Clone->SetPosition(a_Pos);
+	return Clone;
+}
+
+
+
+
+
+void cMonster::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Monster = static_cast<const cMonster &>(a_Src);
+	m_PathFinder = cPathFinder(GetWidth(), GetHeight());
+	m_PathfinderActivated = Monster.m_PathfinderActivated;
+	m_FinalDestination = Monster.m_FinalDestination;
+	m_JumpCoolDown= Monster.m_JumpCoolDown;
+	m_IdleInterval = Monster.m_IdleInterval;
+	m_DestroyTimer = Monster.m_DestroyTimer;
+	m_CustomName = Monster.m_CustomName;
+	m_CustomNameAlwaysVisible = Monster.m_CustomNameAlwaysVisible;
+	m_SoundHurt = Monster.m_SoundHurt;
+	m_SoundDeath = Monster.m_SoundDeath;
+	m_SoundAmbient = Monster.m_SoundAmbient;
+	m_AttackRate = Monster.m_AttackRate;
+	m_AttackDamage = Monster.m_AttackDamage;
+	m_AttackRange = Monster.m_AttackRange;
+	m_AttackCoolDownTicksLeft = Monster.m_AttackCoolDownTicksLeft;
+	m_SightDistance = Monster.m_SightDistance;
+	m_DropChanceWeapon = Monster.m_DropChanceWeapon;
+	m_DropChanceHelmet = Monster.m_DropChanceHelmet;
+	m_DropChanceChestplate = Monster.m_DropChanceChestplate;
+	m_DropChanceLeggings = Monster.m_DropChanceLeggings;
+	m_DropChanceBoots = Monster.m_DropChanceBoots;
+	m_CanPickUpLoot = Monster.m_CanPickUpLoot;
+	m_TicksSinceLastDamaged = Monster.m_TicksSinceLastDamaged;
+
+	m_BurnsInDaylight = Monster.m_BurnsInDaylight;
+	m_RelativeWalkSpeed = Monster.m_RelativeWalkSpeed;
+	m_AmbientSoundTimer = Monster.m_AmbientSoundTimer;
+	m_Age = Monster.m_Age;
+	m_AgingTimer = Monster.m_AgingTimer;
+	m_WasLastTargetAPlayer = Monster.m_WasLastTargetAPlayer;
+	m_LeashedTo = Monster.m_LeashedTo;
+	m_LeashToPos->x = Monster.m_LeashToPos->x;
+	m_LeashToPos->y = Monster.m_LeashToPos->y;
+	m_LeashToPos->z = Monster.m_LeashToPos->z;
+	m_IsLeashActionJustDone = Monster.m_IsLeashActionJustDone;
+	m_CanBeLeashed = Monster.m_CanBeLeashed;
+	m_Target = Monster.m_Target;
+}

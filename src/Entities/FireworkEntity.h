@@ -46,6 +46,9 @@ public:  // tolua_export
 
 	// tolua_end
 
+	// Entity overrides
+	void CopyFrom(const cEntity &a_Src) override;
+
 protected:
 
 	// cProjectileEntity overrides:

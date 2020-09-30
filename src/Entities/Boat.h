@@ -82,6 +82,10 @@ public:
 	void SetLastDamage(int TimeSinceLastHit);
 
 	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
+
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
+
 private:
 	int m_LastDamage;
 	int m_ForwardDirection;

@@ -47,6 +47,9 @@ public:  // tolua_export
 	/** Split reward into small values according to regular Minecraft rules */
 	static std::vector<int> Split(int a_Reward);
 
+	// cEntity override
+	void CopyFrom(const cEntity &a_Src) override;
+
 protected:
 	int m_Reward;
 

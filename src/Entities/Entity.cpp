@@ -17,6 +17,18 @@
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
 
+// Descendants for cloning
+#include "Boat.h"
+#include "ExpOrb.h"
+#include "FallingBlock.h"
+#include "Floater.h"
+#include "ItemFrame.h"
+#include "LeashKnot.h"
+#include "Minecart.h"
+#include "Painting.h"
+#include "Pickup.h"
+#include "TNTEntity.h"
+
 
 
 
@@ -2308,7 +2320,7 @@ void cEntity::BroadcastLeashedMobs()
 
 
 
-float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower)
 {
 	double EntitySize = m_Width * m_Width * m_Height;
 	if (EntitySize <= 0)
@@ -2318,7 +2330,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 	}
 
 	auto EntityBox = GetBoundingBox();
-	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
+	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExplosionPower * 2.0);
 	cBoundingBox IntersectionBox(EntityBox);
 
 	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
@@ -2333,6 +2345,154 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 	{
 		return 0;
 	}
+}
+
+
+
+
+
+std::unique_ptr<cEntity> cEntity::Clone(Vector3d a_Pos)
+{
+	switch (m_EntityType)
+	{
+		case etEntity:
+		case etPlayer:
+		{
+			break;
+		}
+		case etEnderCrystal:
+		{
+			auto Clone = std::make_unique<cEnderCrystal>(a_Pos);
+			Clone -> CopyFrom(*this);
+			return Clone;
+		}
+		case etPickup:
+		{
+			auto & Pickup = static_cast<cPickup &>(*this);
+			auto Clone = std::make_unique<cPickup>(a_Pos, Pickup.GetItem(), Pickup.IsPlayerCreated(), m_Speed, Pickup.GetLifetime(), Pickup.CanCombine());
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etMonster:
+		{
+			auto & Monster = static_cast<cMonster &>(*this);
+			return Monster.MakeClone(a_Pos);
+		}
+		case etFallingBlock:
+		{
+			auto & FallingBlock = static_cast<cFallingBlock &>(*this);
+			auto Clone = std::make_unique<cFallingBlock>(a_Pos, FallingBlock.GetBlockType(), FallingBlock.GetBlockMeta());
+			return Clone;
+		}
+		case etMinecart:
+		{
+			auto & Minecart = static_cast<cMinecart &>(*this);
+			return Minecart.MakeClone(a_Pos);
+		}
+		case etBoat:
+		{
+			auto & Boat = static_cast<cBoat &>(*this);
+			auto Clone = std::make_unique<cBoat>(a_Pos, Boat.GetMaterial());
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etTNT:
+		{
+			auto & TNT = static_cast<cTNTEntity &>(*this);
+			auto Clone = std::make_unique<cTNTEntity>(a_Pos, TNT.GetFuseTicks());
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etProjectile:
+		{
+			auto & Projectile = static_cast<cProjectileEntity &>(*this);
+			return Projectile.MakeClone(a_Pos);
+		}
+		case etExpOrb:
+		{
+			auto & ExpOrb = static_cast<cExpOrb &>(*this);
+			auto Clone = std::make_unique<cExpOrb>(a_Pos, ExpOrb.GetReward());
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etFloater:
+		{
+			auto & Floater = static_cast<cFloater &>(*this);
+			auto Clone = std::make_unique<cFloater>(a_Pos, Floater.m_Speed, Floater.GetOwnerID(), Floater.GetPickupCountTine());
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etItemFrame:
+		{
+			auto & ItemFrame = static_cast<cItemFrame &>(*this);
+			auto Clone = std::make_unique<cItemFrame>(ItemFrame.GetFacing(), a_Pos);
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etPainting:
+		{
+			auto & Painting = static_cast<cPainting &>(*this);
+			auto Clone = std::make_unique<cPainting>(Painting.GetName(), Painting.GetFacing(), a_Pos);
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+		case etLeashKnot:
+		{
+			auto & LeashKnot = static_cast<cLeashKnot &>(*this);
+			auto Clone = std::make_unique<cLeashKnot>(LeashKnot.GetFacing(), a_Pos);
+			Clone->CopyFrom(*this);
+			return Clone;
+		}
+	}
+	ASSERT(!"Tried to clone unknown entity type!");
+	return nullptr;
+}
+
+
+
+
+
+void cEntity::CopyFrom(const cEntity &a_Src)
+{
+	m_Speed = a_Src.m_Speed;
+	m_Health = a_Src.m_Health;
+	m_MaxHealth = a_Src.m_MaxHealth;
+	m_AttachedTo = a_Src.m_AttachedTo;
+	m_Attachee = a_Src.m_Attachee;
+	m_bDirtyHead = a_Src.m_bDirtyHead;
+	m_bDirtyOrientation = a_Src.m_bDirtyOrientation;
+	m_bHasSentNoSpeed = a_Src.m_bHasSentNoSpeed;
+	m_bOnGround = a_Src.m_bOnGround;
+	m_Gravity = a_Src.m_Gravity;
+	m_AirDrag = a_Src.m_AirDrag;
+	m_LastSentPosition = {0, 0, 0};
+	m_LastPosition = {0, 0, 0};
+	m_EntityType = a_Src.m_EntityType;
+	m_World = nullptr;
+	m_IsFireproof = a_Src.m_IsFireproof;
+	m_TicksSinceLastBurnDamage = a_Src.m_TicksSinceLastBurnDamage;
+	m_TicksSinceLastLavaDamage = a_Src.m_TicksSinceLastLavaDamage;
+	m_TicksSinceLastFireDamage = a_Src.m_TicksSinceLastFireDamage;
+	m_TicksLeftBurning = a_Src.m_TicksLeftBurning;
+	m_TicksSinceLastVoidDamage = a_Src.m_TicksSinceLastVoidDamage;
+	m_IsInFire = a_Src.m_IsInFire;
+	m_IsInLava = a_Src.m_IsInLava;
+	m_IsInWater = a_Src.m_IsInWater;
+	m_IsHeadInWater = a_Src.m_IsHeadInWater;
+	m_AirLevel = a_Src.m_AirLevel;
+	m_AirTickTimer = a_Src.m_AirTickTimer;
+	m_PortalCooldownData = a_Src.m_PortalCooldownData;
+	m_TicksAlive = a_Src.m_TicksAlive;
+	m_IsTicking = a_Src.m_IsTicking;
+	m_ParentChunk = nullptr;
+	m_HeadYaw = a_Src.m_HeadYaw;
+	m_Rot = a_Src.m_Rot;
+	m_WaterSpeed = a_Src.m_WaterSpeed;
+	m_Mass = a_Src.m_Mass;
+	m_Width = a_Src.m_Height;
+	m_Height = a_Src.m_Height;
+	m_InvulnerableTicks = a_Src.m_InvulnerableTicks;
+	m_LeashedMobs = a_Src.m_LeashedMobs;
 }
 
 

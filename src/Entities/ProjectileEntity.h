@@ -110,6 +110,15 @@ public:
 	/** Sets the internal InGround flag. To be used by MCA loader only! */
 	void SetIsInGround(bool a_IsInGround) { m_IsInGround = a_IsInGround; }
 
+	/** Makes an exact copy of this entity, except for its m_World (set to nullptr), and at a new position.
+	Uses CopyFrom() to copy the properties. */
+	std::unique_ptr<cEntity> MakeClone(Vector3d a_Pos);
+
+	/** Copies all properties of a_Src into this entity, except for its m_World and location.
+	Each non-abstract descendant should override to copy its specific properties, and call
+	Super::CopyFrom(a_Src) to copy the common ones. */
+	virtual void CopyFrom(const cEntity & a_Src);
+
 protected:
 
 	/** A structure that stores the Entity ID and Playername of the projectile's creator

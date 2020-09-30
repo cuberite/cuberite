@@ -159,3 +159,15 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vecto
 
 
 
+
+void cLeashKnot::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & LeashKnot = static_cast<const cLeashKnot &>(a_Src);
+	m_ShouldSelfDestroy = LeashKnot.m_ShouldSelfDestroy;
+	m_TicksToSelfDestroy = LeashKnot.m_TicksToSelfDestroy;
+}
+
+
+
+

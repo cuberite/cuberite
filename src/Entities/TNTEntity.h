@@ -38,6 +38,9 @@ public:  // tolua_export
 
 	// tolua_end
 
+	// cEntityOverrides:
+	void CopyFrom(const cEntity &a_Src) override;
+
 protected:
 	int m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
 };  // tolua_export

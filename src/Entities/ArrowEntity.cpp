@@ -55,6 +55,22 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 
+void cArrowEntity::CopyFrom(const cEntity &a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Arrow = static_cast<const cArrowEntity &>(a_Src);
+	m_PickupState = Arrow.m_PickupState;
+	m_DamageCoeff = Arrow.m_DamageCoeff;
+	m_IsCritical = Arrow.m_IsCritical;
+	m_Timer = Arrow.m_Timer;
+	m_bIsCollected = Arrow.m_bIsCollected;
+	m_HitBlockPos = Arrow.m_HitBlockPos;
+}
+
+
+
+
+
 void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	// Save the direction we're going in before Super resets it

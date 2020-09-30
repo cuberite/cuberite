@@ -129,3 +129,14 @@ std::vector<int> cExpOrb::Split(int a_Reward)
 }
 
 
+
+
+
+void cExpOrb::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & ExpOrb = static_cast<const cExpOrb &>(a_Src);
+	m_Timer = ExpOrb.m_Timer;
+}
+
+

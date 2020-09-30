@@ -78,6 +78,9 @@ public:
 	/** Sets the block arrow is in. To be used by the MCA loader only! */
 	void SetBlockHit(const Vector3i & a_BlockHit) { m_HitBlockPos = a_BlockHit; }
 
+	// cEntity Overrides:
+	void CopyFrom(const cEntity &a_Src) override;
+
 protected:
 
 	/** Determines when the arrow can be picked up by players */

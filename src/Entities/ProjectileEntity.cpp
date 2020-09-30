@@ -354,6 +354,58 @@ AString cProjectileEntity::GetMCAClassName(void) const
 
 
 
+std::unique_ptr<cEntity> cProjectileEntity::MakeClone(Vector3d a_Pos)
+{
+	cEntity * Creator;
+	m_World->DoWithEntityByID(m_CreatorData.m_UniqueID, [&] (cEntity & a_Entity){ Creator = & a_Entity;  return true; });
+	std::unique_ptr<cEntity> Clone;
+	switch (m_ProjectileKind)
+	{
+		case pkArrow:         Clone = std::make_unique<cArrowEntity>           (Creator, a_Pos, m_Speed);
+		case pkEgg:           Clone = std::make_unique<cThrownEggEntity>       (Creator, a_Pos, m_Speed);
+		case pkEnderPearl:    Clone = std::make_unique<cThrownEnderPearlEntity>(Creator, a_Pos, m_Speed);
+		case pkSnowball:      Clone = std::make_unique<cThrownSnowballEntity>  (Creator, a_Pos, m_Speed);
+		case pkGhastFireball: Clone = std::make_unique<cGhastFireballEntity>   (Creator, a_Pos, m_Speed);
+		case pkFireCharge:    Clone = std::make_unique<cFireChargeEntity>      (Creator, a_Pos, m_Speed);
+		case pkExpBottle:     Clone = std::make_unique<cExpBottleEntity>       (Creator, a_Pos, m_Speed);
+		case pkWitherSkull:   Clone = std::make_unique<cWitherSkullEntity>     (Creator, a_Pos, m_Speed);
+		case pkFirework:
+		{
+			auto & Firework = static_cast<cFireworkEntity &>(*this);
+			auto Item = Firework.GetItem();
+			if (Item.m_FireworkItem.m_Colours.empty())
+			{
+				return nullptr;
+			}
+
+			Clone = std::make_unique<cFireworkEntity>(Creator, a_Pos, Item);
+		}
+		case pkSplashPotion:
+		{
+			auto & SplashPotion = static_cast<cSplashPotionEntity &>(*this);
+			auto Item = SplashPotion.GetItem();
+			Clone = std::make_unique<cSplashPotionEntity>(Creator, a_Pos, m_Speed, Item);
+		}
+	}
+	Clone->CopyFrom(*this);
+	return Clone;
+}
+
+
+
+
+
+void cProjectileEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Projectile = static_cast<const cProjectileEntity &>(a_Src);
+	m_IsInGround = Projectile.m_IsInGround;
+}
+
+
+
+
+
 void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);

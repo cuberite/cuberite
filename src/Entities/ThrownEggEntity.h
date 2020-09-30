@@ -30,6 +30,9 @@ public:  // tolua_export
 
 	cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
+	// cEntityOverrides:
+	void CopyFrom(const cEntity & a_Src) override;
+
 protected:
 
 	// cProjectileEntity overrides:

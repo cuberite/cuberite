@@ -266,3 +266,19 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
 	return false;
 }
+
+
+
+
+
+void cPickup::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & Other = static_cast<const cPickup &>(a_Src);
+	m_Timer = Other.m_Timer;
+	m_Item = Other.m_Item;
+	m_bCollected = Other.m_bCollected;
+	m_bIsPlayerCreated = Other.m_bIsPlayerCreated;
+	m_bCanCombine = Other.m_bCanCombine;
+	m_Lifetime = Other.m_Lifetime;
+}

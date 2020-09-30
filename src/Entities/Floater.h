@@ -25,11 +25,16 @@ public:  // tolua_export
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
-	bool CanPickup(void)       const { return m_CanPickupItem; }
+	bool CanPickup(void)          const { return m_CanPickupItem; }
 	UInt32 GetOwnerID(void)       const { return m_PlayerID; }
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
 	Vector3d GetBitePos(void)     const { return m_BitePos; }
 	// tolua_end
+
+	int GetPickupCountTine(void)  const { return m_CountDownTime; }
+
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
 
 protected:
 	// Position

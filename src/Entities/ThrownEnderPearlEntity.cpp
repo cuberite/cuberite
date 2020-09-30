@@ -19,6 +19,17 @@ cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a
 
 
 
+void cThrownEnderPearlEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & EnderPearl = static_cast<const cThrownEnderPearlEntity &>(a_Src);
+	m_DestroyTimer = EnderPearl.m_DestroyTimer;
+}
+
+
+
+
+
 void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	// TODO: Tweak a_HitPos based on block face.

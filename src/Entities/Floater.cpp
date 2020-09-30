@@ -197,3 +197,16 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BroadcastMovementUpdate();
 }
+
+
+
+
+
+void cFloater::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & Floater = static_cast<const cFloater &>(a_Src);
+	m_CanPickupItem = Floater.m_CanPickupItem;
+	m_CountDownTime = Floater.m_CountDownTime;
+	m_AttachedMobID = Floater.m_AttachedMobID;
+}

@@ -68,3 +68,12 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+
+void cTNTEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+}
+
+
+
+

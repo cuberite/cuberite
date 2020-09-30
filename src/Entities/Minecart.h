@@ -45,6 +45,9 @@ public:
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
 
+	std::unique_ptr<cEntity> MakeClone(Vector3d a_Pos);
+	void CopyFrom(const cEntity &a_Src) override;
+
 
 protected:
 
@@ -115,6 +118,7 @@ public:
 
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	void CopyFrom(const cEntity &a_Src) override;
 
 protected:
 
@@ -148,6 +152,9 @@ public:
 
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
 	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
+
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
 
 
 protected:
@@ -194,6 +201,7 @@ public:
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	void CopyFrom(const cEntity &a_Src) override;
 
 	// Set functions.
 	void SetIsFueled(bool a_IsFueled, int a_FueledTimeLeft = -1) {m_IsFueled = a_IsFueled; m_FueledTimeLeft = a_FueledTimeLeft;}
@@ -222,6 +230,9 @@ public:
 	CLASS_PROTODEF(cMinecartWithTNT)
 
 	cMinecartWithTNT(Vector3d a_Pos);
+
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
 } ;
 
 
@@ -238,4 +249,7 @@ public:
 	CLASS_PROTODEF(cMinecartWithHopper)
 
 	cMinecartWithHopper(Vector3d a_Pos);
+
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
 } ;

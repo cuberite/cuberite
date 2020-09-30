@@ -52,6 +52,9 @@ public:  // tolua_export
 	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
 
+	// cEntity overrides:
+	void CopyFrom(const cEntity &a_Src) override;
+
 protected:
 
 	cEntityEffect::eType m_EntityEffectType;

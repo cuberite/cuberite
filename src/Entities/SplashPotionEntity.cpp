@@ -34,6 +34,20 @@ cSplashPotionEntity::cSplashPotionEntity(
 
 
 
+void cSplashPotionEntity::CopyFrom(const cEntity &a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & SplashPotion = static_cast<const cSplashPotionEntity &>(a_Src);
+	m_EntityEffectType = SplashPotion.m_EntityEffectType;
+	m_EntityEffect = SplashPotion.m_EntityEffect;
+	m_PotionColor = SplashPotion.m_PotionColor;
+	m_DestroyTimer = SplashPotion.m_DestroyTimer;
+}
+
+
+
+
+
 void cSplashPotionEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
 	Splash(a_HitPos);

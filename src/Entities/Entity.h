@@ -601,8 +601,16 @@ public:
 	@param a_ExplosionPosition explosion position
 	@param a_ExlosionPower explosion power
 	@return exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExplosionPower);
 
+	/** Makes an exact copy of this entity, except for its m_World (set to nullptr), and at a new position.
+	Uses CopyFrom() to copy the properties. */
+	virtual std::unique_ptr<cEntity> Clone(Vector3d a_Pos);
+
+	/** Copies all properties of a_Src into this entity, except for its m_World and location.
+	Each non-abstract descendant should override to copy its specific properties, and call
+	Super::CopyFrom(a_Src) to copy the common ones. */
+	virtual void CopyFrom(const cEntity & a_Src);
 
 protected:
 

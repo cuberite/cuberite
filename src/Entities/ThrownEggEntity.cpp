@@ -72,6 +72,17 @@ void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+void cThrownEggEntity::CopyFrom(const cEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	const auto & Egg = static_cast<const cThrownEggEntity &>(a_Src);
+	m_DestroyTimer = Egg.m_DestroyTimer;
+}
+
+
+
+
+
 void cThrownEggEntity::TrySpawnChicken(Vector3d a_HitPos)
 {
 	auto & Random = GetRandomProvider();

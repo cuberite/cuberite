@@ -30,6 +30,9 @@ public:  // tolua_export
 	/** Returns the leash knot entity representing the knot at the specified position. Returns nullptr if there's no knot. */
 	static cLeashKnot * FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos);
 
+	// cEntity overrides
+	virtual void CopyFrom(const cEntity & a_Src) override;
+
 private:
 
 	/** When a fence is destroyed, the knot on it gets destroyed after a while. This flag turns on the countdown to self destroy. */

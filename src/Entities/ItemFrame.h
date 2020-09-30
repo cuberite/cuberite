@@ -37,6 +37,9 @@ public:  // tolua_export
 
 	// tolua_end
 
+	// cEntity overrides:
+	virtual void CopyFrom(const cEntity & a_Src) override;
+
 private:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;

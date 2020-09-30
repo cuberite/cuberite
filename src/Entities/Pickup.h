@@ -65,6 +65,8 @@ public:  // tolua_export
 	/** Returns true if created by player (i.e. vomiting), used for determining picking-up delay time */
 	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; }  // tolua_export
 
+	void CopyFrom(const cEntity &a_Src) override;
+
 private:
 
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
