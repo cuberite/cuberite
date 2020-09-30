@@ -173,7 +173,7 @@ namespace LootTable
 			{
 				cItem Item;
 
-				if ((a_Value[ParameterName].isString()) && (StringToItem(a_Value[ParameterName].asString(), Item)))
+				if ((a_Value[ParameterName].isString()) && (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item)))
 				{
 					m_Block = Item.m_ItemType;
 				}
@@ -643,7 +643,7 @@ namespace LootTable
 			if (NoCaseCompare(Key, "distance") == 0)
 			{
 				Json::Value Distance = Predicate[Key];
-				if (Distance.isArray())
+				if ((Distance.isArray()) || (Distance.empty()))
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Distance\" encountered a Json problem, dropping condition!");
 					continue;
@@ -675,7 +675,7 @@ namespace LootTable
 			else if (NoCaseCompare(Key, "effects") == 0)
 			{
 				const Json::Value EffectObject = Predicate[Key];
-				if (EffectObject.isArray())
+				if ((EffectObject.isArray()) || (EffectObject.empty()))
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Effects\" encountered a Json problem, dropping condition!");
 					continue;
@@ -724,7 +724,7 @@ namespace LootTable
 			else if (NoCaseCompare(Key, "flags") == 0)
 			{
 				Json::Value FlagsObject = Predicate[Key];
-				if (FlagsObject.isArray())
+				if ((FlagsObject.isArray()) || (FlagsObject.empty()))
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - flags\" encountered a Json problem, dropping condition!");
 					continue;
@@ -773,7 +773,7 @@ namespace LootTable
 			else if (NoCaseCompare(Key, "player") == 0)
 			{
 				Json::Value PlayerObject = Predicate[Key];
-				if (PlayerObject.isArray())
+				if ((PlayerObject.isArray()) || (PlayerObject.empty()))
 				{
 					LOGWARNING("Loot table: Condition \"EntityProperties - Player\" encountered a Json problem, dropping condition!");
 					continue;
@@ -1272,7 +1272,7 @@ namespace LootTable
 			{
 				Json::Value PredicateObject = a_Value[Key];
 
-				if (!PredicateObject.isObject())
+				if ((PredicateObject.isArray()) || (PredicateObject.empty()))
 				{
 					LOGWARNING("Loot table: Condition \"LocationCheck\" is missing predicates, dropping condition");
 					m_Active = false;
@@ -1288,9 +1288,9 @@ namespace LootTable
 					}  // "biome"
 					else if (NoCaseCompare(PredicateKey, "block") == 0)
 					{
-						Json::Value BlockObject;
+						Json::Value BlockObject = PredicateObject[PredicateKey];
 
-						if (!BlockObject.isObject())
+						if ((BlockObject.isArray()) || (BlockObject.empty()))
 						{
 							LOGWARNING("Loot table: Condition \"LocationCheck - Block\" is missing a Json object to describe it's parameters. Dropping part of the condition!");
 							continue;
@@ -1304,7 +1304,7 @@ namespace LootTable
 							}
 							else if (NoCaseCompare(BlockKey, "tag") == 0)
 							{
-								m_BlockTag = NamespaceConverter(BlockObject[BlockKey].asString());
+								m_BlockTag = ItemTag::eItemTags(NamespaceConverter(BlockObject[BlockKey].asString()));
 							}
 							else if (NoCaseCompare(BlockKey, "nbt") == 0)
 							{
@@ -1343,9 +1343,9 @@ namespace LootTable
 					}
 					else if (NoCaseCompare(PredicateKey, "fluid") == 0)
 					{
-						Json::Value FluidObject;
+						Json::Value FluidObject = PredicateObject[PredicateKey];
 
-						if (!FluidObject.isObject())
+						if ((FluidObject.isArray()) || (FluidObject.empty()))
 						{
 							LOGWARNING("Loot table: Condition \"LocationCheck - Fluid\" is missing a Json object to describe it's parameters. Dropping part of the condition!");
 							continue;
@@ -1353,7 +1353,7 @@ namespace LootTable
 
 						for (const auto & FluidKey : FluidObject.getMemberNames())
 						{
-							if (NoCaseCompare(FluidKey, "block") == 0)
+							if (NoCaseCompare(FluidKey, "fluid") == 0)
 							{
 								m_FluidState = cBlockStateProperty(FluidObject);
 							}
@@ -1369,7 +1369,7 @@ namespace LootTable
 					}
 					else if (NoCaseCompare(PredicateKey, "position") == 0)
 					{
-						Json::Value PositionObject;
+						Json::Value PositionObject = PredicateObject[PredicateKey];
 
 						if (!PositionObject.isObject())
 						{
@@ -1423,9 +1423,9 @@ namespace LootTable
 		}
 		Res &= m_BlockState(a_World, Pos);
 
-		if (!m_BlockTag.empty())
+		if (m_BlockTag != ItemTag::eItemTags::None)
 		{
-			Res &= ItemTag::GetItems(ItemTag::eItemTags(m_BlockTag)).Contains(cItem(a_World.GetBlock(a_Pos)));
+			Res &= ItemTag::GetItems(m_BlockTag).Contains(cItem(a_World.GetBlock(a_Pos)));
 		}
 
 		// Block NBT
@@ -1514,7 +1514,7 @@ namespace LootTable
 		{
 			Predicates = a_Value["Predicate"];
 		}
-		if (!Predicates.isObject())
+		if ((Predicates.isArray()) || (Predicates.empty()))
 		{
 			LOGWARNING("Loot table: Condition \"MatchTool\" is missing predicates");
 			return;

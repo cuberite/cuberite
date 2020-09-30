@@ -4,6 +4,7 @@
 #pragma once
 
 #include <variant>
+#include <Registries/ItemTags.h>
 #include "Noise/Noise.h"
 #include "Item.h"
 #include "Blocks/BlockHandler.h"
@@ -145,7 +146,7 @@ namespace LootTable
 
 			// Block
 			cBlockStateProperty m_BlockState;  // Also checks block type
-			AString m_BlockTag;
+			enum ItemTag::eItemTags m_BlockTag = ItemTag::eItemTags::None;
 			AString m_BlockNBT;
 
 			eDimension m_Dimension = eDimension::dimNotSet;

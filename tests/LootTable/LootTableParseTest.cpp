@@ -327,7 +327,76 @@ static void ParseKilledByPlayer()
 
 static void ParseLocationCheck()
 {
+	AString LocationString =
+		"{"
+			"\"condition\": \"minecraft:location_check\","
+			"\"offsetX\": 2.0,"
+			"\"offsetY\": 3.0,"
+			"\"offsetZ\": 4.0,"
+			"\"predicate\": {"
+				"\"biome\": \"minecraft:jungle\","
+				"\"block\": {"
+					"\"block\": {"
+						"\"block\": \"minecraft:iron_ingot\","
+					"},"
+	   				"\"tag\": \"minecraft:wool\","
+					"\"nbt\": \"HelloWorld\","
+	 			"},"
+	 			"\"dimension\": \"the_nether\","
+	 			"\"feature\": \"lalala i'm bored\","
+				"\"fluid\": {"
+					"\"fluid\": \"minecraft:water\","
+					"\"tag\": \"Test123\","
+				"},"
+				"\"light\": {"
+					"\"min\": 5.0,"
+					"\"max\": 6.0,"
+				"},"
+				"\"position\": {"
+					"\"x\": {"
+						"\"min\": 7.0,"
+						"\"max\": 8.0,"
+					"},"
+					"\"y\": {"
+						"\"min\": 9.0,"
+						"\"max\": 10.0,"
+					"},"
+					"\"z\": {"
+						"\"min\": 11.0,"
+						"\"max\": 12.0,"
+					"},"
+				"},"
+	 			"\"smokey\": true,"
+			"}"
+		"}";
 
+	JsonUtils::ParseString(LocationString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto Location = std::get<LootTable::Condition::cLocationCheck>(Condition.m_Parameter);
+
+	TEST_TRUE(Location.IsActive());
+	TEST_EQUAL(Location.m_OffsetX, 2);
+	TEST_EQUAL(Location.m_OffsetY, 3);
+	TEST_EQUAL(Location.m_OffsetZ, 4);
+	TEST_EQUAL(Location.m_Biome, biJungle);
+	TEST_EQUAL(Location.m_BlockTag, ItemTag::eItemTags::Wool);
+	TEST_TRUE(Location.m_BlockState.IsActive());
+	TEST_EQUAL(Location.m_BlockNBT, "HelloWorld");
+	TEST_EQUAL(Location.m_Dimension, dimNether);
+	TEST_EQUAL(Location.m_Feature, "lalala i'm bored");
+	TEST_TRUE(Location.m_FluidState.IsActive());
+	TEST_EQUAL(Location.m_FluidTag, "Test123");
+	TEST_EQUAL(Location.m_LightMin, 5);
+	TEST_EQUAL(Location.m_LightMax, 6);
+	TEST_EQUAL(Location.m_XMin, 7);
+	TEST_EQUAL(Location.m_XMax, 8);
+	TEST_EQUAL(Location.m_YMin, 9);
+	TEST_EQUAL(Location.m_YMax, 10);
+	TEST_EQUAL(Location.m_ZMin, 11);
+	TEST_EQUAL(Location.m_ZMax, 12);
+	TEST_TRUE(Location.m_Smokey);
 }
 
 
@@ -336,7 +405,33 @@ static void ParseLocationCheck()
 
 static void ParseMatchTool()
 {
+	AString ToolString =
+		"{"
+			"\"condition\": \"minecraft:match_tool\","
+   			"\"predicate\": {"
+				"\"count\": {"
+					"\"min\": 6.0,"
+					"\"max\": 7.0,"
+				"},"
+				"\"durability\": {"
+					"\"min\": 8.0,"
+					"\"max\": 9.0,"
+				"},"
+			"},"
+   			"\"\": \"\","
+		"}";
 
+	JsonUtils::ParseString(ToolString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto Tool = std::get<LootTable::Condition::cMatchTool>(Condition.m_Parameter);
+
+	TEST_TRUE(Tool.IsActive());
+	TEST_EQUAL(Tool.m_CountMin, 6);
+	TEST_EQUAL(Tool.m_CountMax, 7);
+	TEST_EQUAL(Tool.m_DurabilityMin, 8);
+	TEST_EQUAL(Tool.m_DurabilityMax, 9);
 }
 
 
