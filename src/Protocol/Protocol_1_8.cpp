@@ -2773,7 +2773,7 @@ void cProtocol_1_8_0::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	}
 	else if ((Flags & 0x1) != 0)
 	{
-		// jump
+		// TODO: Handle vehicle jump (for animals)
 	}
 	else
 	{
@@ -3915,7 +3915,7 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 {
 	if (!a_Entity.IsMob())
 	{
-		// No properties for anything else than mobs
+		// No properties for anything else other than mobs
 		a_Pkt.WriteBEInt32(0);
 		return;
 	}

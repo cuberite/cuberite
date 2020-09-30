@@ -15,10 +15,11 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	Super(etBoat, a_Pos, 1.5, 0.6),
-	m_LastDamage(0), m_ForwardDirection(0),
-	m_DamageTaken(0.0f), m_Material(a_Material),
-	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
+	Super(etBoat, a_Pos, 1.375, 0.5625),
+	m_Material(a_Material),
+	m_LeftPaddleUsed(false),
+	m_RightPaddleUsed(false),
+	m_ShouldShakeForwards(true)
 {
 	SetMass(20.0f);
 	SetGravity(-16.0f);
@@ -41,53 +42,29 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
-{
-	// Cannot use super::BroadcastMovementUpdate here, broadcasting position when not
-	// expected by the client breaks things. See https://github.com/cuberite/cuberite/pull/4488
-
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
-	{
-		return;
-	}
-
-	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
-	if (Diff.HasNonZeroLength())  // Have we moved?
-	{
-		m_World->BroadcastEntityPosition(*this, a_Exclude);
-		m_LastSentPosition = GetPosition();
-		m_bDirtyOrientation = false;
-	}
-}
-
-
-
-
-
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
-	m_LastDamage = 10;
+	if (
+		const auto Attacker = TDI.Attacker;
+
+		(Attacker != nullptr) &&
+		Attacker->IsPlayer() &&
+		static_cast<cPlayer *>(Attacker)->IsGameModeCreative()
+	)
+	{
+		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
+		return Super::DoTakeDamage(TDI);
+	}
+
 	if (!Super::DoTakeDamage(TDI))
 	{
 		return false;
 	}
 
-	m_World->BroadcastEntityMetadata(*this);
+	m_World->BroadcastEntityMetadata(*this);  // Tell the client to play the shaking animation
+	m_ShouldShakeForwards = !m_ShouldShakeForwards;  // The next shake goes the opposite direction
 
-	if (GetHealth() <= 0)
-	{
-		if (TDI.Attacker != nullptr)
-		{
-			if (TDI.Attacker->IsPlayer())
-			{
-				cItems Pickups;
-				Pickups.Add(MaterialToItem(m_Material));
-				m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 0, 0, 0, true);
-			}
-		}
-		Destroy();
-	}
+	SetInvulnerableTicks(2);  // Make rapid attacks have more of an effect
 	return true;
 }
 
@@ -101,7 +78,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 	if (m_Attachee != nullptr)
 	{
-		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+		if (m_Attachee == &a_Player)
 		{
 			// This player is already sitting in, they want out.
 			a_Player.Detach();
@@ -126,38 +103,61 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cBoat::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	Super::Tick(a_Dt, a_Chunk);
-	if (!IsTicking())
+	if (
+		(a_Killer != nullptr) &&
+		a_Killer->IsPlayer() &&
+		!static_cast<cPlayer *>(a_Killer)->IsGameModeCreative()  // No drops for creative
+	)
 	{
-		// The base class tick destroyed us
-		return;
+		a_Drops.Add(MaterialToItem(m_Material));
 	}
-	BroadcastMovementUpdate();
+}
 
-	SetSpeed(GetSpeed() * 0.97);  // Slowly decrease the speed
 
-	if ((POSY_TOINT < 0) || (POSY_TOINT >= cChunkDef::Height))
-	{
-		return;
-	}
+
+
+
+void cBoat::KilledBy(TakeDamageInfo & a_TDI)
+{
+	Super::KilledBy(a_TDI);
+	Destroy();
+}
+
+
+
+
+
+void cBoat::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	const auto Position = POS_TOINT;
+	const auto InWater = IsBlockWater(m_World->GetBlock(Position));
+	const auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt).count();
 
 	// A real boat floats.
 	// Propel to top water block and sit slightly beneath the waterline:
-	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)) && ((GetPosY() - POSY_TOINT) < 0.6))
+	if (InWater)
 	{
-		if (GetSpeedY() < 2)
-		{
-			const auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt).count();
-			SetSpeedY((-m_Gravity + 1) * DtSec);
-		}
+		// Counteract gravity and provide a small upwards force:
+		SetSpeedY((-m_Gravity + 1) * DtSec);
 	}
 
-	if (GetLastDamage() > 0)
+	auto Speed = GetSpeed();
+	ApplyFriction(Speed, 0.9, DtSec);  // Slowly decrease the speed
+	SetSpeed(Speed);
+
+	Super::HandlePhysics(a_Dt, a_Chunk);
+
+	const auto AbovePosition = Position.addedY(1);
+	const auto OnSurface = !IsBlockWater(m_World->GetBlock(AbovePosition));
+	if (InWater && OnSurface)
 	{
-		SetLastDamage(GetLastDamage() - 1);
+		SetSpeedY(0);
+		SetPosY(Position.y + 0.52);
 	}
+
+	BroadcastMovementUpdate();
 }
 
 
@@ -181,12 +181,18 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 
 
-void cBoat::SetLastDamage(int TimeSinceLastHit)
+float cBoat::GetDamageTaken(void) const
 {
-	m_LastDamage = TimeSinceLastHit;
+	return GetMaxHealth() - GetHealth();
+}
 
-	// Tell the client to play the shaking animation
-	m_World->BroadcastEntityMetadata(*this);
+
+
+
+
+bool cBoat::ShouldShakeForwards(void) const
+{
+	return m_ShouldShakeForwards;
 }
 
 
@@ -300,7 +306,3 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 	}
 	UNREACHABLE("Unsupported boat material");
 }
-
-
-
-

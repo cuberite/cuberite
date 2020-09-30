@@ -768,15 +768,15 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEInt8(BOAT_LAST_HIT_TIME);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+			a_Pkt.WriteVarInt32(8);
 
 			a_Pkt.WriteBEInt8(BOAT_FORWARD_DIRECTION);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+			a_Pkt.WriteVarInt32(Boat.ShouldShakeForwards() ? 1 : -1);
 
 			a_Pkt.WriteBEInt8(BOAT_DAMAGE_TAKEN);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+			a_Pkt.WriteBEFloat(10 * Boat.GetDamageTaken());
 
 			a_Pkt.WriteBEInt8(BOAT_TYPE);
 			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
