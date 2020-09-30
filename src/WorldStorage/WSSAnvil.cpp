@@ -7,6 +7,7 @@
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
+#include "NamespaceSerializer.h"
 #include "zlib/zlib.h"
 #include "json/json.h"
 #include "../World.h"
