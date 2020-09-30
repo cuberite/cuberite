@@ -675,6 +675,17 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				Notes = "Queues the specified plugin to be unloaded. To avoid deadlocks, the unloading happens in the main tick thread asynchronously.",
 			},
+			ReloadPlugin =
+			{
+				Params =
+				{
+					{
+						Name = "PluginName",
+						Type = "string",
+					},
+				},
+				Notes = "Queues the specified plugin to be reloaded. To avoid deadlocks, the reloading happens in the main tick thread asynchronously.",
+			}
 		},
 		Constants =
 		{
