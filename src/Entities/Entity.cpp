@@ -19,6 +19,7 @@
 
 // Descendants for cloning
 #include "Boat.h"
+#include "EnderCrystal.h"
 #include "ExpOrb.h"
 #include "FallingBlock.h"
 #include "Floater.h"
