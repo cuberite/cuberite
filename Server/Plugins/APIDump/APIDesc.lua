@@ -542,6 +542,7 @@ return
 				only used as a parameter for the {{OnChunkGenerating|OnChunkGenerating}} and
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
+				Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
 			]],
 			Functions =
 			{

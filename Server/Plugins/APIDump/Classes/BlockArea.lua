@@ -37,6 +37,9 @@ return
 				<li>Modify blocks inside cBlockArea</li>
 				<li>Write the area back to a world / save to file</li>
 			</ul></p>
+			<p>
+			Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
+			</p>
 		]],
 		Functions =
 		{
