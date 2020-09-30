@@ -1342,7 +1342,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
 	{
-		eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
+		eMonsterType MonsterType = NamespaceSerializer::ToMonsterType(a_NBT.GetString(Type));
 		if (MonsterType != eMonsterType::mtInvalidType)
 		{
 			MobSpawner->SetEntity(MonsterType);
@@ -1583,11 +1583,13 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherSkeletonFromNBT },
 		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
 		{ "Zombie",                        &cWSSAnvil::LoadZombieFromNBT },
-		{ "PigZombie",                     &cWSSAnvil::LoadPigZombieFromNBT },
+		{ "PigZombie", &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
 		{ "ZombieVillager",                &cWSSAnvil::LoadZombieVillagerFromNBT },
 
+		// Old names in the new format
 		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
 		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
+		{ "minecraft:zombie_pigman", &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
 
 		// New namespaced mob type ids:
 		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
@@ -1657,11 +1659,8 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "minecraft:zoglin",              &cWSSAnvil::LoadZoglinFromNBT },
 		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
 		{ "minecraft:zombie_horse",        &cWSSAnvil::LoadZombieHorseFromNBT },
-		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadPigZombieFromNBT },
+		{ "minecraft:zombified_piglin",    &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
 		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
-
-		// Renames from versions not yet added
-		{ "minecraft:zombified_piglin",   &cWSSAnvil::LoadPigZombieFromNBT },
 	};
 
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
@@ -3417,7 +3416,7 @@ void cWSSAnvil::LoadZombieHorseFromNBT(cEntityList &a_Entities, const cParsedNBT
 
 
 
-void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+void cWSSAnvil::LoadZombiefiedPiglinFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cZombiePigman> Monster = std::make_unique<cZombiePigman>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))

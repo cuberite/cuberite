@@ -206,7 +206,7 @@ namespace NamespaceSerializer
 			case mtZoglin:         return "minecraft:zoglin";
 			case mtZombie:         return "minecraft:zombie";
 			case mtZombieHorse:    return "minecraft:zombie_horse";
-			case mtZombiePigman:   return "minecraft:zombie_pigman";
+			case mtZombiePigman:   return "minecraft:zombified_piglin";
 			case mtZombieVillager: return "minecraft:zombie_villager";
 		}
 		UNREACHABLE("Tried to save unknown monster type");

@@ -547,7 +547,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
-			mWriter.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+			mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
 		mWriter.EndCompound();
 	}

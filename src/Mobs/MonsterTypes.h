@@ -78,11 +78,11 @@ enum eMonsterType
 	mtZoglin,                       // Added in 1.16
 	mtZombie,
 	mtZombieHorse,                  // Added in 1.6
-	mtZombiePigman,
+	mtZombifiedPiglin,
 	mtZombieVillager,
 
 	// Synonyms:
-	mtZombifiedPiglin = mtZombiePigman,
+	mtZombiePigman = mtZombifiedPiglin,
 } ;
 
 // tolua_end
