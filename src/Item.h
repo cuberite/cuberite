@@ -142,7 +142,7 @@ public:
 
 	/** Randomly enchants the item using the specified number of XP levels.
 	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already).
-	Passing an MTRand PRNG pointer is optional. */
+	Randomness is derived from the provided PRNG. */
 	bool EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random);  // Exported in ManualBindings.cpp
 
 	/** Adds this specific enchantment to this item, returning the cost.

@@ -27,6 +27,7 @@ typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
 
 
 
+
 /** Class that stores item enchantments or stored-enchantments
 The enchantments may be serialized to a stringspec and read back from such stringspec.
 The format for the stringspec is "id=lvl;id=lvl;id=lvl...", with an optional semicolon at the end,
@@ -139,8 +140,7 @@ public:
 	/** Check enchantment conflicts from enchantments from the vector */
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
 
-	/** Gets random enchantment from Vector and returns it
-	Passing an MTRand PRNG pointer is optional. */
+	/** Gets random enchantment from Vector and returns it, with randomness derived from the provided PRNG. */
 	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.

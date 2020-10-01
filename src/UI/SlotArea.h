@@ -400,8 +400,9 @@ public:
 	/* Get the number of bookshelves which are near the enchanting table */
 	unsigned GetBookshelvesCount(cWorld & a_World);
 
-	/* Return the enchanted item matching the chosen option (0, 1, 2) */
-	cItem GetEnchantedOption(size_t a_EnchantOption);
+	/* Return the enchanted item matching the chosen option (0, 1, 2)
+	Ownership of the cItem is transferred to the caller. */
+	cItem SelectEnchantedOption(size_t a_EnchantOption);
 
 protected:
 

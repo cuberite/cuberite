@@ -772,14 +772,14 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		return;
 	}
 
-	// Bail out if something's wrong with the window
+	// Bail out if something's wrong with the window:
 	if (
 		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
-		LOGD("cClientHandle received a non valid enchanting window.");
+		Kick("Enchantment with invalid window - hacked client?");
 		return;
 	}
 
@@ -824,7 +824,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	}
 
 	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
-	cItem EnchantedItem = Window->m_SlotArea->GetEnchantedOption(a_Enchantment);
+	cItem EnchantedItem = Window->m_SlotArea->SelectEnchantedOption(a_Enchantment);
 
 	// Set the item slot to our new enchanted item:
 	Window->m_SlotArea->SetSlot(0, *m_Player, EnchantedItem);

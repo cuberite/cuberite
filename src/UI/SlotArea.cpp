@@ -1738,16 +1738,6 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 
 
-cItem cSlotAreaEnchanting::GetEnchantedOption(size_t a_EnchantOption)
-{
-	ASSERT(a_EnchantOption < m_EnchantedItemOptions.size());
-	return m_EnchantedItemOptions[a_EnchantOption];
-}
-
-
-
-
-
 unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
 	cBlockArea Area;
@@ -1808,6 +1798,16 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	}  // for i - CheckCoords
 
 	return Bookshelves;
+}
+
+
+
+
+
+cItem cSlotAreaEnchanting::SelectEnchantedOption(size_t a_EnchantOption)
+{
+	ASSERT(a_EnchantOption < m_EnchantedItemOptions.size());
+	return std::move(m_EnchantedItemOptions[a_EnchantOption]);
 }
 
 
