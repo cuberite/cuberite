@@ -128,13 +128,11 @@ unsigned int cEnchantments::GetLevel(int a_EnchantmentID) const
 
 int cEnchantments::GetFirstEnchantmentID(void)
 {
-	for (cEnchantments::cMap::const_iterator itr = m_Enchantments.begin(), end = m_Enchantments.end(); itr != end; ++itr)
+	if (m_Enchantments.size() > 0)
 	{
-		if (itr->second>0)
-		{
-			return itr->first;
-		}
+		return m_Enchantments.begin()->first;
 	}
+
 	return -1;
 }
 
