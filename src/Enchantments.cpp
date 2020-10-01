@@ -109,14 +109,17 @@ AString cEnchantments::ToString(void) const
 
 
 
-int cEnchantments::GetFirstEnchantmentID(void)
+unsigned int cEnchantments::GetLevel(int a_EnchantmentID) const
 {
-	if (m_Enchantments.size() > 0)
+	// Return the level for the specified enchantment; 0 if not stored
+	cMap::const_iterator itr = m_Enchantments.find(a_EnchantmentID);
+	if (itr != m_Enchantments.end())
 	{
-		return m_Enchantments.begin()->first;
+		return itr->second;
 	}
 
-	return -1;
+	// Not stored, return zero
+	return 0;
 }
 
 
