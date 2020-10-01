@@ -203,7 +203,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 	class cCallback : public cChunkDataCallback
 	{
 	public:
-		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers, const short a_RequiredPlayerRange) :
+		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers, short a_RequiredPlayerRange) :
 			m_RequiredPlayerRange(a_RequiredPlayerRange),
 			m_SpawnerPos(a_SpawnerPos),
 			m_NumPlayers(a_NumPlayers)
