@@ -151,6 +151,8 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 
 		SetWorld(World);  // Use default world
 
+		m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
+
 		FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}",
 			a_PlayerName, GetPosition()
 		);
@@ -1861,6 +1863,25 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
+MTRand cPlayer::GetEnchantmentRandomProvider()
+{
+	return m_EnchantmentSeed;
+}
+
+
+
+
+
+void cPlayer::PermuteEnchantmentSeed()
+{
+	// Get a new random integer and save that as the seed:
+	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();
+}
+
+
+
+
+
 bool cPlayer::HasPermission(const AString & a_Permission)
 {
 	if (a_Permission.empty())
@@ -2277,6 +2298,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_LifetimeTotalXp     = root.get("xpTotal",        0).asInt();
 	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = root.get("isflying",       0).asBool();
+	m_EnchantmentSeed     = root.get("enchantmentSeed", GetRandomProvider().RandInt<unsigned int>()).asUInt();
 
 	Json::Value & JSON_KnownItems = root["knownItems"];
 	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
@@ -2439,6 +2461,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
 	root["SpawnWorld"]          = m_SpawnWorld->GetName();
+	root["enchantmentSeed"]     = m_EnchantmentSeed;
 
 	if (m_World != nullptr)
 	{

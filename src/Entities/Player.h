@@ -263,6 +263,13 @@ public:
 
 	// tolua_end
 
+	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
+	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	MTRand GetEnchantmentRandomProvider();
+
+	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
+	void PermuteEnchantmentSeed();
+
 	/** Returns the SharedPtr to client handle associated with the player. */
 	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
 
@@ -718,6 +725,7 @@ protected:
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
+	unsigned int m_EnchantmentSeed;
 
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;
