@@ -263,8 +263,9 @@ public:
 
 	// tolua_end
 
-	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
-	unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
+	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
+	The PRNG's state is initialised with an internal seed, where until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	MTRand GetEnchantmentRandomProvider();
 
 	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
 	void PermuteEnchantmentSeed();

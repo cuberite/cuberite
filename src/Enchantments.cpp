@@ -126,20 +126,6 @@ unsigned int cEnchantments::GetLevel(int a_EnchantmentID) const
 
 
 
-int cEnchantments::GetFirstEnchantmentID(void)
-{
-	if (m_Enchantments.size() > 0)
-	{
-		return m_Enchantments.begin()->first;
-	}
-
-	return -1;
-}
-
-
-
-
-
 void cEnchantments::SetLevel(int a_EnchantmentID, unsigned int a_Level)
 {
 	// Sets the level for the specified enchantment, adding it if not stored before or removing it if level <= 0

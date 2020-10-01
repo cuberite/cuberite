@@ -1678,61 +1678,59 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
-	if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
+	if (!cItem::IsEnchantable(Item.m_ItemType) || !Item.m_Enchantments.IsEmpty())
 	{
-		// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
-		const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
-
-		// Initialise the PRNG using the player's enchantment seed
-		auto EnchantmentSeed = a_Player.GetEnchantmentSeed();
-		MTRand Random(EnchantmentSeed);
-
-		// Calculate the levels for the offered enchantment options:
-		const auto Base = (Random.RandInt(1U, 8U) + (Bookshelves / 2) + Random.RandInt(0U, Bookshelves));
-		const std::array<unsigned int, 3> OptionLevels
-		{
-			std::max(Base / 3, 1U),
-			(Base * 2) / 3 + 1,
-			std::max(Base, Bookshelves * 2)
-		};
-
-		// Properties set according to: https://wiki.vg/Protocol#Window_Property
-		// I made the bitmask 0xFFF0 instead of 0xFFFFFFF0 (as on wiki) since we are casting to short anyway
-		// Send bits of the seed to the client so it can write a bunch of BS in squiggly letters
-		m_ParentWindow.SetProperty(3, static_cast<short>(EnchantmentSeed) & 0xFFF0, a_Player);
-
-		// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window
-		for (short i = 0; i < OptionLevels.size(); i++)
-		{
-			// Make a copy of the item, enchant based on the number of levels
-			cItem EnchantedItem = Item.CopyOne();
-			EnchantedItem.EnchantByXPLevels(OptionLevels[i], Random);
-			// Store the item we've enchanted as an option to be retrieved later
-			m_EnchantedItemOptions[i] = EnchantedItem;
-
-			LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
-
-			// Send the level requirement for the enchantment option
-			m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]), a_Player);
-
-			// Get the first enchantment ID
-			const short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.GetFirstEnchantmentID());
-
-			// Send the enchantment ID of the first enchantment on our item
-			m_ParentWindow.SetProperty(4 + i, EnchantmentID, a_Player);
-
-			const short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
-			// Send the level for the first enchantment on our item
-			m_ParentWindow.SetProperty(7 + i, EnchantmentLevel, a_Player);
-		}
+		return;
 	}
-	else
+
+	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
+	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
+
+	// A PRNG initialised using the player's enchantment seed.
+	auto Random = a_Player.GetEnchantmentRandomProvider();
+
+	// Calculate the levels for the offered enchantment options:
+	const auto Base = (Random.RandInt(1U, 8U) + (Bookshelves / 2) + Random.RandInt(0U, Bookshelves));
+	const std::array<unsigned int, 3> OptionLevels
 	{
-		// Reset window properties
-		for (short i = 0; i < 10; i++)
-		{
-			m_ParentWindow.SetProperty(i, 0, a_Player);
-		}
+		std::max(Base / 3, 1U),
+		(Base * 2) / 3 + 1,
+		std::max(Base, Bookshelves * 2)
+	};
+
+	// Properties set according to: https://wiki.vg/Protocol#Window_Property
+	// Fake a "seed" for the client to draw Standard Galactic Alphabet glyphs:
+	m_ParentWindow.SetProperty(3, Random.RandInt<short>(), a_Player);
+
+	// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window:
+	for (short i = 0; i != OptionLevels.size(); i++)
+	{
+		// A copy of the item.
+		cItem EnchantedItem = Item.CopyOne();
+
+		// Enchant based on the number of levels:
+		EnchantedItem.EnchantByXPLevels(OptionLevels[i], Random);
+
+		LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
+
+		// Send the level requirement for the enchantment option:
+		m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]), a_Player);
+
+		// Get the first enchantment ID, which must exist:
+		ASSERT(EnchantedItem.m_Enchantments.begin() != EnchantedItem.m_Enchantments.end());
+		const short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.begin()->first);
+
+		// Send the enchantment ID of the first enchantment on our item:
+		m_ParentWindow.SetProperty(4 + i, EnchantmentID, a_Player);
+
+		const short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
+		ASSERT(EnchantmentLevel > 0);
+
+		// Send the level for the first enchantment on our item:
+		m_ParentWindow.SetProperty(7 + i, EnchantmentLevel, a_Player);
+
+		// Store the item we've enchanted as an option to be retrieved later:
+		m_EnchantedItemOptions[i] = std::move(EnchantedItem);
 	}
 }
 
@@ -1752,7 +1750,6 @@ cItem cSlotAreaEnchanting::GetEnchantedOption(size_t a_EnchantOption)
 
 unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
-	unsigned Bookshelves = 0;
 	cBlockArea Area;
 	Area.Read(a_World, m_BlockPos - Vector3i(2, 0, 2), m_BlockPos + Vector3i(2, 1, 2));
 
@@ -1796,6 +1793,8 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 		{ 2, 1, 0, 2, 1, 1 },  // Bookcase at {2, 1, 0}, air at {2, 1, 1}
 		{ 1, 1, 0, 1, 1, 1 },  // Bookcase at {1, 1, 0}, air at {1, 1, 1}
 	};
+
+	unsigned Bookshelves = 0;
 
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{

@@ -1863,6 +1863,15 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
+MTRand cPlayer::GetEnchantmentRandomProvider()
+{
+	return m_EnchantmentSeed;
+}
+
+
+
+
+
 void cPlayer::PermuteEnchantmentSeed()
 {
 	// Get a new random integer and save that as the seed:
