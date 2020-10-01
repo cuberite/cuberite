@@ -786,7 +786,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
 	const auto BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
-	// Survival players must be checked they can afford enchantment and have lapis removed
+	// Survival players must be checked they can afford enchantment and have lapis removed:
 	if (!m_Player->IsGameModeCreative())
 	{
 		const auto XpRequired = m_Player->XpForLevel(BaseEnchantmentLevel);
@@ -817,7 +817,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		}
 		else
 		{
-			// Not creative and can't afford enchantment, so exit
+			// Not creative and can't afford enchantment, so exit:
 			return;
 		}
 	}
@@ -830,7 +830,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	m_Player->PermuteEnchantmentSeed();
 
 	// Reset window properties
-	for (short i=0; i<10; i++)
+	for (short i = 0; i < 10; i++)
 	{
 		Window->SetProperty(i, 0, *m_Player);
 	}

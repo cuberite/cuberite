@@ -264,7 +264,7 @@ public:
 	// tolua_end
 
 	/** Get the seed for enchanting related PRNGs, don't use this for other purposes. */
-	inline unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
+	unsigned int GetEnchantmentSeed(void) { return m_EnchantmentSeed; }
 
 	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
 	void PermuteEnchantmentSeed();

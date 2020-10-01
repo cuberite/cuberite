@@ -398,12 +398,13 @@ public:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/* Get the number of bookshelves which are near the enchanting table */
-	int GetBookshelvesCount(cWorld & a_World);
+	unsigned GetBookshelvesCount(cWorld & a_World);
 
 	/* Return the enchanted item matching the chosen option (0, 1, 2) */
-	cItem GetEnchantedOption( size_t a_EnchantOption);
+	cItem GetEnchantedOption(size_t a_EnchantOption);
 
 protected:
+
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 

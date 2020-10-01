@@ -2453,7 +2453,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
 	root["SpawnWorld"]          = m_SpawnWorld->GetName();
-	root["enchantmentSeed"]      = m_EnchantmentSeed;
+	root["enchantmentSeed"]     = m_EnchantmentSeed;
 
 	if (m_World != nullptr)
 	{

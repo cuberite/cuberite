@@ -429,7 +429,7 @@ int cItem::GetEnchantability()
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
+bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random)
 {
 	if (!cItem::IsEnchantable(m_ItemType))
 	{
@@ -442,12 +442,8 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
 		return false;
 	}
 
-	if (!a_Random)  // If we weren't provided with a PRNG then use the thread's
-	{
-		a_Random = &GetRandomProvider();
-	}
-	int ModifiedEnchantmentLevel = a_NumXPLevels + a_Random->RandInt(Enchantability / 4) + a_Random->RandInt(Enchantability / 4) + 1;
-	float RandomBonus = 1.0F + (a_Random->RandReal() + a_Random->RandReal() - 1.0F) * 0.15F;
+	int ModifiedEnchantmentLevel = a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (a_Random.RandReal() + a_Random.RandReal() - 1.0F) * 0.15F;
 	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
@@ -468,7 +464,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
 	// Next Enchantment (Second)
 	float NewEnchantmentLevel = a_NumXPLevels / 2.0f;
 	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !a_Random->RandBool(SecondEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(SecondEnchantmentChance))
 	{
 		return true;
 	}
@@ -483,7 +479,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
 	// Next Enchantment (Third)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !a_Random->RandBool(ThirdEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(ThirdEnchantmentChance))
 	{
 		return true;
 	}
@@ -498,7 +494,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand * a_Random)
 	// Next Enchantment (Fourth)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !a_Random->RandBool(FourthEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(FourthEnchantmentChance))
 	{
 		return true;
 	}

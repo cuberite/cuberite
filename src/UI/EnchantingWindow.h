@@ -11,8 +11,14 @@
 
 #include "Window.h"
 
-//fwd
+
+
+
+
 class cSlotAreaEnchanting;
+
+
+
 
 
 class cEnchantingWindow:
@@ -36,10 +42,7 @@ public:
 	cSlotAreaEnchanting * m_SlotArea;
 
 protected:
+
 	std::array<short, 10> m_PropertyValue;
 	Vector3i m_BlockPos;
 };
-
-
-
-

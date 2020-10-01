@@ -9,8 +9,8 @@
 #pragma once
 
 #include "Defines.h"
-#include "WorldStorage/EnchantmentSerializer.h"
 #include "FastRandom.h"
+#include "WorldStorage/EnchantmentSerializer.h"
 
 
 
@@ -144,7 +144,7 @@ public:
 
 	/** Gets random enchantment from Vector and returns it
 	Passing an MTRand PRNG pointer is optional. */
-	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand * Random = nullptr);
+	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.
