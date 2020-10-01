@@ -33,6 +33,11 @@ void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 	m_Entity = src.m_Entity;
 	m_IsActive = src.m_IsActive;
 	m_SpawnDelay = src.m_SpawnDelay;
+	m_SpawnCount = src.m_SpawnCount;
+	m_MinSpawnDelay = src.m_MinSpawnDelay;
+	m_MaxSpawnDelay = src.m_MaxSpawnDelay;
+	m_MaxNearbyEntities = src.m_MaxNearbyEntities;
+	m_RequiredPlayerRange = src.m_RequiredPlayerRange;
 }
 
 
@@ -114,7 +119,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMobSpawnerEntity::ResetTimer(void)
 {
-	m_SpawnDelay = GetRandomProvider().RandInt<short>(200, 800);
+	m_SpawnDelay = GetRandomProvider().RandInt<short>(m_MinSpawnDelay, m_MaxSpawnDelay);
 	m_World->BroadcastBlockEntity(GetPos());
 }
 
@@ -125,7 +130,7 @@ void cMobSpawnerEntity::ResetTimer(void)
 void cMobSpawnerEntity::SpawnEntity(void)
 {
 	auto NearbyEntities = GetNearbyMonsterNum(m_Entity);
-	if (NearbyEntities >= 6)
+	if (NearbyEntities >= m_MaxNearbyEntities)
 	{
 		ResetTimer();
 		return;
@@ -136,9 +141,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 			auto & Random = GetRandomProvider();
 
 			bool HaveSpawnedEntity = false;
-			for (size_t i = 0; i < 4; i++)
+			for (size_t i = 0; i < m_SpawnCount; i++)
 			{
-				if (NearbyEntities >= 6)
+				if (NearbyEntities >= m_MaxNearbyEntities)
 				{
 					break;
 				}
@@ -189,7 +194,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 
 
-int cMobSpawnerEntity::GetNearbyPlayersNum(void)
+int cMobSpawnerEntity::GetNearbyPlayersNum()
 {
 	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumPlayers = 0;
@@ -197,7 +202,8 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 	class cCallback : public cChunkDataCallback
 	{
 	public:
-		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers) :
+		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers, const short a_RequiredPlayerRange) :
+			m_RequiredPlayerRange(a_RequiredPlayerRange),
 			m_SpawnerPos(a_SpawnerPos),
 			m_NumPlayers(a_NumPlayers)
 		{
@@ -210,7 +216,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 				return;
 			}
 
-			if ((m_SpawnerPos - a_Entity->GetPosition()).Length() <= 16)
+			if ((m_SpawnerPos - a_Entity->GetPosition()).Length() <= m_RequiredPlayerRange)
 			{
 				m_NumPlayers++;
 			}
@@ -219,7 +225,8 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 	protected:
 		Vector3d m_SpawnerPos;
 		int & m_NumPlayers;
-	} Callback(SpawnerPos, NumPlayers);
+		const short m_RequiredPlayerRange;
+	} Callback(SpawnerPos, NumPlayers, m_RequiredPlayerRange);
 
 	int ChunkX = GetChunkX();
 	int ChunkZ = GetChunkZ();
@@ -240,10 +247,11 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 	class cCallback : public cChunkDataCallback
 	{
 	public:
-		cCallback(Vector3d a_SpawnerPos, eMonsterType a_CallbackEntityType, int & a_NumEntities) :
+		cCallback(Vector3d a_SpawnerPos, eMonsterType a_CallbackEntityType, int & a_NumEntities, short a_SpawnRange) :
 			m_SpawnerPos(a_SpawnerPos),
 			m_EntityType(a_CallbackEntityType),
-			m_NumEntities(a_NumEntities)
+			m_NumEntities(a_NumEntities),
+			m_SpawnRange(a_SpawnRange)
 		{
 		}
 
@@ -260,7 +268,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 				return;
 			}
 
-			if ((Diff(m_SpawnerPos.x, a_Entity->GetPosX()) <= 8.0) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0) && (Diff(m_SpawnerPos.z, a_Entity->GetPosZ()) <= 8.0))
+			if ((Diff(m_SpawnerPos.x, a_Entity->GetPosX()) <= (2 * m_SpawnRange + 1)) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0) && (Diff(m_SpawnerPos.z, a_Entity->GetPosZ()) <= (2 * m_SpawnRange + 1)))
 			{
 				m_NumEntities++;
 			}
@@ -270,7 +278,8 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 		Vector3d m_SpawnerPos;
 		eMonsterType m_EntityType;
 		int & m_NumEntities;
-	} Callback(SpawnerPos, a_EntityType, NumEntities);
+		short m_SpawnRange;
+	} Callback(SpawnerPos, a_EntityType, NumEntities, m_SpawnRange);
 
 	int ChunkX = GetChunkX();
 	int ChunkZ = GetChunkZ();
