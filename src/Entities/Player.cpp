@@ -1865,9 +1865,8 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 void cPlayer::PermuteEnchantmentSeed()
 {
-	// Get the next rand uint and use that as the next seed
-	MTRand Random(m_EnchantmentSeed);
-	m_EnchantmentSeed = Random.RandInt<unsigned int>();
+	// Get a new random integer and save that as the seed:
+	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();
 }
 
 
