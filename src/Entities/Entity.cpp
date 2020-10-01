@@ -917,26 +917,24 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-class cSolidHitCallbacks :
+class cSolidHitCallbacks final :
 	public cLineBlockTracer::cCallbacks
 {
 public:
 
-	cSolidHitCallbacks(cEntity & a_Entity, const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, eBlockFace & a_CBHitBlockFace) :
-		m_HitBlockFace(a_CBHitBlockFace),
+	cSolidHitCallbacks(cEntity & a_Entity, const Vector3d & a_CBStart, const Vector3d & a_CBEnd, eBlockFace & a_CBHitBlockFace, Vector3d & a_CBHitCoords) :
 		m_Entity(a_Entity),
 		m_Start(a_CBStart),
 		m_End(a_CBEnd),
+		m_HitBlockFace(a_CBHitBlockFace),
 		m_HitCoords(a_CBHitCoords)
 	{
 	}
 
-	eBlockFace & m_HitBlockFace;
-
 private:
 
 	template <typename EachLambdaType>
-	static void ForEachBlockToTest(const cBoundingBox & a_Around, Vector3d a_Direction, EachLambdaType Each)
+	static void ForEachBlockToTest(const cBoundingBox & a_Around, EachLambdaType Each)
 	{
 		const auto BoxStart = a_Around.GetMin().Floor();
 		const auto BoxEnd = a_Around.GetMax().Ceil();
@@ -980,33 +978,41 @@ private:
 		auto Direction = m_End - m_Start;
 		auto Backoff = std::make_pair(0.0, BLOCK_FACE_NONE);
 
-		ForEachBlockToTest(Entity, Direction, [this, &Backoff, &Direction, &Entity](const Vector3i Test)
+		ForEachBlockToTest(Entity, [this, &Backoff, &Direction, &Entity](const Vector3i Test)
 		{
 			cChunk * Chunk;
 			Vector3i Relative;
 			if (
 				!m_Entity.GetParentChunk()->GetChunkAndRelByAbsolute(Test, &Chunk, Relative) ||
 				!cBlockInfo::IsSolid(Chunk->GetBlock(Relative))
-				)
+			)
 			{
 				return;
 			}
 
 			cBoundingBox Intersection{ Vector3d(), Vector3d() };
 			cBoundingBox Block(Test, Test + Vector3i(1, 1, 1));
-			if (Block.Intersect(Entity, Intersection))
+
+			if (!Block.Intersect(Entity, Intersection))
 			{
-				const auto Centre = (Intersection.GetMax() - Intersection.GetMin()) / 2 + Intersection.GetMin();
-				double IgnoredCoefficient;
-				eBlockFace EntryFace;
-
-				VERIFY(Block.CalcLineIntersection(Centre - Direction, Centre + Direction, IgnoredCoefficient, EntryFace));
-
-				Backoff = std::max(
-					Backoff,
-					std::make_pair(CalculateRetardation(EntryFace, Intersection, Block, Direction), EntryFace)
-				);
+				// No collision with this block:
+				return;
 			}
+
+			const auto Centre = (Intersection.GetMax() - Intersection.GetMin()) / 2 + Intersection.GetMin();
+			double IgnoredCoefficient;
+			eBlockFace EntryFace;
+
+			if (!Block.CalcLineIntersection(Centre - Direction, Centre + Direction, IgnoredCoefficient, EntryFace))
+			{
+				// It's still possible to fail if Direction is _really_ massive (i.e. if a tick was super delayed):
+				return;
+			}
+
+			Backoff = std::max(
+				Backoff,
+				std::make_pair(CalculateRetardation(EntryFace, Intersection, Block, Direction), EntryFace)
+			);
 		});
 
 		m_HitCoords = a_TraceIntersection - Direction * Backoff.first;
@@ -1047,6 +1053,7 @@ private:
 	cEntity & m_Entity;
 	const Vector3d & m_Start;
 	const Vector3d & m_End;
+	eBlockFace & m_HitBlockFace;
 	Vector3d & m_HitCoords;
 };
 
@@ -1064,8 +1071,9 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ);
 
 	// TODO Add collision detection with entities.
+
+	auto NextSpeed = GetSpeed();
 	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt).count();
-	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
@@ -1117,7 +1125,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			m_Position.y += 0.5;
 
-			// TODO: tracer tries to handle this case too
+			// TODO: add function to tracer to test for "inside solid block", and if so, push out
+			// make push out not always add 1 each time, but instead the minimum needed to get the bb outside
 		}
 
 		/*
@@ -1185,57 +1194,58 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		eBlockFace HitBlockFace;
 		const auto NextPos = m_Position + NextSpeed * DtSec;
 
-		cSolidHitCallbacks Callbacks(*this, m_Position, NextPos, HitCoords, HitBlockFace);
+		cSolidHitCallbacks Callbacks(*this, m_Position, NextPos, HitBlockFace, HitCoords);
 		cLineBlockTracer::Trace(*GetWorld(), Callbacks, m_Position, NextPos);
 
 		// Calculate the proportion of time remaining to simulate
 		// after a (potential) collision midway through movement:
 		DtSec *= (HitCoords - NextPos).Length() / (m_Position - NextPos).Length();
 
-		if (Callbacks.m_HitBlockFace != BLOCK_FACE_NONE)
+		// Avoid movement in the direction of the blockface that has been hit:
+		switch (HitBlockFace)
 		{
-			// Avoid movement in the direction of the blockface that has been hit:
-			switch (HitBlockFace)
+			case BLOCK_FACE_NONE:
 			{
-				case BLOCK_FACE_NONE: ASSERT(!"Unexpected collision face");
-				case BLOCK_FACE_XM:
-				{
-					NextSpeed.x = 0;
-					m_bOnGround = false;
-					break;
-				}
-				case BLOCK_FACE_XP:
-				{
-					NextSpeed.x = 0;
-					m_bOnGround = false;
-					break;
-				}
-				case BLOCK_FACE_YM:
-				{
-					NextSpeed.y = 0;
-					m_bOnGround = false;
-					break;
-				}
-				case BLOCK_FACE_YP:
-				{
-					// We hit the ground, set the flag and apply friction:
-					NextSpeed.y = 0;
-					m_bOnGround = true;
-					ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec));
-					break;
-				}
-				case BLOCK_FACE_ZM:
-				{
-					NextSpeed.z = 0;
-					m_bOnGround = false;
-					break;
-				}
-				case BLOCK_FACE_ZP:
-				{
-					NextSpeed.z = 0;
-					m_bOnGround = false;
-					break;
-				}
+				// No collision, move unimpeded:
+				break;
+			}
+			case BLOCK_FACE_XM:
+			{
+				NextSpeed.x = 0;
+				m_bOnGround = false;
+				break;
+			}
+			case BLOCK_FACE_XP:
+			{
+				NextSpeed.x = 0;
+				m_bOnGround = false;
+				break;
+			}
+			case BLOCK_FACE_YM:
+			{
+				NextSpeed.y = 0;
+				m_bOnGround = false;
+				break;
+			}
+			case BLOCK_FACE_YP:
+			{
+				// We hit the ground, set the flag and apply friction:
+				NextSpeed.y = 0;
+				m_bOnGround = true;
+				ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec));
+				break;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				NextSpeed.z = 0;
+				m_bOnGround = false;
+				break;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				NextSpeed.z = 0;
+				m_bOnGround = false;
+				break;
 			}
 		}
 
