@@ -48,7 +48,7 @@ public:  // tolua_export
 
 	// Getters
 	int GetNearbyMonsterNum(eMonsterType a_EntityType);
-	int GetNearbyPlayersNum();
+	int GetNearbyPlayersNum(void);
 
 	eMonsterType GetEntity(void) const       { return m_Entity; }
 	short GetSpawnCount(void) const          { return m_SpawnCount; }
@@ -80,16 +80,20 @@ private:
 
 	bool m_IsActive;
 
+	/** Number of entities the spawner tries to spawn each activation. */
 	short m_SpawnCount = 4;
 
+	/** Diameter of the square the new monsters are spawned in */
 	short m_SpawnRange = 8;
 
 	short m_MinSpawnDelay = 200;
 
 	short m_MaxSpawnDelay = 800;
 
+	/** Maximum amount of the same entity type in proximity. */
 	short m_MaxNearbyEntities = 6;
 
+	/** Maximum distance to player for activation */
 	short m_RequiredPlayerRange = 16;
 
 } ;  // tolua_end

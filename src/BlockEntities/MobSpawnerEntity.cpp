@@ -34,6 +34,7 @@ void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 	m_IsActive = src.m_IsActive;
 	m_SpawnDelay = src.m_SpawnDelay;
 	m_SpawnCount = src.m_SpawnCount;
+	m_SpawnRange = src.m_SpawnRange;
 	m_MinSpawnDelay = src.m_MinSpawnDelay;
 	m_MaxSpawnDelay = src.m_MaxSpawnDelay;
 	m_MaxNearbyEntities = src.m_MaxNearbyEntities;
@@ -194,7 +195,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 
 
-int cMobSpawnerEntity::GetNearbyPlayersNum()
+int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 {
 	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumPlayers = 0;
