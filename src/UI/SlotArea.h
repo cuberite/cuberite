@@ -379,7 +379,7 @@ protected:
 
 
 
-class cSlotAreaEnchanting:
+class cSlotAreaEnchanting final :
 	public cSlotAreaTemporary
 {
 	using Super = cSlotAreaTemporary;

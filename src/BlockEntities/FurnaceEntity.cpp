@@ -192,7 +192,7 @@ int cFurnaceEntity::GetAndResetReward(void)
 
 
 
-void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cFurnaceEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)
