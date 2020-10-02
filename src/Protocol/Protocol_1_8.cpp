@@ -1694,13 +1694,13 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
-	Pkt.WriteBEInt16(a_Property);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Property));
 	Pkt.WriteBEInt16(a_Value);
 }
 

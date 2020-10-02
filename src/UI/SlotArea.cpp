@@ -1059,7 +1059,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	{
 		SetSlot(1, a_Player, cItem());
 	}
-	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost));
 
 	m_MaximumCost = 0;
 	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
@@ -1135,7 +1135,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
-		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(0, 0);
 		return;
 	}
 
@@ -1157,7 +1157,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
-				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SetProperty(0, 0);
 				return;
 			}
 
@@ -1180,7 +1180,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
-				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SetProperty(0, 0);
 				return;
 			}
 
@@ -1264,7 +1264,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	SetSlot(2, a_Player, Input);
-	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost), a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost));
 }
 
 
@@ -1700,10 +1700,10 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 	// Properties set according to: https://wiki.vg/Protocol#Window_Property
 	// Fake a "seed" for the client to draw Standard Galactic Alphabet glyphs:
-	m_ParentWindow.SetProperty(3, Random.RandInt<short>(), a_Player);
+	m_ParentWindow.SetProperty(3, Random.RandInt<short>());
 
 	// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window:
-	for (short i = 0; i != OptionLevels.size(); i++)
+	for (size_t i = 0; i != OptionLevels.size(); i++)
 	{
 		// A copy of the item.
 		cItem EnchantedItem = Item.CopyOne();
@@ -1714,20 +1714,20 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
 
 		// Send the level requirement for the enchantment option:
-		m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]), a_Player);
+		m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]));
 
 		// Get the first enchantment ID, which must exist:
 		ASSERT(EnchantedItem.m_Enchantments.begin() != EnchantedItem.m_Enchantments.end());
 		const short EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.begin()->first);
 
 		// Send the enchantment ID of the first enchantment on our item:
-		m_ParentWindow.SetProperty(4 + i, EnchantmentID, a_Player);
+		m_ParentWindow.SetProperty(4 + i, EnchantmentID);
 
 		const short EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
 		ASSERT(EnchantmentLevel > 0);
 
 		// Send the level for the first enchantment on our item:
-		m_ParentWindow.SetProperty(7 + i, EnchantmentLevel, a_Player);
+		m_ParentWindow.SetProperty(7 + i, EnchantmentLevel);
 
 		// Store the item we've enchanted as an option to be retrieved later:
 		m_EnchantedItemOptions[i] = std::move(EnchantedItem);
