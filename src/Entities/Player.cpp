@@ -3150,7 +3150,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 			}
 		}
 	}
-	else  // If we can't harvest the block then no bonuses
+	else  // If we can't harvest the block then no bonuses:
 	{
 		MiningSpeed = 1;
 	}
@@ -3200,13 +3200,13 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 {
 	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
-	// If we know it's instantly breakable then quit here
+	// If we know it's instantly breakable then quit here:
 	if (cBlockInfo::IsOneHitDig(a_Block))
 	{
 		return 1;
 	}
 	float BlockHardness = cBlockInfo::GetHardness(a_Block);
-	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less
+	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
 	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
 	{
 		BlockHardness*=1.5;

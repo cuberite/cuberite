@@ -1270,7 +1270,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->IsGameModeCreative()) ||      // In creative mode, digging is done immediately
+		(m_Player->IsGameModeCreative()) ||     // In creative mode, digging is done immediately
 		m_Player->CanInstantlyMine(a_OldBlock)  // Sometimes the player is fast enough to instantly mine
 	)
 	{
@@ -1379,7 +1379,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		World->DigBlock(absPos);
 	}
 
-	// Damage the tool, but not for 0 hardness items
+	// Damage the tool, but not for 0 hardness blocks:
 	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
 	m_Player->UseEquippedItem(dlAction);
 

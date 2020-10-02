@@ -803,7 +803,7 @@ private:
 	Returns one if using hand.
 	If the player is using a tool that is good to break the block the value is higher.
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
-	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
+	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
