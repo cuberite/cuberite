@@ -1301,8 +1301,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
+		(m_Player->IsGameModeCreative()) ||     // In creative mode, digging is done immediately
+		m_Player->CanInstantlyMine(a_OldBlock)  // Sometimes the player is fast enough to instantly mine
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
@@ -1366,10 +1366,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 
-	if (!m_Player->IsGameModeCreative() && !cBlockInfo::IsOneHitDig(a_OldBlock))
+	if (!m_Player->IsGameModeCreative() && !m_Player->CanInstantlyMine(a_OldBlock))
 	{
-		// Fix for very fast tools.
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(a_OldBlock);
+		// Check for very fast tools. Maybe instead of FASTBREAK_PERCENTAGE we should check we are within x multiplied by the progress per tick
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
@@ -1410,7 +1410,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		World->DigBlock(absPos);
 	}
 
-	// Damage the tool:
+	// Damage the tool, but not for 0 hardness blocks:
 	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
 	m_Player->UseEquippedItem(dlAction);
 
@@ -2120,7 +2120,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_HasStartedDigging)
 	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
 	ProcessProtocolInOut();

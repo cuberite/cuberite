@@ -562,6 +562,8 @@ private:
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
 
+	/** The fraction between 0 and 1, of how far through mining the currently mined block is.
+	0 for just started, 1 for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
