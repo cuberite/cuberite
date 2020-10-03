@@ -17,7 +17,9 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
-	m_IsActive(false)
+	m_IsActive(false),
+	m_EntityBoundingBox({(float) a_Pos.x, (float) a_Pos.y - 4,                     (float) a_Pos.z}, m_SpawnRange, 8),
+	m_PlayerBoundingBox({(float) a_Pos.x, (float) a_Pos.y - m_RequiredPlayerRange, (float) a_Pos.z}, m_RequiredPlayerRange, m_RequiredPlayerRange * 2)
 {
 	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
 }
@@ -151,9 +153,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 				auto SpawnRelPos(GetRelPos());
 				SpawnRelPos += Vector3i(
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0),
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * (float) m_SpawnRange),
 					Random.RandInt(-1, 1),
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0)
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * (float) m_SpawnRange)
 				);
 
 				auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(SpawnRelPos);
@@ -197,41 +199,22 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 {
-	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumPlayers = 0;
 
-	class cCallback : public cChunkDataCallback
+	auto Callback = [&] (cEntity & a_Entity)
 	{
-	public:
-		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers, short a_RequiredPlayerRange) :
-			m_RequiredPlayerRange(a_RequiredPlayerRange),
-			m_SpawnerPos(a_SpawnerPos),
-			m_NumPlayers(a_NumPlayers)
+		if (!a_Entity.IsPlayer())
 		{
+			return false;
 		}
-
-		virtual void Entity(cEntity * a_Entity) override
+		if ((m_Pos - a_Entity.GetPosition()).Length() <= m_RequiredPlayerRange)
 		{
-			if (!a_Entity->IsPlayer())
-			{
-				return;
-			}
-
-			if ((m_SpawnerPos - a_Entity->GetPosition()).Length() <= m_RequiredPlayerRange)
-			{
-				m_NumPlayers++;
-			}
+			NumPlayers++;
 		}
+		return false;
+	};
 
-	protected:
-		Vector3d m_SpawnerPos;
-		int & m_NumPlayers;
-		const short m_RequiredPlayerRange;
-	} Callback(SpawnerPos, NumPlayers, m_RequiredPlayerRange);
-
-	int ChunkX = GetChunkX();
-	int ChunkZ = GetChunkZ();
-	m_World->ForEachChunkInRect(ChunkX - 1, ChunkX + 1, ChunkZ - 1, ChunkZ + 1, Callback);
+	m_World->ForEachEntityInBox(m_PlayerBoundingBox, Callback);
 
 	return NumPlayers;
 }
@@ -242,51 +225,45 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 
 int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 {
-	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumEntities = 0;
 
-	class cCallback : public cChunkDataCallback
+	auto Callback = [&] (cEntity & a_Entity)
 	{
-	public:
-		cCallback(Vector3d a_SpawnerPos, eMonsterType a_CallbackEntityType, int & a_NumEntities, short a_SpawnRange) :
-			m_SpawnerPos(a_SpawnerPos),
-			m_EntityType(a_CallbackEntityType),
-			m_NumEntities(a_NumEntities),
-			m_SpawnRange(a_SpawnRange)
+		if (!a_Entity.IsMob())
 		{
+			return false;
 		}
 
-		virtual void Entity(cEntity * a_Entity) override
+		auto & Mob = static_cast<cMonster &>(a_Entity);
+		if (Mob.GetMobType() == m_Entity)
 		{
-			if (!a_Entity->IsMob())
-			{
-				return;
-			}
-
-			cMonster * Mob = static_cast<cMonster *>(a_Entity);
-			if (Mob->GetMobType() != m_EntityType)
-			{
-				return;
-			}
-
-			if ((Diff(m_SpawnerPos.x, a_Entity->GetPosX()) <= (2 * m_SpawnRange + 1)) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0) && (Diff(m_SpawnerPos.z, a_Entity->GetPosZ()) <= (2 * m_SpawnRange + 1)))
-			{
-				m_NumEntities++;
-			}
+			NumEntities++;
 		}
+		return false;
+	};
 
-	protected:
-		Vector3d m_SpawnerPos;
-		eMonsterType m_EntityType;
-		int & m_NumEntities;
-		short m_SpawnRange;
-	} Callback(SpawnerPos, a_EntityType, NumEntities, m_SpawnRange);
-
-	int ChunkX = GetChunkX();
-	int ChunkZ = GetChunkZ();
-	m_World->ForEachChunkInRect(ChunkX - 1, ChunkX + 1, ChunkZ - 1, ChunkZ + 1, Callback);
+	m_World->ForEachEntityInBox(m_EntityBoundingBox, Callback);
 
 	return NumEntities;
+}
+
+
+
+
+void cMobSpawnerEntity::SetSpawnRange(short a_SpawnRange)
+{
+	m_SpawnRange = std::min(a_SpawnRange, short(20));
+	m_EntityBoundingBox = cBoundingBox({(float) m_Pos.x, (float) m_Pos.y - 4, (float) m_Pos.z}, m_RequiredPlayerRange, 8);
+}
+
+
+
+
+
+void cMobSpawnerEntity::SetRequiredPlayerRange(short a_RequiredPlayerRange)
+{
+	m_RequiredPlayerRange = a_RequiredPlayerRange;
+	m_PlayerBoundingBox = cBoundingBox({(float) m_Pos.x, (float) m_Pos.y - m_RequiredPlayerRange, (float) m_Pos.z}, m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
 }
 
 
