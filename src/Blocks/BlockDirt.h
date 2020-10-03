@@ -7,6 +7,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockDirtHandler :
 	public cBlockHandler
 {
@@ -41,6 +46,10 @@ private:
 		return 10;
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

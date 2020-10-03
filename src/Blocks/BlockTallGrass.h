@@ -8,6 +8,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 /** Handles the grass that is 1 block tall */
 class cBlockTallGrassHandler:
 	public cBlockHandler
@@ -97,6 +102,10 @@ private:
 		return 7;
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

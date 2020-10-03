@@ -89,7 +89,7 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");
-		Pkt.WriteVarInt32(a_World.GetMaxViewDistance());
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteBool(false);
 	}
 

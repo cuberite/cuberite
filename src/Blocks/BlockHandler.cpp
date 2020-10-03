@@ -647,7 +647,8 @@ unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 	if ((a_Tool != nullptr) && ItemCategory::IsTool(a_Tool->m_ItemType))
 	{
 		// Return enchantment level, limited to avoid spawning excessive pickups (crashing the server) when modified items are used:
-		return std::min(8U, a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune));
+		return static_cast<unsigned char>(
+			std::min(8U, a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune)));
 	}
 
 	// Not a tool:

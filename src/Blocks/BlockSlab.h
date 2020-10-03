@@ -17,6 +17,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockSlabHandler :
 	public cBlockHandler
 {
@@ -279,6 +284,10 @@ private:
 		return cBlockHandler::For(GetSingleSlabType(m_BlockType)).GetMapBaseColourID(a_Meta);
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

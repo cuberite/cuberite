@@ -7,6 +7,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockRedstoneTorchHandler :
 	public cBlockTorchHandler
 {
@@ -34,6 +39,10 @@ private:
 		return 0;
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

@@ -94,7 +94,7 @@ private:
 		}
 	}
 
-	virtual void Simulate(float Dt) override {};
+	virtual void Simulate(float Dt) override {}
 	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
 
 	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);

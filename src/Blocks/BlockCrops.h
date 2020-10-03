@@ -8,6 +8,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
 template <NIBBLETYPE RipeMeta>
 class cBlockCropsHandler:
@@ -22,9 +27,9 @@ public:
 private:
 
 	/** Calculate the number of seeds to drop when the crop is broken. */
-	static char CalculateSeedCount(char a_Min, char a_BaseRolls, char a_FortuneLevel)
+	static char CalculateSeedCount(char a_Min, char a_BaseRolls, unsigned char a_FortuneLevel)
 	{
-		std::binomial_distribution Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
+		std::binomial_distribution<char> Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
 		return a_Min + Binomial(GetRandomProvider().Engine());
 	}
 
@@ -132,6 +137,10 @@ private:
 		return 7;
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

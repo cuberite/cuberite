@@ -25,6 +25,11 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 template <class Base = cBlockHandler>
 class cBlockWithNoDrops:
 	public Base
@@ -314,3 +319,7 @@ protected:
 		return Super::YawToMetaData(a_Rotation);
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

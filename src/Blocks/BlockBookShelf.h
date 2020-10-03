@@ -6,6 +6,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockBookShelfHandler :
 	public cBlockHandler
 {
@@ -24,3 +29,7 @@ private:
 		return cItem(E_ITEM_BOOK, 3);
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

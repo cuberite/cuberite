@@ -21,6 +21,11 @@ class cItems;
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockHandler
 {
 public:
@@ -66,12 +71,12 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const {};
+	) const {}
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange
-	) const {};
+	) const {}
 
 	/** Called just after the player breaks the block.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
@@ -91,7 +96,7 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) const {};
+	) const {}
 
 	/** Called when a direct neighbor of this block has been changed.
 	The position is the block's own position, NOT the changed neighbor's position.
@@ -243,3 +248,7 @@ protected:
 
 	BLOCKTYPE m_BlockType;
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

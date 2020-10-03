@@ -311,10 +311,10 @@ namespace RedstoneWireHandler
 
 					const auto YMDiagonalPosition = Relative + OffsetYM;
 					if (
-						BLOCKTYPE Block;
+						BLOCKTYPE QueryBlock;
 						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
-						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, Block) &&
-						(Block == E_BLOCK_REDSTONE_WIRE)
+						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
+						(QueryBlock == E_BLOCK_REDSTONE_WIRE)
 					)
 					{
 						Callback(YMDiagonalPosition);

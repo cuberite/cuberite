@@ -62,10 +62,10 @@ public:
 	bool Run(cSettingsRepositoryInterface & a_OverridesRepo);
 
 	/** Interrupts the server and stops it, as if "/stop" typed in the console. */
-	static void Stop();
+	void Stop();
 
 	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
-	static void Restart();
+	void Restart();
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -208,12 +208,12 @@ private:
 	void HandleInput();
 
 	/** Performs run state transition, enforcing guarantees about state transitions. */
-	static void TransitionNextState(NextState a_NextState);
+	void TransitionNextState(NextState a_NextState);
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 
-	static cEvent s_StopEvent;
+	cEvent m_StopEvent;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -249,5 +249,5 @@ private:
 	static cRoot * s_Root;
 
 	/** Indicates the next action of cRoot, whether to run, stop or restart. */
-	static std::atomic<NextState> s_NextState;
+	std::atomic<NextState> m_NextState;
 };  // tolua_export

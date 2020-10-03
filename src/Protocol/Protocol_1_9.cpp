@@ -632,17 +632,6 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			}
 			break;
 		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = State::Invalid;
-			return false;
-		}
 		case State::Invalid:
 		{
 			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.

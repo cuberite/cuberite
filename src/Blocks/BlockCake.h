@@ -6,6 +6,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockCakeHandler:
 	public cBlockHandler
 {
@@ -70,6 +75,10 @@ private:
 		return 14;
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 
 

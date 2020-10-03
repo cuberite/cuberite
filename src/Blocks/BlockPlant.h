@@ -6,6 +6,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 /** Base class for plants that use light values to decide whether to grow or not.
 On block update, the plant decides whether to grow, die or stay as-is, based on the CanGrow() overridable method result. */
 template <bool NeedsLightToGrow>
@@ -168,3 +173,7 @@ protected:
 		return FloorC(24.0f / Chance) + 1;
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

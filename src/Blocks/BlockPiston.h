@@ -15,6 +15,11 @@ class cWorld;
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockPistonHandler:
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
 {
@@ -161,3 +166,7 @@ public:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

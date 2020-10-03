@@ -9,6 +9,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 class cBlockButtonHandler :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
@@ -272,3 +277,7 @@ private:
 		UNREACHABLE(!"Unhandled block face!");
 	}
 } ;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

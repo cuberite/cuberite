@@ -9,6 +9,11 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
 /** Wrapper for blocks that have a cBlockEntity descendant attached to them and can be "used" by the player.
 Forwards the "use" event to the block entity. */
 class cBlockEntityHandler:
@@ -43,3 +48,7 @@ private:
 		return true;
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

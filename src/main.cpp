@@ -1,6 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include "main.h"
 #include "BuildInfo.h"
 #include "Logger.h"
 #include "MemorySettingsRepository.h"
@@ -17,17 +18,12 @@
 
 
 
-/** If set to true, the protocols will log each player's incoming (C->S) communication to a per-connection logfile. */
 bool g_ShouldLogCommIn;
-
-/** If set to true, the protocols will log each player's outgoing (S->C) communication to a per-connection logfile. */
 bool g_ShouldLogCommOut;
-
-/** If set to true, binary will attempt to run as a service. */
 bool g_RunAsService;
 
 /** Global that registers itself as a last chance exception handler to write a minidump on crash. */
-MiniDumpWriter g_MiniDumpWriter;
+static MiniDumpWriter g_MiniDumpWriter;
 
 
 
@@ -90,7 +86,7 @@ static void NonCtrlHandler(int a_Signal)
 		case SIGTERM:
 		{
 			// Server is shutting down, wait for it...
-			cRoot::Stop();
+			cRoot::Get()->Stop();
 			return;
 		}
 #ifdef SIGPIPE
@@ -115,7 +111,7 @@ static void NonCtrlHandler(int a_Signal)
 // Handle CTRL events in windows, including console window close
 static BOOL CtrlHandler(DWORD fdwCtrlType)
 {
-	cRoot::Stop();
+	cRoot::Get()->Stop();
 	LOGD("Terminate event raised from the Windows CtrlHandler");
 
 	// Delay as much as possible to try to get the server to shut down cleanly - 10 seconds given by Windows

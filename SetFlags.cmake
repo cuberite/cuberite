@@ -111,6 +111,14 @@ function(set_global_flags)
 	endif()
 endfunction()
 
+function (try_add_flag TARGET FLAG)
+	include(CheckCXXCompilerFlag)
+	check_cxx_compiler_flag("${FLAG}" HAS_FLAG)
+	if (HAS_FLAG)
+		target_compile_options(${TARGET} PRIVATE "${FLAG}")
+	endif()
+endfunction()
+
 function(set_exe_flags TARGET)
 	if (MSVC)
 		# TODO: MSVC level 4, warnings as errors
@@ -134,7 +142,7 @@ function(set_exe_flags TARGET)
 		-Wno-unused-parameter
 	)
 
-	if(CMAKE_CXX_COMPILE_ID STREQUAL "Clang")
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		target_compile_options(
 			${TARGET} PRIVATE
 
@@ -155,5 +163,10 @@ function(set_exe_flags TARGET)
 			-Wno-documentation -Wno-documentation-unknown-command -Wno-reserved-id-macro
 			-Wno-error=unused-command-line-argument
 		)
+
+		# We aren't using C++11
+		try_add_flag(${TARGET} -Wno-return-std-move-in-c++11)
+		# int to float conversions happen a lot, not worth fixing all warnings
+		try_add_flag(${TARGET} -Wno-implicit-int-float-conversion)
 	endif()
 endfunction()

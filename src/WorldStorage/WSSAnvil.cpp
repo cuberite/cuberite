@@ -1450,7 +1450,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 	int note = a_NBT.FindChildByName(a_TagIdx, "note");
 	if (note >= 0)
 	{
-		NoteBlock->SetNote(static_cast<char>(a_NBT.GetByte(note)));
+		NoteBlock->SetNote(a_NBT.GetByte(note));
 	}
 	return NoteBlock;
 }
@@ -1856,7 +1856,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
 	if (FuseTicks > 0)
 	{
-		TNT->SetFuseTicks(static_cast<int>(a_NBT.GetByte(FuseTicks)));
+		TNT->SetFuseTicks(a_NBT.GetByte(FuseTicks));
 	}
 
 	a_Entities.emplace_back(std::move(TNT));
