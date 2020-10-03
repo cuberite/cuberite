@@ -130,7 +130,7 @@ static BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // ParseArguments - Read the startup arguments and store into a settings object
 
-static cMemorySettingsRepository ParseArguments(int argc, char ** argv)
+static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & repo)
 {
 	// Parse the comand line args:
 	TCLAP::CmdLine cmd("Cuberite");
@@ -148,7 +148,6 @@ static cMemorySettingsRepository ParseArguments(int argc, char ** argv)
 	cmd.parse(argc, argv);
 
 	// Copy the parsed args' values into a settings repository:
-	cMemorySettingsRepository repo;
 	if (confArg.isSet())
 	{
 		AString conf_file = confArg.getValue();
@@ -200,8 +199,6 @@ static cMemorySettingsRepository ParseArguments(int argc, char ** argv)
 	{
 		g_MiniDumpWriter.AddDumpFlags(MiniDumpFlags::WithFullMemory);
 	}
-
-	return repo;
 }
 
 
@@ -234,7 +231,8 @@ static int UniversalMain(int argc, char * argv[], bool RunningAsService)
 	try
 	{
 		// Make sure g_RunAsService is set correctly before checking it's value
-		auto Settings = ParseArguments(argc, argv);
+		cMemorySettingsRepository Settings;
+		ParseArguments(argc, argv, Settings);
 
 		// Attempt to run as a service
 		if (!RunningAsService && g_RunAsService)

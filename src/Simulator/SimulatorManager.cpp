@@ -68,7 +68,7 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 		Item.first->WakeUp(a_Chunk, a_Position, a_Chunk.GetBlock(a_Position));
 	}
 
-	for (const auto Offset : cSimulator::AdjacentOffsets)
+	for (const auto & Offset : cSimulator::AdjacentOffsets)
 	{
 		auto Relative = a_Position + Offset;
 		if (!cChunkDef::IsValidHeight(Relative.y))

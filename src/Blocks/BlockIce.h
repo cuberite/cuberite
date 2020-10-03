@@ -59,7 +59,7 @@ private:
 			}
 		};
 
-		for (const auto Offset : Adjacents)
+		for (const auto & Offset : Adjacents)
 		{
 			auto Position = a_RelPos + Offset;
 			const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Position);

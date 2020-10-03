@@ -400,7 +400,7 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 			FLOGERROR(
 				"Tried to send disconnect in invalid game state {0}",
 				static_cast<int>(m_State)
-			 );
+			);
 		}
 	}
 }

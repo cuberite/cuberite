@@ -12,7 +12,7 @@ inline void UpdateAdjustedRelative(const cChunk & From, const cChunk & To, const
 {
 	DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + Offset));
 
-	for (const auto LinkedOffset : cSimulator::GetLinkedOffsets(Offset))
+	for (const auto & LinkedOffset : cSimulator::GetLinkedOffsets(Offset))
 	{
 		DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + LinkedOffset));
 	}
@@ -21,7 +21,7 @@ inline void UpdateAdjustedRelative(const cChunk & From, const cChunk & To, const
 template <typename ArrayType>
 inline void UpdateAdjustedRelatives(const cChunk & From, const cChunk & To, const Vector3i Position, const ArrayType & Relative)
 {
-	for (const auto Offset : Relative)
+	for (const auto & Offset : Relative)
 	{
 		UpdateAdjustedRelative(From, To, Position, Offset);
 	}
@@ -30,11 +30,17 @@ inline void UpdateAdjustedRelatives(const cChunk & From, const cChunk & To, cons
 template <typename ArrayType>
 inline void InvokeForAdjustedRelatives(ForEachSourceCallback & Callback, const Vector3i Position, const ArrayType & Relative)
 {
-	for (const auto Offset : Relative)
+	for (const auto & Offset : Relative)
 	{
 		Callback(Position + Offset);
 	}
 }
+
+// Warning shouldn't trigger for inline variables, this is fixed in clang 7
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
 
 inline constexpr Vector3i OffsetYP{ 0, 1, 0 };
 
@@ -61,3 +67,7 @@ inline constexpr std::array<Vector3i, 4> RelativeLaterals
 		{ 0, 0, -1 },
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
