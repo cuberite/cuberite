@@ -2746,6 +2746,33 @@ static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 
 
 
+static int tolua_cItem_EnchantByXPLevels(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cItem") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self;
+	int NumXPLevels;
+	L.GetStackValue(1, Self);
+	L.GetStackValue(2, NumXPLevels);
+
+	// Call:
+	L.Push(Self->EnchantByXPLevels(NumXPLevels, GetRandomProvider()));
+	return 1;
+}
+
+
+
+
+
 static int tolua_set_cItem_m_LoreTable(lua_State * tolua_S)
 {
 	// Check params:
@@ -4420,7 +4447,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItem");
-			tolua_variable(tolua_S, "m_LoreTable", tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
+			tolua_function(tolua_S, "EnchantByXPLevels", tolua_cItem_EnchantByXPLevels);
+			tolua_variable(tolua_S, "m_LoreTable",       tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");
