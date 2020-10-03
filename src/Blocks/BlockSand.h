@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockSandHandler :
+class cBlockSandHandler final :
 	public cBlockHandler
 {
 public:
@@ -27,7 +22,3 @@ private:
 		return 2;
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

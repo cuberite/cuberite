@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockLilypadHandler:
+class cBlockLilypadHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
@@ -49,10 +44,6 @@ private:
 		);
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

@@ -21,11 +21,6 @@ class cItems;
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 class cBlockHandler
 {
 public:
@@ -246,9 +241,7 @@ public:
 
 protected:
 
-	BLOCKTYPE m_BlockType;
-};
+	~cBlockHandler() = default;
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+	const BLOCKTYPE m_BlockType;
+};

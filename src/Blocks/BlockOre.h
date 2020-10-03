@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockOreHandler:
+class cBlockOreHandler :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -20,6 +15,10 @@ class cBlockOreHandler:
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockOreHandler() = default;
 
 private:
 
@@ -126,10 +125,14 @@ private:
 	}
 } ;
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
 
+class cPlainOldOreHandler final :
+	public cBlockOreHandler
+{
+public:
+
+	using cBlockOreHandler::cBlockOreHandler;
+};

@@ -6,12 +6,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockSlimeHandler:
+class cBlockSlimeHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 public:
@@ -26,7 +21,3 @@ private:
 		return 1;
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

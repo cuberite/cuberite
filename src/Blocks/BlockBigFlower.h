@@ -9,12 +9,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockBigFlowerHandler:
+class cBlockBigFlowerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -152,7 +147,3 @@ private:
 		return 7;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

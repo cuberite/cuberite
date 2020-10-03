@@ -8,19 +8,19 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 
-class cBlockTorchHandler:
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>
+class cBlockStaveHandler :
+	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>;
+	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
 
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockStaveHandler() = default;
 
 private:
 
@@ -216,10 +216,44 @@ private:
 	}
 } ;
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
 
+class cBlockTorchHandler final :
+	public cClearMetaOnDrop<cBlockStaveHandler>
+{
+	using Super = cClearMetaOnDrop<cBlockStaveHandler>;
+
+public:
+
+	using Super::Super;
+};
+
+
+
+
+
+class cBlockRedstoneTorchHandler final :
+	public cBlockStaveHandler
+{
+	using Super = cBlockStaveHandler;
+
+public:
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		// Always drop the ON torch, meta 0:
+		return { E_BLOCK_REDSTONE_TORCH_ON };
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 0;
+	}
+};

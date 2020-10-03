@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockRedstoneLampHandler:
+class cBlockRedstoneLampHandler final :
 	public cBlockHandler
 {
 public:
@@ -37,10 +32,6 @@ private:
 		return 15;
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockTripwireHandler :
+class cBlockTripwireHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -38,10 +33,6 @@ private:
 		return 0;
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

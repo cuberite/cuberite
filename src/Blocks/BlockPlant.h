@@ -6,15 +6,10 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 /** Base class for plants that use light values to decide whether to grow or not.
 On block update, the plant decides whether to grow, die or stay as-is, based on the CanGrow() overridable method result. */
 template <bool NeedsLightToGrow>
-class cBlockPlant:
+class cBlockPlant :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -23,38 +18,9 @@ public:
 
 	using Super::Super;
 
-private:
-
-	virtual void OnUpdate(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cBlockPluginInterface & a_PluginInterface,
-		cChunk & a_Chunk,
-		const Vector3i a_RelPos
-	) const override
-	{
-		auto Action = CanGrow(a_Chunk, a_RelPos);
-		switch (Action)
-		{
-			case paGrowth:
-			{
-				Grow(a_Chunk, a_RelPos);
-				break;
-			}
-			case paDeath:
-			{
-				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), E_BLOCK_AIR, 0);
-				break;
-			}
-			case paStay: break;  // do nothing
-		}
-	}
-
-
-
-
-
 protected:
+
+	~cBlockPlant() = default;
 
 	/** The action the plant can take on an update. */
 	enum PlantAction
@@ -63,10 +29,6 @@ protected:
 		paGrowth,
 		paStay
 	};
-
-
-
-
 
 	/** Checks whether there is enough light for the plant to grow.
 	If the plant doesn't require light to grow, then it returns paGrowth.
@@ -172,8 +134,31 @@ protected:
 		}
 		return FloorC(24.0f / Chance) + 1;
 	}
-};
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+private:
+
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
+	{
+		auto Action = CanGrow(a_Chunk, a_RelPos);
+		switch (Action)
+		{
+			case paGrowth:
+			{
+				Grow(a_Chunk, a_RelPos);
+				break;
+			}
+			case paDeath:
+			{
+				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), E_BLOCK_AIR, 0);
+				break;
+			}
+			case paStay: break;  // do nothing
+		}
+	}
+};

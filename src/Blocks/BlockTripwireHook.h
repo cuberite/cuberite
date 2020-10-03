@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockTripwireHookHandler :
+class cBlockTripwireHookHandler final :
 	public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>;
@@ -107,10 +102,6 @@ private:
 		return 0;
 	}
 };
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

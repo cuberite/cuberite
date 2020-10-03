@@ -9,12 +9,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockWorkbenchHandler:
+class cBlockWorkbenchHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -60,10 +55,6 @@ private:
 		return 13;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

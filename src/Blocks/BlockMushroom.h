@@ -7,13 +7,8 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 /** Handler for the small (singleblock) mushrooms. */
-class cBlockMushroomHandler:
+class cBlockMushroomHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
@@ -60,10 +55,6 @@ private:
 		return 0;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

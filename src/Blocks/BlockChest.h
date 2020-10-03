@@ -9,12 +9,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockChestHandler :
+class cBlockChestHandler final :
 	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
 	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
@@ -208,11 +203,6 @@ private:
 		return 13;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
-
 
 
 

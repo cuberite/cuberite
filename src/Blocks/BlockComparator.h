@@ -9,12 +9,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockComparatorHandler :
+class cBlockComparatorHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
@@ -202,10 +197,6 @@ private:
 		return 11;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

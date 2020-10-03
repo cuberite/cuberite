@@ -9,14 +9,9 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 /** Wrapper for blocks that have a cBlockEntity descendant attached to them and can be "used" by the player.
 Forwards the "use" event to the block entity. */
-class cBlockEntityHandler:
+class cBlockEntityHandler :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -24,6 +19,10 @@ class cBlockEntityHandler:
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockEntityHandler() = default;
 
 private:
 
@@ -39,16 +38,20 @@ private:
 		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}
 
-
-
-
-
 	virtual bool IsUseable() const override
 	{
 		return true;
 	}
 };
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+
+
+
+
+class cPlainOldBlockEntityHandler final :
+	public cBlockEntityHandler
+{
+public:
+
+	using cBlockEntityHandler::cBlockEntityHandler;
+};

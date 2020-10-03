@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockCactusHandler :
+class cBlockCactusHandler final :
 	public cClearMetaOnDrop<cBlockPlant<false>>
 {
 	using Super = cClearMetaOnDrop<cBlockPlant<false>>;
@@ -189,10 +184,6 @@ private:
 		return paStay;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

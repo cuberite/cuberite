@@ -7,15 +7,10 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 /** Handler for blocks that have 3 orientations (hay bale, log), specified by the upper 2 bits in meta.
 Handles setting the correct orientation on placement.
 Additionally supports the metadata specifying block sub-type in its lower 2 bits. */
-class cBlockSidewaysHandler:
+class cBlockSidewaysHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -86,10 +81,6 @@ private:
 		UNREACHABLE("Unsupported block face");
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 

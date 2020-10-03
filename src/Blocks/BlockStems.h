@@ -7,16 +7,11 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
 /** Handler for stems from which produce grows in an adjacent block (melon, pumpkin) after it becomes ripe (meta == 7).
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
 template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
-class cBlockStemsHandler:
+class cBlockStemsHandler final :
 	public cBlockPlant<true>
 {
 	using Super = cBlockPlant<true>;
@@ -158,10 +153,6 @@ private:
 		return false;
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 using cBlockMelonStemHandler   = cBlockStemsHandler<E_BLOCK_MELON,   E_ITEM_MELON_SEEDS>;
 using cBlockPumpkinStemHandler = cBlockStemsHandler<E_BLOCK_PUMPKIN, E_ITEM_PUMPKIN_SEEDS>;

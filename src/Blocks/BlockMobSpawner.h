@@ -8,12 +8,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockMobSpawnerHandler:
+class cBlockMobSpawnerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -77,7 +72,3 @@ private:
 		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
 	}
 } ;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif

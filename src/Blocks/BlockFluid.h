@@ -7,12 +7,7 @@
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-
-class cBlockFluidHandler:
+class cBlockFluidHandler :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -20,6 +15,10 @@ class cBlockFluidHandler:
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockFluidHandler() = default;
 
 private:
 
@@ -37,44 +36,13 @@ private:
 	{
 		return true;
 	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_Meta);
-		if (IsBlockWater(m_BlockType))
-		{
-			return 12;
-		}
-		ASSERT(!"Unhandled blocktype in fluid/water handler!");
-		return 0;
-	}
-
-
-
-
-
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
-	{
-		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
-		);
-	}
 } ;
 
 
 
 
 
-class cBlockLavaHandler:
+class cBlockLavaHandler final :
 	public cBlockFluidHandler
 {
 	using Super = cBlockFluidHandler;
@@ -175,10 +143,39 @@ private:
 	}
 } ;
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
 
+class cBlockWaterHandler final :
+	public cBlockFluidHandler
+{
+public:
+
+	using cBlockFluidHandler::cBlockFluidHandler;
+
+private:
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		if (IsBlockWater(m_BlockType))
+		{
+			return 12;
+		}
+		ASSERT(!"Unhandled blocktype in fluid/water handler!");
+		return 0;
+	}
+
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	{
+		return (
+			(a_Plant == E_BLOCK_BEETROOTS) ||
+			(a_Plant == E_BLOCK_CROPS) ||
+			(a_Plant == E_BLOCK_CARROTS) ||
+			(a_Plant == E_BLOCK_POTATOES) ||
+			(a_Plant == E_BLOCK_MELON_STEM) ||
+			(a_Plant == E_BLOCK_PUMPKIN_STEM)
+		);
+	}
+};
