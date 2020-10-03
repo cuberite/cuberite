@@ -250,6 +250,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 
 
 
+
 void cMobSpawnerEntity::SetSpawnRange(short a_SpawnRange)
 {
 	m_SpawnRange = std::min(a_SpawnRange, short(20));
