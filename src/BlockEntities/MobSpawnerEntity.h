@@ -95,6 +95,8 @@ private:
 	/** Maximum distance to player for activation */
 	short m_RequiredPlayerRange = 16;
 
+	/** The bounding boxes used to look for entities around the spawner.
+	Updated on updating m_RequiredPlayerRange or m_SpawnRange. */
 	cBoundingBox m_PlayerBoundingBox;
 	cBoundingBox m_EntityBoundingBox;
 
