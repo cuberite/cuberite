@@ -1379,7 +1379,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number",
 				},
-				Notes = "Returns the diameter of the square the spawner tries to spawn entities in.",
+				Notes = "Returns the shortest radius of the square the spawner tries to spawn entities in.",
 			},
 			GetSpawnDelay =
 			{
@@ -1397,7 +1397,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number",
 				},
-				Notes = "Returns the minimum number of ticks the spawner waits until spawning new entities.",
+				Notes = "Returns the minimum number of ticks the spawner waits until spawning new entities automatically.",
 			},
 			GetMaxSpawnDelay =
 			{
@@ -1405,7 +1405,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number",
 				},
-				Notes = "Returns the maximum number of ticks the spawner waits until spawning new entities.",
+				Notes = "Returns the maximum number of ticks the spawner waits until spawning new entities automatically.",
 			},
 			GetMaxNearbyEntities =
 			{
@@ -1413,7 +1413,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number",
 				},
-				Notes = "Returns the number of entities of the same type that stop the spawner from spawning more entities.",
+				Notes = "Returns the maximum number of entities of the same type that can be present before the spawner cannot spawn more entities.",
 			},
 			GetRequiredPlayerRange =
 			{
@@ -1421,7 +1421,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number"
 				},
-				Notes = "Returns the maximum activation range for the mob spawner",
+				Notes = "Returns the maximum euclidean distance from a player where the spawner can be activated.",
 			},
 			ResetTimer =
 			{
@@ -1480,7 +1480,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Sets the minimum amount of ticks the spawner will way before spawning new entities.",
+				Notes = "Sets the minimum amount of ticks the spawner will wait before spawning new entities.",
 			},
 			SetMaxSpawnDelay =
 			{
@@ -1491,7 +1491,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Sets the maximum amount of ticks the spawner will way before spawning new entities.",
+				Notes = "Sets the maximum amount of ticks the spawner will wait before spawning new entities.",
 			},
 			SetMaxNearbyEntities =
 			{
@@ -1513,11 +1513,11 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Sets the maximum amount of blocks the spawner looks for a player during activation check.",
+				Notes = "Sets the maximum euclidean distance from a player where the spawner can be activated.",
 			},
 			SpawnEntity =
 			{
-				Notes = "Spawns the entity. This function automatically change the spawn delay int the gives limits!",
+				Notes = "Spawns the entity. NOTE: This function resets the delay before the next automatic activation of the spawner.",
 			},
 			UpdateActiveState =
 			{
