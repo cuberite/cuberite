@@ -151,9 +151,9 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 				auto SpawnRelPos(GetRelPos());
 				SpawnRelPos += Vector3i(
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * (float) m_SpawnRange),
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange)),
 					Random.RandInt(-1, 1),
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * (float) m_SpawnRange)
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange))
 				);
 
 				auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(SpawnRelPos);

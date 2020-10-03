@@ -1379,7 +1379,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				{
 					Type = "number",
 				},
-				Notes = "Returns the shortest radius of the square the spawner tries to spawn entities in.",
+				Notes = "Returns half the length of the square the spawner tries to spawn entities in.",
 			},
 			GetSpawnDelay =
 			{
@@ -1469,7 +1469,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Sets the diameter of the square the spawner will try to spawn entities in.",
+				Notes = "Sets half the length of the square the spawner will try to spawn entities in.",
 			},
 			SetMinSpawnDelay =
 			{
