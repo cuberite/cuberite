@@ -17,9 +17,7 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
-	m_IsActive(false),
-	m_EntityBoundingBox({(float) a_Pos.x, (float) a_Pos.y - 4,                     (float) a_Pos.z}, m_SpawnRange, 8),
-	m_PlayerBoundingBox({(float) a_Pos.x, (float) a_Pos.y - m_RequiredPlayerRange, (float) a_Pos.z}, m_RequiredPlayerRange, m_RequiredPlayerRange * 2)
+	m_IsActive(false)
 {
 	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
 }
@@ -214,7 +212,9 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 		return false;
 	};
 
-	m_World->ForEachEntityInBox(m_PlayerBoundingBox, Callback);
+	auto PlayerBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
+
+	m_World->ForEachEntityInBox(PlayerBoundingBox, Callback);
 
 	return NumPlayers;
 }
@@ -242,29 +242,11 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 		return false;
 	};
 
-	m_World->ForEachEntityInBox(m_EntityBoundingBox, Callback);
+	auto EntityBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
+
+	m_World->ForEachEntityInBox(EntityBoundingBox, Callback);
 
 	return NumEntities;
-}
-
-
-
-
-
-void cMobSpawnerEntity::SetSpawnRange(short a_SpawnRange)
-{
-	m_SpawnRange = std::min(a_SpawnRange, short(20));
-	m_EntityBoundingBox = cBoundingBox({(float) m_Pos.x, (float) m_Pos.y - 4, (float) m_Pos.z}, m_RequiredPlayerRange, 8);
-}
-
-
-
-
-
-void cMobSpawnerEntity::SetRequiredPlayerRange(short a_RequiredPlayerRange)
-{
-	m_RequiredPlayerRange = a_RequiredPlayerRange;
-	m_PlayerBoundingBox = cBoundingBox({(float) m_Pos.x, (float) m_Pos.y - m_RequiredPlayerRange, (float) m_Pos.z}, m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
 }
 
 

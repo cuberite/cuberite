@@ -62,11 +62,11 @@ public:  // tolua_export
 	void SetEntity(eMonsterType a_EntityType)                { m_Entity = a_EntityType; }
 	void SetSpawnDelay(short a_Delay)                        { m_SpawnDelay = a_Delay; }
 	void SetSpawnCount(short a_SpawnCount)                   { m_SpawnCount = a_SpawnCount; }
-	void SetSpawnRange(short a_SpawnRange);
+	void SetSpawnRange(short a_SpawnRange)                   { m_SpawnRange = a_SpawnRange; }
 	void SetMinSpawnDelay(short a_Min)                       { m_MinSpawnDelay = a_Min; }
 	void SetMaxSpawnDelay(short a_Max)                       { m_MaxSpawnDelay = a_Max; }
 	void SetMaxNearbyEntities(short a_MaxNearbyEntities)     { m_MaxNearbyEntities = a_MaxNearbyEntities; }
-	void SetRequiredPlayerRange(short a_RequiredPlayerRange);
+	void SetRequiredPlayerRange(short a_RequiredPlayerRange) { m_RequiredPlayerRange = a_RequiredPlayerRange; }
 
 	// tolua_end
 
@@ -94,11 +94,6 @@ private:
 
 	/** Maximum distance to player for activation */
 	short m_RequiredPlayerRange = 16;
-
-	/** The bounding boxes used to look for entities around the spawner.
-	Updated on updating m_RequiredPlayerRange or m_SpawnRange. */
-	cBoundingBox m_PlayerBoundingBox;
-	cBoundingBox m_EntityBoundingBox;
 
 } ;  // tolua_end
 
