@@ -22,7 +22,7 @@
 #include "PathFinder.h"
 #include "../Entities/LeashKnot.h"
 
-
+const int TPS = 20;
 
 
 
@@ -111,7 +111,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1)
 	, m_Age(1)
-	, m_AgingTimer(20 * 60 * 20)  // about 20 minutes
+	, m_AgingTimer(TPS * 60 * 20)  // about 20 minutes
 	, m_WasLastTargetAPlayer(false)
 	, m_LeashedTo(nullptr)
 	, m_LeashToPos(nullptr)
@@ -906,7 +906,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::ResetAttackCooldown()
 {
-	m_AttackCoolDownTicksLeft = static_cast<int>(20 * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every second
+	m_AttackCoolDownTicksLeft = static_cast<int>(TPS * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every second
 }
 
 
@@ -1273,7 +1273,7 @@ void cMonster::ResetLoveMode()
 	m_LovePartner = nullptr;
 	m_LoveTimer = 0;
 	m_MatingTimer = 0;
-	m_LoveCooldown = 20 * 60 * 5;  // 5 minutes
+	m_LoveCooldown = TPS * 60 * 5;  // 5 minutes
 
 	// when an animal is in love mode, the client only stops sending the hearts if we let them know it's in cooldown, which is done with the "age" metadata
 	m_World->BroadcastEntityMetadata(*this);
@@ -1419,7 +1419,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 			{
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
-			m_LoveTimer = 20 * 30;  // half a minute
+			m_LoveTimer = TPS * 30;  // half a minute
 			m_World->BroadcastEntityStatus(*this, esMobInLove);
 		}
 	}

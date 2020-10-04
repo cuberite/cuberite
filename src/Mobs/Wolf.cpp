@@ -229,7 +229,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				{
 					if (IsBaby())
 					{
-						m_Age = m_Age * 0.9;
+						m_AgingTimer = m_AgingTimer * 0.9;
 					}
 				}
 				break;
@@ -246,7 +246,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				}
 				break;
 			}
-			// multiplication is handeled in cMonster. Just prevents from sitting down.
+			// multiplication is handheld in cMonster. Just prevents from sitting down.
 			case E_ITEM_SPAWN_EGG:
 			{
 				break;
