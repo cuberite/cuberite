@@ -244,7 +244,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	UInt32 ProtocolVersion;
 	AString ServerAddress;
 	UInt16 ServerPort;
-	cProtocol::State NextState;
+	UInt32 NextStateValue;
 
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
@@ -262,13 +262,29 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		!m_Buffer.ReadVarInt(ProtocolVersion) ||
 		!m_Buffer.ReadVarUTF8String(ServerAddress) ||
 		!m_Buffer.ReadBEUInt16(ServerPort) ||
-		!m_Buffer.ReadVarInt(NextState)
+		!m_Buffer.ReadVarInt(NextStateValue)
 	)
 	{
 		// TryRecognizeProtocol guarantees that we will have as much
 		// data to read as the client claims in the protocol length field:
 		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
+
+	cProtocol::State NextState = [&]
+		{
+			switch (NextStateValue)
+			{
+				case cProtocol::State::Status: return cProtocol::State::Status;
+				case cProtocol::State::Login: return cProtocol::State::Login;
+				case cProtocol::State::Game: return cProtocol::State::Game;
+				default:
+				{
+					throw TriedToJoinWithUnsupportedProtocolException(
+						fmt::format("Invalid next game state: {}", NextStateValue)
+					);
+				}
+			}
+		}();
 
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);

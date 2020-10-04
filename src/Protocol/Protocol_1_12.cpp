@@ -1082,12 +1082,6 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			}
 			break;
 		}
-		case State::Invalid:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
-		}
 	}  // switch (m_State)
 
 	// Unknown packet type, report to the ClientHandle:
@@ -1217,12 +1211,6 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x20: HandlePacketUseItem(a_ByteBuffer); return true;
 			}
 			break;
-		}
-		case State::Invalid:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
