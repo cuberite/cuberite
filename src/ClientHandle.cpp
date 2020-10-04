@@ -1407,7 +1407,8 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	else
 	{
-		World->DigBlock(absPos);
+		// Using the chunk maps DigBlock function to prevent calling BreakBlock and OnPlayerBrokeBlock simultaneously
+		World->GetChunkMap()->DigBlock(absPos);
 	}
 
 	// Damage the tool, but not for 0 hardness blocks:
