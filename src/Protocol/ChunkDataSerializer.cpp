@@ -515,7 +515,7 @@ inline void cChunkDataSerializer::WriteSectionDataSeamless(const cChunkData::sCh
 		Buffer |= Value << BitIndex;
 
 		// The _signed_ count of bits in Value left to write
-		if (BitIndex + a_BitsPerEntry < 64)
+		if (BitIndex + a_BitsPerEntry >= 64)
 		{
 			// There were some bits remaining: we've filled the buffer. Flush it:
 			m_Packet.WriteBEUInt64(Buffer);
