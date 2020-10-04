@@ -41,10 +41,6 @@ protected:
 	NOISE_DATATYPE m_FrequencyY;
 	NOISE_DATATYPE m_FrequencyZ;
 
-	// Minimum and maximum chunk coords for chunks inside the island area. Chunks outside won't get calculated at all
-	int m_MinChunkX, m_MaxChunkX;
-	int m_MinChunkZ, m_MaxChunkZ;
-
 	// Noise array for the last chunk (in the noise range)
 	cChunkCoords m_LastChunkCoords;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
@@ -55,10 +51,6 @@ protected:
 
 	/** Generates the m_NoiseArray array for the current chunk */
 	void GenerateNoiseArray(void);
-
-	/** Returns true if the chunk is outside of the island's dimensions */
-	bool IsChunkOutsideRange(cChunkCoords a_ChunkCoords);
-
 
 	// cTerrainShapeGen overrides:
 	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
