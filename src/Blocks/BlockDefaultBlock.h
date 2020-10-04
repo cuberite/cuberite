@@ -5,7 +5,7 @@
 
 
 
-class cPlainOldBlockHandler final :
+class cDefaultBlockHandler final :
 	public cBlockHandler
 {
 public:

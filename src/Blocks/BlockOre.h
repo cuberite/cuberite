@@ -129,7 +129,7 @@ private:
 
 
 
-class cPlainOldOreHandler final :
+class cDefaultOreHandler final :
 	public cBlockOreHandler
 {
 public:

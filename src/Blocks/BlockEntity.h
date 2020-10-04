@@ -48,7 +48,7 @@ private:
 
 
 
-class cPlainOldBlockEntityHandler final :
+class cDefaultBlockEntityHandler final :
 	public cBlockEntityHandler
 {
 public:

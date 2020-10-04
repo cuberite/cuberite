@@ -9,7 +9,7 @@
 
 
 
-class cBlockStaveHandler :
+class cBlockTorchBaseHandler :
 	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
 	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
@@ -20,7 +20,7 @@ public:
 
 protected:
 
-	~cBlockStaveHandler() = default;
+	~cBlockTorchBaseHandler() = default;
 
 private:
 
@@ -221,9 +221,9 @@ private:
 
 
 class cBlockTorchHandler final :
-	public cClearMetaOnDrop<cBlockStaveHandler>
+	public cClearMetaOnDrop<cBlockTorchBaseHandler>
 {
-	using Super = cClearMetaOnDrop<cBlockStaveHandler>;
+	using Super = cClearMetaOnDrop<cBlockTorchBaseHandler>;
 
 public:
 
@@ -235,9 +235,9 @@ public:
 
 
 class cBlockRedstoneTorchHandler final :
-	public cBlockStaveHandler
+	public cBlockTorchBaseHandler
 {
-	using Super = cBlockStaveHandler;
+	using Super = cBlockTorchBaseHandler;
 
 public:
 

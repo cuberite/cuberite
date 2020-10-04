@@ -27,12 +27,13 @@ target_sources(
 	BlockConcretePowder.h
 	BlockCrops.h
 	BlockDeadBush.h
+	BlockDefaultBlock.h
 	BlockDirt.h
 	BlockDoor.h
 	BlockDropSpenser.h
 	BlockEnchantingTable.h
-	BlockEndPortalFrame.h
 	BlockEnderchest.h
+	BlockEndPortalFrame.h
 	BlockEntity.h
 	BlockFarmland.h
 	BlockFence.h
@@ -60,13 +61,12 @@ target_sources(
 	BlockMobSpawner.h
 	BlockMushroom.h
 	BlockMycelium.h
-	BlockNetherWart.h
 	BlockNetherrack.h
+	BlockNetherWart.h
 	BlockObserver.h
 	BlockOre.h
 	BlockPackedIce.h
 	BlockPiston.h
-	BlockPlainOldBlock.h
 	BlockPlanks.h
 	BlockPlant.h
 	BlockPluginInterface.h

@@ -24,8 +24,8 @@ private:
 	/** Calculate the number of seeds to drop when the crop is broken. */
 	static char CalculateSeedCount(char a_Min, char a_BaseRolls, unsigned char a_FortuneLevel)
 	{
-		std::binomial_distribution Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
-		return a_Min + static_cast<char>(Binomial(GetRandomProvider().Engine()));
+		std::binomial_distribution<> Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
+		return static_cast<char>(a_Min + Binomial(GetRandomProvider().Engine()));
 	}
 
 

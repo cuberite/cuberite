@@ -9,6 +9,7 @@ Implements the 1.8 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_8.h"
+#include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
@@ -86,13 +87,6 @@ Implements the 1.8 protocol classes:
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
 static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
-
-
-
-
-
-// fwd: main.cpp:
-extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 
 
