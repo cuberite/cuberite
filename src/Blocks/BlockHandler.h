@@ -75,6 +75,7 @@ public:
 
 	/** Called just after the player breaks the block.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
+	When you want the same behaviour on natural breaking and on player breaking you have to do add a call to OnBroken manually.
 	By default does nothing special, descendants may provide further behavior. */
 	virtual void OnPlayerBrokeBlock(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,

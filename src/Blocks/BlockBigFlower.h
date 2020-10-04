@@ -141,6 +141,20 @@ private:
 
 
 
+	virtual void OnPlayerBrokeBlock(
+			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+			cPlayer & a_Player,
+			Vector3i a_BlockPos,
+			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	) const override
+	{
+		OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
+	}
+
+
+
+
+
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);

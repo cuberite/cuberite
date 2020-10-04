@@ -159,5 +159,10 @@ public:
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) const override;
 
+	void OnPlayerBrokeBlock(
+			cChunkInterface &a_ChunkInterface, cWorldInterface &a_WorldInterface,
+			cPlayer &a_Player, Vector3i a_BlockPos,
+			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) const override;
+
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
 } ;

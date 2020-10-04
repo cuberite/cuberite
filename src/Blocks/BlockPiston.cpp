@@ -339,6 +339,20 @@ void cBlockPistonHeadHandler::OnBroken(
 
 
 
+void cBlockPistonHeadHandler::OnPlayerBrokeBlock(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+) const
+{
+	OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
+}
+
+
+
+
+
 cItems cBlockPistonHeadHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
 	// Give a normal\sticky piston base, not piston extension
