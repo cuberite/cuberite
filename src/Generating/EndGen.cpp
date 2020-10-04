@@ -40,10 +40,6 @@ cEndGen::cEndGen(int a_Seed) :
 	m_FrequencyX(80),
 	m_FrequencyY(80),
 	m_FrequencyZ(80),
-	m_MinChunkX(0),
-	m_MaxChunkX(0),
-	m_MinChunkZ(0),
-	m_MaxChunkZ(0),
 	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Use dummy coords that won't ever be used by real chunks
 {
 	m_Perlin.AddOctave(1, 1);
@@ -64,12 +60,6 @@ void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
 	m_FrequencyX = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyX", m_FrequencyX));
 	m_FrequencyY = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyY", m_FrequencyY));
 	m_FrequencyZ = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyZ", m_FrequencyZ));
-
-	// Recalculate the min and max chunk coords of the island
-	m_MaxChunkX = (m_IslandSizeX + cChunkDef::Width - 1) / cChunkDef::Width;
-	m_MinChunkX = -m_MaxChunkX;
-	m_MaxChunkZ = (m_IslandSizeZ + cChunkDef::Width - 1) / cChunkDef::Width;
-	m_MinChunkZ = -m_MaxChunkZ;
 }
 
 
@@ -78,8 +68,6 @@ void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
 
 void cEndGen::PrepareState(cChunkCoords a_ChunkCoords)
 {
-	ASSERT(!IsChunkOutsideRange(a_ChunkCoords));  // Should be filtered before calling this function
-
 	if (m_LastChunkCoords == a_ChunkCoords)
 	{
 		return;
@@ -136,30 +124,8 @@ void cEndGen::GenerateNoiseArray(void)
 
 
 
-bool cEndGen::IsChunkOutsideRange(cChunkCoords a_ChunkCoords)
-{
-	return (
-		(a_ChunkCoords.m_ChunkX < m_MinChunkX) || (a_ChunkCoords.m_ChunkX > m_MaxChunkX) ||
-		(a_ChunkCoords.m_ChunkZ < m_MinChunkZ) || (a_ChunkCoords.m_ChunkZ > m_MaxChunkZ)
-	);
-}
-
-
-
-
-
 void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
-	// If the chunk is outside out range, fill the shape with zeroes:
-	if (IsChunkOutsideRange(a_ChunkCoords))
-	{
-		for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
-		{
-			a_Shape[i] = 0;
-		}
-		return;
-	}
-
 	PrepareState(a_ChunkCoords);
 
 	int MaxY = std::min(static_cast<int>(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
@@ -169,11 +135,11 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 		{
 			for (int y = 0; y < MaxY; y++)
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = (m_NoiseArray[y * 17 * 17 + z * 17 + z] > 0) ? 1 : 0;
+				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= 0) ? 1 : 0;
 			}
 			for (int y = MaxY; y < cChunkDef::Height; y++)
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = 0;
+				a_Shape[y + x * 256 + z * 256 * 16] = 0;
 			}
 		}  // for x
 	}  // for z
