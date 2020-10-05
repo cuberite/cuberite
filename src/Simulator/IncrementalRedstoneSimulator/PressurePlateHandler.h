@@ -12,7 +12,7 @@ namespace PressurePlateHandler
 {
 	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
-		Int64 NumberOfEntities = 0;
+		size_t NumberOfEntities = 0;
 		bool FoundPlayer = false;
 
 		Chunk.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [&](cEntity & Entity)
@@ -24,7 +24,8 @@ namespace PressurePlateHandler
 
 			if (Entity.IsPickup())
 			{
-				NumberOfEntities += static_cast<cPickup &>(Entity).GetItem().m_ItemCount;
+				const auto & Pickup = static_cast<cPickup &>(Entity);
+				NumberOfEntities += static_cast<size_t>(Pickup.GetItem().m_ItemCount);
 				return false;
 			}
 			NumberOfEntities++;
@@ -35,11 +36,11 @@ namespace PressurePlateHandler
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			{
-				return (FoundPlayer ? 15 : 0);
+				return FoundPlayer ? 15 : 0;
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			{
-				return (NumberOfEntities > 0 ? 15 : 0);
+				return (NumberOfEntities != 0) ? 15 : 0;
 			}
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{

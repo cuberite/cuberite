@@ -489,9 +489,20 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
-template <class T> inline T Diff(T a_Val1, T a_Val2)
+template <class T, typename = std::enable_if_t<!std::is_integral_v<T>>>
+inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
+}
+
+
+
+
+
+template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>
+inline auto Diff(T a_Val1, T a_Val2)
+{
+	return static_cast<std::make_unsigned_t<T>>(std::abs(a_Val1 - a_Val2));
 }
 
 

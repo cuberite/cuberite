@@ -316,9 +316,7 @@ void cProtocol_1_13::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
-	m_Client->HandleBeaconSelection(
-		static_cast<int>(Effect1), static_cast<int>(Effect2)
-	);
+	m_Client->HandleBeaconSelection(Effect1, Effect2);
 }
 
 
