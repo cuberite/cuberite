@@ -67,7 +67,7 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 ////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
+cClientHandle::cClientHandle(const AString & a_IPString, unsigned a_ViewDistance) :
 	m_LastSentDimension(dimNotSet),
 	m_ForgeHandshake(this),
 	m_CurrentViewDistance(a_ViewDistance),
@@ -473,7 +473,7 @@ bool cClientHandle::StreamNextChunk(void)
 	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
-	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
+	for (unsigned Range = 0; Range < m_CurrentViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
@@ -513,8 +513,10 @@ bool cClientHandle::StreamNextChunk(void)
 	}
 
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
-	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
+	for (unsigned Range = 0; Range <= m_CurrentViewDistance; ++Range)  // cycle through (square) distance, from nearest to furthest
 	{
+		const int d = static_cast<int>(Range);
+
 		// For each distance add chunks in a hollow square centered around current position:
 		cChunkCoordsList CurcleChunks;
 		for (int i = -d; i <= d; ++i)
@@ -569,8 +571,8 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		cCSLock Lock(m_CSChunkLists);
 		for (auto itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
 		{
-			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
-			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			const auto DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			const auto DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
 			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				ChunksToRemove.push_back(*itr);
@@ -584,8 +586,8 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 
 		for (auto itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
-			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
-			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			const auto DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			const auto DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
 			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
@@ -808,8 +810,8 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 			// The experience to add to get the same fill percent.
 			const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
 
-			// Apply the experience delta:
-			m_Player->DeltaExperience(FloorC(DeltaForLevel + DeltaForPercent));
+			// Apply the experience delta, rounded for greater accuracy:
+			m_Player->DeltaExperience(static_cast<int>(std::lround(DeltaForLevel + DeltaForPercent)));
 
 			// Now reduce the lapis in our stack and send it back:
 			LapisStack.AddCount(static_cast<char>(-LapisRequired));
@@ -1002,7 +1004,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect)
+void cClientHandle::HandleBeaconSelection(unsigned a_PrimaryEffect, unsigned a_SecondaryEffect)
 {
 	cWindow * Window = m_Player->GetWindow();
 	if ((Window == nullptr) || (Window->GetWindowType() != cWindow::wtBeacon))
@@ -1017,12 +1019,12 @@ void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEf
 	}
 
 	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
-	if ((a_PrimaryEffect >= 0) && (a_PrimaryEffect <= static_cast<int>(cEntityEffect::effSaturation)))
+	if (a_PrimaryEffect <= static_cast<int>(cEntityEffect::effSaturation))
 	{
 		PrimaryEffect = static_cast<cEntityEffect::eType>(a_PrimaryEffect);
 	}
 	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
-	if ((a_SecondaryEffect >= 0) && (a_SecondaryEffect <= static_cast<int>(cEntityEffect::effSaturation)))
+	if (a_SecondaryEffect <= static_cast<int>(cEntityEffect::effSaturation))
 	{
 		SecondaryEffect = static_cast<cEntityEffect::eType>(a_SecondaryEffect);
 	}
@@ -3261,7 +3263,7 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
-void cClientHandle::SetUsername( const AString & a_Username)
+void cClientHandle::SetUsername(const AString & a_Username)
 {
 	m_Username = a_Username;
 }
@@ -3270,15 +3272,15 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 
 
-void cClientHandle::SetViewDistance(int a_ViewDistance)
+void cClientHandle::SetViewDistance(unsigned a_ViewDistance)
 {
 	m_RequestedViewDistance = a_ViewDistance;
 	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);
 
-	// Set the current view distance based on the requested VD and world max VD:
 	cWorld * world = m_Player->GetWorld();
 	if (world != nullptr)
 	{
+		// Set the current view distance based on the requested VD and world max VD:
 		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
 	}
 }

@@ -2760,7 +2760,7 @@ static int tolua_cItem_EnchantByXPLevels(lua_State * tolua_S)
 
 	// Get the params:
 	cItem * Self;
-	int NumXPLevels;
+	unsigned NumXPLevels;
 	L.GetStackValue(1, Self);
 	L.GetStackValue(2, NumXPLevels);
 

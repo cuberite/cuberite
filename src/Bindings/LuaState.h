@@ -665,10 +665,9 @@ public:
 	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
-	template <class T>
-	bool GetStackValue(int a_StackPos, T & a_ReturnedVal, typename std::enable_if<std::is_integral<T>::value>::type * unused = nullptr)
+	template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>
+	bool GetStackValue(int a_StackPos, T & a_ReturnedVal)
 	{
-		UNUSED(unused);
 		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
 		{
 			return false;

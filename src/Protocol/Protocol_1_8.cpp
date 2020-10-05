@@ -1719,7 +1719,7 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Prop
 
 bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
-	const auto UncompressedSize = static_cast<size_t>(a_Packet.size());
+	const auto UncompressedSize = a_Packet.size();
 
 	if (UncompressedSize < CompressionThreshold)
 	{
@@ -1734,8 +1734,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		----------------------------------------------
 		*/
 		const UInt32 DataSize = 0;
-		const auto PacketSize = static_cast<UInt32>(
-			cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
+		const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
 
 		cByteBuffer LengthHeaderBuffer(
 			cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1787,8 +1786,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	}
 
 	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
-	const auto PacketSize = static_cast<UInt32>(
-		cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
+	const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
 
 	cByteBuffer LengthHeaderBuffer(
 		cByteBuffer::GetVarIntSize(PacketSize) +
@@ -2987,8 +2985,8 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	}
 	else if (a_Channel == "MC|Beacon")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect1);
-		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect2);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect2);
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
 		return;
 	}
