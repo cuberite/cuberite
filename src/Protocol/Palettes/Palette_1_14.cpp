@@ -9578,7 +9578,7 @@ namespace Palette_1_14
 			case Statistic::WalkOneCm: return 5;
 			case Statistic::WalkOnWaterOneCm: return 8;
 			case Statistic::WalkUnderWaterOneCm: return 12;
-			default: return -1;
+			default: return static_cast<UInt32>(-1);
 		}
 	}
 

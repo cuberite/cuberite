@@ -503,31 +503,30 @@ inline void cChunkDataSerializer::WriteSectionDataSeamless(const cChunkData::sCh
 	ASSERT(a_BitsPerEntry < 64);
 
 	UInt64 Buffer = 0;  // A buffer to compose multiple smaller bitsizes into one 64-bit number
-	unsigned char BitIndex = 0;  // The bit-position in Buffer that represents where to write next
+	int BitIndex = 0;  // The bit-position in Buffer that represents where to write next
 
 	for (size_t Index = 0; Index != cChunkData::SectionBlockCount; Index++)
 	{
-		const UInt32 BlockType = a_Section.m_BlockTypes[Index];
-		const UInt32 BlockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
-		const UInt32 Value = Palette(BlockType, BlockMeta);
+		const BLOCKTYPE BlockType = a_Section.m_BlockTypes[Index];
+		const NIBBLETYPE BlockMeta = (a_Section.m_BlockMetas[Index / 2] >> ((Index % 2) * 4)) & 0x0f;
+		const auto Value = static_cast<UInt64>(Palette(BlockType, BlockMeta));
 
 		// Write as much as possible of Value, starting from BitIndex, into Buffer:
-		Buffer |= static_cast<UInt64>(Value) << BitIndex;
+		Buffer |= Value << BitIndex;
 
 		// The _signed_ count of bits in Value left to write
-		const char Remaining = a_BitsPerEntry - (64 - BitIndex);
-		if (Remaining >= 0)
+		if (BitIndex + a_BitsPerEntry >= 64)
 		{
 			// There were some bits remaining: we've filled the buffer. Flush it:
 			m_Packet.WriteBEUInt64(Buffer);
 
 			// And write the remaining bits, setting the new BitIndex:
-			Buffer = Value >> (a_BitsPerEntry - Remaining);
-			BitIndex = Remaining;
+			Buffer = Value >> (64 - BitIndex);
+			BitIndex = a_BitsPerEntry - (64 - BitIndex);
 		}
 		else
 		{
-			// It fit, sexcellent.
+			// It fit, excellent.
 			BitIndex += a_BitsPerEntry;
 		}
 	}

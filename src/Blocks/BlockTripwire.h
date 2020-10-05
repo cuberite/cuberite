@@ -7,7 +7,7 @@
 
 
 
-class cBlockTripwireHandler :
+class cBlockTripwireHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

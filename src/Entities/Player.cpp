@@ -3232,17 +3232,17 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
 	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
 	{
-		BlockHardness*=1.5;
+		BlockHardness *= 1.5f;
 	}
 	else
 	{
-		BlockHardness*=5;
+		BlockHardness *= 5.0f;
 	}
 	float DigSpeed = GetDigSpeed(a_Block);
 	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
 	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
 	// Therefore take inverse to get fraction mined per tick:
-	return DigSpeed / (20 * BlockHardness);
+	return DigSpeed / (20.0f * BlockHardness);
 }
 
 

@@ -74,7 +74,7 @@ void ForEachSourceCallback::CheckIndirectPower()
 	ForEachSourceCallback QuasiQueryCallback(m_Chunk, Above, m_Chunk.GetBlock(Above));
 
 	// Manually feed the callback object all positions that may deliver power to Above:
-	for (const auto QuasiPowerOffset : cSimulator::GetLinkedOffsets(OffsetYP))
+	for (const auto & QuasiPowerOffset : cSimulator::GetLinkedOffsets(OffsetYP))
 	{
 		QuasiQueryCallback(m_Position + QuasiPowerOffset);
 	}
@@ -116,7 +116,7 @@ PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const V
 	PowerLevel Power = 0;
 
 	// Loop through all linked powerable offsets in the direction requested:
-	for (const auto Offset : cSimulator::GetLinkedOffsets(SolidBlockPosition - QueryPosition))
+	for (const auto & Offset : cSimulator::GetLinkedOffsets(SolidBlockPosition - QueryPosition))
 	{
 		auto SourcePosition = QueryPosition + Offset;
 		if (!cChunk::IsValidHeight(SourcePosition.y))

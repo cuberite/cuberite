@@ -6,7 +6,7 @@
 
 
 
-class cBlockSlimeHandler:
+class cBlockSlimeHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 public:

@@ -7,7 +7,7 @@
 
 
 
-class cBlockConcretePowderHandler :
+class cBlockConcretePowderHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

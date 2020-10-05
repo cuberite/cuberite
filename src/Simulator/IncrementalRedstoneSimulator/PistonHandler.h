@@ -53,7 +53,7 @@ namespace PistonHandler
 		const auto Face = cBlockPistonHandler::MetaDataToDirection(a_Meta);
 		const auto FrontOffset = AddFaceDirection(Vector3i(), Face);
 
-		for (const auto Offset : RelativeAdjacents)
+		for (const auto & Offset : RelativeAdjacents)
 		{
 			if (Offset != FrontOffset)
 			{
