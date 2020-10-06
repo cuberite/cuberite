@@ -201,19 +201,13 @@ namespace Explodinator
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Step, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
 
-		// The total displacement the ray must travel.
-		const auto TraceDisplacement = (a_Destination - a_Origin);
-
-		// The displacement that they ray in one iteration step should travel.
-		const auto Step = TraceDisplacement.NormalizeCopy() * StepUnit;
-
-		// Loop until we've reached the prescribed destination:
-		while (true)//(TraceDisplacement > (Checkpoint - a_Origin))
+		// Loop until intensity runs out:
+		while (true)
 		{
 			auto Position = Checkpoint.Floor();
 			if (!cChunkDef::IsValidHeight(Position.y))
@@ -242,7 +236,7 @@ namespace Explodinator
 			a_Chunk = Neighbour;
 
 			// Increment the simulation, weaken the ray:
-			Checkpoint += Step;
+			Checkpoint += a_Step;
 			a_Intensity -= StepAttenuation;
 		}
 	}
@@ -250,51 +244,43 @@ namespace Explodinator
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
 	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
-		const auto Intensity = a_Power * (0.7f + GetRandomProvider().RandReal(0.6f));
-		const auto ExplosionRadius = CeilC((Intensity / StepAttenuation) * StepUnit);
 
 		// Oh boy... Better hope you have a hot cache, 'cos this little manoeuvre's gonna cost us 1352 raytraces in one tick...
-		const int HalfSide = TraceCubeSideLength / 2;
 
 		// The following loops implement the tracing algorithm described in http://minecraft.gamepedia.com/Explosion
 
+		// Want 16 rays per length so apply lamposts and spaces
+		const float GridPointSpacing = 0.133333333333333333f;
+
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
-		// in the YM and YP directions:
-		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
+		// Careful to avoid duplicates along edges
+		// top and bottom sides:
+		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
 		{
-			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
+			for (float OffsetZ = -1; OffsetZ < 1; OffsetZ+=GridPointSpacing)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, 1, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
 			}
 		}
 
-		/*
-		Trace rays from the centre to the sides of the explosion cube, being careful to avoid duplicates:
-
-		Top view:
-		______
-		.       | (dot to make style checker happy)
-		|       |
-		|       |
-		|  ______
-
-		Side view:
-		+        +
-		|======  |
-		|     |  |
-		|======  |
-		+        +
-
-		*/
-		for (int Offset = -HalfSide; Offset < HalfSide - 1; Offset++)
+		// left and right sides, avoid duplicates at top and bottom edges
+		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
 		{
-			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, 1).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+			}
+		}
+
+		// front and back sides, avoid all edges
+		for (float OffsetZ = -1+GridPointSpacing; OffsetZ < 1-GridPointSpacing; OffsetZ+=GridPointSpacing)
+		{
+			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
+			{
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(1, OffsetY, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
 			}
 		}
 	}
@@ -313,13 +299,14 @@ namespace Explodinator
 		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{
 			LagTheClient(a_Chunk, a_Position, a_Power);
+			DamageEntities(a_Chunk, a_Position, a_Power);
+
 			std::cout << "Starting timer." << std::endl;
 			auto t1 = std::chrono::high_resolution_clock::now();
-			DamageEntities(a_Chunk, a_Position, a_Power);
-			auto t2 = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
-			std::cout << "Finished. Time taken: " << duration << std::endl;
 			DamageBlocks(a_Chunk, AbsoluteToRelative(a_Position, a_Chunk.GetPos()), a_Power, a_Fiery, a_ExplodingEntity);
+			auto t2 = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+			std::cout << "Finished. Time taken: " << duration << std::endl;
 
 			return false;
 		});
