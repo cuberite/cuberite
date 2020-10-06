@@ -117,11 +117,11 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_LeashToPos(nullptr)
 	, m_IsLeashActionJustDone(false)
 	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
-	, m_Target(nullptr)
 	, m_LovePartner(nullptr)
 	, m_LoveTimer(0)
 	, m_LoveCooldown(0)
 	, m_MatingTimer(0)
+	, m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
