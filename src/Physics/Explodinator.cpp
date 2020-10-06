@@ -17,7 +17,7 @@ namespace Explodinator
 	const auto StepUnit = 0.3f;
 	const auto KnockbackFactor = 25U;
 	const auto StepAttenuation = 0.225f;
-	const auto GridPointSpacing = 0.133333333333333333f;  // 16 Ray per cube length
+	const auto GridPointSpacing = 0.133333333333333333f;  // = 2 / 15: 16 rays per cube length
 	const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
