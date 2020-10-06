@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Network.h"
+#include <asio/ip/tcp.hpp>
 
 
 
@@ -24,23 +25,7 @@ public:
 	/** Creates a lookup object and schedules the lookup. */
 	static void Lookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
-protected:
+private:
 
-	/** Creates the lookup object. Doesn't start the lookup yet. */
-	cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
-
-	/** The callbacks to call for resolved names / errors. */
-	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
-
-	/** The hostname that was queried (needed for the callbacks). */
-	AString m_Hostname;
-
-	void Callback(int a_ErrCode, struct addrinfo * a_Addr);
+	static void Callback(cNetwork::cResolveNameCallbacks & a_Callbacks, const asio::ip::tcp::resolver::results_type & a_Addr);
 };
-typedef std::shared_ptr<cHostnameLookup> cHostnameLookupPtr;
-typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
-
-
-
-
-

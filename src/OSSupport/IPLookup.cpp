@@ -32,7 +32,7 @@ void cIPLookup::Lookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr 
 	cIPLookupPtr Lookup{ new cIPLookup(a_IP, std::move(a_Callbacks)) };  // Cannot use std::make_shared here, constructor is not accessible
 
 	// Note the Lookup object is owned solely by this lambda which is destroyed after it runs
-	cNetworkSingleton::Get().GetLookupThread().ScheduleLookup([=]()
+	/* cNetworkSingleton::Get().GetLookupThread().ScheduleLookup( */[=]()
 	{
 		sockaddr_storage sa;
 		int salen = sizeof(sa);
@@ -58,7 +58,7 @@ void cIPLookup::Lookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr 
 			0
 		);
 		Lookup->Callback(ErrCode, Hostname);
-	});
+	}();
 }
 
 

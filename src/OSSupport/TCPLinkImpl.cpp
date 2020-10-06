@@ -138,7 +138,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	};
 
 	// Schedule the host query
-	cNetwork::HostnameToIP(a_Host, std::make_shared<cHostnameCallback>(res, a_Port));
+	cNetwork::HostnameToIP(a_Host, std::make_unique<cHostnameCallback>(res, a_Port));
 	return res;
 }
 

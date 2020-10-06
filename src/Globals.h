@@ -57,7 +57,7 @@
 			#include <stdlib.h>
 			#include <crtdbg.h>
 			#define DEBUG_CLIENTBLOCK   new(_CLIENT_BLOCK, __FILE__, __LINE__)
-			#define new DEBUG_CLIENTBLOCK
+			// #define new DEBUG_CLIENTBLOCK
 			// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
 			// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 		#endif

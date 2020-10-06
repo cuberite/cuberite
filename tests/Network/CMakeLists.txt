@@ -55,6 +55,8 @@ add_library(Network
 	${Network_HDRS}
 )
 
+target_include_directories(Network SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/lib/asio/asio/include)
+
 target_link_libraries(Network event_core event_extra fmt::fmt mbedtls)
 if(NOT WIN32)
 	target_link_libraries(Network event_pthreads Threads::Threads)

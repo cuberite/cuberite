@@ -16,7 +16,8 @@
 
 
 cNetworkSingleton::cNetworkSingleton() :
-	m_HasTerminated(true)
+	m_HasTerminated(true),
+	m_Resolver(m_Context)
 {
 }
 
@@ -47,7 +48,9 @@ cNetworkSingleton & cNetworkSingleton::Get(void)
 void cNetworkSingleton::Initialise(void)
 {
 	// Start the lookup thread
-	m_LookupThread.Start();
+	m_Context.restart();
+	m_Context.get_executor().on_work_started();
+	m_LookupThread = std::thread([this] { m_Context.run(); });
 
 	// Windows: initialize networking:
 	#ifdef _WIN32
@@ -100,7 +103,8 @@ void cNetworkSingleton::Terminate(void)
 	ASSERT(!m_HasTerminated);
 
 	// Wait for the lookup thread to stop
-	m_LookupThread.Stop();
+	m_Context.get_executor().on_work_finished();
+	m_LookupThread.join();
 
 	// Wait for the LibEvent event loop to terminate:
 	event_base_loopbreak(m_EventBase);

@@ -270,8 +270,7 @@ bool cUDPEndpointImpl::Send(const AString & a_Payload, const AString & a_Host, U
 	if (evutil_parse_sockaddr_port(a_Host.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen) != 0)
 	{
 		// a_Host is a hostname, we need to do a lookup first:
-		auto queue = std::make_shared<cUDPSendAfterLookup>(a_Payload, a_Port, m_MainSock, m_SecondarySock, m_IsMainSockIPv6);
-		return cNetwork::HostnameToIP(a_Host, queue);
+		return cNetwork::HostnameToIP(a_Host, std::make_unique<cUDPSendAfterLookup>(a_Payload, a_Port, m_MainSock, m_SecondarySock, m_IsMainSockIPv6));
 	}
 
 	// a_Host is an IP address and has been parsed into "sa"

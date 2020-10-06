@@ -169,7 +169,7 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
-	bool res = cNetwork::HostnameToIP(host, std::make_shared<cLuaNameLookup>(host, std::move(callbacks)));
+	bool res = cNetwork::HostnameToIP(host, std::make_unique<cLuaNameLookup>(host, std::move(callbacks)));
 	S.Push(res);
 	return 1;
 }
@@ -205,7 +205,7 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
 	// Try to look up:
-	bool res = cNetwork::IPToHostName(ip, std::make_shared<cLuaNameLookup>(ip, std::move(callbacks)));
+	bool res = cNetwork::IPToHostName(ip, std::make_unique<cLuaNameLookup>(ip, std::move(callbacks)));
 	S.Push(res);
 	return 1;
 }

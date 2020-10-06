@@ -66,3 +66,6 @@
 [submodule "Tools/BlockTypePaletteGenerator/lib/lunajson"]
 	path = Tools/BlockTypePaletteGenerator/lib/lunajson
 	url = https://github.com/grafi-tt/lunajson.git
+[submodule "lib/asio"]
+	path = lib/asio
+	url = https://github.com/chriskohlhoff/asio
