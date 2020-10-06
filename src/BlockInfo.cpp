@@ -134,6 +134,19 @@ bool IsBlockFence(BLOCKTYPE a_BlockType)
 
 
 
+bool IsBlockShulkerBox(BLOCKTYPE a_BlockType)
+{
+	if ((a_BlockType >= E_BLOCK_WHITE_SHULKER_BOX) && (a_BlockType <= E_BLOCK_BLACK_SHULKER_BOX))
+	{
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
 {
 	switch (a_BlockType)

@@ -111,7 +111,7 @@ namespace Explodinator
 	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
 	{
 		// If it's a Shulker box
-		if ((a_Block >= E_BLOCK_WHITE_SHULKER_BOX) && (a_Block <= E_BLOCK_BLACK_SHULKER_BOX))
+		if (IsBlockShulkerBox(a_Block))
 		{
 			return true;
 		}

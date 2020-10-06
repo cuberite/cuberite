@@ -86,6 +86,8 @@ bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType);
 
 bool IsBlockFence(BLOCKTYPE a_BlockType);
 
+bool IsBlockShulkerBox(BLOCKTYPE a_BlockType);
+
 bool IsBlockMaterialWood(BLOCKTYPE a_BlockType);
 
 bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType);
