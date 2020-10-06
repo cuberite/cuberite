@@ -213,7 +213,7 @@ namespace Explodinator
 		const auto Step = TraceDisplacement.NormalizeCopy() * StepUnit;
 
 		// Loop until we've reached the prescribed destination:
-		while (TraceDisplacement > (Checkpoint - a_Origin))
+		while (true)//(TraceDisplacement > (Checkpoint - a_Origin))
 		{
 			auto Position = Checkpoint.Floor();
 			if (!cChunkDef::IsValidHeight(Position.y))
@@ -264,8 +264,8 @@ namespace Explodinator
 		{
 			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
 			}
 		}
 
@@ -291,10 +291,10 @@ namespace Explodinator
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
 			}
 		}
 	}
