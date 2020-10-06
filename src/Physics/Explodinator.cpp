@@ -21,7 +21,7 @@ namespace Explodinator
 	const auto StepUnit = 0.3f;
 	const auto KnockbackFactor = 25U;
 	const auto StepAttenuation = 0.225f;
-	const auto TraceCubeSideLength = 16U;
+	const auto GridPointSpacing = 0.133333333333333333f;  // 16 Ray per cube length
 	const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
@@ -249,12 +249,9 @@ namespace Explodinator
 
 		// The following loops implement the tracing algorithm described in http://minecraft.gamepedia.com/Explosion
 
-		// Want 16 rays per length so apply lamposts and spaces
-		const float GridPointSpacing = 0.133333333333333333f;
-
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
 		// Careful to avoid duplicates along edges
-		// top and bottom sides:
+		// Top and bottom sides:
 		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
 		{
 			for (float OffsetZ = -1; OffsetZ < 1; OffsetZ+=GridPointSpacing)
@@ -264,7 +261,7 @@ namespace Explodinator
 			}
 		}
 
-		// left and right sides, avoid duplicates at top and bottom edges
+		// Left and right sides, avoid duplicates at top and bottom edges:
 		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
 		{
 			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
@@ -274,7 +271,7 @@ namespace Explodinator
 			}
 		}
 
-		// front and back sides, avoid all edges
+		// Front and back sides, avoid all edges:
 		for (float OffsetZ = -1+GridPointSpacing; OffsetZ < 1-GridPointSpacing; OffsetZ+=GridPointSpacing)
 		{
 			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
