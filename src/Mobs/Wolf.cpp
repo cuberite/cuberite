@@ -229,7 +229,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				{
 					if (IsBaby())
 					{
-						m_AgingTimer = m_AgingTimer * 0.9;
+						m_AgingTimer = FloorC(m_AgingTimer * 0.9);
 					}
 				}
 				break;
