@@ -7,7 +7,7 @@
 
 
 
-class cBlockGlowstoneHandler :
+class cBlockGlowstoneHandler final :
 	public cBlockHandler
 {
 public:

@@ -9,7 +9,7 @@
 
 
 
-class cBlockButtonHandler :
+class cBlockButtonHandler final :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>;

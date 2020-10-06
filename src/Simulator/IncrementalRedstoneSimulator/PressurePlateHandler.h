@@ -12,7 +12,7 @@ namespace PressurePlateHandler
 {
 	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
-		unsigned NumberOfEntities = 0;
+		Int64 NumberOfEntities = 0;
 		bool FoundPlayer = false;
 
 		Chunk.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [&](cEntity & Entity)
@@ -39,7 +39,7 @@ namespace PressurePlateHandler
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			{
-				return (NumberOfEntities != 0 ? 15 : 0);
+				return (NumberOfEntities > 0 ? 15 : 0);
 			}
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{

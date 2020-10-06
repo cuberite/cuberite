@@ -113,7 +113,7 @@ namespace RedstoneComparatorHandler
 
 		const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
 		const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
-		const auto NewMeta = (FrontPower > 0) ? (a_Meta | 0x8) : (a_Meta & 0x7);
+		const NIBBLETYPE NewMeta = (FrontPower > 0) ? (a_Meta | 0x08u) : (a_Meta & 0x07u);
 
 		// Don't care about the previous power level so return value ignored
 		Data.ExchangeUpdateOncePowerData(a_Position, FrontPower);

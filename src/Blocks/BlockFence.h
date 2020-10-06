@@ -10,7 +10,7 @@
 
 
 
-class cBlockFenceHandler:
+class cBlockFenceHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

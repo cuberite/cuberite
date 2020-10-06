@@ -7,7 +7,7 @@
 
 
 
-class cBlockRedstoneLampHandler:
+class cBlockRedstoneLampHandler final :
 	public cBlockHandler
 {
 public:

@@ -16,7 +16,7 @@ enum ENUM_PURE
 
 
 
-class cBlockRailHandler :
+class cBlockRailHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;

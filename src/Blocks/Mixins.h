@@ -25,33 +25,9 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 
 
 
-template <class Base = cBlockHandler>
-class cBlockWithNoDrops:
-	public Base
-{
-public:
-
-	constexpr cBlockWithNoDrops(BLOCKTYPE a_BlockType):
-		Base(a_BlockType)
-	{
-	}
-
-private:
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
-	{
-		// Don't drop anything:
-		return {};
-	}
-};
-
-
-
-
-
 /** Mixin to clear the block's meta value when converting to a pickup. */
 template <class Base>
-class cClearMetaOnDrop:
+class cClearMetaOnDrop :
 	public Base
 {
 public:
@@ -60,6 +36,10 @@ public:
 		Base(a_BlockType)
 	{
 	}
+
+protected:
+
+	~cClearMetaOnDrop() = default;
 
 private:
 
@@ -78,7 +58,7 @@ private:
 Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in North, East, South, West.
 There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
 template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched = false>
-class cMetaRotator:
+class cMetaRotator :
 	public Base
 {
 public:
@@ -89,6 +69,8 @@ public:
 	}
 
 protected:
+
+	~cMetaRotator() = default;
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
@@ -176,7 +158,7 @@ template <
 	NIBBLETYPE West = 0x04,
 	bool AssertIfNotMatched = false
 >
-class cYawRotator:
+class cYawRotator :
 	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
 {
 	using Super = cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>;
@@ -184,8 +166,6 @@ class cYawRotator:
 public:
 
 	using Super::Super;
-
-public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
@@ -230,6 +210,10 @@ public:
 			return North;
 		}
 	}
+
+protected:
+
+	~cYawRotator() = default;
 };
 
 
@@ -258,6 +242,8 @@ public:
 	using Super::Super;
 
 protected:
+
+	~cPitchYawRotator() = default;
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,

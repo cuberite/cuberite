@@ -14,7 +14,7 @@
 
 
 
-class cBlockLeavesHandler:
+class cBlockLeavesHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

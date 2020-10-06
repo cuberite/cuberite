@@ -244,7 +244,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	UInt32 ProtocolVersion;
 	AString ServerAddress;
 	UInt16 ServerPort;
-	cProtocol::State NextState;
+	UInt32 NextStateValue;
 
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
@@ -262,13 +262,29 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		!m_Buffer.ReadVarInt(ProtocolVersion) ||
 		!m_Buffer.ReadVarUTF8String(ServerAddress) ||
 		!m_Buffer.ReadBEUInt16(ServerPort) ||
-		!m_Buffer.ReadVarInt(NextState)
+		!m_Buffer.ReadVarInt(NextStateValue)
 	)
 	{
 		// TryRecognizeProtocol guarantees that we will have as much
 		// data to read as the client claims in the protocol length field:
 		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
+
+	cProtocol::State NextState = [&]
+		{
+			switch (NextStateValue)
+			{
+				case cProtocol::State::Status: return cProtocol::State::Status;
+				case cProtocol::State::Login: return cProtocol::State::Login;
+				case cProtocol::State::Game: return cProtocol::State::Game;
+				default:
+				{
+					throw TriedToJoinWithUnsupportedProtocolException(
+						fmt::format("Invalid next game state: {}", NextStateValue)
+					);
+				}
+			}
+		}();
 
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);
@@ -285,23 +301,23 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	// All good, eat up the data:
 	m_Buffer.CommitRead();
 
-	switch (static_cast<cProtocol::Version>(ProtocolVersion))
+	switch (ProtocolVersion)
 	{
-		case cProtocol::Version::v1_8_0:  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_9_0:  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_9_1:  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_9_2:  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_9_4:  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_10_0: return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_11_0: return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_11_1: return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_12:   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_12_1: return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_12_2: return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_13:   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_13_1: return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_13_2: return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
-		case cProtocol::Version::v1_14:   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_8_0):  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_0):  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_1):  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_2):  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_4):  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_10_0): return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_11_0): return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_11_1): return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12):   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12_1): return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12_2): return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13):   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13_1): return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13_2): return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14):   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

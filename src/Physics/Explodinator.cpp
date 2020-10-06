@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockInfo.h"
+#include "Explodinator.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/ChunkInterface.h"
 #include "Chunk.h"
@@ -19,7 +20,7 @@ namespace Explodinator
 	const auto KnockbackFactor = 25U;
 	const auto StepAttenuation = 0.225f;
 	const auto TraceCubeSideLength = 16U;
-	const auto BoundingBoxStepUnit = 0.5f;
+	const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
 	static Vector3f AbsoluteToRelative(const Vector3f a_Position, const cChunkCoords a_ChunkPosition)
@@ -41,17 +42,18 @@ namespace Explodinator
 	/** Calculates the approximate percentage of an Entity's bounding box that is exposed to an explosion centred at Position. */
 	static float CalculateEntityExposure(cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const float a_SquareRadius)
 	{
+		const Vector3d Position = a_Position;
 		unsigned Unobstructed = 0, Total = 0;
 		const auto Box = a_Entity.GetBoundingBox();
 
-		for (float X = Box.GetMinX(); X < Box.GetMaxX(); X += BoundingBoxStepUnit)
+		for (double X = Box.GetMinX(); X < Box.GetMaxX(); X += BoundingBoxStepUnit)
 		{
-			for (float Y = Box.GetMinY(); Y < Box.GetMaxY(); Y += BoundingBoxStepUnit)
+			for (double Y = Box.GetMinY(); Y < Box.GetMaxY(); Y += BoundingBoxStepUnit)
 			{
-				for (float Z = Box.GetMinZ(); Z < Box.GetMaxZ(); Z += BoundingBoxStepUnit)
+				for (double Z = Box.GetMinZ(); Z < Box.GetMaxZ(); Z += BoundingBoxStepUnit)
 				{
-					const auto Destination = Vector3f(X, Y, Z);
-					if ((Destination - a_Position).SqrLength() > a_SquareRadius)
+					const Vector3d Destination{X, Y, Z};
+					if ((Destination - Position).SqrLength() > a_SquareRadius)
 					{
 						// Don't bother with points outside our designated area-of-effect
 						// This is, surprisingly, a massive amount of work saved (~3m to detonate a sphere of 37k TNT before, ~1m after):

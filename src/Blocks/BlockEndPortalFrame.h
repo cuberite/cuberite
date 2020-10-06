@@ -7,7 +7,7 @@
 
 
 
-class cBlockEndPortalFrameHandler:
+class cBlockEndPortalFrameHandler final :
 	public cMetaRotator<cBlockHandler, 0x03,
 		E_META_END_PORTAL_FRAME_ZM,
 		E_META_END_PORTAL_FRAME_XP,

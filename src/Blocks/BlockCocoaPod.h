@@ -7,7 +7,7 @@
 
 
 
-class cBlockCocoaPodHandler :
+class cBlockCocoaPodHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

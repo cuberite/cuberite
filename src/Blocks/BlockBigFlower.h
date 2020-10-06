@@ -9,7 +9,7 @@
 
 
 
-class cBlockBigFlowerHandler:
+class cBlockBigFlowerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

@@ -63,12 +63,12 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 {
 	ASSERT(a_Chunk.IsValid());
 
-	for (const auto Item : m_Simulators)
+	for (const auto & Item : m_Simulators)
 	{
 		Item.first->WakeUp(a_Chunk, a_Position, a_Chunk.GetBlock(a_Position));
 	}
 
-	for (const auto Offset : cSimulator::AdjacentOffsets)
+	for (const auto & Offset : cSimulator::AdjacentOffsets)
 	{
 		auto Relative = a_Position + Offset;
 		if (!cChunkDef::IsValidHeight(Relative.y))
@@ -86,7 +86,7 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 		// Since they all need this we save them querying it themselves
 		const auto Block = Chunk->GetBlock(Relative);
 
-		for (const auto Item : m_Simulators)
+		for (const auto & Item : m_Simulators)
 		{
 			Item.first->WakeUp(*Chunk, Relative, Offset, Block);
 		}
@@ -99,7 +99,7 @@ void cSimulatorManager::WakeUp(cChunk & a_Chunk, Vector3i a_Position)
 
 void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 {
-	for (const auto Item : m_Simulators)
+	for (const auto & Item : m_Simulators)
 	{
 		Item.first->WakeUp(a_Area);
 	}

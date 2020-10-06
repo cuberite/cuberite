@@ -7,7 +7,7 @@
 
 
 
-class cBlockMyceliumHandler:
+class cBlockMyceliumHandler final :
 	public cBlockHandler
 {
 public:

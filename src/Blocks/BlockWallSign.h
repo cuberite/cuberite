@@ -8,7 +8,7 @@
 
 
 
-class cBlockWallSignHandler:
+class cBlockWallSignHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

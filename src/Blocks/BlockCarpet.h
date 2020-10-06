@@ -14,7 +14,7 @@
 
 
 
-class cBlockCarpetHandler:
+class cBlockCarpetHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

@@ -66,12 +66,12 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const {};
+	) const {}
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange
-	) const {};
+	) const {}
 
 	/** Called after a block gets broken (replaced with air), by natural means.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
@@ -232,5 +232,7 @@ public:
 
 protected:
 
-	BLOCKTYPE m_BlockType;
+	~cBlockHandler() = default;
+
+	const BLOCKTYPE m_BlockType;
 };

@@ -350,7 +350,6 @@ public:
 		Status = 1,
 		Login = 2,
 		Game = 3,
-		Invalid = 255
 	};
 
 	/** Called when client sends some data */

@@ -809,10 +809,10 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 			const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
 
 			// Apply the experience delta:
-			m_Player->DeltaExperience(DeltaForLevel + DeltaForPercent);
+			m_Player->DeltaExperience(FloorC(DeltaForLevel + DeltaForPercent));
 
 			// Now reduce the lapis in our stack and send it back:
-			LapisStack.AddCount(-LapisRequired);
+			LapisStack.AddCount(static_cast<char>(-LapisRequired));
 			Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
 		}
 		else
