@@ -156,9 +156,11 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Breaker
 	) const override
 	{
+		UNUSED(a_Breaker);
 		// Destroy any leash knot tied to the fence:
 		auto leashKnot = cLeashKnot::FindKnotAtPos(a_WorldInterface, a_BlockPos);
 		if (leashKnot != nullptr)
@@ -166,21 +168,6 @@ private:
 			leashKnot->SetShouldSelfDestroy();
 		}
 	}
-
-
-
-
-
-	virtual void OnPlayerBrokeBlock(
-			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-			cPlayer & a_Player,
-			Vector3i a_BlockPos,
-			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) const override
-	{
-		OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
-	}
-
 };
 
 

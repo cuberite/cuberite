@@ -111,7 +111,7 @@ namespace Explodinator
 		a_Chunk.SetBlock(a_RelativePosition, a_NewBlock, 0);
 
 		cChunkInterface Interface(a_World.GetChunkMap());
-		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta);
+		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, nullptr);
 	}
 
 	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.

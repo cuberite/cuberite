@@ -289,9 +289,11 @@ bool cBlockPistonHandler::CanPushBlock(
 void cBlockPistonHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	const cEntity * a_Breaker
 ) const
 {
+	UNUSED(a_Breaker);
 	if (!IsExtended(a_OldBlockMeta))
 	{
 		return;
@@ -318,9 +320,11 @@ void cBlockPistonHandler::OnBroken(
 void cBlockPistonHeadHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	const cEntity * a_Breaker
 ) const
 {
+	UNUSED(a_Breaker);
 	const auto Base = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
 	if (!cChunkDef::IsValidHeight(Base.y))
 	{
@@ -333,20 +337,6 @@ void cBlockPistonHeadHandler::OnBroken(
 		// Remove the base of the piston:
 		a_ChunkInterface.SetBlock(Base, E_BLOCK_AIR, 0);
 	}
-}
-
-
-
-
-
-void cBlockPistonHeadHandler::OnPlayerBrokeBlock(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-) const
-{
-	OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
 }
 
 

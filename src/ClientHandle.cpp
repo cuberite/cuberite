@@ -1416,7 +1416,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	m_Player->UseEquippedItem(dlAction);
 
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	cBlockHandler::For(a_OldBlock).OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
+	cBlockHandler::For(a_OldBlock).OnBroken(ChunkInterface, *World, absPos, a_OldBlock, a_OldMeta, m_Player);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 

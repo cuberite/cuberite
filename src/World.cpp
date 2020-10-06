@@ -2166,7 +2166,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock(Vector3i a_BlockPos)
+bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Breaker)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -2178,7 +2178,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 	}
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
+	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta, a_Breaker);
 
 	return true;
 }
@@ -2190,7 +2190,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
 {
 	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
-	if (!DigBlock(a_BlockPos))
+	if (!DigBlock(a_BlockPos, a_Digger))
 	{
 		return false;
 	}

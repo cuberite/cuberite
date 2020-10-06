@@ -81,7 +81,8 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Breaker
 	) const override
 	{
 		// If there's a solid block or a liquid underneath, convert to water, rather than air
@@ -97,19 +98,6 @@ private:
 		}
 	}
 
-
-
-
-
-	virtual void OnPlayerBrokeBlock(
-			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-			cPlayer & a_Player,
-			Vector3i a_BlockPos,
-			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) const override
-	{
-		OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta);
-	}
 
 
 

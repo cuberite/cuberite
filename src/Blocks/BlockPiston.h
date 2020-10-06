@@ -128,7 +128,8 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Breaker
 	) const override;
 
 	/** Moves a list of blocks in a specific direction */
@@ -156,13 +157,9 @@ public:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Breaker
 	) const override;
-
-	void OnPlayerBrokeBlock(
-			cChunkInterface &a_ChunkInterface, cWorldInterface &a_WorldInterface,
-			cPlayer &a_Player, Vector3i a_BlockPos,
-			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) const override;
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
 } ;

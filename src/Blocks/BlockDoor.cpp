@@ -7,8 +7,14 @@
 
 
 
-void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) const
+void cBlockDoorHandler::OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Breaker
+) const
 {
+	UNUSED(a_Breaker);
 	// A part of the multiblock door was broken; the relevant half will drop any pickups as required.
 	// All that is left to do is to delete the other half of the multiblock.
 
