@@ -9,7 +9,7 @@
 
 
 
-class cBlockCobWebHandler :
+class cBlockCobWebHandler final :
 	public cBlockHandler
 {
 public:

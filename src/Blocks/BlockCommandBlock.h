@@ -7,7 +7,7 @@
 
 
 
-class cBlockCommandBlockHandler :
+class cBlockCommandBlockHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;

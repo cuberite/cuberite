@@ -7,7 +7,7 @@
 
 
 
-class cBlockGlassHandler :
+class cBlockGlassHandler final :
 	public cBlockHandler
 {
 public:

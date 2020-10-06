@@ -7,7 +7,7 @@
 
 
 
-class cBlockPlanksHandler:
+class cBlockPlanksHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

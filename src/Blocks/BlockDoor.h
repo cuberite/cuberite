@@ -11,7 +11,7 @@
 
 
 
-class cBlockDoorHandler :
+class cBlockDoorHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
@@ -94,6 +94,14 @@ public:
 				return false;
 			}
 		}
+	}
+
+	/** Returns true iff the door at the specified coords is open.
+	The coords may point to either the top part or the bottom part of the door. */
+	static bool IsOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
+	{
+		const auto Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockPos);
+		return (Meta & 0x04) != 0;
 	}
 
 	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
@@ -231,18 +239,6 @@ private:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1)), a_Chunk.GetMeta(a_RelPos.addedY(-1))));
-	}
-
-
-
-
-
-	/** Returns true iff the door at the specified coords is open.
-	The coords may point to either the top part or the bottom part of the door. */
-	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
-	{
-		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockPos);
-		return ((Meta & 0x04) != 0);
 	}
 
 

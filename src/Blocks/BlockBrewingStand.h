@@ -7,7 +7,7 @@
 
 
 
-class cBlockBrewingStandHandler :
+class cBlockBrewingStandHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;

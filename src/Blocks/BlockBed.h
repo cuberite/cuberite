@@ -15,7 +15,7 @@ class cWorldInterface;
 
 
 
-class cBlockBedHandler :
+class cBlockBedHandler final :
 	public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;

@@ -10,7 +10,7 @@
 
 
 
-class cBlockAnvilHandler:
+class cBlockAnvilHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;

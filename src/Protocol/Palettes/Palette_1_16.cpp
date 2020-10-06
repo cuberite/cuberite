@@ -12758,8 +12758,8 @@ namespace Palette_1_16
 			case Item::ZombieSpawnEgg: return 818;
 			case Item::ZombieVillagerSpawnEgg: return 820;
 			case Item::ZombiePigmanSpawnEgg: return 821;
-			default: return 0;
 		}
+		UNREACHABLE("Invalid item");
 	}
 
 	UInt32 From(const Statistic ID)
@@ -12840,7 +12840,7 @@ namespace Palette_1_16
 			case Statistic::WalkOnWaterOneCm: return 8;
 			case Statistic::WalkOneCm: return 5;
 			case Statistic::WalkUnderWaterOneCm: return 12;
-			default: return -1;
+			default: return UInt32(-1);
 		}
 	}
 

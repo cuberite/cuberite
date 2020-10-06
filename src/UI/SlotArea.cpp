@@ -1059,7 +1059,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	{
 		SetSlot(1, a_Player, cItem());
 	}
-	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost), a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<short>(m_MaximumCost));
 
 	m_MaximumCost = 0;
 	static_cast<cAnvilWindow &>(m_ParentWindow).SetRepairedItemName("", nullptr);
@@ -1135,7 +1135,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
-		m_ParentWindow.SetProperty(0, 0, a_Player);
+		m_ParentWindow.SetProperty(0, 0);
 		return;
 	}
 
@@ -1157,7 +1157,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
-				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SetProperty(0, 0);
 				return;
 			}
 
@@ -1180,7 +1180,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
-				m_ParentWindow.SetProperty(0, 0, a_Player);
+				m_ParentWindow.SetProperty(0, 0);
 				return;
 			}
 
@@ -1264,7 +1264,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 
 	SetSlot(2, a_Player, Input);
-	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost), a_Player);
+	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost));
 }
 
 
@@ -1678,25 +1678,59 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
-	if (cItem::IsEnchantable(Item.m_ItemType) && Item.m_Enchantments.IsEmpty())
+	if (!cItem::IsEnchantable(Item.m_ItemType) || !Item.m_Enchantments.IsEmpty())
 	{
-		int Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15);
-
-		auto & Random = GetRandomProvider();
-		int Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
-		int TopSlot = std::max(Base / 3, 1);
-		int MiddleSlot = (Base * 2) / 3 + 1;
-		int BottomSlot = std::max(Base, Bookshelves * 2);
-
-		m_ParentWindow.SetProperty(0, static_cast<short>(TopSlot), a_Player);
-		m_ParentWindow.SetProperty(1, static_cast<short>(MiddleSlot), a_Player);
-		m_ParentWindow.SetProperty(2, static_cast<short>(BottomSlot), a_Player);
+		return;
 	}
-	else
+
+	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
+	const auto Bookshelves = std::min(static_cast<int>(GetBookshelvesCount(*a_Player.GetWorld())), 15);
+
+	// A PRNG initialised using the player's enchantment seed.
+	auto Random = a_Player.GetEnchantmentRandomProvider();
+
+	// Calculate the levels for the offered enchantment options:
+	const auto Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
+	const std::array<short, 3> OptionLevels
 	{
-		m_ParentWindow.SetProperty(0, 0, a_Player);
-		m_ParentWindow.SetProperty(1, 0, a_Player);
-		m_ParentWindow.SetProperty(2, 0, a_Player);
+		static_cast<short>(std::max(Base / 3, 1)),
+		static_cast<short>((Base * 2) / 3 + 1),
+		static_cast<short>(std::max(Base, Bookshelves * 2))
+	};
+
+	// Properties set according to: https://wiki.vg/Protocol#Window_Property
+	// Fake a "seed" for the client to draw Standard Galactic Alphabet glyphs:
+	m_ParentWindow.SetProperty(3, Random.RandInt<short>());
+
+	// Calculate an enchanting possibility for each option (top, middle and bottom) and send details to window:
+	for (size_t i = 0; i != OptionLevels.size(); i++)
+	{
+		// A copy of the item.
+		cItem EnchantedItem = Item.CopyOne();
+
+		// Enchant based on the number of levels:
+		EnchantedItem.EnchantByXPLevels(OptionLevels[i], Random);
+
+		LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
+
+		// Send the level requirement for the enchantment option:
+		m_ParentWindow.SetProperty(i, OptionLevels[i]);
+
+		// Get the first enchantment ID, which must exist:
+		ASSERT(EnchantedItem.m_Enchantments.begin() != EnchantedItem.m_Enchantments.end());
+		const auto EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.begin()->first);
+
+		// Send the enchantment ID of the first enchantment on our item:
+		m_ParentWindow.SetProperty(4 + i, EnchantmentID);
+
+		const auto EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
+		ASSERT(EnchantmentLevel > 0);
+
+		// Send the level for the first enchantment on our item:
+		m_ParentWindow.SetProperty(7 + i, EnchantmentLevel);
+
+		// Store the item we've enchanted as an option to be retrieved later:
+		m_EnchantedItemOptions[i] = std::move(EnchantedItem);
 	}
 }
 
@@ -1704,9 +1738,8 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 
 
 
-int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
+unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 {
-	int Bookshelves = 0;
 	cBlockArea Area;
 	Area.Read(a_World, m_BlockPos - Vector3i(2, 0, 2), m_BlockPos + Vector3i(2, 1, 2));
 
@@ -1751,6 +1784,8 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 		{ 1, 1, 0, 1, 1, 1 },  // Bookcase at {1, 1, 0}, air at {1, 1, 1}
 	};
 
+	unsigned Bookshelves = 0;
+
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{
 		if (
@@ -1763,6 +1798,16 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	}  // for i - CheckCoords
 
 	return Bookshelves;
+}
+
+
+
+
+
+cItem cSlotAreaEnchanting::SelectEnchantedOption(size_t a_EnchantOption)
+{
+	ASSERT(a_EnchantOption < m_EnchantedItemOptions.size());
+	return std::move(m_EnchantedItemOptions[a_EnchantOption]);
 }
 
 

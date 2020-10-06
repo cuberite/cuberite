@@ -7,7 +7,7 @@
 
 
 
-class cBlockHopperHandler :
+class cBlockHopperHandler final :
 	public cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>
 {
 	using Super = cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>;

@@ -9,7 +9,7 @@
 
 
 
-class cBlockChestHandler :
+class cBlockChestHandler final :
 	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
 	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;

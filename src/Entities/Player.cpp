@@ -151,6 +151,8 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 
 		SetWorld(World);  // Use default world
 
+		m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
+
 		FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}",
 			a_PlayerName, GetPosition()
 		);
@@ -1861,6 +1863,25 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
+MTRand cPlayer::GetEnchantmentRandomProvider()
+{
+	return m_EnchantmentSeed;
+}
+
+
+
+
+
+void cPlayer::PermuteEnchantmentSeed()
+{
+	// Get a new random integer and save that as the seed:
+	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();
+}
+
+
+
+
+
 bool cPlayer::HasPermission(const AString & a_Permission)
 {
 	if (a_Permission.empty())
@@ -2277,6 +2298,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_LifetimeTotalXp     = root.get("xpTotal",        0).asInt();
 	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = root.get("isflying",       0).asBool();
+	m_EnchantmentSeed     = root.get("enchantmentSeed", GetRandomProvider().RandInt<unsigned int>()).asUInt();
 
 	Json::Value & JSON_KnownItems = root["knownItems"];
 	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
@@ -2439,6 +2461,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
 	root["SpawnWorld"]          = m_SpawnWorld->GetName();
+	root["enchantmentSeed"]     = m_EnchantmentSeed;
 
 	if (m_World != nullptr)
 	{
@@ -3133,61 +3156,109 @@ bool cPlayer::IsInsideWater()
 
 float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 {
-	float f = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
-	if (f > 1.0f)
+	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
+
+	// Get the base speed multiplier of the equipped tool for the mined block
+	float MiningSpeed = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
+
+	// If we can harvest the block then we can apply material and enchantment bonuses
+	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
 	{
-		unsigned int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
-		if (efficiencyModifier > 0)
+		if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 		{
-			f += (efficiencyModifier * efficiencyModifier) + 1;
+			unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+			if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
+			{
+				MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
+			}
 		}
 	}
+	else  // If we can't harvest the block then no bonuses:
+	{
+		MiningSpeed = 1;
+	}
 
+	// Haste increases speed by 20% per level
 	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
 	if (Haste != nullptr)
 	{
 		int intensity = Haste->GetIntensity() + 1;
-		f *= 1.0f + (intensity * 0.2f);
+		MiningSpeed *= 1.0f + (intensity * 0.2f);
 	}
 
+	// Mining fatigue decreases speed a lot
 	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
 	if (MiningFatigue != nullptr)
 	{
 		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
-			case 0:  f *= 0.3f;     break;
-			case 1:  f *= 0.09f;    break;
-			case 2:  f *= 0.0027f;  break;
-			default: f *= 0.00081f; break;
+			case 0:  MiningSpeed *= 0.3f;     break;
+			case 1:  MiningSpeed *= 0.09f;    break;
+			case 2:  MiningSpeed *= 0.0027f;  break;
+			default: MiningSpeed *= 0.00081f; break;
 
 		}
 	}
 
+	// 5x speed loss for being in water
 	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
+	// 5x speed loss for not touching ground
 	if (!IsOnGround())
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
-	return f;
+	return MiningSpeed;
 }
 
 
 
 
 
-float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
+float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 {
-	float blockHardness = cBlockInfo::GetHardness(a_Block);
-	float digSpeed = GetDigSpeed(a_Block);
-	float canHarvestBlockDivisor = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
-	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
-	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
+	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
+	// If we know it's instantly breakable then quit here:
+	if (cBlockInfo::IsOneHitDig(a_Block))
+	{
+		return 1;
+	}
+	float BlockHardness = cBlockInfo::GetHardness(a_Block);
+	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
+	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
+	{
+		BlockHardness *= 1.5f;
+	}
+	else
+	{
+		BlockHardness *= 5.0f;
+	}
+	float DigSpeed = GetDigSpeed(a_Block);
+	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
+	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
+	// Therefore take inverse to get fraction mined per tick:
+	return DigSpeed / (20.0f * BlockHardness);
+}
+
+
+
+
+
+bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
+{
+	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
+	// Check it has non-zero hardness
+	if (cBlockInfo::IsOneHitDig(a_Block))
+	{
+		return true;
+	}
+	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine
+	return GetDigSpeed(a_Block) > 30 * cBlockInfo::GetHardness(a_Block);
 }
 
 

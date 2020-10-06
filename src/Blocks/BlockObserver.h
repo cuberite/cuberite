@@ -5,7 +5,7 @@
 #include "Mixins.h"
 
 
-class cBlockObserverHandler:
+class cBlockObserverHandler final :
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>
 {
 	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;

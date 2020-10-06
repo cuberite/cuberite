@@ -263,6 +263,13 @@ public:
 
 	// tolua_end
 
+	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
+	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	MTRand GetEnchantmentRandomProvider();
+
+	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
+	void PermuteEnchantmentSeed();
+
 	/** Returns the SharedPtr to client handle associated with the player. */
 	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
 
@@ -590,11 +597,17 @@ public:
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
 	void RemoveClientHandle(void);
 
-	/** Returns the relative block hardness for the block a_Block.
-	The bigger it is the faster the player can break the block.
-	Returns zero if the block is instant breakable.
-	Otherwise it returns the dig speed (float GetDigSpeed(BLOCKTYPE a_Block)) divided by the block hardness (cBlockInfo::GetHardness(BLOCKTYPE a_Block)) divided by 30 if the player can harvest the block and divided by 100 if he can't. */
-	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block);
+	/** Returns the progress mined per tick for the block a_Block as a fraction
+	(1 would be completely mined)
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
+
+	/** Given tool, enchantments, status effects, and world position
+	returns whether a_Block would be instantly mined.
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	bool CanInstantlyMine(BLOCKTYPE a_Block);
 
 	/** get player explosion exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
@@ -718,6 +731,7 @@ protected:
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
+	unsigned int m_EnchantmentSeed;
 
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;
@@ -797,8 +811,9 @@ private:
 	Returns one if using hand.
 	If the player is using a tool that is good to break the block the value is higher.
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
-	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
-	If he is not on ground it also gets divided by 5. */
+	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
+	If he is not on ground it also gets divided by 5.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
 
 	/** Add the recipe Id to the known recipes.

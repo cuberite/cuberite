@@ -8,7 +8,7 @@
 
 
 
-class cBlockJukeboxHandler :
+class cBlockJukeboxHandler final :
 	public cClearMetaOnDrop<cBlockEntityHandler>
 {
 public:

@@ -233,7 +233,7 @@ public:  // tolua_export
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;
@@ -562,6 +562,8 @@ private:
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
 
+	/** The fraction between 0 and 1, of how far through mining the currently mined block is.
+	0 for just started, 1 for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */

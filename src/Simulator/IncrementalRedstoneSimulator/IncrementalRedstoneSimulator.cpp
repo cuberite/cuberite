@@ -39,7 +39,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 		ProcessWorkItem(*NeighbourChunk, *a_Chunk, CurrentLocation);
 	}
 
-	for (const auto Position : ChunkData.AlwaysTickedPositions)
+	for (const auto & Position : ChunkData.AlwaysTickedPositions)
 	{
 		ChunkData.WakeUp(Position);
 	}
@@ -119,7 +119,7 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 	// The only thing to do go one block farther than this cross-coord, in the direction of Offset
 	// in order to notify linked-powered positions that there was a change
 
-	for (const auto Offset : cSimulator::GetLinkedOffsets(a_Offset))
+	for (const auto & Offset : cSimulator::GetLinkedOffsets(a_Offset))
 	{
 		auto Relative = a_Position - a_Offset + Offset;
 		if (!cChunkDef::IsValidHeight(Relative.y))
