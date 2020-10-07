@@ -8,7 +8,7 @@
 
 
 
-class cBlockRedstoneHandler:
+class cBlockRedstoneHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

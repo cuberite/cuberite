@@ -8,7 +8,7 @@
 
 
 
-class cBlockSaplingHandler :
+class cBlockSaplingHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

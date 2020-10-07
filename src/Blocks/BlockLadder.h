@@ -8,7 +8,7 @@
 
 
 
-class cBlockLadderHandler:
+class cBlockLadderHandler final :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;

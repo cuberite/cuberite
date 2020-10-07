@@ -6,7 +6,7 @@
 
 
 
-class cBlockCakeHandler:
+class cBlockCakeHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

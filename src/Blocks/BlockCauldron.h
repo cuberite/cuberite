@@ -8,7 +8,7 @@
 
 
 
-class cBlockCauldronHandler :
+class cBlockCauldronHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

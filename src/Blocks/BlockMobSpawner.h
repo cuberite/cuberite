@@ -8,7 +8,7 @@
 
 
 
-class cBlockMobSpawnerHandler:
+class cBlockMobSpawnerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

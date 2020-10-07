@@ -7,7 +7,7 @@
 
 
 
-class cBlockPortalHandler:
+class cBlockPortalHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

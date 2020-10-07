@@ -7,7 +7,7 @@
 
 
 
-class cBlockGravelHandler :
+class cBlockGravelHandler final :
 	public cBlockHandler
 {
 public:

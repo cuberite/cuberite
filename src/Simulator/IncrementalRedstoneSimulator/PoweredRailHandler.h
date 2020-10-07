@@ -7,7 +7,9 @@
 
 namespace PoweredRailHandler
 {
-	Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)  // Not in cBlockRailHandler since specific to powered rails
+	/** Get the offset along which the rail faces.
+	Not in cBlockRailHandler since specific to powered rails. */
+	inline Vector3i GetPoweredRailAdjacentXZCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
 		{

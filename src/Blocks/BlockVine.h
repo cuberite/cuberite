@@ -6,7 +6,7 @@
 
 
 
-class cBlockVineHandler :
+class cBlockVineHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
