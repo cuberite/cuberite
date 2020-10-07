@@ -108,41 +108,45 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 
 			// The main island can get a different airthreshold. This way the other island can be more sparse while the main island
 			// is one big island.
-			if (distanceFromSpawn > m_MainIslandSize) {
-				if (noise <= m_AirThresholdOtherIslands) {
+			if (distanceFromSpawn > m_MainIslandSize)
+			{
+				if (noise <= m_AirThresholdOtherIslands)
+				{
 					continue;
 				}
 				noise -= m_AirThresholdOtherIslands;
 			}
-			else {
-				if (noise <= m_AirThresholdMainIsland) {
+			else
+			{
+				if (noise <= m_AirThresholdMainIsland)
+				{
 					continue;
 				}
 				noise -= m_AirThresholdMainIsland;
 			}
-			
 			NOISE_DATATYPE voidOffset = VoidOffsetData[z * cChunkDef::Width + x];
 
 
 			float maxHeightLimit;
-			if (distanceFromSpawn > m_MainIslandSize * 3) {
+			if (distanceFromSpawn > m_MainIslandSize * 3)
+			{
 				// The distance from spawn is so big we don't need to calculate the max height anymore.
 				// In fact, if we don't cut it off somewhere there is a chance the maxheight gets too big which
 				// can cause corrupted looking terrain.
 				maxHeightLimit = static_cast<float>(cChunkDef::Height);
 			}
-			else {
-				// Create a void between the main island and the other island using the formula 'x^3 - 3*x' where x is distance from spawn.
+			else
+			{
+				// Create a void between the main island and the other island using the formula 'x^3 - 3 * x' where x is distance from spawn.
 				auto pow = std::pow((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize, 3);
 				auto mult = 3 * ((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize);
 				maxHeightLimit = Clamp((pow - mult) * 100 + static_cast<double>(voidOffset) * m_VoidOffsetNoiseMultiplier, 0.0, static_cast<double>(cChunkDef::Height));
 			}
-			
 			int maxHeight = Clamp(m_BaseHeight + noise * m_TerrainTopMultiplier, 0.0f, maxHeightLimit);
 			int minHeight = Clamp(m_BaseHeight - noise * m_TerrainBottomMultiplier, 0.0f, static_cast<NOISE_DATATYPE>(cChunkDef::Height));
 
-
-			for (int y = minHeight; y < maxHeight; y++) {
+			for (int y = minHeight; y < maxHeight; y++)
+			{
 				a_Shape[y + x * 256 + z * 256 * 16] = 1;
 			}
 		}

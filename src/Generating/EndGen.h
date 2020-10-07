@@ -53,5 +53,5 @@ protected:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 
 	// cTerrainShapeGen overrides:
-	virtual void InitializeShapeGen(cIniFile& a_IniFile) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override;
 } ;
