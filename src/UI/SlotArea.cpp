@@ -1148,6 +1148,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 
 		RepairCost += Sacrifice.m_RepairCost;
+		// Can we repair with sacrifce material?
 		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
@@ -1174,7 +1175,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		}
 		else
 		{
-			// Tool and armor repair with two tools / armors
+			// No result if we can't repair with the sacrifice
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
 				// No enchantment
@@ -1184,22 +1185,22 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			if ((Target.GetMaxDamage() > 0) && !IsEnchantBook)
+			// Can we repair with sacrifice tool / armour?
+			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage!=0))
 			{
-				int FirstDamageDiff = Target.GetMaxDamage() - Target.m_ItemDamage;
-				int SecondDamageDiff = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
-				int Damage = SecondDamageDiff + Target.GetMaxDamage() * 12 / 100;
+				// Durability = MaxDamage - m_ItemDamage = how far from broken
+				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
+				const short SacrificeDurability = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
+				// How much durability to repair by:
+				const short RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
 
-				int NewItemDamage = Target.GetMaxDamage() - (FirstDamageDiff + Damage);
-				if (NewItemDamage > 0)
-				{
-					NewItemDamage = 0;
-				}
+				// Don't give item a negative damage:
+				short NewItemDamage = std::max<short>(Target.GetMaxDamage() - (TargetDurability + RepairDurability), 0);
 
 				if (NewItemDamage < Target.m_ItemDamage)
 				{
 					Target.m_ItemDamage = static_cast<short>(NewItemDamage);
-					NeedExp += std::max(1, Damage / 100);
+					NeedExp += std::max(1, RepairDurability / 100);
 				}
 			}
 
