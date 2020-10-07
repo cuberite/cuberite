@@ -225,7 +225,7 @@ void cBeaconEntity::GiveEffects(void)
 		return;
 	}
 
-	int Radius = m_BeaconLevel * 10 + 10;
+	double Radius = static_cast<double>(m_BeaconLevel) * 10 + 10;
 	short EffectLevel = 0;
 	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect == m_SecondaryEffect))
 	{
@@ -234,28 +234,22 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	Vector3d BeaconPosition(m_Pos);
-	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
+	auto Area = cBoundingBox(m_Pos, Radius, cChunkDef::Height - 1, static_cast<double>(-m_Pos.y));
+	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsPlayer())
 		{
-			auto PlayerPosition = a_Player.GetPosition();
-			if (PlayerPosition.y > BeaconPosition.y)
-			{
-				PlayerPosition.y = BeaconPosition.y;
-			}
-
-			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
-			if ((PlayerPosition - BeaconPosition).Length() <= Radius)
-			{
-				a_Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
-
-				if (HasSecondaryEffect)
-				{
-					a_Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
-				}
-			}
 			return false;
 		}
-	);
+		auto & Player = static_cast<cPlayer &>(a_Entity);
+		Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
+
+		if (HasSecondaryEffect)
+		{
+			Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
+		}
+		return false;
+	});
 }
 
 
