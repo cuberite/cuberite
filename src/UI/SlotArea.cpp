@@ -1127,11 +1127,11 @@ void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 {
-	cItem Input(*GetSlot(0, a_Player));
-	cItem SecondInput(*GetSlot(1, a_Player));
+	cItem Target(*GetSlot(0, a_Player));
+	cItem Sacrifice(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
 
-	if (Input.IsEmpty())
+	if (Target.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
@@ -1141,17 +1141,17 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
-	int RepairCost = Input.m_RepairCost;
+	int RepairCost = Target.m_RepairCost;
 	int NeedExp = 0;
-	if (!SecondInput.IsEmpty())
+	if (!Sacrifice.IsEmpty())
 	{
-		bool IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+		bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 
-		RepairCost += SecondInput.m_RepairCost;
-		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
+		RepairCost += Sacrifice.m_RepairCost;
+		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
+			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1162,11 +1162,11 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 
 			int x = 0;
-			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
+			while ((DamageDiff > 0) && (x < Sacrifice.m_ItemCount))
 			{
-				Input.m_ItemDamage -= DamageDiff;
-				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Input.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
+				Target.m_ItemDamage -= DamageDiff;
+				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
+				DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 
 				++x;
 			}
@@ -1175,7 +1175,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		else
 		{
 			// Tool and armor repair with two tools / armors
-			if (!IsEnchantBook && (!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
+			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
 				// No enchantment
 				Output.Empty();
@@ -1184,27 +1184,27 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			if ((Input.GetMaxDamage() > 0) && !IsEnchantBook)
+			if ((Target.GetMaxDamage() > 0) && !IsEnchantBook)
 			{
-				int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
-				int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
-				int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
+				int FirstDamageDiff = Target.GetMaxDamage() - Target.m_ItemDamage;
+				int SecondDamageDiff = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
+				int Damage = SecondDamageDiff + Target.GetMaxDamage() * 12 / 100;
 
-				int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
+				int NewItemDamage = Target.GetMaxDamage() - (FirstDamageDiff + Damage);
 				if (NewItemDamage > 0)
 				{
 					NewItemDamage = 0;
 				}
 
-				if (NewItemDamage < Input.m_ItemDamage)
+				if (NewItemDamage < Target.m_ItemDamage)
 				{
-					Input.m_ItemDamage = static_cast<short>(NewItemDamage);
+					Target.m_ItemDamage = static_cast<short>(NewItemDamage);
 					NeedExp += std::max(1, Damage / 100);
 				}
 			}
 
 			// Add the enchantments from the sacrifice to the target
-			int EnchantmentCost = Input.AddEnchantmentsFromItem(SecondInput);
+			int EnchantmentCost = Target.AddEnchantmentsFromItem(Sacrifice);
 			NeedExp += EnchantmentCost;
 		}
 	}
@@ -1214,32 +1214,32 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
-		if (!Input.m_CustomName.empty())
+		if (!Target.m_CustomName.empty())
 		{
-			NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Input.m_CustomName = "";
+			Target.m_CustomName = "";
 		}
 	}
-	else if (RepairedItemName != Input.m_CustomName)
+	else if (RepairedItemName != Target.m_CustomName)
 	{
 		// Change custom name
-		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+		NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
-		if (!Input.m_CustomName.empty())
+		if (!Target.m_CustomName.empty())
 		{
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Input.m_CustomName = RepairedItemName;
+		Target.m_CustomName = RepairedItemName;
 	}
 
 	m_MaximumCost = RepairCost + NeedExp;
 
 	if (NeedExp < 0)
 	{
-		Input.Empty();
+		Target.Empty();
 	}
 
 	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
@@ -1248,22 +1248,22 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 	if ((m_MaximumCost >= 40) && !a_Player.IsGameModeCreative())
 	{
-		Input.Empty();
+		Target.Empty();
 	}
 
-	if (!Input.IsEmpty())
+	if (!Target.IsEmpty())
 	{
-		RepairCost = std::max(Input.m_RepairCost, SecondInput.m_RepairCost);
-		if (!Input.m_CustomName.empty())
+		RepairCost = std::max(Target.m_RepairCost, Sacrifice.m_RepairCost);
+		if (!Target.m_CustomName.empty())
 		{
 			RepairCost -= 9;
 		}
 		RepairCost = std::max(RepairCost, 0);
 		RepairCost += 2;
-		Input.m_RepairCost = RepairCost;
+		Target.m_RepairCost = RepairCost;
 	}
 
-	SetSlot(2, a_Player, Input);
+	SetSlot(2, a_Player, Target);
 	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost));
 }
 
