@@ -34,6 +34,8 @@ enum
 
 cEndGen::cEndGen(int a_Seed) :
 	m_Seed(a_Seed),
+	m_Perlin(a_Seed),
+	m_VoidOffsetNoise(a_Seed + 1000),
 	m_AirThresholdMainIsland(0.0f),
 	m_AirThresholdOtherIslands(0.5f),
 	m_MainIslandSize(450),
@@ -43,9 +45,7 @@ cEndGen::cEndGen(int a_Seed) :
 	m_VoidOffsetNoiseMultiplier(50),
 	m_FrequencyX(80),
 	m_FrequencyY(80),
-	m_FrequencyZ(80),
-	m_Perlin(a_Seed),
-	m_VoidOffsetNoise(a_Seed + 1000)
+	m_FrequencyZ(80)
 {
 	m_Perlin.AddOctave(1, 1);
 	m_Perlin.AddOctave(2, 0.5);
@@ -127,7 +127,7 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 			NOISE_DATATYPE voidOffset = VoidOffsetData[z * cChunkDef::Width + x];
 
 
-			float maxHeightLimit;
+			double maxHeightLimit;
 			if (distanceFromSpawn > m_MainIslandSize * 3)
 			{
 				// The distance from spawn is so big we don't need to calculate the max height anymore.
@@ -138,12 +138,12 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 			else
 			{
 				// Create a void between the main island and the other island using the formula 'x^3 - 3 * x' where x is distance from spawn.
-				auto pow = std::pow((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize, 3);
-				auto mult = 3 * ((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize);
+				double pow = std::pow((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize, 3);
+				double mult = 3 * ((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize);
 				maxHeightLimit = Clamp((pow - mult) * 100 + static_cast<double>(voidOffset) * m_VoidOffsetNoiseMultiplier, 0.0, static_cast<double>(cChunkDef::Height));
 			}
-			int maxHeight = Clamp(m_BaseHeight + noise * m_TerrainTopMultiplier, 0.0f, maxHeightLimit);
-			int minHeight = Clamp(m_BaseHeight - noise * m_TerrainBottomMultiplier, 0.0f, static_cast<NOISE_DATATYPE>(cChunkDef::Height));
+			int maxHeight = static_cast<int>(Clamp(m_BaseHeight + static_cast<double>(noise) * m_TerrainTopMultiplier, 0.0, maxHeightLimit));
+			int minHeight = static_cast<int>(Clamp(m_BaseHeight - static_cast<double>(noise) * m_TerrainBottomMultiplier, 0.0, static_cast<double>(cChunkDef::Height)));
 
 			for (int y = minHeight; y < maxHeight; y++)
 			{
