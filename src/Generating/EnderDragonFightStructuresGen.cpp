@@ -79,6 +79,7 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
+
 void cEnderDragonFightStructuresGen::PlaceFountainSouthEast(cChunkDesc & a_ChunkDesc) const
 {
 	// Places the center post
@@ -174,13 +175,15 @@ void cEnderDragonFightStructuresGen::PlaceFountainNorthWest(cChunkDesc &a_ChunkD
 
 
 
+
 void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const Vector3i & a_AbsPos)
 {
 	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
 	sTowerProperties Properties = {0, 0, false};
 	// Choose random height
-	int Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerHeights.size();;
-	do {
+	int Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerHeights.size();
+	do
+	{
 		Index = (Index + 1) % m_TowerHeights.size();
 		Properties = m_TowerHeights[Index];
 	} while (Properties.m_Height == 0);
