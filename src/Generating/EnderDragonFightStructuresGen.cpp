@@ -32,6 +32,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AStri
 		else
 		{
 			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s", TowerProperty, TowerPropertyVector[2]);
+			continue;
 		}
 		m_TowerProperties.emplace_back(sTowerProperties(Height, Radius, HasCage));
 	}
