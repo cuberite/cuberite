@@ -6,7 +6,7 @@
 
 
 
-class cBlockBookShelfHandler :
+class cBlockBookShelfHandler final :
 	public cBlockHandler
 {
 public:

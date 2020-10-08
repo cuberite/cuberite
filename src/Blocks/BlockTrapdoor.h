@@ -8,7 +8,7 @@
 
 
 
-class cBlockTrapdoorHandler :
+class cBlockTrapdoorHandler final :
 	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
 	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;

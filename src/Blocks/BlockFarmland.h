@@ -16,7 +16,7 @@
 
 
 
-class cBlockFarmlandHandler :
+class cBlockFarmlandHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

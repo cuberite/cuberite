@@ -7,7 +7,7 @@
 
 
 
-class cBlockSeaLanternHandler :
+class cBlockSeaLanternHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

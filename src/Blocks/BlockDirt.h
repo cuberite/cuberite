@@ -7,7 +7,7 @@
 
 
 
-class cBlockDirtHandler :
+class cBlockDirtHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

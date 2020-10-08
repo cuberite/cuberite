@@ -6,7 +6,7 @@
 
 
 
-class cBlockPressurePlateHandler :
+class cBlockPressurePlateHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;

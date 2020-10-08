@@ -10,7 +10,7 @@
 
 
 
-class cBlockGrassHandler :
+class cBlockGrassHandler final :
 	public cBlockHandler
 {
 public:

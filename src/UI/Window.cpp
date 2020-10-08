@@ -347,6 +347,75 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 
 
+void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
+{
+	// Translate local slot num into global slot num:
+	int SlotNum = 0;
+	bool HasFound = false;
+	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		if (a_Area == *itr)
+		{
+			SlotNum += a_LocalSlotNum;
+			HasFound = true;
+			break;
+		}
+		SlotNum += (*itr)->GetNumSlots();
+	}  // for itr - m_SlotAreas[]
+	if (!HasFound)
+	{
+		LOGWARNING("%s: Invalid slot area parameter", __FUNCTION__);
+		ASSERT(!"Invalid slot area");
+		return;
+	}
+
+	// Broadcast the update packet:
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::SendWholeWindow(cClientHandle & a_Client)
+{
+	a_Client.SendWholeInventory(*this);
+}
+
+
+
+
+
+void cWindow::BroadcastWholeWindow(void)
+{
+	cCSLock Lock(m_CS);
+	for (auto Player : m_OpenedBy)
+	{
+		SendWholeWindow(*Player->GetClientHandle());
+	}
+}
+
+
+
+
+
+void cWindow::SetProperty(size_t a_Property, short a_Value)
+{
+	cCSLock Lock(m_CS);
+	for (auto Player : m_OpenedBy)
+	{
+		Player->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+	}
+}
+
+
+
+
+
 void cWindow::OwnerDestroyed()
 {
 	m_Owner = nullptr;
@@ -685,84 +754,3 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	}  // for itr - SlotNums[]
 	return NumDistributed;
 }
-
-
-
-
-
-void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
-{
-	// Translate local slot num into global slot num:
-	int SlotNum = 0;
-	bool HasFound = false;
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
-	{
-		if (a_Area == *itr)
-		{
-			SlotNum += a_LocalSlotNum;
-			HasFound = true;
-			break;
-		}
-		SlotNum += (*itr)->GetNumSlots();
-	}  // for itr - m_SlotAreas[]
-	if (!HasFound)
-	{
-		LOGWARNING("%s: Invalid slot area parameter", __FUNCTION__);
-		ASSERT(!"Invalid slot area");
-		return;
-	}
-
-	// Broadcast the update packet:
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
-	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SendWholeWindow(cClientHandle & a_Client)
-{
-	a_Client.SendWholeInventory(*this);
-}
-
-
-
-
-
-void cWindow::BroadcastWholeWindow(void)
-{
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
-	{
-		SendWholeWindow(*(*itr)->GetClientHandle());
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SetProperty(short a_Property, short a_Value)
-{
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
-	{
-		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
-{
-	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
-}
-
-
-

@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockInfo.h"
+#include "Explodinator.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/ChunkInterface.h"
 #include "Chunk.h"
@@ -19,7 +20,7 @@ namespace Explodinator
 	const auto KnockbackFactor = 25U;
 	const auto StepAttenuation = 0.225f;
 	const auto TraceCubeSideLength = 16U;
-	const auto BoundingBoxStepUnit = 0.5f;
+	const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
 	static Vector3f AbsoluteToRelative(const Vector3f a_Position, const cChunkCoords a_ChunkPosition)
@@ -41,17 +42,18 @@ namespace Explodinator
 	/** Calculates the approximate percentage of an Entity's bounding box that is exposed to an explosion centred at Position. */
 	static float CalculateEntityExposure(cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const float a_SquareRadius)
 	{
+		const Vector3d Position = a_Position;
 		unsigned Unobstructed = 0, Total = 0;
 		const auto Box = a_Entity.GetBoundingBox();
 
-		for (float X = Box.GetMinX(); X < Box.GetMaxX(); X += BoundingBoxStepUnit)
+		for (double X = Box.GetMinX(); X < Box.GetMaxX(); X += BoundingBoxStepUnit)
 		{
-			for (float Y = Box.GetMinY(); Y < Box.GetMaxY(); Y += BoundingBoxStepUnit)
+			for (double Y = Box.GetMinY(); Y < Box.GetMaxY(); Y += BoundingBoxStepUnit)
 			{
-				for (float Z = Box.GetMinZ(); Z < Box.GetMaxZ(); Z += BoundingBoxStepUnit)
+				for (double Z = Box.GetMinZ(); Z < Box.GetMaxZ(); Z += BoundingBoxStepUnit)
 				{
-					const auto Destination = Vector3f(X, Y, Z);
-					if ((Destination - a_Position).SqrLength() > a_SquareRadius)
+					const Vector3d Destination{X, Y, Z};
+					if ((Destination - Position).SqrLength() > a_SquareRadius)
 					{
 						// Don't bother with points outside our designated area-of-effect
 						// This is, surprisingly, a massive amount of work saved (~3m to detonate a sphere of 37k TNT before, ~1m after):
@@ -100,7 +102,7 @@ namespace Explodinator
 	}
 
 	/** Sets the block at the given position, updating surroundings. */
-	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock)
+	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
 
@@ -111,12 +113,12 @@ namespace Explodinator
 		a_Chunk.SetBlock(a_RelativePosition, a_NewBlock, 0);
 
 		cChunkInterface Interface(a_World.GetChunkMap());
-		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta);
+		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, a_ExplodingEntity);
 	}
 
 	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
-	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery)
+	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
 		if (DestroyedBlock == E_BLOCK_AIR)
@@ -148,7 +150,7 @@ namespace Explodinator
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
-				DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE);
+				DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
 				return;
 			}
 		}
@@ -167,11 +169,11 @@ namespace Explodinator
 			}
 		}
 
-		DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR);
+		DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
@@ -204,7 +206,7 @@ namespace Explodinator
 				break;
 			}
 
-			DestroyBlock(*Neighbour, Position, a_Power, a_Fiery);
+			DestroyBlock(*Neighbour, Position, a_Power, a_Fiery, a_ExplodingEntity);
 
 			// Adjust coordinates to be relative to the neighbour chunk:
 			Checkpoint = RebaseRelativePosition(a_Chunk->GetPos(), Neighbour->GetPos(), Checkpoint);
@@ -218,7 +220,7 @@ namespace Explodinator
 	}
 
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
-	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery)
+	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto Intensity = a_Power * (0.7f + GetRandomProvider().RandReal(0.6f));
 		const auto ExplosionRadius = CeilC((Intensity / StepAttenuation) * StepUnit);
@@ -234,8 +236,8 @@ namespace Explodinator
 		{
 			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
 			}
 		}
 
@@ -261,10 +263,10 @@ namespace Explodinator
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, Intensity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, Intensity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, Intensity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, Intensity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
 			}
 		}
 	}
@@ -278,13 +280,13 @@ namespace Explodinator
 		}
 	}
 
-	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery)
+	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
-		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery](cChunk & a_Chunk)
+		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{
 			LagTheClient(a_Chunk, a_Position, a_Power);
 			DamageEntities(a_Chunk, a_Position, a_Power);
-			DamageBlocks(a_Chunk, AbsoluteToRelative(a_Position, a_Chunk.GetPos()), a_Power, a_Fiery);
+			DamageBlocks(a_Chunk, AbsoluteToRelative(a_Position, a_Chunk.GetPos()), a_Power, a_Fiery, a_ExplodingEntity);
 
 			return false;
 		});

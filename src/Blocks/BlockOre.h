@@ -7,7 +7,7 @@
 
 
 
-class cBlockOreHandler:
+class cBlockOreHandler :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -15,6 +15,10 @@ class cBlockOreHandler:
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockOreHandler() = default;
 
 private:
 
@@ -60,26 +64,33 @@ private:
 
 
 
-	virtual void OnPlayerBrokeBlock(
+	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player, Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override
 	{
-		if (!a_Player.IsGameModeSurvival())
+		if (!a_Digger->IsPlayer())
+		{
+			return;
+		}
+
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
+		if (!Player->IsGameModeSurvival())
 		{
 			// Don't drop XP unless the player is in survival mode.
 			return;
 		}
 
-		if (a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
+		if (Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
 			return;
 		}
 
-		auto & random = GetRandomProvider();
-		int reward = 0;
+		auto & Random = GetRandomProvider();
+		int Reward = 0;
 
 		switch (a_OldBlockType)
 		{
@@ -87,36 +98,36 @@ private:
 			case E_BLOCK_LAPIS_ORE:
 			{
 				// Lapis and nether quartz get 2 - 5 experience
-				reward = random.RandInt(2, 5);
+				Reward = Random.RandInt(2, 5);
 				break;
 			}
 			case E_BLOCK_REDSTONE_ORE:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{
 				// Redstone gets 1 - 5 experience
-				reward = random.RandInt(1, 5);
+				Reward = Random.RandInt(1, 5);
 				break;
 			}
 			case E_BLOCK_DIAMOND_ORE:
 			case E_BLOCK_EMERALD_ORE:
 			{
 				// Diamond and emerald get 3 - 7 experience
-				reward = random.RandInt(3, 7);
+				Reward = Random.RandInt(3, 7);
 				break;
 			}
 			case E_BLOCK_COAL_ORE:
 			{
 				// Coal gets 0 - 2 experience
-				reward = random.RandInt(2);
+				Reward = Random.RandInt(2);
 				break;
 			}
 
 			default: break;
 		}
 
-		if (reward > 0)
+		if (Reward > 0)
 		{
-			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
+			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 		}
 	}
 } ;
@@ -124,3 +135,11 @@ private:
 
 
 
+
+class cDefaultOreHandler final :
+	public cBlockOreHandler
+{
+public:
+
+	using cBlockOreHandler::cBlockOreHandler;
+};

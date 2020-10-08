@@ -7932,7 +7932,7 @@ namespace Palette_1_13_1
 			case Statistic::WalkOneCm: return 5;
 			case Statistic::WalkOnWaterOneCm: return 18;
 			case Statistic::WalkUnderWaterOneCm: return 12;
-			default: return -1;
+			default: return UInt32(-1);
 		}
 	}
 

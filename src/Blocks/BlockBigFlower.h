@@ -9,7 +9,7 @@
 
 
 
-class cBlockBigFlowerHandler:
+class cBlockBigFlowerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -115,8 +115,14 @@ private:
 
 
 
-	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, const Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) const override
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		const Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override
 	{
+		UNUSED(a_Digger);
 		if ((a_OldBlockMeta & 0x8) != 0)
 		{
 			// Was upper part of flower

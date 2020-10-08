@@ -75,7 +75,7 @@ namespace RedstoneTorchHandler
 		a_Chunk.FastSetBlock(a_Position, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
 		Data.m_MechanismDelays.erase(a_Position);
 
-		for (const auto Adjacent : RelativeAdjacents)
+		for (const auto & Adjacent : RelativeAdjacents)
 		{
 			// Update all adjacents (including linked power positions)
 			// apart from our attachment, which can't possibly need an update:

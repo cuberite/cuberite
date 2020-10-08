@@ -8,7 +8,7 @@
 
 
 
-class cBlockNetherWartHandler:
+class cBlockNetherWartHandler final :
 	public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
