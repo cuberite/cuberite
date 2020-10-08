@@ -262,7 +262,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "EnderDragonFightStructures");
+			a_IniFile.GetValueSet("Generator", "Finishers","EnderDragonFightStructures");
 			break;
 		}  // dimEnd
 
@@ -454,7 +454,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(finisher, "EnderDragonFightStructures") == 0)
 		{
-			m_FinishGens.push_back(cFinishGenPtr(new cEnderDragonFightStructuresGen(m_Seed)));
+			AString Pillars = a_IniFile.GetValueSet("Generator", "ObsidianPillars",
+				"76|3|false; 79|3|true; 82|3|true; "
+				"85|4|false; 88|4|false; 91|4|false; "
+				"94|5|false; 97|5|false; 100|5|false; "
+				"103|6|false");
+			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
+			m_FinishGens.push_back(cFinishGenPtr(new cEnderDragonFightStructuresGen(m_Seed, Pillars, Radius)));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{

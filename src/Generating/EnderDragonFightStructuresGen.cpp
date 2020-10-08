@@ -5,22 +5,34 @@
 #include "../Chunk.h"
 #include "../Entities/EnderCrystal.h"
 
-#define RADIUS 43
-#define TOWERCOUNT 10.0f
-
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius) :
 	m_Noise(a_Seed)
 {
-	// Generate 10 Positions where the tower should spawn
-
+	// Reads the given tower properties
+	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
+	for (const auto & TowerProperty : TowerPropertiesVector)
+	{
+		const auto TowerPropertyVector = StringSplitAndTrim(TowerProperty, "|");
+		if (TowerPropertyVector.size() != 3)
+		{
+			LOGWARNING("Got unmatching parameters on generating obsidian pillars: %s, Please use \"Height|Radius|HasCage\", ...", TowerProperty);
+			continue;
+		}
+		int Height = std::stoi(TowerPropertyVector[0]);
+		int Radius = std::stoi(TowerPropertyVector[1]);
+		bool HasCage = false;
+		if (NoCaseCompare(TowerPropertyVector[2], "true") == 0)
+		{
+			HasCage = true;
+		}
+		m_TowerProperties.emplace_back(sTowerProperties(Height, Radius, HasCage));
+	}
 	// A random angle in radian
 	double Angle = m_Noise.IntNoise1D(a_Seed) * M_PI + M_PI;
-	// Generate 10 Positions in a circle with thr radius of 43
-	for (int i = 0; i < 10; i++)
+	// Generate Positions in a circle
+	for (int i = 0; i < static_cast<int>(m_TowerProperties.size()); i++)
 	{
-		auto TowerPos = Vector3i(static_cast<int>(FloorC(RADIUS * cos(Angle))), 0, static_cast<int>(FloorC(RADIUS * sin(Angle))));
-
-
+		auto TowerPos = Vector3i(static_cast<int>(FloorC(a_Radius * cos(Angle))), 0, static_cast<int>(FloorC(a_Radius * sin(Angle))));
 		auto ChunkX = static_cast<int>(FloorC(TowerPos.x / cChunkDef::Width));
 		if (TowerPos.x < 0)
 		{
@@ -33,7 +45,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 		}
 
 		m_TowerPos[cChunkCoords(ChunkX, ChunkZ)] = TowerPos;
-		Angle = fmod(Angle + (2.0f * M_PI / TOWERCOUNT), 2.0f * M_PI);
+		Angle = fmod(Angle + (2.0f * M_PI / static_cast<double>(m_TowerProperties.size())), 2.0f * M_PI);
 	}
 }
 
@@ -186,11 +198,11 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
 	sTowerProperties Properties = {0, 0, false};
 	// Choose random height
-	unsigned long Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerHeights.size();
+	unsigned long Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerProperties.size();
 	do
 	{
-		Index = (Index + 1) % m_TowerHeights.size();
-		Properties = m_TowerHeights[Index];
+		Index = (Index + 1) % m_TowerProperties.size();
+		Properties = m_TowerProperties[Index];
 	} while (Properties.m_Height == 0);
 
 	// Make sure the tower does not cross chunk boarders
@@ -251,5 +263,5 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 		}
 	}
 	// Set the height to zero that this tower has been generated
-	m_TowerHeights[Index].m_Height = 0;
+	m_TowerProperties[Index].m_Height = 0;
 }

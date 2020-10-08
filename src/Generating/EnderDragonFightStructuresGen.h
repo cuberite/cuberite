@@ -11,7 +11,7 @@ class cEnderDragonFightStructuresGen :
 	public cFinishGen
 {
 public:
-	cEnderDragonFightStructuresGen(int a_Seed);
+	cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius);
 
 protected:
 	cNoise m_Noise;
@@ -29,19 +29,7 @@ protected:
 		{
 		}
 	};
-	std::array<sTowerProperties, 10> m_TowerHeights =
-	{
-		sTowerProperties(76,  3, false),
-		{79,  3, true},
-		{82,  3, true},
-		{85,  4, false},
-		{88,  4, false},
-		{91,  4, false},
-		{94,  5, false},
-		{97,  5, false},
-		{100, 5, false},
-		{103, 6, false},
-	};
+	std::vector<sTowerProperties> m_TowerProperties;
 
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
 	// Places the fountain elements
