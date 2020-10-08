@@ -207,7 +207,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
 	sTowerProperties Properties = {0, 0, false};
 	// Choose random height
-	unsigned long Index = static_cast<unsigned long>(m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerProperties.size());
+	unsigned long Index = static_cast<unsigned long>(m_Noise.IntNoise3DInt(a_AbsPos)) % m_TowerProperties.size();
 	do
 	{
 		Index = (Index + 1) % m_TowerProperties.size();
