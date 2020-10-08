@@ -290,10 +290,10 @@ void cBlockPistonHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
 	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-	const cEntity * a_Breaker
+	const cEntity * a_Digger
 ) const
 {
-	UNUSED(a_Breaker);
+	UNUSED(a_Digger);
 	if (!IsExtended(a_OldBlockMeta))
 	{
 		return;
@@ -303,7 +303,7 @@ void cBlockPistonHandler::OnBroken(
 	if (
 		cChunkDef::IsValidHeight(Extension.y) &&
 		(a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION)
-		)
+	)
 	{
 		// If the piston is extended, destroy the extension as well:
 		a_ChunkInterface.SetBlock(Extension, E_BLOCK_AIR, 0);
@@ -321,10 +321,10 @@ void cBlockPistonHeadHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
 	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-	const cEntity * a_Breaker
+	const cEntity * a_Digger
 ) const
 {
-	UNUSED(a_Breaker);
+	UNUSED(a_Digger);
 	const auto Base = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
 	if (!cChunkDef::IsValidHeight(Base.y))
 	{

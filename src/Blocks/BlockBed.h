@@ -58,7 +58,7 @@ private:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		const Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Breaker
+		const cEntity * a_Digger
 	) const override;
 
 	virtual bool OnUse(

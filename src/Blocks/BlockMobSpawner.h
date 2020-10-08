@@ -58,14 +58,15 @@ private:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Breaker
+		const cEntity * a_Digger
 	) const override
 	{
-		if (!a_Breaker->IsPlayer())
+		if (!a_Digger->IsPlayer())
 		{
 			return;
 		}
-		const auto Player = static_cast<const cPlayer *>(a_Breaker);
+
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
 		auto Handler = Player->GetEquippedItem().GetHandler();
 		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
 		{

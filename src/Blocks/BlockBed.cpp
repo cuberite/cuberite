@@ -19,10 +19,10 @@ void cBlockBedHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	const Vector3i a_BlockPos,
 	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-	const cEntity * a_Breaker
+	const cEntity * a_Digger
 ) const
 {
-	UNUSED(a_Breaker);
+	UNUSED(a_Digger);
 	auto Direction = MetaDataToDirection(a_OldBlockMeta & 0x03);
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{

@@ -76,12 +76,12 @@ public:
 	/** Called after a block gets broken (replaced with air), by natural means.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
 	By default notifies all direct neighbors via their OnNeighborChanged() callbacks.
-	You can determine what kind of entity broke the block (e.g. player by checking a_Breaker! */
+	You can determine what kind of entity broke the block (e.g. player) by checking a_Digger! */
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Breaker
+		const cEntity * a_Digger
 	) const {}
 
 	/** Called when a direct neighbor of this block has been changed.

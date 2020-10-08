@@ -102,7 +102,7 @@ namespace Explodinator
 	}
 
 	/** Sets the block at the given position, updating surroundings. */
-	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * a_ExplodingEntity)
+	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
 
@@ -118,7 +118,7 @@ namespace Explodinator
 
 	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
-	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * a_ExplodingEntity)
+	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
 		if (DestroyedBlock == E_BLOCK_AIR)
@@ -173,7 +173,7 @@ namespace Explodinator
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
@@ -220,7 +220,7 @@ namespace Explodinator
 	}
 
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
-	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * a_ExplodingEntity)
+	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto Intensity = a_Power * (0.7f + GetRandomProvider().RandReal(0.6f));
 		const auto ExplosionRadius = CeilC((Intensity / StepAttenuation) * StepUnit);
@@ -280,7 +280,7 @@ namespace Explodinator
 		}
 	}
 
-	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * a_ExplodingEntity)
+	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{

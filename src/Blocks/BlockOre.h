@@ -68,14 +68,15 @@ private:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Breaker
-	)const override
+		const cEntity * a_Digger
+	) const override
 	{
-		if (!a_Breaker->IsPlayer())
+		if (!a_Digger->IsPlayer())
 		{
 			return;
 		}
-		const auto Player = static_cast<const cPlayer *>(a_Breaker);
+
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
 		if (!Player->IsGameModeSurvival())
 		{
 			// Don't drop XP unless the player is in survival mode.

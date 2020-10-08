@@ -101,7 +101,7 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 
 
 
-bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Breaker)
+bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Digger)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -112,7 +112,7 @@ bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_Bl
 		return false;
 	}
 
-	cBlockHandler::For(BlockType).OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta, a_Breaker);
+	cBlockHandler::For(BlockType).OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta, a_Digger);
 	return true;
 }
 

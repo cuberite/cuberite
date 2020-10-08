@@ -1398,7 +1398,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
+	// Apply hunger:
 	m_Player->AddFoodExhaustion(0.025);
+
+	// Damage the tool, but not for 0 hardness blocks:
+	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
 	if (m_Player->IsGameModeSurvival())
@@ -1407,16 +1412,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	else
 	{
-		// Using the chunk maps DigBlock function to prevent calling BreakBlock and OnPlayerBrokeBlock simultaneously
-		World->GetChunkMap()->DigBlock(absPos);
+		World->DigBlock(absPos, m_Player);
 	}
 
-	// Damage the tool, but not for 0 hardness blocks:
-	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
-	m_Player->UseEquippedItem(dlAction);
-
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	cBlockHandler::For(a_OldBlock).OnBroken(ChunkInterface, *World, absPos, a_OldBlock, a_OldMeta, m_Player);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
