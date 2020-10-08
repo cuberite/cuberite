@@ -1127,11 +1127,11 @@ void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 {
-	cItem Target(*GetSlot(0, a_Player));
-	cItem Sacrifice(*GetSlot(1, a_Player));
+	const cItem Target(*GetSlot(0, a_Player));
+	const cItem Sacrifice(*GetSlot(1, a_Player));
 
 	// Output initialised as copy of target
-	cItem Output(*GetSlot(0, a_Player));
+	cItem Output(Target);
 
 	if (Target.IsEmpty())
 	{
@@ -1164,16 +1164,17 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			int x = 0;
-			while ((DamageDiff > 0) && (x < Sacrifice.m_ItemCount))
+			int NumItemsConsumed = 0;
+			// Repair until out of materials, or fully repaired
+			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
 				Output.m_ItemDamage -= DamageDiff;
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
 				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 
-				++x;
+				++NumItemsConsumed;
 			}
-			m_StackSizeToBeUsedInRepair = static_cast<char>(x);
+			m_StackSizeToBeUsedInRepair = static_cast<char>(NumItemsConsumed);
 		}
 		else  // Combining items
 		{
@@ -1201,7 +1202,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 				if (NewItemDamage < Target.m_ItemDamage)
 				{
-					Output.m_ItemDamage = static_cast<short>(NewItemDamage);
+					Output.m_ItemDamage = NewItemDamage;
 					NeedExp += std::max(1, RepairDurability / 100);
 				}
 			}
@@ -1270,6 +1271,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (Target.IsEqual(Output))
 	{
 		Output.Empty();
+		SetSlot(2, a_Player, Output);
+		m_ParentWindow.SetProperty(0, 0);
+		return;
 	}
 
 	SetSlot(2, a_Player, Output);
