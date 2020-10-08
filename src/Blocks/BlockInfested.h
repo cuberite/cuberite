@@ -42,17 +42,22 @@ private:
 
 
 
-	virtual void OnPlayerBrokeBlock(
+	virtual void OnBroken(
 			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-			cPlayer & a_Player,
 			Vector3i a_BlockPos,
-			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+			const cEntity * a_Digger
 	) const override
 	{
-		if (!a_Player.IsGameModeCreative())
+		if (a_Digger->IsPlayer())
 		{
-			SpawnSilverfish(a_ChunkInterface, a_WorldInterface, a_BlockPos);
+			const auto Player = static_cast<const cPlayer *>(a_Digger);
+			if (Player->IsGameModeCreative())
+			{
+				return;
+			}
 		}
+		SpawnSilverfish(a_WorldInterface, a_BlockPos);
 	}
 
 
@@ -64,7 +69,7 @@ private:
 
 
 
-	void SpawnSilverfish(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos) const
+	void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos) const
 	{
 		// TODO: only display animation if the difficulty allows mob spawns
 		// Spawn Silverfish
