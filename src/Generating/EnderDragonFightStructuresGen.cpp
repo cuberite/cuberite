@@ -20,10 +20,18 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AStri
 		}
 		int Height = std::stoi(TowerPropertyVector[0]);
 		int Radius = std::stoi(TowerPropertyVector[1]);
-		bool HasCage = false;
+		bool HasCage;
 		if (NoCaseCompare(TowerPropertyVector[2], "true") == 0)
 		{
 			HasCage = true;
+		}
+		else if (NoCaseCompare(TowerPropertyVector[2], "false") == 0)
+		{
+			HasCage = false;
+		}
+		else
+		{
+			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s", TowerProperty, TowerPropertyVector[2]);
 		}
 		m_TowerProperties.emplace_back(sTowerProperties(Height, Radius, HasCage));
 	}
@@ -198,7 +206,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
 	sTowerProperties Properties = {0, 0, false};
 	// Choose random height
-	unsigned long Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerProperties.size();
+	unsigned long Index = static_cast<unsigned long>(m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerProperties.size());
 	do
 	{
 		Index = (Index + 1) % m_TowerProperties.size();
