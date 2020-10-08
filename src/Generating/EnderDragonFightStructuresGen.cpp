@@ -5,6 +5,9 @@
 #include "../Chunk.h"
 #include "../Entities/EnderCrystal.h"
 
+#define RADIUS 43
+#define TOWERCOUNT 10.0f
+
 cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 	m_Noise(a_Seed)
 {
@@ -15,7 +18,9 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 	// Generate 10 Positions in a circle with thr radius of 43
 	for (int i = 0; i < 10; i++)
 	{
-		auto TowerPos = Vector3i(static_cast<int>(FloorC(43 * cos(Angle))), 0, static_cast<int>(FloorC(43 * sin(Angle))));
+		auto TowerPos = Vector3i(static_cast<int>(FloorC(RADIUS * cos(Angle))), 0, static_cast<int>(FloorC(RADIUS * sin(Angle))));
+
+
 		auto ChunkX = static_cast<int>(FloorC(TowerPos.x / cChunkDef::Width));
 		if (TowerPos.x < 0)
 		{
@@ -28,7 +33,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 		}
 
 		m_TowerPos[cChunkCoords(ChunkX, ChunkZ)] = TowerPos;
-		Angle = fmod(Angle + (M_PI / 5.0f), 2.0f * M_PI);
+		Angle = fmod(Angle + (2.0f * M_PI / TOWERCOUNT), 2.0f * M_PI);
 	}
 }
 
@@ -181,7 +186,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
 	sTowerProperties Properties = {0, 0, false};
 	// Choose random height
-	int Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerHeights.size();
+	unsigned long Index = m_Noise.IntNoise3DInt(a_AbsPos) % m_TowerHeights.size();
 	do
 	{
 		Index = (Index + 1) % m_TowerHeights.size();
@@ -189,10 +194,8 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	} while (Properties.m_Height == 0);
 
 	// Make sure the tower does not cross chunk boarders
-	Pos.x = std::max(Pos.x, Properties.m_Radius - 1);
-	Pos.x = std::min(Pos.x, cChunkDef::Width - Properties.m_Radius);
-	Pos.z = std::max(Pos.z, Properties.m_Radius - 1);
-	Pos.z = std::min(Pos.z, cChunkDef::Width - Properties.m_Radius);
+	Pos.x = Clamp(Pos.x, Properties.m_Radius - 1, cChunkDef::Width - Properties.m_Radius);
+	Pos.z = Clamp(Pos.z, Properties.m_Radius - 1, cChunkDef::Width - Properties.m_Radius);
 
 	// Place obsidian pillar
 	for (int Y = 0; Y <= Properties.m_Height - 2; Y++)
