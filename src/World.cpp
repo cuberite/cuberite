@@ -1394,7 +1394,27 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
 		// TODO: CanCauseFire gets reset to false for some reason
-		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC<unsigned>(a_ExplosionSize), a_CanCauseFire);
+
+		const cEntity * Entity;
+		switch (a_Source)
+		{
+			case eExplosionSource::esEnderCrystal:
+			case eExplosionSource::esGhastFireball:
+			case eExplosionSource::esMonster:
+			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esWitherBirth:
+			case eExplosionSource::esWitherSkull:
+			{
+				Entity = static_cast<const cEntity *>(a_SourceData);
+				break;
+			}
+			default:
+			{
+				Entity = nullptr;
+			}
+		}
+
+		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC<unsigned>(a_ExplosionSize), a_CanCauseFire, Entity);
 		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 	}
 }
@@ -2166,7 +2186,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock(Vector3i a_BlockPos)
+bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -2178,7 +2198,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 	}
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta);
+	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta, a_Digger);
 
 	return true;
 }
@@ -2190,7 +2210,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
 {
 	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
-	if (!DigBlock(a_BlockPos))
+	if (!DigBlock(a_BlockPos, a_Digger))
 	{
 		return false;
 	}

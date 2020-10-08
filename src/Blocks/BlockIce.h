@@ -81,7 +81,8 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override
 	{
 		// If there's a solid block or a liquid underneath, convert to water, rather than air
@@ -96,6 +97,10 @@ private:
 			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_WATER, 0);
 		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
