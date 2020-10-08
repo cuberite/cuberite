@@ -1129,7 +1129,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 {
 	cItem Target(*GetSlot(0, a_Player));
 	cItem Sacrifice(*GetSlot(1, a_Player));
-	cItem Output(*GetSlot(2, a_Player));
+
+	// Output initialised as copy of target
+	cItem Output(*GetSlot(0, a_Player));
 
 	if (Target.IsEmpty())
 	{
@@ -1165,18 +1167,18 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			int x = 0;
 			while ((DamageDiff > 0) && (x < Sacrifice.m_ItemCount))
 			{
-				Target.m_ItemDamage -= DamageDiff;
+				Output.m_ItemDamage -= DamageDiff;
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 
 				++x;
 			}
 			m_StackSizeToBeUsedInRepair = static_cast<char>(x);
 		}
-		else
+		else  // Combining items
 		{
-			// No result if we can't repair with the sacrifice
-			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
+			// No result if we can't combine the items
+			if ((!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable())))
 			{
 				// No enchantment
 				Output.Empty();
@@ -1199,13 +1201,13 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 				if (NewItemDamage < Target.m_ItemDamage)
 				{
-					Target.m_ItemDamage = static_cast<short>(NewItemDamage);
+					Output.m_ItemDamage = static_cast<short>(NewItemDamage);
 					NeedExp += std::max(1, RepairDurability / 100);
 				}
 			}
 
 			// Add the enchantments from the sacrifice to the target
-			int EnchantmentCost = Target.AddEnchantmentsFromItem(Sacrifice);
+			int EnchantmentCost = Output.AddEnchantmentsFromItem(Sacrifice);
 			NeedExp += EnchantmentCost;
 		}
 	}
@@ -1219,7 +1221,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		{
 			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Target.m_CustomName = "";
+			Output.m_CustomName = "";
 		}
 	}
 	else if (RepairedItemName != Target.m_CustomName)
@@ -1233,14 +1235,14 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Target.m_CustomName = RepairedItemName;
+		Output.m_CustomName = RepairedItemName;
 	}
 
 	m_MaximumCost = RepairCost + NeedExp;
 
 	if (NeedExp < 0)
 	{
-		Target.Empty();
+		Output.Empty();
 	}
 
 	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
@@ -1249,22 +1251,28 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 	if ((m_MaximumCost >= 40) && !a_Player.IsGameModeCreative())
 	{
-		Target.Empty();
+		Output.Empty();
 	}
 
-	if (!Target.IsEmpty())
+	if (!Output.IsEmpty())
 	{
 		RepairCost = std::max(Target.m_RepairCost, Sacrifice.m_RepairCost);
-		if (!Target.m_CustomName.empty())
+		if (!Output.m_CustomName.empty())
 		{
 			RepairCost -= 9;
 		}
 		RepairCost = std::max(RepairCost, 0);
 		RepairCost += 2;
-		Target.m_RepairCost = RepairCost;
+		Output.m_RepairCost = RepairCost;
 	}
 
-	SetSlot(2, a_Player, Target);
+	// If after everything, output will be the same then no point enchanting
+	if (Target.IsEqual(Output))
+	{
+		Output.Empty();
+	}
+
+	SetSlot(2, a_Player, Output);
 	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost));
 }
 
