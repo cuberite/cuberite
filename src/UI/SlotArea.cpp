@@ -1176,10 +1176,10 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 			m_StackSizeToBeUsedInRepair = static_cast<char>(NumItemsConsumed);
 		}
-		else  // Combining items
+		else  // Combining tools / armour
 		{
 			// No result if we can't combine the items
-			if ((!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable())))
+			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
 				// No enchantment
 				Output.Empty();
