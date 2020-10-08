@@ -43,16 +43,12 @@ public:
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
-
-	int GetLastDamage(void) const { return m_LastDamage; }
-	int GetForwardDirection(void) const { return m_ForwardDirection; }
-
-	float GetDamageTaken(void) const { return m_DamageTaken; }
 
 	// tolua_begin
 
@@ -76,20 +72,18 @@ public:
 
 	// tolua_end
 
-	bool IsRightPaddleUsed(void) const { return m_RightPaddleUsed; }
 	bool IsLeftPaddleUsed(void) const { return m_LeftPaddleUsed; }
+	bool IsRightPaddleUsed(void) const { return m_RightPaddleUsed; }
 
-	void SetLastDamage(int TimeSinceLastHit);
+	float GetDamageTaken(void) const;
+	bool ShouldShakeForwards(void) const;
 
-	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
+	void UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed);
+
 private:
-	int m_LastDamage;
-	int m_ForwardDirection;
-
-	float m_DamageTaken;
 
 	eMaterial m_Material;
-
-	bool m_RightPaddleUsed;
 	bool m_LeftPaddleUsed;
+	bool m_RightPaddleUsed;
+	bool m_ShouldShakeForwards;
 } ;  // tolua_export

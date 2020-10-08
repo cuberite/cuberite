@@ -3030,6 +3030,9 @@ void cPlayer::Detach()
 		return;
 	}
 
+	// Position to go to if all else fails.
+	const auto FallbackPosition = m_AttachedTo->GetPosition().addedY(m_AttachedTo->GetHeight());
+
 	Super::Detach();
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT;
@@ -3037,7 +3040,6 @@ void cPlayer::Detach()
 
 	// Search for a position within an area to teleport player after detachment
 	// Position must be solid land with two air blocks above.
-	// If nothing found, player remains where they are
 	for (int x = PosX - 1; x <= (PosX + 1); ++x)
 	{
 		for (int y = PosY; y <= (PosY + 3); ++y)
@@ -3056,6 +3058,9 @@ void cPlayer::Detach()
 			}
 		}
 	}
+
+	// If nothing found, player is placed above the detachee:
+	TeleportToCoords(FallbackPosition.x, FallbackPosition.y, FallbackPosition.z);
 }
 
 

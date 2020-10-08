@@ -858,13 +858,13 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			auto & Boat = static_cast<const cBoat &>(a_Entity);
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+			a_Pkt.WriteVarInt32(8);
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+			a_Pkt.WriteVarInt32(Boat.ShouldShakeForwards() ? 1 : -1);
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+			a_Pkt.WriteBEFloat(10 * Boat.GetDamageTaken());
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
@@ -874,9 +874,6 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(0);
 
 			break;
 		}  // case etBoat

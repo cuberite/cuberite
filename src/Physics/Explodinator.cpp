@@ -69,7 +69,7 @@ namespace Explodinator
 			}
 		}
 
-		return static_cast<float>(Unobstructed) / Total;
+		return (Total == 0) ? 0 : (static_cast<float>(Unobstructed) / Total);
 	}
 
 	/** Applies distance-based damage and knockback to all entities within the explosion's effect range. */
@@ -181,7 +181,7 @@ namespace Explodinator
 		// The total displacement the ray must travel.
 		const auto TraceDisplacement = (a_Destination - a_Origin);
 
-		// The displacement that they ray in one iteration step should travel.
+		// The displacement that the ray in one iteration step should travel.
 		const auto Step = TraceDisplacement.NormalizeCopy() * StepUnit;
 
 		// Loop until we've reached the prescribed destination:

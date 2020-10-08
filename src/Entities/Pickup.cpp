@@ -94,7 +94,7 @@ protected:
 // cPickup:
 
 cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
-	Super(etPickup, a_Pos, 0.2, 0.2),
+	Super(etPickup, a_Pos, 0.25, 0.25),
 	m_Timer(0),
 	m_Item(a_Item),
 	m_bCollected(false),
