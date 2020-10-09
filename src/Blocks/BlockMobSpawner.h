@@ -54,21 +54,27 @@ private:
 
 
 
-	virtual void OnPlayerBrokeBlock(
+	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override
 	{
-		auto handler = a_Player.GetEquippedItem().GetHandler();
-		if (!a_Player.IsGameModeSurvival() || !handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		if (!a_Digger->IsPlayer())
 		{
 			return;
 		}
 
-		auto & random = GetRandomProvider();
-		int reward = 15 + random.RandInt(14) + random.RandInt(14);
-		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
+		auto Handler = Player->GetEquippedItem().GetHandler();
+		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		{
+			return;
+		}
+
+		auto & Random = GetRandomProvider();
+		int Reward = 15 + Random.RandInt(14) + Random.RandInt(14);
+		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 	}
 } ;
