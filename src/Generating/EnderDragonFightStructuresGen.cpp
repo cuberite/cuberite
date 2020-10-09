@@ -10,7 +10,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AStri
 	m_Noise(a_Seed)
 {
 	// Loads the fountain schematic
-	if(!cSchematicFileSerializer::LoadFromSchematicFile(m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
+	if (!cSchematicFileSerializer::LoadFromSchematicFile(m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
 	{
 		LOGWARNING("EnderDragonFightStructuresGen is missing it's end fountain prefab, please update your cuberite server files! There will be no end fountain!");
 	}
