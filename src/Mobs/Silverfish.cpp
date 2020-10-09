@@ -3,11 +3,11 @@
 
 #include "Silverfish.h"
 
-#include "../Entities/ProjectileEntity.h"
 #include "../World.h"
 #include "../Chunk.h"
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockInfested.h"
+#include "../Entities/Player.h"
 
 bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 {
