@@ -427,7 +427,7 @@ void cEnderCrystal::SpawnOn(class cClientHandle & a_ClientHandle)
 
 
 
-void cEnderCrystal::Tick(class std::chrono::duration<__int64,struct std::ratio<1,1000> > a_Dt,class cChunk & a_Chunk)
+void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
 {
 }
 
@@ -626,7 +626,7 @@ void cEntity::Heal(int a_Value)
 
 
 
-void cEntity::Tick(class std::chrono::duration<__int64, struct std::ratio<1,1000> > a_Dt, class cChunk & a_Chunk)
+void cEntity::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
 {
 }
 
@@ -635,7 +635,7 @@ void cEntity::Tick(class std::chrono::duration<__int64, struct std::ratio<1,1000
 
 
 
-void cEntity::HandlePhysics(class std::chrono::duration<__int64,struct std::ratio<1,1000> > a_Dt, class cChunk & a_Chunk)
+void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
 {
 }
 
