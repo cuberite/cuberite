@@ -19,6 +19,7 @@
 #include "Entities/Entity.h"
 #include "Entities/EnderCrystal.h"
 #include "Mobs/Monster.h"
+#include "Mobs/EnderDragon.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "MobSpawner.h"
@@ -791,5 +792,317 @@ void cEntity::SetSwimState(class cChunk & a_Chunk)
 
 
 void cEntity::ResetPosition(class Vector3<double> a_Pos)
+{
+}
+
+
+
+
+
+cEnderDragon::cEnderDragon(void) :
+	cAggressiveMonster("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16.0, 8.0)
+{
+}
+
+
+
+
+
+cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
+	cEntity(etMonster, Vector3d(), a_Height, a_Width)
+{
+}
+
+
+
+
+
+cPawn::~cPawn(void)
+{
+}
+
+
+
+
+
+void __cdecl cPawn::Destroyed(void)
+{
+}
+
+
+
+
+
+bool cPawn::IsFireproof(void) const
+{
+	return true;
+}
+
+
+
+
+
+bool cPawn::IsInvisible(void) const
+{
+	return true;
+}
+
+
+
+
+
+void cPawn::HandleAir(void)
+{
+}
+
+
+
+
+
+void cPawn::HandleFalling(void)
+{
+}
+
+
+
+
+
+void cPawn::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+void cPawn::ResetPosition(class Vector3<double>)
+{
+}
+
+
+
+
+
+void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+	cPawn(etMonster, a_Width, a_Height),
+	m_PathFinder(a_Width, a_Height)
+{
+}
+
+
+
+cPathFinder::cPathFinder(double a_Width, double a_Height)
+{
+
+}
+
+
+cMonster::~cMonster(void)
+{
+}
+
+
+
+
+
+void cMonster::OnRemoveFromWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+void cMonster::Destroyed(void)
+{
+}
+
+
+
+
+
+
+void cMonster::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::SpawnOn(class cClientHandle & a_ClientHandle)
+{
+}
+
+
+
+
+
+bool cMonster::DoTakeDamage(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+	return true;
+}
+
+
+
+
+
+void cMonster::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+void cMonster::OnRightClicked(class cPlayer & a_Player)
+{
+}
+
+
+
+
+
+void cMonster::HandleFalling(void)
+{
+}
+
+
+
+
+
+void cMonster::MoveToPosition(class Vector3<double> const & a_Pos)
+{
+}
+
+
+
+
+
+void cMonster::CheckEventSeePlayer(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+bool cMonster::IsUndead(void)
+{
+	return true;
+}
+
+
+
+
+
+void cMonster::EventLosePlayer(void)
+{
+}
+
+
+
+
+
+void cMonster::CheckEventLostPlayer(void)
+{
+}
+
+
+
+
+
+void cMonster::InStateIdle(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::DoMoveToWorld(cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
+{
+}
+
+
+
+
+
+cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+	cMonster(a_StringA, a_MonsterType, a_StringB, a_StringC, a_StringD, a_Width, a_Height)
+{
+}
+
+
+
+
+
+void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cAggressiveMonster::EventSeePlayer(class cPlayer *,class cChunk &)
+{
+}
+
+
+
+
+
+bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
+{
+	return true;
+}
+
+
+
+
+
+void cEnderDragon::GetDrops(cItems & a_Items, cEntity * a_Entity)
 {
 }
