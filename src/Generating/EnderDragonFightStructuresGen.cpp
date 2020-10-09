@@ -4,6 +4,7 @@
 #include "EnderDragonFightStructuresGen.h"
 #include "../Chunk.h"
 #include "../Entities/EnderCrystal.h"
+#include "../Mobs/EnderDragon.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 
 cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius) :
@@ -82,22 +83,25 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc & a_ChunkDesc)
 	auto Coords = a_ChunkDesc.GetChunkCoords();
 	if (Coords == cChunkCoords({0, 0}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, -3, 62, -3, cBlockArea::msSpongePrint);
+		auto EnderDragon = std::make_unique<cEnderDragon>();
+		EnderDragon->SetPosition({0.0, 80.0, 0.0});
+		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
+		a_ChunkDesc.WriteBlockArea(m_Fountain, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), 62, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), cBlockArea::msSpongePrint);
 		return;
 	}
 	else if (Coords == cChunkCoords({-1, 0}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, 13, 62, -3, cBlockArea::msSpongePrint);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)), 62, static_cast<int>(FloorC(-m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
 		return;
 	}
 	else if (Coords == cChunkCoords({0, -1}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, -3, 62, 13, cBlockArea::msSpongePrint);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), 62, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
 		return;
 	}
 	else if (Coords == cChunkCoords({-1, -1}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, 13, 62, 13, cBlockArea::msSpongePrint);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)), 62, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
 		return;
 	}
 	auto It = m_TowerPos.find(Coords);
@@ -106,102 +110,6 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc & a_ChunkDesc)
 		return;
 	}
 	PlaceTower(a_ChunkDesc, It->second);
-}
-
-
-
-
-
-void cEnderDragonFightStructuresGen::PlaceFountainSouthEast(cChunkDesc & a_ChunkDesc) const
-{
-	// Places the center post
-	for (int i = 62; i < 67; i++)
-	{
-		a_ChunkDesc.SetBlockType(0, i, 0, E_BLOCK_BEDROCK);
-	}
-	// Places torches
-	a_ChunkDesc.SetBlockTypeMeta(0, 65, 1, E_BLOCK_TORCH, E_META_TORCH_SOUTH);
-	a_ChunkDesc.SetBlockTypeMeta(1, 65, 0, E_BLOCK_TORCH, E_META_TORCH_EAST);
-
-	// Places floor
-	a_ChunkDesc.SetBlockType(0, 62, 1, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(0, 62, 2, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(0, 63, 3, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(1, 62, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 62, 1, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 62, 2, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 63, 3, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(2, 62, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(2, 62, 1, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(2, 63, 2, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(3, 63, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(3, 63, 1, E_BLOCK_BEDROCK);
-}
-
-
-
-
-
-void cEnderDragonFightStructuresGen::PlaceFountainNorthEast(cChunkDesc &a_ChunkDesc) const
-{
-	// Places torch
-	a_ChunkDesc.SetBlockTypeMeta(0, 65, 15, E_BLOCK_TORCH, E_META_TORCH_NORTH);
-
-	// Places floor
-	a_ChunkDesc.SetBlockType(0, 62, 15, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 62, 15, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(2, 62, 15, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(3, 63, 15, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(0, 62, 14, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 62, 14, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(2, 63, 14, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(0, 63, 13, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(1, 63, 13, E_BLOCK_BEDROCK);
-}
-
-
-
-
-
-void cEnderDragonFightStructuresGen::PlaceFountainSouthWest(cChunkDesc &a_ChunkDesc) const
-{
-	// Places torch
-	a_ChunkDesc.SetBlockTypeMeta(15, 65, 0, E_BLOCK_TORCH, E_META_TORCH_WEST);
-
-	// Places floor
-	a_ChunkDesc.SetBlockType(15, 62, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(15, 62, 1, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(15, 62, 2, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(15, 63, 3, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(14, 62, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(14, 62, 1, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(14, 63, 2, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(13, 63, 0, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(13, 63, 1, E_BLOCK_BEDROCK);
-}
-
-
-
-
-
-void cEnderDragonFightStructuresGen::PlaceFountainNorthWest(cChunkDesc &a_ChunkDesc) const
-{
-	// Places floor
-	a_ChunkDesc.SetBlockType(15, 62, 15, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(15, 62, 14, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(15, 63, 13, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(14, 62, 15, E_BLOCK_BEDROCK);
-	a_ChunkDesc.SetBlockType(14, 63, 14, E_BLOCK_BEDROCK);
-
-	a_ChunkDesc.SetBlockType(13, 63, 15, E_BLOCK_BEDROCK);
 }
 
 

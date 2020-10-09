@@ -33,10 +33,5 @@ protected:
 	cBlockArea m_Fountain;
 
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
-	// Places the fountain elements
-	void PlaceFountainSouthEast(cChunkDesc & a_ChunkDesc) const;
-	void PlaceFountainNorthEast(cChunkDesc & a_ChunkDesc) const;
-	void PlaceFountainSouthWest(cChunkDesc & a_ChunkDesc) const;
-	void PlaceFountainNorthWest(cChunkDesc & a_ChunkDesc) const;
 	void PlaceTower(cChunkDesc & a_ChunkDesc, const Vector3i & a_AbsPos);
 };
