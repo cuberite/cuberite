@@ -12,7 +12,7 @@ typedef std::vector<int> cSlotNums;
 
 
 /** Constant to calculate ticks from seconds "ticks per second" */
-inline constexpr int TPS = 20;
+constexpr inline const int TPS = 20;
 // This is not added to the lua API because it broke the build
 
 
