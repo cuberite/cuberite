@@ -21,19 +21,21 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 	}
 
 	// Entity does receive lethal damage or Attacker doesn't exist
-	if ((m_Health < a_TDI.FinalDamage) || (a_TDI.Attacker == nullptr))
+	if ((m_Health < a_TDI.FinalDamage) ||
+		((a_TDI.Attacker == nullptr) && (a_TDI.DamageType != dtPoison) && (a_TDI.DamageType != dtPotionOfHarming)))
 	{
 		return SuperResult;
 	}
 
 	// If attacker is player or splash potion
 	bool ShouldSpawn = false;
-	ShouldSpawn |= a_TDI.Attacker->IsPlayer();
-
-	if (a_TDI.Attacker->IsProjectile())
+	if ((a_TDI.DamageType == dtPoison) || (a_TDI.DamageType == dtPotionOfHarming))
 	{
-		const auto Projectile = static_cast<const cProjectileEntity *>(a_TDI.Attacker);
-		ShouldSpawn |= Projectile->GetProjectileKind() == cProjectileEntity::eKind::pkSplashPotion;
+		ShouldSpawn = true;
+	}
+	else
+	{
+		ShouldSpawn |= a_TDI.Attacker->IsPlayer();
 	}
 
 	if (!ShouldSpawn)
