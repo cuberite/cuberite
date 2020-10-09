@@ -13,6 +13,10 @@
 	#include <signal.h>
 	#if defined(__linux__)
 		#include <fstream>
+
+		#if !defined(__GLIBC__)
+			#include <sys/select.h>
+		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
 	#endif
