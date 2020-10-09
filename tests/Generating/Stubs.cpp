@@ -1106,3 +1106,4 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 void cEnderDragon::GetDrops(cItems & a_Items, cEntity * a_Entity)
 {
 }
+
