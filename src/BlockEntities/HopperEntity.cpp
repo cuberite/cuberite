@@ -383,14 +383,17 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		return true;
 	}
 
-	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
-	static const Vector3i neighborOfs[] =
+	static constexpr std::array<Vector3i, 4> neighborOfs
 	{
-		{ 1, 1,  0},
-		{-1, 1,  0},
-		{ 0, 1,  1},
-		{ 0, 1, -1},
-	} ;
+		{
+			{  1, 1,  0 },
+			{ -1, 1,  0 },
+			{  0, 1,  1 },
+			{  0, 1, -1 }
+		}
+	};
+
+	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
 	for (const auto & ofs: neighborOfs)
 	{
 		auto neighborRelCoord = ofs.addedXZ(m_RelX, m_RelZ);
@@ -546,15 +549,19 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 		return true;
 	}
 
-	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
-	static const Vector3i neighborOfs [] =
+	static constexpr std::array<Vector3i, 4> neighborOfs =
 	{
-		{ 1, 0,  0},
-		{-1, 0,  0},
-		{ 0, 0,  1},
-		{ 0, 0, -1},
-	} ;
-	auto relCoord = a_Chunk.AbsoluteToRelative(a_Coords);
+		{
+			{  1, 0,  0 },
+			{ -1, 0,  0 },
+			{  0, 0,  1 },
+			{  0, 0, -1 }
+		}
+	};
+
+	const auto relCoord = a_Chunk.AbsoluteToRelative(a_Coords);
+
+	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
 	for (const auto & ofs: neighborOfs)
 	{
 		auto otherHalfRelCoord = relCoord + ofs;
