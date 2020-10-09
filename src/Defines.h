@@ -11,6 +11,11 @@ typedef std::vector<int> cSlotNums;
 
 
 
+/** Constant to calculate ticks from seconds "ticks per second" */
+const int TPS = 20;
+
+
+
 
 // tolua_begin
 
@@ -380,12 +385,6 @@ enum eMessageType
 	mtInfo  = mtInformation,
 	mtPM    = mtPrivateMessage,
 };
-
-
-
-
-/** Constant to calculate ticks from seconds "ticks per second" */
-const int TPS = 20;
 
 
 
