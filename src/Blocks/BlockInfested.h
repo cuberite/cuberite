@@ -1,6 +1,8 @@
 
 // BlockInfested.h
 
+#include "../Entities/Player.h"
+
 /* This Block Handler describes the blocks spawning silver fishes. Mojang calls them monster egg */
 
 class cBlockInfestedHandler final:
