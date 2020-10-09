@@ -14,7 +14,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		switch (a_BlockMeta)
 		{
@@ -42,7 +42,7 @@ private:
 
 
 
-	virtual void OnBroken(
+	void OnBroken(
 			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 			Vector3i a_BlockPos,
 			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
@@ -75,7 +75,7 @@ private:
 		// Spawn Silverfish
 		a_WorldInterface.SpawnMob(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f, mtSilverfish, false);
 		// Play particle
-		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", a_BlockPos, {0.5f, 0.5f, 0.5f}, 0.1, 50);
+		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", a_BlockPos, {0.5f, 0.5f, 0.5f}, 0.1f, 50);
 	}
 } ;
 
