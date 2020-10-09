@@ -12,6 +12,16 @@ public:
 
 	using Super::Super;
 
+	static void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
+	{
+		auto Pos = Vector3f(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f);
+		// TODO: only display animation if the difficulty allows mob spawns - Add when difficulty is implemented
+		// Spawn Silverfish
+		a_WorldInterface.SpawnMob(Pos.x, Pos.y, Pos.z, mtSilverfish, false);
+		// Play particle
+		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Pos, Vector3f(), 0.1f, 50);
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
@@ -49,10 +59,17 @@ private:
 			const cEntity * a_Digger
 	) const override
 	{
-		if (a_Digger->IsPlayer())
+		if (a_Digger != nullptr)
 		{
-			const auto Player = static_cast<const cPlayer *>(a_Digger);
-			if (Player->IsGameModeCreative())
+			if (a_Digger->IsPlayer())
+			{
+				const auto Player = static_cast<const cPlayer *>(a_Digger);
+				if (Player->IsGameModeCreative())
+				{
+					return;
+				}
+			}
+			if (a_Digger->IsMob())
 			{
 				return;
 			}
@@ -64,19 +81,6 @@ private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		return 11;
-	}
-
-
-
-
-	void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos) const
-	{
-		auto Pos = Vector3f(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f);
-		// TODO: only display animation if the difficulty allows mob spawns - Add when difficulty is implemented
-		// Spawn Silverfish
-		a_WorldInterface.SpawnMob(Pos.x, Pos.y, Pos.z, mtSilverfish, false);
-		// Play particle
-		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Pos, Vector3f(), 0.1f, 50);
 	}
 } ;
 
