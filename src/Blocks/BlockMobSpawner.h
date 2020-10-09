@@ -61,6 +61,10 @@ private:
 		const cEntity * a_Digger
 	) const override
 	{
+		if (a_Digger == nullptr)
+		{
+			return;
+		}
 		if (!a_Digger->IsPlayer())
 		{
 			return;

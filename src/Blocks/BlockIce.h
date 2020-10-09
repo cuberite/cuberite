@@ -85,6 +85,7 @@ private:
 		const cEntity * a_Digger
 	) const override
 	{
+		UNUSED(a_Digger);
 		// If there's a solid block or a liquid underneath, convert to water, rather than air
 		if (a_BlockPos.y <= 0)
 		{
