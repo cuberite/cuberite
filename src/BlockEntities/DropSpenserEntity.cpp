@@ -61,8 +61,8 @@ void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_D
 void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 {
 	// Pick one of the occupied slots:
-	int OccupiedSlots[9];
-	int SlotsCnt = 0;
+	std::array<int, 9> OccupiedSlots;
+	size_t SlotsCnt = 0;
 	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
 	{
 		if (!m_Contents.GetSlot(i).IsEmpty())
@@ -79,7 +79,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		return;
 	}
 
-	const int RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const size_t RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
 	const int SpenseSlot = OccupiedSlots[RandomSlot];
 
 	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
