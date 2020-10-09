@@ -246,7 +246,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				}
 				break;
 			}
-			// multiplication is handheld in cMonster. Just prevents from sitting down.
+			// Multiplication is handled in cMonster. Just prevents from sitting down.
 			case E_ITEM_SPAWN_EGG:
 			{
 				break;
