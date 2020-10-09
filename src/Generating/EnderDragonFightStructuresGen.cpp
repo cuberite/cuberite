@@ -4,10 +4,16 @@
 #include "EnderDragonFightStructuresGen.h"
 #include "../Chunk.h"
 #include "../Entities/EnderCrystal.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 
 cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius) :
 	m_Noise(a_Seed)
 {
+	// Loads the fountain schematic
+	if(!cSchematicFileSerializer::LoadFromSchematicFile(m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
+	{
+		LOGWARNING("EnderDragonFightStructuresGen is missing it's end fountain prefab, please update your cuberite server files! There will be no end fountain!");
+	}
 	// Reads the given tower properties
 	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
 	for (const auto & TowerProperty : TowerPropertiesVector)
@@ -76,22 +82,22 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc & a_ChunkDesc)
 	auto Coords = a_ChunkDesc.GetChunkCoords();
 	if (Coords == cChunkCoords({0, 0}))
 	{
-		PlaceFountainSouthEast(a_ChunkDesc);
-		return;
-	}
-	else if (Coords == cChunkCoords({0, -1}))
-	{
-		PlaceFountainNorthEast(a_ChunkDesc);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, -3, 62, -3, cBlockArea::msSpongePrint);
 		return;
 	}
 	else if (Coords == cChunkCoords({-1, 0}))
 	{
-		PlaceFountainSouthWest(a_ChunkDesc);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, 13, 62, -3, cBlockArea::msSpongePrint);
+		return;
+	}
+	else if (Coords == cChunkCoords({0, -1}))
+	{
+		a_ChunkDesc.WriteBlockArea(m_Fountain, -3, 62, 13, cBlockArea::msSpongePrint);
 		return;
 	}
 	else if (Coords == cChunkCoords({-1, -1}))
 	{
-		PlaceFountainNorthWest(a_ChunkDesc);
+		a_ChunkDesc.WriteBlockArea(m_Fountain, 13, 62, 13, cBlockArea::msSpongePrint);
 		return;
 	}
 	auto It = m_TowerPos.find(Coords);

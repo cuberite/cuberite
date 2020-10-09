@@ -30,6 +30,7 @@ protected:
 		}
 	};
 	std::vector<sTowerProperties> m_TowerProperties;
+	cBlockArea m_Fountain;
 
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
 	// Places the fountain elements
