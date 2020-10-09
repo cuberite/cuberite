@@ -14,19 +14,19 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 	bool SuperResult = Super::DoTakeDamage(a_TDI);
 	// Todo: stop this if /gamerule mobGriefing is set to false
 
-	// If either damage by player or potion inflicts non lethal damage spawn surrounding silverfishes
-
+	// If the entity didn't take andy damage
 	if (!SuperResult)
 	{
 		return SuperResult;
 	}
 
-	// Entity does receive lethal damage
-	if (a_TDI.Attacker == nullptr)
+	// Entity does receive lethal damage or Attacker doesn't exist
+	if ((m_Health < a_TDI.FinalDamage) || (a_TDI.Attacker == nullptr))
 	{
 		return SuperResult;
 	}
 
+	// If attacker is player or splash potion
 	bool ShouldSpawn = false;
 	ShouldSpawn |= a_TDI.Attacker->IsPlayer();
 
