@@ -3,7 +3,7 @@
 
 /* This Block Handler describes the blocks spawning silver fishes. Mojang calls them monster egg */
 
-class cBlockInfestedHandler:
+class cBlockInfestedHandler final:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
