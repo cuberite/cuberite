@@ -8,6 +8,7 @@
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockInfested.h"
 #include "../Entities/Player.h"
+#include "../Entities/Entity.h"
 
 bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 {
