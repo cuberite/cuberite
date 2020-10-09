@@ -541,28 +541,56 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			DigBlock =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "X",
-						Type = "number",
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Digger",
+							Type = "cEntity",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Y",
-						Type = "number",
+						{
+							Type = "boolean",
+						},
 					},
-					{
-						Name = "Z",
-						Type = "number",
-					},
+					Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. The optional Digger parameter specifies the entity who dug the block, usually a player. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Type = "boolean",
+						{
+							Name = "BlockPos",
+							Type = "Vector3i",
+						},
+						{
+							Name = "Digger",
+							Type = "cEntity",
+							IsOptional = true,
+						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. The optional Digger parameter specifies the entity who dug the block, usually a player. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 				},
-				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 			},
 			DoExplosionAt =
 			{
