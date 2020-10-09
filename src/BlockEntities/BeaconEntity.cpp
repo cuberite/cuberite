@@ -234,7 +234,7 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	auto Area = cBoundingBox(m_Pos, Radius, cChunkDef::Height - 1, static_cast<double>(-m_Pos.y));
+	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double(cChunkDef::Height), -Radius);
 	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsPlayer())
@@ -316,7 +316,6 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	}
 	return true;
 }
-
 
 
 
