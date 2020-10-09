@@ -667,16 +667,16 @@ public:
 	/** Replaces the specified block with air, and calls the OnBroken block handler.
 	Wakes up the simulators. Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(Vector3i a_BlockPos);
+	bool DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
 	Wakes up the simulators.
 	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(int a_X, int a_Y, int a_Z)
+	bool DigBlock(int a_X, int a_Y, int a_Z, cEntity * a_Digger)
 	{
-		return DigBlock({a_X, a_Y, a_Z});
+		return DigBlock({a_X, a_Y, a_Z}, a_Digger);
 	}
 
 	/** Digs the specified block, and spawns the appropriate pickups for it.
