@@ -14,7 +14,7 @@ public:
 
 private:
 
-	cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		switch (a_BlockMeta)
 		{
@@ -42,7 +42,7 @@ private:
 
 
 
-	void OnBroken(
+	virtual void OnBroken(
 			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 			Vector3i a_BlockPos,
 			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
@@ -61,7 +61,7 @@ private:
 	}
 
 
-	ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		return 11;
 	}
