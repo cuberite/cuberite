@@ -22,8 +22,6 @@
 #include "PathFinder.h"
 #include "../Entities/LeashKnot.h"
 
-const int TPS = 20;
-
 
 
 /** Map for eType <-> string

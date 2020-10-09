@@ -384,6 +384,11 @@ enum eMessageType
 
 
 
+/** Constant to calculate ticks from seconds "ticks per second" */
+const int TPS = 20;
+
+
+
 
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);

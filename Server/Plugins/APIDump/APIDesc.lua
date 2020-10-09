@@ -17179,6 +17179,10 @@ end
 				{
 					Notes = "A mask of all valid skin parts combined",
 				},
+				TPS =
+				{
+					Notes = "Ticks per second. Used to convert seconds to tick times.",
+				},
 			},
 			ConstantGroups =
 			{
