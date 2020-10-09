@@ -71,11 +71,12 @@ private:
 
 	void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos) const
 	{
-		// TODO: only display animation if the difficulty allows mob spawns
+		auto Pos = Vector3f(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f);
+		// TODO: only display animation if the difficulty allows mob spawns - Add when difficulty is implemented
 		// Spawn Silverfish
-		a_WorldInterface.SpawnMob(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f, mtSilverfish, false);
+		a_WorldInterface.SpawnMob(Pos.x, Pos.y, Pos.z, mtSilverfish, false);
 		// Play particle
-		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", a_BlockPos, {0.5f, 0.5f, 0.5f}, 0.1f, 50);
+		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Pos, Vector3f(), 0.1f, 50);
 	}
 } ;
 
