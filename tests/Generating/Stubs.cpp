@@ -17,6 +17,7 @@
 #include "Generating/ChunkDesc.h"
 #include "DeadlockDetect.h"
 #include "Entities/Entity.h"
+#include "Entities/EnderCrystal.h"
 #include "Mobs/Monster.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
@@ -402,5 +403,393 @@ cItem::cItem(
 
 
 void cItem::Empty()
+{
+}
+
+
+
+
+
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos) : cEntity(etEnderCrystal, a_Pos, 1.0f, 1.0f)
+{
+}
+
+
+
+
+
+void cEnderCrystal::SpawnOn(class cClientHandle & a_ClientHandle)
+{
+}
+
+
+
+
+
+
+void cEnderCrystal::Tick(class std::chrono::duration<__int64,struct std::ratio<1,1000> > a_Dt,class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEnderCrystal::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, double a_Height, double a_Width)
+{
+}
+
+
+
+
+
+cEntity::~cEntity(void)
+{
+}
+
+
+
+
+
+bool cEntity::Initialize(class std::unique_ptr<class cEntity,struct std::default_delete<class cEntity> > a_Entity,class cWorld & a_World)
+{
+	return true;
+}
+
+
+
+
+
+void cEntity::OnAddToWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+void cEntity::OnRemoveFromWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+bool cEntity::IsA(char const * a_Type)const
+{
+	return true;
+}
+
+
+
+
+
+char const * cEntity::GetParentClass(void) const
+{
+	return "";
+}
+
+
+
+
+
+void cEntity::HandleSpeedFromAttachee(float a_SpeedX,float a_SpeedZ)
+{
+}
+
+
+
+
+
+
+void cEntity::Destroy(void)
+{
+}
+
+
+
+
+
+
+bool cEntity::DoTakeDamage(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+	return true;
+}
+
+
+
+
+
+
+int cEntity::GetRawDamageAgainst(class cEntity const & a_Entity)
+{
+	return 0;
+}
+
+
+
+
+
+
+bool cEntity::ArmorCoversAgainst(enum eDamageType a_DamageType)
+{
+	return true;
+}
+
+
+
+
+
+
+float cEntity::GetArmorCoverAgainst(class cEntity const * a_Entity,enum eDamageType a_DamageType,int a_Value)
+{
+	return 0.0f;
+}
+
+
+
+
+
+char const * cEntity::GetClass(void) const
+{
+	return "";
+}
+
+
+
+
+
+float cEntity::GetEnchantmentCoverAgainst(class cEntity const * a_Entity,enum eDamageType a_DamageType,int a_Value)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+float cEntity::GetEnchantmentBlastKnockbackReduction(void)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+double cEntity::GetKnockbackAmountAgainst(class cEntity const & a_Entity)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+void cEntity::ApplyArmorDamage(int)
+{
+}
+
+
+
+
+
+
+void cEntity::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+
+void cEntity::Heal(int a_Value)
+{
+}
+
+
+
+
+
+
+void cEntity::Tick(class std::chrono::duration<__int64, struct std::ratio<1,1000> > a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::HandlePhysics(class std::chrono::duration<__int64,struct std::ratio<1,1000> > a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::TickBurning(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::DetectCacti(void)
+{
+}
+
+
+
+
+
+
+bool cEntity::DetectPortal(void)
+{
+	return true;
+}
+
+
+
+
+
+
+void cEntity::TickInVoid(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::OnStartedBurning(void)
+{
+}
+
+
+
+
+
+
+void cEntity::OnFinishedBurning(void)
+{
+}
+
+
+
+
+
+
+void cEntity::TeleportToEntity(class cEntity & a_Entity)
+{
+}
+
+
+
+
+
+
+void cEntity::TeleportToCoords(double a_XPos, double a_YPos, double a_ZPos)
+{
+}
+
+
+
+
+
+
+void cEntity::BroadcastMovementUpdate(class cClientHandle const * a_ClientHandle)
+{
+}
+
+
+
+
+
+
+void cEntity::AttachTo(class cEntity * a_Entity)
+{
+}
+
+
+
+
+
+
+void cEntity::Detach(void)
+{
+}
+
+
+
+
+
+
+float cEntity::GetExplosionExposureRate(class Vector3<double> a_Pos, float a_Value)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+void cEntity::DoSetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
+{
+}
+
+
+
+
+
+
+void cEntity::DoMoveToWorld(struct cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
+{
+}
+
+
+
+
+
+
+void cEntity::HandleAir(void)
+{
+}
+
+
+
+
+
+
+void cEntity::SetSwimState(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::ResetPosition(class Vector3<double> a_Pos)
 {
 }

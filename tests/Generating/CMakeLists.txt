@@ -44,6 +44,7 @@ set (GENERATING_SRCS
 	${CMAKE_SOURCE_DIR}/src/Generating/DistortedHeightmap.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/DungeonRoomsFinisher.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/EndGen.cpp
+	${CMAKE_SOURCE_DIR}/src/Generating/EnderDragonFightStructuresGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/FinishGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/GridStructGen.cpp
 	${CMAKE_SOURCE_DIR}/src/Generating/HeiGen.cpp
