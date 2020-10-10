@@ -7,7 +7,6 @@
 #include "../Chunk.h"
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockInfested.h"
-#include "../Entities/Player.h"
 
 bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 {
@@ -28,26 +27,21 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 	}
 
 	// If attacker is player or splash potion
-	bool ShouldSpawn = false;
-	if ((a_TDI.DamageType == dtPoison) || (a_TDI.DamageType == dtPotionOfHarming))
-	{
-		ShouldSpawn = true;
-	}
-	else
-	{
-		ShouldSpawn |= a_TDI.Attacker->IsPlayer();
-	}
+	bool ShouldSpawn = (
+		(a_TDI.DamageType == dtPoison) || (a_TDI.DamageType == dtPotionOfHarming) ||
+		a_TDI.Attacker->IsPlayer()
+	);
 
 	if (!ShouldSpawn)
 	{
 		return SuperResult;
 	}
 	auto Blocks = sSetBlockVector();
-	for (int X = static_cast<int>(m_LastPosition.x - 10); X <= static_cast<int>(m_LastPosition.x + 10); X++)
+	for (int X = static_cast<int>(GetPosX() - 10); X <= static_cast<int>(GetPosX() + 10); X++)
 	{
-		for (int Y = static_cast<int>(m_LastPosition.y - 5); Y <= static_cast<int>(m_LastPosition.y + 5); Y++)
+		for (int Y = static_cast<int>(GetPosY() - 5); Y <= static_cast<int>(GetPosY() + 5); Y++)
 		{
-			for (int Z = static_cast<int>(m_LastPosition.z - 10); Z <= static_cast<int>(m_LastPosition.z + 10); Z++)
+			for (int Z = static_cast<int>(GetPosZ() - 10); Z <= static_cast<int>(GetPosZ() + 10); Z++)
 			{
 				Blocks.emplace_back(sSetBlock({X, Y, Z}, 0, 0));
 			}
