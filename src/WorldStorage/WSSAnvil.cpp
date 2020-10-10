@@ -1349,12 +1349,54 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 		}
 	}
 
-	// Load delay:
-	int Delay = a_NBT.FindChildByName(a_TagIdx, "Delay");
-	if ((Delay >= 0) && (a_NBT.GetType(Delay) == TAG_Short))
+	// Load spawn count:
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "SpawnCount");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
 	{
-		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
+		MobSpawner->SetSpawnCount(a_NBT.GetShort(CurrentLine));
 	}
+
+	// Load spawn range:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "SpawnRange");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetSpawnRange(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load delay:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Delay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load delay range:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MinSpawnDelay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMinSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MaxSpawnDelay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMaxSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load MaxNearbyEntities:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MaxNearbyEntities");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMaxNearbyEntities(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load RequiredPlayerRange:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "RequiredPlayerRange");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetRequiredPlayerRange(a_NBT.GetShort(CurrentLine));
+	}
+
 
 	return MobSpawner;
 }

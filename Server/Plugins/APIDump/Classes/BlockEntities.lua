@@ -1353,7 +1353,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Returns the amount of this monster type in a 8-block radius (Y: 4-block radius).",
+				Notes = "Returns the amount of this monster type in a radius defined by SetSpawnRange (Y: 4-block radius).",
 			},
 			GetNearbyPlayersNum =
 			{
@@ -1365,6 +1365,22 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Returns the amount of the nearby players in a 16-block radius.",
 			},
+			GetSpawnCount =
+			{
+				Returns =
+				{
+					Type = "number",
+				},
+				Notes = "Returns the number of entities the spawner will try to spawn on each activation.",
+			},
+			GetSpawnRange =
+			{
+				Returns =
+				{
+					Type = "number",
+				},
+				Notes = "Returns half the length of the square the spawner tries to spawn entities in.",
+			},
 			GetSpawnDelay =
 			{
 				Returns =
@@ -1374,6 +1390,38 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 					},
 				},
 				Notes = "Returns the spawn delay. This is the tick delay that is needed to spawn new monsters.",
+			},
+			GetMinSpawnDelay =
+			{
+				Returns =
+				{
+					Type = "number",
+				},
+				Notes = "Returns the minimum number of ticks the spawner waits until spawning new entities automatically.",
+			},
+			GetMaxSpawnDelay =
+			{
+				Returns =
+				{
+					Type = "number",
+				},
+				Notes = "Returns the maximum number of ticks the spawner waits until spawning new entities automatically.",
+			},
+			GetMaxNearbyEntities =
+			{
+				Returns =
+				{
+					Type = "number",
+				},
+				Notes = "Returns the maximum number of entities of the same type that can be present before the spawner cannot spawn more entities.",
+			},
+			GetRequiredPlayerRange =
+			{
+				Returns =
+				{
+					Type = "number"
+				},
+				Notes = "Returns the maximum euclidean distance from a player where the spawner can be activated.",
 			},
 			ResetTimer =
 			{
@@ -1401,13 +1449,79 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				},
 				Notes = "Sets the spawn delay.",
 			},
+			SetSpawnCount =
+			{
+				Params =
+				{
+					{
+						Name = "SpawnCount",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the number of entities the spawner will try to spawn in each activation. Might not spawn all of them due to spawn limitations of the entity.",
+			},
+			SetSpawnRange =
+			{
+				Params =
+				{
+					{
+						Name = "SpawnRange",
+						Type = "number",
+					},
+				},
+				Notes = "Sets half the length of the square the spawner will try to spawn entities in.",
+			},
+			SetMinSpawnDelay =
+			{
+				Params =
+				{
+					{
+						Name = "MinSpawnDelay",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the minimum amount of ticks the spawner will wait before spawning new entities.",
+			},
+			SetMaxSpawnDelay =
+			{
+				Params =
+				{
+					{
+						Name = "MaxSpawnDelay",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the maximum amount of ticks the spawner will wait before spawning new entities.",
+			},
+			SetMaxNearbyEntities =
+			{
+				Params =
+				{
+					{
+						Name = "MaxNearbyEntities",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the maximum amount of nearby entities until the spawner will stop spawning this entity type.",
+			},
+			SetRequiredPlayerRange =
+			{
+				Params =
+				{
+					{
+						Name = "RequiredPlayerRange",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the maximum euclidean distance from a player where the spawner can be activated.",
+			},
 			SpawnEntity =
 			{
-				Notes = "Spawns the entity. This function automaticly change the spawn delay!",
+				Notes = "Spawns the entity. NOTE: This function resets the delay before the next automatic activation of the spawner.",
 			},
 			UpdateActiveState =
 			{
-				Notes = "Upate the active flag from the mob spawner. This function is called every 5 seconds from the Tick() function.",
+				Notes = "Update the active flag from the mob spawner. This function is called every 5 seconds from the Tick() function.",
 			},
 		},
 		Inherits = "cBlockEntity",
