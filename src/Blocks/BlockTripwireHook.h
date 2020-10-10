@@ -7,7 +7,7 @@
 
 
 
-class cBlockTripwireHookHandler :
+class cBlockTripwireHookHandler final :
 	public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>;

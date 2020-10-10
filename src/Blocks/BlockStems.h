@@ -11,7 +11,7 @@
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
 template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
-class cBlockStemsHandler:
+class cBlockStemsHandler final :
 	public cBlockPlant<true>
 {
 	using Super = cBlockPlant<true>;

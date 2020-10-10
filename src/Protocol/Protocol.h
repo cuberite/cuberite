@@ -350,7 +350,6 @@ public:
 		Status = 1,
 		Login = 2,
 		Game = 3,
-		Invalid = 255
 	};
 
 	/** Called when client sends some data */
@@ -440,7 +439,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
+	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;

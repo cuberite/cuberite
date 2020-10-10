@@ -7,7 +7,7 @@
 
 
 
-class cBlockClothHandler :
+class cBlockClothHandler final :
 	public cBlockHandler
 {
 public:

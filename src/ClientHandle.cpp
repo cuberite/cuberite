@@ -809,10 +809,10 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 			const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
 
 			// Apply the experience delta:
-			m_Player->DeltaExperience(DeltaForLevel + DeltaForPercent);
+			m_Player->DeltaExperience(FloorC(DeltaForLevel + DeltaForPercent));
 
 			// Now reduce the lapis in our stack and send it back:
-			LapisStack.AddCount(-LapisRequired);
+			LapisStack.AddCount(static_cast<char>(-LapisRequired));
 			Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
 		}
 		else
@@ -1398,7 +1398,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
+	// Apply hunger:
 	m_Player->AddFoodExhaustion(0.025);
+
+	// Damage the tool, but not for 0 hardness blocks:
+	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
 	if (m_Player->IsGameModeSurvival())
@@ -1407,15 +1412,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	else
 	{
-		World->DigBlock(absPos);
+		World->DigBlock(absPos, m_Player);
 	}
 
-	// Damage the tool, but not for 0 hardness blocks:
-	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
-	m_Player->UseEquippedItem(dlAction);
-
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	cBlockHandler::For(a_OldBlock).OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
@@ -3251,7 +3251,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }

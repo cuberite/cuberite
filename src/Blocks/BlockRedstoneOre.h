@@ -8,7 +8,7 @@
 
 
 
-class cBlockRedstoneOreHandler :
+class cBlockRedstoneOreHandler final :
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
@@ -60,7 +60,7 @@ public:
 
 
 
-class cBlockGlowingRedstoneOreHandler:
+class cBlockGlowingRedstoneOreHandler final :
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;

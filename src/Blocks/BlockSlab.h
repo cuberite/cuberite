@@ -17,7 +17,7 @@
 
 
 
-class cBlockSlabHandler :
+class cBlockSlabHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -235,7 +235,7 @@ private:
 
 
 
-class cBlockDoubleSlabHandler:
+class cBlockDoubleSlabHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

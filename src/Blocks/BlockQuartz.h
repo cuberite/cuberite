@@ -7,7 +7,7 @@
 
 
 
-class cBlockQuartzHandler:
+class cBlockQuartzHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

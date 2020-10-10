@@ -9,6 +9,7 @@ Implements the 1.8 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_8.h"
+#include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
@@ -91,20 +92,13 @@ static const UInt32 CompressionThreshold = 256;  // After how large a packet sho
 
 
 
-// fwd: main.cpp:
-extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_8_0:
 
 cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
 	Super(a_Client),
-	m_ServerAddress(a_ServerAddress),
 	m_State(a_State),
+	m_ServerAddress(a_ServerAddress),
 	m_IsEncrypted(false)
 {
 	AStringVector Params;
@@ -394,6 +388,13 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 			cPacketizer Pkt(*this, pktDisconnectDuringGame);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
+		}
+		default:
+		{
+			FLOGERROR(
+				"Tried to send disconnect in invalid game state {0}",
+				static_cast<int>(m_State)
+			);
 		}
 	}
 }
@@ -1694,13 +1695,13 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
-	Pkt.WriteBEInt16(a_Property);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Property));
 	Pkt.WriteBEInt16(a_Value);
 }
 
@@ -1725,7 +1726,8 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		----------------------------------------------
 		*/
 		const UInt32 DataSize = 0;
-		const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize;
+		const auto PacketSize = static_cast<UInt32>(
+			cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
 
 		cByteBuffer LengthHeaderBuffer(
 			cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1776,8 +1778,9 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		return false;
 	}
 
-	const UInt32 DataSize = UncompressedSize;
-	const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + CompressedSize;
+	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
+	const auto PacketSize = static_cast<UInt32>(
+		cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
 
 	cByteBuffer LengthHeaderBuffer(
 		cByteBuffer::GetVarIntSize(PacketSize) +
@@ -2271,23 +2274,6 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x19: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = State::Invalid;
-			return false;
-		}
-		case State::Invalid:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 

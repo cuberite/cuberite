@@ -7,7 +7,7 @@
 
 
 
-class cBlockPackedIceHandler :
+class cBlockPackedIceHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

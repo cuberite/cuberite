@@ -7,7 +7,7 @@
 
 
 
-class cBlockMelonHandler :
+class cBlockMelonHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

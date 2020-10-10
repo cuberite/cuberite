@@ -7,7 +7,7 @@
 
 
 
-class cBlockIceHandler :
+class cBlockIceHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -54,7 +54,7 @@ private:
 			}
 		};
 
-		for (const auto Offset : Adjacents)
+		for (const auto & Offset : Adjacents)
 		{
 			auto Position = a_RelPos + Offset;
 			const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Position);
@@ -81,9 +81,11 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override
 	{
+		UNUSED(a_Digger);
 		// If there's a solid block or a liquid underneath, convert to water, rather than air
 		if (a_BlockPos.y <= 0)
 		{
@@ -96,6 +98,10 @@ private:
 			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_WATER, 0);
 		}
 	}
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{

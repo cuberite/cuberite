@@ -8,7 +8,7 @@
 
 
 /** Handler for the small (singleblock) mushrooms. */
-class cBlockMushroomHandler:
+class cBlockMushroomHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;

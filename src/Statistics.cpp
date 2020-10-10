@@ -63,9 +63,8 @@ bool cStatManager::SatisfiesPrerequisite(const Statistic a_Stat)
 		case Statistic::AchKillWither:         return IsStatisticPresent(Statistic::AchSpawnWither);
 		case Statistic::AchFullBeacon:         return IsStatisticPresent(Statistic::AchKillWither);
 		case Statistic::AchDiamondsToYou:      return IsStatisticPresent(Statistic::AchDiamonds);
+		default: return true;
 	}
-
-	return true;
 }
 
 

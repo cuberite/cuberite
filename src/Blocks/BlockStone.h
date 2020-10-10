@@ -6,7 +6,7 @@
 
 
 
-class cBlockStoneHandler:
+class cBlockStoneHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
