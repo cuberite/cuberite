@@ -1371,7 +1371,6 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 	}
 
 	// Load delay range:
-	int MinSpawnDelay = 200, MaxSpawnDelay = 800;
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MinSpawnDelay");
 	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
 	{
@@ -1384,14 +1383,14 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 		MobSpawner->SetMaxSpawnDelay(a_NBT.GetShort(CurrentLine));
 	}
 
-	// Load MaxNearbyEntities
+	// Load MaxNearbyEntities:
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MaxNearbyEntities");
 	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
 	{
 		MobSpawner->SetMaxNearbyEntities(a_NBT.GetShort(CurrentLine));
 	}
 
-	// Load RequiredPlayerRange
+	// Load RequiredPlayerRange:
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "RequiredPlayerRange");
 	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
 	{
