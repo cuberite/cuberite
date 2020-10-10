@@ -142,7 +142,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 			auto & Random = GetRandomProvider();
 
 			bool HaveSpawnedEntity = false;
-			for (size_t i = 0; i < m_SpawnCount; i++)
+			for (short I = 0; I < m_SpawnCount; I++)
 			{
 				if (NearbyEntities >= m_MaxNearbyEntities)
 				{
