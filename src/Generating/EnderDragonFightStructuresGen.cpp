@@ -41,7 +41,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s", TowerProperty, TowerPropertyVector[2]);
 			continue;
 		}
-		m_TowerProperties.emplace_back(sTowerProperties(Height, Radius, HasCage));
+		m_TowerProperties.push_back({Height, Radius, HasCage});
 	}
 	// A random angle in radian
 	double Angle = m_Noise.IntNoise1D(a_Seed) * M_PI + M_PI;
