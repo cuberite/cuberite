@@ -1127,84 +1127,91 @@ void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
 
 void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 {
-	cItem Input(*GetSlot(0, a_Player));
-	cItem SecondInput(*GetSlot(1, a_Player));
-	cItem Output(*GetSlot(2, a_Player));
+	const cItem Target(*GetSlot(0, a_Player));
+	const cItem Sacrifice(*GetSlot(1, a_Player));
 
-	if (Input.IsEmpty())
+	// Output initialised as copy of target
+	cItem Output(Target);
+
+	if (Target.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0);
+		m_MaximumCost = 0;
 		return;
 	}
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
-	int RepairCost = Input.m_RepairCost;
+	int RepairCost = Target.m_RepairCost;
 	int NeedExp = 0;
-	if (!SecondInput.IsEmpty())
+	if (!Sacrifice.IsEmpty())
 	{
-		bool IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+		bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
 
-		RepairCost += SecondInput.m_RepairCost;
-		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
+		RepairCost += Sacrifice.m_RepairCost;
+		// Can we repair with sacrifce material?
+		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
+			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
+				m_MaximumCost = 0;
 				return;
 			}
 
-			int x = 0;
-			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
+			int NumItemsConsumed = 0;
+			// Repair until out of materials, or fully repaired
+			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
-				Input.m_ItemDamage -= DamageDiff;
-				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Input.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Input.m_ItemDamage), static_cast<int>(Input.GetMaxDamage()) / 4);
+				Output.m_ItemDamage -= DamageDiff;
+				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
+				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 
-				++x;
+				++NumItemsConsumed;
 			}
-			m_StackSizeToBeUsedInRepair = static_cast<char>(x);
+			m_StackSizeToBeUsedInRepair = static_cast<char>(NumItemsConsumed);
 		}
-		else
+		else  // Combining tools / armour
 		{
-			// Tool and armor repair with two tools / armors
-			if (!IsEnchantBook && (!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
+			// No result if we can't combine the items
+			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
 				// No enchantment
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
+				m_MaximumCost = 0;
 				return;
 			}
 
-			if ((Input.GetMaxDamage() > 0) && !IsEnchantBook)
+			// Can we repair with sacrifice tool / armour?
+			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage!=0))
 			{
-				int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
-				int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
-				int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
+				// Durability = MaxDamage - m_ItemDamage = how far from broken
+				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
+				const short SacrificeDurability = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
+				// How much durability to repair by:
+				const short RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
 
-				int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
-				if (NewItemDamage > 0)
-				{
-					NewItemDamage = 0;
-				}
+				// Don't give item a negative damage:
+				short NewItemDamage = std::max<short>(Target.GetMaxDamage() - (TargetDurability + RepairDurability), 0);
 
-				if (NewItemDamage < Input.m_ItemDamage)
+				if (NewItemDamage < Target.m_ItemDamage)
 				{
-					Input.m_ItemDamage = static_cast<short>(NewItemDamage);
-					NeedExp += std::max(1, Damage / 100);
+					Output.m_ItemDamage = NewItemDamage;
+					NeedExp += std::max(1, RepairDurability / 100);
 				}
 			}
 
 			// Add the enchantments from the sacrifice to the target
-			int EnchantmentCost = Input.AddEnchantmentsFromItem(SecondInput);
+			int EnchantmentCost = Output.AddEnchantmentsFromItem(Sacrifice);
 			NeedExp += EnchantmentCost;
 		}
 	}
@@ -1214,32 +1221,32 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
-		if (!Input.m_CustomName.empty())
+		if (!Target.m_CustomName.empty())
 		{
-			NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Input.m_CustomName = "";
+			Output.m_CustomName = "";
 		}
 	}
-	else if (RepairedItemName != Input.m_CustomName)
+	else if (RepairedItemName != Target.m_CustomName)
 	{
 		// Change custom name
-		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+		NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
-		if (!Input.m_CustomName.empty())
+		if (!Target.m_CustomName.empty())
 		{
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Input.m_CustomName = RepairedItemName;
+		Output.m_CustomName = RepairedItemName;
 	}
 
 	m_MaximumCost = RepairCost + NeedExp;
 
 	if (NeedExp < 0)
 	{
-		Input.Empty();
+		Output.Empty();
 	}
 
 	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
@@ -1248,22 +1255,29 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 	if ((m_MaximumCost >= 40) && !a_Player.IsGameModeCreative())
 	{
-		Input.Empty();
+		Output.Empty();
 	}
 
-	if (!Input.IsEmpty())
+	if (!Output.IsEmpty())
 	{
-		RepairCost = std::max(Input.m_RepairCost, SecondInput.m_RepairCost);
-		if (!Input.m_CustomName.empty())
+		RepairCost = std::max(Target.m_RepairCost, Sacrifice.m_RepairCost);
+		if (!Output.m_CustomName.empty())
 		{
 			RepairCost -= 9;
 		}
 		RepairCost = std::max(RepairCost, 0);
 		RepairCost += 2;
-		Input.m_RepairCost = RepairCost;
+		Output.m_RepairCost = RepairCost;
 	}
 
-	SetSlot(2, a_Player, Input);
+	// If after everything, output will be the same then no point enchanting
+	if (Target.IsEqual(Output))
+	{
+		Output.Empty();
+		m_MaximumCost = 0;
+	}
+
+	SetSlot(2, a_Player, Output);
 	m_ParentWindow.SetProperty(0, static_cast<Int16>(m_MaximumCost));
 }
 
