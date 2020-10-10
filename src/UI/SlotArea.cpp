@@ -1138,6 +1138,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0);
+		m_MaximumCost = 0;
 		return;
 	}
 
@@ -1161,6 +1162,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
+				m_MaximumCost = 0;
 				return;
 			}
 
@@ -1185,6 +1187,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				Output.Empty();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
+				m_MaximumCost = 0;
 				return;
 			}
 
@@ -1271,9 +1274,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	if (Target.IsEqual(Output))
 	{
 		Output.Empty();
-		SetSlot(2, a_Player, Output);
-		m_ParentWindow.SetProperty(0, 0);
-		return;
+		m_MaximumCost = 0;
 	}
 
 	SetSlot(2, a_Player, Output);
