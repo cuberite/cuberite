@@ -126,8 +126,6 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	{
 		Index = (Index + 1) % m_TowerProperties.size();
 		Properties = m_TowerProperties[Index];
-		LOG("%d", Index);
-		LOG("Properties: %d, %d, %d", Properties.m_Height, Properties.m_Radius, Properties.m_HasCage);
 	} while (Properties.m_Height == 0);
 
 	// Make sure the tower does not cross chunk boarders
