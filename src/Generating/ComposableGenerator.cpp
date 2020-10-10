@@ -262,7 +262,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			a_IniFile.GetValueSet("Generator", "Finishers","");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "EnderDragonFightStructures");
 			break;
 		}  // dimEnd
 
