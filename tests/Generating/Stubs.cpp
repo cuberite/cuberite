@@ -825,7 +825,7 @@ cPawn::~cPawn(void)
 
 
 
-void __cdecl cPawn::Destroyed(void)
+void cPawn::Destroyed(void)
 {
 }
 

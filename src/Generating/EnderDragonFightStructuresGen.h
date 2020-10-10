@@ -11,7 +11,7 @@ class cEnderDragonFightStructuresGen :
 	public cFinishGen
 {
 public:
-	cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius);
+	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius);
 
 protected:
 	cNoise m_Noise;
@@ -21,13 +21,6 @@ protected:
 		int m_Height;
 		int m_Radius;
 		bool m_HasCage;
-
-		sTowerProperties(int a_Height, int a_Radius, bool a_HasCage) :
-			m_Height(a_Height),
-			m_Radius(a_Radius),
-			m_HasCage(a_HasCage)
-		{
-		}
 	};
 	std::vector<sTowerProperties> m_TowerProperties;
 	cBlockArea m_Fountain;

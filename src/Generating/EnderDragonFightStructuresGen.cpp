@@ -7,7 +7,7 @@
 #include "../Mobs/EnderDragon.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AString & a_TowerProperties, int a_Radius) :
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius) :
 	m_Noise(a_Seed)
 {
 	// Loads the fountain schematic
@@ -48,20 +48,20 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, AStri
 	// Generate Positions in a circle
 	for (int i = 0; i < static_cast<int>(m_TowerProperties.size()); i++)
 	{
-		auto TowerPos = Vector3i(static_cast<int>(FloorC(a_Radius * cos(Angle))), 0, static_cast<int>(FloorC(a_Radius * sin(Angle))));
-		auto ChunkX = static_cast<int>(FloorC(TowerPos.x / cChunkDef::Width));
+		auto TowerPos = Vector3i(FloorC(a_Radius * cos(Angle)), 0, FloorC(a_Radius * sin(Angle)));
+		auto ChunkX = FloorC(TowerPos.x / cChunkDef::Width);
 		if (TowerPos.x < 0)
 		{
 			ChunkX--;
 		}
-		auto ChunkZ = static_cast<int>(FloorC(TowerPos.z / cChunkDef::Width));
+		auto ChunkZ = FloorC(TowerPos.z / cChunkDef::Width);
 		if (TowerPos.z < 0)
 		{
 			ChunkZ--;
 		}
 
 		m_TowerPos[cChunkCoords(ChunkX, ChunkZ)] = TowerPos;
-		Angle = fmod(Angle + (2.0f * M_PI / static_cast<double>(m_TowerProperties.size())), 2.0f * M_PI);
+		Angle = fmod(Angle + (2.0 * M_PI / static_cast<double>(m_TowerProperties.size())), 2.0 * M_PI);
 	}
 }
 
