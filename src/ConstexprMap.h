@@ -159,6 +159,11 @@ constexpr void sort(It a_First, It a_Last, Pred a_Less = std::less<>{})
 
 
 
+// NOTE: Some supported MSVC compilers won't allow throw in a constexpr function.
+// Skipping is okay though, error checking is still done on all other compilers.
+#if (!defined(_MSC_VER) || (_MSC_VER >= 1923))
+	#define CAN_THROW_IN_CONSTEXPR
+#endif
 
 // A flat-map intended for constexpr lookup tables
 template <typename K, typename V, size_t Size, typename Comp=std::less<>>
@@ -167,8 +172,8 @@ class cConstexprMap
 	// NOTE: std::pair assignment isn't constexpr, so need our own type
 	struct sKVPair
 	{
-		K first;
-		V second;
+		K first = {};
+		V second = {};
 	};
 	using cStorage = std::array<sKVPair, Size>;
 public:
@@ -183,7 +188,9 @@ public:
 	{
 		if (a_IL.size() != Size)
 		{
-			throw std::invalid_argument("Wrong number of elements");
+			#ifdef CAN_THROW_IN_CONSTEXPR
+				throw std::invalid_argument("Wrong number of elements");
+			#endif
 		}
 
 		ConstexprAlgorithms::copy(a_IL.begin(), a_IL.end(), std::begin(m_Storage));
@@ -194,7 +201,7 @@ public:
 			}
 		);
 
-		#ifdef DEBUG
+		#if defined(DEBUG) && defined(CAN_THROW_IN_CONSTEXPR)
 			for (size_t i = 0; i + 1 < Size; ++i)
 			{
 				// Assert m_Storage is sorted
@@ -205,17 +212,19 @@ public:
 			}
 		#endif
 
-		auto It = ConstexprAlgorithms::adjacent_find(begin(), end(),
-			[](const auto & a_Lhs, const auto & a_Rhs)
-			{
-				return a_Lhs.first == a_Rhs.first;
-			}
-		);
+		#if defined(CAN_THROW_IN_CONSTEXPR)
+			auto It = ConstexprAlgorithms::adjacent_find(begin(), end(),
+				[](const auto & a_Lhs, const auto & a_Rhs)
+				{
+					return a_Lhs.first == a_Rhs.first;
+				}
+			);
 
-		if (It != end())
-		{
-			throw std::invalid_argument("Duplicate keys in initializer_list");
-		}
+			if (It != end())
+			{
+				throw std::invalid_argument("Duplicate keys in initializer_list");
+			}
+		#endif
 	}
 
 	constexpr iterator cbegin() const { return std::cbegin(m_Storage); }
@@ -243,7 +252,7 @@ public:
 	}
 
 	template <typename K2>
-	constexpr const V & at(const K2 & a_Key) const
+	const V & at(const K2 & a_Key) const
 	{
 		auto It = find(a_Key);
 		if (It == end())
