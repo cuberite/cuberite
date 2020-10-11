@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "NamespaceSerializer.h"
+#include "../ConstexprMap.h"
 
 namespace NamespaceSerializer
 {
@@ -137,7 +138,7 @@ namespace NamespaceSerializer
 
 	Statistic ToCustomStatistic(const std::string_view ID)
 	{
-		static const std::unordered_map<std::string_view, Statistic> CustomStatistics
+		static constexpr cConstexprMap<std::string_view, Statistic, 109> CustomStatistics
 		{
 			{ "animals_bred",                            Statistic::AnimalsBred },
 			{ "aviate_one_cm",                           Statistic::AviateOneCm },

@@ -4,6 +4,7 @@
 
 #include "Globals.h"
 #include "../Statistics.h"
+#include "../ConstexprMap.h"
 #include "StatSerializer.h"
 #include "NamespaceSerializer.h"
 
@@ -58,7 +59,7 @@ namespace StatSerializer
 	static void LoadLegacyFromJSON(cStatManager & Manager, const Json::Value & In)
 	{
 		// Upgrade mapping from pre-1.13 names. TODO: remove on 2020-09-18
-		static const std::unordered_map<std::string_view, Statistic> LegacyMapping
+		static constexpr cConstexprMap<std::string_view, Statistic, 82> LegacyMapping
 		{
 			{ "achievement.openInventory", Statistic::AchOpenInventory },
 			{ "achievement.mineWood", Statistic::AchMineWood },

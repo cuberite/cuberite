@@ -14,6 +14,7 @@ Implements the 1.8 protocol classes:
 #include "Packetizer.h"
 
 #include "../ClientHandle.h"
+#include "../ConstexprMap.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -1806,7 +1807,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 
 int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 {
-	static const std::unordered_map<AString, int> ParticleMap
+	static constexpr cConstexprMap<std::string_view, int, 49> ParticleMap
 	{
 		// Initialize the ParticleMap:
 		{ "explode",          0 },
