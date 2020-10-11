@@ -460,6 +460,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				"94|5|false; 97|5|false; 100|5|false; "
 				"103|6|false");
 			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
+			UNUSED_VAR(Radius);
 			// m_FinishGens.push_back(cFinishGenPtr(new cEnderDragonFightStructuresGen(m_Seed, Pillars, Radius)));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
