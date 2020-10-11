@@ -1369,7 +1369,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number",
+					{
+						Type = "number",
+					}
 				},
 				Notes = "Returns the number of entities the spawner will try to spawn on each activation.",
 			},
@@ -1377,7 +1379,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number",
+					{
+						Type = "number",
+					}
 				},
 				Notes = "Returns half the length of the square the spawner tries to spawn entities in.",
 			},
@@ -1395,7 +1399,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number",
+					{
+						Type = "number",
+					}
 				},
 				Notes = "Returns the minimum number of ticks the spawner waits until spawning new entities automatically.",
 			},
@@ -1403,7 +1409,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number",
+					{
+						Type = "number",
+					}
 				},
 				Notes = "Returns the maximum number of ticks the spawner waits until spawning new entities automatically.",
 			},
@@ -1411,7 +1419,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number",
+					{
+						Type = "number",
+					}
 				},
 				Notes = "Returns the maximum number of entities of the same type that can be present before the spawner cannot spawn more entities.",
 			},
@@ -1419,7 +1429,9 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Returns =
 				{
-					Type = "number"
+					{
+						Type = "number"
+					}
 				},
 				Notes = "Returns the maximum euclidean distance from a player where the spawner can be activated.",
 			},
