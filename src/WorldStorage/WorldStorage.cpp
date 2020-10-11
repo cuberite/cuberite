@@ -235,7 +235,9 @@ bool cWorldStorage::LoadOneChunk(void)
 	}
 
 	// Load the chunk:
-	return LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+	LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+
+	return true;
 }
 
 
@@ -253,14 +255,12 @@ bool cWorldStorage::SaveOneChunk(void)
 	}
 
 	// Save the chunk, if it's valid:
-	bool Status = false;
 	if (m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
 	{
 		m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(cChunkCoords(ToSave.m_ChunkX, ToSave.m_ChunkZ)))
 		{
 			m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-			Status = true;
 		}
 	}
 
