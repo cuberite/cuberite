@@ -93,7 +93,7 @@ constexpr It partition(It a_First, It a_Last, Pred a_Pred)
 			}
 		}
 
-		swap(*a_First, *a_Last);
+		ConstexprAlgorithms::swap(*a_First, *a_Last);
 		++a_First;
 	}
 }
@@ -115,7 +115,7 @@ constexpr void InsertionSort(It a_First, It a_Last, Comp a_Less = std::less<>{})
 			{
 				break;
 			}
-			swap(*j, *Prev);
+			ConstexprAlgorithms::swap(*j, *Prev);
 			j = Prev;
 		}
 	}
