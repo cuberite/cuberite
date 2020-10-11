@@ -26,6 +26,7 @@ target_sources(
 	Pig.cpp
 	Rabbit.cpp
 	Sheep.cpp
+	Silverfish.cpp
 	Skeleton.cpp
 	Slime.cpp
 	SnowGolem.cpp

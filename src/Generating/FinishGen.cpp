@@ -1615,14 +1615,15 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 {
 	static OreInfos res
 	{
-		// OreType,            OreMeta, MaxHeight, NumNests, NestSize
-		{E_BLOCK_COAL_ORE,     0,       127,       20,       16},
-		{E_BLOCK_IRON_ORE,     0,        64,       20,        8},
-		{E_BLOCK_GOLD_ORE,     0,        32,        2,        8},
-		{E_BLOCK_REDSTONE_ORE, 0,        16,        8,        7},
-		{E_BLOCK_DIAMOND_ORE,  0,        15,        1,        7},
-		{E_BLOCK_LAPIS_ORE,    0,        30,        1,        6},
-		{E_BLOCK_EMERALD_ORE,  0,        32,       11,        1},
+		// OreType,              OreMeta, MaxHeight, NumNests, NestSize
+		{E_BLOCK_COAL_ORE,       0,       127,       20,       16},
+		{E_BLOCK_IRON_ORE,       0,        64,       20,        8},
+		{E_BLOCK_GOLD_ORE,       0,        32,        2,        8},
+		{E_BLOCK_REDSTONE_ORE,   0,        16,        8,        7},
+		{E_BLOCK_DIAMOND_ORE,    0,        15,        1,        7},
+		{E_BLOCK_LAPIS_ORE,      0,        30,        1,        6},
+		{E_BLOCK_EMERALD_ORE,    0,        32,       11,        1},
+		{E_BLOCK_SILVERFISH_EGG, 0,        64,        7,        9},
 	};
 	return res;
 }
@@ -1789,6 +1790,24 @@ void cFinishGenOreNests::GenerateOre(
 		{
 			a_MaxHeight = 76;
 			a_NumNests = 22;  // 2 times default + 20 times mesa bonus
+		}
+	}
+
+	if (a_OreType == E_BLOCK_SILVERFISH_EGG)
+	{
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+
+		if (
+			!IsBiomeMountain(BiomeSampleOne) &&
+			!IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) &&
+			!IsBiomeMountain(BiomeSampleFour)
+			)
+		{
+			return;
 		}
 	}
 

@@ -69,7 +69,7 @@ public:
 
 	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 
-	bool DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos);
+	bool DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Digger);
 
 	/** Digs the block and spawns the relevant pickups, as if a_Digger used a_Tool to dig the block. */
 	void DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);

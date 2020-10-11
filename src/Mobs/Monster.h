@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../Entities/Pawn.h"
+#include "../UUID.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
 
@@ -217,6 +218,38 @@ public:
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
 	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
 
+	/* the breeding processing */
+
+	/** Returns the items that the animal of this class follows when a player holds it in hand. */
+	virtual void GetFollowedItems(cItems & a_Items) { }
+
+	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow, but not necessarily. */
+	virtual void GetBreedingItems(cItems & a_Items) { GetFollowedItems(a_Items); }
+
+	/** Called after the baby is born, allows the baby to inherit the parents' properties (color, etc.) */
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) { }
+
+	/** Returns the partner which the monster is currently mating with. */
+	cMonster * GetPartner(void) const { return m_LovePartner; }
+
+	/** Start the mating process. Causes the monster to keep bumping into the partner until m_MatingTimer reaches zero. */
+	void EngageLoveMode(cMonster * a_Partner);
+
+	/** Finish the mating process. Called after a baby is born. Resets all breeding related timers and sets m_LoveCooldown to 20 minutes. */
+	void ResetLoveMode();
+
+	/** Returns whether the monster has just been fed and is ready to mate. If this is "true" and GetPartner isn't "nullptr", then the monster is mating. */
+	bool IsInLove() const { return (m_LoveTimer > 0); }
+
+	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
+	bool IsInLoveCooldown() const { return (m_LoveCooldown > 0); }
+
+	/** Does the whole love and breeding processing */
+	void LoveTick(void);
+
+	/** Right click call to process feeding */
+	void RightClickFeed(cPlayer & a_Player);
+
 protected:
 
 	/** The pathfinder instance handles pathfinding for this monster. */
@@ -329,6 +362,23 @@ protected:
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
+
+	/* The breeding processing */
+
+	/** The monster's breeding partner. */
+	cMonster * m_LovePartner;
+
+	/** Remembers the player is was last fed by for statistics tracking */
+	cUUID m_Feeder;
+
+	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
+	int m_LoveTimer;
+
+	/** If above 0, the monster is in cooldown mode and will refuse to breed. Decrements by 1 per tick till reaching zero. */
+	int m_LoveCooldown;
+
+	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till reaching zero, then a baby is made and ResetLoveMode() is called. */
+	int m_MatingTimer;
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach.

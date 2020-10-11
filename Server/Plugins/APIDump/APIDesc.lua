@@ -16867,6 +16867,18 @@ end
 				{
 					Notes = ""
 				},
+				E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from chiseled stone bricks"
+				},
+				E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from cracked stone bricks"
+				},
+				E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK =
+				{
+					Notes =  "A flag in the metadata of the silverfish egg that the block is made from mossy stone bricks"
+				},
 				E_META_SPONGE_DRY =
 				{
 					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
