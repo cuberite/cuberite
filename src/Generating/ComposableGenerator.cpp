@@ -23,7 +23,7 @@
 #include "DistortedHeightmap.h"
 #include "DungeonRoomsFinisher.h"
 #include "EndGen.h"
-#include "EnderDragonFightStructuresGen.h"
+// #include "EnderDragonFightStructuresGen.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
@@ -451,7 +451,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
 			m_FinishGens.push_back(cFinishGenPtr(new cDungeonRoomsFinisher(m_ShapeGen, m_Seed, GridSize, MaxSize, MinSize, HeightDistrib)));
-		}
+		} /*
 		else if (NoCaseCompare(finisher, "EnderDragonFightStructures") == 0)
 		{
 			AString Pillars = a_IniFile.GetValueSet("Generator", "ObsidianPillars",
@@ -462,7 +462,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
 			UNUSED_VAR(Radius);
 			// m_FinishGens.push_back(cFinishGenPtr(new cEnderDragonFightStructuresGen(m_Seed, Pillars, Radius)));
-		}
+		} */
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenGlowStone(m_Seed)));
