@@ -11,7 +11,7 @@ target_sources(
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
 	EndGen.cpp
-	# EnderDragonFightStructuresGen.cpp
+	EnderDragonFightStructuresGen.cpp
 	FinishGen.cpp
 	GridStructGen.cpp
 	HeiGen.cpp
@@ -44,7 +44,7 @@ target_sources(
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h
-	# EnderDragonFightStructuresGen.h
+	EnderDragonFightStructuresGen.h
 	FinishGen.h
 	GridStructGen.h
 	HeiGen.h
