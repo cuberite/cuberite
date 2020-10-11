@@ -19,7 +19,6 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
 	for (const auto & TowerProperty : TowerPropertiesVector)
 	{
-		LOG(TowerProperty);
 		const auto TowerPropertyVector = StringSplitAndTrim(TowerProperty, "|");
 		if (TowerPropertyVector.size() != 3)
 		{
@@ -43,7 +42,6 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 			continue;
 		}
 		m_TowerProperties.push_back({Height, Radius, HasCage});
-		LOG("Tower Properties no %ld", m_TowerProperties.size());
 	}
 	// A random angle in radian
 	double Angle = m_Noise.IntNoise1D(a_Seed) * M_PI + M_PI;
@@ -64,7 +62,6 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 
 		m_TowerPos[cChunkCoords(ChunkX, ChunkZ)] = TowerPos;
 		Angle = fmod(Angle + (2.0 * M_PI / static_cast<double>(m_TowerProperties.size())), 2.0 * M_PI);
-		LOG("%f", Angle);
 	}
 }
 
