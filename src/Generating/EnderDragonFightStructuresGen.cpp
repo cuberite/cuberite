@@ -154,7 +154,8 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const V
 	// Spawn the bedrock
 	a_ChunkDesc.SetBlockType(Pos.x, Properties.m_Height - 1, Pos.z, E_BLOCK_BEDROCK);
 	// Spawn the Ender Crystal - the original passed position is not used because the tower might have been moved due to crossing chunk borders
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(Pos.x + cChunkDef::Width * a_ChunkDesc.GetChunkX() + 0.5, Properties.m_Height, Pos.z + cChunkDef::Width * a_ChunkDesc.GetChunkZ() + 0.5));
+	const auto AbsPos = cChunkDef::RelativeToAbsolute(Pos, a_ChunkDesc.GetChunkCoords());
+	auto EnderCrystal = std::make_unique<cEnderCrystal>(AbsPos + Vector3d(0.5, Properties.m_Height, 0.5));
 	a_ChunkDesc.GetEntities().emplace_back(std::move(EnderCrystal));
 	// Spawn the fire
 	a_ChunkDesc.SetBlockType(Pos.x, Properties.m_Height, Pos.z, E_BLOCK_FIRE);
