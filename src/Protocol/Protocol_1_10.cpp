@@ -1053,6 +1053,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtSquid:
 		{
 			// Entities without additional metadata
+			break;
 		}
 		case mtInvalidType:
 		{

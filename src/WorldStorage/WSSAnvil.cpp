@@ -1590,7 +1590,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		// Old names in the new format
 		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
 		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
-		{ "minecraft:zombie_pigman", &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
+		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
 
 		// New namespaced mob type ids:
 		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
