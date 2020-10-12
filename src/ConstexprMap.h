@@ -101,17 +101,12 @@ constexpr It partition(It a_First, It a_Last, Pred a_Pred)
 template <typename It, typename Comp>
 constexpr void InsertionSort(It a_First, It a_Last, Comp a_Less = std::less<>{})
 {
-	if (a_First == a_Last)
+	for (auto i = a_First; i != a_Last; ++i)
 	{
-		return;
-	}
-
-	for (auto i = std::next(a_First); i != a_Last; ++i)
-	{
-		for (auto j = i;;)
+		for (auto j = i; j != a_First;)
 		{
 			auto Prev = std::prev(j);
-			if ((Prev == a_First) || !a_Less(*j, *Prev))
+			if (!a_Less(*j, *Prev))
 			{
 				break;
 			}
@@ -201,7 +196,7 @@ public:
 			}
 		);
 
-		#if defined(DEBUG) && defined(CAN_THROW_IN_CONSTEXPR)
+		#if defined(CAN_THROW_IN_CONSTEXPR)
 			for (size_t i = 0; i + 1 < Size; ++i)
 			{
 				// Assert m_Storage is sorted
