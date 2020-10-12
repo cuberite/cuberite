@@ -1132,23 +1132,6 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			}
 			break;
 		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = State::Invalid;
-			return false;
-		}
-		case State::Invalid:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
-		}
 	}  // switch (m_State)
 
 	// Unknown packet type, report to the ClientHandle:
@@ -1278,23 +1261,6 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x20: HandlePacketUseItem(a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = State::Invalid;
-			return false;
-		}
-		case State::Invalid:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 

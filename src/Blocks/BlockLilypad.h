@@ -7,7 +7,7 @@
 
 
 
-class cBlockLilypadHandler:
+class cBlockLilypadHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;

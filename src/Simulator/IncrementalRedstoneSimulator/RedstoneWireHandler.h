@@ -109,7 +109,7 @@ namespace RedstoneWireHandler
 		const bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
 
 		// Loop through laterals, discovering terracing connections:
-		for (const auto Offset : RelativeLaterals)
+		for (const auto & Offset : RelativeLaterals)
 		{
 			auto Adjacent = Position + Offset;
 			auto NeighbourChunk = Chunk.GetRelNeighborChunkAdjustCoords(Adjacent);
@@ -268,7 +268,7 @@ namespace RedstoneWireHandler
 		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
-		for (const auto Offset : RelativeAdjacents)
+		for (const auto & Offset : RelativeAdjacents)
 		{
 			if (Offset == OffsetYP)
 			{
@@ -291,7 +291,7 @@ namespace RedstoneWireHandler
 		const auto Block = Data.WireStates.find(a_Position)->second;
 
 		// Figure out, based on our pre-computed block, where we connect to:
-		for (const auto Offset : RelativeLaterals)
+		for (const auto & Offset : RelativeLaterals)
 		{
 			const auto Relative = a_Position + Offset;
 			Callback(Relative);
@@ -311,10 +311,10 @@ namespace RedstoneWireHandler
 
 					const auto YMDiagonalPosition = Relative + OffsetYM;
 					if (
-						BLOCKTYPE Block;
+						BLOCKTYPE QueryBlock;
 						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
-						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, Block) &&
-						(Block == E_BLOCK_REDSTONE_WIRE)
+						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
+						(QueryBlock == E_BLOCK_REDSTONE_WIRE)
 					)
 					{
 						Callback(YMDiagonalPosition);

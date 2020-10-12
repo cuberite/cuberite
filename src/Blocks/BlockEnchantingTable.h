@@ -11,7 +11,7 @@
 
 
 
-class cBlockEnchantingTableHandler :
+class cBlockEnchantingTableHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

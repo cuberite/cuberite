@@ -66,32 +66,23 @@ public:
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const {};
+	) const {}
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange
-	) const {};
-
-	/** Called just after the player breaks the block.
-	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
-	By default does nothing special, descendants may provide further behavior. */
-	virtual void OnPlayerBrokeBlock(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
 	) const {}
 
-	/** Called after a block gets broken (replaced with air), either by player or by natural means.
-	If by player, it is called before the OnPlayerBrokeBlock() callback.
+	/** Called after a block gets broken (replaced with air), by natural means.
 	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
-	By default notifies all direct neighbors via their OnNeighborChanged() callbacks. */
+	By default notifies all direct neighbors via their OnNeighborChanged() callbacks.
+	You can determine what kind of entity broke the block (e.g. player) by checking a_Digger! */
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) const {};
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const {}
 
 	/** Called when a direct neighbor of this block has been changed.
 	The position is the block's own position, NOT the changed neighbor's position.
@@ -227,10 +218,21 @@ public:
 	Can be used in ConvertToPickups() implementations. */
 	static unsigned char ToolFortuneLevel(const cItem * a_Tool);
 
+	/** Returns a random number of drops taking into account fortune.
+	Only applies to drops following clamped discrete random distribution.
+	a_DefaultMax is the maximum items from one block without fortune.
+	a_BonusMax is the amount to increase the max of randInt by, usually the fortune level (but not always)
+	a_DropCap is the maximum items from one block with fortune,
+	if unspecified set to 25 to prevent lag or crash with high level tools.
+	Similar to uniform_bonus_count at https://minecraft.gamepedia.com/Loot_table#Functions */
+	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_DropCap = 25);
+
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);
 
 protected:
 
-	BLOCKTYPE m_BlockType;
+	~cBlockHandler() = default;
+
+	const BLOCKTYPE m_BlockType;
 };

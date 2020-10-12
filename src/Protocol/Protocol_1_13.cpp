@@ -315,7 +315,9 @@ void cProtocol_1_13::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
-	m_Client->HandleBeaconSelection(Effect1, Effect2);
+	m_Client->HandleBeaconSelection(
+		static_cast<int>(Effect1), static_cast<int>(Effect2)
+	);
 }
 
 
@@ -682,7 +684,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 		return true;
 	}
 
-	const auto Translated = GetItemFromProtocolID(ItemID);
+	const auto Translated = GetItemFromProtocolID(ToUnsigned(ItemID));
 	a_Item.m_ItemType = Translated.first;
 	a_Item.m_ItemDamage = Translated.second;
 
@@ -725,7 +727,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 
 	// Normal item
-	a_Pkt.WriteBEInt16(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage)));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT

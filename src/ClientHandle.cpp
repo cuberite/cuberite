@@ -768,36 +768,67 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	if (a_Enchantment > 2)
 	{
 		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
-		Kick("Invalid enchanting!");
+		Kick("Selected invalid enchantment - hacked client?");
 		return;
 	}
 
+	// Bail out if something's wrong with the window:
 	if (
 		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
+		Kick("Enchantment with invalid window - hacked client?");
 		return;
 	}
 
 	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
-	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+	const auto BaseEnchantmentLevel = Window->GetProperty(a_Enchantment);
 
-	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	// Survival players must be checked they can afford enchantment and have lapis removed:
+	if (!m_Player->IsGameModeCreative())
 	{
-		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
-		{
-			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
-			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
-			Window->BroadcastWholeWindow();
+		const auto XpRequired = m_Player->XpForLevel(BaseEnchantmentLevel);
+		auto LapisStack = *Window->m_SlotArea->GetSlot(1, *m_Player);  // A copy of the lapis stack.
+		const auto LapisRequired = a_Enchantment + 1;
 
-			Window->SetProperty(0, 0, *m_Player);
-			Window->SetProperty(1, 0, *m_Player);
-			Window->SetProperty(2, 0, *m_Player);
+		// Only allow enchantment if the player has sufficient levels and lapis to enchant:
+		if ((m_Player->GetCurrentXp() >= XpRequired) && (LapisStack.m_ItemCount >= LapisRequired))
+		{
+			/** We need to reduce the player's level by the number of lapis required.
+			However we need to keep the resulting percentage filled the same. */
+
+			const auto TargetLevel = m_Player->GetXpLevel() - LapisRequired;
+			const auto CurrentFillPercent = m_Player->GetXpPercentage();
+
+			// The experience to remove in order to reach the start (0% fill) of the target level.
+			const auto DeltaForLevel = -m_Player->GetCurrentXp() + m_Player->XpForLevel(TargetLevel);
+
+			// The experience to add to get the same fill percent.
+			const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
+
+			// Apply the experience delta:
+			m_Player->DeltaExperience(FloorC(DeltaForLevel + DeltaForPercent));
+
+			// Now reduce the lapis in our stack and send it back:
+			LapisStack.AddCount(static_cast<char>(-LapisRequired));
+			Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
+		}
+		else
+		{
+			// Not creative and can't afford enchantment, so exit:
+			Kick("Selected unavailable enchantment - hacked client?");
+			return;
 		}
 	}
+
+	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
+	cItem EnchantedItem = Window->m_SlotArea->SelectEnchantedOption(a_Enchantment);
+
+	// Set the item slot to our new enchanted item:
+	Window->m_SlotArea->SetSlot(0, *m_Player, EnchantedItem);
+	m_Player->PermuteEnchantmentSeed();
 }
 
 
@@ -1270,8 +1301,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
+		(m_Player->IsGameModeCreative()) ||     // In creative mode, digging is done immediately
+		m_Player->CanInstantlyMine(a_OldBlock)  // Sometimes the player is fast enough to instantly mine
 	)
 	{
 		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
@@ -1335,10 +1366,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		}
 	}
 
-	if (!m_Player->IsGameModeCreative() && !cBlockInfo::IsOneHitDig(a_OldBlock))
+	if (!m_Player->IsGameModeCreative() && !m_Player->CanInstantlyMine(a_OldBlock))
 	{
-		// Fix for very fast tools.
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(a_OldBlock);
+		// Check for very fast tools. Maybe instead of FASTBREAK_PERCENTAGE we should check we are within x multiplied by the progress per tick
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
@@ -1367,7 +1398,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
+	// Apply hunger:
 	m_Player->AddFoodExhaustion(0.025);
+
+	// Damage the tool, but not for 0 hardness blocks:
+	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
 	if (m_Player->IsGameModeSurvival())
@@ -1376,15 +1412,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	else
 	{
-		World->DigBlock(absPos);
+		World->DigBlock(absPos, m_Player);
 	}
 
-	// Damage the tool:
-	auto dlAction = cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock;
-	m_Player->UseEquippedItem(dlAction);
-
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	cBlockHandler::For(a_OldBlock).OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
@@ -2089,7 +2120,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_HasStartedDigging)
 	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
 	ProcessProtocolInOut();
@@ -3220,7 +3251,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }

@@ -192,7 +192,17 @@ class FileStream final : public StreamType
 {
 public:
 
-	FileStream(const std::string & Path);
+	FileStream(const std::string & Path)
+	{
+		// Except on failbit, which is what open sets on failure:
+		FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+		// Open the file:
+		FileStream::open(Path);
+
+		// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+		FileStream::exceptions(FileStream::badbit);
+	}
 };
 
 

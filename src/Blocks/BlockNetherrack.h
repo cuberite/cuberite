@@ -7,7 +7,7 @@
 
 
 
-class cBlockNetherrack : public cBlockHandler
+class cBlockNetherrack final : public cBlockHandler
 {
 public:
 

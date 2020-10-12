@@ -189,7 +189,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)

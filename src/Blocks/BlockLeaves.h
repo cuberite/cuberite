@@ -14,7 +14,7 @@
 
 
 
-class cBlockLeavesHandler:
+class cBlockLeavesHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -24,6 +24,23 @@ public:
 	using Super::Super;
 
 private:
+
+	static double FortuneDropProbability(unsigned char a_DefaultDenominator, unsigned char a_FirstDenominatorReduction, unsigned char a_FortuneLevel)
+	{
+		// Fortune 3 behaves like fortune 4 for some reason
+		if (a_FortuneLevel == 3)
+		{
+			a_FortuneLevel++;
+		}
+
+		// Denominator, capped at minimum of 10.
+		const auto Denominator = std::max<unsigned char>(10, a_DefaultDenominator - a_FortuneLevel * a_FirstDenominatorReduction);
+		return 1.0 / Denominator;
+	}
+
+
+
+
 
 	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of leaves blocks. */
 	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
@@ -98,44 +115,56 @@ private:
 		// If breaking with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			return cItem(m_BlockType, a_BlockMeta & 0x03);
+			return cItem(m_BlockType, 1, a_BlockMeta & 0x03);
 		}
 
 
 		// There is a chance to drop a sapling that varies depending on the type of leaf broken.
 		// Note: It is possible (though very rare) for a single leaves block to drop both a sapling and an apple
-		// TODO: Take into account fortune for sapling drops.
-		double chance = 0.0;
-		auto & rand = GetRandomProvider();
-		cItems res;
+		double DropProbability;
+		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
+		auto & Random = GetRandomProvider();
+		cItems Res;
+
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
 		{
-			// Jungle leaves have a 2.5% chance of dropping a sapling.
-			chance = 0.025;
+			// Jungle leaves have a 2.5% default chance of dropping a sapling.
+			DropProbability = FortuneDropProbability(40, 4, FortuneLevel);
 		}
 		else
 		{
-			// Other leaves have a 5% chance of dropping a sapling.
-			chance = 0.05;
+			// Other leaves have a 5% default chance of dropping a sapling.
+			DropProbability = FortuneDropProbability(20, 4, FortuneLevel);
 		}
-		if (rand.RandBool(chance))
+
+		if (Random.RandBool(DropProbability))
 		{
-			res.Add(
+			Res.Add(
 				E_BLOCK_SAPLING,
 				1,
 				(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : static_cast<short>(4 + (a_BlockMeta & 0x01))
 			);
 		}
 
-		// 0.5 % chance of dropping an apple, if the leaves' type is Apple Leaves
+		// 0.5 % chance of dropping an apple, increased by fortune, if the leaves' type is Apple Leaves
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
-			if (rand.RandBool(0.005))
+			DropProbability = FortuneDropProbability(200, 20, FortuneLevel);
+			if (Random.RandBool(DropProbability))
 			{
-				res.Add(E_ITEM_RED_APPLE, 1, 0);
+				Res.Add(E_ITEM_RED_APPLE);
 			}
 		}
-		return res;
+
+		// 2% chance of dropping sticks (yuck) in 1.14
+		DropProbability = FortuneDropProbability(50, 5, FortuneLevel);
+		if (Random.RandBool(DropProbability))
+		{
+			// 1 or 2 sticks are dropped on success:
+			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2));
+		}
+
+		return Res;
 	}
 
 

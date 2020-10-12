@@ -7,7 +7,7 @@
 
 
 
-class cBlockMobHeadHandler :
+class cBlockMobHeadHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;

@@ -7,7 +7,7 @@
 
 
 
-class cBlockFireHandler :
+class cBlockFireHandler final :
 	public cBlockHandler
 {
 public:

@@ -58,8 +58,12 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	BroadcastMovementUpdate();
 
-	m_FuseTicks -= 1;
-	if (m_FuseTicks <= 0)
+	if (m_FuseTicks > 0)
+	{
+		--m_FuseTicks;
+	}
+
+	if (m_FuseTicks == 0)
 	{
 		Explode();
 	}

@@ -7,6 +7,7 @@ target_sources(
 	BlockPiston.cpp
 	ChunkInterface.cpp
 
+	BlockAir.h
 	BlockAnvil.h
 	BlockBed.h
 	BlockBigFlower.h
@@ -26,6 +27,7 @@ target_sources(
 	BlockConcretePowder.h
 	BlockCrops.h
 	BlockDeadBush.h
+	BlockDefaultBlock.h
 	BlockDirt.h
 	BlockDoor.h
 	BlockDropSpenser.h
@@ -42,6 +44,7 @@ target_sources(
 	BlockFluid.h
 	BlockFurnace.h
 	BlockGlass.h
+	BlockGlazedTerracotta.h
 	BlockGlowstone.h
 	BlockGrass.h
 	BlockGravel.h
@@ -56,6 +59,7 @@ target_sources(
 	BlockMelon.h
 	BlockMobHead.h
 	BlockMobSpawner.h
+	BlockInfested.h
 	BlockMushroom.h
 	BlockMycelium.h
 	BlockNetherrack.h
@@ -76,21 +80,21 @@ target_sources(
 	BlockRedstoneLamp.h
 	BlockRedstoneOre.h
 	BlockRedstoneRepeater.h
-	BlockRedstoneTorch.h
 	BlockSand.h
 	BlockSapling.h
 	BlockSeaLantern.h
 	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h
+	BlockSlime.h
 	BlockSnow.h
 	BlockSponge.h
 	BlockStairs.h
 	BlockStems.h
 	BlockStone.h
 	BlockSugarcane.h
-	BlockTallGrass.h
 	BlockTNT.h
+	BlockTallGrass.h
 	BlockTorch.h
 	BlockTrapdoor.h
 	BlockTripwire.h

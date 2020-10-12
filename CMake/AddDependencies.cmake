@@ -1,12 +1,13 @@
 function(build_dependencies)
 	# Set options for SQLiteCpp, disable all their tests and lints:
-	set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide.")
-	set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis tool.")
-	set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool.")
-	set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples.")
-	set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests.")
-	set(SQLITECPP_INTERNAL_SQLITE ON  CACHE BOOL "Add the internal SQLite3 source to the project.")
-	set(SQLITE_ENABLE_COLUMN_METADATA OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
+	set(SQLITECPP_BUILD_EXAMPLES       OFF CACHE BOOL "Build examples.")
+	set(SQLITECPP_BUILD_TESTS          OFF CACHE BOOL "Build and run tests.")
+	set(SQLITECPP_INTERNAL_SQLITE      ON  CACHE BOOL "Add the internal SQLite3 source to the project.")
+	set(SQLITECPP_RUN_CPPCHECK         OFF CACHE BOOL "Run cppcheck C++ static analysis tool.")
+	set(SQLITECPP_RUN_CPPLINT          OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide.")
+	set(SQLITECPP_RUN_DOXYGEN          OFF CACHE BOOL "Run Doxygen C++ documentation tool.")
+	set(SQLITECPP_USE_STACK_PROTECTION OFF CACHE BOOL "USE Stack Protection hardening.")
+	set(SQLITE_ENABLE_COLUMN_METADATA  OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
 
 	# Set options for LibEvent, disable all their tests and benchmarks:
 	set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL   "Disable OpenSSL in LibEvent")
