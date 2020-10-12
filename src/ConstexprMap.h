@@ -154,10 +154,16 @@ constexpr void sort(It a_First, It a_Last, Pred a_Less = std::less<>{})
 
 
 
-// NOTE: Some supported MSVC compilers won't allow throw in a constexpr function.
-// Skipping is okay though, error checking is still done on all other compilers.
-#if (!defined(_MSC_VER) || (_MSC_VER >= 1923))
-	#define CAN_THROW_IN_CONSTEXPR
+// NOTE: Some supported compilers won't allow throw in a constexpr function.
+// Skipping is okay though; error checking is still done on all other compilers.
+#ifdef _MSC_VER
+	#define CAN_THROW_IN_CONSTEXPR (_MSC_VER >= 1923)
+#elif defined(__clang__)
+	#define CAN_THROW_IN_CONSTEXPR 1
+#elif defined(__GNUC__)
+	#define CAN_THROW_IN_CONSTEXPR (__GNUC__ >= 8)
+#else
+	#define CAN_THROW_IN_CONSTEXPR 1
 #endif
 
 // A flat-map intended for constexpr lookup tables
@@ -183,7 +189,7 @@ public:
 	{
 		if (a_IL.size() != Size)
 		{
-			#ifdef CAN_THROW_IN_CONSTEXPR
+			#if CAN_THROW_IN_CONSTEXPR
 				throw std::invalid_argument("Wrong number of elements");
 			#endif
 		}
@@ -196,7 +202,7 @@ public:
 			}
 		);
 
-		#if defined(CAN_THROW_IN_CONSTEXPR)
+		#if CAN_THROW_IN_CONSTEXPR
 			for (size_t i = 0; i + 1 < Size; ++i)
 			{
 				// Assert m_Storage is sorted
@@ -207,7 +213,7 @@ public:
 			}
 		#endif
 
-		#if defined(CAN_THROW_IN_CONSTEXPR)
+		#if CAN_THROW_IN_CONSTEXPR
 			auto It = ConstexprAlgorithms::adjacent_find(begin(), end(),
 				[](const auto & a_Lhs, const auto & a_Rhs)
 				{
