@@ -130,8 +130,8 @@ namespace NamespaceSerializer
 
 		UNREACHABLE("Tried to save unhandled statistic");
 	}
-	
-	
+
+
 
 
 
