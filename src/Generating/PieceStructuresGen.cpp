@@ -8,7 +8,6 @@
 #include "PrefabStructure.h"
 #include "PieceGeneratorBFSTree.h"
 #include "../IniFile.h"
-#include "../Stopwatch.h"
 
 
 
@@ -51,9 +50,9 @@ public:
 		m_PiecePool.AssignGens(m_Seed, m_BiomeGen, m_HeightGen, m_SeaLevel);
 
 		// Apply generator params from the piecepool (in the metadata) into the generator:
-		auto & generatorParams = m_PiecePool.GetAllMetadata();
-		SetGeneratorParams(generatorParams);
-		m_MaxDepth = GetStringMapInteger<int>(generatorParams, "MaxDepth", m_MaxDepth);
+		auto & GeneratorParams = m_PiecePool.GetAllMetadata();
+		SetGeneratorParams(GeneratorParams);
+		m_MaxDepth = GetStringMapInteger<int>(GeneratorParams, "MaxDepth", m_MaxDepth);
 
 		return true;
 	}
@@ -63,11 +62,10 @@ public:
 	// cGridStructGen overrides:
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override
 	{
-		cStopwatch sw(Printf("CreateStructure for %s at <%d, %d>", m_Name.c_str(), a_GridX, a_GridZ));
-		cPlacedPieces outPieces;
-		cPieceGeneratorBFSTree pg(m_PiecePool, m_Seed);
-		pg.PlacePieces(a_OriginX, a_OriginZ, m_MaxDepth, outPieces);
-		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(outPieces), m_HeightGen);
+		cPlacedPieces OutPieces;
+		cPieceGeneratorBFSTree PieceTree(m_PiecePool, m_Seed);
+		PieceTree.PlacePieces(a_OriginX, a_OriginZ, m_MaxDepth, OutPieces);
+		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPieces), m_HeightGen);
 	}
 
 
@@ -134,23 +132,23 @@ cPieceStructuresGen::cPieceStructuresGen(int a_Seed):
 bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
 {
 	// Load each piecepool:
-	auto structures = StringSplitAndTrim(a_Prefabs, "|");
-	for (const auto & s: structures)
+	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
+	for (const auto & Structure : Structures)
 	{
-		auto fileName = Printf("Prefabs%cPieceStructures%c%s.cubeset", cFile::PathSeparator(), cFile::PathSeparator(), s.c_str());
-		if (!cFile::IsFile(fileName))
+		auto FileName = Printf("Prefabs%cPieceStructures%c%s.cubeset", cFile::PathSeparator(), cFile::PathSeparator(), Structure.c_str());
+		if (!cFile::IsFile(FileName))
 		{
-			fileName.append(".gz");
-			if (!cFile::IsFile(fileName))
+			FileName.append(".gz");
+			if (!cFile::IsFile(FileName))
 			{
-				LOGWARNING("Cannot load PieceStructures cubeset file %s", fileName.c_str());
+				LOGWARNING("Cannot load PieceStructures cubeset file %s", FileName.c_str());
 				continue;
 			}
 		}
-		auto gen = std::make_shared<cGen>(m_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel, s);
-		if (gen->LoadFromFile(fileName))
+		auto Gen = std::make_shared<cGen>(m_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel, Structure);
+		if (Gen->LoadFromFile(FileName))
 		{
-			m_Gens.push_back(gen);
+			m_Gens.push_back(Gen);
 		}
 	}
 
@@ -169,9 +167,9 @@ bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, 
 
 void cPieceStructuresGen::GenFinish(cChunkDesc & a_Chunk)
 {
-	for (auto & gen: m_Gens)
+	for (auto & Gen : m_Gens)
 	{
-		gen->GenFinish(a_Chunk);
+		Gen->GenFinish(a_Chunk);
 	}
 }
 
