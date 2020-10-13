@@ -161,6 +161,7 @@ target_sources(
 	WebAdmin.h
 	World.h
 	XMLParser.h
+	main.h
 )
 
 set(FOLDERS

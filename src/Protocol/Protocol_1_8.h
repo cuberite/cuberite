@@ -120,7 +120,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
+	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 

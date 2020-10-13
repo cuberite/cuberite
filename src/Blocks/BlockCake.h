@@ -6,7 +6,7 @@
 
 
 
-class cBlockCakeHandler:
+class cBlockCakeHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -36,7 +36,7 @@ private:
 		a_Player.GetStatManager().AddValue(Statistic::EatCakeSlice);
 		if (Meta >= 5)
 		{
-			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos);
+			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos, &a_Player);
 		}
 		else
 		{

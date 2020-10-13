@@ -100,10 +100,10 @@ protected:
 
 	virtual void Execute(void) override;
 
-	/** Loads one chunk from the queue (if any queued); returns true if there are more chunks in the load queue */
+	/** Loads one chunk from the queue (if any queued); returns true if there was a chunk in the queue to load */
 	bool LoadOneChunk(void);
 
-	/** Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue */
+	/** Saves one chunk from the queue (if any queued); returns true if there was a chunk in the queue to save */
 	bool SaveOneChunk(void);
 } ;
 

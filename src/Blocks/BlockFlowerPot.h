@@ -5,7 +5,7 @@
 
 
 
-class cBlockFlowerPotHandler :
+class cBlockFlowerPotHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;

@@ -31,7 +31,7 @@ class cChunkDataSerializer
 		v401,
 		v477,
 
-		Count
+		Last = CacheVersion::v477
 	};
 
 	/** A single cache entry containing the raw data, compressed data, and a validity flag. */
@@ -79,7 +79,7 @@ protected:
 
 	/** A cache, mapping protocol version to a fully serialised chunk.
 	It is used during a single invocation of SendToClients with more than one client. */
-	std::array<ChunkDataCache, static_cast<size_t>(CacheVersion::Count)> m_Cache;
+	std::array<ChunkDataCache, static_cast<size_t>(CacheVersion::Last) + 1> m_Cache;
 } ;
 
 

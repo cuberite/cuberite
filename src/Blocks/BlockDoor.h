@@ -11,7 +11,7 @@
 
 
 
-class cBlockDoorHandler :
+class cBlockDoorHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
@@ -142,7 +142,8 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override;
 
 	virtual bool OnUse(

@@ -542,6 +542,7 @@ return
 				only used as a parameter for the {{OnChunkGenerating|OnChunkGenerating}} and
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
+				Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
 			]],
 			Functions =
 			{
@@ -1119,7 +1120,7 @@ return
 							Type = "EMCSBiome",
 						},
 					},
-					Notes = "Sets the biome at the specified relative coords",
+					Notes = "Sets the biome at the specified relative coords.",
 				},
 				SetBlockMeta =
 				{
@@ -1142,7 +1143,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords",
+					Notes = "Sets the block meta at the specified relative coords.",
 				},
 				SetBlockType =
 				{
@@ -16883,6 +16884,18 @@ end
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
+				},
+				E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from chiseled stone bricks"
+				},
+				E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from cracked stone bricks"
+				},
+				E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK =
+				{
+					Notes =  "A flag in the metadata of the silverfish egg that the block is made from mossy stone bricks"
 				},
 				E_META_SPONGE_DRY =
 				{

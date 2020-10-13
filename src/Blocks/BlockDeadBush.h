@@ -7,7 +7,7 @@
 
 
 
-class cBlockDeadBushHandler:
+class cBlockDeadBushHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

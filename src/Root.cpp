@@ -13,6 +13,10 @@
 	#include <signal.h>
 	#if defined(__linux__)
 		#include <fstream>
+
+		#if !defined(__GLIBC__)
+			#include <sys/select.h>
+		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
 	#endif
@@ -45,10 +49,8 @@
 
 
 
-extern bool                  g_RunAsService;
-decltype(cRoot::s_Root)      cRoot::s_Root;
-decltype(cRoot::s_NextState) cRoot::s_NextState;
-decltype(cRoot::s_StopEvent) cRoot::s_StopEvent;
+extern bool g_RunAsService;
+cRoot * cRoot::s_Root = nullptr;
 
 
 
@@ -194,7 +196,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		HandleInput();
-		s_StopEvent.Wait();
+		m_StopEvent.Wait();
 
 		// Stop the server:
 		m_WebAdmin->Stop();
@@ -233,7 +235,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOG("Shutdown successful!");
 	LOG("--- Stopped Log ---");
 
-	return s_NextState == NextState::Restart;
+	return m_NextState == NextState::Restart;
 }
 
 
@@ -957,7 +959,7 @@ void cRoot::HandleInput()
 	cLogCommandOutputCallback Output;
 	AString Command;
 
-	while (s_NextState == NextState::Run)
+	while (m_NextState == NextState::Run)
 	{
 #ifndef _WIN32
 		timeval Timeout{ 0, 0 };
@@ -980,7 +982,7 @@ void cRoot::HandleInput()
 			return;
 		}
 
-		if (s_NextState != NextState::Run)
+		if (m_NextState != NextState::Run)
 		{
 			// Already shutting down, can't execute commands
 			break;
@@ -1001,7 +1003,7 @@ void cRoot::HandleInput()
 void cRoot::TransitionNextState(NextState a_NextState)
 {
 	{
-		auto Current = s_NextState.load();
+		auto Current = m_NextState.load();
 		do
 		{
 			// Stopping is final, so stops override restarts:
@@ -1010,15 +1012,15 @@ void cRoot::TransitionNextState(NextState a_NextState)
 				return;
 			}
 		}
-		while (!s_NextState.compare_exchange_strong(Current, a_NextState));
+		while (!m_NextState.compare_exchange_strong(Current, a_NextState));
 	}
 
-	if (s_NextState == NextState::Run)
+	if (m_NextState == NextState::Run)
 	{
 		return;
 	}
 
-	s_StopEvent.Set();
+	m_StopEvent.Set();
 
 #ifdef WIN32
 

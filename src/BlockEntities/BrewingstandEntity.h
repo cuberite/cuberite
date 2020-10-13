@@ -137,7 +137,7 @@ protected:
 	short m_RemainingFuel;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	// /** Broadcasts progressbar updates, if needed */
 	void UpdateProgressBars(bool a_ForceUpdate = false);

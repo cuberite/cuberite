@@ -7,7 +7,7 @@
 
 
 
-class cBlockSnowHandler :
+class cBlockSnowHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

@@ -7,7 +7,7 @@
 
 
 
-class cBlockSpongeHandler :
+class cBlockSpongeHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

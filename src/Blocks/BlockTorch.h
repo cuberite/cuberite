@@ -8,14 +8,19 @@
 
 
 
-class cBlockTorchHandler:
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>
+
+class cBlockTorchBaseHandler :
+	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>;
+	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
 
 public:
 
 	using Super::Super;
+
+protected:
+
+	~cBlockTorchBaseHandler() = default;
 
 private:
 
@@ -214,3 +219,41 @@ private:
 
 
 
+
+class cBlockTorchHandler final :
+	public cClearMetaOnDrop<cBlockTorchBaseHandler>
+{
+	using Super = cClearMetaOnDrop<cBlockTorchBaseHandler>;
+
+public:
+
+	using Super::Super;
+};
+
+
+
+
+
+class cBlockRedstoneTorchHandler final :
+	public cBlockTorchBaseHandler
+{
+	using Super = cBlockTorchBaseHandler;
+
+public:
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		// Always drop the ON torch, meta 0:
+		return { E_BLOCK_REDSTONE_TORCH_ON };
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 0;
+	}
+};

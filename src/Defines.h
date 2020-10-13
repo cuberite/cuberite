@@ -12,6 +12,21 @@ typedef std::vector<int> cSlotNums;
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+/** Constant to calculate ticks from seconds "ticks per second" */
+constexpr inline const int TPS = 20;
+// This is not added to the lua API because it broke the build
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+
+
+
+
 // tolua_begin
 
 /** Experience Orb setup */
@@ -380,7 +395,6 @@ enum eMessageType
 	mtInfo  = mtInformation,
 	mtPM    = mtPrivateMessage,
 };
-
 
 
 

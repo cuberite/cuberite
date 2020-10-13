@@ -9,7 +9,7 @@
 
 
 /** Handles the grass that is 1 block tall */
-class cBlockTallGrassHandler:
+class cBlockTallGrassHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

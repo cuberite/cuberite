@@ -8,7 +8,7 @@
 
 
 
-class cBlockSignPostHandler:
+class cBlockSignPostHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

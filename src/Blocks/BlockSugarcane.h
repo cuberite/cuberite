@@ -7,7 +7,7 @@
 
 
 
-class cBlockSugarcaneHandler :
+class cBlockSugarcaneHandler final :
 	public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;

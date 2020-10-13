@@ -145,7 +145,7 @@ protected:
 	bool m_IsLoading;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	/** One item finished cooking */
 	void FinishOne();

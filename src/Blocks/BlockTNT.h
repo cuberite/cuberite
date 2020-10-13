@@ -7,7 +7,7 @@
 
 
 
-class cBlockTNTHandler :
+class cBlockTNTHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

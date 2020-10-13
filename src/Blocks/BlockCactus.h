@@ -7,7 +7,7 @@
 
 
 
-class cBlockCactusHandler :
+class cBlockCactusHandler final :
 	public cClearMetaOnDrop<cBlockPlant<false>>
 {
 	using Super = cClearMetaOnDrop<cBlockPlant<false>>;

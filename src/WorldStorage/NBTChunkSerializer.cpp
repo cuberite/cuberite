@@ -554,7 +554,13 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
 			mWriter.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
+			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
+			mWriter.AddShort("MinSpawnDelay", a_MobSpawner->GetMinSpawnDelay());
+			mWriter.AddShort("MaxSpawnDelay", a_MobSpawner->GetMaxSpawnDelay());
+			mWriter.AddShort("MaxNearbyEntities", a_MobSpawner->GetMaxNearbyEntities());
+			mWriter.AddShort("RequiredPlayerRange", a_MobSpawner->GetRequiredPlayerRange());
 		mWriter.EndCompound();
 	}
 
