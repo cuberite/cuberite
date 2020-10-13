@@ -2256,7 +2256,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			GrowTreeByBiome =
 			{
@@ -2267,7 +2273,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			GrowTreeFromSapling =
 			{
@@ -2278,7 +2290,13 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta. If the sapling is part of a 2x2 sapling area, grows a large tree.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta. If the sapling is part of a 2x2 sapling area, grows a large tree. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			IsBlockDirectlyWatered =
 			{
