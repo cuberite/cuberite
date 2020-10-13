@@ -388,7 +388,7 @@ namespace LootTable
 		class cSurvivesExplosion : public cCondition
 		{
 		public:
-			cSurvivesExplosion() = default;
+			cSurvivesExplosion() { m_Active = true; };
 			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 		private:
 		};

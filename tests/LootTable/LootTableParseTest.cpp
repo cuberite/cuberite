@@ -406,20 +406,19 @@ static void ParseLocationCheck()
 static void ParseMatchTool()
 {
 	AString ToolString =
-		"{"
-			"\"condition\": \"minecraft:match_tool\","
-   			"\"predicate\": {"
-				"\"count\": {"
-					"\"min\": 6.0,"
-					"\"max\": 7.0,"
-				"},"
-				"\"durability\": {"
-					"\"min\": 8.0,"
-					"\"max\": 9.0,"
-				"},"
+	"{"
+		"\"condition\": \"minecraft:match_tool\","
+		"\"predicate\": {"
+			"\"count\": {"
+				"\"min\": 6.0,"
+				"\"max\": 7.0,"
 			"},"
-   			"\"\": \"\","
-		"}";
+			"\"durability\": {"
+				"\"min\": 8.0,"
+				"\"max\": 9.0,"
+			"},"
+		"},"
+	"}";
 
 	JsonUtils::ParseString(ToolString, JsonObject, & ErrorMessage);
 
@@ -432,6 +431,8 @@ static void ParseMatchTool()
 	TEST_EQUAL(Tool.m_CountMax, 7);
 	TEST_EQUAL(Tool.m_DurabilityMin, 8);
 	TEST_EQUAL(Tool.m_DurabilityMax, 9);
+
+	// TODO
 }
 
 
@@ -440,7 +441,20 @@ static void ParseMatchTool()
 
 static void ParseRandomChance()
 {
+	AString RandomChanceString =
+	"{"
+		"\"condition\": \"minecraft:random_chance\","
+		"\"chance\": 0.3,"
+	"}";
 
+	JsonUtils::ParseString(RandomChanceString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto RandomChance = std::get<LootTable::Condition::cRandomChance>(Condition.m_Parameter);
+
+	TEST_TRUE(RandomChance.IsActive());
+	TEST_LESS_THAN_OR_EQUAL(RandomChance.m_Chance - 0.300000, 0.0001);
 }
 
 
@@ -449,7 +463,22 @@ static void ParseRandomChance()
 
 static void ParseRandomChanceWithLooting()
 {
+	AString RandomChanceLootingString =
+	"{"
+		"\"condition\": \"minecraft:random_chance_with_looting\","
+		"\"chance\": 0.3,"
+		"\"looting_multiplier\": 0.5,"
+	"}";
 
+	JsonUtils::ParseString(RandomChanceLootingString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto RandomChanceLooting = std::get<LootTable::Condition::cRandomChanceWithLooting>(Condition.m_Parameter);
+
+	TEST_TRUE(RandomChanceLooting.IsActive());
+	TEST_LESS_THAN_OR_EQUAL(RandomChanceLooting.m_Chance - 0.300000, 0.0001);
+	TEST_LESS_THAN_OR_EQUAL(RandomChanceLooting.m_LootingMultiplier - 0.500000, 0.0001);
 }
 
 
@@ -458,7 +487,18 @@ static void ParseRandomChanceWithLooting()
 
 static void ParseReference()
 {
+	AString ReferenceString =
+	"{"
+	"\"condition\": \"minecraft:reference\","
+	"}";
 
+	JsonUtils::ParseString(ReferenceString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto Reference = std::get<LootTable::Condition::cReference>(Condition.m_Parameter);
+
+	TEST_TRUE(Reference.IsActive());
 }
 
 
@@ -467,7 +507,18 @@ static void ParseReference()
 
 static void ParseSurvivesExplosion()
 {
+	AString SurvivesExplosionString =
+	"{"
+		"\"condition\": \"minecraft:survives_explosion\","
+	"}";
 
+	JsonUtils::ParseString(SurvivesExplosionString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto SurvivesExplosion = std::get<LootTable::Condition::cSurvivesExplosion>(Condition.m_Parameter);
+
+	TEST_TRUE(SurvivesExplosion.IsActive());
 }
 
 
@@ -476,7 +527,28 @@ static void ParseSurvivesExplosion()
 
 static void ParseTableBonus()
 {
+	AString LootTableBonusString =
+	"{"
+		"\"condition\": \"minecraft:table_bonus\","
+  		"\"enchantment\": 3,"
+		"\"chances\": ["
+			"0, 0.1,"
+			"0, 0.2,"
+			"0, 0.3,"
+		"],"
+	"}";
 
+	JsonUtils::ParseString(LootTableBonusString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto TableBonus = std::get<LootTable::Condition::cTableBonus>(Condition.m_Parameter);
+
+	TEST_TRUE(TableBonus.IsActive());
+	TEST_EQUAL(TableBonus.m_Enchantment, 3);
+	TEST_LESS_THAN_OR_EQUAL(TableBonus.m_Chances[0] - 0.1, 0.0000001);
+	TEST_LESS_THAN_OR_EQUAL(TableBonus.m_Chances[1] - 0.2, 0.0000001);
+	TEST_LESS_THAN_OR_EQUAL(TableBonus.m_Chances[2] - 0.3, 0.0000001);
 }
 
 
@@ -485,7 +557,26 @@ static void ParseTableBonus()
 
 static void ParseTimeCheck()
 {
+	AString TimeString =
+	"{"
+		"\"condition\": \"minecraft:time_check\","
+		"\"value\": {"
+			"\"min\": 100,"
+			"\"max\": 1000,"
+  		"},"
+		"\"period\": 10000"
+	"}";
 
+	JsonUtils::ParseString(TimeString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto Time = std::get<LootTable::Condition::cTimeCheck>(Condition.m_Parameter);
+
+	TEST_TRUE(Time.IsActive());
+	TEST_EQUAL(Time.m_Min, 100);
+	TEST_EQUAL(Time.m_Max, 1000);
+	TEST_EQUAL(Time.m_Period, 10000);
 }
 
 
@@ -493,6 +584,209 @@ static void ParseTimeCheck()
 
 
 static void ParseWeatherCheck()
+{
+	AString WeatherString =
+	"{"
+		"\"condition\": \"minecraft:weather_check\","
+		"\"raining\": true,"
+		"\"thundering\": true,"
+	"}";
+
+	JsonUtils::ParseString(WeatherString, JsonObject, & ErrorMessage);
+
+	auto Condition = LootTable::ParseCondition(JsonObject);
+
+	auto Weather = std::get<LootTable::Condition::cWeatherCheck>(Condition.m_Parameter);
+
+	TEST_TRUE(Weather.IsActive());
+	TEST_TRUE(Weather.m_Raining);
+	TEST_TRUE(Weather.m_Thundering);
+}
+
+
+
+
+static void ParseApplyBonus()
+{
+
+}
+
+
+
+
+
+static void ParseCopyName()
+{
+
+}
+
+
+
+
+
+static void ParseCopyNbt()
+{
+
+}
+
+
+
+
+
+static void ParseCopyState()
+{
+
+}
+
+
+
+
+
+static void ParseEnchantRandomly()
+{
+
+}
+
+
+
+
+
+static void ParseEnchantWithLevels()
+{
+
+}
+
+
+
+
+
+static void ParseExplorationMap()
+{
+
+}
+
+
+
+
+
+static void ParseExplosionDecay()
+{
+
+}
+
+
+
+
+
+static void ParseFurnaceSmelt()
+{
+
+}
+
+
+
+
+
+static void ParseFillPlayerHead()
+{
+
+}
+
+
+
+
+
+static void ParseLimitCount()
+{
+
+}
+
+
+
+
+
+static void ParseLootingEnchant()
+{
+
+}
+
+
+
+
+
+static void ParseSetAttributes()
+{
+
+}
+
+
+
+
+
+static void ParseSetContents()
+{
+
+}
+
+
+
+
+
+static void ParseSetCount()
+{
+
+}
+
+
+
+
+
+static void ParseSetDamage()
+{
+
+}
+
+
+
+
+
+static void ParseSetLootTable()
+{
+
+}
+
+
+
+
+
+static void ParseSetLore()
+{
+
+}
+
+
+
+
+
+static void ParseSetName()
+{
+
+}
+
+
+
+
+
+static void ParseSetNbt()
+{
+
+}
+
+
+
+
+
+static void ParseSetStewEffect()
 {
 
 }
@@ -523,4 +817,26 @@ IMPLEMENT_TEST_MAIN("LootTableParseTest",
 	ParseTableBonus();
 	ParseTimeCheck();
 	ParseWeatherCheck();
+
+	ParseApplyBonus();
+	ParseCopyName();
+	ParseCopyNbt();
+	ParseCopyState();
+	ParseEnchantRandomly();
+	ParseEnchantWithLevels();
+	ParseExplorationMap();
+	ParseExplosionDecay();
+	ParseFurnaceSmelt();
+	ParseFillPlayerHead();
+	ParseLimitCount();
+	ParseLootingEnchant();
+	ParseSetAttributes();
+	ParseSetContents();
+	ParseSetCount();
+	ParseSetDamage();
+	ParseSetLootTable();
+	ParseSetLore();
+	ParseSetName();
+	ParseSetNbt();
+	ParseSetStewEffect();
 })

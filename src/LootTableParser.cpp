@@ -1991,7 +1991,7 @@ namespace LootTable
 		{
 			m_Raining = a_Value["raining"].asBool();
 		}
-		else if (a_Value.isMember("thundering"))
+		if (a_Value.isMember("thundering"))
 		{
 			m_Thundering = a_Value["thundering"].asBool();
 		}
