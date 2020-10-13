@@ -443,8 +443,9 @@ namespace LootTable
 		/** The Base class for Loot Table functions */
 		class cFunction
 		{
+		public:
+			bool IsActive(void) { return m_Active; }
 		protected:
-			void Activate() { m_Active = true; }
 			bool m_Active = false;
 		};
 
@@ -568,7 +569,7 @@ namespace LootTable
 			cEnchantRandomly(const Json::Value & a_Value);
 			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
 		private:
-			cWeightedEnchantments m_EnchantmentLimiter;
+			std::vector<int> m_Enchantments;
 		};
 
 
@@ -622,7 +623,7 @@ namespace LootTable
 		/*  */
 		{
 		public:
-			cExplosionDecay() { Activate(); }
+			cExplosionDecay() { m_Active = true; }
 			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 		};
 

@@ -2117,6 +2117,7 @@ namespace LootTable
 		{
 			m_BonusMultiplier = Parameters["BonusMultiplier"].asInt();
 		}
+		m_Active = true;
 	}
 
 
@@ -2192,21 +2193,32 @@ namespace LootTable
 
 		if (a_Value.isMember("source"))
 		{
-			if ((a_Value["source"].asString() == "block entity") || (a_Value["source"].asString() == "BlockEntity"))
+			if (NoCaseCompare(NamespaceConverter(a_Value["source"].asString()), "BlockEntity") == 0)
 			{
 				m_Active = true;
+			}
+			else
+			{
+				LOGWARNING("Loot table: Function \"CopyName\" wasn't provided a valid source, dropping function");
+				return;
 			}
 		}
 		else if (a_Value.isMember("Source"))
 		{
-			if ((a_Value["Source"].asString() == "block entity") || (a_Value["Source"].asString() == "BlockEntity"))
+			if (NoCaseCompare(NamespaceConverter(a_Value["Source"].asString()), "BlockEntity") == 0)
 			{
 				m_Active = true;
+			}
+			else
+			{
+				LOGWARNING("Loot table: Function \"CopyName\" wasn't provided a valid source, dropping function");
+				return;
 			}
 		}
 		else
 		{
-			LOGWARNING("Loot table: Function wasn't provided a valid source, dropping function");
+			LOGWARNING("Loot table: Function \"CopyName\" wasn't provided a source, dropping function");
+			return;
 		}
 	}
 
@@ -2330,6 +2342,7 @@ namespace LootTable
 				m_Operations.emplace_back(sOperation{SourcePath, TargetPath, Operation});
 			}
 		}
+	m_Active = true;
 	}
 
 
@@ -2426,12 +2439,12 @@ namespace LootTable
 		{
 			for (unsigned int i = 0; i < Enchantments.size(); i++)
 			{
-				m_EnchantmentLimiter.push_back({1, cEnchantments(NamespaceConverter(Enchantments[i].asString()))});
+				m_Enchantments.push_back(cEnchantments::StringToEnchantmentID(NamespaceConverter(Enchantments[i].asString())));
 			}
 		}
 		else if (!Enchantments.empty())
 		{
-			LOGWARNING("Loot table: Function \"EnchantRandomly\" got invalid object to get it's allowed functions from");
+			LOGWARNING("Loot table: Function \"EnchantRandomly\" got invalid object to get it's allowed enchantments from");
 		}
 		m_Active = true;
 	}
@@ -2447,19 +2460,22 @@ namespace LootTable
 			LOGWARNING("Loot table: Item %s can not be enchanted in loot table", ItemToString(a_Item));
 			return;
 		}
-		if (!m_EnchantmentLimiter.empty())
+		if (!m_Enchantments.empty())
 		{
 			if (a_Item.IsSameType(E_ITEM_BOOK))
 			{
 				a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
 			}
-			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(m_EnchantmentLimiter));
+			cWeightedEnchantments EnchantmentLimiter;
+			GetRandomProvider();
+			auto Enchantment = m_Enchantments[a_Noise.IntNoise3DInt(a_Pos) % m_Enchantments.size()];
+			a_Item.m_Enchantments.Add(cEnchantments(std::to_string(Enchantment) + "=" + std::to_string(a_Noise.IntNoise3DInt(a_Pos) % static_cast<int>(cEnchantments::GetLevelCap(Enchantment)))));
 		}
 		else  // All are possible
 		{
 			cWeightedEnchantments EnchantmentLimiter;
 			cEnchantments::AddItemEnchantmentWeights(EnchantmentLimiter, a_Item.m_ItemType, 24 + a_Noise.IntNoise3DInt(a_Pos * 20) % 7);
-			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter));
+			a_Item.m_Enchantments.Add(cEnchantments::GetRandomEnchantmentFromVector(EnchantmentLimiter, GetRandomProvider()));
 		}
 	}
 
@@ -2516,7 +2532,7 @@ namespace LootTable
 			return;
 		}
 		int Levels = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LevelsMax - m_LevelsMin) + m_LevelsMin;
-		a_Item.EnchantByXPLevels(Levels);
+		a_Item.EnchantByXPLevels(Levels, GetRandomProvider());
 		if (a_Item.m_ItemType == E_ITEM_BOOK)
 		{
 			a_Item.m_ItemType = E_ITEM_ENCHANTED_BOOK;
@@ -2852,7 +2868,7 @@ namespace LootTable
 	cSetContents::cSetContents(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("Loot table: NBT for items is not yet supported, Dropping function \"SetContents\"!");
+		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetContents\"!");
 	}
 
 
@@ -2887,6 +2903,8 @@ namespace LootTable
 		if (CountObject.isInt())
 		{
 			m_Count = CountObject.asInt();
+			m_Active = true;
+			return;
 		}
 		else if (CountObject.isObject())
 		{
@@ -2907,6 +2925,7 @@ namespace LootTable
 			}
 			else if (Type == "Binomial")
 			{
+				m_Type = eType::Binomial;
 				if (CountObject.isMember("n"))
 				{
 					m_N = CountObject["n"].asInt();
@@ -2929,8 +2948,10 @@ namespace LootTable
 			{
 				LOGWARNING("Loot table: Function \"SetCount\" got provided a unknown type: %s, dropping function!", Type);
 				m_Active = false;
+				return;
 			}
 		}
+		m_Active = true;
 	}
 
 
@@ -3007,7 +3028,7 @@ namespace LootTable
 	cSetLootTable::cSetLootTable(const Json::Value & a_Value)
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
-		LOGWARNING("Loot table: NBT for items is not yet supported, dropping \"SetLootTable\" function!");
+		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetLootTable\"!");
 		return;
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
@@ -3048,7 +3069,7 @@ namespace LootTable
 			LOGWARNING("Loot table: Function \"SetLore\" encountered a Json problem, dropping function!");
 			return;
 		}
-
+		m_Active = true;
 		for (const auto & Key : a_Value.getMemberNames())
 		{
 			if (NoCaseCompare(Key, "lore") == 0)
@@ -3057,6 +3078,8 @@ namespace LootTable
 				if (!Lore.isArray())
 				{
 					LOGWARNING("Loot table: function \"SetLore\" got a unknown object for it's lore, dropping function!");
+					m_Active = false;
+					return;
 				}
 				for (unsigned int i = 0; i < Lore.size(); i++)
 				{
@@ -3089,6 +3112,8 @@ namespace LootTable
 				else
 				{
 					LOGWARNING("Loot table: Function \"SetLore\" got unknown destination: %s, dropping function!", Entity);
+					m_Active = false;
+					return;
 				}
 			}
 			else if (NoCaseCompare(Key, "replace") == 0)
@@ -3126,6 +3151,7 @@ namespace LootTable
 			LOGWARNING("Loot table: Function \"SetName\" encountered a Json problem, dropping function!");
 			return;
 		}
+		m_Active = true;
 		for (const auto & Key : a_Value.getMemberNames())
 		{
 			if (NoCaseCompare(Key, "name") == 0)
@@ -3134,6 +3160,8 @@ namespace LootTable
 				{
 					// TODO: 16.09.2020 - Add when Json objects are used for Names - 12xx12
 					LOGWARNING("Loot table: Items only support plain text in item name. Please make sure you don't supply a Json object in function \"SetName\".");
+					m_Active = false;
+					return;
 				}
 				else
 				{
@@ -3158,6 +3186,8 @@ namespace LootTable
 				else
 				{
 					LOGWARNING("Loot table: Function \"SetName\" got unknown destination: %s, dropping function!", Entity);
+					m_Active = false;
+					return;
 				}
 			}
 		}

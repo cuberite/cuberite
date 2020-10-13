@@ -454,7 +454,7 @@ static void ParseRandomChance()
 	auto RandomChance = std::get<LootTable::Condition::cRandomChance>(Condition.m_Parameter);
 
 	TEST_TRUE(RandomChance.IsActive());
-	TEST_LESS_THAN_OR_EQUAL(RandomChance.m_Chance - 0.300000, 0.0001);
+	TEST_EQUAL(RandomChance.m_Chance, 0.3f);
 }
 
 
@@ -606,9 +606,72 @@ static void ParseWeatherCheck()
 
 
 
+
 static void ParseApplyBonus()
 {
+	// Mode: BinomialWithBonusCount
+	AString BonusString =
+	"{"
+		"\"function\": \"minecraft:apply_bonus\","
+		"\"enchantment\": 2,"
+		"\"formula\": \"binomial_with_bonus_count\","
+		"\"parameters\": {"
+			"\"extra\": 3,"
+			"\"probability\": 0.3,"
+		"},"
+	"}";
 
+	JsonUtils::ParseString(BonusString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto ApplyBonus = std::get<LootTable::Function::cApplyBonus>(Function.m_Function);
+
+	TEST_TRUE(ApplyBonus.IsActive());
+	TEST_EQUAL(ApplyBonus.m_Formula, LootTable::Function::cApplyBonus::eFormula::BinomialWithBonusCount);
+	TEST_EQUAL(ApplyBonus.m_Enchantment, 2);
+	TEST_EQUAL(ApplyBonus.m_Extra, 3);
+	TEST_LESS_THAN_OR_EQUAL(ApplyBonus.m_Probability - 0.3, 0.0000001);
+
+	// Mode: UniformBonusCount
+	BonusString =
+	"{"
+		"\"function\": \"minecraft:apply_bonus\","
+		"\"enchantment\": 10,"
+		"\"formula\": \"uniform_bonus_count\","
+		"\"parameters\": {"
+			"\"bonusMultiplier\": 0.5,"
+		"},"
+	"}";
+
+	JsonUtils::ParseString(BonusString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	ApplyBonus = std::get<LootTable::Function::cApplyBonus>(Function.m_Function);
+
+	TEST_TRUE(ApplyBonus.IsActive());
+	TEST_EQUAL(ApplyBonus.m_Formula, LootTable::Function::cApplyBonus::eFormula::UniformBonusCount);
+	TEST_EQUAL(ApplyBonus.m_Enchantment, 10);
+	TEST_LESS_THAN_OR_EQUAL(ApplyBonus.m_BonusMultiplier - 0.5, 0.0000001);
+
+	//
+	BonusString =
+	"{"
+		"\"function\": \"minecraft:apply_bonus\","
+		"\"enchantment\": 15,"
+		"\"formula\": \"ore_drops\","
+	"}";
+
+	JsonUtils::ParseString(BonusString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	ApplyBonus = std::get<LootTable::Function::cApplyBonus>(Function.m_Function);
+
+	TEST_TRUE(ApplyBonus.IsActive());
+	TEST_EQUAL(ApplyBonus.m_Formula, LootTable::Function::cApplyBonus::eFormula::OreDrops);
+	TEST_EQUAL(ApplyBonus.m_Enchantment, 15);
 }
 
 
@@ -617,7 +680,19 @@ static void ParseApplyBonus()
 
 static void ParseCopyName()
 {
+	AString CopyNameString =
+	"{"
+		"\"function\": \"minecraft:copy_name\","
+		"\"source\": \"block_entity\","
+	"}";
 
+	JsonUtils::ParseString(CopyNameString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto CopyName = std::get<LootTable::Function::cCopyName>(Function.m_Function);
+
+	TEST_TRUE(CopyName.m_Active);
 }
 
 
@@ -626,7 +701,18 @@ static void ParseCopyName()
 
 static void ParseCopyNbt()
 {
+	AString CopyNBTString =
+	"{"
+		"\"function\": \"minecraft:copy_nbt\","
+	"}";
 
+	JsonUtils::ParseString(CopyNBTString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto CopyNBT = std::get<LootTable::Function::cCopyNbt>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -635,7 +721,18 @@ static void ParseCopyNbt()
 
 static void ParseCopyState()
 {
+	AString CopyStateString =
+	"{"
+		"\"function\": \"minecraft:copy_state\","
+	"}";
 
+	JsonUtils::ParseString(CopyStateString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto CopyState = std::get<LootTable::Function::cCopyState>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -644,7 +741,24 @@ static void ParseCopyState()
 
 static void ParseEnchantRandomly()
 {
+	AString EnchantRandomlyString =
+	"{"
+		"\"function\": \"minecraft:enchant_randomly\","
+		"\"enchantments\": ["
+			"\"minecraft:efficiency\","
+			"\"minecraft:smite\","
+		"],"
+	"}";
 
+	JsonUtils::ParseString(EnchantRandomlyString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto EnchantRandomly = std::get<LootTable::Function::cEnchantRandomly>(Function.m_Function);
+
+	TEST_TRUE(EnchantRandomly.IsActive());
+	TEST_EQUAL(EnchantRandomly.m_Enchantments[0], cEnchantments::enchEfficiency);
+	TEST_EQUAL(EnchantRandomly.m_Enchantments[1], cEnchantments::enchSmite);
 }
 
 
@@ -653,7 +767,26 @@ static void ParseEnchantRandomly()
 
 static void ParseEnchantWithLevels()
 {
+	AString EnchantWithLevelsString =
+	"{"
+		"\"function\": \"minecraft:enchant_with_levels\","
+		"\"treasure\": true,"
+		"\"levels\": {"
+			"\"min\": 1,"
+			"\"max\": 3,"
+		"},"
+	"}";
 
+	JsonUtils::ParseString(EnchantWithLevelsString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto EnchantWithLevels = std::get<LootTable::Function::cEnchantWithLevels>(Function.m_Function);
+
+	TEST_TRUE(EnchantWithLevels.IsActive());
+	TEST_TRUE(EnchantWithLevels.m_Treasure);
+	TEST_EQUAL(EnchantWithLevels.m_LevelsMin, 1);
+	TEST_EQUAL(EnchantWithLevels.m_LevelsMax, 3);
 }
 
 
@@ -662,7 +795,18 @@ static void ParseEnchantWithLevels()
 
 static void ParseExplorationMap()
 {
+	AString ExplorationMapString =
+	"{"
+		"\"function\": \"minecraft:exploration_map\","
+	"}";
 
+	JsonUtils::ParseString(ExplorationMapString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto ExplorationMap = std::get<LootTable::Function::cExplorationMap>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -671,7 +815,18 @@ static void ParseExplorationMap()
 
 static void ParseExplosionDecay()
 {
+	AString ExplosionDecayString =
+	"{"
+		"\"function\": \"minecraft:explosion_decay\","
+	"}";
 
+	JsonUtils::ParseString(ExplosionDecayString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto ExplosionDecay = std::get<LootTable::Function::cExplosionDecay>(Function.m_Function);
+
+	TEST_TRUE(ExplosionDecay.IsActive());
 }
 
 
@@ -680,7 +835,18 @@ static void ParseExplosionDecay()
 
 static void ParseFurnaceSmelt()
 {
+	AString FurnaceSmeltString =
+	"{"
+		"\"function\": \"minecraft:furnace_smelt\","
+	"}";
 
+	JsonUtils::ParseString(FurnaceSmeltString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto FurnaceSmelt = std::get<LootTable::Function::cFurnaceSmelt>(Function.m_Function);
+
+	TEST_TRUE(FurnaceSmelt.IsActive());
 }
 
 
@@ -689,6 +855,53 @@ static void ParseFurnaceSmelt()
 
 static void ParseFillPlayerHead()
 {
+	// Dest = this
+	AString FillPlayerHeadString =
+	"{"
+		"\"function\": \"minecraft:fill_player_head\","
+		"\"entity\": \"this\""
+	"}";
+
+	JsonUtils::ParseString(FillPlayerHeadString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto FillPlayerHead = std::get<LootTable::Function::cFillPlayerHead>(Function.m_Function);
+
+	TEST_TRUE(FillPlayerHead.IsActive());
+	TEST_EQUAL(FillPlayerHead.m_Dest, LootTable::Function::cFillPlayerHead::eDest::This);
+
+	// Dest = killer
+	FillPlayerHeadString =
+	"{"
+		"\"function\": \"minecraft:fill_player_head\","
+		"\"entity\": \"killer\""
+	"}";
+
+	JsonUtils::ParseString(FillPlayerHeadString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	FillPlayerHead = std::get<LootTable::Function::cFillPlayerHead>(Function.m_Function);
+
+	TEST_TRUE(FillPlayerHead.IsActive());
+	TEST_EQUAL(FillPlayerHead.m_Dest, LootTable::Function::cFillPlayerHead::eDest::Killer);
+
+	// Dest = killer_player
+	FillPlayerHeadString =
+	"{"
+		"\"function\": \"minecraft:fill_player_head\","
+		"\"entity\": \"killer_player\""
+	"}";
+
+	JsonUtils::ParseString(FillPlayerHeadString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	FillPlayerHead = std::get<LootTable::Function::cFillPlayerHead>(Function.m_Function);
+
+	TEST_TRUE(FillPlayerHead.IsActive());
+	TEST_EQUAL(FillPlayerHead.m_Dest, LootTable::Function::cFillPlayerHead::eDest::KillerPlayer);
 
 }
 
@@ -698,7 +911,24 @@ static void ParseFillPlayerHead()
 
 static void ParseLimitCount()
 {
+	AString FillPlayerHeadString =
+	"{"
+		"\"function\": \"minecraft:limit_count\","
+		"\"limit\": {"
+			"\"min\": 10,"
+			"\"max\": 20,"
+		"},"
+	"}";
 
+	JsonUtils::ParseString(FillPlayerHeadString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto LimitCount = std::get<LootTable::Function::cLimitCount>(Function.m_Function);
+
+	TEST_TRUE(LimitCount.m_Active);
+	TEST_EQUAL(LimitCount.m_LimitMin, 10);
+	TEST_EQUAL(LimitCount.m_LimitMax, 20);
 }
 
 
@@ -707,7 +937,26 @@ static void ParseLimitCount()
 
 static void ParseLootingEnchant()
 {
+	AString FillPlayerHeadString =
+	"{"
+		"\"function\": \"minecraft:looting_enchant\","
+		"\"count\": {"
+  			"\"min\": 10,"
+  			"\"max\": 20,"
+		"},"
+  		"\"limit\": 30,"
+	"}";
 
+	JsonUtils::ParseString(FillPlayerHeadString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto LootingEnchant = std::get<LootTable::Function::cLootingEnchant>(Function.m_Function);
+
+	TEST_TRUE(LootingEnchant.IsActive());
+	TEST_EQUAL(LootingEnchant.m_CountMin, 10);
+	TEST_EQUAL(LootingEnchant.m_CountMax, 20);
+	TEST_EQUAL(LootingEnchant.m_Limit, 30);
 }
 
 
@@ -716,7 +965,18 @@ static void ParseLootingEnchant()
 
 static void ParseSetAttributes()
 {
+	AString SetAttributesString =
+	"{"
+		"\"function\": \"minecraft:set_attributes\","
+	"}";
 
+	JsonUtils::ParseString(SetAttributesString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetAttributes = std::get<LootTable::Function::cSetAttributes>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -725,7 +985,18 @@ static void ParseSetAttributes()
 
 static void ParseSetContents()
 {
+	AString SetContentsString =
+	"{"
+		"\"function\": \"minecraft:set_contents\","
+	"}";
 
+	JsonUtils::ParseString(SetContentsString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetContents = std::get<LootTable::Function::cSetContents>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -734,7 +1005,65 @@ static void ParseSetContents()
 
 static void ParseSetCount()
 {
+	// Static limit
+	AString SetCountString =
+	"{"
+		"\"function\": \"minecraft:set_count\","
+  		"\"count\": 10,"
+	"}";
 
+	JsonUtils::ParseString(SetCountString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetCount = std::get<LootTable::Function::cSetCount>(Function.m_Function);
+
+	TEST_TRUE(SetCount.IsActive());
+	TEST_EQUAL(SetCount.m_Count, 10);
+
+	// Uniform limit
+	SetCountString =
+	"{"
+		"\"function\": \"minecraft:set_count\","
+  		"\"count\": {"
+			"\"type\": \"uniform\","
+			"\"min\": 10,"
+			"\"max\": 20,"
+		"},"
+	"}";
+
+	JsonUtils::ParseString(SetCountString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetCount = std::get<LootTable::Function::cSetCount>(Function.m_Function);
+
+	TEST_TRUE(SetCount.IsActive());
+	TEST_EQUAL(SetCount.m_Type, LootTable::Function::cSetCount::eType::Uniform);
+	TEST_EQUAL(SetCount.m_UniformMin, 10);
+	TEST_EQUAL(SetCount.m_UniformMax, 20);
+
+	// Binomial limit
+	SetCountString =
+	"{"
+		"\"function\": \"minecraft:set_count\","
+  		"\"count\": {"
+			"\"type\": \"binomial\","
+			"\"n\": 10,"
+			"\"p\": 0.5,"
+		"},"
+	"}";
+
+	JsonUtils::ParseString(SetCountString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetCount = std::get<LootTable::Function::cSetCount>(Function.m_Function);
+
+	TEST_TRUE(SetCount.IsActive());
+	TEST_EQUAL(SetCount.m_Type, LootTable::Function::cSetCount::eType::Binomial);
+	TEST_EQUAL(SetCount.m_N, 10);
+	TEST_EQUAL(SetCount.m_P, 0.5f);
 }
 
 
@@ -743,7 +1072,24 @@ static void ParseSetCount()
 
 static void ParseSetDamage()
 {
+	AString SetDamageString =
+	"{"
+		"\"function\": \"minecraft:set_damage\","
+		"\"damage\": {"
+			"\"min\": 0.2,"
+			"\"max\": 0.8,"
+		"},"
+	"}";
 
+	JsonUtils::ParseString(SetDamageString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetDamage = std::get<LootTable::Function::cSetDamage>(Function.m_Function);
+
+	TEST_TRUE(SetDamage.IsActive());
+	TEST_EQUAL(SetDamage.m_Min, 0.2f);
+	TEST_EQUAL(SetDamage.m_Max, 0.8f);
 }
 
 
@@ -752,7 +1098,24 @@ static void ParseSetDamage()
 
 static void ParseSetLootTable()
 {
+	AString SetLootTableString =
+	"{"
+		"\"function\": \"minecraft:set_loot_table\","
+		"\"name\": \"Hello World!\","
+		"\"Seed\": 42,"
+	"}";
 
+	JsonUtils::ParseString(SetLootTableString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetLootTable = std::get<LootTable::Function::cSetLootTable>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
+
+	return;
+	TEST_EQUAL(SetLootTable.m_LootTable, "Hello World!");
+	TEST_EQUAL(SetLootTable.m_Seed, 42);
 }
 
 
@@ -761,7 +1124,68 @@ static void ParseSetLootTable()
 
 static void ParseSetLore()
 {
+	// This
+	AString SetLoreString =
+	"{"
+		"\"function\": \"minecraft:set_lore\","
+		"\"lore\": [\"Hello World!\", \"Hello World!2\"],"
+		"\"entity\": \"this\","
+		"\"replace\": true,"
+	"}";
 
+	JsonUtils::ParseString(SetLoreString, JsonObject, &ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetLore = std::get<LootTable::Function::cSetLore>(Function.m_Function);
+
+	TEST_TRUE(SetLore.IsActive());
+	TEST_EQUAL(SetLore.m_Lore[0], "Hello World!");
+	TEST_EQUAL(SetLore.m_Lore[1], "Hello World!2");
+	TEST_EQUAL(SetLore.m_Type, LootTable::Function::cSetLore::eType::This);
+	TEST_TRUE(SetLore.m_Replace);
+
+	// killer
+	SetLoreString =
+	"{"
+		"\"function\": \"minecraft:set_lore\","
+		"\"lore\": [\"Hello World!\", \"Hello World!2\"],"
+		"\"entity\": \"killer\","
+		"\"replace\": true,"
+	"}";
+
+	JsonUtils::ParseString(SetLoreString, JsonObject, &ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetLore = std::get<LootTable::Function::cSetLore>(Function.m_Function);
+
+	TEST_TRUE(SetLore.IsActive());
+	TEST_EQUAL(SetLore.m_Lore[0], "Hello World!");
+	TEST_EQUAL(SetLore.m_Lore[1], "Hello World!2");
+	TEST_EQUAL(SetLore.m_Type, LootTable::Function::cSetLore::eType::Killer);
+	TEST_TRUE(SetLore.m_Replace);
+
+	// This
+	SetLoreString =
+	"{"
+		"\"function\": \"minecraft:set_lore\","
+		"\"lore\": [\"Hello World!\", \"Hello World!2\"],"
+		"\"entity\": \"killer_player\","
+		"\"replace\": true,"
+	"}";
+
+	JsonUtils::ParseString(SetLoreString, JsonObject, &ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetLore = std::get<LootTable::Function::cSetLore>(Function.m_Function);
+
+	TEST_TRUE(SetLore.IsActive());
+	TEST_EQUAL(SetLore.m_Lore[0], "Hello World!");
+	TEST_EQUAL(SetLore.m_Lore[1], "Hello World!2");
+	TEST_EQUAL(SetLore.m_Type, LootTable::Function::cSetLore::eType::KillerPlayer);
+	TEST_TRUE(SetLore.m_Replace);
 }
 
 
@@ -770,7 +1194,59 @@ static void ParseSetLore()
 
 static void ParseSetName()
 {
+	// This
+	AString SetNameString =
+	"{"
+		"\"function\": \"minecraft:set_name\","
+		"\"name\": \"Hello World!\","
+  		"\"entity\": \"this\","
+	"}";
 
+	JsonUtils::ParseString(SetNameString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetName = std::get<LootTable::Function::cSetName>(Function.m_Function);
+
+	TEST_TRUE(SetName.IsActive());
+	TEST_EQUAL(SetName.m_Name, "Hello World!");
+	TEST_EQUAL(SetName.m_Type, LootTable::Function::cSetName::eType::This);
+
+	// Killer
+	SetNameString =
+	"{"
+		"\"function\": \"minecraft:set_name\","
+		"\"name\": \"Hello World!\","
+		"\"entity\": \"killer\","
+	"}";
+
+	JsonUtils::ParseString(SetNameString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetName = std::get<LootTable::Function::cSetName>(Function.m_Function);
+
+	TEST_TRUE(SetName.IsActive());
+	TEST_EQUAL(SetName.m_Name, "Hello World!");
+	TEST_EQUAL(SetName.m_Type, LootTable::Function::cSetName::eType::Killer);
+
+	// Killer
+	SetNameString =
+	"{"
+		"\"function\": \"minecraft:set_name\","
+		"\"name\": \"Hello World!\","
+		"\"entity\": \"killer_player\","
+	"}";
+
+	JsonUtils::ParseString(SetNameString, JsonObject, & ErrorMessage);
+
+	Function = LootTable::ParseFunction(JsonObject);
+
+	SetName = std::get<LootTable::Function::cSetName>(Function.m_Function);
+
+	TEST_TRUE(SetName.IsActive());
+	TEST_EQUAL(SetName.m_Name, "Hello World!");
+	TEST_EQUAL(SetName.m_Type, LootTable::Function::cSetName::eType::KillerPlayer);
 }
 
 
@@ -779,7 +1255,18 @@ static void ParseSetName()
 
 static void ParseSetNbt()
 {
+	AString SetNBTString =
+			"{"
+			"\"function\": \"minecraft:set_nbt\","
+			"}";
 
+	JsonUtils::ParseString(SetNBTString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetNBT = std::get<LootTable::Function::cSetNbt>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
@@ -788,7 +1275,18 @@ static void ParseSetNbt()
 
 static void ParseSetStewEffect()
 {
+	AString SetStewEffectString =
+	"{"
+		"\"function\": \"minecraft:set_stew_effect\","
+	"}";
 
+	JsonUtils::ParseString(SetStewEffectString, JsonObject, & ErrorMessage);
+
+	auto Function = LootTable::ParseFunction(JsonObject);
+
+	auto SetStewEffect = std::get<LootTable::Function::cSetStewEffect>(Function.m_Function);
+
+	// TODO: 13.10.2020 - Add test when implemented - 12xx12
 }
 
 
