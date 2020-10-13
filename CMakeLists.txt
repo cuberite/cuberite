@@ -88,13 +88,10 @@ endif()
 # Selectively disable warnings in the level where the target is created:
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	# Generated file has old-style casts, missing prototypes, and deprecated declarations
-	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -Wno-everything)
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -Wno-everything)
 
 	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
-	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
-
-	# Enforce BlockHandler handling all blocks in switch statements
-	set_source_files_properties("${CMAKE_SOURCE_DIR}/src/Blocks/BlockHandler.cpp" PROPERTIES COMPILE_OPTIONS -Werror=switch)
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
 endif()
 
 if(${BUILD_TOOLS})
