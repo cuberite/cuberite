@@ -2158,13 +2158,13 @@ namespace LootTable
 			{
 				// Binomial Probability Distribution with n=level + extra, p=probability
 				std::default_random_engine Generator(static_cast<unsigned long>(a_Noise.GetSeed()));
-				std::binomial_distribution<int> Dist(Level + m_Extra, m_Probability);
+				std::binomial_distribution<int> Dist(static_cast<int>(Level) + m_Extra, m_Probability);
 				std::vector<int> Values;
 				for (size_t I = 0; I < static_cast<size_t>(Level + m_Extra); I++)
 				{
 					Values[I] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size()];
+				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size())];
 				break;
 			}
 			case eFormula::UniformBonusCount:
@@ -2176,7 +2176,7 @@ namespace LootTable
 			case eFormula::OreDrops:
 			{
 				// Count *= (max(0; random(0..Level + 2) - 1) + 1)
-				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (Level + 2) - 1) + 1;
+				a_Item.m_ItemCount *= std::max(0, a_Noise.IntNoise1DInt(a_Noise.GetSeed() * a_Item.m_ItemType) % (static_cast<int>(Level) + 2) - 1) + 1;
 				break;
 			}
 			case eFormula::None:
@@ -2250,7 +2250,6 @@ namespace LootTable
 	{
 		// TODO: 06.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported. Dropping function!");
-		return; /*
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"CopyNbt\" encountered a Json problem, dropping function!");
@@ -2349,7 +2348,7 @@ namespace LootTable
 				m_Operations.emplace_back(sOperation{SourcePath, TargetPath, Operation});
 			}
 		}
-	m_Active = true; */
+	// m_Active = true;
 	}
 
 
@@ -2554,7 +2553,6 @@ namespace LootTable
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: Exploration maps are not implemented, dropping function!");
-		return; /*
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"ExplorationMap\" encountered a Json problem, dropping function!");
@@ -2583,7 +2581,7 @@ namespace LootTable
 			{
 				m_SkipExistingChunks = a_Value[Key].asBool();
 			}
-		} */
+		}
 	}
 
 
@@ -2842,7 +2840,7 @@ namespace LootTable
 
 		int Count = (a_Noise.IntNoise3DInt(a_Pos) / 11) % (m_CountMin - m_CountMax) + m_CountMin;
 
-		a_Item.m_ItemCount += Looting * Count;
+		a_Item.m_ItemCount += static_cast<int>(Looting) * Count;
 
 		if ((m_Limit > 0) && (a_Item.m_ItemCount > m_Limit))
 		{
@@ -2977,14 +2975,14 @@ namespace LootTable
 			}
 			case eType::Binomial:
 			{
-				std::default_random_engine Generator(a_Noise.GetSeed());
+				std::default_random_engine Generator(static_cast<unsigned long>(a_Noise.GetSeed()));
 				std::binomial_distribution<int> Dist(m_N, m_P);
 				std::vector<int> Values;
-				for (int i = 0; i < m_N; i++)
+				for (size_t I = 0; I < static_cast<size_t>(m_N); I++)
 				{
-					Values[i] = Dist(Generator);
+					Values[I] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * a_Item.m_ItemType) % Values.size()];
+				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * a_Item.m_ItemType) % Values.size())];
 				break;
 			}
 		}
@@ -3026,7 +3024,7 @@ namespace LootTable
 	{
 		ACTIVECHECK
 		float Damage = std::fmod((a_Noise.IntNoise3D(a_Pos) / 7), m_Max - m_Min) + m_Min;
-		a_Item.m_ItemDamage = floor(a_Item.m_ItemDamage * Damage);
+		a_Item.m_ItemDamage = FloorC<short>(a_Item.m_ItemDamage * Damage);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3667,9 +3665,7 @@ namespace LootTable
 			{
 				return cLootTablePoolEntry(Conditions, Functions, Type, Children, Weight, Quality);
 			}
-
-			case ePoolEntryType::Empty: return cLootTablePoolEntry();
-			default:                               return cLootTablePoolEntry();
+			default: return cLootTablePoolEntry();
 		}
 	}
 
