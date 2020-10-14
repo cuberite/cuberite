@@ -148,6 +148,11 @@ public:
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
 	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
+	const AString & GetLootTable() const { return m_LootTable; }
+	void SetLootTable(const AString & a_LootTable) { m_LootTable = a_LootTable; }
+
+	int GetLootTableSeed() const { return m_LootTableSeed; }
+	void SetLootTableSeed(int a_LootTableSeed) { m_LootTableSeed = a_LootTableSeed; }
 
 protected:
 
@@ -158,6 +163,7 @@ protected:
 	/** This string is the filename of the loottable without the ".json" end.
 	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world */
 	AString m_LootTable;
+	int m_LootTableSeed = 0;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override

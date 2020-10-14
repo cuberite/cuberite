@@ -1390,7 +1390,7 @@ void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
 	if (!m_LootTable.empty())
 	{
-		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(m_Contents, * m_World, GetBlockPos(), a_Player.GetUniqueID());
+		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(m_Contents, * m_World, GetBlockPos(), a_Player.GetUniqueID(), m_LootTableSeed);
 		m_LootTable = "";
 	}
 

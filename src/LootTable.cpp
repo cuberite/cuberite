@@ -40,9 +40,13 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 
 
 
-bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Vector3i a_Pos, const UInt32 a_PlayerID) const
+bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Vector3i a_Pos, const UInt32 a_PlayerID, int m_Seed = 0) const
 {
-	auto Noise = cNoise(a_World.GetGenerator().GetSeed());
+	cNoise Noise = cNoise(a_World.GetSeed());
+	if (m_Seed != 0)
+	{
+		Noise = cNoise(m_Seed);
+	}
 
 	// The player is killed and killer here because he influences both in the functions or conditions
 	auto DamageInfo = TakeDamageInfo();
