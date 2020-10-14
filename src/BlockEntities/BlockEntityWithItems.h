@@ -69,7 +69,7 @@ protected:
 	cItemGrid m_Contents;
 
 	/** This string is the filename of the loottable without the ".json" end.
-	Check root / LootTables / * for availeble names. If you put a file into the worldfolder / LootTables / **/
+	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world */
 	AString m_LootTable;
 
 	/** If there's a loot table in this container, generates the loot according to it. */

@@ -745,22 +745,6 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 
 void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 {
-	static const cLootProbab LootProbab[] =
-	{
-		// Item,                          MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_IRON),             1,         5,         10 },
-		{ cItem(E_ITEM_GOLD),             1,         3,          5 },
-		{ cItem(E_ITEM_REDSTONE_DUST),    4,         9,          5 },
-		{ cItem(E_ITEM_DIAMOND),          1,         2,          3 },
-		{ cItem(E_ITEM_DYE, 1, 4),        4,         9,          5 },  // lapis lazuli dye
-		{ cItem(E_ITEM_COAL),             3,         8,         10 },
-		{ cItem(E_ITEM_BREAD),            1,         3,         15 },
-		{ cItem(E_ITEM_IRON_PICKAXE),     1,         1,          1 },
-		{ cItem(E_BLOCK_MINECART_TRACKS), 4,         8,          1 },
-		{ cItem(E_ITEM_MELON_SEEDS),      2,         4,         10 },
-		{ cItem(E_ITEM_PUMPKIN_SEEDS),    2,         4,         10 },
-	} ;
-
 	if (m_ChestPosition < 0)
 	{
 		return;
@@ -803,10 +787,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, Meta);
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
-		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
-		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
-		int Seed = Noise.IntNoise2DInt(x, z);
-		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
+		ChestEntity->SetLootTable("AbandonedMineshaft");
 	}
 }
 
