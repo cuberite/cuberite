@@ -261,7 +261,7 @@ namespace LootTable
 			// Team
 			AString m_Team;
 			// Type
-			cEntity::eEntityType m_EntityType;
+			AString m_EntityType;
 			cEntityProperties * m_TargetEntity = nullptr;
 			cEntityProperties * m_Vehicle = nullptr;
 		};

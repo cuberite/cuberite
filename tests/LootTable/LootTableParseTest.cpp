@@ -1256,9 +1256,9 @@ static void ParseSetName()
 static void ParseSetNbt()
 {
 	AString SetNBTString =
-			"{"
-			"\"function\": \"minecraft:set_nbt\","
-			"}";
+	"{"
+		"\"function\": \"minecraft:set_nbt\","
+	"}";
 
 	JsonUtils::ParseString(SetNBTString, JsonObject, & ErrorMessage);
 

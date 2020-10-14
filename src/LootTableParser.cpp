@@ -834,7 +834,7 @@ namespace LootTable
 					LOGWARNING("Loot table: Condition \"EntityProperties - Type\" encountered a Json problem, dropping condition!");
 					continue;
 				}
-				// todo
+				m_EntityType = std::move(Type);
 			}
 			else if (
 				(NoCaseCompare(Key, "target_entity") == 0) ||
@@ -1902,9 +1902,9 @@ namespace LootTable
 		}
 		else
 		{
-			for (int i = 0; i < Chances.size(); i++)
+			for (unsigned int I = 0; I < Chances.size(); I++)
 			{
-				m_Chances[i] = Chances[i].asFloat();
+				m_Chances[I] = Chances[I].asFloat();
 			}
 		}
 	}
@@ -2320,7 +2320,7 @@ namespace LootTable
 			for (const auto & OperationKey : OperationObject.getMemberNames())
 			{
 				AString SourcePath, TargetPath;
-				eOperation Operation;
+				eOperation Operation = eOperation::Replace;
 				if (NoCaseCompare(OperationKey, "source") == 0)
 				{
 					SourcePath = NamespaceConverter(OperationObject[OperationKey].asString());
@@ -2332,15 +2332,15 @@ namespace LootTable
 				else if (NoCaseCompare(OperationKey, "op") == 0)
 				{
 					AString Op = NamespaceConverter(OperationObject[OperationKey].asString());
-					if (Op == "Replace")
+					if (NoCaseCompare(Op, "Replace") == 0)
 					{
 						Operation = eOperation::Replace;
 					}
-					else if (Op == "Append")
+					else if (NoCaseCompare(Op, "Append") == 0)
 					{
 						Operation = eOperation::Append;
 					}
-					else if (Op == "Merge")
+					else if (NoCaseCompare(Op, "Merge") == 0)
 					{
 						Operation = eOperation::Merge;
 					}
@@ -2373,7 +2373,6 @@ namespace LootTable
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: States for blocks is not yet supported, dropping function!");
-		return;
 
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
@@ -2982,7 +2981,7 @@ namespace LootTable
 				{
 					Values[I] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * a_Item.m_ItemType) % Values.size())];
+				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * a_Item.m_ItemType) % static_cast<int>(Values.size()))];
 				break;
 			}
 		}
@@ -3216,7 +3215,6 @@ namespace LootTable
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetNBT\"!");
-		return;
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetNbt\" encountered a Json problem, dropping function!");
