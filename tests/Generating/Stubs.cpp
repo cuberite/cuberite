@@ -22,6 +22,7 @@
 #include "Simulator/FireSimulator.h"
 #include "MobSpawner.h"
 #include "ItemGrid.h"
+#include "BlockEntities/ChestEntity.h"
 
 
 
@@ -395,5 +396,12 @@ cItem::cItem(
 
 
 void cItem::Empty()
+{
+}
+
+
+
+
+void cBlockEntityWithItems::SetLootTable(const AString & a_LootTable)
 {
 }
