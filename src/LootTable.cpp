@@ -172,7 +172,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 
 			if (a_Entry.m_Expand)
 			{
-				Items.Add(TagItems[a_Noise.IntNoise3DInt(a_Pos * static_cast<int>(TagItems.size())) % static_cast<int>(TagItems.size())]);
+				Items.Add(TagItems[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * static_cast<int>(TagItems.size())) % static_cast<int>(TagItems.size()))]);
 			}
 			else
 			{
@@ -219,7 +219,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 			{
 				auto Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
 				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * static_cast<int>(Children.size())) % static_cast<int>(Children.size());
-				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+				auto NewItems = GetItems(Children[static_cast<size_t>(ChildPos)], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			}
 			catch (const std::bad_variant_access &)

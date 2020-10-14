@@ -1581,8 +1581,8 @@ namespace LootTable
 				{
 					Json::Value EnchantmentObject = Enchantments[i];
 					cEnchantments Enchantment;
-					int EnchantmentID;
-					int Min = 0, Max = 100;
+					int EnchantmentID = -1;
+					unsigned int Min = 0, Max = 100;
 					if (!EnchantmentObject.isObject())
 					{
 						LOGWARNING("Loot table: Unknown entry provided for enchantment in condition \"MatchTool\"");
@@ -1597,8 +1597,13 @@ namespace LootTable
 						}
 						else if (NoCaseCompare(EnchantmentKey, "levels") == 0)
 						{
-							MinMaxRange(EnchantmentObject[EnchantmentKey], Min, Max);
+							MinMaxRange<unsigned int>(EnchantmentObject[EnchantmentKey], Min, Max);
 						}
+					}
+					if (EnchantmentID == -1)
+					{
+						LOGWARNING("Loot table: No enchantment was provided in condition \"MatchTool\"");
+						continue;
 					}
 					m_StoredEnchantmentsMin.Add(Enchantment);
 					m_StoredEnchantmentsMin.SetLevel(EnchantmentID, Min);
@@ -1897,7 +1902,7 @@ namespace LootTable
 		}
 		else
 		{
-			for (unsigned int i = 0; i < Chances.size(); i++)
+			for (int i = 0; i < Chances.size(); i++)
 			{
 				m_Chances[i] = Chances[i].asFloat();
 			}
@@ -1922,10 +1927,10 @@ namespace LootTable
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 			unsigned long Level = Player.GetEquippedItem().m_Enchantments.GetLevel(m_Enchantment);
 
-			Level = std::min(Level, (unsigned long) m_Chances.size());
+			Level = std::min(Level, static_cast<unsigned long>(m_Chances.size()));
 			// this is some funky business going on with MVSC. This sees the return value of .size() as unsigned long long. Clang does see unsigned long...
 
-			return GetRandomProvider().RandReal(0.0f, 1.0f) < m_Chances.at(Level);
+			return GetRandomProvider().RandReal(0.0f, 1.0f) < m_Chances.at(static_cast<int>(Level));
 		};
 		return a_World.DoWithEntityByID(a_KillerID, Callback);
 	}
@@ -2131,7 +2136,7 @@ namespace LootTable
 			UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
 		ACTIVECHECK
-		int Level;
+		unsigned int Level;
 		auto Callback = [&] (cEntity & a_Entity)
 		{
 			if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -2152,12 +2157,12 @@ namespace LootTable
 			case eFormula::BinomialWithBonusCount:
 			{
 				// Binomial Probability Distribution with n=level + extra, p=probability
-				std::default_random_engine Generator(a_Noise.GetSeed());
+				std::default_random_engine Generator(static_cast<unsigned long>(a_Noise.GetSeed()));
 				std::binomial_distribution<int> Dist(Level + m_Extra, m_Probability);
 				std::vector<int> Values;
-				for (int i = 0; i < Level + m_Extra; i++)
+				for (size_t I = 0; I < static_cast<size_t>(Level + m_Extra); I++)
 				{
-					Values[i] = Dist(Generator);
+					Values[I] = Dist(Generator);
 				}
 				a_Item.m_ItemCount += Values[a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size()];
 				break;
@@ -2165,7 +2170,7 @@ namespace LootTable
 			case eFormula::UniformBonusCount:
 			{
 				// prob = (0, level * BonusMultiplier)
-				a_Item.m_ItemCount += (a_Noise.IntNoise3DInt(a_Pos) / 3) % (int) round(Level * m_BonusMultiplier);
+				a_Item.m_ItemCount += (a_Noise.IntNoise3DInt(a_Pos) / 3) % FloorC(Level * m_BonusMultiplier);
 				break;
 			}
 			case eFormula::OreDrops:
@@ -2245,7 +2250,7 @@ namespace LootTable
 	{
 		// TODO: 06.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported. Dropping function!");
-		return;
+		return; /*
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"CopyNbt\" encountered a Json problem, dropping function!");
@@ -2344,7 +2349,7 @@ namespace LootTable
 				m_Operations.emplace_back(sOperation{SourcePath, TargetPath, Operation});
 			}
 		}
-	m_Active = true;
+	m_Active = true; */
 	}
 
 
@@ -2470,7 +2475,7 @@ namespace LootTable
 			}
 			cWeightedEnchantments EnchantmentLimiter;
 			GetRandomProvider();
-			auto Enchantment = m_Enchantments[a_Noise.IntNoise3DInt(a_Pos) % m_Enchantments.size()];
+			auto Enchantment = m_Enchantments[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos) % static_cast<int>(m_Enchantments.size()))];
 			a_Item.m_Enchantments.Add(cEnchantments(std::to_string(Enchantment) + "=" + std::to_string(a_Noise.IntNoise3DInt(a_Pos) % static_cast<int>(cEnchantments::GetLevelCap(Enchantment)))));
 		}
 		else  // All are possible
@@ -2549,7 +2554,7 @@ namespace LootTable
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: Exploration maps are not implemented, dropping function!");
-		return;
+		return; /*
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"ExplorationMap\" encountered a Json problem, dropping function!");
@@ -2578,7 +2583,7 @@ namespace LootTable
 			{
 				m_SkipExistingChunks = a_Value[Key].asBool();
 			}
-		}
+		} */
 	}
 
 
@@ -2769,7 +2774,7 @@ namespace LootTable
 	void cLimitCount::operator()(cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const
 	{
 		ACTIVECHECK
-		int Limit = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LimitMin - m_LimitMax) + m_LimitMin;
+		char Limit = static_cast<char>((a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LimitMin - m_LimitMax) + m_LimitMin);
 		if (a_Item.m_ItemCount > Limit)
 		{
 			a_Item.m_ItemCount = Limit;
@@ -2818,7 +2823,7 @@ namespace LootTable
 
 	void cLootingEnchant::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KillerID) const
 	{
-		int Looting = 0;
+		unsigned int Looting = 0;
 		auto Callback = [&] (cEntity & a_Entity)
 		{
 			if (a_Entity.GetEntityType() != cEntity::etPlayer)
@@ -2841,7 +2846,7 @@ namespace LootTable
 
 		if ((m_Limit > 0) && (a_Item.m_ItemCount > m_Limit))
 		{
-			a_Item.m_ItemCount = m_Limit;
+			a_Item.m_ItemCount = static_cast<char>(m_Limit);
 		}
 	}
 
@@ -2967,7 +2972,7 @@ namespace LootTable
 		{
 			case eType::Uniform:
 			{
-				a_Item.m_ItemCount = (a_Noise.IntNoise3DInt(a_Pos) / 9) % (m_UniformMin - m_UniformMax) + m_UniformMin;
+				a_Item.m_ItemCount = static_cast<char>((a_Noise.IntNoise3DInt(a_Pos) / 9) % (m_UniformMin - m_UniformMax) + m_UniformMin);
 				break;
 			}
 			case eType::Binomial:
