@@ -7,7 +7,6 @@
 #include "Registries/ItemTags.h"
 #include "LootTableParser.h"
 
-using namespace LootTable;
 
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTable
@@ -94,7 +93,7 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 
 
-cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	auto Items = cItems();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
@@ -136,7 +135,7 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, con
 
 
 
-cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	auto Items = cItems();
 
@@ -205,7 +204,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 		{
 			try
 			{
-				for (const auto & Child : std::get<cLootTablePoolEntries>(a_Entry.m_Content))
+				for (const auto & Child : std::get<LootTable::cLootTablePoolEntries>(a_Entry.m_Content))
 				{
 					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 					Items.insert(Items.end(), NewItems.begin(), NewItems.end());
@@ -221,7 +220,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 		{
 			try
 			{
-				auto Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
+				auto Children = std::get<LootTable::cLootTablePoolEntries>(a_Entry.m_Content);
 				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * static_cast<int>(Children.size())) % static_cast<int>(Children.size());
 				auto NewItems = GetItems(Children[static_cast<size_t>(ChildPos)], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
@@ -234,10 +233,10 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 		}
 		case LootTable::ePoolEntryType::Sequence:  // Selects entries from Children until one is not granted.
 		{
-			cLootTablePoolEntries Children;
+			LootTable::cLootTablePoolEntries Children;
 			try
 			{
-				Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
+				Children = std::get<LootTable::cLootTablePoolEntries>(a_Entry.m_Content);
 			}
 			catch (const std::bad_variant_access &)
 			{
@@ -286,7 +285,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 
 
 
-bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+bool cLootTable::ConditionsApply(const LootTable::cLootTableConditions & a_Conditions, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
 	bool Success = true;
 	for (const auto & Condition : a_Conditions)
@@ -300,9 +299,9 @@ bool cLootTable::ConditionsApply(const cLootTableConditions & a_Conditions, cWor
 
 
 
-bool cLootTable::ConditionApplies(const cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+bool cLootTable::ConditionApplies(const LootTable::cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
-	return std::visit(VISITCONDITION, a_Condition.m_Parameter);
+	return std::visit(LootTable::VISITCONDITION, a_Condition.m_Parameter);
 }
 
 
@@ -316,7 +315,7 @@ void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function,
 		return;
 	}
 
-	std::visit(VISITFUNCTION, a_Function.m_Function);
+	std::visit(LootTable::VISITFUNCTION, a_Function.m_Function);
 }
 
 
