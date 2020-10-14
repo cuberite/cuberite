@@ -1904,7 +1904,7 @@ namespace LootTable
 		{
 			for (unsigned int I = 0; I < Chances.size(); I++)
 			{
-				m_Chances[static_cast<size_t>(I)] = Chances[I].asFloat();
+				m_Chances[static_cast<int>(I)] = Chances[I].asFloat();
 			}
 		}
 	}
