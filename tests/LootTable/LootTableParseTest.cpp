@@ -926,7 +926,7 @@ static void ParseLimitCount()
 
 	auto LimitCount = std::get<LootTable::Function::cLimitCount>(Function.m_Function);
 
-	TEST_TRUE(LimitCount.m_Active);
+	TEST_TRUE(LimitCount.IsActive());
 	TEST_EQUAL(LimitCount.m_LimitMin, 10);
 	TEST_EQUAL(LimitCount.m_LimitMax, 20);
 }
