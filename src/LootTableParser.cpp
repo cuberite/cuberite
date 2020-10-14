@@ -315,7 +315,6 @@ namespace LootTable
 		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
 	{
 		ACTIVECHECK
-		return true;
 		bool Res = true;
 		if (m_BypassesArmor)
 		{
@@ -329,7 +328,6 @@ namespace LootTable
 		{
 			switch (a_DamageSource.DamageType)
 			{
-				case dtAdmin:
 				case dtAttack:
 				case dtCactusContact:
 				case dtDrowning:
@@ -338,7 +336,6 @@ namespace LootTable
 				case dtExplosion:
 				case dtFalling:
 				case dtFireContact:
-				case dtInVoid:
 				case dtOnFire:
 				case dtLavaContact:
 				case dtLightning:
@@ -352,8 +349,8 @@ namespace LootTable
 					Res &= false;
 					break;
 				}
-
-
+				case dtAdmin:
+				case dtInVoid:
 				{
 					Res &= true;
 					break;
@@ -524,6 +521,7 @@ namespace LootTable
 		// TODO: 22.09.2020 - Add when implemented - 12xx12
 		// Res &= m_DirectEntity(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID);
 		Res &= m_SourceEntity(a_World, a_Noise, a_Pos, a_DamageSource.Attacker->GetUniqueID(), a_DamageSource.Attacker->GetUniqueID());
+		return Res;
 	}
 
 
@@ -888,46 +886,46 @@ namespace LootTable
 				return true;
 			};
 
-			if ((m_AbsoluteMin != 0) ||
-				(m_AbsoluteMax != std::numeric_limits<float>::max()))
+			if ((m_AbsoluteMin > 0) ||
+				(m_AbsoluteMax < std::numeric_limits<float>::max()))
 			{
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = std::abs(sqrt(
+				double Dist = std::abs(sqrt(
 					(KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x) +
 					(KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y) +
 					(KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
-			if ((m_HorizontalMin != 0) ||
-				(m_HorizontalMax != std::numeric_limits<float>::max()))
+			if ((m_HorizontalMin > 0) ||
+				(m_HorizontalMax < std::numeric_limits<float>::max()))
 			{
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = std::abs(sqrt(
+				double Dist = std::abs(sqrt(
 					(KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x) +
 					(KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_HorizontalMin <= Dist) && (m_HorizontalMax >= Dist);
 			}
-			if ((m_XMin != 0) || (m_XMax != std::numeric_limits<float>::max()))
+			if ((m_XMin > 0) || (m_XMax < std::numeric_limits<float>::max()))
 			{
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = std::abs(sqrt((KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
+				double Dist = std::abs(sqrt((KillerPos.x - KilledPos.x) * (KillerPos.x - KilledPos.x)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
-			if ((m_YMin != 0) || (m_YMax != std::numeric_limits<float>::max()))
+			if ((m_YMin > 0) || (m_YMax < std::numeric_limits<float>::max()))
 			{
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = std::abs(sqrt((KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
+				double Dist = std::abs(sqrt((KillerPos.y - KilledPos.y) * (KillerPos.y - KilledPos.y)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
-			if ((m_ZMin != 0) || (m_ZMax != std::numeric_limits<float>::max()))
+			if ((m_ZMin > 0) || (m_ZMax < std::numeric_limits<float>::max()))
 			{
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);

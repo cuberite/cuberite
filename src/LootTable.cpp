@@ -109,8 +109,8 @@ cItems cLootTable::GetItems(const cLootTablePool & a_Pool, cWorld & a_World, con
 
 	// Determines the total weight manipulated by the quality
 	int TotalWeight = a_Pool.m_TotalWeight + Luck * a_Pool.m_TotalQuality;
-	int TotalRolls = a_Pool.m_Rolls(a_Noise, a_Pos) + round(a_Pool.m_BonusRolls(a_Noise, a_Pos) * Luck);
-	int EntryNum;
+	int TotalRolls = a_Pool.m_Rolls(a_Noise, a_Pos) + FloorC(a_Pool.m_BonusRolls(a_Noise, a_Pos) * Luck);
+	size_t EntryNum;
 
 	for (int i = 0; i < TotalRolls; i++)
 	{
@@ -172,7 +172,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 
 			if (a_Entry.m_Expand)
 			{
-				Items.Add(TagItems[a_Noise.IntNoise3DInt(a_Pos * TagItems.size()) % TagItems.size()]);
+				Items.Add(TagItems[a_Noise.IntNoise3DInt(a_Pos * TagItems.size()) % static_cast<int>(TagItems.size())]);
 			}
 			else
 			{
@@ -218,7 +218,7 @@ cItems cLootTable::GetItems(const cLootTablePoolEntry & a_Entry, cWorld & a_Worl
 			try
 			{
 				auto Children = std::get<cLootTablePoolEntries>(a_Entry.m_Content);
-				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * Children.size()) % Children.size();
+				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * Children.size()) % static_cast<int>(Children.size());
 				auto NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			}

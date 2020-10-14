@@ -119,7 +119,7 @@ namespace LootTable
 			cBlockStateProperty(const Json::Value & a_Value);
 			bool operator () (cWorld & a_World, const Vector3i & a_Pos) const;
 		private:
-			BLOCKTYPE m_Block;
+			short m_Block;
 			AStringMap m_Properties;
 		};
 
@@ -894,28 +894,28 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 #define VISITFUNCTION \
 	overloaded { \
-		[&] (const LootTable::Function::cApplyBonus        & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cCopyName          & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cCopyNbt           & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cCopyState         & a_Function) { a_Function(a_Item, a_World, a_Pos); }, \
-		[&] (const LootTable::Function::cEnchantRandomly   & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
-		[&] (const LootTable::Function::cEnchantWithLevels & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
-		[&] (const LootTable::Function::cExplorationMap    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cExplosionDecay    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cFurnaceSmelt      & a_Function) { a_Function(a_Item); }, \
-		[&] (const LootTable::Function::cFillPlayerHead    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cLimitCount        & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
-		[&] (const LootTable::Function::cLootingEnchant    & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KillerID); }, \
-		[&] (const LootTable::Function::cSetAttributes     & a_Function) { a_Function(a_Item); }, \
-		[&] (const LootTable::Function::cSetContents       & a_Function) { a_Function(a_Item); }, \
-		[&] (const LootTable::Function::cSetCount          & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
-		[&] (const LootTable::Function::cSetDamage         & a_Function) { a_Function(a_Item, a_Noise, a_Pos); }, \
-		[&] (const LootTable::Function::cSetLootTable      & a_Function) { a_Function(a_Item); }, \
-		[&] (const LootTable::Function::cSetLore           & a_Function) { a_Function(a_Item, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cSetName           & a_Function) { a_Function(a_Item, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cSetNbt            & a_Function) { a_Function(a_Item); }, \
-		[&] (const LootTable::Function::cSetStewEffect     & a_Function) { a_Function(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cNone              & a_Function) {} \
+		[&] (const LootTable::Function::cApplyBonus        & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyName          & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyNbt           & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cCopyState         & a_Func) { a_Func(a_Item, a_World, a_Pos); }, \
+		[&] (const LootTable::Function::cEnchantRandomly   & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cEnchantWithLevels & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cExplorationMap    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cExplosionDecay    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cFurnaceSmelt      & a_Func) { a_Func(a_Item); }, \
+		[&] (const LootTable::Function::cFillPlayerHead    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cLimitCount        & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cLootingEnchant    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetAttributes     & a_Func) { a_Func(a_Item); }, \
+		[&] (const LootTable::Function::cSetContents       & a_Func) { a_Func(a_Item); }, \
+		[&] (const LootTable::Function::cSetCount          & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cSetDamage         & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
+		[&] (const LootTable::Function::cSetLootTable      & a_Func) { a_Func(a_Item); }, \
+		[&] (const LootTable::Function::cSetLore           & a_Func) { a_Func(a_Item, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetName           & a_Func) { a_Func(a_Item, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cSetNbt            & a_Func) { a_Func(a_Item); }, \
+		[&] (const LootTable::Function::cSetStewEffect     & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cNone              & a_Func) {} \
 	} \
 
 

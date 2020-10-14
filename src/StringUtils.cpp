@@ -1114,7 +1114,7 @@ void Capitalize (AString & a_String)
 	{
 		if (isalpha(a_String[i]) && Cap)
 		{
-			a_String[i] = toupper(a_String[i]);
+			a_String[i] = static_cast<char>(toupper(a_String[i]));
 			Cap = false;
 		}
 		else if (isspace(a_String[i]))

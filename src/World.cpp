@@ -219,8 +219,8 @@ cWorld::cWorld(
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
 	m_ChunkSender(*this),
-	m_LootTableProvider(*this),
 	m_Lighting(*this),
+	m_LootTableProvider(*this),
 	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());

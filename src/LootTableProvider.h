@@ -54,7 +54,7 @@ private:
 	cLootTables m_LootTables;
 
 	/** Empty loot table in case there is an error */
-	static cLootTable m_EmptyLootTable;
+	const cLootTable m_EmptyLootTable = cLootTable();
 
 	cWorld & m_World;
 };

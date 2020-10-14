@@ -13,12 +13,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTableProvider
 
-cLootTable cLootTableProvider::m_EmptyLootTable = cLootTable();
-
-
-
-
-
 cLootTableProvider::cLootTableProvider(cWorld & a_World):
 	m_World(a_World)
 {
