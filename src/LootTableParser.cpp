@@ -1904,7 +1904,7 @@ namespace LootTable
 		{
 			for (unsigned int I = 0; I < Chances.size(); I++)
 			{
-				m_Chances[I] = Chances[I].asFloat();
+				m_Chances[static_cast<size_t>(I)] = Chances[I].asFloat();
 			}
 		}
 	}
@@ -2160,11 +2160,11 @@ namespace LootTable
 				std::default_random_engine Generator(static_cast<unsigned long>(a_Noise.GetSeed()));
 				std::binomial_distribution<int> Dist(static_cast<int>(Level) + m_Extra, m_Probability);
 				std::vector<int> Values;
-				for (size_t I = 0; I < static_cast<size_t>(Level + m_Extra); I++)
+				for (size_t I = 0; I < static_cast<size_t>(Level + static_cast<unsigned int>(m_Extra)); I++)
 				{
 					Values[I] = Dist(Generator);
 				}
-				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * 15) % Values.size())];
+				a_Item.m_ItemCount += Values[static_cast<size_t>(a_Noise.IntNoise3DInt(a_Pos * 15) % static_cast<int>(Values.size()))];
 				break;
 			}
 			case eFormula::UniformBonusCount:
