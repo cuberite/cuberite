@@ -220,8 +220,8 @@ cWorld::cWorld(
 	m_GeneratorCallbacks(*this),
 	m_ChunkSender(*this),
 	m_Lighting(*this),
-	m_LootTableProvider(*this),
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_LootTableProvider(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 

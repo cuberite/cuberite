@@ -930,7 +930,7 @@ namespace LootTable
 				a_World.DoWithEntityByID(a_KilledID, KilledCallback);
 				a_World.DoWithEntityByID(a_KillerID, KillerCallback);
 
-				float Dist = std::abs(sqrt((KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
+				double Dist = std::abs(sqrt((KillerPos.z - KilledPos.z) * (KillerPos.z - KilledPos.z)));
 				Res &= (m_AbsoluteMin <= Dist) && (m_AbsoluteMax >= Dist);
 			}
 		}
@@ -953,7 +953,7 @@ namespace LootTable
 				// This is a bad workaround to prevent checking for any entity type and then casting to it.
 				const auto & Player = static_cast<const cPlayer &>(a_Entity);
 				const auto & Effects = Player.GetEntityEffects();
-				for (const auto Effect : m_Effects)
+				for (const auto & Effect : m_Effects)
 				{
 					auto * EffectPrt = Effects.at(Effect.first);
 					CallbackRes &=
@@ -1462,20 +1462,20 @@ namespace LootTable
 			Res &= ((Light >= m_LightMin) && (Light <= m_LightMax));
 		}
 
-		if ((m_XMin != std::numeric_limits<double>::min()) ||
-			(m_XMax != std::numeric_limits<double>::max()))
+		if ((m_XMin > std::numeric_limits<double>::min()) ||
+			(m_XMax < std::numeric_limits<double>::max()))
 		{
 			Res &= ((Pos.x >= m_XMin) && (Pos.x <= m_XMax));
 		}
 
-		if ((m_YMin != std::numeric_limits<double>::min()) ||
-			(m_YMax != std::numeric_limits<double>::max()))
+		if ((m_YMin > std::numeric_limits<double>::min()) ||
+			(m_YMax < std::numeric_limits<double>::max()))
 		{
 			Res &= ((Pos.y >= m_YMin) && (Pos.y <= m_YMax));
 		}
 
-		if ((m_ZMin != std::numeric_limits<double>::min()) ||
-			(m_ZMax != std::numeric_limits<double>::max()))
+		if ((m_ZMin > std::numeric_limits<double>::min()) ||
+			(m_ZMax < std::numeric_limits<double>::max()))
 		{
 			Res &= ((Pos.z >= m_ZMin) && (Pos.z <= m_ZMax));
 		}
@@ -1538,11 +1538,11 @@ namespace LootTable
 				{
 					Json::Value EnchantmentObject = Enchantments[i];
 					cEnchantments Enchantment;
-					int EnchantmentID;
-					int Min = 0, Max = 100;
+					int EnchantmentID = -1;
+					unsigned int Min = 0, Max = 100;
 					if (!EnchantmentObject.isObject())
 					{
-						LOGWARNING("Loot table: Unknown entry provided for enchantment in in condition \"MatchTool\"");
+						LOGWARNING("Loot table: Unknown entry provided for enchantment in condition \"MatchTool\"");
 						continue;
 					}
 					for (const auto & EnchantmentKey : EnchantmentObject.getMemberNames())
@@ -1554,8 +1554,13 @@ namespace LootTable
 						}
 						else if (NoCaseCompare(EnchantmentKey, "levels") == 0)
 						{
-							MinMaxRange<int>(EnchantmentObject[EnchantmentKey], Min, Max);
+							MinMaxRange<unsigned int>(EnchantmentObject[EnchantmentKey], Min, Max);
 						}
+					}
+					if (EnchantmentID == -1)
+					{
+						LOGWARNING("Loot table: No enchantment was provided in condition \"MatchTool\"");
+						continue;
 					}
 					m_EnchantmentsMin.Add(Enchantment);
 					m_EnchantmentsMin.SetLevel(EnchantmentID, Min);
@@ -1612,7 +1617,6 @@ namespace LootTable
 			{
 				// TODO: 10.09.2020 - Add when implemented - 12xx12
 				LOGWARNING("Loot table: NBT for items is not yet supported!");
-				continue;
 				m_NBT = Predicates[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "potion") == 0)
@@ -1764,7 +1768,7 @@ namespace LootTable
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		return fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f) < m_Chance;
+		return fmod(a_Noise.IntNoise3D(a_Pos), 1.0f) < m_Chance;
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1805,7 +1809,7 @@ namespace LootTable
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
 		ACTIVECHECK
-		float Rnd = fmod(a_Noise.IntNoise1D(a_World.GetWorldAge()), 1.0f);
+		double Rnd = fmod(a_Noise.IntNoise3D(a_Pos), 1.0f);
 
 		auto Callback = [&](cEntity & a_Entity)
 		{
@@ -1814,8 +1818,8 @@ namespace LootTable
 				return true;
 			}
 			const auto & Player = static_cast<const cPlayer &>(a_Entity);
-			int Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
-			return m_Chance + Looting * m_LootingMultiplier > Rnd;
+			unsigned int Looting = Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+			return m_Chance + static_cast<int>(Looting) * m_LootingMultiplier > Rnd;
 		};
 
 		return a_World.DoWithEntityByID(a_KillerID, Callback);
