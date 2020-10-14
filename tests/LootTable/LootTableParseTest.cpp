@@ -798,6 +798,11 @@ static void ParseExplorationMap()
 	AString ExplorationMapString =
 	"{"
 		"\"function\": \"minecraft:exploration_map\","
+		"\"destination\": \"Destination is unknown!\","
+		"\"decoration\": \"Decoration looks nice\","
+		"\"zoom\": 10,"
+		"\"search_radius\": 20,"
+		"\"skip_existing_chunks\": true,"
 	"}";
 
 	JsonUtils::ParseString(ExplorationMapString, JsonObject, & ErrorMessage);
@@ -806,7 +811,12 @@ static void ParseExplorationMap()
 
 	auto ExplorationMap = std::get<LootTable::Function::cExplorationMap>(Function.m_Function);
 
-	// TODO: 13.10.2020 - Add test when implemented - 12xx12
+	// TODO: 13.10.2020 - Add active test when implemented - 12xx12
+	TEST_EQUAL(ExplorationMap.m_Destination, "DestinationIsUnknown!");
+	TEST_EQUAL(ExplorationMap.m_Decoration, "DecorationLooksNice");
+	TEST_EQUAL(ExplorationMap.m_Zoom, 10);
+	TEST_EQUAL(ExplorationMap.m_SearchRadius, 20);
+	TEST_TRUE(ExplorationMap.m_SkipExistingChunks);
 }
 
 
@@ -1111,10 +1121,8 @@ static void ParseSetLootTable()
 
 	auto SetLootTable = std::get<LootTable::Function::cSetLootTable>(Function.m_Function);
 
-	// TODO: 13.10.2020 - Add test when implemented - 12xx12
-
-	return;
-	TEST_EQUAL(SetLootTable.m_LootTable, "Hello World!");
+	// TODO: 13.10.2020 - Add active test when implemented - 12xx12
+	TEST_EQUAL(SetLootTable.m_LootTable, "HelloWorld!");
 	TEST_EQUAL(SetLootTable.m_Seed, 42);
 }
 
@@ -1258,6 +1266,7 @@ static void ParseSetNbt()
 	AString SetNBTString =
 	"{"
 		"\"function\": \"minecraft:set_nbt\","
+		"\"tag\": \"Hello World!\","
 	"}";
 
 	JsonUtils::ParseString(SetNBTString, JsonObject, & ErrorMessage);
@@ -1266,7 +1275,8 @@ static void ParseSetNbt()
 
 	auto SetNBT = std::get<LootTable::Function::cSetNbt>(Function.m_Function);
 
-	// TODO: 13.10.2020 - Add test when implemented - 12xx12
+	// TODO: 13.10.2020 - Add active test when implemented - 12xx12
+	TEST_EQUAL(SetNBT.m_Tag, "Hello World!");
 }
 
 

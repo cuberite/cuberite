@@ -3033,7 +3033,6 @@ namespace LootTable
 	{
 		// TODO: 02.09.2020 - Add when implemented - 12xx12
 		LOGWARNING("Loot table: NBT for items is not yet supported, dropping function \"SetLootTable\"!");
-		return;
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Function \"SetLootTable\" encountered a Json problem, dropping function!");
