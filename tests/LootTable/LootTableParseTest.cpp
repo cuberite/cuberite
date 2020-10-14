@@ -692,7 +692,7 @@ static void ParseCopyName()
 
 	auto CopyName = std::get<LootTable::Function::cCopyName>(Function.m_Function);
 
-	TEST_TRUE(CopyName.m_Active);
+	TEST_TRUE(CopyName.IsActive());
 }
 
 

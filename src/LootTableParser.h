@@ -25,7 +25,7 @@ namespace Json
 /** This namespace contains all enum, structs, typedefs used in the loot table classes */
 namespace LootTable
 {
-	const AString LootTablePath = "LootTables";
+	static constexpr const char * LootTablePath = "LootTables";
 
 
 
@@ -388,7 +388,7 @@ namespace LootTable
 		class cSurvivesExplosion : public cCondition
 		{
 		public:
-			cSurvivesExplosion() { m_Active = true; };
+			cSurvivesExplosion() { m_Active = true; }
 			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 		private:
 		};
@@ -495,8 +495,6 @@ namespace LootTable
 		public:
 			cCopyName(const Json::Value & a_Value);
 			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
-		private:
-			bool m_Active = false;
 		};
 
 
@@ -670,7 +668,6 @@ namespace LootTable
 			cLimitCount(const Json::Value & a_Value);
 			void operator () (cItem & a_Item, const cNoise & a_Noise, const Vector3i & a_Pos) const;
 		private:
-			bool m_Active = false;
 			int m_LimitMin = 0;
 			int m_LimitMax = std::numeric_limits<int>::max();
 		};
