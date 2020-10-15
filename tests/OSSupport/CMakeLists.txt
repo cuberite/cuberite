@@ -1,17 +1,17 @@
 find_package(Threads REQUIRED)
-include_directories(${CMAKE_SOURCE_DIR}/src/)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 # Create a single OSSupport library that contains all the OSSupport code used in the tests:
 set (OSSupport_SRCS
-	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
-	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 )
 set (OSSupport_HDRS
-	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
-	${CMAKE_SOURCE_DIR}/src/StringUtils.h
-	${CMAKE_SOURCE_DIR}/src/Globals.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/Globals.h
 )
 add_library(OSSupport
 	${OSSupport_SRCS}

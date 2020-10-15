@@ -1,33 +1,33 @@
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/mbedtls/include)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 
 # Create a single HTTP library that contains all the HTTP code:
 set (HTTP_SRCS
-	${CMAKE_SOURCE_DIR}/src/HTTP/EnvelopeParser.cpp
-	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessage.cpp
-	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessageParser.cpp
-	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.cpp
-	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.cpp
-	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
-	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/EnvelopeParser.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/HTTPMessage.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/HTTPMessageParser.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/TransferEncodingParser.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/UrlClient.cpp
+	${PROJECT_SOURCE_DIR}/src/HTTP/UrlParser.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 )
 
 set (HTTP_HDRS
-	${CMAKE_SOURCE_DIR}/src/HTTP/EnvelopeParser.h
-	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessage.h
-	${CMAKE_SOURCE_DIR}/src/HTTP/HTTPMessageParser.h
-	${CMAKE_SOURCE_DIR}/src/HTTP/TransferEncodingParser.h
-	${CMAKE_SOURCE_DIR}/src/HTTP/UrlClient.h
-	${CMAKE_SOURCE_DIR}/src/HTTP/UrlParser.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
-	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/EnvelopeParser.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/HTTPMessage.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/HTTPMessageParser.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/TransferEncodingParser.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/UrlClient.h
+	${PROJECT_SOURCE_DIR}/src/HTTP/UrlParser.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
 )
 
 set (SHARED_SRCS
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.cpp
 )
 
 add_library(HTTP

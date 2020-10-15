@@ -1,15 +1,15 @@
-include_directories(${CMAKE_SOURCE_DIR}/src/)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 set (SHARED_SRCS
-	${CMAKE_SOURCE_DIR}/src/BoundingBox.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
+	${PROJECT_SOURCE_DIR}/src/BoundingBox.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 )
 
 set (SHARED_HDRS
-	${CMAKE_SOURCE_DIR}/src/BoundingBox.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
+	${PROJECT_SOURCE_DIR}/src/BoundingBox.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 )
 
 set (SRCS
