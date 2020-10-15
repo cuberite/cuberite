@@ -1144,19 +1144,19 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 
 		cLootTablePoolEntry(
-				cLootTableConditions a_Conditions,
-				cLootTableFunctions a_Functions,
-				enum ePoolEntryType a_Type,
-				bool a_IsSelf,
-				int a_Weight,
-				int a_Quality
+			cLootTableConditions a_Conditions,
+			cLootTableFunctions a_Functions,
+			enum ePoolEntryType a_Type,
+			bool a_IsSelf,
+			int a_Weight,
+			int a_Quality
 		):
-				m_Conditions(std::move(a_Conditions)),
-				m_Functions(std::move(a_Functions)),
-				m_Type(a_Type),
-				m_Content(a_IsSelf),
-				m_Weight(a_Weight),
-				m_Quality(a_Quality)
+			m_Conditions(std::move(a_Conditions)),
+			m_Functions(std::move(a_Functions)),
+			m_Type(a_Type),
+			m_Content(a_IsSelf),
+			m_Weight(a_Weight),
+			m_Quality(a_Quality)
 		{
 		}
 

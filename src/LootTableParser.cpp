@@ -2598,7 +2598,7 @@ namespace LootTable
 
 	void cExplosionDecay::operator() (cItem & a_Item, float a_ExplosionSize) const
 	{
-		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC(1/a_ExplosionSize);
+		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC(1 / a_ExplosionSize);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
