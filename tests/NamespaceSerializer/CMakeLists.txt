@@ -1,13 +1,13 @@
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 set (SHARED_SRCS
-        ${CMAKE_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
+        ${PROJECT_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
         ${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
         )
 
 set (SHARED_HDRS
         ../TestHelpers.h
-        ${CMAKE_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.h
+        ${PROJECT_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.h
         ${PROJECT_SOURCE_DIR}/src/StringUtils.h
         )
 
