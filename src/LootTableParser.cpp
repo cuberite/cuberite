@@ -3612,7 +3612,7 @@ namespace LootTable
 					}
 					case ePoolEntryType::Dynamic:
 					{
-						AString Dest = NamespaceConverter(a_Value[EntryParameter].asString());
+						Name = NamespaceConverter(a_Value[EntryParameter].asString());
 						if (NoCaseCompare(Name, "contents") == 0)
 						{
 							IsSelf = false;

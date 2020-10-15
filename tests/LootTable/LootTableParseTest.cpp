@@ -1384,7 +1384,7 @@ static void ParseCompleteTableExampleTwo()
 								"\"condition\": \"minecraft:survives_explosion\""
 							"}"
 						"],"
-						"\"name\": \"Hello World!\""
+						"\"name\": \"Wool\""
 					"}"
 				"],"
 				"\"conditions\": ["
@@ -1427,7 +1427,7 @@ static void ParseCompleteTableExampleTwo()
 	const auto & Entry = Pool.m_Entries[0];
 	TEST_EQUAL(Entry.m_Type, LootTable::ePoolEntryType::Tag);
 	TEST_TRUE(Entry.m_Expand);
-	TEST_EQUAL(std::get<AString>(Entry.m_Content), "HelloWorld!");
+	TEST_EQUAL(std::get<enum ItemTag::eItemTags>(Entry.m_Content), ItemTag::eItemTags::Wool);
 }
 
 
@@ -1463,7 +1463,7 @@ static void ParseEntryTypeDynamic()
 	"{"
 		"\"type\": \"minecraft:dynamic\","
 		"\"weight\": 30,"
-		"\"name\": \"Hello World!\""
+		"\"name\": \"self\""
 	"}";
 
 	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
@@ -1472,7 +1472,7 @@ static void ParseEntryTypeDynamic()
 
 	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::Dynamic);
 	TEST_EQUAL(PoolEntry.m_Weight, 30);
-	TEST_EQUAL(std::get<AString>(PoolEntry.m_Content), "HelloWorld!");
+	TEST_TRUE(std::get<bool>(PoolEntry.m_Content));
 }
 
 

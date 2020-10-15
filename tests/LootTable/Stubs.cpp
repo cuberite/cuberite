@@ -10,6 +10,7 @@
 #include "ChunkMap.h"
 #include "World.h"
 #include "Entities/Player.h"
+#include "BlockEntities/BlockEntity.h"
 
 class cItem;
 
@@ -38,6 +39,15 @@ const cItem & cInventory::GetEquippedItem() const { return Item; }
 
 
 EMCSBiome cWorld::GetBiomeAt(int a_BlockX, int a_BlockZ) { return biInvalidBiome; }
+
+
+
+
+
+bool cWorld::DoWithBlockEntityAt(int a_X, int a_Y, int a_Z, cFunctionRef<bool (cBlockEntity&)> a_Function)
+{
+	return true;
+}
 
 
 
@@ -246,3 +256,9 @@ int cChunkGeneratorThread::GetSeed(void) const { return 0; }
 
 
 cLootTable const * cLootTableProvider::GetLootTable(const AString & a_String) { return nullptr; }
+
+
+
+
+
+bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_Block) { return true; }
