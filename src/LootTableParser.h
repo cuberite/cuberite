@@ -1083,7 +1083,6 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 			cLootTableFunctions a_Functions,
 			enum ePoolEntryType a_Type,
 			AString a_Name,
-			bool a_Expand,
 			int a_Weight,
 			int a_Quality
 		):
@@ -1091,7 +1090,6 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 			m_Functions(std::move(a_Functions)),
 			m_Type(a_Type),
 			m_Content(std::move(a_Name)),
-			m_Expand(a_Expand),
 			m_Weight(a_Weight),
 			m_Quality(a_Quality)
 		{
@@ -1118,10 +1116,54 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 		{
 		}
 
+
+
+
+
+		cLootTablePoolEntry(
+			cLootTableConditions a_Conditions,
+			cLootTableFunctions a_Functions,
+			enum ePoolEntryType a_Type,
+			enum ItemTag::eItemTags a_Tag,
+			bool a_Expand,
+			int a_Weight,
+			int a_Quality
+		):
+			m_Conditions(std::move(a_Conditions)),
+			m_Functions(std::move(a_Functions)),
+			m_Type(a_Type),
+			m_Content(a_Tag),
+			m_Expand(a_Expand),
+			m_Weight(a_Weight),
+			m_Quality(a_Quality)
+		{
+		}
+
+
+
+
+
+		cLootTablePoolEntry(
+				cLootTableConditions a_Conditions,
+				cLootTableFunctions a_Functions,
+				enum ePoolEntryType a_Type,
+				bool a_IsSelf,
+				int a_Weight,
+				int a_Quality
+		):
+				m_Conditions(std::move(a_Conditions)),
+				m_Functions(std::move(a_Functions)),
+				m_Type(a_Type),
+				m_Content(a_IsSelf),
+				m_Weight(a_Weight),
+				m_Quality(a_Quality)
+		{
+		}
+
 		cLootTableConditions m_Conditions;
 		cLootTableFunctions m_Functions;
 		enum ePoolEntryType m_Type;
-		std::variant<cItem, AString, cLootTablePoolEntries> m_Content;
+		std::variant<cItem, AString, cLootTablePoolEntries, enum ItemTag::eItemTags, bool> m_Content;
 		bool m_Expand;
 		int m_Weight;
 		int m_Quality;

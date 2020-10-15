@@ -3558,6 +3558,8 @@ namespace LootTable
 
 		cItem Item;
 		AString Name;
+		bool IsSelf;
+		enum ItemTag::eItemTags Tag;
 		cLootTablePoolEntries Children;
 
 		bool Expand = true;
@@ -3591,18 +3593,34 @@ namespace LootTable
 				{
 					case ePoolEntryType::Item:
 					{
-						if (!StringToItem(a_Value[EntryParameter].asString(), Item))
+						if (!StringToItem(NamespaceConverter(a_Value[EntryParameter].asString()), Item))
 						{
-							LOGWARNING("Got Unknown Item: %s in Pool. Dropping entry!", a_Value[EntryParameter].asString());
+							LOGWARNING("Loot table: Got Unknown Item: %s in Pool. Dropping entry!", NamespaceConverter(a_Value[EntryParameter].asString()));
 							return cLootTablePoolEntry();
 						}
 						break;
 					}
 					case ePoolEntryType::Tag:
+					{
+						Tag = ItemTag::eItemTags(NamespaceConverter(a_Value[EntryParameter].asString()));
+						break;
+					}
 					case ePoolEntryType::LootTable:
-					case ePoolEntryType::Dynamic:
 					{
 						Name = NamespaceConverter(a_Value[EntryParameter].asString());
+						break;
+					}
+					case ePoolEntryType::Dynamic:
+					{
+						AString Dest = NamespaceConverter(a_Value[EntryParameter].asString());
+						if (NoCaseCompare(Name, "contents") == 0)
+						{
+							IsSelf = false;
+						}
+						else if (NoCaseCompare(Name, "self") == 0)
+						{
+							IsSelf = true;
+						}
 						break;
 					}
 					default: break;
@@ -3668,10 +3686,16 @@ namespace LootTable
 				return cLootTablePoolEntry(Conditions, Functions, Type, Item, Weight, Quality);
 			}
 			case ePoolEntryType::Tag:
+			{
+				return cLootTablePoolEntry(Conditions, Functions, Type, Tag, Expand, Weight, Quality);
+			}
 			case ePoolEntryType::LootTable:
+			{
+				return cLootTablePoolEntry(Conditions, Functions, Type, Name, Weight, Quality);
+			}
 			case ePoolEntryType::Dynamic:
 			{
-				return cLootTablePoolEntry(Conditions, Functions, Type, Name, Expand, Weight, Quality);
+				return cLootTablePoolEntry(Conditions, Functions, Type, IsSelf, Weight, Quality);
 			}
 			case ePoolEntryType::Group:
 			case ePoolEntryType::Alternatives:

@@ -161,7 +161,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry");
 			}
 			break;
 		}
@@ -174,7 +174,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry");
 				break;
 			}
 
@@ -199,7 +199,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry");
 				break;
 			}
 
@@ -219,7 +219,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry");
 			}
 			break;
 		}
@@ -234,7 +234,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry");
 			}
 			break;
 		}
@@ -247,7 +247,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			}
 			catch (const std::bad_variant_access &)
 			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry!");
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry!");
 				break;
 			}
 			cItems NewItems;
@@ -268,22 +268,22 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 		}
 		case LootTable::ePoolEntryType::Dynamic:  // Generates loot based on the block broken: chest content...
 		{
-			AString Name;
-			try
-			{
-				Name = std::get<AString>(a_Entry.m_Content);
-			}
-			catch (const std::bad_variant_access &)
-			{
-				LOGWARNING("Unsupported Data type in loot table pool - dropping entry!");
-				break;
-			}
 			if (!cBlockEntity::IsBlockEntityBlockType(a_World.GetBlock(a_Pos)))
 			{
 				break;
 			}
+			bool IsSelf;
+			try
+			{
+				IsSelf = std::get<bool>(a_Entry.m_Content);
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Loot table: Unsupported Data type in loot table pool - dropping entry!");
+				break;
+			}
 
-			if (NoCaseCompare(Name, "contents") == 0)
+			if (!IsSelf)
 			{
 				// Drops contents of chest or similar...
 				auto Block = a_World.GetBlock(a_Pos);
@@ -310,7 +310,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 				}
 				break;
 			}
-			else if (NoCaseCompare(Name, "self") == 0)
+			else
 			{
 				// Drops the block itself...
 				auto Block = a_World.GetBlock(a_Pos);
