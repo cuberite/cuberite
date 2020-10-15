@@ -11395,6 +11395,12 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 					Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>",
 				},
 				ForEachWorld =
@@ -11406,7 +11412,13 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
-					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>. Returns false if a callback aborts, otherwise true.",
 				},
 				Get =
 				{
@@ -12539,7 +12551,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "Path",
@@ -12582,7 +12594,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 					},
 					Notes = "Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message.",

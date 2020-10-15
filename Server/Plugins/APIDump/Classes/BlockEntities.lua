@@ -848,34 +848,11 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 					{
 						Name = "BlockMeta",
-						Type = "number",
-					},
-				},
-				Returns =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
 						Type = "number",
 					},
 				},
@@ -1628,11 +1605,11 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Returns the current pitch set for the block",
+				Notes = "(<b>DEPRECATED</b>) Please use cNoteEntity:GetNote. Returns the current pitch set for the block",
 			},
 			IncrementPitch =
 			{
-				Notes = "Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher.",
+				Notes = "(<b>DEPRECATED</b>) Please use cNoteEntity:IncrementNote. Adds 1 to the current pitch. Wraps around to 0 when the pitch cannot go any higher.",
 			},
 			MakeSound =
 			{
@@ -1647,7 +1624,7 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 				},
-				Notes = "Sets a new note for the block.",
+				Notes = "(<b>DEPRECATED</b>) Please use cNoteEntity:SetNote. Sets a new note for the block.",
 			},
 		},
 		Inherits = "cBlockEntity",

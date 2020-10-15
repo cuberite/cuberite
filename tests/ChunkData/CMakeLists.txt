@@ -1,6 +1,6 @@
-include_directories(${CMAKE_SOURCE_DIR}/src/)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
-add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
+add_library(ChunkBuffer ${PROJECT_SOURCE_DIR}/src/ChunkData.cpp ${PROJECT_SOURCE_DIR}/src/StringUtils.cpp)
 
 target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
 

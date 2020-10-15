@@ -40,7 +40,7 @@ if [ -z "$THREADS" ]; then
 	THREADS="4"
 fi
 
-cd $BASEDIR
+cd "$BASEDIR"
 
 case "$1" in
 
@@ -93,9 +93,9 @@ case "$1" in
 	;;
 esac
 
-mkdir -p $BUILDDIR
-cd $BUILDDIR
-"$CMAKE" $BASEDIR/../android -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
+mkdir -p "$BUILDDIR"
+cd "$BUILDDIR"
+"$CMAKE" "$BASEDIR/../android" -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$1" \
     -DANDROID_NATIVE_API_LEVEL="$APILEVEL" \
     -DCMAKE_BUILD_TYPE="$TYPE" \
