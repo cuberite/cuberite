@@ -7,6 +7,8 @@
 #include "Registries/ItemTags.h"
 #include "LootTableParser.h"
 
+#include "BlockEntities/ChestEntity.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cLootTable
@@ -266,8 +268,75 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 		}
 		case LootTable::ePoolEntryType::Dynamic:  // Generates loot based on the block broken: chest content...
 		{
-			// TODO: 07.09.2020 - 12xx12
-			LOGWARNING("Loot table pool entry type \"Dynamic\" is not supported yet - dropping entry!");
+			AString Name;
+			try
+			{
+				Name = std::get<AString>(a_Entry.m_Content);
+			}
+			catch (const std::bad_variant_access &)
+			{
+				LOGWARNING("Unsupported Data type in loot table pool - dropping entry!");
+				break;
+			}
+			if (!cBlockEntity::IsBlockEntityBlockType(a_World.GetBlock(a_Pos)))
+			{
+				break;
+			}
+
+			if (NoCaseCompare(Name, "contents") == 0)
+			{
+				// Drops contents of chest or similar...
+				auto Block = a_World.GetBlock(a_Pos);
+				switch (Block)
+				{
+					case E_BLOCK_BEACON:
+					case E_BLOCK_BREWING_STAND:
+					case E_BLOCK_DISPENSER:
+					case E_BLOCK_DROPPER:
+					case E_BLOCK_ENCHANTMENT_TABLE:
+					case E_BLOCK_FURNACE:
+					case E_BLOCK_LIT_FURNACE:
+					case E_BLOCK_HOPPER:
+					case E_BLOCK_CHEST:
+					case E_BLOCK_TRAPPED_CHEST:
+					{
+						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
+						{
+							Items = a_Entity.ConvertToPickups();
+						});
+					}
+					default: break;
+				}
+				break;
+			}
+			else if (NoCaseCompare(Name, "self") == 0)
+			{
+				// Drops the block itself...
+				auto Block = a_World.GetBlock(a_Pos);
+				switch (Block)
+				{
+					case E_BLOCK_BEACON:
+					case E_BLOCK_BREWING_STAND:
+					case E_BLOCK_DISPENSER:
+					case E_BLOCK_DROPPER:
+					case E_BLOCK_ENCHANTMENT_TABLE:
+					case E_BLOCK_FURNACE:
+					case E_BLOCK_LIT_FURNACE:
+					case E_BLOCK_HOPPER:
+					case E_BLOCK_CHEST:
+					case E_BLOCK_TRAPPED_CHEST:
+					{
+						Items.Add(cItem(Block));
+					}
+					default:
+					{
+						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
+						{
+							Items = a_Entity.ConvertToPickups();
+						});
+					}
+				}
+			}
 			break;
 		}
 		case LootTable::ePoolEntryType::Empty:
