@@ -2598,7 +2598,7 @@ namespace LootTable
 
 	void cExplosionDecay::operator() (cItem & a_Item, float a_ExplosionSize) const
 	{
-		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC(1 / a_ExplosionSize);
+		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC<char>(1 / a_ExplosionSize);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3558,8 +3558,8 @@ namespace LootTable
 
 		cItem Item;
 		AString Name;
-		bool IsSelf;
-		enum ItemTag::eItemTags Tag;
+		bool IsSelf = false;
+		enum ItemTag::eItemTags Tag = ItemTag::eItemTags::None;
 		cLootTablePoolEntries Children;
 
 		bool Expand = true;
