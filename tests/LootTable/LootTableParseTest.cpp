@@ -8,8 +8,10 @@
 #include "JsonUtils.h"
 
 #define private public  // Yes - bad but does the job
+#define protected public
 
 #include "LootTableParser.h"
+#include "LootTable.h"
 
 Json::Value JsonObject;
 AString ErrorMessage;
@@ -284,12 +286,12 @@ static void ParseEntityScores()
 static void ParseInverted()
 {
 	AString InvertedString =
-			"{"
-				"\"condition\": \"minecraft:inverted\","
-				"\"term\": {"
-					"\"condition\": \"minecraft:survives_explosion\","
-				"},"
-			"}";
+	"{"
+		"\"condition\": \"minecraft:inverted\","
+		"\"term\": {"
+			"\"condition\": \"minecraft:survives_explosion\","
+		"},"
+	"}";
 	JsonUtils::ParseString(InvertedString , JsonObject, & ErrorMessage);
 
 	auto Condition = LootTable::ParseCondition(JsonObject);
@@ -489,7 +491,7 @@ static void ParseReference()
 {
 	AString ReferenceString =
 	"{"
-	"\"condition\": \"minecraft:reference\","
+		"\"condition\": \"minecraft:reference\","
 	"}";
 
 	JsonUtils::ParseString(ReferenceString, JsonObject, & ErrorMessage);
@@ -499,6 +501,8 @@ static void ParseReference()
 	auto Reference = std::get<LootTable::Condition::cReference>(Condition.m_Parameter);
 
 	TEST_TRUE(Reference.IsActive());
+
+	// TODO
 }
 
 
@@ -1302,6 +1306,292 @@ static void ParseSetStewEffect()
 
 
 
+static void ParseCompleteTableExampleOne()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:chest\","
+		"\"pools\": ["
+			"{"
+				"\"rolls\": {"
+					"\"min\": 1.0,"
+					"\"max\": 2.0,"
+					"\"type\": \"minecraft:uniform\""
+				"},"
+				"\"entries\": ["
+					"{"
+						"\"type\": \"minecraft:item\","
+						"\"weight\": 30,"
+						"\"functions\": ["
+							"{"
+								"\"function\": \"minecraft:set_count\","
+								"\"count\": {"
+									"\"min\": 2.0,"
+									"\"max\": 7.0,"
+									"\"type\": \"minecraft:uniform\""
+								"}"
+							"}"
+						"],"
+						"\"name\": \"minecraft:arrow\""
+					"}"
+				"]"
+			"}"
+		"]"
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto WholeLootTable = cLootTable(JsonObject);
+	TEST_EQUAL(WholeLootTable.m_LootTablePools.size(), 1);
+	TEST_EQUAL(WholeLootTable.m_Functions.size(), 0);
+	const auto & Pool = WholeLootTable.m_LootTablePools[0];
+	TEST_EQUAL(Pool.m_Conditions.size(), 0);
+	TEST_EQUAL(Pool.m_Rolls.m_RollsMin, 1);
+	TEST_EQUAL(Pool.m_Rolls.m_RollsMax, 2);
+	TEST_EQUAL(Pool.m_Entries.size(), 1);
+	const auto & Entry = Pool.m_Entries[0];
+	TEST_EQUAL(Entry.m_Type, LootTable::ePoolEntryType::Item);
+	TEST_EQUAL(Entry.m_Weight, 30);
+	TEST_EQUAL(Pool.m_TotalWeight, 30);
+	TEST_EQUAL(Entry.m_Conditions.size(), 0);
+	TEST_EQUAL(Entry.m_Functions.size(), 1);
+	const auto & SetCount = std::get<LootTable::Function::cSetCount>(Entry.m_Functions[0].m_Function);
+	TEST_TRUE(SetCount.IsActive());
+	TEST_EQUAL(SetCount.m_Type, LootTable::Function::cSetCount::eType::Uniform);
+	TEST_EQUAL(SetCount.m_UniformMin, 2);
+	TEST_EQUAL(SetCount.m_UniformMax, 7);
+	// The Item can't be tested, because the function GetItemFromString is only a stub.
+}
+
+
+
+
+static void ParseCompleteTableExampleTwo()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:chest\","
+		"\"pools\": ["
+			"{"
+				"\"rolls\": 2,"
+				"\"entries\": ["
+					"{"
+						"\"type\": \"minecraft:tag\","
+						"\"weight\": 30,"
+						"\"expand\": true,"
+						"\"conditions\": ["
+							"{"
+								"\"condition\": \"minecraft:survives_explosion\""
+							"}"
+						"],"
+						"\"name\": \"Hello World!\""
+					"}"
+				"],"
+				"\"conditions\": ["
+					"{"
+						"\"condition\": \"minecraft:inverted\","
+						"\"term\": {"
+						"\"condition\": \"minecraft:survives_explosion\""
+						"}"
+					"}"
+				"]"
+			"}"
+		"],"
+		"\"functions\": ["
+			"{"
+				"\"function\": \"minecraft:furnace_smelt\","
+				"\"conditions\": ["
+					"{"
+						"\"condition\": \"minecraft:random_chance_with_looting\","
+						"\"chance\": 0.3,"
+						"\"looting_multiplier\": 0.5"
+					"}"
+				"]"
+			"}"
+		"]"
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto WholeLootTable = cLootTable(JsonObject);
+
+	TEST_EQUAL(WholeLootTable.m_Functions.size(), 1);
+	const auto & FunctionObject = WholeLootTable.m_Functions[0];
+	const auto & FurnaceSmelt = std::get<LootTable::Function::cFurnaceSmelt>(FunctionObject.m_Function);
+	TEST_TRUE(FurnaceSmelt.IsActive());
+	const auto & RandomChanceWithLooting = std::get<LootTable::Condition::cRandomChanceWithLooting>(FunctionObject.m_Conditions[0].m_Parameter);
+	TEST_TRUE(RandomChanceWithLooting.IsActive());
+	const auto & Pool = WholeLootTable.m_LootTablePools[0];
+	TEST_EQUAL(Pool.m_Conditions.size(), 1);
+	TEST_TRUE(std::get<LootTable::Condition::cInverted>(Pool.m_Conditions[0].m_Parameter).IsActive());
+	const auto & Entry = Pool.m_Entries[0];
+	TEST_EQUAL(Entry.m_Type, LootTable::ePoolEntryType::Tag);
+	TEST_TRUE(Entry.m_Expand);
+	TEST_EQUAL(std::get<AString>(Entry.m_Content), "HelloWorld!");
+}
+
+
+
+
+static void ParseEntryTypeLootTable()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:loot_table\","
+		"\"weight\": 30,"
+		"\"quality\": 40,"
+		"\"name\": \"Hello World!\""
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto PoolEntry = LootTable::ParsePoolEntry(JsonObject);
+
+	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::LootTable);
+	TEST_EQUAL(PoolEntry.m_Weight, 30);
+	TEST_EQUAL(PoolEntry.m_Quality, 40);
+	TEST_EQUAL(std::get<AString>(PoolEntry.m_Content), "HelloWorld!");
+}
+
+
+
+
+
+static void ParseEntryTypeDynamic()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:dynamic\","
+		"\"weight\": 30,"
+		"\"name\": \"Hello World!\""
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto PoolEntry = LootTable::ParsePoolEntry(JsonObject);
+
+	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::Dynamic);
+	TEST_EQUAL(PoolEntry.m_Weight, 30);
+	TEST_EQUAL(std::get<AString>(PoolEntry.m_Content), "HelloWorld!");
+}
+
+
+
+
+
+static void ParseEntryTypeGroup()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:group\","
+		"\"weight\": 30,"
+		"\"children\": ["
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"}"
+		"]"
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto PoolEntry = LootTable::ParsePoolEntry(JsonObject);
+
+	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::Group);
+	TEST_EQUAL(PoolEntry.m_Weight, 30);
+	TEST_EQUAL(std::get<LootTable::cLootTablePoolEntries>(PoolEntry.m_Content).size(), 2);
+}
+
+
+
+
+
+static void ParseEntryTypeAlternatives()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:alternatives\","
+		"\"weight\": 30,"
+		"\"children\": ["
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"}"
+		"]"
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto PoolEntry = LootTable::ParsePoolEntry(JsonObject);
+
+	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::Alternatives);
+	TEST_EQUAL(PoolEntry.m_Weight, 30);
+	TEST_EQUAL(std::get<LootTable::cLootTablePoolEntries>(PoolEntry.m_Content).size(), 3);
+}
+
+
+
+
+
+static void ParseEntryTypeSequence()
+{
+	AString LootTableString =
+	"{"
+		"\"type\": \"minecraft:sequence\","
+		"\"weight\": 30,"
+		"\"children\": ["
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"},"
+			"{"
+				"\"type\": \"minecraft:dynamic\","
+				"\"weight\": 30,"
+				"\"name\": \"Hello World!\""
+			"}"
+		"]"
+	"}";
+
+	JsonUtils::ParseString(LootTableString, JsonObject, & ErrorMessage);
+
+	auto PoolEntry = LootTable::ParsePoolEntry(JsonObject);
+
+	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::Sequence);
+	TEST_EQUAL(PoolEntry.m_Weight, 30);
+	TEST_EQUAL(std::get<LootTable::cLootTablePoolEntries>(PoolEntry.m_Content).size(), 4);
+}
+
+
+
+
 
 IMPLEMENT_TEST_MAIN("LootTableParseTest",
 {
@@ -1347,4 +1637,13 @@ IMPLEMENT_TEST_MAIN("LootTableParseTest",
 	ParseSetName();
 	ParseSetNbt();
 	ParseSetStewEffect();
+
+	ParseEntryTypeLootTable();
+	ParseEntryTypeDynamic();
+	ParseEntryTypeGroup();
+	ParseEntryTypeAlternatives();
+	ParseEntryTypeSequence();
+
+	ParseCompleteTableExampleOne();
+	ParseCompleteTableExampleTwo();
 })

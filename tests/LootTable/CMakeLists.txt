@@ -5,6 +5,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/)
 
 add_executable(LootTableParseTest
         ${CMAKE_SOURCE_DIR}/src/LootTableParser.cpp
+        ${CMAKE_SOURCE_DIR}/src/LootTable.cpp
         ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
         ${CMAKE_SOURCE_DIR}/src/JsonUtils.cpp
         ${CMAKE_SOURCE_DIR}/src/Registries/ItemTags.cpp

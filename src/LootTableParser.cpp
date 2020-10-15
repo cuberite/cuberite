@@ -3326,19 +3326,24 @@ namespace LootTable
 
 		Json::Value ConditionsObject;
 
-		if (a_Value.isMember("condition"))
+		if (a_Value.isMember("conditions"))
 		{
-			ConditionsObject = a_Value["condition"];
+			ConditionsObject = a_Value["conditions"];
 		}
-		else if (a_Value.isMember("Condition"))
+		else if (a_Value.isMember("Conditions"))
 		{
 			ConditionsObject = a_Value["Conditions"];
 		}
 
-		if (ConditionsObject.isObject())
+		if (!ConditionsObject.empty())
 		{
 			for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 			{
+				if (!ConditionsObject[ConditionId].isObject())
+				{
+					LOGWARNING("Loot table: Encountered a problem to while parsing loot table functions condition, dropping condition!");
+					continue;
+				}
 				Conditions.emplace_back(ParseCondition(ConditionsObject[ConditionId]));
 			}
 		}
@@ -3586,7 +3591,11 @@ namespace LootTable
 				{
 					case ePoolEntryType::Item:
 					{
-						StringToItem(NamespaceConverter(a_Value[EntryParameter].asString()), Item);
+						if (!StringToItem(a_Value[EntryParameter].asString(), Item))
+						{
+							LOGWARNING("Got Unknown Item: %s in Pool. Dropping entry!", a_Value[EntryParameter].asString());
+							return cLootTablePoolEntry();
+						}
 						break;
 					}
 					case ePoolEntryType::Tag:
@@ -3612,6 +3621,11 @@ namespace LootTable
 				auto ConditionsObject = a_Value[EntryParameter];
 				for (unsigned int ConditionId = 0; ConditionId < ConditionsObject.size(); ConditionId++)
 				{
+					if (!ConditionsObject[ConditionId].isObject())
+					{
+						LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+						continue;
+					}
 					Conditions.push_back(ParseCondition(ConditionsObject[ConditionId]));
 				}
 			}
@@ -3626,6 +3640,11 @@ namespace LootTable
 						auto ChildrenObject = a_Value[EntryParameter];
 						for (unsigned int ChildrenObjectId = 0; ChildrenObjectId < ChildrenObject.size(); ++ChildrenObjectId)
 						{
+							if (!ChildrenObject[ChildrenObjectId].isObject())
+							{
+								LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+								continue;
+							}
 							Children.push_back(ParsePoolEntry(ChildrenObject[ChildrenObjectId]));
 						}
 						break;

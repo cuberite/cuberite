@@ -29,6 +29,11 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 			auto FunctionsObject = a_Description[RootId];
 			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
+				if (!FunctionsObject[FunctionIndex].isObject())
+				{
+					LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+					continue;
+				}
 				m_Functions.push_back(LootTable::ParseFunction(FunctionsObject[FunctionIndex]));
 			}
 		}

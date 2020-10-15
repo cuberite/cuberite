@@ -444,7 +444,7 @@ namespace LootTable
 		class cFunction
 		{
 		public:
-			bool IsActive(void) { return m_Active; }
+			bool IsActive(void) const { return m_Active; }
 		protected:
 			bool m_Active = false;
 		};
