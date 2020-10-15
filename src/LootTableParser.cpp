@@ -2596,9 +2596,9 @@ namespace LootTable
 // cExplosionDecay
 
 
-	void cExplosionDecay::operator() (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
+	void cExplosionDecay::operator() (cItem & a_Item, float a_ExplosionSize) const
 	{
-		// Todo
+		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC(1/a_ExplosionSize);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3202,7 +3202,7 @@ namespace LootTable
 
 	void cSetName::operator()(cItem & a_Item, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		// Todo: 19.09.20 - Add Json text component - 12xx12
+		// TODO: 19.09.20 - Add Json text component - 12xx12
 		a_Item.m_CustomName = m_Name;
 	}
 
@@ -3667,14 +3667,12 @@ namespace LootTable
 			{
 				return cLootTablePoolEntry(Conditions, Functions, Type, Item, Weight, Quality);
 			}
-
 			case ePoolEntryType::Tag:
 			case ePoolEntryType::LootTable:
 			case ePoolEntryType::Dynamic:
 			{
 				return cLootTablePoolEntry(Conditions, Functions, Type, Name, Expand, Weight, Quality);
 			}
-
 			case ePoolEntryType::Group:
 			case ePoolEntryType::Alternatives:
 			case ePoolEntryType::Sequence:

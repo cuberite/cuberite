@@ -78,19 +78,19 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Ve
 
 
 
-cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
+cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWorld & a_World, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize) const
 {
 	auto Items = cItems();
 	for (const auto & Pool : m_LootTablePools)
 	{
-		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	for (auto & Item : Items)
 	{
 		for (const auto & Function : m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 		}
 	}
 	return Items;
@@ -100,7 +100,7 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 
 
-cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize)
 {
 	auto Items = cItems();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
@@ -132,7 +132,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a
 			EntryNum = (EntryNum + 1) % a_Pool.m_Entries.size();
 		} while (Rnd > 0);
 		const auto & Entry = a_Pool.m_Entries[EntryNum];
-		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+		auto NewItems = GetItems(Entry, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 	}
 	return Items;
@@ -142,7 +142,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a
 
 
 
-cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize)
 {
 	auto Items = cItems();
 
@@ -213,7 +213,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			{
 				for (const auto & Child : std::get<LootTable::cLootTablePoolEntries>(a_Entry.m_Content))
 				{
-					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+					auto NewItems = GetItems(Child, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 					Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				}
 			}
@@ -229,7 +229,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			{
 				auto Children = std::get<LootTable::cLootTablePoolEntries>(a_Entry.m_Content);
 				auto ChildPos = a_Noise.IntNoise3DInt(a_Pos * static_cast<int>(Children.size())) % static_cast<int>(Children.size());
-				auto NewItems = GetItems(Children[static_cast<size_t>(ChildPos)], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+				auto NewItems = GetItems(Children[static_cast<size_t>(ChildPos)], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 			}
 			catch (const std::bad_variant_access &)
@@ -255,7 +255,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 			unsigned int ChildPos = 0;
 			do
 			{
-				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+				NewItems = GetItems(Children[ChildPos], a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 				Items.insert(Items.end(), NewItems.begin(), NewItems.end());
 				ChildPos = (ChildPos + 1) % Children.size();
 				if (ChildPos == Children.size() - 1)
@@ -303,6 +303,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
 						{
 							Items = a_Entity.ConvertToPickups();
+							return true;
 						});
 					}
 					default: break;
@@ -333,6 +334,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
 						{
 							Items = a_Entity.ConvertToPickups();
+							return true;
 						});
 					}
 				}
@@ -349,7 +351,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 	{
 		for (const auto & Function : a_Entry.m_Functions)
 		{
-			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource);
+			ApplyFunction(Function, Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 		}
 	}
 	return Items;
@@ -382,7 +384,7 @@ bool cLootTable::ConditionApplies(const LootTable::cLootTableCondition & a_Condi
 
 
 
-void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
+void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function, cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize)
 {
 	if (!ConditionsApply(a_Function.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{

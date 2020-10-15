@@ -622,7 +622,7 @@ namespace LootTable
 		{
 		public:
 			cExplosionDecay() { m_Active = true; }
-			void operator () (cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			void operator () (cItem & a_Item, float a_ExplosionSize) const;
 		};
 
 
@@ -901,7 +901,7 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 		[&] (const LootTable::Function::cEnchantRandomly   & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
 		[&] (const LootTable::Function::cEnchantWithLevels & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
 		[&] (const LootTable::Function::cExplorationMap    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Function::cExplosionDecay    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Function::cExplosionDecay    & a_Func) { a_Func(a_Item, a_ExplosionSize); }, \
 		[&] (const LootTable::Function::cFurnaceSmelt      & a_Func) { a_Func(a_Item); }, \
 		[&] (const LootTable::Function::cFillPlayerHead    & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Function::cLimitCount        & a_Func) { a_Func(a_Item, a_Noise, a_Pos); }, \
