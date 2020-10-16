@@ -33,8 +33,10 @@ protected:
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+/*
 static cItemTags & GetItemTags()
 {
 	static cItemTags ItemTags;
 	return ItemTags;
 }
+*/  // TODO: uncomment when used - 12xx12
