@@ -7,16 +7,68 @@
 #include "../Mobs/EnderDragon.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius) :
+const std::array<Vector3i, 48> cEnderDragonFightStructuresGen::m_CagePos =
+{
+	{
+		// First layer
+		{-2, -1, -2}, {-2, -1, -1}, {-2, -1, 0}, {-2, -1, 1}, {-2, -1, 2},
+		{2,  -1, -2}, {2,  -1, -1}, {2,  -1, 0}, {2,  -1, 1}, {2,  -1, 2},
+		{-1, -1, -2}, {0,  -1, -2}, {1,  -1, -2},
+		{-1, -1, 2},  {0,  -1, 2},  {1,  -1, 2},
+
+		// Second layer
+		{-2, 0, -2}, {-2, 0, -1}, {-2, 0, 0}, {-2, 0, 1}, {-2, 0, 2},
+		{2,  0, -2}, {2,  0, -1}, {2,  0, 0}, {2,  0, 1}, {2,  0, 2},
+		{-1, 0, -2}, {0,  0, -2}, {1,  0, -2},
+		{-1, 0, 2},  {0,  0, 2},  {1,  0, 2},
+
+		// Third layer
+		{-2, 1, -2}, {-2, 1, -1}, {-2, 1, 0}, {-2, 1, 1}, {-2, 1, 2},
+		{2,  1, -2}, {2,  1, -1}, {2,  1, 0}, {2,  1, 1}, {2,  1, 2},
+		{-1, 1, -2}, {0,  1, -2}, {1,  1, -2},
+		{-1, 1, 2},  {0,  1, 2},  {1,  1, 2},
+	}
+};
+
+
+
+
+const std::array<Vector3i, 26> cEnderDragonFightStructuresGen::m_CageAir =
+{
+	{
+		// First layer
+		{-1, -1, -1}, {0, -1, -1}, {1, -1, -1},
+		{-1, -1, 1},  {0, -1, 1},  {1, -1, 1},
+		{-1, -1, 0}, {1, -1, 0},
+
+		// Second layer
+		{-1, 0, -1}, {0, 0, -1}, {1, 0, -1},
+		{-1, 0, 1},  {0, 0, 1},  {1, 0, 1},
+		{-1, 0, 0}, {1, 0, 0}, {0, 0, 0},
+
+		// Third layer
+		{-1, 1, -1}, {0, 1, -1}, {1, 1, -1},
+		{-1, 1, 1},  {0, 1, 1},  {1, 1, 1},
+		{-1, 1, 0}, {1, 1, 0}, {0, 1, 0},
+	}
+};
+
+
+
+
+
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString &a_TowerProperties, int a_Radius) :
 	m_Noise(a_Seed)
 {
 	// Loads the fountain schematic
-	if (!cSchematicFileSerializer::LoadFromSchematicFile(m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
+	if (!cSchematicFileSerializer::LoadFromSchematicFile(
+		m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
 	{
 		LOGWARNING("EnderDragonFightStructuresGen is missing it's end fountain prefab, please update your cuberite server files! There will be no end fountain!");
 	}
 	// Reads the given tower properties
 	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
+	std::vector<sTowerProperties> TowerProperties;
 	for (const auto & TowerProperty : TowerPropertiesVector)
 	{
 		const auto TowerPropertyVector = StringSplitAndTrim(TowerProperty, "|");
@@ -41,27 +93,44 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s", TowerProperty, TowerPropertyVector[2]);
 			continue;
 		}
-		m_TowerProperties.push_back({Height, Radius, HasCage});
+		TowerProperties.push_back({Vector3d(), Height, Radius, HasCage});
 	}
 	// A random angle in radian
 	double Angle = m_Noise.IntNoise1D(a_Seed) * M_PI + M_PI;
+	// Shuffles the order of the towers
+	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(a_Seed));
 	// Generate Positions in a circle
-	for (int i = 0; i < static_cast<int>(m_TowerProperties.size()); i++)
+	for (int I = 0; I < static_cast<int>(TowerProperties.size()); I++)
 	{
 		auto TowerPos = Vector3i(FloorC(a_Radius * cos(Angle)), 0, FloorC(a_Radius * sin(Angle)));
-		auto ChunkX = FloorC(TowerPos.x / cChunkDef::Width);
-		if (TowerPos.x < 0)
-		{
-			ChunkX--;
-		}
-		auto ChunkZ = FloorC(TowerPos.z / cChunkDef::Width);
-		if (TowerPos.z < 0)
-		{
-			ChunkZ--;
-		}
+		TowerProperties[I].m_Pos = TowerPos;
 
-		m_TowerPos[cChunkCoords(ChunkX, ChunkZ)] = TowerPos;
-		Angle = fmod(Angle + (2.0 * M_PI / static_cast<double>(m_TowerProperties.size())), 2.0 * M_PI);
+		// Check all crossed chunks
+		for (int X = -TowerProperties[I].m_Radius - cChunkDef::Width; X <= TowerProperties[I].m_Radius + cChunkDef::Width; X+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
+		{
+			for (int Z = -TowerProperties[I].m_Radius - cChunkDef::Width; Z <= TowerProperties[I].m_Radius + cChunkDef::Width; Z+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
+			{
+				auto Chunk = cChunkDef::BlockToChunk({TowerPos.x + X, 0, TowerPos.z + Z});
+				// Update limits
+				m_MinX = std::min(Chunk.m_ChunkX, m_MinX);
+				m_MinZ = std::min(Chunk.m_ChunkZ, m_MinZ);
+
+				m_MaxX = std::max(Chunk.m_ChunkX, m_MaxX);
+				m_MaxZ = std::max(Chunk.m_ChunkZ, m_MaxZ);
+				// If the tower is not in chunk put it in
+				bool ShouldPlace = true;
+				for (const auto & Property : m_TowerPos[Chunk])
+				{
+					ShouldPlace &= !(TowerPos == Property.m_Pos);
+				}
+				if (ShouldPlace)
+				{
+					m_TowerPos[Chunk].emplace_back(TowerProperties[I]);
+				}
+			}
+		}
+		// Generate angle of next tower
+		Angle = fmod(Angle + (2.0 * M_PI / static_cast<double>(TowerProperties.size())), 2.0 * M_PI);
 	}
 }
 
@@ -69,123 +138,134 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 
 
 
-void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc & a_ChunkDesc)
+void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 {
+	auto Coords = a_ChunkDesc.GetChunkCoords();
 	// If not in the chunks to write
-	if ((a_ChunkDesc.GetChunkX() > 6) ||
-		(a_ChunkDesc.GetChunkX() < -6) ||
-		(a_ChunkDesc.GetChunkZ() > 6) ||
-		(a_ChunkDesc.GetChunkZ() < -6))
+	if ((Coords.m_ChunkX > m_MaxX) ||
+		(Coords.m_ChunkX < m_MinX) ||
+		(Coords.m_ChunkZ > m_MaxZ) ||
+		(Coords.m_ChunkZ < m_MinZ))
 	{
 		return;
 	}
 	// Places the exit portal
-	auto Coords = a_ChunkDesc.GetChunkCoords();
 	if (Coords == cChunkCoords({0, 0}))
 	{
 		auto EnderDragon = std::make_unique<cEnderDragon>();
 		EnderDragon->SetPosition({0.0, 80.0, 0.0});
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
-		a_ChunkDesc.WriteBlockArea(m_Fountain, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), 62, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), cBlockArea::msSpongePrint);
-		return;
+		a_ChunkDesc.WriteBlockArea(m_Fountain,
+			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			62,
+			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			cBlockArea::msSpongePrint
+		);
 	}
 	else if (Coords == cChunkCoords({-1, 0}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)), 62, static_cast<int>(FloorC(-m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
-		return;
+		a_ChunkDesc.WriteBlockArea(m_Fountain,
+			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
+			62,
+			static_cast<int>(FloorC(-m_Fountain.GetSizeZ() / 2)),
+			cBlockArea::msSpongePrint
+		);
 	}
 	else if (Coords == cChunkCoords({0, -1}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)), 62, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
-		return;
+		a_ChunkDesc.WriteBlockArea(m_Fountain,
+			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			62,
+			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			cBlockArea::msSpongePrint);
 	}
 	else if (Coords == cChunkCoords({-1, -1}))
 	{
-		a_ChunkDesc.WriteBlockArea(m_Fountain, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)), 62, cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)), cBlockArea::msSpongePrint);
-		return;
+		a_ChunkDesc.WriteBlockArea(m_Fountain,
+			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
+			62,
+			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			cBlockArea::msSpongePrint);
 	}
 	auto It = m_TowerPos.find(Coords);
 	if (It == m_TowerPos.end())
 	{
 		return;
 	}
-	PlaceTower(a_ChunkDesc, It->second);
+	for (const auto & Property : It->second)
+	{
+		PlaceTower(a_ChunkDesc, Property);
+	}
 }
 
 
 
 
 
-void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const Vector3i & a_AbsPos)
+void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const sTowerProperties & a_Properties)
 {
-	auto Pos = cChunk::AbsoluteToRelative(a_AbsPos);
-	sTowerProperties Properties = {0, 0, false};
-	// Choose random height
-	unsigned long Index = static_cast<unsigned long>(m_Noise.IntNoise3DInt(a_AbsPos)) % m_TowerProperties.size();
-	do
-	{
-		Index = (Index + 1) % m_TowerProperties.size();
-		Properties = m_TowerProperties[Index];
-	} while (Properties.m_Height == 0);
-
-	// Make sure the tower does not cross chunk boarders
-	Pos.x = Clamp(Pos.x, Properties.m_Radius - 1, cChunkDef::Width - Properties.m_Radius);
-	Pos.z = Clamp(Pos.z, Properties.m_Radius - 1, cChunkDef::Width - Properties.m_Radius);
+	auto Pos = cChunk::AbsoluteToRelative(a_Properties.m_Pos, a_ChunkDesc.GetChunkCoords());
 
 	// Place obsidian pillar
-	for (int Y = 0; Y <= Properties.m_Height - 2; Y++)
+	for (int X = -a_Properties.m_Radius; X < a_Properties.m_Radius; X++)
 	{
-		for (int X = -Properties.m_Radius; X < Properties.m_Radius; X++)
+		for (int Z = -a_Properties.m_Radius; Z < a_Properties.m_Radius; Z++)
 		{
-			for (int Z = -Properties.m_Radius; Z < Properties.m_Radius; Z++)
+			Vector3i NewPos = {Pos.x + X, 1, Pos.z + Z};
+			if (cChunkDef::IsValidRelPos(NewPos))
 			{
-				Vector3i NewPos = {Pos.x + X, Y, Pos.z + Z};
 				// The 3 was achieved by trial and error till the shape matched the notchian implementation
-				if ((NewPos - Vector3i(Pos.x, Y, Pos.z)).SqrLength() < Properties.m_Radius * Properties.m_Radius - 3)
+				if ((NewPos - Vector3i(Pos.x, 1, Pos.z)).SqrLength() < a_Properties.m_Radius * a_Properties.m_Radius - 3)
 				{
-					a_ChunkDesc.SetBlockType(NewPos.x, NewPos.y, NewPos.z, E_BLOCK_OBSIDIAN);
+					for (int Y = 0; Y <= a_Properties.m_Height - 2; Y++)
+					{
+						a_ChunkDesc.SetBlockType(NewPos.x, Y, NewPos.z, E_BLOCK_OBSIDIAN);
+					}
 				}
 			}
 		}
 	}
-	// Spawn the bedrock
-	a_ChunkDesc.SetBlockType(Pos.x, Properties.m_Height - 1, Pos.z, E_BLOCK_BEDROCK);
-	// Spawn the Ender Crystal - the original passed position is not used because the tower might have been moved due to crossing chunk borders
-	const auto AbsPos = cChunkDef::RelativeToAbsolute(Pos, a_ChunkDesc.GetChunkCoords());
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(AbsPos + Vector3d(0.5, Properties.m_Height, 0.5));
-	a_ChunkDesc.GetEntities().emplace_back(std::move(EnderCrystal));
-	// Spawn the fire
-	a_ChunkDesc.SetBlockType(Pos.x, Properties.m_Height, Pos.z, E_BLOCK_FIRE);
+
 	// Spawn the iron bars if there are some
-	if (Properties.m_HasCage)
+	if (a_Properties.m_HasCage)
 	{
 		// Place walls
-		for (int I = -2; I <= 2; I++)
+		for (const auto & Offset : m_CagePos)
 		{
-			a_ChunkDesc.SetBlockType(Pos.x - 2, Properties.m_Height - 1, Pos.z + I, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x - 2, Properties.m_Height, Pos.z + I, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x - 2, Properties.m_Height + 1, Pos.z + I, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + 2, Properties.m_Height - 1, Pos.z + I, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + 2, Properties.m_Height, Pos.z + I, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + 2, Properties.m_Height + 1, Pos.z + I, E_BLOCK_IRON_BARS);
-
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height - 1, Pos.z - 2, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height, Pos.z - 2, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height + 1, Pos.z - 2, E_BLOCK_IRON_BARS);
-
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height - 1, Pos.z + 2, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height, Pos.z + 2, E_BLOCK_IRON_BARS);
-			a_ChunkDesc.SetBlockType(Pos.x + I, Properties.m_Height + 1, Pos.z + 2, E_BLOCK_IRON_BARS);
+			if (cChunkDef::IsValidRelPos(Vector3d(Pos.x, a_Properties.m_Height, Pos.z) + Offset))
+			{
+				a_ChunkDesc.SetBlockType(Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z, E_BLOCK_IRON_BARS);
+			}
+		}
+		// Remove any block that may generate inside the cage
+		for (const auto & Offset : m_CageAir)
+		{
+			if (cChunkDef::IsValidRelPos(Pos + Offset))
+			{
+				a_ChunkDesc.SetBlockType(Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z, E_BLOCK_AIR);
+			}
 		}
 		// Place roof
 		for (int X = -2; X <= 2; ++X)
 		{
 			for (int Z = -2; Z <= 2; ++Z)
 			{
-				a_ChunkDesc.SetBlockType(Pos.x + X, Properties.m_Height + 2, Pos.z + Z, E_BLOCK_IRON_BARS);
+				if (cChunkDef::IsValidRelPos({Pos.x + X, 1, Pos.z + Z}))
+				{
+					a_ChunkDesc.SetBlockType(Pos.x + X, a_Properties.m_Height + 2, Pos.z + Z, E_BLOCK_IRON_BARS);
+				}
 			}
 		}
 	}
-	// Set the height to zero that this tower has been generated
-	m_TowerProperties[Index].m_Height = 0;
+	// Place the top decoration if the origin is in this chunk
+	if (cChunkDef::IsValidRelPos(Pos))
+	{
+		// Spawn the bedrock
+		a_ChunkDesc.SetBlockType(Pos.x, a_Properties.m_Height - 1, Pos.z, E_BLOCK_BEDROCK);
+		// Spawn the fire
+		a_ChunkDesc.SetBlockType(Pos.x, a_Properties.m_Height, Pos.z, E_BLOCK_FIRE);
+		// Spawn the ender crystal of the origin position is in this chunk
+		auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(0.5, a_Properties.m_Height, 0.5) + a_Properties.m_Pos);
+		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderCrystal));
+	}
 }

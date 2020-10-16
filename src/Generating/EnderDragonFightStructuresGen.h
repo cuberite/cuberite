@@ -14,17 +14,22 @@ public:
 	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius);
 
 protected:
-	cNoise m_Noise;
-	std::map<cChunkCoords, Vector3i> m_TowerPos;
 	struct sTowerProperties
 	{
+		Vector3i m_Pos;
 		int m_Height;
 		int m_Radius;
 		bool m_HasCage;
 	};
-	std::vector<sTowerProperties> m_TowerProperties;
+
+	cNoise m_Noise;
+	std::map<cChunkCoords, std::vector<sTowerProperties>> m_TowerPos;
+	static const std::array<Vector3i, 48> m_CagePos;
+	static const std::array<Vector3i, 26> m_CageAir;
 	cBlockArea m_Fountain;
 
+	int m_MinX = -1, m_MaxX = 1, m_MinZ = -1, m_MaxZ = 1;
+
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
-	void PlaceTower(cChunkDesc & a_ChunkDesc, const Vector3i & a_AbsPos);
+	void PlaceTower(cChunkDesc & a_ChunkDesc, const sTowerProperties & a_TowerProperties);
 };
