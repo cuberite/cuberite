@@ -47,19 +47,19 @@ const cItems cItemTags::Resolve(const AString & a_Name) const
 			std::visit(
 				overloaded
 				{
-						[&] (const AString & a_ItemTagName)
+					[&] (const AString & a_ItemTagName)
+					{
+						// Just to prevent infinite recursion
+						if (NoCaseCompare(a_Name, a_ItemTagName) == 0)
 						{
-							// Just to prevent infinite recursion
-							if (NoCaseCompare(a_Name, a_ItemTagName) == 0)
-							{
-								return;
-							}
-							auto SubResult = Resolve(a_ItemTagName);
-							Result.insert(Result.end(), SubResult.begin(), SubResult.end());
-						},
-						[&] (const cItem & a_Item) { Result.Add(a_Item); }
+							return;
+						}
+						auto SubResult = Resolve(a_ItemTagName);
+						Result.insert(Result.end(), SubResult.begin(), SubResult.end());
+					},
+					[&] (const cItem & a_Item) { Result.Add(a_Item); }
 				}
-				, Item);
+			, Item);
 		}
 		return Result;
 	}
