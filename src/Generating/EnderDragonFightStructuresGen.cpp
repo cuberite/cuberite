@@ -100,7 +100,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 	// Shuffles the order of the towers
 	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(a_Seed));
 	// Generate Positions in a circle
-	for (int I = 0; I < static_cast<int>(TowerProperties.size()); I++)
+	for (size_t I = 0; I < TowerProperties.size(); I++)
 	{
 		auto TowerPos = Vector3i(FloorC(a_Radius * cos(Angle)), 0, FloorC(a_Radius * sin(Angle)));
 		TowerProperties[I].m_Pos = TowerPos;
