@@ -63,6 +63,7 @@ const cItems cItemTags::Resolve(const AString & a_Name) const
 		}
 		return Result;
 	}
+	LOGWARNING("Item tags: Got unknown item tag: %s!", a_Name);
 	return cItems();
 }
 
