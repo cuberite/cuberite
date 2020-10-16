@@ -13,22 +13,6 @@
 
 
 
-cBlockInfo::cBlockInfo()
-{
-}
-
-
-
-
-
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
-{
-}
-
-
-
-
-
 cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 {
 }
