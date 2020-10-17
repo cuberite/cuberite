@@ -107,9 +107,9 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 
 		// Check all crossed chunks
 		const int & Width = cChunkDef::Width;
-		for (int X = -TowerProperties[I].m_Radius - cChunkDef::Width; X <= TowerProperties[I].m_Radius + cChunkDef::Width; X+=std::min(TowerProperties[I].m_Radius, Width))
+		for (int X = -TowerProperties[I].m_Radius - Width; X <= TowerProperties[I].m_Radius + Width; X+=std::min(TowerProperties[I].m_Radius, Width))
 		{
-			for (int Z = -TowerProperties[I].m_Radius - cChunkDef::Width; Z <= TowerProperties[I].m_Radius + cChunkDef::Width; Z+=std::min(TowerProperties[I].m_Radius, Width))
+			for (int Z = -TowerProperties[I].m_Radius - Width; Z <= TowerProperties[I].m_Radius + Width; Z+=std::min(TowerProperties[I].m_Radius, Width))
 			{
 				auto Chunk = cChunkDef::BlockToChunk({TowerPos.x + X, 0, TowerPos.z + Z});
 				// Update limits
