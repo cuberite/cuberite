@@ -45,7 +45,7 @@ const cItems cItemTags::Resolve(const AString & a_Name) const
 		for (const auto & Item : Items)
 		{
 			std::visit(
-				overloaded
+				OverloadedVariantAccess
 				{
 					[&] (const AString & a_ItemTagName)
 					{

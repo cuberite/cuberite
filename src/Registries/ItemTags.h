@@ -30,9 +30,6 @@ protected:
 	std::unordered_map<AString, cItemTag> m_Map;
 };
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
 /*
 static cItemTags & GetItemTags()
 {
