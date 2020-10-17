@@ -158,6 +158,12 @@ extern bool StringToFloat(const AString & a_String, float & a_Num);
 /** Returns true if only whitespace characters are present in the string */
 bool IsOnlyWhitespace(const AString & a_String);
 
+/** Capitalizes any letter following a space */
+extern void Capitalize (AString & a_String);
+
+/** Moves a_String from the minecraft:namespace_convention to CuberiteNamespace */
+AString NamespaceConverter(AString a_String);
+
 
 
 
