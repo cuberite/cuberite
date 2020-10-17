@@ -261,12 +261,5 @@ T GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Defau
 
 // If you have any other string helper functions, declare them here
 
-/** Capitalizes any letter following a space */
-extern void Capitalize (AString & a_String);
-
-/** Moves a_String from the "minecraft:" namespace to CuberiteNamespace */
-AString NamespaceConverter(AString a_String);
-
-
 
 
