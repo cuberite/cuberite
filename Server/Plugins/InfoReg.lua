@@ -233,10 +233,14 @@ end
 local function CompileView(a_Content)
 	content = 'return table.concat({[===[' .. a_Content .. ']===]})';
 	content = content:gsub("%{=%{(.-)%}=%}", function(logic)
+		logic = logic
+			:gsub("<>(.-)</>", "table.insert(__RESULTING_CONTENT__, [===[%1]===])")
+			:gsub("%{%{(.-)%}%}", "table.insert(__RESULTING_CONTENT__, cWebAdmin:GetHTMLEscapedString(%1))");
+			
 		return [[]===], (
 				function() 
 					local __RESULTING_CONTENT__ = {};
-				]] .. logic:gsub("%{%{(.-)%}%}", "table.insert(__RESULTING_CONTENT__, cWebAdmin:GetHTMLEscapedString(%1))") .. [[
+				]] .. logic .. [[
 					return table.concat(__RESULTING_CONTENT__)
 				end
 			)(), [===[
