@@ -17,6 +17,7 @@
 
 
 
+
 // tolua_begin
 class cBlockEntityWithItems :
 	public cBlockEntity,
