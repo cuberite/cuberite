@@ -33,6 +33,7 @@ const std::array<Vector3i, 48> cEnderDragonFightStructuresGen::m_CagePos =
 
 
 
+
 const std::array<Vector3i, 26> cEnderDragonFightStructuresGen::m_CageAir =
 {
 	{
@@ -57,7 +58,7 @@ const std::array<Vector3i, 26> cEnderDragonFightStructuresGen::m_CageAir =
 
 
 
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString &a_TowerProperties, int a_Radius) :
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString &a_TowerProperties, int a_Radius, int a_ChunkWidth) :
 	m_Noise(a_Seed)
 {
 	// Loads the fountain schematic
@@ -74,7 +75,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 		const auto TowerPropertyVector = StringSplitAndTrim(TowerProperty, "|");
 		if (TowerPropertyVector.size() != 3)
 		{
-			LOGWARNING("Got unmatching parameters on generating obsidian pillars: %s, Please use \"Height|Radius|HasCage\", ...", TowerProperty);
+			LOGWARNING("Got unknown parameters on generating obsidian pillars: %s, Please use \"Height|Radius|HasCage\"; ...", TowerProperty);
 			continue;
 		}
 		int Height = std::stoi(TowerPropertyVector[0]);
@@ -90,7 +91,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 		}
 		else
 		{
-			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s", TowerProperty, TowerPropertyVector[2]);
+			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s. Tower wont be generated!", TowerProperty, TowerPropertyVector[2]);
 			continue;
 		}
 		TowerProperties.push_back({Vector3d(), Height, Radius, HasCage});
@@ -106,10 +107,9 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 		TowerProperties[I].m_Pos = TowerPos;
 
 		// Check all crossed chunks
-		const int & Width = cChunkDef::Width;
-		for (int X = -TowerProperties[I].m_Radius - Width; X <= TowerProperties[I].m_Radius + Width; X+=std::min(TowerProperties[I].m_Radius, Width))
+		for (int X = -TowerProperties[I].m_Radius - a_ChunkWidth; X <= TowerProperties[I].m_Radius + a_ChunkWidth; X+=std::min(TowerProperties[I].m_Radius, a_ChunkWidth))
 		{
-			for (int Z = -TowerProperties[I].m_Radius - Width; Z <= TowerProperties[I].m_Radius + Width; Z+=std::min(TowerProperties[I].m_Radius, Width))
+			for (int Z = -TowerProperties[I].m_Radius - a_ChunkWidth; Z <= TowerProperties[I].m_Radius + a_ChunkWidth; Z+=std::min(TowerProperties[I].m_Radius, a_ChunkWidth))
 			{
 				auto Chunk = cChunkDef::BlockToChunk({TowerPos.x + X, 0, TowerPos.z + Z});
 				// Update limits

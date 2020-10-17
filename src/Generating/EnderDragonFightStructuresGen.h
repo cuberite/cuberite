@@ -11,7 +11,7 @@ class cEnderDragonFightStructuresGen :
 	public cFinishGen
 {
 public:
-	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius);
+	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius, int a_ChunkWidth);
 
 protected:
 	struct sTowerProperties
