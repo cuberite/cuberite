@@ -111,7 +111,6 @@ bool cHopperEntity::UsedBy(cPlayer * a_Player)
 	// Loot table processing
 	ApplyLootTable(a_Player);
 
-
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

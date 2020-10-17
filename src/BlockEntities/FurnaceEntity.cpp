@@ -144,7 +144,6 @@ bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 	// Loot table processing
 	ApplyLootTable(a_Player);
 
-
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
