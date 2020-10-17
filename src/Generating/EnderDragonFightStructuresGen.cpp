@@ -153,7 +153,7 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 	if (Coords == cChunkCoords({0, 0}))
 	{
 		auto EnderDragon = std::make_unique<cEnderDragon>();
-		EnderDragon->SetPosition({0.0, 80.0, 0.0});
+		EnderDragon->SetPosition({0.0, static_cast<double>(a_ChunkDesc.GetHeight(0, 0) + 20), 0.0});  // Spawns the dragon 20 blocks above the terrain at (0, 0)
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
 			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
