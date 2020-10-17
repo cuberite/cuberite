@@ -868,11 +868,8 @@ namespace LootTable
 		class cNone {};
 	}  // Namespace Function
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
 #define VISITCONDITION \
-	overloaded { \
+	OverloadedVariantAccess { \
 		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
 		[&] (const LootTable::Condition::cBlockStateProperty & a_Cond)      { return a_Cond(a_World, a_Pos); }, \
 		[&] (const LootTable::Condition::cDamageSourceProperties & a_Cond)  { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
@@ -893,7 +890,7 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 	} \
 
 #define VISITFUNCTION \
-	overloaded { \
+	OverloadedVariantAccess { \
 		[&] (const LootTable::Function::cApplyBonus        & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Function::cCopyName          & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Function::cCopyNbt           & a_Func) { a_Func(a_Item, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
