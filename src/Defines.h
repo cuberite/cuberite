@@ -34,8 +34,8 @@ example:
 std::visit(
 	OverloadedVariantAccess
 	{
-		[&] (const cFirstType  & a_FirstTypeObject )  { // Your code to handle cFirstType },
-		[&] (const cSecondType & a_SecondTypeObject ) { // YourCode to handle cSecondType },
+		[&] (const cFirstType  & a_FirstTypeObject)  {  // Your code to handle cFirstType },
+		[&] (const cSecondType & a_SecondTypeObject) {  // YourCode to handle cSecondType },
 		...
 	}
 , YourVariant);
