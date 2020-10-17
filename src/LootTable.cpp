@@ -2,12 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "LootTable.h"
-
-#include "Entities/Player.h"
-#include "Registries/ItemTags.h"
 #include "LootTableParser.h"
 
 #include "BlockEntities/ChestEntity.h"
+#include "Entities/Player.h"
+#include "Registries/ItemTags.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,23 +19,33 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 	{
 		if (NoCaseCompare(RootId, "pools") == 0)
 		{
-			Json::Value Pools = a_Description[RootId];
+			const Json::Value & Pools = a_Description[RootId];
+			if (!Pools.isArray())
+			{
+				LOGWARNING("Loot table: Didn't get a array while parsing loot table pools, dropping loot table!");
+				return;
+			}
 			for (unsigned int PoolId = 0; PoolId < Pools.size(); PoolId++)
 			{
-				m_LootTablePools.push_back(LootTable::ParsePool(Pools[PoolId]));
+				m_LootTablePools.emplace_back(std::move(LootTable::ParsePool(Pools[PoolId])));
 			}
 		}
 		else if (NoCaseCompare(RootId, "functions") == 0)
 		{
-			auto FunctionsObject = a_Description[RootId];
+			const auto & FunctionsObject = a_Description[RootId];
+			if (!FunctionsObject.isArray())
+			{
+				LOGWARNING("Loot table: Didn't get an array while parsing loot table wide functions, dropping functions!");
+				continue;
+			}
 			for (unsigned int FunctionIndex = 0; FunctionIndex < FunctionsObject.size(); FunctionIndex++)
 			{
-				if (!FunctionsObject[FunctionIndex].isObject())
+				if (FunctionsObject[FunctionIndex].empty() || FunctionsObject[FunctionIndex].isArray())
 				{
-					LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+					LOGWARNING("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
 					continue;
 				}
-				m_Functions.push_back(LootTable::ParseFunction(FunctionsObject[FunctionIndex]));
+				m_Functions.emplace_back(std::move(LootTable::ParseFunction(FunctionsObject[FunctionIndex])));
 			}
 		}
 	}
