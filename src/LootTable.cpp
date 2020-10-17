@@ -68,16 +68,16 @@ bool cLootTable::FillWithLoot(cItemGrid & a_ItemGrid, cWorld & a_World, const Ve
 	auto Items = GetItems(Noise, a_Pos, a_World, a_PlayerID, a_PlayerID, DamageInfo);
 
 	// Places items in a_ItemGrid
-	int i = 0;  // This value is used for some more randomness
+	int I = 0;  // This value is used for some more randomness
 	for (auto & Item : Items)
 	{
 		cItem Copy;
 		while (Item.m_ItemCount > 0)
 		{
 			Copy = Item.CopyOne();
-			a_ItemGrid.AddItem(Copy, true, abs((Noise.IntNoise3DInt(a_Pos) * Noise.IntNoise1DInt(i)) % a_ItemGrid.GetNumSlots()));
+			a_ItemGrid.AddItem(Copy, true, abs((Noise.IntNoise3DInt(a_Pos) * Noise.IntNoise1DInt(I)) % a_ItemGrid.GetNumSlots()));
 			Item.m_ItemCount--;
-			i++;
+			I++;
 		}
 	}
 	return true;
@@ -92,8 +92,7 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 	auto Items = cItems();
 	for (const auto & Pool : m_LootTablePools)
 	{
-		auto NewItems = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
-		Items.insert(Items.end(), NewItems.begin(), NewItems.end());
+		Items = GetItems(Pool, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize);
 	}
 	for (auto & Item : Items)
 	{
@@ -111,11 +110,11 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize)
 {
-	auto Items = cItems();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{
 		return Items;
 	}
+	auto Items = cItems();
 
 	int Luck = 0;
 	/*  TODO: Luck 16.09.2020 - 12xx12
