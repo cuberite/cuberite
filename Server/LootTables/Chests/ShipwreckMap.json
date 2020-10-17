@@ -9,7 +9,6 @@
           "functions": [
             {
               "function": "minecraft:exploration_map",
-              "destination": "buried_treasure",
               "decoration": "red_x",
               "zoom": 1,
               "skip_existing_chunks": false
