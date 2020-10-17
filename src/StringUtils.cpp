@@ -1106,7 +1106,7 @@ bool IsOnlyWhitespace(const AString & a_String)
 
 
 
-void Capitalize (AString & a_String)
+void Capitalize(AString & a_String)
 {
 	bool Cap = true;
 
