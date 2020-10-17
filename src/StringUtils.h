@@ -161,8 +161,8 @@ bool IsOnlyWhitespace(const AString & a_String);
 /** Capitalizes any letter following a space */
 extern void Capitalize(AString & a_String);
 
-/** Moves a_String from the minecraft:namespace_convention to CuberiteNamespace */
-AString NamespaceConverter(AString a_String);
+/** Moves a_String from the minecraft:namespace_convention to CuberiteNamespace. Returns a copy of the modified string */
+AString NamespaceConverter(AString & a_String);
 
 
 

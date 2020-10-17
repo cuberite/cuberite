@@ -1128,14 +1128,15 @@ void Capitalize(AString & a_String)
 
 
 
-AString NamespaceConverter(AString a_String)
+AString NamespaceConverter(AString & a_String)
 {
-	ReplaceString(a_String, "minecraft:", "");
-	ReplaceString(a_String, "_", " ");
-	Capitalize(a_String);
-	ReplaceString(a_String, " ", "");
-	ReplaceString(a_String, "/", "|");
-	return a_String;
+	auto String(a_String);
+	ReplaceString(String, "minecraft:", "");
+	ReplaceString(String, "_", " ");
+	Capitalize(String);
+	ReplaceString(String, " ", "");
+	ReplaceString(String, "/", "|");
+	return String;
 }
 
 
