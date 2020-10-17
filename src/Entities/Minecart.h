@@ -161,7 +161,8 @@ protected:
 	virtual void Destroyed() override;
 
 	/** This string is the filename of the loottable without the ".json" end.
-	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world */
+	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world.
+	If the string is not empty loot will be generated. */
 	AString m_LootTable;
 	int m_LootTableSeed = 0;
 
