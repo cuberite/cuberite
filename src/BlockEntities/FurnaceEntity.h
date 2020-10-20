@@ -38,8 +38,6 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cFurnaceEntity)
-
 	/** Constructor used for normal operation */
 	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -175,7 +173,3 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 } ;  // tolua_export
-
-
-
-
