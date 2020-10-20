@@ -40,8 +40,6 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cBrewingstandEntity)
-
 	/** Constructor used for normal operation */
 	cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -144,10 +142,4 @@ protected:
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-
 } ;  // tolua_export
-
-
-
-
-

@@ -26,6 +26,7 @@ class cHopperEntity :
 	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 1,
@@ -33,11 +34,7 @@ public:
 		TICKS_PER_TRANSFER = 8,  ///< How many ticks at minimum between two item transfers to or from the hopper
 	} ;
 
-
-
 	// tolua_end
-
-	BLOCKENTITY_PROTODEF(cHopperEntity)
 
 	/** Constructor used for normal operation */
 	cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -100,7 +97,3 @@ private:
 
 	bool m_Locked;
 } ;  // tolua_export
-
-
-
-

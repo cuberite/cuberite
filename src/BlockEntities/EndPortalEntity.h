@@ -14,8 +14,6 @@ class cEndPortalEntity :
 
 public:
 
-	BLOCKENTITY_PROTODEF(cEndPortalEntity)
-
 	cEndPortalEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 private:

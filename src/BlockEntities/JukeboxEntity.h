@@ -19,8 +19,6 @@ class cJukeboxEntity :
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cJukeboxEntity)
-
 	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
@@ -55,7 +53,3 @@ public:  // tolua_export
 private:
 	int m_Record;
 } ;  // tolua_end
-
-
-
-
