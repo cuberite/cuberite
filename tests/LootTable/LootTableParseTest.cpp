@@ -816,8 +816,8 @@ static void ParseExplorationMap()
 	auto ExplorationMap = std::get<LootTable::Function::cExplorationMap>(Function.m_Function);
 
 	// TODO: 13.10.2020 - Add active test when implemented - 12xx12
-	TEST_EQUAL(ExplorationMap.m_Destination, "DestinationIsUnknown!");
-	TEST_EQUAL(ExplorationMap.m_Decoration, "DecorationLooksNice");
+	TEST_EQUAL(ExplorationMap.m_Destination, "Destination is unknown!");
+	TEST_EQUAL(ExplorationMap.m_Decoration, "Decoration looks nice");
 	TEST_EQUAL(ExplorationMap.m_Zoom, 10);
 	TEST_EQUAL(ExplorationMap.m_SearchRadius, 20);
 	TEST_TRUE(ExplorationMap.m_SkipExistingChunks);
@@ -1040,7 +1040,7 @@ static void ParseSetCount()
 	"{"
 		"\"function\": \"minecraft:set_count\","
   		"\"count\": {"
-			"\"type\": \"uniform\","
+			"\"type\": \"minecraft:uniform\","
 			"\"min\": 10,"
 			"\"max\": 20,"
 		"},"
@@ -1062,7 +1062,7 @@ static void ParseSetCount()
 	"{"
 		"\"function\": \"minecraft:set_count\","
   		"\"count\": {"
-			"\"type\": \"binomial\","
+			"\"type\": \"minecraft:binomial\","
 			"\"n\": 10,"
 			"\"p\": 0.5,"
 		"},"
@@ -1126,7 +1126,7 @@ static void ParseSetLootTable()
 	auto SetLootTable = std::get<LootTable::Function::cSetLootTable>(Function.m_Function);
 
 	// TODO: 13.10.2020 - Add active test when implemented - 12xx12
-	TEST_EQUAL(SetLootTable.m_LootTable, "HelloWorld!");
+	TEST_EQUAL(SetLootTable.m_LootTable, "Hello World!");
 	TEST_EQUAL(SetLootTable.m_Seed, 42);
 }
 
@@ -1384,7 +1384,7 @@ static void ParseCompleteTableExampleTwo()
 								"\"condition\": \"minecraft:survives_explosion\""
 							"}"
 						"],"
-						"\"name\": \"Wool\""
+						"\"name\": \"wool\""
 					"}"
 				"],"
 				"\"conditions\": ["
@@ -1450,7 +1450,7 @@ static void ParseEntryTypeLootTable()
 	TEST_EQUAL(PoolEntry.m_Type, LootTable::ePoolEntryType::LootTable);
 	TEST_EQUAL(PoolEntry.m_Weight, 30);
 	TEST_EQUAL(PoolEntry.m_Quality, 40);
-	TEST_EQUAL(std::get<AString>(PoolEntry.m_Content), "HelloWorld!");
+	TEST_EQUAL(std::get<AString>(PoolEntry.m_Content), "Hello World!");
 }
 
 
