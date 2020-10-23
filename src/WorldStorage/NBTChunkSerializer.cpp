@@ -1033,8 +1033,7 @@ public:
 				{
 					cSplashPotionEntity * Potion = static_cast<cSplashPotionEntity *>(a_Projectile);
 
-					// mWriter.AddInt("EffectType",                static_cast<Int16>(Potion->GetEntityEffectType()));
-					mWriter.AddString("EffectType",             AString("minecraft:") + NamespaceSerializer::From(Potion->GetEntityEffectType());
+					mWriter.AddString("EffectType",             AString("minecraft:") + NamespaceSerializer::From(Potion->GetEntityEffectType()));
 					mWriter.AddInt("EffectDuration",            static_cast<Int16>(Potion->GetEntityEffect().GetDuration()));
 					mWriter.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 					mWriter.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
