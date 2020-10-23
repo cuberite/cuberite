@@ -300,7 +300,7 @@ namespace NamespaceSerializer
 
 	cEntityEffect::eType ToEntityEffect(std::string_view a_ID)
 	{
-		static const std::unordered_map<std::string_view, cEntityEffect::eType> Effect =
+		static const std::unordered_map<std::string_view, cEntityEffect::eType> Effects =
 		{
 			{ "no_effect",       cEntityEffect::effNoEffect },
 			{ "speed",           cEntityEffect::effSpeed },
@@ -326,7 +326,89 @@ namespace NamespaceSerializer
 			{ "saturation",      cEntityEffect::effSaturation }
 		};
 
-		return Effect.at(a_ID);
+		return Effects.at(a_ID);
+	}
+
+
+
+
+
+	const char * From(cEnchantments::eEnchantment a_Enchantment)
+	{
+		switch (a_Enchantment)
+		{
+			case cEnchantments::enchProtection:           return "protection";
+			case cEnchantments::enchFireProtection:       return "fire_protection";
+			case cEnchantments::enchFeatherFalling:       return "feather_falling";
+			case cEnchantments::enchBlastProtection:      return "blast_protection";
+			case cEnchantments::enchProjectileProtection: return "projectile_protection";
+			case cEnchantments::enchRespiration:          return "respiration";
+			case cEnchantments::enchAquaAffinity:         return "aqua_affinity";
+			case cEnchantments::enchThorns:               return "thorns";
+			case cEnchantments::enchDepthStrider:         return "depth_strider";
+			case cEnchantments::enchSharpness:            return "sharpness";
+			case cEnchantments::enchSmite:                return "smite";
+			case cEnchantments::enchBaneOfArthropods:     return "bane_of_arthropods";
+			case cEnchantments::enchKnockback:            return "knockback";
+			case cEnchantments::enchFireAspect:           return "fire_aspect";
+			case cEnchantments::enchLooting:              return "looting";
+			case cEnchantments::enchEfficiency:           return "efficiency";
+			case cEnchantments::enchSilkTouch:            return "silk_touch";
+			case cEnchantments::enchUnbreaking:           return "unbreaking";
+			case cEnchantments::enchFortune:              return "fortune";
+			case cEnchantments::enchPower:                return "power";
+			case cEnchantments::enchPunch:                return "punch";
+			case cEnchantments::enchFlame:                return "flame";
+			case cEnchantments::enchInfinity:             return "infinity";
+			case cEnchantments::enchLuckOfTheSea:         return "luck_of_the_sea";
+			case cEnchantments::enchLure:                 return "lure";
+		}
+
+		UNREACHABLE("Tried to save unhandled enchantment");
+	}
+
+
+
+
+
+	cEnchantments::eEnchantment ToEnchantmentID(std::string_view a_ID)
+	{
+		static const std::unordered_map<std::string_view, cEnchantments::eEnchantment> Enchantments =
+		{
+			{ "protection",            cEnchantments::enchProtection },
+			{ "fire_protection",       cEnchantments::enchFireProtection },
+			{ "feather_falling",       cEnchantments::enchFeatherFalling },
+			{ "blast_protection",      cEnchantments::enchBlastProtection },
+			{ "projectile_protection", cEnchantments::enchProjectileProtection },
+			{ "respiration",           cEnchantments::enchRespiration },
+			{ "aqua_affinity",         cEnchantments::enchAquaAffinity },
+			{ "thorns",                cEnchantments::enchThorns },
+			{ "depth_strider",         cEnchantments::enchDepthStrider },
+			{ "sharpness",             cEnchantments::enchSharpness },
+			{ "smite",                 cEnchantments::enchSmite },
+			{ "bane_of_arthropods",    cEnchantments::enchBaneOfArthropods },
+			{ "knockback",             cEnchantments::enchKnockback },
+			{ "fire_aspect",           cEnchantments::enchFireAspect },
+			{ "looting",               cEnchantments::enchLooting },
+			{ "efficiency",            cEnchantments::enchEfficiency },
+			{ "silk_touch",            cEnchantments::enchSilkTouch },
+			{ "unbreaking",            cEnchantments::enchUnbreaking },
+			{ "fortune",               cEnchantments::enchFortune },
+			{ "power",                 cEnchantments::enchPower },
+			{ "punch",                 cEnchantments::enchPunch },
+			{ "flame",                 cEnchantments::enchFlame },
+			{ "infinity",              cEnchantments::enchInfinity },
+			{ "luck_of_the_sea",       cEnchantments::enchLuckOfTheSea },
+			{ "lure",                  cEnchantments::enchLure },
+		};
+		try
+		{
+			return Enchantments.at(a_ID);
+		}
+		catch (...)
+		{
+			LOG(a_ID);
+		}
 	}
 
 

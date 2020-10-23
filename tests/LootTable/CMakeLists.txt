@@ -21,6 +21,7 @@ add_executable(LootTableParseTest
         ${CMAKE_SOURCE_DIR}/src/OSSupport/File.cpp
         ${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
         ${CMAKE_SOURCE_DIR}/src/WorldStorage/FireworksSerializer.cpp
+        ${CMAKE_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
         Stubs.cpp
         LootTableParseTest.cpp
         ../TestHelpers.h
