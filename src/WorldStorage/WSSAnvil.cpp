@@ -914,13 +914,31 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Primary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetPrimaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			Beacon->SetPrimaryEffect(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			Beacon->SetPrimaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
 	}
 
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Secondary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetSecondaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			Beacon->SetSecondaryEffect(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			Beacon->SetSecondaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
 	}
 
 	// We are better than mojang, we load / save the beacon inventory!
@@ -2176,13 +2194,49 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 		return;
 	}
 
-	int EffectDuration         = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
-	int EffectIntensity        = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
-	int EffectDistanceModifier = a_NBT.FindChildByName(a_TagIdx, "EffectDistanceModifier");
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectType");
+	if (CurrentLine >= 0)
+	{
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			SplashPotion->SetEntityEffectType(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			SplashPotion->SetEntityEffectType(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
+	}
 
-	SplashPotion->SetEntityEffectType(static_cast<cEntityEffect::eType>(a_NBT.FindChildByName(a_TagIdx, "EffectType")));
-	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, static_cast<Int16>(EffectIntensity), EffectDistanceModifier));
-	SplashPotion->SetPotionColor(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
+	int EffectDuration;
+	short EffectIntensity;
+	double EffectDistanceModifier;
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
+	if (CurrentLine >= 0)
+	{
+		EffectDuration = a_NBT.GetInt(CurrentLine);
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
+	if (CurrentLine >= 0)
+	{
+		EffectIntensity = a_NBT.GetShort(CurrentLine);
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectDistanceModifier");
+	if (CurrentLine >= 0)
+	{
+		EffectDistanceModifier = a_NBT.GetDouble(CurrentLine);
+	}
+
+	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, EffectIntensity, EffectDistanceModifier));
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "PotionName");
+	if (CurrentLine >= 0)
+	{
+		SplashPotion->SetPotionColor(a_NBT.GetInt(CurrentLine));
+	}
 
 	// Store the new splash potion in the entities list:
 	a_Entities.emplace_back(std::move(SplashPotion));

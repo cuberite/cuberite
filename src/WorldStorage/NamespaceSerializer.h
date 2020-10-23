@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Registries/Statistics.h"
+#include "../Entities/EntityEffect.h"
 
 namespace NamespaceSerializer
 {
@@ -16,6 +17,9 @@ namespace NamespaceSerializer
 	const char * From(Statistic ID);
 
 	Statistic ToCustomStatistic(std::string_view ID);
+
+	const char * From(cEntityEffect::eType a_ID);
+	cEntityEffect::eType ToEntityEffect(std::string_view a_ID);
 
 	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
 }

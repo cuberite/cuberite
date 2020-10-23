@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
+#include "NamespaceSerializer.h"
 #include "../ChunkDataCallback.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
@@ -383,8 +384,8 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity, "Beacon");
 			mWriter.AddInt("Levels", a_Entity->GetBeaconLevel());
-			mWriter.AddInt("Primary", static_cast<int>(a_Entity->GetPrimaryEffect()));
-			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect()));
+			mWriter.AddString("Primary", AString("minecraft:") + NamespaceSerializer::From(a_Entity->GetPrimaryEffect()));
+			mWriter.AddString("Secondary", AString("minecraft:") + NamespaceSerializer::From(a_Entity->GetSecondaryEffect()));
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -1039,7 +1040,7 @@ public:
 				{
 					cSplashPotionEntity * Potion = static_cast<cSplashPotionEntity *>(a_Projectile);
 
-					mWriter.AddInt("EffectType",                static_cast<Int16>(Potion->GetEntityEffectType()));
+					mWriter.AddString("EffectType",             AString("minecraft:") + NamespaceSerializer::From(Potion->GetEntityEffectType()));
 					mWriter.AddInt("EffectDuration",            static_cast<Int16>(Potion->GetEntityEffect().GetDuration()));
 					mWriter.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 					mWriter.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());

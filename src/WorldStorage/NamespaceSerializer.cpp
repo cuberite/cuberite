@@ -257,6 +257,82 @@ namespace NamespaceSerializer
 		return CustomStatistics.at(ID);
 	}
 
+
+
+
+
+	const char * From(cEntityEffect::eType a_ID)
+	{
+		switch (a_ID)
+		{
+			case cEntityEffect::effNoEffect:       return "no_effect";
+			case cEntityEffect::effSpeed:          return "speed";
+			case cEntityEffect::effSlowness:       return "slowness";
+			case cEntityEffect::effHaste:          return "haste";
+			case cEntityEffect::effMiningFatigue:  return "mining_fatigue";
+			case cEntityEffect::effStrength:       return "strength";
+			case cEntityEffect::effInstantHealth:  return "instant_health";
+			case cEntityEffect::effInstantDamage:  return "instant_damage";
+			case cEntityEffect::effJumpBoost:      return "jump_boost";
+			case cEntityEffect::effNausea:         return "nausea";
+			case cEntityEffect::effRegeneration:   return "regeneration";
+			case cEntityEffect::effResistance:     return "resistance";
+			case cEntityEffect::effFireResistance: return "fire_resistance";
+			case cEntityEffect::effWaterBreathing: return "water_breathing";
+			case cEntityEffect::effInvisibility:   return "invisibility";
+			case cEntityEffect::effBlindness:      return "blindness";
+			case cEntityEffect::effNightVision:    return "night_vision";
+			case cEntityEffect::effHunger:         return "hunger";
+			case cEntityEffect::effWeakness:       return "weakness";
+			case cEntityEffect::effPoison:         return "poison";
+			case cEntityEffect::effWither:         return "wither";
+			case cEntityEffect::effHealthBoost:    return "health_boost";
+			case cEntityEffect::effAbsorption:     return "absorption";
+			case cEntityEffect::effSaturation:     return "saturation";
+		}
+
+		UNREACHABLE("Tried to save unhandled entity effect");
+	}
+
+
+
+
+
+	cEntityEffect::eType ToEntityEffect(std::string_view a_ID)
+	{
+		static const std::unordered_map<std::string_view, cEntityEffect::eType> Effect =
+		{
+			{ "no_effect",       cEntityEffect::effNoEffect },
+			{ "speed",           cEntityEffect::effSpeed },
+			{ "slowness",        cEntityEffect::effSlowness },
+			{ "haste",           cEntityEffect::effHaste },
+			{ "mining_fatigue",  cEntityEffect::effMiningFatigue },
+			{ "strength",        cEntityEffect::effStrength },
+			{ "instant_health",  cEntityEffect::effInstantHealth },
+			{ "instant_damage",  cEntityEffect::effInstantDamage },
+			{ "jump_boost",      cEntityEffect::effJumpBoost },
+			{ "nausea",          cEntityEffect::effNausea },
+			{ "regeneration",    cEntityEffect::effRegeneration },
+			{ "resistance",      cEntityEffect::effResistance },
+			{ "fire_resistance", cEntityEffect::effFireResistance },
+			{ "water_breathing", cEntityEffect::effWaterBreathing },
+			{ "invisibility",    cEntityEffect::effInvisibility },
+			{ "hunger",          cEntityEffect::effHunger },
+			{ "weakness",        cEntityEffect::effWeakness },
+			{ "poison",          cEntityEffect::effPoison },
+			{ "wither",          cEntityEffect::effWither },
+			{ "healthBoost",     cEntityEffect::effHealthBoost },
+			{ "absorption",      cEntityEffect::effAbsorption },
+			{ "saturation",      cEntityEffect::effSaturation }
+		};
+
+		return Effect.at(a_ID);
+	}
+
+
+
+
+
 	std::pair<Namespace, std::string_view> SplitNamespacedID(const std::string_view ID)
 	{
 		const auto NamespaceIndex = ID.find(':');
