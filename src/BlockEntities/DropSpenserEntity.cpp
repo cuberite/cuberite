@@ -63,7 +63,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	// Pick one of the occupied slots:
 	std::array<int, 9> OccupiedSlots;
 	size_t SlotsCnt = 0;
-	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
+	for (int i = m_Contents.OldGetNumSlots() - 1; i >= 0; i--)
 	{
 		if (!m_Contents.GetSlot(i).IsEmpty())
 		{

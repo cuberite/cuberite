@@ -350,7 +350,7 @@ public:
 	Note that it doesn't begin nor end the list tag, so that multiple grids may be concatenated together using this function. */
 	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0)
 	{
-		int NumSlots = a_Grid.GetNumSlots();
+		int NumSlots = a_Grid.OldGetNumSlots();
 		for (int i = 0; i < NumSlots; i++)
 		{
 			const cItem & Item = a_Grid.GetSlot(i);

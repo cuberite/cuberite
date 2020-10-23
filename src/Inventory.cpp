@@ -113,7 +113,7 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 	// When the item is a armor, try to set it directly to the armor slot.
 	if (ItemCategory::IsArmor(a_Item.m_ItemType))
 	{
-		for (int i = 0; i < m_ArmorSlots.GetNumSlots(); i++)
+		for (int i = 0; i < m_ArmorSlots.OldGetNumSlots(); i++)
 		{
 			if (m_ArmorSlots.GetSlot(i).IsEmpty() && cSlotAreaArmor::CanPlaceArmorInSlot(i, a_Item))
 			{
