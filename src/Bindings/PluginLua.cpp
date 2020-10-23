@@ -504,7 +504,7 @@ bool cPluginLua::OnHandshake(cClientHandle & a_Client, const AString & a_Usernam
 
 
 
-bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, size_t a_SrcSlotNum)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PULLING_ITEM, &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum);
 }

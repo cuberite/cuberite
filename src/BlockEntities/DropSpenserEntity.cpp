@@ -47,9 +47,9 @@ void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_D
 void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 {
 	// Pick one of the occupied slots:
-	int OccupiedSlots[9];
-	int SlotsCnt = 0;
-	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
+	std::array<int, 9> OccupiedSlots;
+	size_t SlotsCnt = 0;
+	for (int i = m_Contents.OldGetNumSlots() - 1; i >= 0; i--)
 	{
 		if (!m_Contents.GetSlot(i).IsEmpty())
 		{

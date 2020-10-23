@@ -46,11 +46,15 @@ public:  // tolua_export
 
 	// tolua_begin
 
-	const cItem & GetSlot(int a_SlotNum)    const { return m_Contents.GetSlot(a_SlotNum); }
+	const cItem & GetSlot(size_t a_SlotNum) const { return m_Contents.GetSlot(a_SlotNum); }
 	const cItem & GetSlot(int a_X, int a_Y) const { return m_Contents.GetSlot(a_X, a_Y); }
+	///! \deprecated See cItemGrid::GetSlot
+	const cItem & GetSlot(int a_SlotNum) const    { return m_Contents.GetSlot(a_SlotNum); }
 
-	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
+	void SetSlot(size_t a_SlotNum, const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
+	///! \deprecated See cItemGrid::GetSlot
+	void SetSlot(int a_SlotNum, const cItem & a_Item)    { m_Contents.SetSlot(a_SlotNum, a_Item); }
 
 	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }

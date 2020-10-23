@@ -606,7 +606,7 @@ bool cPluginManager::CallHookHandshake(cClientHandle & a_ClientHandle, const ASt
 
 
 
-bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, size_t a_SrcSlotNum)
 {
 	return GenericCallHook(HOOK_HOPPER_PULLING_ITEM, [&](cPlugin * a_Plugin)
 		{
