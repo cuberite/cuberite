@@ -10,49 +10,31 @@
 #include "Root.h"
 #include "Mobs/Monster.h"
 #include "json/json.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 #include "World.h"
 
 namespace LootTable
 {
-	enum ePoolEntryType ePoolEntryType(const AString & a_Type)
+	enum ePoolEntryType ePoolEntryType(std::string_view a_Type)
 	{
-
-		if (NoCaseCompare(a_Type, "Item") == 0)
+		static const std::map<std::string_view, enum ePoolEntryType> Entries =
 		{
-			return ePoolEntryType::Item;
+			{ "item", ePoolEntryType::Item },
+			{ "tag", ePoolEntryType::Tag },
+			{ "loot_table", ePoolEntryType::LootTable },
+			{ "group", ePoolEntryType::Group },
+			{ "alternatives", ePoolEntryType::Alternatives },
+			{ "sequence", ePoolEntryType::Sequence },
+			{ "dynamic", ePoolEntryType::Dynamic },
+			{ "empty", ePoolEntryType::Empty }
+		};
+		try
+		{
+			return Entries.at(a_Type);
 		}
-		else if (NoCaseCompare(a_Type, "Tag") == 0)
+		catch (...)
 		{
-			return ePoolEntryType::Tag;
-		}
-		else if (NoCaseCompare(a_Type, "LootTable") == 0)
-		{
-			return ePoolEntryType::LootTable;
-		}
-		else if (NoCaseCompare(a_Type, "Group") == 0)
-		{
-			return ePoolEntryType::Group;
-		}
-		else if (NoCaseCompare(a_Type, "Alternatives") == 0)
-		{
-			return ePoolEntryType::Alternatives;
-		}
-		else if (NoCaseCompare(a_Type, "Sequence") == 0)
-		{
-			return ePoolEntryType::Sequence;
-		}
-		else if (NoCaseCompare(a_Type, "Dynamic") == 0)
-		{
-			return ePoolEntryType::Dynamic;
-		}
-		else if (NoCaseCompare(a_Type, "Empty") == 0)
-		{
-			return ePoolEntryType::Empty;
-		}
-		else
-		{
-			LOGWARNING("Unknown loot table pool entry type provided: %s. Defaulting to Empty", a_Type);
 			return ePoolEntryType::Empty;
 		}
 	}
@@ -173,7 +155,7 @@ namespace LootTable
 			{
 				cItem Item;
 
-				if ((a_Value[ParameterName].isString()) && (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item)))
+				if ((a_Value[ParameterName].isString()) && (StringToItem(a_Value[ParameterName].asString(), Item)))
 				{
 					m_Block = Item.m_ItemType;
 				}
@@ -562,22 +544,22 @@ namespace LootTable
 		AString DestString;
 		if (a_Value.isMember("entity"))
 		{
-			DestString = NamespaceConverter(a_Value["entity"].asString());
+			DestString = a_Value["entity"].asString();
 		}
 		else if (a_Value.isMember("Entity"))
 		{
-			DestString = NamespaceConverter(a_Value["Entity"].asString());
+			DestString = a_Value["Entity"].asString();
 		}
 
-		if ((DestString.empty()) || (NoCaseCompare(DestString, "This") == 0))
+		if ((DestString.empty()) || (NoCaseCompare(DestString, "this") == 0))
 		{
 			m_Dest = eDest::This;
 		}
-		else if (NoCaseCompare(DestString, "Killer") == 0)
+		else if (NoCaseCompare(DestString, "killer") == 0)
 		{
 			m_Dest = eDest::Killer;
 		}
-		else if (NoCaseCompare(DestString, "KillerPlayer") == 0)
+		else if (NoCaseCompare(DestString, "killer_player") == 0)
 		{
 			m_Dest = eDest::KillerPlayer;
 		}
@@ -680,7 +662,7 @@ namespace LootTable
 				}
 				for (const auto & EffectKey : EffectObject.getMemberNames())
 				{
-					m_Effects[cEntityEffect::GetTypeFromString(NamespaceConverter(EffectKey))] = sEffectDesc(EffectObject[EffectKey]);
+					m_Effects[NamespaceSerializer::ToEntityEffect(NamespaceSerializer::SplitNamespacedID(EffectKey).second)] = sEffectDesc(EffectObject[EffectKey]);
 				}
 			}
 			else if (NoCaseCompare(Key, "equipment") == 0)
@@ -787,7 +769,7 @@ namespace LootTable
 					else if (NoCaseCompare(PlayerKey, "gamemode") == 0)
 					{
 						// Allowed values: survival, adventure, creative or spectator
-						AString Gamemode = NamespaceConverter(PlayerObject[PlayerKey].asString());
+						AString Gamemode = PlayerObject[PlayerKey].asString();
 						if (NoCaseCompare(Gamemode, "survival") == 0)
 						{
 							m_Gamemode = eGameMode_Survival;
@@ -1281,7 +1263,7 @@ namespace LootTable
 				{
 					if (NoCaseCompare(PredicateKey, "biome") == 0)
 					{
-						m_Biome = StringToBiome(NamespaceConverter(PredicateObject[PredicateKey].asString()));
+						m_Biome = StringToBiome(static_cast<AString>(NamespaceSerializer::SplitNamespacedID(PredicateObject[PredicateKey].asString()).second));
 						// Todo: this might fail due to changed biome names in 1.13
 					}  // "biome"
 					else if (NoCaseCompare(PredicateKey, "block") == 0)
@@ -1302,11 +1284,11 @@ namespace LootTable
 							}
 							else if (NoCaseCompare(BlockKey, "tag") == 0)
 							{
-								m_BlockTag = ItemTag::eItemTags(NamespaceConverter(BlockObject[BlockKey].asString()));
+								m_BlockTag = ItemTag::eItemTags(NamespaceSerializer::SplitNamespacedID(BlockObject[BlockKey].asString()).second);
 							}
 							else if (NoCaseCompare(BlockKey, "nbt") == 0)
 							{
-								m_BlockNBT = NamespaceConverter(BlockObject[BlockKey].asString());
+								m_BlockNBT = BlockObject[BlockKey].asString();
 							}
 						}  // for BlockKey
 					}	   // "block"
@@ -1357,7 +1339,7 @@ namespace LootTable
 							}
 							else if (NoCaseCompare(FluidKey, "tag") == 0)
 							{
-								m_FluidTag = NamespaceConverter(FluidObject[FluidKey].asString());
+								m_FluidTag = FluidObject[FluidKey].asString();
 							}
 						}
 					}  // "fluid"
@@ -1549,8 +1531,8 @@ namespace LootTable
 					{
 						if (NoCaseCompare(EnchantmentKey, "enchantment") == 0)
 						{
-							EnchantmentID = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject[EnchantmentKey].asString()));
-							Enchantment = cEnchantments(NamespaceConverter(EnchantmentObject[EnchantmentKey].asString()));
+							EnchantmentID = NamespaceSerializer::ToEnchantmentID(NamespaceSerializer::SplitNamespacedID(EnchantmentObject[EnchantmentKey].asString()).second);
+							Enchantment = cEnchantments(std::to_string(EnchantmentID));
 						}
 						else if (NoCaseCompare(EnchantmentKey, "levels") == 0)
 						{
@@ -1592,8 +1574,8 @@ namespace LootTable
 					{
 						if (NoCaseCompare(EnchantmentKey, "enchantment") == 0)
 						{
-							EnchantmentID =cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject[EnchantmentKey].asString()));
-							Enchantment = cEnchantments(NamespaceConverter(EnchantmentObject[EnchantmentKey].asString()));
+							EnchantmentID = NamespaceSerializer::ToEnchantmentID(NamespaceSerializer::SplitNamespacedID(EnchantmentObject[EnchantmentKey].asString()).second);
+							Enchantment = cEnchantments(std::to_string(EnchantmentID));
 						}
 						else if (NoCaseCompare(EnchantmentKey, "levels") == 0)
 						{
@@ -1613,9 +1595,9 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "item") == 0)
 			{
-				if (!StringToItem(NamespaceConverter(Predicates[Key].asString()), m_Item))
+				if (!StringToItem(Predicates[Key].asString(), m_Item))
 				{
-					LOGWARNING("Loot table: Unknown item provided in condition \"MatchTool\"");
+					LOGWARNING("Loot table: Unknown item provided in condition \"MatchTool\": %s", Predicates[Key].asString());
 				}
 			}
 			else if (NoCaseCompare(Key, "nbt") == 0)
@@ -1878,11 +1860,11 @@ namespace LootTable
 		m_Active = true;
 		if (a_Value.isMember("enchantment"))
 		{
-			m_Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(a_Value["enchantment"].asString()));
+			m_Enchantment = static_cast<cEnchantments::eEnchantment>(a_Value["enchantment"].asInt());
 		}
 		else if (a_Value.isMember("Enchantment"))
 		{
-			m_Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(a_Value["Enchantment"].asString()));
+			m_Enchantment = static_cast<cEnchantments::eEnchantment>(a_Value["Enchantment"].asInt());
 		}
 
 		Json::Value Chances;
@@ -2057,27 +2039,33 @@ namespace LootTable
 			EnchantmentObject = a_Value["Enchantment"];
 		}
 
-		m_Enchantment = cEnchantments::StringToEnchantmentID(NamespaceConverter(EnchantmentObject.asString()));
+		if (!EnchantmentObject.isNumeric())
+		{
+			LOGWARNING("Loot table: Function \"Apply Bonus\" recieved malformated Json. Dropping function!");
+			return;
+		}
+
+		m_Enchantment = static_cast<cEnchantments::eEnchantment>(EnchantmentObject.asInt());
 
 		AString Formula;
 		if (a_Value.isMember("formula"))
 		{
-			Formula = NamespaceConverter(a_Value["formula"].asString());
+			Formula = a_Value["formula"].asString();
 		}
 		else if (a_Value.isMember("Formula"))
 		{
-			Formula = NamespaceConverter(a_Value["Formula"].asString());
+			Formula = a_Value["Formula"].asString();
 		}
 
-		if (Formula == "BinomialWithBonusCount")
+		if (NoCaseCompare(Formula, "binomial_with_bonus_count") == 0)
 		{
 			m_Formula = eFormula::BinomialWithBonusCount;
 		}
-		else if (Formula == "UniformBonusCount")
+		else if (NoCaseCompare(Formula, "uniform_bonus_count") == 0)
 		{
 			m_Formula = eFormula::UniformBonusCount;
 		}
-		else if (Formula == "OreDrops")
+		else if (NoCaseCompare(Formula, "ore_drops") == 0)
 		{
 			m_Formula = eFormula::OreDrops;
 		}
@@ -2200,7 +2188,7 @@ namespace LootTable
 
 		if (a_Value.isMember("source"))
 		{
-			if (NoCaseCompare(NamespaceConverter(a_Value["source"].asString()), "BlockEntity") == 0)
+			if (NoCaseCompare(a_Value["source"].asString(), "block_entity") == 0)
 			{
 				m_Active = true;
 			}
@@ -2212,7 +2200,7 @@ namespace LootTable
 		}
 		else if (a_Value.isMember("Source"))
 		{
-			if (NoCaseCompare(NamespaceConverter(a_Value["Source"].asString()), "BlockEntity") == 0)
+			if (NoCaseCompare(a_Value["Source"].asString(), "block_entity") == 0)
 			{
 				m_Active = true;
 			}
@@ -2259,11 +2247,11 @@ namespace LootTable
 		AString Source;
 		if (a_Value.isMember("source"))
 		{
-			Source = NamespaceConverter(a_Value["source"].asString());
+			Source = a_Value["source"].asString();
 		}
 		else if (a_Value.isMember("Source"))
 		{
-			Source = NamespaceConverter(a_Value["Source"].asString());
+			Source = a_Value["Source"].asString();
 		}
 		else
 		{
@@ -2271,19 +2259,19 @@ namespace LootTable
 			return;
 		}
 
-		if (Source == "BlockEntity")
+		if (NoCaseCompare(Source, "block_entity") == 0)
 		{
 			m_Source = eSource::BlockEntity;
 		}
-		else if (Source == "This")
+		else if (NoCaseCompare(Source, "this") == 0)
 		{
 			m_Source = eSource::This;
 		}
-		else if (Source == "Killer")
+		else if (NoCaseCompare(Source, "killer") == 0)
 		{
 			m_Source = eSource::Killer;
 		}
-		else if (Source == "KillerPlayer")
+		else if (NoCaseCompare(Source, "killer_player") == 0)
 		{
 			m_Source = eSource::KillerPlayer;
 		}
@@ -2323,24 +2311,24 @@ namespace LootTable
 				eOperation Operation = eOperation::Replace;
 				if (NoCaseCompare(OperationKey, "source") == 0)
 				{
-					SourcePath = NamespaceConverter(OperationObject[OperationKey].asString());
+					SourcePath = OperationObject[OperationKey].asString();
 				}
 				else if (NoCaseCompare(OperationKey, "target") == 0)
 				{
-					TargetPath = NamespaceConverter(OperationObject[OperationKey].asString());
+					TargetPath = OperationObject[OperationKey].asString();
 				}
 				else if (NoCaseCompare(OperationKey, "op") == 0)
 				{
-					AString Op = NamespaceConverter(OperationObject[OperationKey].asString());
-					if (NoCaseCompare(Op, "Replace") == 0)
+					AString Op = OperationObject[OperationKey].asString();
+					if (NoCaseCompare(Op, "replace") == 0)
 					{
 						Operation = eOperation::Replace;
 					}
-					else if (NoCaseCompare(Op, "Append") == 0)
+					else if (NoCaseCompare(Op, "append") == 0)
 					{
 						Operation = eOperation::Append;
 					}
-					else if (NoCaseCompare(Op, "Merge") == 0)
+					else if (NoCaseCompare(Op, "merge") == 0)
 					{
 						Operation = eOperation::Merge;
 					}
@@ -2386,7 +2374,7 @@ namespace LootTable
 			{
 				cItem Item;
 
-				if (StringToItem(NamespaceConverter(a_Value[ParameterName].asString()), Item))
+				if (StringToItem(a_Value[ParameterName].asString(), Item))
 				{
 					m_Block = Item.m_ItemType;
 				}
@@ -2406,7 +2394,7 @@ namespace LootTable
 
 				for (unsigned int i = 0; i < Properties.size(); i++)
 				{
-					m_Properties.push_back(NamespaceConverter(Properties[i].asString()));
+					m_Properties.push_back(Properties[i].asString());
 				}
 			}
 			m_Active = true;
@@ -2444,7 +2432,7 @@ namespace LootTable
 		{
 			for (unsigned int i = 0; i < Enchantments.size(); i++)
 			{
-				m_Enchantments.push_back(cEnchantments::StringToEnchantmentID(NamespaceConverter(Enchantments[i].asString())));
+				m_Enchantments.push_back(NamespaceSerializer::ToEnchantmentID(NamespaceSerializer::SplitNamespacedID(Enchantments[i].asString()).second));
 			}
 		}
 		else if (!Enchantments.empty())
@@ -2562,21 +2550,21 @@ namespace LootTable
 		{
 			if (NoCaseCompare(Key, "Destination") == 0)
 			{
-				m_Destination = NamespaceConverter(a_Value[Key].asString());
+				m_Destination = a_Value[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "Decoration") == 0)
 			{
-				m_Decoration = NamespaceConverter(a_Value[Key].asString());
+				m_Decoration = a_Value[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "Zoom") == 0)
 			{
 				m_Zoom = a_Value[Key].asInt();
 			}
-			else if ((NoCaseCompare(Key, "search_radius") == 0) || (NoCaseCompare(Key, "SearchRadius") == 0))
+			else if (NoCaseCompare(Key, "search_radius") == 0)
 			{
 				m_SearchRadius = a_Value[Key].asInt();
 			}
-			else if ((NoCaseCompare(Key, "skip_existing_chunks") == 0) || (NoCaseCompare(Key, "SkipExistingChunks") == 0))
+			else if (NoCaseCompare(Key, "skip_existing_chunks") == 0)
 			{
 				m_SkipExistingChunks = a_Value[Key].asBool();
 			}
@@ -2645,7 +2633,7 @@ namespace LootTable
 		{
 			m_Dest = eDest::Killer;
 		}
-		else if ((NoCaseCompare(Entity, "killer_player")) || (NoCaseCompare(Entity, "KillerPlayer")))
+		else if (NoCaseCompare(Entity, "killer_player") == 0)
 		{
 			m_Dest = eDest::KillerPlayer;
 		}
@@ -2915,19 +2903,19 @@ namespace LootTable
 			AString Type;
 			if (CountObject.isMember("type"))
 			{
-				Type = NamespaceConverter(CountObject["type"].asString());
+				Type = CountObject["type"].asString();
 			}
 			else if (CountObject.isMember("Type"))
 			{
-				Type = NamespaceConverter(CountObject["Type"].asString());
+				Type = CountObject["Type"].asString();
 			}
 
-			if (Type == "Uniform")
+			if (NoCaseCompare(Type, "minecraft:uniform") == 0)
 			{
 				m_Type = eType::Uniform;
 				MinMaxRange<int>(CountObject, m_UniformMin, m_UniformMax);
 			}
-			else if (Type == "Binomial")
+			else if (NoCaseCompare(Type, "minecraft:binomial") == 0)
 			{
 				m_Type = eType::Binomial;
 				if (CountObject.isMember("n"))
@@ -3043,7 +3031,7 @@ namespace LootTable
 		{
 			if (NoCaseCompare(Key, "name") == 0)
 			{
-				m_LootTable = NamespaceConverter(a_Value[Key].asString());
+				m_LootTable = a_Value[Key].asString();
 			}
 			else if (NoCaseCompare(Key, "seed") == 0)
 			{
@@ -3099,16 +3087,16 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "entity") == 0)
 			{
-				AString Entity = NamespaceConverter(a_Value[Key].asString());
-				if (Entity == "This")
+				AString Entity = a_Value[Key].asString();
+				if (NoCaseCompare(Entity, "this") == 0)
 				{
 					m_Type = eType::This;
 				}
-				else if (Entity == "Killer")
+				else if (NoCaseCompare(Entity, "killer") == 0)
 				{
 					m_Type = eType::Killer;
 				}
-				else if (Entity == "KillerPlayer")
+				else if (NoCaseCompare(Entity, "killer_player") == 0)
 				{
 					m_Type = eType::KillerPlayer;
 				}
@@ -3173,16 +3161,16 @@ namespace LootTable
 			}
 			else if (NoCaseCompare(Key, "entity") == 0)
 			{
-				AString Entity = NamespaceConverter(a_Value[Key].asString());
-				if (Entity == "This")
+				AString Entity = a_Value[Key].asString();
+				if (NoCaseCompare(Entity, "this") == 0)
 				{
 					m_Type = eType::This;
 				}
-				else if (Entity == "Killer")
+				else if (NoCaseCompare(Entity, "killer") == 0)
 				{
 					m_Type = eType::Killer;
 				}
-				else if (Entity == "KillerPlayer")
+				else if (NoCaseCompare(Entity, "killer_player") == 0)
 				{
 					m_Type = eType::KillerPlayer;
 				}
@@ -3352,98 +3340,98 @@ namespace LootTable
 
 		if (a_Value.isMember("function"))
 		{
-			Function = NamespaceConverter(a_Value["function"].asString());
+			Function = NamespaceSerializer::SplitNamespacedID(a_Value["function"].asString()).second;
 		}
 		else if (a_Value.isMember("Function"))
 		{
-			Function = NamespaceConverter(a_Value["Function"].asString());
+			Function = NamespaceSerializer::SplitNamespacedID(a_Value["Function"].asString()).second;
 		}
 
-		if (NoCaseCompare(Function, "ApplyBonus") == 0)
+		if (NoCaseCompare(Function, "apply_bonus") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cApplyBonus(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "CopyName") == 0)
+		else if (NoCaseCompare(Function, "copy_name") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cCopyName(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "CopyNbt") == 0)
+		else if (NoCaseCompare(Function, "copy_nbt") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cCopyNbt(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "CopyState") == 0)
+		else if (NoCaseCompare(Function, "copy_state") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cCopyState(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "EnchantRandomly") == 0)
+		else if (NoCaseCompare(Function, "enchant_randomly") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cEnchantRandomly(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "EnchantWithLevels") == 0)
+		else if (NoCaseCompare(Function, "enchant_with_levels") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cEnchantWithLevels(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "ExplorationMap") == 0)
+		else if (NoCaseCompare(Function, "exploration_map") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cExplorationMap(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "ExplosionDecay") == 0)
+		else if (NoCaseCompare(Function, "explosion_decay") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cExplosionDecay(), Conditions);
 		}
-		else if (NoCaseCompare(Function, "FurnaceSmelt") == 0)
+		else if (NoCaseCompare(Function, "furnace_smelt") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cFurnaceSmelt(), Conditions);
 		}
-		else if (NoCaseCompare(Function, "FillPlayerHead") == 0)
+		else if (NoCaseCompare(Function, "fill_player_head") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cFillPlayerHead(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "LimitCount") == 0)
+		else if (NoCaseCompare(Function, "limit_count") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cLimitCount(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "LootingEnchant") == 0)
+		else if (NoCaseCompare(Function, "looting_enchant") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cLootingEnchant(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetAttributes") == 0)
+		else if (NoCaseCompare(Function, "set_attributes") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetAttributes(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetContents") == 0)
+		else if (NoCaseCompare(Function, "set_contents") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetContents(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetCount") == 0)
+		else if (NoCaseCompare(Function, "set_count") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetCount(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetDamage") == 0)
+		else if (NoCaseCompare(Function, "set_damage") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetDamage(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetLootTable") == 0)
+		else if (NoCaseCompare(Function, "set_loot_table") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetLootTable(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetLore") == 0)
+		else if (NoCaseCompare(Function, "set_lore") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetLore(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetName") == 0)
+		else if (NoCaseCompare(Function, "set_name") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetName(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetNbt") == 0)
+		else if (NoCaseCompare(Function, "set_nbt") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetNbt(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "SetStewEffect") == 0)
+		else if (NoCaseCompare(Function, "set_stew_effect") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cSetStewEffect(a_Value), Conditions);
 		}
-		else if (NoCaseCompare(Function, "None") == 0)
+		else if (NoCaseCompare(Function, "none") == 0)
 		{
 			return cLootTableFunction(LootTable::Function::cNone(), Conditions);
 		}
@@ -3463,11 +3451,11 @@ namespace LootTable
 		// Type has to be known beforehand
 		if (a_Value.isMember("condition"))
 		{
-			Type = NamespaceConverter(a_Value["condition"].asString());
+			Type = NamespaceSerializer::SplitNamespacedID(a_Value["condition"].asString()).second;
 		}
 		else if (a_Value.isMember("Condition"))
 		{
-			Type = NamespaceConverter(a_Value["Condition"].asString());
+			Type = NamespaceSerializer::SplitNamespacedID(a_Value["Condition"].asString()).second;
 		}
 		else
 		{
@@ -3475,67 +3463,67 @@ namespace LootTable
 			return cLootTableCondition(Condition::cNone());
 		}
 
-		if (NoCaseCompare(Type, "Alternative") == 0)
+		if (NoCaseCompare(Type, "alternative") == 0)
 		{
 			return cLootTableCondition(Condition::cAlternative(a_Value));
 		}
-		else if (NoCaseCompare(Type, "BlockStateProperty") == 0)
+		else if (NoCaseCompare(Type, "block_state_property") == 0)
 		{
 			return cLootTableCondition(Condition::cBlockStateProperty(a_Value));
 		}
-		else if (NoCaseCompare(Type, "DamageSourceProperties") == 0)
+		else if (NoCaseCompare(Type, "damage_source_properties") == 0)
 		{
 			return cLootTableCondition(Condition::cDamageSourceProperties(a_Value));
 		}
-		else if (NoCaseCompare(Type, "EntityProperties") == 0)
+		else if (NoCaseCompare(Type, "entity_properties") == 0)
 		{
 			return cLootTableCondition(Condition::cEntityProperties(a_Value));
 		}
-		else if (NoCaseCompare(Type, "EntityScores") == 0)
+		else if (NoCaseCompare(Type, "entity_scores") == 0)
 		{
 			return cLootTableCondition(Condition::cEntityScores(a_Value));
 		}
-		else if (NoCaseCompare(Type, "Inverted") == 0)
+		else if (NoCaseCompare(Type, "inverted") == 0)
 		{
 			return cLootTableCondition(Condition::cInverted(a_Value));
 		}
-		else if (NoCaseCompare(Type, "KilledByPlayer") == 0)
+		else if (NoCaseCompare(Type, "killed_by_player") == 0)
 		{
 			return cLootTableCondition(Condition::cKilledByPlayer(a_Value));
 		}
-		else if (NoCaseCompare(Type, "LocationCheck") == 0)
+		else if (NoCaseCompare(Type, "location_check") == 0)
 		{
 			return cLootTableCondition(Condition::cLocationCheck(a_Value));
 		}
-		else if (NoCaseCompare(Type, "MatchTool") == 0)
+		else if (NoCaseCompare(Type, "match_tool") == 0)
 		{
 			return cLootTableCondition(Condition::cMatchTool(a_Value));
 		}
-		else if (NoCaseCompare(Type, "RandomChance") == 0)
+		else if (NoCaseCompare(Type, "random_chance") == 0)
 		{
 			return cLootTableCondition(Condition::cRandomChance(a_Value));
 		}
-		else if (NoCaseCompare(Type, "RandomChanceWithLooting") == 0)
+		else if (NoCaseCompare(Type, "random_chance_with_looting") == 0)
 		{
 			return cLootTableCondition(Condition::cRandomChanceWithLooting(a_Value));
 		}
-		else if (NoCaseCompare(Type, "Reference") == 0)
+		else if (NoCaseCompare(Type, "reference") == 0)
 		{
 			return cLootTableCondition(Condition::cReference(a_Value));
 		}
-		else if (NoCaseCompare(Type, "SurvivesExplosion") == 0)
+		else if (NoCaseCompare(Type, "survives_explosion") == 0)
 		{
 			return cLootTableCondition(Condition::cSurvivesExplosion());
 		}
-		else if (NoCaseCompare(Type, "TableBonus") == 0)
+		else if (NoCaseCompare(Type, "table_bonus") == 0)
 		{
 			return cLootTableCondition(Condition::cTableBonus(a_Value));
 		}
-		else if (NoCaseCompare(Type, "TimeCheck") == 0)
+		else if (NoCaseCompare(Type, "time_check") == 0)
 		{
 			return cLootTableCondition(Condition::cTimeCheck(a_Value));
 		}
-		else if (NoCaseCompare(Type, "WeatherCheck") == 0)
+		else if (NoCaseCompare(Type, "weather_check") == 0)
 		{
 			return cLootTableCondition(Condition::cWeatherCheck(a_Value));
 		}
@@ -3569,11 +3557,11 @@ namespace LootTable
 		// The type has to be known beforehand
 		if (a_Value.isMember("type"))
 		{
-			Type = ePoolEntryType(NamespaceConverter(a_Value["type"].asString()));
+			Type = ePoolEntryType(NamespaceSerializer::SplitNamespacedID(a_Value["type"].asString()).second);
 		}
 		else if (a_Value.isMember("Type"))
 		{
-			Type = ePoolEntryType(NamespaceConverter(a_Value["Type"].asString()));
+			Type = ePoolEntryType(NamespaceSerializer::SplitNamespacedID(a_Value["Type"].asString()).second);
 		}
 		else
 		{
@@ -3593,26 +3581,26 @@ namespace LootTable
 				{
 					case ePoolEntryType::Item:
 					{
-						if (!StringToItem(NamespaceConverter(a_Value[EntryParameter].asString()), Item))
+						if (!StringToItem(a_Value[EntryParameter].asString(), Item))
 						{
-							LOGWARNING("Loot table: Got Unknown Item: %s in Pool. Dropping entry!", NamespaceConverter(a_Value[EntryParameter].asString()));
+							LOGWARNING("Loot table: Got Unknown Item: %s in Pool. Dropping entry!", a_Value[EntryParameter].asString());
 							return cLootTablePoolEntry();
 						}
 						break;
 					}
 					case ePoolEntryType::Tag:
 					{
-						Tag = ItemTag::eItemTags(NamespaceConverter(a_Value[EntryParameter].asString()));
+						Tag = ItemTag::eItemTags(a_Value[EntryParameter].asString());
 						break;
 					}
 					case ePoolEntryType::LootTable:
 					{
-						Name = NamespaceConverter(a_Value[EntryParameter].asString());
+						Name = a_Value[EntryParameter].asString();
 						break;
 					}
 					case ePoolEntryType::Dynamic:
 					{
-						Name = NamespaceConverter(a_Value[EntryParameter].asString());
+						Name = a_Value[EntryParameter].asString();
 						if (NoCaseCompare(Name, "contents") == 0)
 						{
 							IsSelf = false;
@@ -3641,7 +3629,7 @@ namespace LootTable
 				{
 					if (!ConditionsObject[ConditionId].isObject())
 					{
-						LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+						LOGWARNING("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
 						continue;
 					}
 					Conditions.push_back(ParseCondition(ConditionsObject[ConditionId]));
@@ -3660,7 +3648,7 @@ namespace LootTable
 						{
 							if (!ChildrenObject[ChildrenObjectId].isObject())
 							{
-								LOG("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
+								LOGWARNING("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
 								continue;
 							}
 							Children.push_back(ParsePoolEntry(ChildrenObject[ChildrenObjectId]));

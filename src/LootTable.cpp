@@ -110,11 +110,11 @@ cItems cLootTable::GetItems(const cNoise & a_Noise, const Vector3i & a_Pos, cWor
 
 cItems cLootTable::GetItems(const LootTable::cLootTablePool & a_Pool, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, float a_ExplosionSize)
 {
+	auto Items = cItems();
 	if (!ConditionsApply(a_Pool.m_Conditions, a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource))
 	{
 		return Items;
 	}
-	auto Items = cItems();
 
 	int Luck = 0;
 	/*  TODO: Luck 16.09.2020 - 12xx12
@@ -385,7 +385,7 @@ bool cLootTable::ConditionsApply(const LootTable::cLootTableConditions & a_Condi
 
 bool cLootTable::ConditionApplies(const LootTable::cLootTableCondition & a_Condition, cWorld & a_World, const cNoise & a_Noise, const Vector3i a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource)
 {
-	return std::visit(LootTable::VISITCONDITION, a_Condition.m_Parameter);
+	return std::visit(VISITCONDITION, a_Condition.m_Parameter);
 }
 
 
@@ -399,7 +399,7 @@ void cLootTable::ApplyFunction(const LootTable::cLootTableFunction & a_Function,
 		return;
 	}
 
-	std::visit(LootTable::VISITFUNCTION, a_Function.m_Function);
+	std::visit(VISITFUNCTION, a_Function.m_Function);
 }
 
 

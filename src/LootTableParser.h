@@ -48,7 +48,7 @@ namespace LootTable
 
 	// Declaration of methods in the cpp
 	/** Gets the ePoolEntryType from String. Defaults to Empty */
-	enum ePoolEntryType ePoolEntryType(const AString & a_Type);
+	enum ePoolEntryType ePoolEntryType(std::string_view a_Type);
 	/** Reads keys min and max and writes them into a_Min and a_Max
 	if there are no appropriately named keys there is no change */
 	template <typename T>
@@ -402,7 +402,7 @@ namespace LootTable
 			cTableBonus(const Json::Value & a_Value);
 			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
 		private:
-			int m_Enchantment;
+			cEnchantments::eEnchantment m_Enchantment;
 			std::unordered_map<int, float> m_Chances;
 		};
 
