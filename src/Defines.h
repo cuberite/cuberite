@@ -27,6 +27,24 @@ constexpr inline const int TPS = 20;
 
 
 
+/**
+You can use this struct to use in std::visit
+example:
+std::visit(
+	OverloadedVariantAccess
+	{
+		[&] (const cFirstType  & a_FirstTypeObject)  {  // Your code to handle cFirstType },
+		[&] (const cSecondType & a_SecondTypeObject) {  // YourCode to handle cSecondType },
+		...
+	}
+, YourVariant);
+*/
+template<class... Ts> struct OverloadedVariantAccess : Ts... { using Ts::operator()...; };
+template<class... Ts> OverloadedVariantAccess(Ts...) -> OverloadedVariantAccess<Ts...>;
+
+
+
+
 // tolua_begin
 
 /** Experience Orb setup */
