@@ -81,7 +81,7 @@ namespace ItemTag
 	};
 
 	/** Obtains the eItemTags type from string */
-	enum eItemTags eItemTags(const AString &a_String);
+	enum eItemTags eItemTags(std::string_view a_String);
 
 // NOTE: Some of the Items are contained in multiple tags. Those are defined in the following macros
 
