@@ -12,12 +12,14 @@
 
 
 
+
+
 namespace Explodinator
 {
 	const auto StepUnit = 0.3f;
 	const auto KnockbackFactor = 25U;
 	const auto StepAttenuation = 0.225f;
-	const auto GridPointSpacing = 0.133333333333333333f;  // = 2 / 15: 16 rays per cube length
+	const auto TraceCubeSideLength = 16U;
 	const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
@@ -81,7 +83,7 @@ namespace Explodinator
 			// Percentage of rays unobstructed.
 			const auto Exposure = CalculateEntityExposure(a_Chunk, Entity, a_Position, SquareRadius);
 			const auto Direction = Entity.GetPosition() - a_Position;
-			auto Impact = (1 - (static_cast<float>(Direction.Length()) / Radius)) * Exposure;
+			const auto Impact = (1 - (static_cast<float>(Direction.Length()) / Radius)) * Exposure;
 
 			// Don't apply damage to other TNT entities and falling blocks, they should be invincible:
 			if (!Entity.IsTNT() && !Entity.IsFallingBlock())
@@ -93,9 +95,13 @@ namespace Explodinator
 			// Impact reduced by armour, expensive call so only apply to Pawns:
 			if (Entity.IsPawn())
 			{
-				Impact *= 1 - Entity.GetEnchantmentBlastKnockbackReduction();
+				const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();
+				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
 			}
-			Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
+			else
+			{
+				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
+			}
 
 			// Continue iteration:
 			return false;
@@ -111,6 +117,7 @@ namespace Explodinator
 		{
 			return true;
 		}
+
 		switch (a_Block)
 		{
 			case E_BLOCK_DRAGON_EGG:
@@ -136,8 +143,8 @@ namespace Explodinator
 		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, a_ExplodingEntity);
 	}
 
-	/** Work out what should happen when explosion destroys the given block
-	lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
+	/** Work out what should happen when an explosion destroys the given block.
+	Tasks include lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
@@ -161,9 +168,7 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		/** If the block was not TNT, and we are a TNT explosion,
-		or it is a block that always drops, or if RandBool, then drop pickups */
-		else if ((a_ExplodingEntity->GetEntityType() == cEntity::etTNT) || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))
+		else if (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
@@ -197,13 +202,16 @@ namespace Explodinator
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Step, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
 
+		// The displacement that the ray in one iteration step should travel.
+		const auto Step = a_Direction.NormalizeCopy() * StepUnit;
+
 		// Loop until intensity runs out:
-		while (true)
+		while (a_Intensity > 0)
 		{
 			auto Position = Checkpoint.Floor();
 			if (!cChunkDef::IsValidHeight(Position.y))
@@ -232,48 +240,54 @@ namespace Explodinator
 			a_Chunk = Neighbour;
 
 			// Increment the simulation, weaken the ray:
-			Checkpoint += a_Step;
+			Checkpoint += Step;
 			a_Intensity -= StepAttenuation;
 		}
+	}
+
+	/** Returns a random intensity for an Explosion Lazor (tm) as a function of the explosion's power. */
+	static float RandomIntensity(MTRand & a_Random, const unsigned a_Power)
+	{
+		return a_Power * (0.7f + a_Random.RandReal(0.6f));
 	}
 
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
 	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
-
 		// Oh boy... Better hope you have a hot cache, 'cos this little manoeuvre's gonna cost us 1352 raytraces in one tick...
+		const int HalfSide = TraceCubeSideLength / 2;
+		auto & Random = GetRandomProvider();
 
 		// The following loops implement the tracing algorithm described in http://minecraft.gamepedia.com/Explosion
 
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
-		// Careful to avoid duplicates along edges
-		// Top and bottom sides:
-		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
+		// for the top and bottom sides:
+		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (float OffsetZ = -1; OffsetZ < 1; OffsetZ+=GridPointSpacing)
+			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, 1, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
 		// Left and right sides, avoid duplicates at top and bottom edges:
-		for (float OffsetX = -1; OffsetX < 1; OffsetX+=GridPointSpacing)
+		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
+			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, 1).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
 		// Front and back sides, avoid all edges:
-		for (float OffsetZ = -1+GridPointSpacing; OffsetZ < 1-GridPointSpacing; OffsetZ+=GridPointSpacing)
+		for (int OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
 		{
-			for (float OffsetY = -1+GridPointSpacing; OffsetY < 1-GridPointSpacing; OffsetY+=GridPointSpacing)
+			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(1, OffsetY, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ).NormalizeCopy()*StepUnit, a_Power, a_Fiery, a_Power * (0.7f + GetRandomProvider().RandReal(0.6f)), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(+1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 	}
