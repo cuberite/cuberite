@@ -27,7 +27,7 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 			}
 			for (unsigned int PoolId = 0; PoolId < Pools.size(); PoolId++)
 			{
-				m_LootTablePools.emplace_back(std::move(LootTable::ParsePool(Pools[PoolId])));
+				m_LootTablePools.emplace_back(LootTable::ParsePool(Pools[PoolId]));
 			}
 		}
 		else if (NoCaseCompare(RootId, "functions") == 0)
@@ -45,7 +45,7 @@ cLootTable::cLootTable(const Json::Value & a_Description)
 					LOGWARNING("Loot table: Encountered a problem to while parsing loot table wide functions, dropping function!");
 					continue;
 				}
-				m_Functions.emplace_back(std::move(LootTable::ParseFunction(FunctionsObject[FunctionIndex])));
+				m_Functions.emplace_back(LootTable::ParseFunction(FunctionsObject[FunctionIndex]));
 			}
 		}
 	}

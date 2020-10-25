@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "WSSAnvil.h"
+#include "NamespaceSerializer.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
 #include "zlib/zlib.h"
