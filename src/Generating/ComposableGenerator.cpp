@@ -460,7 +460,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				"94|5|false; 97|5|false; 100|5|false; "
 				"103|6|false");
 			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
-			m_FinishGens.push_back(cFinishGenPtr(new cEnderDragonFightStructuresGen(m_Seed, Pillars, Radius)));
+			// The init method is called manually because the linker can't access the cChunkDef::Width in the constructor
+			auto Gen = new cEnderDragonFightStructuresGen(m_Seed);
+			Gen->Init(Pillars, Radius);
+			m_FinishGens.push_back(cFinishGenPtr(Gen));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{

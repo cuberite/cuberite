@@ -58,10 +58,9 @@ const std::array<Vector3i, 26> cEnderDragonFightStructuresGen::m_CageAir =
 
 
 
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius) :
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 		m_Noise(a_Seed)
 {
-	Init(a_TowerProperties, a_Radius);
 }
 
 
