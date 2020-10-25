@@ -3,6 +3,8 @@
 
 /*
 https://minecraft.gamepedia.com/End_spike
+https://minecraft.gamepedia.com/End_Crystal
+https://minecraft.gamepedia.com/Ender_Dragon
 */
 
 #include "FinishGen.h"
@@ -11,7 +13,7 @@ class cEnderDragonFightStructuresGen :
 	public cFinishGen
 {
 public:
-	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius, int a_ChunkWidth);
+	cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius);
 
 protected:
 	struct sTowerProperties
@@ -30,6 +32,7 @@ protected:
 
 	int m_MinX = -1, m_MaxX = 1, m_MinZ = -1, m_MaxZ = 1;
 
+	void Init(const AString & a_TowerProperties, int a_Radius);
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
 	void PlaceTower(cChunkDesc & a_ChunkDesc, const sTowerProperties & a_TowerProperties);
 };

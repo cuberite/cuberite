@@ -58,8 +58,17 @@ const std::array<Vector3i, 26> cEnderDragonFightStructuresGen::m_CageAir =
 
 
 
-cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString &a_TowerProperties, int a_Radius, int a_ChunkWidth) :
-	m_Noise(a_Seed)
+cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const AString & a_TowerProperties, int a_Radius) :
+		m_Noise(a_Seed)
+{
+	Init(a_TowerProperties, a_Radius);
+}
+
+
+
+
+
+void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int a_Radius)
 {
 	// Loads the fountain schematic
 	if (!cSchematicFileSerializer::LoadFromSchematicFile(
@@ -78,7 +87,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 			LOGWARNING("Got unknown parameters on generating obsidian pillars: %s, Please use \"Height|Radius|HasCage\"; ...", TowerProperty);
 			continue;
 		}
-		int Height = std::stoi(TowerPropertyVector[0]);
+		int Height = std::min(std::stoi(TowerPropertyVector[0]), cChunkDef::Height - 2);  // The highest block placed is two blocks above the given height (the cage above some towers)
 		int Radius = std::stoi(TowerPropertyVector[1]);
 		bool HasCage;
 		if (NoCaseCompare(TowerPropertyVector[2], "true") == 0)
@@ -97,9 +106,9 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 		TowerProperties.push_back({Vector3d(), Height, Radius, HasCage});
 	}
 	// A random angle in radian
-	double Angle = m_Noise.IntNoise1D(a_Seed) * M_PI + M_PI;
+	double Angle = m_Noise.IntNoise1D(m_Noise.GetSeed()) * M_PI + M_PI;
 	// Shuffles the order of the towers
-	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(static_cast<size_t>(a_Seed)));
+	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(static_cast<size_t>(m_Noise.GetSeed())));
 	// Generate Positions in a circle
 	for (size_t I = 0; I < TowerProperties.size(); I++)
 	{
@@ -107,9 +116,9 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed, const
 		TowerProperties[I].m_Pos = TowerPos;
 
 		// Check all crossed chunks
-		for (int X = -TowerProperties[I].m_Radius - a_ChunkWidth; X <= TowerProperties[I].m_Radius + a_ChunkWidth; X+=std::min(TowerProperties[I].m_Radius, a_ChunkWidth))
+		for (int X = -TowerProperties[I].m_Radius - cChunkDef::Width; X <= TowerProperties[I].m_Radius + cChunkDef::Width; X+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
 		{
-			for (int Z = -TowerProperties[I].m_Radius - a_ChunkWidth; Z <= TowerProperties[I].m_Radius + a_ChunkWidth; Z+=std::min(TowerProperties[I].m_Radius, a_ChunkWidth))
+			for (int Z = -TowerProperties[I].m_Radius - cChunkDef::Width; Z <= TowerProperties[I].m_Radius + cChunkDef::Width; Z+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
 			{
 				auto Chunk = cChunkDef::BlockToChunk({TowerPos.x + X, 0, TowerPos.z + Z});
 				// Update limits
@@ -153,9 +162,11 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 	// Places the exit portal
 	if (Coords == cChunkCoords({0, 0}))
 	{
+		/*
 		auto EnderDragon = std::make_unique<cEnderDragon>();
 		EnderDragon->SetPosition({0.0, static_cast<double>(a_ChunkDesc.GetHeight(0, 0) + 20), 0.0});  // Spawns the dragon 20 blocks above the terrain at (0, 0)
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
+		*/  // Todo: 25.10.20 - Add the ender dragon spawning when the dragon behaves properly - 12xx12
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
 			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
 			62,
