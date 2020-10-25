@@ -102,13 +102,13 @@ public:
 	fertilization success is reported even in the case when the chance fails (bonemeal still needs to be consumed). */
 	static bool FertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
 	{
-		BLOCKTYPE blockType;
-		NIBBLETYPE blockMeta;
-		if (!a_World.GetBlockTypeMeta(a_BlockPos, blockType, blockMeta))
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		if (!a_World.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta))
 		{
 			return false;
 		}
-		switch (blockType)
+		switch (BlockType)
 		{
 			case E_BLOCK_WHEAT:
 			case E_BLOCK_CARROTS:
@@ -116,14 +116,14 @@ public:
 			case E_BLOCK_MELON_STEM:
 			case E_BLOCK_PUMPKIN_STEM:
 			{
-				// Grow by 2 - 5 stages:
-				auto numStages = GetRandomProvider().RandInt(2, 5);
-				// No longer create a melon / pumpkin block when right-clicking on a grown melon / pumpkin seed
+				// Don't fertilize when already fully grown
 				if (a_World.IsFullGrownPlantAt(a_BlockPos))
 				{
 					return false;
 				}
-				if (a_World.GrowPlantAt(a_BlockPos, numStages) <= 0)
+				// Grow by 2 - 5 stages:
+				auto NumStages = GetRandomProvider().RandInt(2, 5);
+				if (a_World.GrowPlantAt(a_BlockPos, NumStages) <= 0)
 				{
 					return false;
 				}
@@ -133,7 +133,7 @@ public:
 
 			case E_BLOCK_BEETROOTS:
 			{
-				// Fix #4805
+				// Don't fertilize when already fully grown
 				if (a_World.IsFullGrownPlantAt(a_BlockPos))
 				{
 					return false;
@@ -165,16 +165,16 @@ public:
 			case E_BLOCK_BIG_FLOWER:
 			{
 				// Drop the corresponding flower item without destroying the block:
-				cItems pickups;
-				switch (blockMeta)
+				cItems Pickups;
+				switch (BlockMeta)
 				{
-					case E_META_BIG_FLOWER_SUNFLOWER: pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_SUNFLOWER); break;
-					case E_META_BIG_FLOWER_LILAC:     pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_LILAC);     break;
-					case E_META_BIG_FLOWER_ROSE_BUSH: pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_ROSE_BUSH); break;
-					case E_META_BIG_FLOWER_PEONY:     pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_PEONY);     break;
+					case E_META_BIG_FLOWER_SUNFLOWER: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_SUNFLOWER); break;
+					case E_META_BIG_FLOWER_LILAC:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_LILAC);     break;
+					case E_META_BIG_FLOWER_ROSE_BUSH: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_ROSE_BUSH); break;
+					case E_META_BIG_FLOWER_PEONY:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_PEONY);     break;
 				}
 				// TODO: Should we call any hook for this?
-				a_World.SpawnItemPickups(pickups, a_BlockPos);
+				a_World.SpawnItemPickups(Pickups, a_BlockPos);
 				return true;
 			}  // big flower
 

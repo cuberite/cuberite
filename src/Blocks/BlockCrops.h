@@ -52,43 +52,37 @@ private:
 		}
 
 		// Fully grown, drop the crop's produce:
-		cItems res;
-		// Get current fortune level
-		int fortune = 0;
-		if (a_Tool)
-		{
-			fortune = a_Tool->m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchFortune);
-		}
+		cItems Res;
 
 		switch (m_BlockType)
 		{
 			case E_BLOCK_BEETROOTS:
 			{
 				const auto SeedCount = CalculateSeedCount(0, 3, ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
-				res.Add(E_ITEM_BEETROOT);
+				Res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
+				Res.Add(E_ITEM_BEETROOT);
 				break;
 			}
 			case E_BLOCK_CROPS:
 			{
 				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
-				res.Add(E_ITEM_WHEAT);
+				Res.Add(E_ITEM_WHEAT);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_SEEDS, SeedCount);
+				Res.Add(E_ITEM_SEEDS, SeedCount);
 				break;
 			}
 			case E_BLOCK_CARROTS:
 			{
 				// https://minecraft.gamepedia.com/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_CARROT, CarrotCount);
+				Res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
 				// https://minecraft.gamepedia.com/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
-				res.Add(E_ITEM_POTATO, PotatoCount);
+				Res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
 					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
@@ -103,7 +97,7 @@ private:
 				break;
 			}
 		}  // switch (m_BlockType)
-		return res;
+		return Res;
 	}
 
 
@@ -112,16 +106,16 @@ private:
 
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
-		if (oldMeta >= RipeMeta)
+		auto OldMeta = a_Chunk.GetMeta(a_RelPos);
+		if (OldMeta >= RipeMeta)
 		{
 			// Already ripe
 			return 0;
 		}
-		auto newMeta = std::min<int>(oldMeta + a_NumStages, RipeMeta);
-		ASSERT(newMeta > oldMeta);
-		a_Chunk.GetWorld()->SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), m_BlockType, static_cast<NIBBLETYPE>(newMeta));
-		return newMeta - oldMeta;
+		auto NewMeta = std::min<int>(OldMeta + a_NumStages, RipeMeta);
+		ASSERT(NewMeta > OldMeta);
+		a_Chunk.GetWorld()->SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), m_BlockType, static_cast<NIBBLETYPE>(NewMeta));
+		return NewMeta - OldMeta;
 	}
 
 
