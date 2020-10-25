@@ -19,8 +19,6 @@ class cEnderChestEntity :
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cEnderChestEntity)
-
 	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 	virtual ~cEnderChestEntity() override;
 
@@ -34,7 +32,3 @@ public:  // tolua_export
 	/** Opens a new enderchest window for this enderchest */
 	void OpenNewWindow(void);
 } ;  // tolua_export
-
-
-
-

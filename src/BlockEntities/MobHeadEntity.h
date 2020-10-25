@@ -27,8 +27,6 @@ class cMobHeadEntity :
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cMobHeadEntity)
-
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
 	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -85,7 +83,3 @@ private:
 	AString m_OwnerTexture;
 	AString m_OwnerTextureSignature;
 } ;  // tolua_export
-
-
-
-

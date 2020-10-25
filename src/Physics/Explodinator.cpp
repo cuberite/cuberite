@@ -92,17 +92,44 @@ namespace Explodinator
 				Entity.TakeDamage(dtExplosion, nullptr, FloorC(Damage), 0);
 			}
 
-			// Impact reduced by armour:
-			const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();  // TODO: call is very expensive, should only apply to Pawns
-			Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
+			// Impact reduced by armour, expensive call so only apply to Pawns:
+			if (Entity.IsPawn())
+			{
+				const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();
+				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
+			}
+			else
+			{
+				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
+			}
 
 			// Continue iteration:
 			return false;
 		});
 	}
 
+	/** Returns true if block should always drop when exploded.
+	Currently missing conduits from 1.13 */
+	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
+	{
+		// If it's a Shulker box
+		if (IsBlockShulkerBox(a_Block))
+		{
+			return true;
+		}
+
+		switch (a_Block)
+		{
+			case E_BLOCK_DRAGON_EGG:
+			case E_BLOCK_BEACON:
+			case E_BLOCK_HEAD: return true;
+		}
+
+		return false;
+	}
+
 	/** Sets the block at the given position, updating surroundings. */
-	static void DestroyBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
+	static void SetBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
 
@@ -116,7 +143,8 @@ namespace Explodinator
 		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, a_ExplodingEntity);
 	}
 
-	/** Sets the block at the given Position to air, updates surroundings, and spawns pickups, fire, shrapnel according to Minecraft rules.
+	/** Work out what should happen when an explosion destroys the given block.
+	Tasks include lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
@@ -131,7 +159,8 @@ namespace Explodinator
 		auto & World = *a_Chunk.GetWorld();
 		auto & Random = GetRandomProvider();
 		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
-		if (DestroyedBlock == E_BLOCK_TNT)
+
+		if (DestroyedBlock == E_BLOCK_TNT)  // If the block is TNT we should set it off
 		{
 			// Random fuse between 10 to 30 game ticks.
 			const int FuseTime = Random.RandInt(10, 30);
@@ -139,7 +168,7 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		else if (Random.RandBool(1.f / a_Power))
+		else if (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
@@ -150,11 +179,11 @@ namespace Explodinator
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
-				DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
+				SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
 				return;
 			}
 		}
-		else if (const auto Shrapnel = World.GetTNTShrapnelLevel(); (Shrapnel > slNone) && Random.RandBool(0))  // 20% chance of flinging stuff around
+		else if (const auto Shrapnel = World.GetTNTShrapnelLevel(); (Shrapnel > slNone) && Random.RandBool(0))  // Currently 0% chance of flinging stuff around
 		{
 			// If the block is shrapnel-able, make a falling block entity out of it:
 			if (
@@ -169,23 +198,20 @@ namespace Explodinator
 			}
 		}
 
-		DestroyBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
+		SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Destination, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
 
-		// The total displacement the ray must travel.
-		const auto TraceDisplacement = (a_Destination - a_Origin);
+		// The displacement that the ray in one iteration step should travel.
+		const auto Step = a_Direction.NormalizeCopy() * StepUnit;
 
-		// The displacement that they ray in one iteration step should travel.
-		const auto Step = TraceDisplacement.NormalizeCopy() * StepUnit;
-
-		// Loop until we've reached the prescribed destination:
-		while (TraceDisplacement > (Checkpoint - a_Origin))
+		// Loop until intensity runs out:
+		while (a_Intensity > 0)
 		{
 			auto Position = Checkpoint.Floor();
 			if (!cChunkDef::IsValidHeight(Position.y))
@@ -219,54 +245,49 @@ namespace Explodinator
 		}
 	}
 
+	/** Returns a random intensity for an Explosion Lazor (tm) as a function of the explosion's power. */
+	static float RandomIntensity(MTRand & a_Random, const unsigned a_Power)
+	{
+		return a_Power * (0.7f + a_Random.RandReal(0.6f));
+	}
+
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
 	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
-		const auto Intensity = a_Power * (0.7f + GetRandomProvider().RandReal(0.6f));
-		const auto ExplosionRadius = CeilC((Intensity / StepAttenuation) * StepUnit);
-
 		// Oh boy... Better hope you have a hot cache, 'cos this little manoeuvre's gonna cost us 1352 raytraces in one tick...
 		const int HalfSide = TraceCubeSideLength / 2;
+		auto & Random = GetRandomProvider();
 
 		// The following loops implement the tracing algorithm described in http://minecraft.gamepedia.com/Explosion
 
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
-		// in the YM and YP directions:
+		// for the top and bottom sides:
 		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
 			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, +ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(OffsetX, -ExplosionRadius, OffsetZ), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
-		/*
-		Trace rays from the centre to the sides of the explosion cube, being careful to avoid duplicates:
-
-		Top view:
-		______
-		.       | (dot to make style checker happy)
-		|       |
-		|       |
-		|  ______
-
-		Side view:
-		+        +
-		|======  |
-		|     |  |
-		|======  |
-		+        +
-
-		*/
-		for (int Offset = -HalfSide; Offset < HalfSide - 1; Offset++)
+		// Left and right sides, avoid duplicates at top and bottom edges:
+		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(ExplosionRadius, OffsetY, Offset + 1), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(-ExplosionRadius, OffsetY, Offset), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset, OffsetY, ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, a_Position + Vector3f(Offset + 1, OffsetY, -ExplosionRadius), a_Power, a_Fiery, Intensity, a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+			}
+		}
+
+		// Front and back sides, avoid all edges:
+		for (int OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
+		{
+			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			{
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(+1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 	}

@@ -1390,10 +1390,9 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	cLock Lock(*this);
-
 	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
-		// TODO: CanCauseFire gets reset to false for some reason
+		// TODO: CanCauseFire gets reset to false for some reason, (plugin has ability to change it, might be related)
 
 		const cEntity * Entity;
 		switch (a_Source)

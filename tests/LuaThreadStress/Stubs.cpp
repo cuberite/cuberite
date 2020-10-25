@@ -86,16 +86,9 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 
 
 
-cBlockInfo::cBlockInfo()
+bool cBlockInfo::IsSolid(BLOCKTYPE)
 {
-}
-
-
-
-
-
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
-{
+	return false;
 }
 
 

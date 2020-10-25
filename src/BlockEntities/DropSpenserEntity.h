@@ -42,8 +42,6 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
-
 	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 	virtual ~cDropSpenserEntity() override;
 
@@ -64,6 +62,7 @@ public:
 	// tolua_end
 
 protected:
+
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
 
 	/** Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects */
@@ -75,7 +74,3 @@ protected:
 	/** Helper function, drops one item from the specified slot (like a dropper) */
 	void DropFromSlot(cChunk & a_Chunk, int a_SlotNum);
 } ;  // tolua_export
-
-
-
-

@@ -5,27 +5,6 @@
 
 
 
-/** Place this macro in the declaration of each cBlockEntity descendant. */
-#define BLOCKENTITY_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override \
-	{ \
-		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || Super::IsA(a_ClassName))); \
-	} \
-	virtual const char * GetClass() const override \
-	{ \
-		return #classname; \
-	} \
-	static const char * GetClassStatic() \
-	{ \
-		return #classname; \
-	} \
-	virtual const char * GetParentClass() const override \
-	{ \
-		return Super::GetClass(); \
-	}
-
-
-
 
 
 class cChunk;
@@ -56,6 +35,7 @@ protected:
 	}
 
 public:
+
 	// tolua_end
 
 	virtual ~cBlockEntity() {}  // force a virtual destructor in all descendants
@@ -92,20 +72,6 @@ public:
 	Each non-abstract descendant should override to copy its specific properties, and call
 	Super::CopyFrom(a_Src) to copy the common ones. */
 	virtual void CopyFrom(const cBlockEntity & a_Src);
-
-	static const char * GetClassStatic()  // Needed for ManualBindings's ForEach templates
-	{
-		return "cBlockEntity";
-	}
-
-	/** Returns true if the object is the specified class, or its descendant. */
-	virtual bool IsA(const char * a_ClassName) const { return (strcmp(a_ClassName, "cBlockEntity") == 0); }
-
-	/** Returns the name of the topmost class (the most descendant). Used for Lua bindings to push the correct object type. */
-	virtual const char * GetClass() const { return GetClassStatic(); }
-
-	/** Returns the name of the parent class, or empty string if no parent class. */
-	virtual const char * GetParentClass() const { return ""; }
 
 	// tolua_begin
 
@@ -163,7 +129,3 @@ protected:
 
 	cWorld * m_World;
 } ;  // tolua_export
-
-
-
-
