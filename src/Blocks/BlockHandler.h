@@ -212,7 +212,7 @@ public:
 
 	/** Check if the plant at the specified position is full grown.
 	Returns true if plant is full grown or if not supported (default). */
-	virtual bool IsFullGrown(cChunk & a_Chunk, Vector3i a_RelPos) { return true; }
+	virtual bool IsFullGrown(cChunk & a_Chunk, Vector3i a_RelPos) const { return true; }
 
 	/** Returns true if the specified tool is valid and has a non-zero silk-touch enchantment.
 	Helper used in many ConvertToPickups() implementations. */

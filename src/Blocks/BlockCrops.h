@@ -165,7 +165,4 @@ private:
 		}
 		return SeedCount;
 	}
-} ;
-
-
-
+};

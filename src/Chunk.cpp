@@ -980,8 +980,7 @@ int cChunk::GrowPlantAt(Vector3i a_RelPos, int a_NumStages)
 
 bool cChunk::IsFullGrownPlantAt(Vector3i a_RelPos)
 {
-	auto blockHandler = BlockHandler(GetBlock(a_RelPos));
-	return blockHandler->IsFullGrown(*this, a_RelPos);
+	return cBlockHandler::For(GetBlock(a_RelPos)).IsFullGrown(*this, a_RelPos);
 }
 
 
