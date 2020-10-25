@@ -195,7 +195,7 @@ private:
 	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
 	/** The array describes how many seed may be dropped at which age. The outer arrays describe the probability to drop 0, 1, 2, 3 seeds.
 	The outer describes the age of the stem. */
-	static constexpr std::array<std::array<float, 4>, 8> m_AgeSeedDropProbability =
+	static constexpr std::array<std::array<double, 4>, 8> m_AgeSeedDropProbability =
 	{
 		{
 			{
