@@ -247,14 +247,23 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 	int NumBlocks = m_Noise.IntNoise2DInt(a_CenterX + ChunkX * 16, a_CenterZ + ChunkZ * 16) % (MAX_NUM_FOLIAGE - MIN_NUM_FOLIAGE) + MIN_NUM_FOLIAGE + 1;
 	for (int i = 1; i < NumBlocks; i++)
 	{
-		int rnd = m_Noise.IntNoise2DInt(ChunkX + ChunkZ + i, ChunkX - ChunkZ - i) / 59;
-		int x = a_CenterX + (((rnd % 256) % RANGE_FROM_CENTER * 2) - RANGE_FROM_CENTER);
-		int z = a_CenterZ + (((rnd / 256) % RANGE_FROM_CENTER * 2) - RANGE_FROM_CENTER);
+		int Rnd = m_Noise.IntNoise2DInt(ChunkX + ChunkZ + i, ChunkX - ChunkZ - i) / 59;
+		int x = a_CenterX + (((Rnd % 59) % RANGE_FROM_CENTER * 2) - RANGE_FROM_CENTER);
+		int z = a_CenterZ + (((Rnd / 97) % RANGE_FROM_CENTER * 2) - RANGE_FROM_CENTER);
 		int Top = a_ChunkDesc.GetHeight(x, z);
 
+		// Doesn't place if the blocks can't be placed. Checked value also depends on a_IsDoubleTall
+		if (!cChunkDef::IsValidHeight(Top + 1 + static_cast<int>(a_IsDoubleTall)))
+		{
+			continue;
+		}
+
 		auto GroundBlockType = a_ChunkDesc.GetBlockType(x, Top, z);
-		if ((GroundBlockType == E_BLOCK_GRASS) ||
-			((GroundBlockType == E_BLOCK_MYCELIUM) && ((a_BlockType == E_BLOCK_RED_MUSHROOM) || (a_BlockType == E_BLOCK_BROWN_MUSHROOM))))
+		if (
+			(GroundBlockType == E_BLOCK_GRASS) || (
+				(GroundBlockType == E_BLOCK_MYCELIUM) && ((a_BlockType == E_BLOCK_RED_MUSHROOM) || (a_BlockType == E_BLOCK_BROWN_MUSHROOM))
+			)
+		)
 		{
 			a_ChunkDesc.SetBlockTypeMeta(x, Top + 1, z, a_BlockType, a_BlockMeta);
 			if (a_IsDoubleTall)

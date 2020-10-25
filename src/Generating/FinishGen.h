@@ -132,7 +132,7 @@ protected:
 	/** The maximum number of foliage per clump */
 	const int MAX_NUM_FOLIAGE = 8;
 
-	/** The mininum number of foliage per clump */
+	/** The minimnum number of foliage per clump */
 	const int MIN_NUM_FOLIAGE = 4;
 
 	/** The maximum range a foliage can be placed from the center of the clump */
