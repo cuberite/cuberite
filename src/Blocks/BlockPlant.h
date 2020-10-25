@@ -9,53 +9,18 @@
 /** Base class for plants that use light values to decide whether to grow or not.
 On block update, the plant decides whether to grow, die or stay as-is, based on the CanGrow() overridable method result. */
 template <bool NeedsLightToGrow>
-class cBlockPlant:
+class cBlockPlant :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-
 public:
 
-	cBlockPlant(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
-
-
-
-
-
-	virtual void OnUpdate(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cBlockPluginInterface & a_PluginInterface,
-		cChunk & a_Chunk,
-		const Vector3i a_RelPos
-	) override
-	{
-		auto Action = CanGrow(a_Chunk, a_RelPos);
-		switch (Action)
-		{
-			case paGrowth:
-			{
-				Grow(a_Chunk, a_RelPos);
-				break;
-			}
-			case paDeath:
-			{
-				a_ChunkInterface.DigBlock(a_WorldInterface, a_Chunk.RelativeToAbsolute(a_RelPos));
-				break;
-			}
-			case paStay: break;  // do nothing
-		}
-	}
-
-
-
-
+	using Super::Super;
 
 protected:
+
+	~cBlockPlant() = default;
 
 	/** The action the plant can take on an update. */
 	enum PlantAction
@@ -65,16 +30,12 @@ protected:
 		paStay
 	};
 
-
-
-
-
 	/** Checks whether there is enough light for the plant to grow.
 	If the plant doesn't require light to grow, then it returns paGrowth.
 	If the plant requires light to grow and there is enough light, it returns paGrowth.
 	If the plant requires light to grow and there isn't enough light, it returns paStay.
 	If the plant requires light to grow and there is too little light, it returns paDeath. */
-	PlantAction HasEnoughLight(cChunk & a_Chunk, Vector3i a_RelPos)
+	static PlantAction HasEnoughLight(cChunk & a_Chunk, Vector3i a_RelPos)
 	{
 		// If the plant requires light to grow, check to see if there is enough light
 		// Otherwise, return true
@@ -117,7 +78,7 @@ protected:
 	paDeath is returned when there isn't enough light for the plant to survive.
 	Plants that don't require light will never have a paDeath returned
 	*/
-	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos)
+	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const
 	{
 		// Plant can grow if it has the required amount of light, and it passes a random chance based on surrounding blocks
 		auto action = HasEnoughLight(a_Chunk, a_RelPos);
@@ -134,7 +95,7 @@ protected:
 
 	/** Generates an int value between 4 and 25 based on surrounding blocks that affect how quickly the plant grows.
 	The higher the value, the less likely the plant is to grow */
-	virtual int GetGrowthChance(cChunk & a_Chunk, Vector3i a_RelPos)
+	virtual int GetGrowthChance(cChunk & a_Chunk, Vector3i a_RelPos) const
 	{
 		float Chance = 1.0f;
 		a_RelPos.y -= 1;
@@ -149,10 +110,8 @@ protected:
 				// If the chunk we are trying to get the block information from is loaded
 				if (a_Chunk.UnboundedRelGetBlock(a_RelPos + Vector3i(x, 0, z), Block, Meta))
 				{
-					cBlockHandler * Handler = BlockHandler(Block);
-
 					// If the block affects growth, add to the adjustment
-					if (Handler->CanSustainPlant(m_BlockType))
+					if (cBlockHandler::For(Block).CanSustainPlant(m_BlockType))
 					{
 						Adjustment = 1.0f;
 
@@ -174,5 +133,32 @@ protected:
 			}
 		}
 		return FloorC(24.0f / Chance) + 1;
+	}
+
+private:
+
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
+	{
+		auto Action = CanGrow(a_Chunk, a_RelPos);
+		switch (Action)
+		{
+			case paGrowth:
+			{
+				Grow(a_Chunk, a_RelPos);
+				break;
+			}
+			case paDeath:
+			{
+				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), E_BLOCK_AIR, 0);
+				break;
+			}
+			case paStay: break;  // do nothing
+		}
 	}
 };

@@ -38,8 +38,6 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cFurnaceEntity)
-
 	/** Constructor used for normal operation */
 	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -145,7 +143,7 @@ protected:
 	bool m_IsLoading;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	/** One item finished cooking */
 	void FinishOne();
@@ -175,7 +173,3 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 } ;  // tolua_export
-
-
-
-

@@ -299,8 +299,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	// Wash away the block there, if possible:
 	if (CanWashAway(BlockType))
 	{
-		cBlockHandler * Handler = BlockHandler(BlockType);
-		if (Handler->DoesDropOnUnsuitable())
+		if (cBlockHandler::For(BlockType).DoesDropOnUnsuitable())
 		{
 			m_World.DropBlockAsPickups(absPos, nullptr, nullptr);
 		}
@@ -309,7 +308,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	// Spread:
 	FLUID_FLOG("  Spreading to {0} with meta {1}", absPos, a_NewMeta);
 	a_NearChunk->SetBlock(relPos, m_FluidBlock, a_NewMeta);
-	m_World.GetSimulatorManager()->WakeUp(absPos, a_NearChunk);
+	m_World.GetSimulatorManager()->WakeUp(*a_NearChunk, relPos);
 
 	HardenBlock(a_NearChunk, relPos, m_FluidBlock, a_NewMeta);
 }

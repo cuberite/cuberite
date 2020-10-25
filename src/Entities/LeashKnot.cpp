@@ -85,7 +85,6 @@ void cLeashKnot::KilledBy(TakeDamageInfo & a_TDI)
 	Super::KilledBy(a_TDI);
 	m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosition(), 1, 1);
 	Destroy();
-	return;
 }
 
 

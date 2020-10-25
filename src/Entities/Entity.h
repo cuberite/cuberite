@@ -241,6 +241,7 @@ public:
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
+	// Get the Entity's axis aligned bounding box, with absolute (world-relative) coordinates.
 	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
 
 	void SetHeadYaw (double a_HeadYaw);
@@ -339,9 +340,6 @@ public:
 	/** Returns the last position we sent to all the clients. Use this to
 	initialize clients with our position. */
 	Vector3d GetLastSentPosition(void) const { return m_LastSentPosition; }
-
-	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
-	void DestroyNoScheduling(bool a_ShouldBroadcast);
 
 	/** Makes this entity take damage specified in the a_TDI.
 	The TDI is sent through plugins first, then applied.

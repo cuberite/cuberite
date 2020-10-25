@@ -1,29 +1,23 @@
 
 #pragma once
 
-#include "BlockEntity.h"
 #include "Mixins.h"
 
 
 
 
-class cBlockEnderchestHandler :
-	public cYawRotator<cBlockEntityHandler>
+class cBlockEnderchestHandler final :
+	public cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
-	using Super = cYawRotator<cBlockEntityHandler>;
+	using Super = cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
 public:
 
-	cBlockEnderchestHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drop something when mined with a pickaxe:
 		if (
@@ -34,13 +28,12 @@ public:
 			// Only drop self when mined with a silk-touch pickaxe:
 			if (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0)
 			{
-				return cItem(E_BLOCK_ENDER_CHEST, 1, 0);
+				return cItem(E_BLOCK_ENDER_CHEST);
 			}
-			else
-			{
-				return cItem(E_BLOCK_OBSIDIAN, 8, 0);
-			}
+
+			return cItem(E_BLOCK_OBSIDIAN, 8);
 		}
+
 		return {};
 	}
 

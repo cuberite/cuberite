@@ -17,6 +17,7 @@
 #include "ChunkSender.h"
 #include "EffectID.h"
 #include "Protocol/ForgeHandshake.h"
+#include "Protocol/ProtocolRecognizer.h"
 #include "UUID.h"
 
 
@@ -107,7 +108,10 @@ public:  // tolua_export
 	/** Formats the type of message with the proper color and prefix for sending to the client. */
 	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 
-	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+	static AString FormatChatPrefix(
+		bool ShouldAppendChatPrefixes, const AString & a_ChatPrefixS,
+		const AString & m_Color1, const AString & m_Color2
+	);
 
 	void Kick(const AString & a_Reason);  // tolua_export
 
@@ -153,7 +157,7 @@ public:  // tolua_export
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
+	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, const std::string_view a_ChunkData);
 	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
@@ -171,7 +175,7 @@ public:  // tolua_export
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendExplosion                  (const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion);
+	void SendExplosion                  (Vector3f a_Position, float a_Power);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
 	void SendHeldItemChange             (int a_ItemIndex);
@@ -218,11 +222,18 @@ public:  // tolua_export
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Send a newly discovered recipe to show the notification and unlock in the recipe book */
+	void SendUnlockRecipe               (UInt32 a_RecipeId);
+
+	/** Send already known recipes without notification but visible in the recipe book */
+	void SendInitRecipes                (UInt32 a_RecipeId);
+
 	void SendWeather                    (eWeather a_Weather);
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;
@@ -368,6 +379,9 @@ public:  // tolua_export
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 
+	/** Called when a recipe from the recipe book is selected */
+	void HandleCraftRecipe      (UInt32 a_RecipeId);
+
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.
 	*/
@@ -424,7 +438,7 @@ private:
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
 
-	std::unique_ptr<cProtocol> m_Protocol;
+	cMultiVersionProtocol m_Protocol;
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
@@ -509,9 +523,6 @@ private:
 	it may just read m_State without locking m_CSState. */
 	std::atomic<eState> m_State;
 
-	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
-	bool m_ShouldCheckDownloaded;
-
 	/** Number of explosions sent this tick */
 	int m_NumExplosionsThisTick;
 
@@ -551,6 +562,8 @@ private:
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
 
+	/** The fraction between 0 and 1, of how far through mining the currently mined block is.
+	0 for just started, 1 for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
@@ -560,7 +573,7 @@ private:
 	bool CheckBlockInteractionsRate(void);
 
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
 	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);

@@ -9,23 +9,18 @@
 
 
 
-class cBlockBigFlowerHandler:
+class cBlockBigFlowerHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockBigFlowerHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		if (IsMetaTopPart(a_Meta))
 		{
@@ -52,7 +47,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		if (IsMetaTopPart(a_BlockMeta))
 		{
@@ -70,15 +65,23 @@ public:
 		auto flowerType = a_BlockMeta & 0x07;
 		if (flowerType == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 		{
-			if (GetRandomProvider().RandBool(1.0 / 24.0))
+
+			// Drop seeds, depending on bernoulli trial result:
+			if (GetRandomProvider().RandBool(0.875))
 			{
-				return cItem(E_ITEM_SEEDS);
+				// 87.5% chance of dropping nothing:
+				return {};
 			}
+
+			// 12.5% chance of dropping some seeds.
+			const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+			return cItem(E_ITEM_SEEDS, DropNum);
 		}
 		else if (flowerType != E_META_BIG_FLOWER_LARGE_FERN)
 		{
 			return cItem(m_BlockType, 1, static_cast<short>(flowerType));
 		}
+
 		return {};
 	}
 
@@ -86,7 +89,7 @@ public:
 
 
 
-	bool IsMetaTopPart(NIBBLETYPE a_Meta)
+	static bool IsMetaTopPart(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x08) != 0);
 	}
@@ -95,7 +98,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		if (a_RelPos.y <= 0)
 		{
@@ -112,8 +115,14 @@ public:
 
 
 
-	virtual void OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, const Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta) override
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		const Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override
 	{
+		UNUSED(a_Digger);
 		if ((a_OldBlockMeta & 0x8) != 0)
 		{
 			// Was upper part of flower
@@ -138,7 +147,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

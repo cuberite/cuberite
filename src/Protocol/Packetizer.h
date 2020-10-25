@@ -125,10 +125,18 @@ public:
 	}
 
 
-	/** Writes the specified block position as a single encoded 64-bit BigEndian integer. */
-	inline void WritePosition64(int a_BlockX, int a_BlockY, int a_BlockZ)
+	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
+	The three coordinates are written in XYZ order. */
+	inline void WriteXYZPosition64(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		VERIFY(m_Out.WritePosition64(a_BlockX, a_BlockY, a_BlockZ));
+		VERIFY(m_Out.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ));
+	}
+
+	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
+	The three coordinates are written in XZY order, in 1.14+. */
+	inline void WriteXZYPosition64(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		VERIFY(m_Out.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ));
 	}
 
 	/** Writes the specified angle using a single byte. */

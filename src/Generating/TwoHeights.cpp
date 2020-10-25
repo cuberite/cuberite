@@ -21,7 +21,7 @@ class cTwoHeights:
 
 public:
 
-	cTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen):
+	cTwoHeights(int a_Seed, const cBiomeGenPtr & a_BiomeGen):
 		m_Seed(a_Seed),
 		m_Choice(a_Seed),
 		m_HeightA(a_Seed + 1, a_BiomeGen),
@@ -113,7 +113,7 @@ protected:
 
 
 
-cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen)
+cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, const cBiomeGenPtr & a_BiomeGen)
 {
 	return std::make_shared<cTwoHeights>(a_Seed, a_BiomeGen);
 }

@@ -9,7 +9,7 @@
 
 #pragma once
 
-
+#include "BiomeDef.h"
 
 
 
@@ -624,27 +624,6 @@ public:
 	/** Called with the chunk's coords, and an optional operation status flag for operations that support it. */
 	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) = 0;
 } ;
-
-
-
-
-
-/** Provides storage for a set of chunk coords together with a callback.
-Used for chunk queues that notify about processed items. */
-class cChunkCoordsWithCallback
-{
-public:
-	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback):
-		m_ChunkX(a_ChunkX),
-		m_ChunkZ(a_ChunkZ),
-		m_Callback(a_Callback)
-	{
-	}
-
-	int m_ChunkX;
-	int m_ChunkZ;
-	cChunkCoordCallback * m_Callback;
-};
 
 
 

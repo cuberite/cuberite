@@ -160,17 +160,10 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 
 bool IsValidBlock(int a_BlockType)
 {
-	if (
-		(
-		(a_BlockType > -1) &&
-		(a_BlockType <= E_BLOCK_MAX_TYPE_ID)
-		) ||
+	return (
+		((a_BlockType > -1) && (a_BlockType <= E_BLOCK_MAX_TYPE_ID)) ||
 		(a_BlockType == 255)  // the blocks 253-254 don't exist yet -> https://minecraft.gamepedia.com/Data_values#Block_IDs
-	)
-	{
-		return true;
-	}
-	return false;
+	);
 }
 
 
@@ -282,6 +275,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtCactusContact:   return "dtCactusContact";
 		case dtDrowning:        return "dtDrowning";
 		case dtEnderPearl:      return "dtEnderPearl";
+		case dtEnvironment:     return "dtEnvironment";
 		case dtFalling:         return "dtFalling";
 		case dtFireContact:     return "dtFireContact";
 		case dtInVoid:          return "dtInVoid";
@@ -338,6 +332,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtPotionOfHarming, "dtPotionOfHarming"},
 		{ dtAdmin,           "dtAdmin"},
 		{ dtExplosion,       "dtExplosion"},
+		{ dtEnvironment,     "dtEnvironment"},
 
 		// Common synonyms:
 		{ dtAttack,        "dtPawnAttack"},

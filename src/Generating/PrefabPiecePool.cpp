@@ -398,7 +398,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 			);
 			return nullptr;
 		}
-		return cpp14::make_unique<cPrefab>(area);
+		return std::make_unique<cPrefab>(area);
 	}  // if (SchematicFileName)
 
 	// There's no referenced schematic file, load from BlockDefinitions / BlockData.
@@ -452,7 +452,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 		return nullptr;
 	}
 
-	return cpp14::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
+	return std::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
 }
 
 

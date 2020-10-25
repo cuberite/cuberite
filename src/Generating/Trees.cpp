@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Trees.h"
 #include "../BlockType.h"
+#include "../World.h"
 
 
 
@@ -58,7 +59,7 @@ static const Vector3d & pickBranchDirection(const cNoise a_Noise, Vector3i a_Blo
 		}
 	};
 
-	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos.x, a_BlockPos.y + a_Seq, a_BlockPos.z)) % directions.size();
+	size_t index = static_cast<size_t>(a_Noise.IntNoise3DInt(a_BlockPos * a_Seq)) % directions.size();
 	return directions[index];
 }
 
@@ -147,7 +148,49 @@ static const sCoords BigO5Jungle[] =
 	/*  6 */                                                   {0,  6}, {1,  6},
 } ;
 
+static const sCoords TopLargePine[] =
+{
+	/*  0 */ {0,  0}, {1,  0},
+	/*  1 */ {0,  1}, {1,  1},
+} ;
 
+static const sCoords BigOF2Pine[] =
+{
+	/* -1 */           {0, -1}, {1, -1},
+	/*  0 */ {-1,  0}, {0,  0}, {1,  0}, {2,  0},
+	/*  1 */ {-1,  1}, {0,  1}, {1,  1}, {2,  1},
+	/*  2 */           {0,  2}, {1,  2},
+} ;
+
+static const sCoords BigO2Pine[] =
+{
+	/* -2 */                     {0, -2}, {1, -2},
+	/* -1 */           {-1, -1}, {0, -1}, {1, -1}, {2, -1},
+	/*  0 */ {-2,  0}, {-1,  0},                   {2,  0}, {3,  0},
+	/*  1 */ {-2,  1}, {-1,  1},                   {2,  1}, {3,  1},
+	/*  2 */           {-1,  2}, {0,  2}, {1,  2}, {2,  2},
+	/*  3 */                     {0,  3}, {1,  3},
+} ;
+
+static const sCoords BigO3Pine[] =
+{
+	/* -3 */                               {0, -3}, {1, -3},
+	/* -2 */                     {-1, -2}, {0, -2}, {1, -2}, {2, -2},
+	/* -1 */           {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1},
+	/*  0 */ {-3,  0}, {-2,  0}, {-1,  0},                   {2,  0}, {3,  0}, {4,  0},
+	/*  1 */ {-3,  1}, {-2,  1}, {-1,  1},                   {2,  1}, {3,  1}, {4,  1},
+	/*  2 */           {-2,  2}, {-1,  2}, {0,  2}, {1,  2}, {2,  2}, {3,  2},
+	/*  3 */                     {-1,  3}, {0,  3}, {1,  3}, {2,  3},
+	/*  4 */                               {0,  4}, {1,  4},
+};
+
+static const sCoords BigO1Spruce[] =
+{
+	/* -1 */           {0, -1}, {1, -1},
+	/*  0 */ {-1,  0},                   {2,  0},
+	/*  1 */ {-1,  1},                   {2,  1},
+	/*  2 */           {0,  2}, {1,  2},
+} ;
 
 
 
@@ -171,6 +214,45 @@ static const sCoordsArr BigOJungleLayers[] =
 	{BigO4Jungle, ARRAYCOUNT(BigO4Jungle)},
 	{BigO3Jungle, ARRAYCOUNT(BigO3Jungle)},
 };
+
+static const sCoordsArr BigOPineLayers[] =
+{
+	{BigO3Pine, ARRAYCOUNT(BigO3Pine)},
+	{BigO2Pine, ARRAYCOUNT(BigO2Pine)},
+	{BigOF2Pine, ARRAYCOUNT(BigOF2Pine)},
+	{TopLargePine, ARRAYCOUNT(TopLargePine)},
+};
+
+static const sCoordsArr BigOSpruceLayersV1[] =
+{
+	{BigO1Spruce, ARRAYCOUNT(BigO1Spruce)},
+	{nullptr, 0},
+};
+
+static const sCoordsArr BigOSpruceLayersV2[] =
+{
+	{BigO2Pine, ARRAYCOUNT(BigO2Pine)},
+	{BigO1Spruce, ARRAYCOUNT(BigO1Spruce)},
+};
+
+static const sCoordsArr BigOSpruceLayersV3[] =
+{
+	{BigO3Pine, ARRAYCOUNT(BigO3Pine)},
+	{BigO2Pine, ARRAYCOUNT(BigO2Pine)},
+};
+
+static const sCoordsArr BigOSpruceLayersV4[] =
+{
+	{BigO4Jungle, ARRAYCOUNT(BigO4Jungle)},
+	{BigO3Pine, ARRAYCOUNT(BigO3Pine)},
+};
+
+static const sCoordsArr BigOSpruceTop[] =
+{
+	{BigO1Spruce, ARRAYCOUNT(BigO1Spruce)},
+	{TopLargePine, ARRAYCOUNT(TopLargePine)},
+};
+
 
 
 
@@ -262,7 +344,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biTaigaM:
 		{
 			// Conifers
-			GetConiferTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			GetConiferTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, false);
 			return;
 		}
 
@@ -310,14 +392,16 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biMegaTaiga:
 		case biMegaTaigaHills:
 		{
-			// TODO: implement trees 2x2 huge conifers (spruce and pine)
+			bool IsLarge = a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedY(32 * a_Seq)) < 0x30000000;
+			GetConiferTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, IsLarge);
 			return;
 		}
 
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		{
-			// TODO: implement trees 2x2 huge spruce
+			bool IsLarge = a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedY(32 * a_Seq)) < 0x30000000;
+			GetSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, IsLarge);
 			return;
 		}
 
@@ -615,7 +699,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
 
 	// Choose if we have to add another branch
-	bool TwoTop = (a_Noise.IntNoise3D(a_BlockPos) < 0 ? true : false);
+	bool TwoTop = (a_Noise.IntNoise3D(a_BlockPos) < 0);
 	if (!TwoTop)
 	{
 		return;
@@ -748,16 +832,16 @@ void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 
 
-void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
-	// Half chance for a spruce, half for a pine:
-	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq).addedZ(32 * a_Seq)) < 0x40000000)
+	// Half chance for a spruce, half for a pine and for the large ones 3 chances for a pine and one for spruce:
+	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq).addedZ(32 * a_Seq)) < (a_Large ? 0x20000000 : 0x40000000))
 	{
-		GetSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+		GetSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, a_Large);
 	}
 	else
 	{
-		GetPineTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+		GetPineTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks, a_Large);
 	}
 }
 
@@ -765,7 +849,41 @@ void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 
 
 
-void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+{
+	if (a_Large)
+	{
+		GetLargeSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+	}
+	else
+	{
+		GetSmallSpruceTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+	}
+
+}
+
+
+
+
+
+void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+{
+	if (a_Large)
+	{
+		GetLargePineTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+	}
+	else
+	{
+		GetSmallPineTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+	}
+
+}
+
+
+
+
+
+void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Spruces have a top section with layer sizes of (0, 1, 0) or only (1, 0),
 	// then 1 - 3 sections of ascending sizes (1, 2) [most often], (1, 3) or (1, 2, 3)
@@ -862,7 +980,112 @@ void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 
 
 
-void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+static void LargeSpruceAddRing(Vector3i a_BlockPos, int & a_Height, const sCoordsArr* const a_Ring, size_t a_RingCount, sSetBlockVector & a_OtherBlocks)
+{
+	for (size_t i = 0; i < a_RingCount ; i++)
+	{
+		PushCoordBlocks(a_BlockPos.x, a_Height--, a_BlockPos.z, a_OtherBlocks, a_Ring[a_RingCount - 1 - i].Coords, a_Ring[a_RingCount - 1 - i].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
+	}
+}
+
+
+
+
+
+const int MIN_LARGE_SPRUCE_TREE_RINGS = 3;
+const int MAX_LARGE_SPRUCE_TREE_RINGS = 11;
+void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
+	int LeavesRingCount =
+		MIN_LARGE_SPRUCE_TREE_RINGS +
+		(a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 13) % (1 + MAX_LARGE_SPRUCE_TREE_RINGS - MIN_LARGE_SPRUCE_TREE_RINGS);
+
+	int RingRadius = 0;
+
+	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
+	a_OtherBlocks.reserve(ARRAYCOUNT(BigO1Spruce) + ARRAYCOUNT(TopLargePine) +
+		MAX_LARGE_SPRUCE_TREE_RINGS * (ARRAYCOUNT(BigO4Jungle) + ARRAYCOUNT(BigO3Pine) + ARRAYCOUNT(BigO2Pine)));
+
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER));
+	}
+	int hei = a_BlockPos.y + Height - 1;
+
+	// Prevent floating trees by placing dirt under them
+	for (int i = 1; i < 5; i++)
+	{
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+	}
+
+	// Place the top.
+	for (size_t i = 0; i < ARRAYCOUNT(BigOSpruceTop); i++)
+	{
+		PushCoordBlocks(a_BlockPos.x, hei++, a_BlockPos.z, a_OtherBlocks, BigOSpruceTop[i].Coords, BigOSpruceTop[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
+	}
+
+	hei = a_BlockPos.y + Height - 2;
+
+	for (int i = 0; i < LeavesRingCount; i++)
+	{
+		unsigned int Val = (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * i)) / 23) % 8;
+		if ((Val < 4) && RingRadius < 3)
+		{
+			RingRadius++;
+		}
+		else if ((Val == 7) && (RingRadius > 0))
+		{
+			RingRadius--;
+		}
+
+		switch (RingRadius)
+		{
+			case 0:
+			{
+				LargeSpruceAddRing(a_BlockPos, hei, BigOSpruceLayersV1, ARRAYCOUNT(BigOSpruceLayersV1), a_OtherBlocks);
+				break;
+			}
+			case 1:
+			{
+				LargeSpruceAddRing(a_BlockPos, hei, BigOSpruceLayersV2, ARRAYCOUNT(BigOSpruceLayersV2), a_OtherBlocks);
+				break;
+			}
+			case 2:
+			{
+				LargeSpruceAddRing(a_BlockPos, hei, BigOSpruceLayersV3, ARRAYCOUNT(BigOSpruceLayersV3), a_OtherBlocks);
+				break;
+			}
+			case 3:
+			{
+				LargeSpruceAddRing(a_BlockPos, hei, BigOSpruceLayersV4, ARRAYCOUNT(BigOSpruceLayersV4), a_OtherBlocks);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		if (hei - a_BlockPos.y <= 2)
+		{
+			break;
+		}
+
+	}
+}
+
+
+
+
+
+void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Tall, little leaves on top. The top leaves are arranged in a shape of two cones joined by their bases.
 	// There can be one or two layers representing the cone bases (SameSizeMax)
@@ -908,6 +1131,42 @@ void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBloc
 		ASSERT(static_cast<size_t>(LayerSize) < ARRAYCOUNT(BigOLayers));
 		PushCoordBlocks(a_BlockPos.x, h, a_BlockPos.z, a_OtherBlocks, BigOLayers[LayerSize].Coords, BigOLayers[LayerSize].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		h--;
+	}
+}
+
+
+
+
+
+void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
+
+	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
+	a_OtherBlocks.reserve(ARRAYCOUNT(BigO3Pine) + ARRAYCOUNT(BigO2Pine) + ARRAYCOUNT(BigOF2Pine) + ARRAYCOUNT(TopLargePine));
+
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER));
+	}
+	int hei = a_BlockPos.y + Height - 2;
+
+	// Prevent floating trees by placing dirt under them
+	for (int i = 1; i < 5; i++)
+	{
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+	}
+
+	// Place the canopy.
+	for (size_t i = 0; i < ARRAYCOUNT(BigOPineLayers); i++)
+	{
+		PushCoordBlocks(a_BlockPos.x, hei++, a_BlockPos.z, a_OtherBlocks, BigOPineLayers[i].Coords, BigOPineLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 	}
 }
 
@@ -1008,11 +1267,12 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		{2,  1, 2}, {2,  0, 2},  // East face
 	};
 
-	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
+	int Height = 10 + ((a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 20);  // 10 < Height < 29
 
 	a_LogBlocks.reserve(static_cast<size_t>(Height) * 4);
 	a_OtherBlocks.reserve(2 * ARRAYCOUNT(BigO5Jungle) + ARRAYCOUNT(BigO4Jungle) + ARRAYCOUNT(BigO3Jungle) + static_cast<size_t>(Height) * 4 + 50);
 
+	// Generates the main trunk
 	for (int i = 0; i < Height; i++)
 	{
 		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_JUNGLE));
@@ -1030,7 +1290,6 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedXZ(VinesTrunk[j].x, VinesTrunk[j].z).addedY(i), E_BLOCK_VINES, VinesTrunk[j].Meta));
 		}
 	}
-	int hei = a_BlockPos.y + Height - 2;
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
@@ -1041,26 +1300,41 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
 	}
 
-	int numBranches = (a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 11) % 3 + 1;
-	int branchStartHeight = 8 + Height % 11;
-	int branchInterval = (Height - branchStartHeight) / numBranches;
-	for (int i = branchStartHeight; i < (Height - 6); i += branchInterval)
+	int NumBranches = std::max(
+		(a_Noise.IntNoise2DInt(a_BlockPos.x * a_Seq, a_BlockPos.z * a_Seq) / 10) % 4,  // The Original Calculation
+		FloorC(Height / 10.0f)                                                         // Just to assure that no massive trees spawn with just one branch
+		);
+	int BranchStartHeight = 6 + Height % 5;                                            // 6 < BranchStartHeight < 10
+	int BranchInterval = (Height - 6 - BranchStartHeight) / NumBranches;
+	for (int i = BranchStartHeight; i < (Height - 6); i += BranchInterval)             // Stop 6 blocks before reaching the top
 	{
 		// Get a direction for the trunk to go to.
 		Vector3d BranchStartDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i), a_Seq);
 		Vector3d BranchDirection = pickBranchDirection(a_Noise, a_BlockPos.addedY(i * a_Seq), a_Seq) / 3;
-
 		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockPos * a_Seq) % 2;
 		Vector3i BranchEndPosition = GetTreeBranch(E_BLOCK_LOG, E_META_LOG_JUNGLE, a_BlockPos.addedY(i), BranchLength, BranchStartDirection, BranchDirection, a_LogBlocks).Floor();
-		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-		PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-		a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+
+		// There's a chance that there is a third leaf level on a branch
+		if ((a_Noise.IntNoise3DInt(a_BlockPos.x * a_Seq, a_BlockPos.y * a_Seq, a_BlockPos.z * a_Seq) % 4) == 0)  // A quarter chance
+		{
+			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 2, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+			a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 2, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+		}
+		else
+		{
+			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+			a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+		}
 	}
 
 	// Place the canopy.
+	int CanopyHeight = a_BlockPos.y + Height - 2;
 	for (size_t i = 0; i < ARRAYCOUNT(BigOJungleLayers); i++)
 	{
-		PushCoordBlocks(a_BlockPos.x, hei++, a_BlockPos.z, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		PushCoordBlocks(a_BlockPos.x, CanopyHeight++, a_BlockPos.z, a_OtherBlocks, BigOJungleLayers[i].Coords, BigOJungleLayers[i].Count, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 	}
 }
 

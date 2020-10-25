@@ -135,6 +135,7 @@ typedef unsigned char Byte;
 
 // Common headers (without macros):
 #include "fmt.h"
+#include "LoggerSimple.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
@@ -167,8 +168,6 @@ typedef unsigned char Byte;
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY(x) (!!(x) || (LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
-
-#include "BiomeDef.h"
 
 
 

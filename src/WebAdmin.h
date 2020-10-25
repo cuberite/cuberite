@@ -140,7 +140,7 @@ public:
 			m_Title(a_Title),
 			m_UrlPath(a_UrlPath),
 			m_PluginName(a_PluginName),
-			m_Callback(a_Callback)
+			m_Callback(std::move(a_Callback))
 		{
 		}
 	};

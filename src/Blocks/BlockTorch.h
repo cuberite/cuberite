@@ -8,21 +8,21 @@
 
 
 
-class cBlockTorchHandler:
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>
+
+class cBlockTorchBaseHandler :
+	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>>;
+	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
 
 public:
 
-	cBlockTorchHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+protected:
 
+	~cBlockTorchBaseHandler() = default;
 
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -31,7 +31,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
@@ -190,7 +190,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		auto Face = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
 		auto NeighborRelPos = AddFaceDirection(a_RelPos, Face, true);
@@ -209,7 +209,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
@@ -219,3 +219,41 @@ public:
 
 
 
+
+class cBlockTorchHandler final :
+	public cClearMetaOnDrop<cBlockTorchBaseHandler>
+{
+	using Super = cClearMetaOnDrop<cBlockTorchBaseHandler>;
+
+public:
+
+	using Super::Super;
+};
+
+
+
+
+
+class cBlockRedstoneTorchHandler final :
+	public cBlockTorchBaseHandler
+{
+	using Super = cBlockTorchBaseHandler;
+
+public:
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		// Always drop the ON torch, meta 0:
+		return { E_BLOCK_REDSTONE_TORCH_ON };
+	}
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 0;
+	}
+};

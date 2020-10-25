@@ -19,7 +19,7 @@ cPrefabStructure::cPrefabStructure(
 ):
 	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_Pieces(std::move(a_Pieces)),
-	m_HeightGen(a_HeightGen)
+	m_HeightGen(std::move(a_HeightGen))
 {
 }
 

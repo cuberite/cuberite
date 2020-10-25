@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ChunkDef.h"
+
 class cWorld;
 class cChunk;
 class cCuboid;
@@ -13,12 +15,13 @@ class cCuboid;
 Each descendant provides an implementation of what needs to be done on each world tick.
 The descendant may choose to do all processing in a single call for the entire world (Simulate())
 or do per-chunk calculations (SimulateChunk()).
-Whenever a block is changed, the WakeUp() or WakeUpArea() functions are called to notify all simulators.
-The functions add all affected blocks and all their direct neighbors using the AddBlock() function. The simulator
-may update its internal state based on this call. */
+Whenever a block is changed, the WakeUp() functions are called to notify all simulators by the simulator manager.
+The functions are invoked to add all affected blocks and their direct neighbors using the AddBlock() function.
+The simulator may update its internal state based on this call. */
 class cSimulator
 {
 public:
+
 	cSimulator(cWorld & a_World)
 		: m_World(a_World)
 	{
@@ -26,10 +29,28 @@ public:
 
 	virtual ~cSimulator() {}
 
-	/** Called in each tick, a_Dt is the time passed since the last tick, in msec */
-	virtual void Simulate(float a_Dt) = 0;
+	/** Contains offsets for direct adjacents of any position. */
+	static constexpr std::array<Vector3i, 6> AdjacentOffsets
+	{
+		{
+			{  1,  0,  0 },
+			{ -1,  0,  0 },
+			{  0,  1,  0 },
+			{  0, -1,  0 },
+			{  0,  0,  1 },
+			{  0,  0, -1 },
+		}
+	};
 
-	/** Called in each tick for each chunk, a_Dt is the time passed since the last tick, in msec; direct access to chunk data available */
+	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset position, excluding the old position. */
+	static std::array<Vector3i, 5> GetLinkedOffsets(Vector3i Offset);
+
+protected:
+
+	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
+	friend class cSimulatorManager;  // Class reponsible for dispatching calls to the various slave Simulators
+
+	virtual void Simulate(float a_Dt) = 0;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 	{
 		UNUSED(a_Dt);
@@ -38,28 +59,23 @@ public:
 		UNUSED(a_Chunk);
 	}
 
-	/** Called when a block changes */
-	void WakeUp(Vector3i a_Block, cChunk * a_Chunk);
+	/** Called to simulate a new block. Unlike WakeUp this function will perform minimal checking.
+	It queues the block to be simulated as fast as possible, suitable for area wakeups. */
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) = 0;
 
-	/** Does the same processing as WakeUp, but for all blocks within the specified area.
-	Has better performance than calling WakeUp for each block individually, due to neighbor-checking.
-	All chunks intersected by the area should be valid (outputs a warning if not).
-	Note that, unlike WakeUp(), this call adds blocks not only face-neighboring, but also edge-neighboring and
-	corner-neighboring the specified area. So far none of the simulators care about that. */
-	void WakeUpArea(const cCuboid & a_Area);
+	/** Called to simulate a single new block, typically as a result of a single block break or change.
+	The simulator implementation may decide to perform additional checks or maintain consistency of internal state
+	before the block is added to the simulate queue. */
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block);
 
-	/** Returns true if the specified block type is "interesting" for this simulator. */
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) = 0;
+	/** Called to simulate a single block, synthesised by the simulator manager.
+	The position represents the adjacents of the block that was actually changed, with the offset used given.
+	Simulators may use this information to update additional blocks that were affected by the change, or queue
+	farther, extra-adjacents blocks to be updated. The simulator manager calls this overload after the 3-argument WakeUp. */
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block);
 
-protected:
-	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
-
-	/** Called to simulate a new block */
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) = 0;
+	/** Called to simulate an area by the manager, delegated to cSimulator to avoid virtual calls in tight loops. */
+	void WakeUp(const cCuboid & a_Area);
 
 	cWorld & m_World;
 } ;
-
-
-
-

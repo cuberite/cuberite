@@ -11,126 +11,14 @@
 
 
 
-class cBlockDoorHandler :
+class cBlockDoorHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
 
 public:
 
-	cBlockDoorHandler(BLOCKTYPE a_BlockType);
-
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override;
-
-	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace,
-		const Vector3i a_CursorPos
-	) override;
-
-	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace
-	) override;
-
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  override;
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  override;
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		// If clicking a bottom face, place the door one block lower:
-		auto PlacedPos = a_PlacedBlockPos;
-		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
-		{
-			PlacedPos.y--;
-		}
-
-		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos)) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos.addedY(1)))
-		)
-		{
-			return false;
-		}
-
-		return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, PlacedPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
-	}
-
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) override;
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		// Top part of a door doesn't drop anything:
-		if ((a_BlockMeta & 0x08) != 0)
-		{
-			return {};
-		}
-
-		switch (m_BlockType)
-		{
-			case E_BLOCK_OAK_DOOR:      return cItem(E_ITEM_WOODEN_DOOR);
-			case E_BLOCK_ACACIA_DOOR:   return cItem(E_ITEM_ACACIA_DOOR);
-			case E_BLOCK_BIRCH_DOOR:    return cItem(E_ITEM_BIRCH_DOOR);
-			case E_BLOCK_DARK_OAK_DOOR: return cItem(E_ITEM_DARK_OAK_DOOR);
-			case E_BLOCK_JUNGLE_DOOR:   return cItem(E_ITEM_JUNGLE_DOOR);
-			case E_BLOCK_SPRUCE_DOOR:   return cItem(E_ITEM_SPRUCE_DOOR);
-			case E_BLOCK_IRON_DOOR:     return cItem(E_ITEM_IRON_DOOR);
-			default:
-			{
-				ASSERT(!"Unhandled door type!");
-				return {};
-			}
-		}
-	}
-
-
-
-
-
-	virtual bool IsUseable(void) override
-	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1)), a_Chunk.GetMeta(a_RelPos.addedY(-1))));
-	}
-
-
-
-
+	using Super::Super;
 
 	/** Returns true if door can be placed on the specified block type. */
 	static bool CanBeOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
@@ -174,25 +62,17 @@ public:
 		return false;
 	}
 
-
-
-
-
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
 	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
 	{
 		switch (a_BlockMeta & 0x03)
 		{
-			case 0:  return Vector3i(-1, 0,  0);  // Facing West  / XM
-			case 1:  return Vector3i( 0, 0, -1);  // Facing North / ZM
-			case 2:  return Vector3i( 1, 0,  0);  // Facing East  / XP
-			default: return Vector3i( 0, 0,  1);  // Facing South / ZP
+			case 0:  return Vector3i(-1, 0, 0);  // Facing West  / XM
+			case 1:  return Vector3i(0, 0, -1);  // Facing North / ZM
+			case 2:  return Vector3i(1, 0, 0);  // Facing East  / XP
+			default: return Vector3i(0, 0, 1);  // Facing South / ZP
 		}
 	}
-
-
-
-
 
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
@@ -216,16 +96,150 @@ public:
 		}
 	}
 
-
-
-
-
 	/** Returns true iff the door at the specified coords is open.
 	The coords may point to either the top part or the bottom part of the door. */
-	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
+	static bool IsOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
 	{
+		const auto Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockPos);
+		return (Meta & 0x04) != 0;
+	}
+
+	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
+	static void SetOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Open)
+	{
+		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockPos);
+		if (!IsDoorBlockType(Block))
+		{
+			return;
+		}
+
 		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockPos);
-		return ((Meta & 0x04) != 0);
+		bool IsOpened = ((Meta & 0x04) != 0);
+		if (IsOpened == a_Open)
+		{
+			return;
+		}
+
+		// Change the door
+		NIBBLETYPE NewMeta = (Meta & 0x07) ^ 0x04;  // Flip the "IsOpen" bit (0x04)
+		if ((Meta & 0x08) == 0)
+		{
+			// The block is the bottom part of the door
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, NewMeta);
+		}
+		else
+		{
+			// The block is the top part of the door, set the meta to the corresponding top part
+			if (a_BlockPos.y > 0)
+			{
+				a_ChunkInterface.SetBlockMeta(a_BlockPos.addedY(-1), NewMeta);
+			}
+		}
+	}
+
+private:
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override;
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override;
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  const override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  const override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  const override;
+
+
+
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) const override
+	{
+		// If clicking a bottom face, place the door one block lower:
+		auto PlacedPos = a_PlacedBlockPos;
+		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
+		{
+			PlacedPos.y--;
+		}
+
+		if (
+			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos)) ||
+			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos.addedY(1)))
+		)
+		{
+			return false;
+		}
+
+		return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, PlacedPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
+	}
+
+	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override;
+
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		switch (m_BlockType)
+		{
+			case E_BLOCK_OAK_DOOR:      return cItem(E_ITEM_WOODEN_DOOR);
+			case E_BLOCK_ACACIA_DOOR:   return cItem(E_ITEM_ACACIA_DOOR);
+			case E_BLOCK_BIRCH_DOOR:    return cItem(E_ITEM_BIRCH_DOOR);
+			case E_BLOCK_DARK_OAK_DOOR: return cItem(E_ITEM_DARK_OAK_DOOR);
+			case E_BLOCK_JUNGLE_DOOR:   return cItem(E_ITEM_JUNGLE_DOOR);
+			case E_BLOCK_SPRUCE_DOOR:   return cItem(E_ITEM_SPRUCE_DOOR);
+			case E_BLOCK_IRON_DOOR:     return cItem(E_ITEM_IRON_DOOR);
+			default:
+			{
+				ASSERT(!"Unhandled door type!");
+				return {};
+			}
+		}
+	}
+
+
+
+
+
+	virtual bool IsUseable(void) const override
+	{
+		return true;
+	}
+
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	{
+		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1)), a_Chunk.GetMeta(a_RelPos.addedY(-1))));
 	}
 
 
@@ -268,43 +282,6 @@ public:
 
 
 
-	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
-	static void SetOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Open)
-	{
-		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockPos);
-		if (!IsDoorBlockType(Block))
-		{
-			return;
-		}
-
-		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockPos);
-		bool IsOpened = ((Meta & 0x04) != 0);
-		if (IsOpened == a_Open)
-		{
-			return;
-		}
-
-		// Change the door
-		NIBBLETYPE NewMeta = (Meta & 0x07) ^ 0x04;  // Flip the "IsOpen" bit (0x04)
-		if ((Meta & 0x08) == 0)
-		{
-			// The block is the bottom part of the door
-			a_ChunkInterface.SetBlockMeta(a_BlockPos, NewMeta);
-		}
-		else
-		{
-			// The block is the top part of the door, set the meta to the corresponding top part
-			if (a_BlockPos.y > 0)
-			{
-				a_ChunkInterface.SetBlockMeta(a_BlockPos.addedY(-1), NewMeta);
-			}
-		}
-	}
-
-
-
-
-
 	/** Changes the door at the specified coords from open to close or vice versa */
 	static void ChangeDoor(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
 	{
@@ -315,7 +292,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

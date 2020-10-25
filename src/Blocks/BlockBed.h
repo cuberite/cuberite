@@ -15,67 +15,26 @@ class cWorldInterface;
 
 
 
-class cBlockBedHandler :
+class cBlockBedHandler final :
 	public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;
 
 public:
 
-	cBlockBedHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
-
-
-
-
-
-	// Overrides:
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		const Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override;
-
-	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override;
-
-	virtual cItems ConvertToPickups(
-		NIBBLETYPE a_BlockMeta,
-		cBlockEntity * a_BlockEntity,
-		const cEntity * a_Digger,
-		const cItem * a_Tool
-	) override;
-
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const sSetBlock & a_BlockChange
-	) override;
-
-
-
-
+	using Super::Super;
 
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
 		{
-			case 0: return Vector3i( 0, 0,  1);
-			case 1: return Vector3i(-1, 0,  0);
-			case 2: return Vector3i( 0, 0, -1);
-			case 3: return Vector3i( 1, 0,  0);
+			case 0: return Vector3i(0, 0, 1);
+			case 1: return Vector3i(-1, 0, 0);
+			case 2: return Vector3i(0, 0, -1);
+			case 3: return Vector3i(1, 0, 0);
 		}
 		return Vector3i();
 	}
-
-
-
-
 
 	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, Vector3i a_BedPosition, bool a_IsOccupied)
 	{
@@ -92,11 +51,41 @@ public:
 		a_ChunkInterface.SetBlockMeta(a_BedPosition, Meta);
 	}
 
+private:
+
+	// Overrides:
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		const Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) const override;
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
+
+	virtual void OnPlacedByPlayer(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const sSetBlock & a_BlockChange
+	) const override;
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+	static void SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition);
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 28;

@@ -3,8 +3,6 @@
 
 #include "SettingsRepositoryInterface.h"
 
-#include <unordered_map>
-
 class cMemorySettingsRepository : public cSettingsRepositoryInterface
 {
 public:
@@ -57,7 +55,7 @@ private:
 			#ifdef _DEBUG
 				m_Type(eType::String),
 			#endif
-			m_stringValue (value)
+			m_stringValue (std::move(value))
 		{
 		}
 

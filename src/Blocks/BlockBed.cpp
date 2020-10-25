@@ -18,9 +18,11 @@
 void cBlockBedHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	const Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-)
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	const cEntity * a_Digger
+) const
 {
+	UNUSED(a_Digger);
 	auto Direction = MetaDataToDirection(a_OldBlockMeta & 0x03);
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
@@ -61,7 +63,7 @@ bool cBlockBedHandler::OnUse(
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
-)
+) const
 {
 	// Sleeping in bed only allowed in Overworld, beds explode elsewhere:
 	if (a_WorldInterface.GetDimension() != dimOverworld)
@@ -71,11 +73,16 @@ bool cBlockBedHandler::OnUse(
 		return true;
 	}
 
-	// Sleeping is allowed only during night:
-	// TODO: Also during thunderstorms
-	if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
+	// Sleeping is allowed only during night and thunderstorms:
+	if (
+		!(((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)) ||
+		(a_Player.GetWorld()->GetWeather() == wThunderstorm))
+	)  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
-		a_Player.SendMessageFailure("You can only sleep at night");
+		a_Player.SendAboveActionBarMessage("You can only sleep at night and during thunderstorms");
+
+		// Try to set home position anyway:
+		SetBedPos(a_Player, a_BlockPos);
 		return true;
 	}
 
@@ -97,7 +104,7 @@ bool cBlockBedHandler::OnUse(
 	};
 	if (!a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player.GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 	{
-		a_Player.SendMessageFailure("You may not rest now, there are monsters nearby");
+		a_Player.SendAboveActionBarMessage("You may not rest now, there are monsters nearby");
 		return true;
 	}
 
@@ -120,19 +127,15 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Occupy the bed:
-	a_Player.SetBedPos(a_BlockPos);
+	SetBedPos(a_Player, a_BlockPos);
 	SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 	a_Player.SetIsInBed(true);
-	a_Player.SendMessageSuccess("Home position set successfully");
+	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
 
 	// Fast-forward the time if all players in the world are in their beds:
 	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
 	{
-		if (!a_OtherPlayer.IsInBed())
-		{
-			return true;
-		}
-		return false;
+		return !a_OtherPlayer.IsInBed();
 	};
 	if (a_WorldInterface.ForEachPlayer(TimeFastForwardTester))
 	{
@@ -153,7 +156,7 @@ bool cBlockBedHandler::OnUse(
 
 
 
-void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
+void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) const
 {
 	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), [&](cBedEntity & a_Bed)
 		{
@@ -167,12 +170,21 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
+cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
-	short color = E_META_WOOL_RED;
-	if (a_BlockEntity != nullptr)
+	// Drops handled by the block entity:
+	return {};
+}
+
+
+
+
+
+void cBlockBedHandler::SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition)
+{
+	if (a_Player.GetLastBedPos() != a_BedPosition)
 	{
-		color = reinterpret_cast<cBedEntity *>(a_BlockEntity)->GetColor();
+		a_Player.SetBedPos(a_BedPosition);
+		a_Player.SendMessageSuccess("Home position set successfully");
 	}
-	return cItem(E_ITEM_BED, 1, color);
 }

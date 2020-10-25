@@ -1,16 +1,13 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	BlockBed.cpp
 	BlockDoor.cpp
 	BlockHandler.cpp
 	BlockPiston.cpp
 	ChunkInterface.cpp
-)
 
-SET (HDRS
+	BlockAir.h
 	BlockAnvil.h
 	BlockBed.h
 	BlockBigFlower.h
@@ -30,10 +27,11 @@ SET (HDRS
 	BlockConcretePowder.h
 	BlockCrops.h
 	BlockDeadBush.h
+	BlockDefaultBlock.h
 	BlockDirt.h
 	BlockDoor.h
 	BlockDropSpenser.h
-	BlockEnchantmentTable.h
+	BlockEnchantingTable.h
 	BlockEnderchest.h
 	BlockEndPortalFrame.h
 	BlockEntity.h
@@ -46,12 +44,14 @@ SET (HDRS
 	BlockFluid.h
 	BlockFurnace.h
 	BlockGlass.h
+	BlockGlazedTerracotta.h
 	BlockGlowstone.h
 	BlockGrass.h
 	BlockGravel.h
 	BlockHandler.h
 	BlockHopper.h
 	BlockIce.h
+	BlockJukebox.h
 	BlockLadder.h
 	BlockLeaves.h
 	BlockLever.h
@@ -59,12 +59,14 @@ SET (HDRS
 	BlockMelon.h
 	BlockMobHead.h
 	BlockMobSpawner.h
+	BlockInfested.h
 	BlockMushroom.h
 	BlockMycelium.h
 	BlockNetherrack.h
 	BlockNetherWart.h
 	BlockObserver.h
 	BlockOre.h
+	BlockPackedIce.h
 	BlockPiston.h
 	BlockPlanks.h
 	BlockPlant.h
@@ -76,22 +78,23 @@ SET (HDRS
 	BlockRail.h
 	BlockRedstone.h
 	BlockRedstoneLamp.h
+	BlockRedstoneOre.h
 	BlockRedstoneRepeater.h
-	BlockRedstoneTorch.h
 	BlockSand.h
 	BlockSapling.h
 	BlockSeaLantern.h
 	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h
+	BlockSlime.h
 	BlockSnow.h
 	BlockSponge.h
 	BlockStairs.h
 	BlockStems.h
 	BlockStone.h
 	BlockSugarcane.h
-	BlockTallGrass.h
 	BlockTNT.h
+	BlockTallGrass.h
 	BlockTorch.h
 	BlockTrapdoor.h
 	BlockTripwire.h
@@ -105,8 +108,3 @@ SET (HDRS
 	Mixins.h
 	WorldInterface.h
 )
-
-if(NOT MSVC)
-	add_library(Blocks ${SRCS} ${HDRS})
-	target_link_libraries(Blocks fmt::fmt SQLiteCpp)
-endif()

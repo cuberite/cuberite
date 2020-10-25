@@ -27,6 +27,7 @@
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
 #include "RoughRavines.h"
+#include "SinglePieceStructuresGen.h"
 #include "VillageGen.h"
 #include "PieceStructuresGen.h"
 
@@ -39,8 +40,8 @@
 
 cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	cIniFile & a_IniFile,
-	cBiomeGenPtr a_BiomeGen,
-	cTerrainShapeGenPtr a_ShapeGen,
+	const cBiomeGenPtr & a_BiomeGen,
+	const cTerrainShapeGenPtr & a_ShapeGen,
 	int a_Seed
 )
 {
@@ -217,6 +218,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"Mineshafts, "
 				"Trees, "
 				"Villages, "
+				"SinglePieceStructures: JungleTemple|WitchHut|DesertPyramid|DesertWell, "
 				"TallGrass, "
 				"SprinkleFoliage, "
 				"Ice, "
@@ -606,6 +608,20 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				static_cast<float>(MinCeilingHeightCenter),
 				GridSize, MaxOffset
 			)));
+		}
+		else if (NoCaseCompare(finisher, "SinglePieceStructures") == 0)
+		{
+			if (split.size() < 2)
+			{
+				LOGWARNING("The SinglePieceStructures generator needs the structures to use. Example: \"SinglePieceStructures: DesertPyramid\".");
+				continue;
+			}
+
+			auto Gen = std::make_shared<cSinglePieceStructuresGen>(m_Seed);
+			if (Gen->Initialize(split[1], seaLevel, m_BiomeGen, m_CompositedHeightCache))
+			{
+				m_FinishGens.push_back(Gen);
+			}
 		}
 		else if (NoCaseCompare(finisher, "SoulsandRims") == 0)
 		{

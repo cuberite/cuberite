@@ -26,6 +26,17 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 
 
 
+cItems cBlockEntityWithItems::ConvertToPickups() const
+{
+	cItems Pickups;
+	Pickups.AddItemGrid(m_Contents);
+	return Pickups;
+}
+
+
+
+
+
 void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
@@ -41,19 +52,19 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 {
 	UNUSED(a_SlotNum);
 	ASSERT(a_Grid == &m_Contents);
-	if (m_World != nullptr)
-	{
-		if (GetWindow() != nullptr)
-		{
-			GetWindow()->BroadcastWholeWindow();
-		}
 
-		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-		m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-			{
-				m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
-				return true;
-			}
-		);
+	if (m_World == nullptr)
+	{
+		return;
 	}
+
+	if (GetWindow() != nullptr)
+	{
+		GetWindow()->BroadcastWholeWindow();
+	}
+
+	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+
+	// Notify comparators:
+	m_World->WakeUpSimulators(m_Pos);
 }

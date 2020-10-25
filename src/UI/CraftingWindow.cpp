@@ -10,7 +10,7 @@
 
 
 
-cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cCraftingWindow::cCraftingWindow() :
 	cWindow(wtWorkbench, "Crafting Table")
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
@@ -59,3 +59,9 @@ void cCraftingWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer &
 
 
 
+
+void cCraftingWindow::LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId)
+{
+	auto slotAreaCrafting = static_cast<cSlotAreaCrafting *>(m_SlotAreas[0]);
+	slotAreaCrafting->LoadRecipe(a_Player, a_RecipeId);
+}

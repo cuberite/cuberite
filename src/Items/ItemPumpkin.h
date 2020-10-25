@@ -82,7 +82,7 @@ public:
 	bool TrySpawnSnowGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos)
 	{
 		ASSERT(a_PumpkinPos.y > 1);
-		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)) == E_BLOCK_SNOW);
+		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)) == E_BLOCK_SNOW_BLOCK);
 
 		// Need one more snow block 2 blocks below the pumpkin:
 		if (a_World.GetBlock(a_PumpkinPos.addedY(-2)) != E_BLOCK_SNOW_BLOCK)

@@ -159,14 +159,14 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	// Take damage when wet, drowning damage seems to be most appropriate
+	// Take damage when wet
 	if (
 		cChunkDef::IsValidHeight(POSY_TOINT) &&
 		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
 	)
 	{
 		EventLosePlayer();
-		TakeDamage(dtDrowning, nullptr, 1, 0);
+		TakeDamage(dtEnvironment, nullptr, 1, 0);
 		// TODO teleport to a safe location
 	}
 }

@@ -367,23 +367,19 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 /** Retrieves the log message from the first param on the Lua stack.
 Can take either a string or a cCompositeChat.
 */
-static AString GetLogMessage(lua_State * tolua_S)
+static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 {
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		return static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		Logger::LogSimple(Msg, a_LogLevel);
+		return;
 	}
-	else
-	{
-		size_t len = 0;
-		const char * str = lua_tolstring(tolua_S, 1, &len);
-		if (str != nullptr)
-		{
-			return AString(str, len);
-		}
-	}
-	return "";
+
+	size_t len = 0;
+	const char * str = lua_tolstring(tolua_S, 1, &len);
+	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
 }
 
 
@@ -401,15 +397,17 @@ static int tolua_LOG(lua_State * tolua_S)
 	}
 
 	// If the param is a cCompositeChat, read the log level from it:
-	cLogger::eLogLevel LogLevel = cLogger::llRegular;
+	eLogLevel LogLevel = eLogLevel::Regular;
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType());
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(
+			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
+		);
 	}
 
 	// Log the message:
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
+	LogFromLuaStack(tolua_S, LogLevel);
 	return 0;
 }
 
@@ -427,7 +425,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llInfo);
+	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
 
@@ -445,7 +443,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llWarning);
+	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
 
@@ -463,7 +461,7 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llError);
+	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
 
@@ -2748,6 +2746,33 @@ static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 
 
 
+static int tolua_cItem_EnchantByXPLevels(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cItem") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self;
+	int NumXPLevels;
+	L.GetStackValue(1, Self);
+	L.GetStackValue(2, NumXPLevels);
+
+	// Call:
+	L.Push(Self->EnchantByXPLevels(NumXPLevels, GetRandomProvider()));
+	return 1;
+}
+
+
+
+
+
 static int tolua_set_cItem_m_LoreTable(lua_State * tolua_S)
 {
 	// Check params:
@@ -4422,7 +4447,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItem");
-			tolua_variable(tolua_S, "m_LoreTable", tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
+			tolua_function(tolua_S, "EnchantByXPLevels", tolua_cItem_EnchantByXPLevels);
+			tolua_variable(tolua_S, "m_LoreTable",       tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");

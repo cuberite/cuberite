@@ -8,6 +8,12 @@
 
 
 
+#pragma once
+
+
+
+
+
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
 	// Disable some warnings that we don't care about:
@@ -142,20 +148,7 @@ template class SizeChecker<UInt8,  1>;
 		#undef GetFreeSpace
 	#endif  // GetFreeSpace
 #else
-	#include <sys/types.h>
-	#include <sys/time.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
 	#include <arpa/inet.h>
-	#include <netdb.h>
-	#include <time.h>
-	#include <dirent.h>
-	#include <errno.h>
-	#include <iostream>
-	#include <cstring>
-	#include <pthread.h>
-	#include <semaphore.h>
-	#include <fcntl.h>
 	#include <unistd.h>
 #endif
 
@@ -164,7 +157,6 @@ template class SizeChecker<UInt8,  1>;
 
 
 // CRT stuff:
-#include <sys/stat.h>
 #include <cassert>
 #include <cstdio>
 #include <cmath>
@@ -175,24 +167,27 @@ template class SizeChecker<UInt8,  1>;
 
 
 // STL stuff:
-#include <array>
-#include <chrono>
-#include <vector>
-#include <list>
-#include <deque>
-#include <string>
-#include <map>
 #include <algorithm>
-#include <memory>
-#include <set>
-#include <queue>
-#include <limits>
-#include <random>
-#include <type_traits>
+#include <array>
 #include <atomic>
-#include <mutex>
-#include <thread>
+#include <chrono>
 #include <condition_variable>
+#include <deque>
+#include <fstream>
+#include <limits>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <random>
+#include <set>
+#include <string>
+#include <thread>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 
 
@@ -200,46 +195,43 @@ template class SizeChecker<UInt8,  1>;
 // Common headers (part 1, without macros):
 #include "fmt.h"
 #include "StringUtils.h"
+#include "LoggerSimple.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
 #include "OSSupport/File.h"
 #include "OSSupport/StackTrace.h"
 
-#ifndef TEST_GLOBALS
+#ifdef TEST_GLOBALS
 
-	#include "LoggerSimple.h"
-
-#else
-	#include "fmt/printf.h"
-
-	// Logging functions
-	template <typename ... Args>
-	void LOG(const char * a_Format, const Args & ... a_Args)
+	// Basic logging function implementations
+	namespace Logger
 	{
-		fmt::printf(a_Format, a_Args...);
+
+	inline void LogFormat(
+		std::string_view a_Format, eLogLevel, fmt::format_args a_ArgList
+	)
+	{
+		fmt::vprint(a_Format, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}
 
-	#define LOGERROR   LOG
-	#define LOGWARNING LOG
-	#define LOGD       LOG
-	#define LOGINFO    LOG
-	#define LOGWARN    LOG
-
-	template <typename ... Args>
-	void FLOG(const char * a_Format, const Args & ... a_Args)
+	inline void LogPrintf(
+		std::string_view a_Format, eLogLevel, fmt::printf_args a_ArgList
+	)
 	{
-		fmt::print(a_Format, a_Args...);
+		fmt::vprintf(a_Format, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}
 
-	#define FLOGERROR   FLOG
-	#define FLOGWARNING FLOG
-	#define FLOGD       FLOG
-	#define FLOGINFO    FLOG
-	#define FLOGWARN    FLOG
+	inline void LogSimple(std::string_view a_Message, eLogLevel)
+	{
+		fmt::print("{}\n", a_Message);
+		fflush(stdout);
+	}
+
+	}  // namespace Logger
 
 #endif
 
@@ -288,23 +280,23 @@ template class SizeChecker<UInt8,  1>;
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
-	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 
 #else  // TEST_GLOBALS
 
 	#ifdef _DEBUG
-		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
+		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 	#else
 		#define ASSERT(x)
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
-	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
+	#define VERIFY(x) (!!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 
 #endif  // else TEST_GLOBALS
 
 /** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); PrintStackTrace(); std::terminate(); } while (false)
+#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
 
 
 
@@ -336,12 +328,7 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
-// TODO: Replace cpp14 with std at point of use
 
-namespace cpp14
-{
-using std::make_unique;
-}
 
 // a tick is 50 ms
 using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
@@ -368,5 +355,4 @@ auto ToUnsigned(T a_Val)
 
 // Common headers (part 2, with macros):
 #include "Vector3.h"
-#include "BiomeDef.h"
-#include "ChunkDef.h"
+

@@ -63,7 +63,7 @@ then
 fi
 
 # Build
-CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 -DBUILD_TOOLS=1 ${CACHE_ARGS} ${TOOLCHAINFILE} ${COMPILEMODE} ${FORCE32}
+CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 ${CACHE_ARGS} ${TOOLCHAINFILE} ${COMPILEMODE} ${FORCE32}
 make -j 2
 
 
@@ -77,11 +77,12 @@ echo Cuberite "$CUBERITE_BUILD_SERIES_NAME-$CUBERITE_BUILD_ID\n$BUILD_URL" > Ser
 # T: files-from (list of server files accepted for release archives)
 # f: file (output file location)
 pushd Server
-tar -hzcv -T Install/UnixExecutables.list -f ../Cuberite.tar.gz
+tar -hzcv --exclude .git -T Install/UnixExecutables.list -f ../Cuberite.tar.gz
 popd
 sha1sum Cuberite.tar.gz > Cuberite.tar.gz.sha1
 
 # Package ProtoProxy
-pushd Tools/ProtoProxy
-sha1sum ProtoProxy > ProtoProxy.sha1
-popd
+# This tool is very out of date, uncomment when it's being worked on again
+# pushd Tools/ProtoProxy
+# sha1sum ProtoProxy > ProtoProxy.sha1
+# popd

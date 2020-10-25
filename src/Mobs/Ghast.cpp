@@ -89,7 +89,7 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
 
-		auto GhastBall = cpp14::make_unique<cGhastFireballEntity>(this, GetPosition(), Speed);
+		auto GhastBall = std::make_unique<cGhastFireballEntity>(this, GetPosition(), Speed);
 		auto GhastBallPtr = GhastBall.get();
 		GhastBallPtr->Initialize(std::move(GhastBall), *m_World);
 

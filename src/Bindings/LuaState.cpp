@@ -1213,7 +1213,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackPtr & a_Callback)
 {
 	if (a_Callback == nullptr)
 	{
-		a_Callback = cpp14::make_unique<cCallback>();
+		a_Callback = std::make_unique<cCallback>();
 	}
 	return a_Callback->RefStack(*this, a_StackPos);
 }
@@ -1235,7 +1235,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cOptionalCallbackPtr & a_Callback)
 {
 	if (a_Callback == nullptr)
 	{
-		a_Callback = cpp14::make_unique<cOptionalCallback>();
+		a_Callback = std::make_unique<cOptionalCallback>();
 	}
 	return a_Callback->RefStack(*this, a_StackPos);
 }
@@ -1290,7 +1290,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cStackTablePtr & a_StackTable)
 	}
 
 	// Assign the StackTable to the specified stack position:
-	a_StackTable = cpp14::make_unique<cStackTable>(*this, a_StackPos);
+	a_StackTable = std::make_unique<cStackTable>(*this, a_StackPos);
 	return true;
 }
 
@@ -1311,7 +1311,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cTableRefPtr & a_TableRef)
 {
 	if (a_TableRef == nullptr)
 	{
-		a_TableRef = cpp14::make_unique<cTableRef>();
+		a_TableRef = std::make_unique<cTableRef>();
 	}
 	return a_TableRef->RefStack(*this, a_StackPos);
 }
@@ -1333,7 +1333,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref)
 {
 	if (a_Ref == nullptr)
 	{
-		a_Ref = cpp14::make_unique<cTrackedRef>();
+		a_Ref = std::make_unique<cTrackedRef>();
 	}
 	return a_Ref->RefStack(*this, a_StackPos);
 }
@@ -2014,7 +2014,7 @@ bool cLuaState::CheckParamStaticSelf(const char * a_SelfClassName)
 
 
 
-bool cLuaState::IsParamUserType(int a_ParamIdx, AString a_UserType)
+bool cLuaState::IsParamUserType(int a_ParamIdx, const AString & a_UserType)
 {
 	ASSERT(IsValid());
 
@@ -2107,7 +2107,7 @@ void cLuaState::LogStackTrace(lua_State * a_LuaState, int a_StartingDepth)
 
 
 
-int cLuaState::ApiParamError(fmt::string_view a_Msg)
+int cLuaState::ApiParamError(std::string_view a_Msg)
 {
 	// Retrieve current function name
 	lua_Debug entry;

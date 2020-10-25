@@ -12,7 +12,7 @@ not unload
 
 #pragma once
 
-
+#include "ChunkDef.h"
 
 
 
@@ -65,7 +65,7 @@ public:
 	/** Called when a specific chunk become available. */
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) = 0;
 
-	/** Caled once all of the contained chunks are available.
+	/** Called once all of the contained chunks are available.
 	If returns true, the ChunkStay is automatically disabled by the ChunkMap; if it returns false, the ChunkStay is kept. */
 	virtual bool OnAllChunksAvailable(void) = 0;
 

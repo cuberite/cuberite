@@ -18,6 +18,9 @@
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "../BlockEntities/EnchantingTableEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
+#include "../BlockEntities/EndPortalEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -207,25 +210,27 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_BEACON:        AddBeaconEntity      (static_cast<cBeaconEntity *>      (a_Entity)); break;
-			case E_BLOCK_BED:           AddBedEntity         (static_cast<cBedEntity *>         (a_Entity)); break;
-			case E_BLOCK_BREWING_STAND: AddBrewingstandEntity(static_cast<cBrewingstandEntity *>(a_Entity)); break;
-			case E_BLOCK_CHEST:         AddChestEntity       (static_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity(static_cast<cCommandBlockEntity *>(a_Entity)); break;
-			case E_BLOCK_DISPENSER:     AddDispenserEntity   (static_cast<cDispenserEntity *>   (a_Entity)); break;
-			case E_BLOCK_DROPPER:       AddDropperEntity     (static_cast<cDropperEntity *>     (a_Entity)); break;
-			case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                               break;
-			case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   (static_cast<cFlowerPotEntity *>   (a_Entity)); break;
-			case E_BLOCK_FURNACE:       AddFurnaceEntity     (static_cast<cFurnaceEntity *>     (a_Entity)); break;
-			case E_BLOCK_HEAD:          AddMobHeadEntity     (static_cast<cMobHeadEntity *>     (a_Entity)); break;
-			case E_BLOCK_HOPPER:        AddHopperEntity      (static_cast<cHopperEntity *>      (a_Entity)); break;
-			case E_BLOCK_JUKEBOX:       AddJukeboxEntity     (static_cast<cJukeboxEntity *>     (a_Entity)); break;
-			case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     (static_cast<cFurnaceEntity *>     (a_Entity)); break;
-			case E_BLOCK_MOB_SPAWNER:   AddMobSpawnerEntity  (static_cast<cMobSpawnerEntity *>  (a_Entity)); break;
-			case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        (static_cast<cNoteEntity *>        (a_Entity)); break;
-			case E_BLOCK_SIGN_POST:     AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
-			case E_BLOCK_TRAPPED_CHEST: AddChestEntity       (static_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_WALLSIGN:      AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
+			case E_BLOCK_BEACON:            AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
+			case E_BLOCK_BED:               AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
+			case E_BLOCK_BREWING_STAND:     AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
+			case E_BLOCK_CHEST:             AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case E_BLOCK_COMMAND_BLOCK:     AddCommandBlockEntity   (static_cast<cCommandBlockEntity *>   (a_Entity)); break;
+			case E_BLOCK_DISPENSER:         AddDispenserEntity      (static_cast<cDispenserEntity *>      (a_Entity)); break;
+			case E_BLOCK_DROPPER:           AddDropperEntity        (static_cast<cDropperEntity *>        (a_Entity)); break;
+			case E_BLOCK_ENCHANTMENT_TABLE: AddEnchantingTableEntity(static_cast<cEnchantingTableEntity *>(a_Entity)); break;
+			case E_BLOCK_ENDER_CHEST:       AddEnderchestEntity     (static_cast<cEnderChestEntity *>     (a_Entity)); break;
+			case E_BLOCK_END_PORTAL:        AddEndPortalEntity      (static_cast<cEndPortalEntity *>      (a_Entity)); break;
+			case E_BLOCK_FLOWER_POT:        AddFlowerPotEntity      (static_cast<cFlowerPotEntity *>      (a_Entity)); break;
+			case E_BLOCK_FURNACE:           AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
+			case E_BLOCK_HEAD:              AddMobHeadEntity        (static_cast<cMobHeadEntity *>        (a_Entity)); break;
+			case E_BLOCK_HOPPER:            AddHopperEntity         (static_cast<cHopperEntity *>         (a_Entity)); break;
+			case E_BLOCK_JUKEBOX:           AddJukeboxEntity        (static_cast<cJukeboxEntity *>        (a_Entity)); break;
+			case E_BLOCK_LIT_FURNACE:       AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
+			case E_BLOCK_MOB_SPAWNER:       AddMobSpawnerEntity     (static_cast<cMobSpawnerEntity *>     (a_Entity)); break;
+			case E_BLOCK_NOTE_BLOCK:        AddNoteEntity           (static_cast<cNoteEntity *>           (a_Entity)); break;
+			case E_BLOCK_SIGN_POST:         AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
+			case E_BLOCK_TRAPPED_CHEST:     AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case E_BLOCK_WALLSIGN:          AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
 
 			default:
 			{
@@ -460,6 +465,41 @@ public:
 
 
 
+	void AddEnchantingTableEntity(cEnchantingTableEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EnchantingTable");
+			if (!a_Entity->GetCustomName().empty())
+			{
+				mWriter.AddString("CustomName", a_Entity->GetCustomName());
+			}
+		mWriter.EndCompound();
+	}
+
+
+
+
+	void AddEnderchestEntity(cEnderChestEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EnderChest");
+		mWriter.EndCompound();
+	}
+
+
+
+
+	void AddEndPortalEntity(cEndPortalEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EndPortal");
+		mWriter.EndCompound();
+	}
+
+
+
+
+
 	void AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 	{
 		mWriter.BeginCompound("");
@@ -506,9 +546,14 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
-			mWriter.AddShort("Entity", static_cast<short>(a_MobSpawner->GetEntity()));
 			mWriter.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
+			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
+			mWriter.AddShort("MinSpawnDelay", a_MobSpawner->GetMinSpawnDelay());
+			mWriter.AddShort("MaxSpawnDelay", a_MobSpawner->GetMaxSpawnDelay());
+			mWriter.AddShort("MaxNearbyEntities", a_MobSpawner->GetMaxNearbyEntities());
+			mWriter.AddShort("RequiredPlayerRange", a_MobSpawner->GetRequiredPlayerRange());
 		mWriter.EndCompound();
 	}
 
@@ -520,7 +565,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Note, "Music");
-			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetPitch()));
+			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetNote()));
 		mWriter.EndCompound();
 	}
 

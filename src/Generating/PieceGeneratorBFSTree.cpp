@@ -177,7 +177,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	// Place the piece:
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
-	auto PlacedPiece = cpp14::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
+	auto PlacedPiece = std::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
 
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();

@@ -16,7 +16,6 @@
 
 
 // tolua_begin
-
 class cFlowerPotEntity :
 	public cBlockEntity
 {
@@ -25,8 +24,6 @@ class cFlowerPotEntity :
 	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cFlowerPotEntity)
 
 	/** Creates a new flowerpot entity at the specified block coords. a_World may be nullptr */
 	cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -57,7 +54,3 @@ private:
 
 	cItem m_Item;
 } ;  // tolua_export
-
-
-
-

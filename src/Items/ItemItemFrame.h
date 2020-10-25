@@ -49,7 +49,7 @@ public:
 		}
 
 		// Place the item frame:
-		auto ItemFrame = cpp14::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
+		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 		{

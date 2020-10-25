@@ -88,6 +88,9 @@ public:
 	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 
+	/** Finds an item based on ItemType and ItemDamage (<- defines the itemType, too) */
+	cItem * FindItem(const cItem & a_RecipeItem);
+
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
 
@@ -210,7 +213,3 @@ protected:
 	// cItemGrid::cListener override:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 };  // tolua_export
-
-
-
-

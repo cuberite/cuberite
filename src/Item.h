@@ -141,8 +141,9 @@ public:
 	int GetEnchantability();  // tolua_export
 
 	/** Randomly enchants the item using the specified number of XP levels.
-	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already). */
-	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
+	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already).
+	Randomness is derived from the provided PRNG. */
+	bool EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random);  // Exported in ManualBindings.cpp
 
 	/** Adds this specific enchantment to this item, returning the cost.
 	FromBook specifies whether the enchantment should be treated as coming
@@ -168,6 +169,31 @@ public:
 	// tolua_end
 
 	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+
+	/**
+	Compares two items for the same type or category. Type of item is defined
+	via `m_ItemType` and `m_ItemDamage`. Some items (e.g. planks) have the same
+	`m_ItemType` and the wood kind is defined via `m_ItemDamage`. `-1` is used
+	as placeholder for all kinds (e.g. all kind of planks).
+
+	Items are different when the `ItemType` is different or the `ItemDamage`
+	is different and unequal -1.
+	*/
+	struct sItemCompare
+	{
+		bool operator() (const cItem & a_Lhs, const cItem & a_Rhs) const
+		{
+			if (a_Lhs.m_ItemType != a_Rhs.m_ItemType)
+			{
+				return (a_Lhs.m_ItemType < a_Rhs.m_ItemType);
+			}
+			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
+			{
+				return false;  // -1 is a wildcard, damage of -1 alway compares equal
+			}
+			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
+		}
+	};
 
 	// tolua_begin
 
@@ -205,6 +231,8 @@ public:
 	cItem * Get   (int a_Idx);
 	void    Set   (int a_Idx, const cItem & a_Item);
 	void    Add   (const cItem & a_Item) {push_back(a_Item); }
+	void    Add   (short a_ItemType) { emplace_back(a_ItemType); }
+	void    Add   (short a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
@@ -214,7 +242,7 @@ public:
 
 	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
 	{
-		push_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+		emplace_back(a_ItemType, a_ItemCount, a_ItemDamage);
 	}
 
 	/** Adds a copy of all items in a_ItemGrid. */

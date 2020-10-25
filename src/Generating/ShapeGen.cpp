@@ -24,7 +24,7 @@ class cTerrainHeightToShapeGen:
 {
 public:
 	cTerrainHeightToShapeGen(cTerrainHeightGenPtr a_HeightGen):
-		m_HeightGen(a_HeightGen)
+		m_HeightGen(std::move(a_HeightGen))
 	{
 	}
 
@@ -77,7 +77,7 @@ typedef std::shared_ptr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
 
 cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
 	cIniFile & a_IniFile,
-	cBiomeGenPtr a_BiomeGen,
+	const cBiomeGenPtr & a_BiomeGen,
 	int a_Seed,
 	bool & a_CacheOffByDefault
 )

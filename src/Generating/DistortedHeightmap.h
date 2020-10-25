@@ -26,7 +26,7 @@ class cDistortedHeightmap :
 	public cTerrainShapeGen
 {
 public:
-	cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen);
+	cDistortedHeightmap(int a_Seed, const cBiomeGenPtr & a_BiomeGen);
 
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];

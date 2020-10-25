@@ -1,5 +1,6 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	CriticalSection.cpp
 	Errors.cpp
 	Event.cpp
@@ -16,9 +17,7 @@ SET (SRCS
 	TCPLinkImpl.cpp
 	UDPEndpointImpl.cpp
 	WinStackWalker.cpp
-)
 
-SET (HDRS
 	AtomicUniquePtr.h
 	CriticalSection.h
 	Errors.h
@@ -29,22 +28,16 @@ SET (HDRS
 	HostnameLookup.h
 	IPLookup.h
 	IsThread.h
+	MiniDumpWriter.h
 	Network.h
 	NetworkLookup.h
 	NetworkSingleton.h
 	Queue.h
 	ServerHandleImpl.h
 	StackTrace.h
+	StartAsService.h
 	TCPLinkImpl.h
 	UDPEndpointImpl.h
 	WinStackWalker.h
 )
 
-if(NOT MSVC)
-	add_library(OSSupport ${SRCS} ${HDRS})
-	target_link_libraries(OSSupport fmt::fmt)
-
-	if(NOT WIN32)
-		target_link_libraries(OSSupport event_pthreads_static)
-	endif()
-endif()

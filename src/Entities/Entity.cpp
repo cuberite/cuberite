@@ -39,8 +39,8 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_MaxHealth(1),
 	m_AttachedTo(nullptr),
 	m_Attachee(nullptr),
-	m_bDirtyHead(true),
-	m_bDirtyOrientation(true),
+	m_bDirtyHead(false),
+	m_bDirtyOrientation(false),
 	m_bHasSentNoSpeed(true),
 	m_bOnGround(false),
 	m_Gravity(-9.81f),
@@ -82,11 +82,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 
 cEntity::~cEntity()
 {
-
-	// Before deleting, the entity needs to have been removed from the world, if ever added
-	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
-	ASSERT(!IsTicking());
-
 	/*
 	// DEBUG:
 	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",
@@ -248,21 +243,6 @@ void cEntity::Destroy()
 		// Also, not storing the returned pointer means automatic destruction
 		VERIFY(a_World.RemoveEntity(*this));
 	});
-	Destroyed();
-}
-
-
-
-
-
-void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
-{
-	SetIsTicking(false);
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
-	}
-
 	Destroyed();
 }
 
@@ -544,7 +524,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
+		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
 	m_Health -= a_TDI.FinalDamage;
@@ -617,7 +597,6 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 void cEntity::ApplyArmorDamage(int DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
-	return;
 }
 
 
@@ -641,6 +620,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtFalling:
 		case dtLightning:
 		case dtPlugin:
+		case dtEnvironment:
 		{
 			return false;
 		}
@@ -1427,7 +1407,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimNether)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchPortal);
 						}
 
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
@@ -1506,7 +1486,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimEnd)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchTheEnd);
 						}
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
@@ -2041,11 +2021,10 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
 {
-	if ((m_AttachedTo != nullptr) && (a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID()))
-	{
-		return true;
-	}
-	return false;
+	return (
+		(m_AttachedTo != nullptr) &&
+		(a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID())
+	);
 }
 
 

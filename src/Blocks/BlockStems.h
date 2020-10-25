@@ -11,23 +11,18 @@
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
 template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
-class cBlockStemsHandler:
+class cBlockStemsHandler final :
 	public cBlockPlant<true>
 {
 	using Super = cBlockPlant<true>;
 
 public:
 
-	cBlockStemsHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(StemPickupType, 1, 0);
 	}
@@ -36,7 +31,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_FARMLAND));
 	}
@@ -45,7 +40,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
@@ -55,7 +50,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
 		auto meta = oldMeta + a_NumStages;
@@ -74,14 +69,9 @@ public:
 		return meta - oldMeta;
 	}
 
-
-
-
-protected:
-
 	/** Grows the final produce next to the stem at the specified pos.
 	Returns true if successful, false if not. */
-	bool growProduce(cChunk & a_Chunk, Vector3i a_StemRelPos)
+	static bool growProduce(cChunk & a_Chunk, Vector3i a_StemRelPos)
 	{
 		auto & random = GetRandomProvider();
 

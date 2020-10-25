@@ -21,9 +21,9 @@ public:
 
 	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
 	template <typename... Args>
-	void Out(const char * a_Fmt, const Args & ... a_Args)
+	void Out(const char * a_Format, const Args & ... a_Args)
 	{
-		vOut(a_Fmt, fmt::make_printf_args(a_Args...));
+		vOut(a_Format, fmt::make_printf_args(a_Args...));
 	}
 
 	/** Called when the command wants to output anything; may be called multiple times */

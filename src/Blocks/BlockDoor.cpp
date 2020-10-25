@@ -7,31 +7,33 @@
 
 
 
-cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType):
-	Super(a_BlockType)
+void cBlockDoorHandler::OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+) const
 {
-}
+	UNUSED(a_Digger);
+	// A part of the multiblock door was broken; the relevant half will drop any pickups as required.
+	// All that is left to do is to delete the other half of the multiblock.
 
-
-
-
-
-void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
-{
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
-		// Was upper part of door
-		if ((a_BlockPos.y > 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1))))
+		const auto Lower = a_BlockPos.addedY(-1);
+		if ((Lower.y >= 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(Lower)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(-1));
+			// Was upper part of door, remove lower:
+			a_ChunkInterface.SetBlock(Lower, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
-		// Was lower part
-		if ((a_BlockPos.y < cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(1))))
+		const auto Upper = a_BlockPos.addedY(1);
+		if ((Upper.y < cChunkDef::Height) && IsDoorBlockType(a_ChunkInterface.GetBlock(Upper)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(1));
+			// Was lower part, remove upper:
+			a_ChunkInterface.SetBlock(Upper, E_BLOCK_AIR, 0);
 		}
 	}
 }
@@ -47,7 +49,7 @@ bool cBlockDoorHandler::OnUse(
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
-)
+) const
 {
 	UNUSED(a_WorldInterface);
 	UNUSED(a_BlockFace);
@@ -70,11 +72,13 @@ bool cBlockDoorHandler::OnUse(
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 			break;
 		}
-		// Prevent iron door from opening on player click
 		case E_BLOCK_IRON_DOOR:
 		{
+			// Prevent iron door from opening on player click (#2415):
 			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockPos, a_BlockFace);
-			break;
+
+			// Allow placement actions to instead take place:
+			return false;
 		}
 	}
 
@@ -91,7 +95,7 @@ void cBlockDoorHandler::OnCancelRightClick(
 	cPlayer & a_Player,
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace
-)
+) const
 {
 	UNUSED(a_ChunkInterface);
 	UNUSED(a_BlockFace);
@@ -115,7 +119,7 @@ void cBlockDoorHandler::OnCancelRightClick(
 
 
 
-cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
 {
 	// Doors can be placed inside the player
 	return cBoundingBox(0, 0, 0, 0, 0, 0);
@@ -125,7 +129,7 @@ cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTY
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
 	{
@@ -143,7 +147,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
 	{
@@ -161,7 +165,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta) const
 {
 	/*
 	Top bit (0x08) contains door block position (Top / Bottom). Only Bottom blocks contain position data
@@ -195,7 +199,7 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta) const
 {
 	// Top bit (0x08) contains door panel type (Top / Bottom panel)  Only Bottom panels contain position data
 	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)

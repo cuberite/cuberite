@@ -278,9 +278,6 @@ bool cPathFinder::PathIsTooOld() const
 	{
 		acceptableDeviation = 1;
 	}
-	if ((m_FinalDestination - m_DeviationOrigin).SqrLength() > acceptableDeviation * acceptableDeviation)
-	{
-		return true;
-	}
-	return false;
+	const auto DeviationSqr = (m_FinalDestination - m_DeviationOrigin).SqrLength();
+	return (DeviationSqr > (acceptableDeviation * acceptableDeviation));
 }

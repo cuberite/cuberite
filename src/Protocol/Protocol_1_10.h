@@ -26,14 +26,14 @@ class cProtocol_1_10_0:
 
 public:
 
-	cProtocol_1_10_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_4;
+
+protected:
 
 	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 
+	virtual Version GetProtocolVersion() override;
 	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-
-protected:
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
 	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;

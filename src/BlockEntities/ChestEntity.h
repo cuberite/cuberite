@@ -34,8 +34,6 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cChestEntity)
-
 	/** Constructor used for normal operation */
 	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -64,7 +62,6 @@ public:
 	/** Sets the number of players who currently have this chest open */
 	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
 
-
 private:
 
 	/** Number of players who currently have this chest open */
@@ -74,39 +71,5 @@ private:
 	cChestEntity * m_Neighbour;
 
 	/** cItemGrid::cListener overrides: */
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
-	{
-		UNUSED(a_SlotNum);
-		ASSERT(a_Grid == &m_Contents);
-		if (m_World != nullptr)
-		{
-			cWindow * Window = GetWindow();
-			if (
-				(Window == nullptr) &&
-				(m_Neighbour != nullptr)
-			)
-			{
-				// Neighbour might own the window
-				Window = m_Neighbour->GetWindow();
-			}
-
-			if (Window != nullptr)
-			{
-				Window->BroadcastWholeWindow();
-			}
-
-			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-			m_World->DoWithChunkAt(m_Pos, [&](cChunk & a_Chunk)
-				{
-					m_World->GetRedstoneSimulator()->WakeUp(m_Pos, &a_Chunk);
-					return true;
-				}
-			);
-		}
-	}
-
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 } ;  // tolua_export
-
-
-
-

@@ -8,9 +8,8 @@ Implements the 1.8 protocol classes:
 */
 
 #include "Globals.h"
-#include "json/json.h"
 #include "Protocol_1_8.h"
-#include "ChunkDataSerializer.h"
+#include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
@@ -21,7 +20,6 @@ Implements the 1.8 protocol classes:
 #include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
-#include "../Statistics.h"
 #include "../UUID.h"
 #include "../World.h"
 #include "../JsonUtils.h"
@@ -46,6 +44,7 @@ Implements the 1.8 protocol classes:
 
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/EnchantingTableEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
@@ -87,13 +86,7 @@ Implements the 1.8 protocol classes:
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
-
-
-
-
-
-// fwd: main.cpp:
-extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
+static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
 
 
@@ -102,12 +95,10 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_8_0:
 
-cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
 	Super(a_Client),
-	m_ServerAddress(a_ServerAddress),
-	m_ServerPort(a_ServerPort),
 	m_State(a_State),
-	m_ReceivedData(32 KiB),
+	m_ServerAddress(a_ServerAddress),
 	m_IsEncrypted(false)
 {
 	AStringVector Params;
@@ -183,7 +174,7 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 
 
-void cProtocol_1_8_0::DataReceived(const char * a_Data, size_t a_Size)
+void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
@@ -192,14 +183,14 @@ void cProtocol_1_8_0::DataReceived(const char * a_Data, size_t a_Size)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
 			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(reinterpret_cast<const char *>(Decrypted), NumBytes);
+			AddReceivedData(a_Buffer, reinterpret_cast<const char *>(Decrypted), NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
 		}
 	}
 	else
 	{
-		AddReceivedData(a_Data, a_Size);
+		AddReceivedData(a_Buffer, a_Data, a_Size);
 	}
 }
 
@@ -226,7 +217,7 @@ void cProtocol_1_8_0::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockAction);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
 	Pkt.WriteVarInt32(a_BlockType);
@@ -242,7 +233,7 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_
 
 	cPacketizer Pkt(*this, pktBlockBreakAnim);
 	Pkt.WriteVarInt32(a_EntityID);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteBEInt8(a_Stage);
 }
 
@@ -255,7 +246,7 @@ void cProtocol_1_8_0::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
 
@@ -329,16 +320,12 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 
 
 
-void cProtocol_1_8_0::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+void cProtocol_1_8_0::SendChunkData(const std::string_view a_ChunkData)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
-	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ, {});
-
 	cCSLock Lock(m_CSPacket);
-	SendData(ChunkData.data(), ChunkData.size());
+	SendData(a_ChunkData.data(), a_ChunkData.size());
 }
 
 
@@ -390,19 +377,24 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 {
 	switch (m_State)
 	{
-		case 2:
+		case State::Login:
 		{
-			// During login:
 			cPacketizer Pkt(*this, pktDisconnectDuringLogin);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
-		case 3:
+		case State::Game:
 		{
-			// In-game:
 			cPacketizer Pkt(*this, pktDisconnectDuringGame);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
+		}
+		default:
+		{
+			FLOGERROR(
+				"Tried to send disconnect in invalid game state {0}",
+				static_cast<int>(m_State)
+			);
 		}
 	}
 }
@@ -416,7 +408,7 @@ void cProtocol_1_8_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktEditSign);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -627,25 +619,19 @@ void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_8_0::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Power)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktExplosion);
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockX));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockY));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockZ));
-	Pkt.WriteBEFloat(static_cast<float>(a_Radius));
-	Pkt.WriteBEUInt32(static_cast<UInt32>(a_BlocksAffected.size()));
-	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(), end = a_BlocksAffected.end(); itr != end; ++itr)
-	{
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->x));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->y));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->z));
-	}  // for itr - a_BlockAffected[]
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.x));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.y));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.z));
+	Pkt.WriteBEFloat(a_Position.x);
+	Pkt.WriteBEFloat(a_Position.y);
+	Pkt.WriteBEFloat(a_Position.z);
+	Pkt.WriteBEFloat(a_Power);
+	Pkt.WriteBEUInt32(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
 }
 
 
@@ -782,7 +768,7 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WritePosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
 	}
 
 	// Send the server difficulty:
@@ -806,10 +792,10 @@ void cProtocol_1_8_0::SendLoginSuccess(void)
 	// Enable compression:
 	{
 		cPacketizer Pkt(*this, pktStartCompression);
-		Pkt.WriteVarInt32(256);
+		Pkt.WriteVarInt32(CompressionThreshold);
 	}
 
-	m_State = 3;  // State = Game
+	m_State = State::Game;
 
 	{
 		cPacketizer Pkt(*this, pktLoginSuccess);
@@ -831,8 +817,8 @@ void cProtocol_1_8_0::SendPaintingSpawn(const cPainting & a_Painting)
 
 	cPacketizer Pkt(*this, pktSpawnPainting);
 	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
-	Pkt.WriteString(a_Painting.GetName().c_str());
-	Pkt.WritePosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteString(a_Painting.GetName());
+	Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
 
@@ -1345,7 +1331,7 @@ void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, int a_S
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WritePosition64(a_SrcX, a_SrcY, a_SrcZ);
+	Pkt.WriteXYZPosition64(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -1409,8 +1395,8 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
 	Pkt.WriteFPInt(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());  // Doesn't seem to be used
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
@@ -1427,18 +1413,26 @@ void cProtocol_1_8_0::SendStatistics(const cStatManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktStatistics);
-	Pkt.WriteVarInt32(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
-
-	size_t Count = static_cast<size_t>(statCount);
-	for (size_t i = 0; i < Count; ++i)
+	UInt32 Size = 0;
+	a_Manager.ForEachStatisticType([&Size](const auto & Store)
 	{
-		StatValue Value = a_Manager.GetValue(static_cast<eStatistic>(i));
-		const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
+		Size += static_cast<UInt32>(Store.size());
+	});
 
-		Pkt.WriteString(StatName);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
-	}
+	// No need to check Size != 0
+	// Assume that the vast majority of the time there's at least one statistic to send
+
+	cPacketizer Pkt(*this, pktStatistics);
+	Pkt.WriteVarInt32(Size);
+
+	a_Manager.ForEachStatisticType([&Pkt](const cStatManager::CustomStore & Store)
+	{
+		for (const auto & Item : Store)
+		{
+			Pkt.WriteString(GetProtocolStatisticName(Item.first));
+			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
+		}
+	});
 }
 
 
@@ -1532,17 +1526,21 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WritePosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
-		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
-		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
-		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
-		case E_BLOCK_BED:           Action = 11; break;  // Update bed color
+		case E_BLOCK_MOB_SPAWNER:       Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:     Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:            Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:              Action = 4; break;  // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:        Action = 5; break;  // Update flower pot
+		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
+
+		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
@@ -1559,7 +1557,7 @@ void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateSign);
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
 
 	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
@@ -1580,7 +1578,27 @@ void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_B
 
 	cPacketizer Pkt(*this, pktUseBed);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WritePosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	// Client doesn't support this feature
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendInitRecipes(UInt32 a_RecipeID)
+{
+	// Client doesn't support this feature
+	return;
 }
 
 
@@ -1677,13 +1695,13 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
-	Pkt.WriteBEInt16(a_Property);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Property));
 	Pkt.WriteBEInt16(a_Value);
 }
 
@@ -1693,6 +1711,53 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Prope
 
 bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
+	const auto UncompressedSize = static_cast<size_t>(a_Packet.size());
+
+	if (UncompressedSize < CompressionThreshold)
+	{
+		/* Size doesn't reach threshold, not worth compressing.
+
+		--------------- Packet format ----------------
+		|--- Header ---------------------------------|
+		| PacketSize: Size of all fields below       |
+		| DataSize: Zero, means below not compressed |
+		|--- Body -----------------------------------|
+		| a_Packet: copy of uncompressed data        |
+		----------------------------------------------
+		*/
+		const UInt32 DataSize = 0;
+		const auto PacketSize = static_cast<UInt32>(
+			cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
+
+		cByteBuffer LengthHeaderBuffer(
+			cByteBuffer::GetVarIntSize(PacketSize) +
+			cByteBuffer::GetVarIntSize(DataSize)
+		);
+
+		LengthHeaderBuffer.WriteVarInt32(PacketSize);
+		LengthHeaderBuffer.WriteVarInt32(DataSize);
+
+		AString LengthData;
+		LengthHeaderBuffer.ReadAll(LengthData);
+
+		a_CompressedData.reserve(LengthData.size() + UncompressedSize);
+		a_CompressedData.assign(LengthData.data(), LengthData.size());
+		a_CompressedData.append(a_Packet);
+
+		return true;
+	}
+
+	/* Definitely worth compressing.
+
+	--------------- Packet format ----------------
+	|--- Header ---------------------------------|
+	| PacketSize: Size of all fields below       |
+	| DataSize: Size of uncompressed a_Packet    |
+	|--- Body -----------------------------------|
+	| CompressedData: compressed a_Packet        |
+	----------------------------------------------
+	*/
+
 	// Compress the data:
 	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
@@ -1703,30 +1768,35 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		return false;
 	}
 
-	int Status = compress2(
-		reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
-		reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
-	);
-	if (Status != Z_OK)
+	if (
+		compress2(
+			reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
+			reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
+		) != Z_OK
+	)
 	{
 		return false;
 	}
 
+	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
+	const auto PacketSize = static_cast<UInt32>(
+		cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
+
+	cByteBuffer LengthHeaderBuffer(
+		cByteBuffer::GetVarIntSize(PacketSize) +
+		cByteBuffer::GetVarIntSize(DataSize)
+	);
+
+	LengthHeaderBuffer.WriteVarInt32(PacketSize);
+	LengthHeaderBuffer.WriteVarInt32(DataSize);
+
 	AString LengthData;
-	cByteBuffer Buffer(20);
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
+	LengthHeaderBuffer.ReadAll(LengthData);
 
-	Buffer.WriteVarInt32(static_cast<UInt32>(CompressedSize + LengthData.size()));
-	Buffer.WriteVarInt32(static_cast<UInt32>(a_Packet.size()));
-	Buffer.ReadAll(LengthData);
-	Buffer.CommitRead();
-
-	a_CompressedData.clear();
 	a_CompressedData.reserve(LengthData.size() + CompressedSize);
-	a_CompressedData.append(LengthData.data(), LengthData.size());
+	a_CompressedData.assign(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
+
 	return true;
 }
 
@@ -1853,19 +1923,19 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 
 
 
-void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
+void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
 	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 	{
-		if (m_ReceivedData.GetReadableSpace() > 0)
+		if (a_Buffer.GetReadableSpace() > 0)
 		{
 			AString AllData;
-			size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-			m_ReceivedData.ReadAll(AllData);
-			m_ReceivedData.ResetRead();
-			m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-			ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+			a_Buffer.ReadAll(AllData);
+			a_Buffer.ResetRead();
+			a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
 			AString Hex;
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
 			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
@@ -1880,7 +1950,7 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		m_CommLogFile.Flush();
 	}
 
-	if (!m_ReceivedData.Write(a_Data, a_Size))
+	if (!a_Buffer.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
 		m_Client->PacketBufferFull();
@@ -1891,16 +1961,16 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 	for (;;)
 	{
 		UInt32 PacketLen;
-		if (!m_ReceivedData.ReadVarInt(PacketLen))
+		if (!a_Buffer.ReadVarInt(PacketLen))
 		{
 			// Not enough data
-			m_ReceivedData.ResetRead();
+			a_Buffer.ResetRead();
 			break;
 		}
-		if (!m_ReceivedData.CanReadBytes(PacketLen))
+		if (!a_Buffer.CanReadBytes(PacketLen))
 		{
 			// The full packet hasn't been received yet
-			m_ReceivedData.ResetRead();
+			a_Buffer.ResetRead();
 			break;
 		}
 
@@ -1909,15 +1979,15 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		AString UncompressedData;
 		if (m_State == 3)
 		{
-			UInt32 NumBytesRead = static_cast<UInt32>(m_ReceivedData.GetReadableSpace());
+			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
 
-			if (!m_ReceivedData.ReadVarInt(UncompressedSize))
+			if (!a_Buffer.ReadVarInt(UncompressedSize))
 			{
 				m_Client->Kick("Compression packet incomplete");
 				return;
 			}
 
-			NumBytesRead -= static_cast<UInt32>(m_ReceivedData.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
+			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
 			ASSERT(PacketLen > NumBytesRead);
 			PacketLen -= NumBytesRead;
 
@@ -1925,7 +1995,7 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 			{
 				// Decompress the data:
 				AString CompressedData;
-				VERIFY(m_ReceivedData.ReadString(CompressedData, PacketLen));
+				VERIFY(a_Buffer.ReadString(CompressedData, PacketLen));
 				if (InflateString(CompressedData.data(), PacketLen, UncompressedData) != Z_OK)
 				{
 					m_Client->Kick("Compression failure");
@@ -1945,14 +2015,14 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 		if (UncompressedSize == 0)
 		{
 			// No compression was used, move directly
-			VERIFY(m_ReceivedData.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
+			VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
 		}
 		else
 		{
 			// Compression was used, move the uncompressed data:
 			VERIFY(bb.Write(UncompressedData.data(), UncompressedData.size()));
 		}
-		m_ReceivedData.CommitRead();
+		a_Buffer.CommitRead();
 
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
@@ -2028,18 +2098,18 @@ void cProtocol_1_8_0::AddReceivedData(const char * a_Data, size_t a_Size)
 	}  // for (ever)
 
 	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
+	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
 	{
 		AString AllData;
-		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
-		m_ReceivedData.ReadAll(AllData);
-		m_ReceivedData.ResetRead();
-		m_ReceivedData.SkipRead(m_ReceivedData.GetReadableSpace() - OldReadableSpace);
-		ASSERT(m_ReceivedData.GetReadableSpace() == OldReadableSpace);
+		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+		a_Buffer.ReadAll(AllData);
+		a_Buffer.ResetRead();
+		a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
 		AString Hex;
 		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
 		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
-			m_ReceivedData.GetReadableSpace(), m_ReceivedData.GetReadableSpace(), Hex.c_str()
+			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
 		);
 		m_CommLogFile.Flush();
 	}
@@ -2139,13 +2209,21 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 
 
 
+cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
+{
+	return Version::v1_8_0;
+}
+
+
+
+
+
 bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -2154,9 +2232,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
@@ -2165,9 +2242,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
@@ -2198,23 +2274,6 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x19: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
-			return false;
-		}
-		case 255:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
@@ -2250,8 +2309,9 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "Cuberite 1.8";
-	Version["protocol"] = 47;
+	const auto ProtocolVersion = GetProtocolVersion();
+	Version["name"] = "Cuberite " + cMultiVersionProtocol::GetVersionTextFromInt(ProtocolVersion);
+	Version["protocol"] = static_cast<std::underlying_type_t<cProtocol::Version>>(ProtocolVersion);
 
 	// Players:
 	Json::Value Players;
@@ -2274,10 +2334,9 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
 
-	auto Response = JsonUtils::WriteFastString(ResponseValue);
-
+	// Serialize the response into a packet:
 	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Response);
+	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
 }
 
 
@@ -2398,7 +2457,7 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2414,7 +2473,7 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2492,7 +2551,7 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 2:
 		{
 			// Open Inventory achievement
-			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
+			m_Client->GetPlayer()->AwardAchievement(Statistic::AchOpenInventory);
 			break;
 		}
 	}
@@ -2732,7 +2791,7 @@ void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -2742,7 +2801,7 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		if (JsonUtils::ParseString(Line, root))
+		if (JsonUtils::ParseString(Line, root) && root.isString())
 		{
 			Lines[i] = root.asString();
 		}
@@ -3092,7 +3151,7 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 
 
 
-eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(Int8 a_BlockFace)
+eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
 {
 	// Normalize the blockface values returned from the protocol
 	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
@@ -3122,22 +3181,16 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 	m_OutPacketBuffer.ReadAll(PacketData);
 	m_OutPacketBuffer.CommitRead();
 
-	if ((m_State == 3) && (PacketLen >= 256))
+	if (m_State == 3)
 	{
 		// Compress the packet payload:
 		if (!cProtocol_1_8_0::CompressPacket(PacketData, CompressedPacket))
 		{
 			return;
 		}
-	}
-	else if (m_State == 3)
-	{
-		// The packet is not compressed, indicate this in the packet header:
-		m_OutPacketLenBuffer.WriteVarInt32(PacketLen + 1);
-		m_OutPacketLenBuffer.WriteVarInt32(0);
-		AString LengthData;
-		m_OutPacketLenBuffer.ReadAll(LengthData);
-		SendData(LengthData.data(), LengthData.size());
+
+		// Send the packet's payload compressed:
+		SendData(CompressedPacket.data(), CompressedPacket.size());
 	}
 	else
 	{
@@ -3146,17 +3199,10 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		AString LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
 		SendData(LengthData.data(), LengthData.size());
-	}
 
-	// Send the packet's payload, either direct or compressed:
-	if (CompressedPacket.empty())
-	{
+		// Send the packet's payload directly:
 		m_OutPacketLenBuffer.CommitRead();
 		SendData(PacketData.data(), PacketData.size());
-	}
-	else
-	{
-		SendData(CompressedPacket.data(), CompressedPacket.size());
 	}
 
 	// Log the comm into logfile:
@@ -3266,7 +3312,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName.c_str());
+			Writer.AddString("Name", a_Item.m_CustomName);
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -3327,7 +3373,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());
 			Writer.AddInt("y", CommandBlockEntity.GetPosY());
 			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand());
 			// You can set custom names for windows in Vanilla
 			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
 			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
@@ -3337,6 +3383,29 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			{
 				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
 			}
+			break;
+		}
+
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		{
+			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
+			Writer.AddInt("x", EnchantingTableEntity.GetPosX());
+			Writer.AddInt("y", EnchantingTableEntity.GetPosY());
+			Writer.AddInt("z", EnchantingTableEntity.GetPosZ());
+			if (!EnchantingTableEntity.GetCustomName().empty())
+			{
+				Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
+			}
+			Writer.AddString("id", "EnchantingTable");
+			break;
+		}
+
+		case E_BLOCK_END_PORTAL:
+		{
+			Writer.AddInt("x", a_BlockEntity.GetPosX());
+			Writer.AddInt("y", a_BlockEntity.GetPosY());
+			Writer.AddInt("z", a_BlockEntity.GetPosZ());
+			Writer.AddString("id", "EndPortal");
 			break;
 		}
 
@@ -3907,4 +3976,105 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
 	}
 	UNREACHABLE("Unhandled entity kind");
+}
+
+
+
+
+
+const char * cProtocol_1_8_0::GetProtocolStatisticName(Statistic a_Statistic)
+{
+	switch (a_Statistic)
+	{
+		// V1.8 Achievements
+		case Statistic::AchOpenInventory:        return "achievement.openInventory";
+		case Statistic::AchMineWood:             return "achievement.mineWood";
+		case Statistic::AchBuildWorkBench:       return "achievement.buildWorkBench";
+		case Statistic::AchBuildPickaxe:         return "achievement.buildPickaxe";
+		case Statistic::AchBuildFurnace:         return "achievement.buildFurnace";
+		case Statistic::AchAcquireIron:          return "achievement.acquireIron";
+		case Statistic::AchBuildHoe:             return "achievement.buildHoe";
+		case Statistic::AchMakeBread:            return "achievement.makeBread";
+		case Statistic::AchBakeCake:             return "achievement.bakeCake";
+		case Statistic::AchBuildBetterPickaxe:   return "achievement.buildBetterPickaxe";
+		case Statistic::AchCookFish:             return "achievement.cookFish";
+		case Statistic::AchOnARail:              return "achievement.onARail";
+		case Statistic::AchBuildSword:           return "achievement.buildSword";
+		case Statistic::AchKillEnemy:            return "achievement.killEnemy";
+		case Statistic::AchKillCow:              return "achievement.killCow";
+		case Statistic::AchFlyPig:               return "achievement.flyPig";
+		case Statistic::AchSnipeSkeleton:        return "achievement.snipeSkeleton";
+		case Statistic::AchDiamonds:             return "achievement.diamonds";
+		case Statistic::AchPortal:               return "achievement.portal";
+		case Statistic::AchGhast:                return "achievement.ghast";
+		case Statistic::AchBlazeRod:             return "achievement.blazeRod";
+		case Statistic::AchPotion:               return "achievement.potion";
+		case Statistic::AchTheEnd:               return "achievement.theEnd";
+		case Statistic::AchTheEnd2:              return "achievement.theEnd2";
+		case Statistic::AchEnchantments:         return "achievement.enchantments";
+		case Statistic::AchOverkill:             return "achievement.overkill";
+		case Statistic::AchBookcase:             return "achievement.bookcase";
+		case Statistic::AchExploreAllBiomes:     return "achievement.exploreAllBiomes";
+		case Statistic::AchSpawnWither:          return "achievement.spawnWither";
+		case Statistic::AchKillWither:           return "achievement.killWither";
+		case Statistic::AchFullBeacon:           return "achievement.fullBeacon";
+		case Statistic::AchBreedCow:             return "achievement.breedCow";
+		case Statistic::AchDiamondsToYou:        return "achievement.diamondsToYou";
+
+		// V1.8 stats
+		case Statistic::AnimalsBred:               return "stat.animalsBred";
+		case Statistic::BoatOneCm:                 return "stat.boatOneCm";
+		case Statistic::ClimbOneCm:                return "stat.climbOneCm";
+		case Statistic::CrouchOneCm:               return "stat.crouchOneCm";
+		case Statistic::DamageDealt:               return "stat.damageDealt";
+		case Statistic::DamageTaken:               return "stat.damageTaken";
+		case Statistic::Deaths:                    return "stat.deaths";
+		case Statistic::Drop:                      return "stat.drop";
+		case Statistic::FallOneCm:                 return "stat.fallOneCm";
+		case Statistic::FishCaught:                return "stat.fishCaught";
+		case Statistic::FlyOneCm:                  return "stat.flyOneCm";
+		case Statistic::HorseOneCm:                return "stat.horseOneCm";
+		case Statistic::Jump:                      return "stat.jump";
+		case Statistic::LeaveGame:                 return "stat.leaveGame";
+		case Statistic::MinecartOneCm:             return "stat.minecartOneCm";
+		case Statistic::MobKills:                  return "stat.mobKills";
+		case Statistic::PigOneCm:                  return "stat.pigOneCm";
+		case Statistic::PlayerKills:               return "stat.playerKills";
+		case Statistic::PlayOneMinute:             return "stat.playOneMinute";
+		case Statistic::SprintOneCm:               return "stat.sprintOneCm";
+		case Statistic::SwimOneCm:                 return "stat.swimOneCm";
+		case Statistic::TalkedToVillager:          return "stat.talkedToVillager";
+		case Statistic::TimeSinceDeath:            return "stat.timeSinceDeath";
+		case Statistic::TradedWithVillager:        return "stat.tradedWithVillager";
+		case Statistic::WalkOneCm:                 return "stat.walkOneCm";
+		case Statistic::WalkUnderWaterOneCm:       return "stat.diveOneCm";
+
+		// V1.8.2 stats
+		case Statistic::CleanArmor:                return "stat.armorCleaned";
+		case Statistic::CleanBanner:               return "stat.bannerCleaned";
+		case Statistic::EatCakeSlice:              return "stat.cakeSlicesEaten";
+		case Statistic::EnchantItem:               return "stat.itemEnchanted";
+		case Statistic::FillCauldron:              return "stat.cauldronFilled";
+		case Statistic::InspectDispenser:          return "stat.dispenserInspected";
+		case Statistic::InspectDropper:            return "stat.dropperInspected";
+		case Statistic::InspectHopper:             return "stat.hopperInspected";
+		case Statistic::InteractWithBeacon:        return "stat.beaconInteraction";
+		case Statistic::InteractWithBrewingstand:  return "stat.brewingstandInteraction";
+		case Statistic::InteractWithCraftingTable: return "stat.craftingTableInteraction";
+		case Statistic::InteractWithFurnace:       return "stat.furnaceInteraction";
+		case Statistic::OpenChest:                 return "stat.chestOpened";
+		case Statistic::OpenEnderchest:            return "stat.enderchestOpened";
+		case Statistic::PlayNoteblock:             return "stat.noteblockPlayed";
+		case Statistic::PlayRecord:                return "stat.recordPlayed";
+		case Statistic::PotFlower:                 return "stat.flowerPotted";
+		case Statistic::TriggerTrappedChest:       return "stat.trappedChestTriggered";
+		case Statistic::TuneNoteblock:             return "stat.noteblockTuned";
+		case Statistic::UseCauldron:               return "stat.cauldronUsed";
+
+		// V1.9 stats
+		case Statistic::AviateOneCm:               return "stat.aviateOneCm";
+		case Statistic::SleepInBed:                return "stat.sleepInBed";
+		case Statistic::SneakTime:                 return "stat.sneakTime";
+		default:                                   return "";
+	}
 }

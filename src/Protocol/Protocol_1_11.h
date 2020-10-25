@@ -28,7 +28,9 @@ class cProtocol_1_11_0:
 
 public:
 
-	cProtocol_1_11_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_10_0;
+
+protected:
 
 	virtual void SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
 	virtual void SendHideTitle    (void) override;
@@ -36,13 +38,13 @@ public:
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
 	virtual void SendTitleTimes   (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 
-protected:
+	/** Returns 1.11. */
+	virtual Version GetProtocolVersion() override;
 
 	/** Converts eMonsterType to protocol-specific mob IDs */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
@@ -60,7 +62,9 @@ class cProtocol_1_11_1:
 
 public:
 
-	cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_11_0;
 
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+protected:
+
+	virtual Version GetProtocolVersion() override;
 };

@@ -7,22 +7,37 @@
 
 
 
-class cBlockCocoaPodHandler :
+class cBlockCocoaPodHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
-	cBlockCocoaPodHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+
+	using Super::Super;
+
+	static NIBBLETYPE BlockFaceToMeta(eBlockFace a_BlockFace)
 	{
+		switch (a_BlockFace)
+		{
+			case BLOCK_FACE_ZM: return 0;
+			case BLOCK_FACE_XM: return 3;
+			case BLOCK_FACE_XP: return 1;
+			case BLOCK_FACE_ZP: return 2;
+			case BLOCK_FACE_NONE:
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			{
+				ASSERT(!"Unknown face");
+				return 0;
+			}
+		}
+		UNREACHABLE("Unsupported block face");
 	}
 
+private:
 
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		// Check that we're attached to a jungle log block:
 		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelPos));
@@ -43,7 +58,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		if (GetRandomProvider().RandBool(0.20))
 		{
@@ -55,7 +70,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto growState = a_BlockMeta >> 2;
@@ -66,7 +81,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto meta = a_Chunk.GetMeta(a_RelPos);
 		auto typeMeta = meta & 0x03;
@@ -105,30 +120,7 @@ public:
 
 
 
-	static NIBBLETYPE BlockFaceToMeta(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0;
-			case BLOCK_FACE_XM: return 3;
-			case BLOCK_FACE_XP: return 1;
-			case BLOCK_FACE_ZP: return 2;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				ASSERT(!"Unknown face");
-				return 0;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 34;

@@ -124,7 +124,7 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap a_Headers = AStringMap(),
-		AString a_Body = AString(),
+		const AString & a_Body = AString(),
 		AStringMap a_Options = AStringMap()
 	);
 

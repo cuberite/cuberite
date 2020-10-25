@@ -50,11 +50,9 @@ public:
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		auto blockHandler = BlockHandler(ClickedBlockType);
 		Vector3i PlacePos;
-		if (blockHandler->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+		if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 		{
-			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, a_ClickedBlockPos);
 			PlacePos = a_ClickedBlockPos;
 		}
 		else
@@ -70,12 +68,10 @@ public:
 			BLOCKTYPE PlaceBlock;
 			NIBBLETYPE PlaceMeta;
 			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
-			blockHandler = BlockHandler(PlaceBlock);
-			if (!blockHandler->DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
+			if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
 			{
 				return false;
 			}
-			blockHandler->OnPlayerBreakingBlock(ChunkInterface, a_World, a_Player, PlacePos);
 		}
 
 		// Check that there is at most one single neighbor of the same chest type:

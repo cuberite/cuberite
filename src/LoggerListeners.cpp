@@ -15,13 +15,13 @@
 	{
 	protected:
 
-		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) = 0;
+		virtual void SetLogColour(eLogLevel a_LogLevel) = 0;
 		virtual void SetDefaultLogColour() = 0;
 
-		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+		virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 		{
 			SetLogColour(a_LogLevel);
-			fputs(a_Message.c_str(), stdout);
+			fwrite(a_Message.data(), sizeof(char), a_Message.size(), stdout);
 			SetDefaultLogColour();
 		}
 	};
@@ -46,40 +46,40 @@
 		}
 
 		#ifdef _DEBUG
-			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+			virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 			{
 				Super::Log(a_Message, a_LogLevel);
 				// In a Windows Debug build, output the log to debug console as well:
-				OutputDebugStringA(a_Message.c_str());
+				OutputDebugStringA(AString(a_Message).c_str());
 			}
 		#endif
 
 
-		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) override
+		virtual void SetLogColour(eLogLevel a_LogLevel) override
 		{
 			// by default, gray on black
 			WORD Attrib = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 			switch (a_LogLevel)
 			{
-				case cLogger::llRegular:
+				case eLogLevel::Regular:
 				{
 					// Gray on black
 					Attrib = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 					break;
 				}
-				case cLogger::llInfo:
+				case eLogLevel::Info:
 				{
 					// Yellow on black
 					Attrib = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
 					break;
 				}
-				case cLogger::llWarning:
+				case eLogLevel::Warning:
 				{
 					// Red on black
 					Attrib = FOREGROUND_RED | FOREGROUND_INTENSITY;
 					break;
 				}
-				case cLogger::llError:
+				case eLogLevel::Error:
 				{
 					// Black on red
 					Attrib = BACKGROUND_RED | BACKGROUND_INTENSITY;
@@ -111,29 +111,29 @@
 		: public cColouredConsoleListener
 	{
 	public:
-		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) override
+		virtual void SetLogColour(eLogLevel a_LogLevel) override
 		{
 			switch (a_LogLevel)
 			{
-				case cLogger::llRegular:
+				case eLogLevel::Regular:
 				{
 					// Whatever the console default is
 					printf("\x1b[0m");
 					break;
 				}
-				case cLogger::llInfo:
+				case eLogLevel::Info:
 				{
 					// Yellow on black
 					printf("\x1b[33;1m");
 					break;
 				}
-				case cLogger::llWarning:
+				case eLogLevel::Warning:
 				{
 					// Red on black
 					printf("\x1b[31;1m");
 					break;
 				}
-				case cLogger::llError:
+				case eLogLevel::Error:
 				{
 					// Yellow on red
 					printf("\x1b[1;33;41;1m");
@@ -161,33 +161,32 @@ class cVanillaCPPConsoleListener
 	: public cLogger::cListener
 {
 public:
-	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+	virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 	{
-		AString LogLevelString;
 		switch (a_LogLevel)
 		{
-			case cLogger::llRegular:
+			case eLogLevel::Regular:
 			{
-				LogLevelString = "Log";
+				fputs("Log: ", stdout);
 				break;
 			}
-			case cLogger::llInfo:
+			case eLogLevel::Info:
 			{
-				LogLevelString = "Info";
+				fputs("Info: ", stdout);
 				break;
 			}
-			case cLogger::llWarning:
+			case eLogLevel::Warning:
 			{
-				LogLevelString = "Warning";
+				fputs("Warning: ", stdout);
 				break;
 			}
-			case cLogger::llError:
+			case eLogLevel::Error:
 			{
-				LogLevelString = "Error";
+				fputs("Error: ", stdout);
 				break;
 			}
 		}
-		printf("%s: %s", LogLevelString.c_str(), a_Message.c_str());
+		fwrite(a_Message.data(), sizeof(char), a_Message.size(), stdout);
 	}
 };
 
@@ -199,7 +198,7 @@ public:
 class cNullConsoleListener
 	: public cLogger::cListener
 {
-	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+	virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 	{
 	}
 };
@@ -212,7 +211,7 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 {
 	if (a_IsService)
 	{
-		return cpp14::make_unique<cNullConsoleListener>();
+		return std::make_unique<cNullConsoleListener>();
 	}
 
 	#ifdef _WIN32
@@ -224,24 +223,24 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 			HANDLE Console = GetStdHandle(STD_OUTPUT_HANDLE);
 			GetConsoleScreenBufferInfo(Console, &sbi);
 			WORD DefaultConsoleAttrib = sbi.wAttributes;
-			return cpp14::make_unique<cWindowsConsoleListener>(Console, DefaultConsoleAttrib);
+			return std::make_unique<cWindowsConsoleListener>(Console, DefaultConsoleAttrib);
 		}
 		else
 		{
-			return cpp14::make_unique<cVanillaCPPConsoleListener>();
+			return std::make_unique<cVanillaCPPConsoleListener>();
 		}
 	#elif defined (__linux) || defined (__APPLE__)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
 		{
-			return cpp14::make_unique<cANSIConsoleListener>();
+			return std::make_unique<cANSIConsoleListener>();
 		}
 		else
 		{
-			return cpp14::make_unique<cVanillaCPPConsoleListener>();
+			return std::make_unique<cVanillaCPPConsoleListener>();
 		}
 	#else
-		return cpp14::make_unique<cVanillaCPPConsoleListener>();
+		return std::make_unique<cVanillaCPPConsoleListener>();
 	#endif
 }
 
@@ -275,36 +274,38 @@ public:
 		return success;
 	}
 
-	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+	virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 	{
-		const char * LogLevelPrefix = "Unkn ";
+		std::string_view LogLevelPrefix = "Unkn ";
 		bool ShouldFlush = false;
 		switch (a_LogLevel)
 		{
-			case cLogger::llRegular:
+			case eLogLevel::Regular:
 			{
 				LogLevelPrefix = "     ";
 				break;
 			}
-			case cLogger::llInfo:
+			case eLogLevel::Info:
 			{
 				LogLevelPrefix = "Info ";
 				break;
 			}
-			case cLogger::llWarning:
+			case eLogLevel::Warning:
 			{
 				LogLevelPrefix = "Warn ";
 				ShouldFlush = true;
 				break;
 			}
-			case cLogger::llError:
+			case eLogLevel::Error:
 			{
 				LogLevelPrefix = "Err  ";
 				ShouldFlush = true;
 				break;
 			}
 		}
-		m_File.Printf("%s%s", LogLevelPrefix, a_Message.c_str());
+		m_File.Write(LogLevelPrefix);
+		m_File.Write(a_Message);
+
 		if (ShouldFlush)
 		{
 			m_File.Flush();
@@ -322,7 +323,7 @@ private:
 
 std::pair<bool, std::unique_ptr<cLogger::cListener>> MakeFileListener()
 {
-	auto listener = cpp14::make_unique<cFileListener>();
+	auto listener = std::make_unique<cFileListener>();
 	if (!listener->Open())
 	{
 		return {false, nullptr};

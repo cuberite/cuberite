@@ -91,6 +91,18 @@ public:
 		return "cWorld";
 	}
 
+	/** Construct the world and read settings from its ini file.
+	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
+	@param a_WorldNames is a list of all world names, used to validate linked worlds
+	*/
+	cWorld(
+		const AString & a_WorldName, const AString & a_DataPath,
+		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
+		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
+	);
+
+	virtual ~cWorld() override;
+
 	// tolua_begin
 
 	/** Get whether saving chunks is enabled */
@@ -332,17 +344,14 @@ public:
 
 	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
 	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Sends the chunk to the client specified, even if the client already has the chunk.
 	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Removes client from ChunkSender's queue of chunks to be sent */
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
-
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
@@ -365,10 +374,10 @@ public:
 	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
-	/** Regenerate the given chunk: */
+	/** Regenerate the given chunk. */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
-	/** Generates the given chunk */
+	/** Generates the given chunk. */
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
@@ -444,19 +453,15 @@ public:
 	}
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
 	{
-		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData);
 	}
 
 	/** Returns the sky light value at the specified block position.
@@ -649,33 +654,29 @@ public:
 
 	// tolua_end
 
-	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
-	Is more efficient than calling SetBlock() multiple times.
+	/** Replaces the specified block with another, and calls the OnPlaced block handler.
+	Callers MUST ensure the replaced block was destroyed or can handle replacement correctly. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
-	void SetBlocks(const sSetBlockVector & a_Blocks);
-
-	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
-	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
+	void PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
 
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
 	// tolua_begin
 
-	/** Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
-	Wakes up the simulators.
-	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
+	/** Replaces the specified block with air, and calls the OnBroken block handler.
+	Wakes up the simulators. Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(Vector3i a_BlockPos);
+	bool DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
 	Wakes up the simulators.
 	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(int a_X, int a_Y, int a_Z)
+	bool DigBlock(int a_X, int a_Y, int a_Z, cEntity * a_Digger = nullptr)
 	{
-		return DigBlock({a_X, a_Y, a_Z});
+		return DigBlock({a_X, a_Y, a_Z}, a_Digger);
 	}
 
 	/** Digs the specified block, and spawns the appropriate pickups for it.
@@ -821,30 +822,25 @@ public:
 	Returns true if the tree is imprinted successfully, false otherwise. */
 	bool GrowTreeImage(const sSetBlockVector & a_Blocks);
 
-	// tolua_begin
-
 	/** Grows a tree at the specified coords.
 	If the specified block is a sapling, the tree is grown from that sapling.
 	Otherwise a tree is grown based on the biome.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTree(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTree(Vector3i a_BlockPos);
 
-	/** Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(Vector3i a_BlockPos, NIBBLETYPE a_SaplingMeta)
-	{
-		// TODO: Change the implementation to use Vector3i, once cTree uses Vector3i-based functions
-		return GrowTreeFromSapling(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_SaplingMeta);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	/** Grows a tree from the sapling at the specified coords.
+	If the sapling is a part of a large-tree sapling (2x2), a large tree growth is attempted.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload and obsolete additional SaplingMeta param. */
+	bool GrowTreeFromSapling(Vector3i a_BlockPos);
 
 	/** Grows a tree at the specified coords, based on the biome in the place.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeByBiome(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTreeByBiome(Vector3i a_BlockPos);
+
+	// tolua_begin
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -966,7 +962,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline size_t GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -1103,10 +1099,6 @@ public:
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
 private:
-
-	friend class cRoot;
-
-
 
 	class cTickThread:
 		public cIsThread
@@ -1327,17 +1319,6 @@ private:
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
-	/** Construct the world and read settings from its ini file.
-	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
-	@param a_WorldNames is a list of all world names, used to validate linked worlds
-	*/
-	cWorld(
-		const AString & a_WorldName, const AString & a_DataPath,
-		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
-		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
-	);
-	virtual ~cWorld() override;
-
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
 	/** Handles the weather in each tick */
@@ -1388,7 +1369,7 @@ private:
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
-	If so, adjusts the X and Z coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
+	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
 	Returns false if not a part of large-tree sapling. */
-	bool GetLargeTreeAdjustment(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_SaplingMeta);
 };  // tolua_export

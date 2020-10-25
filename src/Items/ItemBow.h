@@ -70,7 +70,7 @@ public:
 		}
 
 		// Create the arrow entity:
-		auto Arrow = cpp14::make_unique<cArrowEntity>(*a_Player, Force * 2);
+		auto Arrow = std::make_unique<cArrowEntity>(*a_Player, Force * 2);
 		auto ArrowPtr = Arrow.get();
 		if (!ArrowPtr->Initialize(std::move(Arrow), *a_Player->GetWorld()))
 		{

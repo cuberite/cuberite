@@ -440,6 +440,31 @@ int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 
 
 
+cItem * cItemGrid::FindItem(const cItem & a_RecipeItem)
+{
+	if (!m_Slots.IsStorageAllocated())
+	{
+		return nullptr;
+	}
+
+	for (int i = 0; i < m_Slots.size(); i++)
+	{
+		// Items are equal if none is greater the other
+		auto compare = cItem::sItemCompare{};
+		if (!compare(a_RecipeItem, m_Slots[i]) &&
+			!compare(m_Slots[i], a_RecipeItem))
+		{
+			return &m_Slots[i];
+		}
+	}
+
+	return nullptr;
+}
+
+
+
+
+
 int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 {
 	if (!IsValidSlotNum(a_SlotNum))
@@ -825,7 +850,3 @@ void cItemGrid::TriggerListeners(int a_SlotNum)
 	}  // for itr - m_Listeners[]
 	m_IsInTriggerListeners = false;
 }
-
-
-
-

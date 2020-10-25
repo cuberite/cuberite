@@ -57,7 +57,7 @@ void cPluginManager::RefreshPluginList(void)
 {
 	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath);
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{
@@ -165,35 +165,54 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 
 void cPluginManager::Tick(float a_Dt)
 {
-	// Unload plugins that have been scheduled for unloading:
-	AStringVector PluginsToUnload;
+	decltype(m_PluginsNeedAction) PluginsNeedAction;
 	{
-		cCSLock Lock(m_CSPluginsToUnload);
-		std::swap(m_PluginsToUnload, PluginsToUnload);
+		cCSLock Lock(m_CSPluginsNeedAction);
+		std::swap(m_PluginsNeedAction, PluginsNeedAction);
 	}
-	for (auto & folder: PluginsToUnload)
+
+	// Process deferred actions:
+	for (auto & CurrentPlugin : PluginsNeedAction)
 	{
-		bool HasUnloaded = false;
-		bool HasFound = false;
-		for (auto & plugin: m_Plugins)
+		auto & Action = CurrentPlugin.first;
+		auto & Folder = CurrentPlugin.second;
+
+		bool WasLoaded = false;
+		bool WasFound = false;
+		for (auto & Plugin: m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (Plugin->GetFolderName() == Folder)
 			{
-				HasFound = true;
-				if (plugin->IsLoaded())
+				WasFound = true;
+				if (Plugin->IsLoaded())
 				{
-					plugin->Unload();
-					HasUnloaded = true;
+					switch (Action)
+					{
+						case PluginAction::Reload :
+						{
+							// Reload plugins by unloading, then loading:
+							Plugin->Unload();
+							Plugin->Load();
+							break;
+						}
+						case PluginAction::Unload :
+						{
+							// Unload plugins that have been scheduled for unloading:
+							Plugin->Unload();
+							break;
+						}
+					}
+					WasLoaded = true;
 				}
 			}
 		}
-		if (!HasFound)
+		if (!WasFound)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", Folder.c_str());
 		}
-		else if (!HasUnloaded)
+		else if (!WasLoaded)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", Folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
@@ -605,6 +624,19 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 	return GenericCallHook(HOOK_HOPPER_PUSHING_ITEM, [&](cPlugin * a_Plugin)
 		{
 			return a_Plugin->OnHopperPushingItem(a_World, a_Hopper, a_SrcSlotNum, a_DstEntity, a_DstSlotNum);
+		}
+	);
+}
+
+
+
+
+
+bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return GenericCallHook(HOOK_DROPSPENSE, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnDropSpense(a_World, a_DropSpenser, a_SlotNum);
 		}
 	);
 }
@@ -1304,8 +1336,18 @@ void cPluginManager::UnloadPluginsNow()
 
 void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
-	cCSLock Lock(m_CSPluginsToUnload);
-	m_PluginsToUnload.push_back(a_PluginFolder);
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Unload, a_PluginFolder);
+}
+
+
+
+
+
+void cPluginManager::ReloadPlugin(const AString & a_PluginFolder)
+{
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Reload, a_PluginFolder);
 }
 
 
@@ -1401,7 +1443,7 @@ bool cPluginManager::BindCommand(
 
 	auto & reg = m_Commands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = a_Permission;
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1508,7 +1550,7 @@ bool cPluginManager::BindConsoleCommand(
 
 	auto & reg = m_ConsoleCommands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = "";
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1739,7 +1781,7 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 	// Get the old format plugin list, and migrate it.
 	// Upgrade path added on 2020-03-27
 	auto OldValues = a_Settings.GetValues("Plugins");
-	for (auto NameValue : OldValues)
+	for (const auto & NameValue : OldValues)
 	{
 		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
@@ -1759,7 +1801,7 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 
 	// Get the list of plugins to load:
 	auto Values = a_Settings.GetValues("Plugins");
-	for (auto NameValue : Values)
+	for (const auto & NameValue : Values)
 	{
 		AString Enabled = NameValue.second;
 		if (Enabled == "1")

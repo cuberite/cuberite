@@ -57,12 +57,6 @@ public:
 
 	virtual ~cProtocol() {}
 
-
-	/** Called after construction so that the protocol class can initialize itself.
-	Throws a std::exception descendant on failure; the client is kicked
-	with the exception's message as a result. */
-	virtual void Initialize(cClientHandle & a_Client) {}
-
 	/** Logical types of outgoing packets.
 	These values get translated to on-wire packet IDs in GetPacketID(), specific for each protocol.
 	This is mainly useful for protocol sub-versions that re-number the packets while using mostly the same packet layout. */
@@ -132,6 +126,7 @@ public:
 		pktTimeUpdate,
 		pktTitle,
 		pktUnloadChunk,
+		pktUnlockRecipe,
 		pktUpdateBlockEntity,
 		pktUpdateHealth,
 		pktUpdateScore,
@@ -144,8 +139,221 @@ public:
 		pktWindowProperty
 	};
 
+	enum class EntityMetadata
+	{
+		EntityFlags,
+		EntityAir,
+		EntityCustomName,
+		EntityCustomNameVisible,
+		EntitySilent,
+		EntityNoGravity,
+		EntityPose,
+
+		PotionThrown,
+
+		FallingBlockPosition,
+
+		AreaEffectCloudRadius,
+		AreaEffectCloudColor,
+		AreaEffectCloudSinglePointEffect,
+		AreaEffectCloudParticleId,
+		AreaEffectCloudParticleParameter1,
+		AreaEffectCloudParticleParameter2,
+
+		ArrowFlags,
+		TippedArrowColor,
+
+		BoatLastHitTime,
+		BoatForwardDirection,
+		BoatDamageTaken,
+		BoatType,
+		BoatLeftPaddleTurning,
+		BoatRightPaddleTurning,
+		BoatSplashTimer,
+
+		EnderCrystalBeamTarget,
+		EnderCrystalShowBottom,
+
+		WitherSkullInvulnerable,
+
+		FireworkInfo,
+		FireworkBoostedEntityId,
+
+		ItemFrameItem,
+		ItemFrameRotation,
+
+		ItemItem,
+
+		LivingActiveHand,
+		LivingHealth,
+		LivingPotionEffectColor,
+		LivingPotionEffectAmbient,
+		LivingNumberOfArrows,
+
+		PlayerAdditionalHearts,
+		PlayerScore,
+		PlayerDisplayedSkinParts,
+		PlayerMainHand,
+
+		ArmorStandStatus,
+		ArmorStandHeadRotation,
+		ArmorStandBodyRotation,
+		ArmorStandLeftArmRotation,
+		ArmorStandRightArmRotation,
+		ArmorStandLeftLegRotation,
+		ArmorStandRightLegRotation,
+
+		InsentientFlags,
+
+		BatHanging,
+
+		AgeableIsBaby,
+
+		AbstractHorseFlags,
+		AbstractHorseOwner,
+
+		HorseVariant,
+		HorseArmour,
+
+		ChestedHorseChested,
+
+		LlamaStrength,
+		LlamaCarpetColor,
+		LlamaVariant,
+
+		PigHasSaddle,
+		PigTotalCarrotOnAStickBoost,
+
+		RabbitType,
+
+		PolarBearStanding,
+
+		SheepFlags,
+
+		TameableAnimalFlags,
+		TameableAnimalOwner,
+
+		OcelotType,
+
+		WolfDamageTaken,
+		WolfBegging,
+		WolfCollarColour,
+
+		VillagerProfession,
+
+		IronGolemPlayerCreated,
+
+		ShulkerFacingDirection,
+		ShulkerAttachmentFallingBlockPosition,
+		ShulkerShieldHeight,
+
+		BlazeOnFire,
+
+		CreeperState,
+		CreeperPowered,
+		CreeperIgnited,
+
+		GuardianStatus,
+		GuardianTarget,
+
+		IllagerFlags,
+		SpeIlagerSpell,
+
+		VexFlags,
+
+		AbstractSkeletonArmsSwinging,
+
+		SpiderClimbing,
+
+		WitchAggresive,
+
+		WitherFirstHeadTarget,
+		WitherSecondHeadTarget,
+		WitherThirdHeadTarget,
+		WitherInvulnerableTimer,
+
+		ZombieIsBaby,
+		ZombieUnusedWasType,
+		ZombieHandsRisedUp,
+
+		ZombieVillagerConverting,
+		ZombieVillagerProfession,
+
+		EndermanCarriedBlock,
+		EndermanScreaming,
+
+		EnderDragonDragonPhase,
+
+		GhastAttacking,
+
+		SlimeSize,
+
+		MinecartShakingPower,
+		MinecartShakingDirection,
+		MinecartShakingMultiplier,
+		MinecartBlockIDMeta,
+		MinecartBlockY,
+		MinecartShowBlock,
+
+		MinecartCommandBlockCommand,
+		MinecartCommandBlockLastOutput,
+
+		MinecartFurnacePowered,
+
+		TNTPrimedFuseTime
+	};
+
+	enum class EntityMetadataType
+	{
+		Byte,
+		VarInt,
+		Float,
+		String,
+		Chat,
+		OptChat,
+		Item,
+		Boolean,
+		Rotation,
+		Position,
+		OptPosition,
+		Direction,
+		OptUUID,
+		OptBlockID,
+		NBT,
+		Particle,
+		VillagerData,
+		OptVarInt,
+		Pose
+	};
+
+	enum class Version
+	{
+		v1_8_0  = 47,
+		v1_9_0  = 107,
+		v1_9_1  = 108,
+		v1_9_2  = 109,
+		v1_9_4  = 110,
+		v1_10_0 = 210,
+		v1_11_0 = 315,
+		v1_11_1 = 316,
+		v1_12   = 335,
+		v1_12_1 = 338,
+		v1_12_2 = 340,
+		v1_13   = 393,
+		v1_13_1 = 401,
+		v1_13_2 = 404,  // TODO: this constant should be in WebServer
+		v1_14   = 477
+	};
+
+	enum State
+	{
+		Status = 1,
+		Login = 2,
+		Game = 3,
+	};
+
 	/** Called when client sends some data */
-	virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
@@ -157,7 +365,7 @@ public:
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) = 0;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) = 0;
-	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
+	virtual void SendChunkData                  (const std::string_view a_ChunkData) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
@@ -173,7 +381,7 @@ public:
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
+	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
@@ -225,11 +433,13 @@ public:
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) = 0;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
 	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) = 0;
+	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
+	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
@@ -253,6 +463,9 @@ protected:
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
+
+	/** Returns the current protocol's version, for handling status requests. */
+	virtual Version GetProtocolVersion() = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;

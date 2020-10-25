@@ -10,23 +10,18 @@
 
 
 
-class cBlockAnvilHandler:
+class cBlockAnvilHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
 
 public:
 
-	cBlockAnvilHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(m_BlockType, 1, a_BlockMeta >> 2);
 	}
@@ -42,9 +37,9 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
-		cWindow * Window = new cAnvilWindow(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+		cWindow * Window = new cAnvilWindow(a_BlockPos);
 		a_Player.OpenWindow(*Window);
 		return true;
 	}
@@ -60,7 +55,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
 		{
@@ -75,7 +70,7 @@ public:
 
 
 
-	virtual bool IsUseable() override
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
@@ -84,7 +79,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 6;

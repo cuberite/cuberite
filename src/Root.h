@@ -1,14 +1,13 @@
 
 #pragma once
 
-#include "Protocol/Authenticator.h"
-#include "Protocol/MojangAPI.h"
-#include "HTTP/HTTPServer.h"
 #include "Defines.h"
 #include "FunctionRef.h"
+#include "HTTP/HTTPServer.h"
+#include "Protocol/Authenticator.h"
+#include "Protocol/MojangAPI.h"
 #include "RankManager.h"
-#include "BlockTypeRegistry.h"
-
+#include "ChunkDef.h"
 
 
 
@@ -18,6 +17,7 @@ class cItem;
 class cMonsterConfig;
 class cBrewingRecipes;
 class cCraftingRecipes;
+class cRecipeMapper;
 class cFurnaceRecipe;
 class cWebAdmin;
 class cPluginManager;
@@ -52,19 +52,20 @@ public:
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
 
-	static bool m_TerminateEventRaised;
-	static bool m_RunAsService;
-
 	/** which ini file to load settings from, default is settings.ini */
 	AString m_SettingsFilename;
 
 	cRoot(void);
 	~cRoot();
 
-	void Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo);
+	/** Run the server. Returns true if we should restart, false to quit. */
+	bool Run(cSettingsRepositoryInterface & a_OverridesRepo);
 
-	/** Stops the server, as if "/stop" was typed in the console. */
-	void StopServer();
+	/** Interrupts the server and stops it, as if "/stop" typed in the console. */
+	void Stop();
+
+	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
+	void Restart();
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -89,17 +90,12 @@ public:
 	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
+	cRecipeMapper * GetRecipeMapper(void) { return m_RecipeMapper.get(); }
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
 	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
 
 	/** Returns the (read-write) storage for registered block types. */
-	BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
-
-	/** Returns the block type palette used for upgrading blocks from pre-1.13 data. */
-	const BlockTypePalette & GetUpgradeBlockTypePalette() const { return *m_UpgradeBlockTypePalette; }
-
-	/** Returns the per-protocol palettes manager. */
-	ProtocolPalettes & GetProtocolPalettes() const { return *m_ProtocolPalettes; }
+	// BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
 
 	/** Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel */
 	static int GetFurnaceFuelBurnTime(const cItem & a_Fuel);  // tolua_export
@@ -131,23 +127,20 @@ public:
 	*/
 	void QueueExecuteConsoleCommand(const AString & a_Cmd);  // tolua_export
 
-	/** Executes a console command through the cServer class; does special handling for "stop" and "restart". */
-	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
-
 	/** Kicks the user, no matter in what world they are. Used from cAuthenticator */
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
 	/** Called by cAuthenticator to auth the specified user */
 	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
-	/** Executes commands queued in the command queue */
-	void TickCommands(void);
-
 	/** Returns the number of chunks loaded */
-	int GetTotalChunkCount(void);  // tolua_export
+	size_t GetTotalChunkCount(void);  // tolua_export
 
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
+
+	/** Saves all chunks in all worlds synchronously (waits until dirty chunks have been sent to the ChunkStorage queue before returning) */
+	void SaveAllChunksNow(void);
 
 	/** Sets whether saving chunks is enabled in all worlds (overrides however the worlds were already set) */
 	void SetSavingEnabled(bool a_SavingEnabled);  // tolua_export
@@ -199,36 +192,34 @@ public:
 	// tolua_end
 
 private:
-	class cCommand
+
+	/** States that the global cRoot can be in.
+	You can transition freely between Run and Restart, but the server unconditionally terminates in Stop. */
+	enum class NextState
 	{
-	public:
-		cCommand(const AString & a_Command, cCommandOutputCallback * a_Output) :
-			m_Command(a_Command),
-			m_Output(a_Output)
-		{
-		}
+		Run,
+		Restart,
+		Stop
+	};
 
-		AString m_Command;
-		cCommandOutputCallback * m_Output;
-	} ;
+	typedef std::map<AString, cWorld> WorldMap;
 
-	typedef std::map<AString, cWorld *> WorldMap;
-	typedef std::vector<cCommand> cCommandQueue;
+	/** Blocking reads and processes console input. */
+	void HandleInput();
+
+	/** Performs run state transition, enforcing guarantees about state transitions. */
+	void TransitionNextState(NextState a_NextState);
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 
-	cCriticalSection m_CSPendingCommands;
-	cCommandQueue    m_PendingCommands;
-
-	std::thread m_InputThread;
 	cEvent m_StopEvent;
-	std::atomic_flag m_InputThreadRunFlag;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
 
 	cCraftingRecipes * m_CraftingRecipes;
+	std::unique_ptr<cRecipeMapper> m_RecipeMapper;
 	cFurnaceRecipe *   m_FurnaceRecipe;
 	std::unique_ptr<cBrewingRecipes> m_BrewingRecipes;
 	cWebAdmin *        m_WebAdmin;
@@ -241,20 +232,10 @@ private:
 	cHTTPServer m_HTTPServer;
 
 	/** The storage for all registered block types. */
-	BlockTypeRegistry m_BlockTypeRegistry;
-
-	/** The upgrade palette for pre-1.13 blocks. */
-	std::unique_ptr<BlockTypePalette> m_UpgradeBlockTypePalette;
-
-	/** The per-protocol palettes manager. */
-	std::unique_ptr<ProtocolPalettes> m_ProtocolPalettes;
+	// BlockTypeRegistry m_BlockTypeRegistry;
 
 
 	void LoadGlobalSettings();
-
-	/** Loads the upgrade palette and the per-protocol palettes.
-	The aProtocolFolder is the path to the folder containing the per-protocol palettes. */
-	void LoadPalettes(const AString & aProtocolFolder);
 
 	/** Loads the worlds from settings.ini, creates the worldmap */
 	void LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_Settings, bool a_IsNewIniFile);
@@ -265,18 +246,8 @@ private:
 	/** Stops each world's threads, so that it's safe to unload them */
 	void StopWorlds(cDeadlockDetect & a_DeadlockDetect);
 
-	/** Unloads all worlds from memory */
-	void UnloadWorlds(void);
-
-	/** Does the actual work of executing a command */
-	void DoExecuteConsoleCommand(const AString & a_Cmd);
-
 	static cRoot * s_Root;
 
-	static void InputThread(cRoot & a_Params);
+	/** Indicates the next action of cRoot, whether to run, stop or restart. */
+	std::atomic<NextState> m_NextState;
 };  // tolua_export
-
-
-
-
-

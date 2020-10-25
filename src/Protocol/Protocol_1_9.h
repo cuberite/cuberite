@@ -22,7 +22,6 @@ Declares the 1.9 protocol classes:
 #include "Protocol.h"
 #include "Protocol_1_8.h"
 #include "../ByteBuffer.h"
-#include "../World.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -38,11 +37,10 @@ class cProtocol_1_9_0:
 
 public:
 
-	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
@@ -62,23 +60,21 @@ public:
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 
-	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
-
 protected:
 
 	/** The current teleport ID, and whether it has been confirmed by the client */
 	bool m_IsTeleportIdConfirmed;
 	UInt32 m_OutstandingTeleportId;
 
-	/** Get the packet ID for a given packet */
+	/** Get the packet ID for a given packet. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+
+	/** Returns 1.9. */
+	virtual Version GetProtocolVersion() override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-
-	// Packet handlers while in the Status state (m_State == 1):
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
 	// Packet handlers while in the Game state (m_State == 3):
 	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer) override;
@@ -101,13 +97,9 @@ protected:
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	virtual void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata) override;
 
-	/** Converts the BlockFace received by the protocol into eBlockFace constants.
-	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
-
 	/** Converts the hand parameter received by the protocol into eHand constants.
 	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */
-	eHand HandIntToEnum(Int32 a_Hand);
+	static eHand HandIntToEnum(Int32 a_Hand);
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
@@ -158,12 +150,14 @@ class cProtocol_1_9_1:
 
 public:
 
-	cProtocol_1_9_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_0;
 
-	// cProtocol_1_9_0 overrides:
+protected:
+
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
 
+	/** Returns 1.9.1. */
+	virtual Version GetProtocolVersion() override;
 } ;
 
 
@@ -178,11 +172,12 @@ class cProtocol_1_9_2:
 
 public:
 
-	cProtocol_1_9_2(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	using Super::cProtocol_1_9_1;
 
-	// cProtocol_1_9_1 overrides:
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+protected:
 
+	/** Returns 1.9.2. */
+	virtual Version GetProtocolVersion() override;
 } ;
 
 
@@ -197,16 +192,13 @@ class cProtocol_1_9_4:
 
 public:
 
-	cProtocol_1_9_4(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
-
-	// cProtocol_1_9_2 overrides:
-	virtual void SendChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendUpdateSign      (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+	using Super::cProtocol_1_9_2;
 
 protected:
 
-	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+	virtual void SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 
+	/** Returns 1.9.4. */
+	virtual Version GetProtocolVersion() override;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 } ;

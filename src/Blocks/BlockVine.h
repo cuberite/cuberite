@@ -6,21 +6,16 @@
 
 
 
-class cBlockVineHandler :
+class cBlockVineHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockVineHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -29,7 +24,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
@@ -51,7 +46,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Only drops self when using shears, otherwise drops nothing:
 		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != E_ITEM_SHEARS))
@@ -128,7 +123,7 @@ public:
 
 
 	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings */
-	NIBBLETYPE GetMaxMeta(cChunk & a_Chunk, Vector3i a_RelPos)
+	static NIBBLETYPE GetMaxMeta(cChunk & a_Chunk, Vector3i a_RelPos)
 	{
 		static const struct
 		{
@@ -162,12 +157,12 @@ public:
 
 
 
-	virtual void Check(
-		cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface,
-		Vector3i a_RelPos,
-		cChunk & a_Chunk
-	) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
+		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
+		{
+
+		const auto a_RelPos = a_Chunk.AbsoluteToRelative(a_BlockPos);
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelPos);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelPos);
 
@@ -190,22 +185,20 @@ public:
 					a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
 				}
 				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
-				return;
+				return false;
 			}
 			a_Chunk.SetBlock(a_RelPos, m_BlockType, Common);
 		}
-		else
-		{
-			auto absPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-			a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(absPos, &a_Chunk);
-		}
+
+		return false;
+		});
 	}
 
 
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		return true;
 	}
@@ -214,7 +207,7 @@ public:
 
 
 
-	virtual bool DoesDropOnUnsuitable(void) override
+	virtual bool DoesDropOnUnsuitable(void) const override
 	{
 		return false;
 	}
@@ -229,7 +222,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
 		UNUSED(a_WorldInterface);
@@ -258,7 +251,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		return ((a_Meta >> 1) | (a_Meta << 3)) & 0x0f;  // Rotate bits to the right
 	}
@@ -267,7 +260,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
 	}
@@ -276,7 +269,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
 	{
 		// Bits 2 and 4 stay, bits 1 and 3 swap
 		return static_cast<NIBBLETYPE>((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
@@ -286,7 +279,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
 		return static_cast<NIBBLETYPE>((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
@@ -296,7 +289,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

@@ -126,7 +126,7 @@ public:
 	bool DoesAllowKeepAlive(void) const { return m_AllowKeepAlive; }
 
 	/** Attaches any kind of data to this request, to be later retrieved by GetUserData(). */
-	void SetUserData(cUserDataPtr a_UserData) { m_UserData = a_UserData; }
+	void SetUserData(cUserDataPtr a_UserData) { m_UserData = std::move(a_UserData); }
 
 	/** Returns the data attached to this request by the class client. */
 	cUserDataPtr GetUserData(void) { return m_UserData; }

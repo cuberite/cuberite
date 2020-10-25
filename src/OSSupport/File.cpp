@@ -6,9 +6,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "File.h"
-#include <fstream>
+#include <sys/stat.h>
 #ifdef _WIN32
 	#include <share.h>  // for _SH_DENYWRITE
+#else
+	#include <dirent.h>
 #endif  // _WIN32
 
 
@@ -692,10 +694,10 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::vPrintf(const char * a_Fmt, fmt::printf_args a_ArgList)
+int cFile::vPrintf(const char * a_Format, fmt::printf_args a_ArgList)
 {
 	fmt::memory_buffer Buffer;
-	fmt::printf(Buffer, fmt::to_string_view(a_Fmt), a_ArgList);
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
 	return Write(Buffer.data(), Buffer.size());
 }
 
@@ -707,7 +709,3 @@ void cFile::Flush(void)
 {
 	fflush(m_File);
 }
-
-
-
-

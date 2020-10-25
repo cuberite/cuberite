@@ -12,6 +12,21 @@ typedef std::vector<int> cSlotNums;
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+/** Constant to calculate ticks from seconds "ticks per second" */
+constexpr inline const int TPS = 20;
+// This is not added to the lua API because it broke the build
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+
+
+
+
 // tolua_begin
 
 /** Experience Orb setup */
@@ -273,6 +288,7 @@ enum eDamageType
 	dtEnderPearl,       // Thrown an ender pearl, teleported by it
 	dtAdmin,            // Damage applied by an admin command
 	dtExplosion,        // Damage applied by an explosion
+	dtEnvironment,      // Damage dealt to mobs from environment: enderman in rain, snow golem in desert
 
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
@@ -379,7 +395,6 @@ enum eMessageType
 	mtInfo  = mtInformation,
 	mtPM    = mtPrivateMessage,
 };
-
 
 
 

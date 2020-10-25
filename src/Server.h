@@ -83,7 +83,7 @@ public:
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
-	bool IsPlayerInQueue(AString a_Username);
+	bool IsPlayerInQueue(const AString & a_Username);
 
 	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */
@@ -100,8 +100,10 @@ public:
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
 
-	/** Executes the console command, sends output through the specified callback */
-	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+	/** Queues a console command for execution through the cServer class.
+	The command will be executed in the server tick thread.
+	The command's output will be written to the a_Output callback. */
+	void QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 
 	/** Lists all available console commands and their helpstrings */
 	void PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
@@ -201,11 +203,12 @@ private:
 	/** Number of players currently playing in the server. */
 	std::atomic_size_t m_PlayerCount;
 
+	cCriticalSection m_CSPendingCommands;
+	std::vector<std::pair<AString, cCommandOutputCallback *>> m_PendingCommands;
+
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	bool m_bIsConnected;  // true - connected false - not connected
-
-	std::atomic<bool> m_bRestarting;
 
 	/** The private key used for the assymetric encryption start in the protocols */
 	cRsaPrivateKey m_PrivateKey;
@@ -229,7 +232,6 @@ private:
 	bool m_bAllowMultiLogin;
 
 	cTickThread m_TickThread;
-	cEvent m_RestartEvent;
 
 	/** The server ID used for client authentication */
 	AString m_ServerID;
@@ -264,6 +266,9 @@ private:
 
 	cServer(void);
 
+	/** Executes the console command, sends output through the specified callback. */
+	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+
 	/** Get the Forge mods registered for a given protocol, for modification */
 	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
 
@@ -274,10 +279,14 @@ private:
 	Returns the cClientHandle reinterpreted as cTCPLink callbacks. */
 	cTCPLink::cCallbacksPtr OnConnectionAccepted(const AString & a_RemoteIPAddress);
 
-	bool Tick(float a_Dt);
+	void Tick(float a_Dt);
 
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
+
+	/** Executes commands queued in the command queue. */
+	void TickCommands(void);
+
 };  // tolua_export
 
 

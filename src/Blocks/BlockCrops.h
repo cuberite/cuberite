@@ -10,23 +10,29 @@
 
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
 template <NIBBLETYPE RipeMeta>
-class cBlockCropsHandler:
+class cBlockCropsHandler final :
 	public cBlockPlant<true>
 {
 	using Super = cBlockPlant<true>;
 
 public:
 
-	cBlockCropsHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+private:
+
+	/** Calculate the number of seeds to drop when the crop is broken. */
+	static char CalculateSeedCount(char a_Min, char a_BaseRolls, unsigned char a_FortuneLevel)
 	{
+		std::binomial_distribution<> Binomial(a_BaseRolls + a_FortuneLevel, 0.57);
+		return static_cast<char>(a_Min + Binomial(GetRandomProvider().Engine()));
 	}
 
 
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		auto & rand = GetRandomProvider();
 
@@ -35,11 +41,12 @@ public:
 		{
 			switch (m_BlockType)
 			{
-				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS, 1, 0); break;
-				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS,          1, 0); break;
-				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT,         1, 0); break;
-				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO,         1, 0); break;
+				case E_BLOCK_BEETROOTS: return cItem(E_ITEM_BEETROOT_SEEDS);
+				case E_BLOCK_CROPS:     return cItem(E_ITEM_SEEDS);
+				case E_BLOCK_CARROTS:   return cItem(E_ITEM_CARROT);
+				case E_BLOCK_POTATOES:  return cItem(E_ITEM_POTATO);
 			}
+
 			ASSERT(!"Unhandled block type");
 			return {};
 		}
@@ -50,30 +57,32 @@ public:
 		{
 			case E_BLOCK_BEETROOTS:
 			{
-				char SeedCount = 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2);  // [1 .. 3] with high preference of 2
-				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount, 0);
-				char BeetrootCount = 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2);  // [1 .. 3] with high preference of 2
-				res.Add(E_ITEM_BEETROOT, BeetrootCount, 0);
+				const auto SeedCount = CalculateSeedCount(0, 3, ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
+				res.Add(E_ITEM_BEETROOT);
 				break;
 			}
 			case E_BLOCK_CROPS:
 			{
-				res.Add(E_ITEM_WHEAT, 1, 0);
-				res.Add(E_ITEM_SEEDS, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
+				res.Add(E_ITEM_WHEAT);
+				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_SEEDS, SeedCount);
 				break;
 			}
 			case E_BLOCK_CARROTS:
 			{
-				res.Add(E_ITEM_CARROT, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
+				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
-				res.Add(E_ITEM_POTATO, 1 + ((rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2), 0);  // [1 .. 3] with high preference of 2
-				if (rand.RandBool(0.05))
+				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
+				res.Add(E_ITEM_POTATO, PotatoCount);
+				if (rand.RandBool(0.02))
 				{
-					// With a 5% chance, drop a poisonous potato as well
-					res.emplace_back(E_ITEM_POISONOUS_POTATO, 1, 0);
+					// With a 2% chance, drop a poisonous potato as well
+					res.Add(E_ITEM_POISONOUS_POTATO);
 				}
 				break;
 			}
@@ -90,7 +99,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
 		if (oldMeta >= RipeMeta)
@@ -108,7 +117,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_FARMLAND));
 	}
@@ -117,7 +126,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

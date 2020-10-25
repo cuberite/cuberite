@@ -1,16 +1,8 @@
-cmake_minimum_required(VERSION 3.0.2)
 project (NoiseSpeedTest)
-
-include(../../SetFlags.cmake)
-set_flags()
-set_lib_flags()
-enable_profile()
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -67,3 +59,6 @@ set_target_properties(
 	NoiseSpeedTest
 	PROPERTIES FOLDER Tools
 )
+
+include(../../SetFlags.cmake)
+set_exe_flags(NoiseSpeedTest)

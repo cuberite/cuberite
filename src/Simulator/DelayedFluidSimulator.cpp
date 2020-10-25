@@ -78,44 +78,6 @@ cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Flu
 
 
 
-void cDelayedFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
-{
-	if ((a_Block.y < 0) || (a_Block.y >= cChunkDef::Height))
-	{
-		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
-		return;
-	}
-
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
-	if (BlockType != m_FluidBlock)
-	{
-		return;
-	}
-
-	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
-	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
-	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
-
-	// Add, if not already present:
-	if (!Slot.Add(RelX, a_Block.y, RelZ))
-	{
-		return;
-	}
-
-	++m_TotalBlocks;
-}
-
-
-
-
-
 void cDelayedFluidSimulator::Simulate(float a_Dt)
 {
 	m_AddSlotNum = m_SimSlotNum;
@@ -156,3 +118,38 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 
 
+
+void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+{
+	if ((a_Block != m_FluidBlock) && (a_Block != m_StationaryFluidBlock))
+	{
+		return;
+	}
+
+	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk.GetWaterSimulatorData() : a_Chunk.GetLavaSimulatorData();
+	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
+	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
+
+	// Add, if not already present:
+	if (!Slot.Add(a_Position.x, a_Position.y, a_Position.z))
+	{
+		return;
+	}
+
+	++m_TotalBlocks;
+}
+
+
+
+
+
+void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+{
+	if (!cChunkDef::IsValidHeight(a_Position.y))
+	{
+		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
+		return;
+	}
+
+	AddBlock(a_Chunk, a_Position, a_Block);
+}

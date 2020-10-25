@@ -183,7 +183,7 @@ public:
 
 	void SetVerticalStrategy(cVerticalStrategyPtr a_VerticalStrategy)
 	{
-		m_VerticalStrategy = a_VerticalStrategy;
+		m_VerticalStrategy = std::move(a_VerticalStrategy);
 	}
 
 	cVerticalStrategyPtr GetVerticalStrategy(void) const

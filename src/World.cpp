@@ -4,6 +4,7 @@
 #include "World.h"
 #include "BlockInfo.h"
 #include "ClientHandle.h"
+#include "Physics/Explodinator.h"
 #include "Server.h"
 #include "Root.h"
 #include "IniFile.h"
@@ -225,7 +226,8 @@ cWorld::cWorld(
 
 	cFile::CreateFolderRecursive(m_DataPath);
 
-	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
+	// TODO: unique ptr unnecessary
+	m_ChunkMap = std::make_unique<cChunkMap>(this);
 	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// Load the scoreboard
@@ -419,11 +421,11 @@ cWorld::cWorld(
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
+	m_SimulatorManager  = std::make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
+	m_SandSimulator     = std::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = std::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
@@ -457,21 +459,6 @@ cWorld::~cWorld()
 	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
 	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
-
-	m_Storage.WaitForFinish();
-
-	if (IsSavingEnabled())
-	{
-		// Unload the scoreboard
-		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
-		Serializer.Save();
-
-		m_MapManager.SaveMapData();
-	}
-
-	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
-	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
-	m_ChunkMap.reset();
 }
 
 
@@ -964,11 +951,20 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 	m_Lighting.Stop();
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
-	m_Storage.Stop();
+	m_Storage.Stop();  // Waits for thread to finish
 
 	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
 	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
 	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
+
+	if (IsSavingEnabled())
+	{
+		// Unload the scoreboard
+		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
+		Serializer.Save();
+
+		m_MapManager.SaveMapData();
+	}
 }
 
 
@@ -1024,25 +1020,18 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 	for (auto & Entity : EntitiesToAdd)
 	{
-		auto EntityPtr = Entity.get();
-		ASSERT(EntityPtr->GetWorld() == this);
 		m_ChunkMap->AddEntity(std::move(Entity));
-		EntityPtr->OnAddToWorld(*this);
-		ASSERT(!EntityPtr->IsTicking());
-		EntityPtr->SetIsTicking(true);
-		cPluginManager::Get()->CallHookSpawnedEntity(*this, *Entity);
 	}
 	EntitiesToAdd.clear();
 
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
 
-	m_ChunkMap->Tick(a_Dt);
-	TickMobs(a_Dt);
-	m_MapManager.TickMaps();
-
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
+	m_ChunkMap->Tick(a_Dt);  // Tick chunk after clients to apply at least one round of queued ticks (e.g. cBlockHandler::Check) this tick
+	TickMobs(a_Dt);
+	m_MapManager.TickMaps();
 	TickQueuedTasks();
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
@@ -1206,11 +1195,8 @@ void cWorld::TickQueuedTasks(void)
 		// Partition everything to be executed by returning false to move to end of list if time reached
 		auto MoveBeginIterator = std::partition(m_Tasks.begin(), m_Tasks.end(), [this](const decltype(m_Tasks)::value_type & a_Task)
 			{
-				if (a_Task.first < std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count())
-				{
-					return false;
-				}
-				return true;
+				const auto WorldAgeTicks = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
+				return (a_Task.first >= WorldAgeTicks);
 			}
 		);
 
@@ -1331,7 +1317,7 @@ void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinB
 
 void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 {
-	m_SimulatorManager->WakeUpArea(a_Area);
+	m_SimulatorManager->WakeUp(a_Area);
 }
 
 
@@ -1404,47 +1390,32 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	cLock Lock(*this);
-	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
+	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
-		return;
-	}
+		// TODO: CanCauseFire gets reset to false for some reason, (plugin has ability to change it, might be related)
 
-	// TODO: Implement block hardiness
-	cVector3iArray BlocksAffected;
-	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-
-	auto & Random = GetRandomProvider();
-	auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 4.0f, SoundPitchMultiplier * 0.7f);
-
-	Vector3d ExplosionPos(a_BlockX, a_BlockY, a_BlockZ);
-	for (auto Player : m_Players)
-	{
-		cClientHandle * ch = Player->GetClientHandle();
-		if (ch == nullptr)
+		const cEntity * Entity;
+		switch (a_Source)
 		{
-			continue;
+			case eExplosionSource::esEnderCrystal:
+			case eExplosionSource::esGhastFireball:
+			case eExplosionSource::esMonster:
+			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esWitherBirth:
+			case eExplosionSource::esWitherSkull:
+			{
+				Entity = static_cast<const cEntity *>(a_SourceData);
+				break;
+			}
+			default:
+			{
+				Entity = nullptr;
+			}
 		}
 
-		bool InRange = (Player->GetExplosionExposureRate(ExplosionPos, static_cast<float>(a_ExplosionSize)) > 0);
-		auto Speed = InRange ? Player->GetSpeed() : Vector3d{};
-		ch->SendExplosion({a_BlockX, a_BlockY, a_BlockZ}, static_cast<float>(a_ExplosionSize), BlocksAffected, Speed);
+		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC<unsigned>(a_ExplosionSize), a_CanCauseFire, Entity);
+		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 	}
-
-	auto Position = Vector3d(a_BlockX, a_BlockY - 0.5f, a_BlockZ);
-	auto ParticleFormula = a_ExplosionSize * 0.33f;
-	auto Spread = ParticleFormula * 0.5f;
-	auto ParticleCount = std::min((ParticleFormula * 125), 600.0);
-
-	BroadcastParticleEffect("largesmoke", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
-
-	Spread = ParticleFormula * 0.35f;
-	ParticleCount = std::min((ParticleFormula * 550), 1800.0);
-
-	BroadcastParticleEffect("explode", Position, Vector3f{}, static_cast<float>(Spread), static_cast<int>(ParticleCount));
-
-	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
 
 
@@ -1604,17 +1575,17 @@ bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 
 
 
-bool cWorld::GrowTree(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTree(const Vector3i a_BlockPos)
 {
-	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
+	if (GetBlock(a_BlockPos) == E_BLOCK_SAPLING)
 	{
 		// There is a sapling here, grow a tree according to its type:
-		return GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
+		return GrowTreeFromSapling(a_BlockPos);
 	}
 	else
 	{
 		// There is nothing here, grow a tree based on the current biome here:
-		return GrowTreeByBiome(a_X, a_Y, a_Z);
+		return GrowTreeByBiome(a_BlockPos);
 	}
 }
 
@@ -1622,31 +1593,37 @@ bool cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 
 
 
-bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
+bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
 	auto WorldAge = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
-	switch (a_SaplingMeta & 0x07)
+	auto SaplingMeta = GetBlockMeta(a_BlockPos);
+	switch (SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:    GetAppleTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_CONIFER:  GetConiferTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage ({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_CONIFER:
+		{
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetConiferTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
+			break;
+		}
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_BlockPos, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_JUNGLE:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta);
-			GetJungleTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other, IsLarge);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetJungleTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
 		case E_META_SAPLING_DARK_OAK:
 		{
-			if (!GetLargeTreeAdjustment(a_X, a_Y, a_Z, a_SaplingMeta))
+			if (!GetLargeTreeAdjustment(a_BlockPos, SaplingMeta))
 			{
 				return false;
 			}
 
-			GetDarkoakTreeImage({ a_X, a_Y, a_Z }, Noise, WorldAge, Logs, Other);
+			GetDarkoakTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other);
 			break;
 		}
 	}
@@ -1659,7 +1636,7 @@ bool cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 
 
 
-bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta)
+bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 {
 	bool IsLarge = true;
 	a_Meta = a_Meta & 0x07;
@@ -1671,8 +1648,8 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1689,14 +1666,14 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_Z;
+		--a_BlockPos.z;
 		return true;
 	}
 
@@ -1708,15 +1685,15 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_Z;
-		--a_X;
+		--a_BlockPos.x;
+		--a_BlockPos.z;
 		return true;
 	}
 
@@ -1728,14 +1705,14 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_X + x, a_Y, a_Z + z, type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((a_Meta & meta) == a_Meta);
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
 	if (IsLarge)
 	{
-		--a_X;
+		--a_BlockPos.x;
 	}
 
 	return IsLarge;
@@ -1745,11 +1722,12 @@ bool cWorld::GetLargeTreeAdjustment(int & a_X, int & a_Y, int & a_Z, NIBBLETYPE 
 
 
 
-bool cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTreeByBiome(const Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
-	GetTreeImageByBiome({ a_X, a_Y, a_Z }, Noise, static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
+	auto seq = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
+	GetTreeImageByBiome(a_BlockPos, Noise, seq, GetBiomeAt(a_BlockPos.x, a_BlockPos.z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
 	return GrowTreeImage(Other);
@@ -1910,9 +1888,9 @@ void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_B
 
 
 
-void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
 }
 
 
@@ -1992,7 +1970,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
-		auto Pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
+		auto Pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
@@ -2011,7 +1989,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 			continue;
 		}
 
-		auto pickup = cpp14::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
+		auto pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
 		auto pickupPtr = pickup.get();
 		pickupPtr->Initialize(std::move(pickup), *this);
 	}
@@ -2023,7 +2001,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 
 UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine)
 {
-	auto pickup = cpp14::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
+	auto pickup = std::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
 	auto pickupPtr = pickup.get();
 	if (!pickupPtr->Initialize(std::move(pickup), *this))
 	{
@@ -2038,7 +2016,7 @@ UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_
 
 UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	auto fallingBlock = cpp14::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
+	auto fallingBlock = std::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
 	auto fallingBlockPtr = fallingBlock.get();
 	auto ID = fallingBlock->GetUniqueID();
 	if (!fallingBlockPtr->Initialize(std::move(fallingBlock), *this))
@@ -2060,7 +2038,7 @@ UInt32 cWorld::SpawnExperienceOrb(Vector3d a_Pos, int a_Reward)
 		return cEntity::INVALID_ID;
 	}
 
-	auto expOrb = cpp14::make_unique<cExpOrb>(a_Pos, a_Reward);
+	auto expOrb = std::make_unique<cExpOrb>(a_Pos, a_Reward);
 	auto expOrbPtr = expOrb.get();
 	if (!expOrbPtr->Initialize(std::move(expOrb), *this))
 	{
@@ -2095,7 +2073,7 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Rewar
 	auto & Random = GetRandomProvider();
 	for (auto Reward : Rewards)
 	{
-		auto ExpOrb = cpp14::make_unique<cExpOrb>(a_Pos, Reward);
+		auto ExpOrb = std::make_unique<cExpOrb>(a_Pos, Reward);
 		auto ExpOrbPtr = ExpOrb.get();
 		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
 		double SpeedY = Random.RandReal(0.5);
@@ -2121,11 +2099,11 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>  (a_Pos); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_Pos); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>    (a_Pos); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper> (a_Pos); break;
+		case E_ITEM_MINECART:             Minecart = std::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = std::make_unique<cMinecartWithChest>  (a_Pos); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = std::make_unique<cMinecartWithFurnace>(a_Pos); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = std::make_unique<cMinecartWithTNT>    (a_Pos); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = std::make_unique<cMinecartWithHopper> (a_Pos); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
@@ -2146,7 +2124,7 @@ UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a
 
 UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
-	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);
+	auto Boat = std::make_unique<cBoat>(a_Pos, a_Material);
 	auto BoatPtr = Boat.get();
 	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
@@ -2161,7 +2139,7 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff, bool a_ShouldPlayFuseSound)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
+	auto TNT = std::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
@@ -2186,18 +2164,12 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 
 
-void cWorld::SetBlocks(const sSetBlockVector & a_Blocks)
+void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlocks(a_Blocks);
-}
+	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
-
-
-
-
-void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
-{
-	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2213,19 +2185,20 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock(Vector3i a_BlockPos)
+bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetBlockTypeMeta(a_BlockPos, blockType, blockMeta);
-	cChunkInterface chunkInterface(GetChunkMap());
-	auto blockHandler = cBlockInfo::GetHandler(blockType);
-	blockHandler->OnBreaking(chunkInterface, *this, a_BlockPos);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+
 	if (!m_ChunkMap->DigBlock(a_BlockPos))
 	{
 		return false;
 	}
-	blockHandler->OnBroken(chunkInterface, *this, a_BlockPos, blockType, blockMeta);
+
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta, a_Digger);
+
 	return true;
 }
 
@@ -2236,7 +2209,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos)
 bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
 {
 	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
-	if (!DigBlock(a_BlockPos))
+	if (!DigBlock(a_BlockPos, a_Digger))
 	{
 		return false;
 	}
@@ -2373,7 +2346,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 				ChunkSender.QueueSendChunkTo(
 					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
-					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
+					cChunkSender::Priority::Medium,
 					a_Chunk.GetAllClients()
 				);
 			}
@@ -2845,7 +2818,7 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
@@ -2854,7 +2827,7 @@ void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriorit
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
@@ -2867,15 +2840,6 @@ void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPr
 void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 {
 	m_ChunkSender.RemoveClient(a_Client);
-}
-
-
-
-
-
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
-{
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2983,7 +2947,6 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
-
 	m_Generator.QueueGenerateChunk({a_ChunkX, a_ChunkZ}, true);
 }
 
@@ -3061,7 +3024,7 @@ void cWorld::QueueSaveAllChunks(void)
 void cWorld::QueueTask(std::function<void(cWorld &)> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.emplace_back(0, a_Task);
+	m_Tasks.emplace_back(0, std::move(a_Task));
 }
 
 
@@ -3075,7 +3038,7 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 	// Insert the task into the list of scheduled tasks
 	{
 		cCSLock Lock(m_CSTasks);
-		m_Tasks.emplace_back(TargetTick, a_Task);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
 	}
 }
 
@@ -3525,7 +3488,7 @@ void cWorld::AddQueuedPlayers(void)
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			auto PlayerPtr = Player.get();
-			m_ChunkMap->AddEntityIfNotPresent(std::move(Player));
+			m_ChunkMap->AddPlayer(std::move(Player));
 			PlayerPtr->OnAddToWorld(*this);
 			ASSERT(!PlayerPtr->IsTicking());
 			PlayerPtr->SetIsTicking(true);
@@ -3598,7 +3561,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
+	auto SetChunkData = std::make_unique<cSetChunkData>(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed

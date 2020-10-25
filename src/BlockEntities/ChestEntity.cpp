@@ -105,6 +105,15 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
+	if (m_BlockType == E_BLOCK_CHEST)
+	{
+		a_Player->GetStatManager().AddValue(Statistic::OpenChest);
+	}
+	else  // E_BLOCK_TRAPPED_CHEST
+	{
+		a_Player->GetStatManager().AddValue(Statistic::TriggerTrappedChest);
+	}
+
 	// If the window is not created, open it anew:
 	cWindow * Window = PrimaryChest->GetWindow();
 	if (Window == nullptr)
@@ -216,3 +225,34 @@ bool cChestEntity::IsBlocked()
 
 
 
+
+void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+{
+	ASSERT(a_Grid == &m_Contents);
+
+	if (m_World == nullptr)
+	{
+		return;
+	}
+
+	// Have cBlockEntityWithItems update redstone and try to broadcast our window:
+	Super::OnSlotChanged(a_Grid, a_SlotNum);
+
+	cWindow * Window = GetWindow();
+	if ((Window == nullptr) && (m_Neighbour != nullptr))
+	{
+		// Window was null, Super will have failed.
+		// Neighbour might own the window:
+		Window = m_Neighbour->GetWindow();
+	}
+
+	if (Window != nullptr)
+	{
+		Window->BroadcastWholeWindow();
+	}
+
+	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+
+	// Notify comparators:
+	m_World->WakeUpSimulators(m_Pos);
+}

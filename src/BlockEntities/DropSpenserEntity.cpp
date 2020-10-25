@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
+#include "../Bindings/PluginManager.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
@@ -51,7 +52,6 @@ void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_D
 		case E_META_DROPSPENSER_FACING_XP: a_RelCoord.x++; return;
 	}
 	LOGWARNING("%s: Unhandled direction: %d", __FUNCTION__, a_Direction);
-	return;
 }
 
 
@@ -79,10 +79,17 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		return;
 	}
 
-	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const int RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const int SpenseSlot = OccupiedSlots[RandomSlot];
+
+	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
+	{
+		// Plugin disagrees with the move
+		return;
+	}
 
 	// DropSpense the item, using the specialized behavior in the subclasses:
-	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
+	DropSpenseFromSlot(a_Chunk, SpenseSlot);
 
 	// Broadcast a smoke and click effects:
 	NIBBLETYPE Meta = a_Chunk.GetMeta(GetRelPos());
@@ -154,6 +161,15 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 
 bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
+	if (m_BlockType == E_BLOCK_DISPENSER)
+	{
+		a_Player->GetStatManager().AddValue(Statistic::InspectDispenser);
+	}
+	else  // E_BLOCK_DROPPER
+	{
+		a_Player->GetStatManager().AddValue(Statistic::InspectDropper);
+	}
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{

@@ -1,22 +1,18 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 
 
 
 
-
-class cRedstoneTorchHandler : public cRedstoneHandler
+namespace RedstoneTorchHandler
 {
-public:
-
-	inline static bool IsOn(BLOCKTYPE a_Block)
+	inline bool IsOn(BLOCKTYPE a_Block)
 	{
 		return (a_Block == E_BLOCK_REDSTONE_TORCH_ON);
 	}
 
-	inline static Vector3i GetOffsetAttachedTo(Vector3i a_Position, NIBBLETYPE a_Meta)
+	inline Vector3i GetOffsetAttachedTo(const NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -33,63 +29,67 @@ public:
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
+		const auto QueryOffset = a_QueryPosition - a_Position;
+
 		if (
-			IsOn(a_BlockType) &&
-			(a_QueryPosition != (a_Position + GetOffsetAttachedTo(a_Position, a_Meta))) &&
-			(cIncrementalRedstoneSimulator::IsMechanism(a_QueryBlockType) || (cBlockInfo::FullyOccupiesVoxel(a_QueryBlockType) && (a_QueryPosition == (a_Position + OffsetYP()))))
+			!IsOn(a_BlockType) ||
+			(QueryOffset == GetOffsetAttachedTo(a_Chunk.GetMeta(a_Position))) ||
+			(IsLinked && (QueryOffset != OffsetYP))
 		)
 		{
-			return 15;
+			return 0;
 		}
-		return 0;
+
+		return 15;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		return IsOn(a_BlockType) ? 15 : 0;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
+		auto & Data = DataForChunk(a_Chunk);
+		auto DelayInfo = Data.GetMechanismDelayInfo(a_Position);
 
 		if (DelayInfo == nullptr)
 		{
-			bool ShouldBeOn = (a_PoweringData.PowerLevel == 0);
+			const bool ShouldBeOn = (Power == 0);
 			if (ShouldBeOn != IsOn(a_BlockType))
 			{
-				Data->m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);
+				Data.m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);
 			}
+
+			return;
 		}
-		else
+
+		int DelayTicks;
+		bool ShouldPowerOn;
+		std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
+
+		if (DelayTicks != 0)
 		{
-			int DelayTicks;
-			bool ShouldPowerOn;
-			std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				a_World.SetBlock(a_Position.x, a_Position.y, a_Position.z, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
-				Data->m_MechanismDelays.erase(a_Position);
-
-				cVector3iArray RelativePositions = GetRelativeAdjacents();
-				RelativePositions.erase(std::remove(RelativePositions.begin(), RelativePositions.end(), GetOffsetAttachedTo(a_Position, a_Meta)), RelativePositions.end());
-				return GetAdjustedRelatives(a_Position, RelativePositions);
-			}
+			return;
 		}
 
-		return {};
+		a_Chunk.FastSetBlock(a_Position, ShouldPowerOn ? E_BLOCK_REDSTONE_TORCH_ON : E_BLOCK_REDSTONE_TORCH_OFF, a_Meta);
+		Data.m_MechanismDelays.erase(a_Position);
+
+		for (const auto & Adjacent : RelativeAdjacents)
+		{
+			// Update all adjacents (including linked power positions)
+			// apart from our attachment, which can't possibly need an update:
+			if (Adjacent != GetOffsetAttachedTo(a_Meta))
+			{
+				UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, Adjacent);
+			}
+		}
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
-		return { (a_Position + GetOffsetAttachedTo(a_Position, a_Meta)) };
+		Callback(a_Position + GetOffsetAttachedTo(a_Meta));
 	}
 };

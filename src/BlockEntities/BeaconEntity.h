@@ -16,17 +16,14 @@
 
 
 // tolua_begin
-class cBeaconEntity:
+class cBeaconEntity :
 	public cBlockEntityWithItems
 {
 	// tolua_end
 
 	using Super = cBlockEntityWithItems;
 
-
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cBeaconEntity)
 
 	cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -77,12 +74,9 @@ public:  // tolua_export
 	// tolua_end
 
 protected:
+
 	bool m_IsActive;
 	char m_BeaconLevel;
 
 	cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
 } ;  // tolua_export
-
-
-
-

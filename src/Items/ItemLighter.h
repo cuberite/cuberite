@@ -65,7 +65,7 @@ public:
 			case E_BLOCK_TNT:
 			{
 				// Activate the TNT:
-				a_World->SetBlock(a_ClickedBlockPos, E_BLOCK_AIR, 0);
+				a_World->DigBlock(a_ClickedBlockPos, a_Player);
 				a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 				break;
 			}
@@ -79,7 +79,7 @@ public:
 				}
 				if (a_World->GetBlock(FirePos) == E_BLOCK_AIR)
 				{
-					a_World->SetBlock(FirePos, E_BLOCK_FIRE, 0);
+					a_World->PlaceBlock(FirePos, E_BLOCK_FIRE, 0);
 					a_World->BroadcastSoundEffect("item.flintandsteel.use", FirePos, 1.0f, 1.04f);
 					break;
 				}

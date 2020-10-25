@@ -541,28 +541,56 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			DigBlock =
 			{
-				Params =
 				{
+					Params =
 					{
-						Name = "X",
-						Type = "number",
+						{
+							Name = "X",
+							Type = "number",
+						},
+						{
+							Name = "Y",
+							Type = "number",
+						},
+						{
+							Name = "Z",
+							Type = "number",
+						},
+						{
+							Name = "Digger",
+							Type = "cEntity",
+							IsOptional = true,
+						},
 					},
+					Returns =
 					{
-						Name = "Y",
-						Type = "number",
+						{
+							Type = "boolean",
+						},
 					},
-					{
-						Name = "Z",
-						Type = "number",
-					},
+					Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. The optional Digger parameter specifies the entity who dug the block, usually a player. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 				},
-				Returns =
 				{
+					Params =
 					{
-						Type = "boolean",
+						{
+							Name = "BlockPos",
+							Type = "Vector3i",
+						},
+						{
+							Name = "Digger",
+							Type = "cEntity",
+							IsOptional = true,
+						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. The optional Digger parameter specifies the entity who dug the block, usually a player. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 				},
-				Notes = "Replaces the specified block with air, without dropping the usual pickups for the block. Wakes up the simulators for the block and its neighbors. Returns true on success, or false if the chunk is not loaded or invalid coords. See also DropBlockAsPickups() for the version that drops pickups.",
 			},
 			DoExplosionAt =
 			{
@@ -2178,7 +2206,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						{
 							Name = "BlockPos",
-							Type = "number",
+							Type = "Vector3i",
 						},
 					},
 					Returns =
@@ -2224,61 +2252,51 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. If there is a sapling there, grows the tree based on that sapling, otherwise chooses a tree image based on the biome. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			GrowTreeByBiome =
 			{
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords.",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			GrowTreeFromSapling =
 			{
 				Params =
 				{
 					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "SaplingMeta",
-						Type = "number",
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
 				},
-				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present).",
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta. If the sapling is part of a 2x2 sapling area, grows a large tree. Returns true if the tree was grown, false if not (invalid chunk, insufficient space)",
 			},
 			IsBlockDirectlyWatered =
 			{
@@ -2829,18 +2847,8 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Name = "BlockMeta",
 							Type = "number",
 						},
-						{
-							Name = "ShouldMarkChunkDirty",
-							Type = "boolean",
-							IsOptional = true,
-						},
-						{
-							Name = "ShouldSendToClients",
-							Type = "boolean",
-							IsOptional = true,
-						},
 					},
-					Notes = "Sets the meta for the block at the specified coords. If ShouldMarkChunkDirty is true (default), the chunk is marked dirty and will be saved later on. If ShouldSendToClients is true (default), the change is broadcast to all clients who have the chunk loaded, if false, the change is kept server-side only.",
+					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
 				},
 				{
 					Params =
@@ -2854,7 +2862,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Sets the meta for the block at the specified coords.",
+					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
 				},
 			},
 			SetChunkAlwaysTicked =
