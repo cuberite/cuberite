@@ -24,26 +24,25 @@ private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		/**
+		/*
 			Use correct percent:
 			https://minecraft.gamepedia.com/Melon_Seeds#Breaking
 			https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
-			Good new: Melon & Pumpkin have same random values !
 		*/
 
 		// Age > 7 (Impossible)
-		if ((a_BlockMeta > 7) || (a_BlockMeta < 0))
+		if (a_BlockMeta > 7)
 		{
 			return cItem(StemPickupType, 1, 0);
 		}
 
 		auto & Rand = GetRandomProvider();
-		float RandomValue = Rand.RandReal<float>(100);
-		float Max = 0;
-		int Count = 0;
+		double RandomValue = Rand.RandReal<double>(100);
+		double Max = 0;
+		char Count = 0;
 		for (; Count < 4; Count++)
 		{
-			Max += m_AgeSeedDropProbability[a_BlockMeta][Count];
+			Max += m_AgeSeedDropProbability[static_cast<size_t>(a_BlockMeta)][static_cast<size_t>(Count)];
 			if (Max > RandomValue)
 			{
 				break;
@@ -138,7 +137,7 @@ private:
 
 		// Pick a direction in which to place the produce:
 		int x = 0, z = 0;
-		int CheckType = Random.RandInt(3);  // The index to the neighbors array which should be checked for emptiness
+		const auto CheckType = Random.RandInt<size_t>(3);  // The index to the neighbors array which should be checked for emptiness
 		switch (CheckType)
 		{
 			case 0: x =  1; break;
