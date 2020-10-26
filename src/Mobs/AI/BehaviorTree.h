@@ -22,11 +22,6 @@ enum class eStatus : Int8
 
 const char * to_string(eStatus a_Status);
 
-inline void format_arg(fmt::BasicFormatter<char> & a_Formatter,  const char *& a_FormatStr, eStatus a_Status)
-{
-	a_Formatter.writer().write(to_string(a_Status));
-}
-
 
 
 
@@ -225,7 +220,7 @@ class cRandomPosition :
 {
 public:
 	cRandomPosition(cBlackboardKey a_WriteKey, double a_MaxRange) :
-		m_Key(a_WriteKey),
+		m_Key(std::move(a_WriteKey)),
 		m_MaxRange(a_MaxRange)
 	{
 	}
@@ -247,7 +242,7 @@ class cMoveToPosition:
 {
 public:
 	cMoveToPosition(cBlackboardKey a_PositionKey) :
-		m_Key(a_PositionKey)
+		m_Key(std::move(a_PositionKey))
 	{
 	}
 
